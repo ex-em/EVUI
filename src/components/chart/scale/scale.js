@@ -180,21 +180,23 @@ class Scale {
       }
     }
 
-    while (numberOfSteps > maxSteps) {
-      interval *= 2;
-      numberOfSteps = Math.round(graphRange / interval);
-      interval = Math.ceil(graphRange / numberOfSteps);
-    }
-
-    if (graphMax - graphMin > (numberOfSteps * interval)) {
-      interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
-    }
-
     if (this.decimalPoint === 'auto') {
       this.decimalPoint = this?.getDecimalPointFromRange?.({
         graphRange,
         numberOfSteps,
       });
+    }
+
+    while (numberOfSteps > maxSteps) {
+      interval *= 2;
+      numberOfSteps = Math.round(graphRange / interval);
+      const tempInterval = graphRange / numberOfSteps;
+      interval = this.decimalPoint ? tempInterval : Math.ceil(tempInterval);
+    }
+
+    if (graphMax - graphMin > (numberOfSteps * interval)) {
+      const tempInterval = (graphMax - graphMin) / numberOfSteps;
+      interval = this.decimalPoint ? tempInterval : Math.ceil(tempInterval);
     }
 
     return {

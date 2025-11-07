@@ -1,3 +1,4 @@
+import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
@@ -11,7 +12,15 @@ class LinearScale extends Scale {
    */
   getLabelFormat(value, data = {}) {
     if (this.formatter) {
-      const formattedLabel = this.formatter(value, data);
+      const formattedLabel = this.formatter(Number(value.toFixed(this.decimalPoint)), {
+        ...data,
+        prevOriginalValue: data?.prev,
+        prevDecimalPointValue: truthyNumber(data?.prev)
+        ? Number(data?.prev.toFixed(this.decimalPoint))
+        : null,
+        currentOriginalValue: value,
+        currentDecimalPointValue: Number(value.toFixed(this.decimalPoint)),
+      });
 
       if (typeof formattedLabel === 'string') {
         return formattedLabel;

@@ -5,6 +5,7 @@ import {
   trillion,
   truthy,
 } from '@/common/utils';
+import { isNil } from 'lodash-es';
 
 export default {
   /**
@@ -148,7 +149,7 @@ export default {
    *
    * @returns {string} signed value
    */
-  labelSignFormat(value, decimalPoint = 0) {
+  labelSignFormat(value, decimalPoint = null) {
     const quad = quadrillion(1);
     const trill = trillion(1);
     const billi = billions(1);
@@ -162,7 +163,7 @@ export default {
 
     const assignLabelWith = (v, target, lb) => {
       if (v % target === 0) {
-        return `${(v / target).toFixed(decimalPoint)}${lb}`;
+        return isNil(decimalPoint) ? `${v / target}${lb}` : `${(v / target).toFixed(decimalPoint)}${lb}`;
       }
       return `${(v / target).toFixed(1)}${lb}`;
     };
@@ -178,7 +179,7 @@ export default {
     } else if (value >= killo) {
       label = assignLabelWith(value, 1000, 'K');
     } else {
-      label = value.toFixed(decimalPoint);
+      label = isNil(decimalPoint) ? value : value.toFixed(decimalPoint);
     }
 
     return label;
