@@ -225,6 +225,7 @@ const chartData = {
 | maxWidth   | Number                      | undefined | fitWidth이 true일 때, maxWidth까지 영역을 확장하고 그 이후로 Ellipsis 처리 |                                        |
 | fitDir     | String                      | 'right'   | Ellipsis 방향                                                              | ( right => 'aaa...', left => '...aaa') |
 | padding    | Number                      | 0         | (X축, linear, time타입에만 해당) label의 좌우 여백                         | 0                                      |
+| fixWidth   | Number                      | 0         | 라벨 넓이를 강제로 고정합니다. (해당 사이즈보다 커질시 Ellipsis처리)               |                                             |
 
 ##### title
 
