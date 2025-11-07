@@ -82,6 +82,10 @@
           autoScaleRatio: 0.1,
           showAxisTick: true,
           axisLineColor: '#25262E',
+          labelStyle: {
+            fixWidth: 20,
+            fitWidth: true,
+          },
         }],
       });
 
