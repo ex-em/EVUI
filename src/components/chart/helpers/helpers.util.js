@@ -5,6 +5,7 @@ import {
   trillion,
   truthy,
 } from '@/common/utils';
+import { isNil } from 'lodash-es';
 
 export default {
   /**
@@ -148,7 +149,7 @@ export default {
    *
    * @returns {string} signed value
    */
-  labelSignFormat(value, decimalPoint = 0) {
+  labelSignFormat(value, decimalPoint = null) {
     const quad = quadrillion(1);
     const trill = trillion(1);
     const billi = billions(1);
@@ -164,11 +165,14 @@ export default {
     const absValue = Math.abs(value);
 
     const assignLabelWith = (v, target, lb) => {
-      const result = v % target === 0
-        ? `${(v / target).toFixed(decimalPoint)}${lb}`
-        : `${(v / target).toFixed(1)}${lb}`;
+      let base;
+      if (v % target === 0) {
+        base = isNil(decimalPoint) ? `${v / target}${lb}` : `${(v / target).toFixed(decimalPoint)}${lb}`;
+      } else {
+        base = `${(v / target).toFixed(1)}${lb}`;
+      }
 
-      return isNegative ? `-${result}` : result;
+      return isNegative ? `-${base}` : base;
     };
 
     if (absValue >= quad) {
@@ -182,7 +186,12 @@ export default {
     } else if (absValue >= killo) {
       label = assignLabelWith(absValue, 1000, 'K');
     } else {
-      label = isNegative ? `-${absValue.toFixed(decimalPoint)}` : value.toFixed(decimalPoint);
+      // 1000 미만 처리
+       const base = isNil(decimalPoint)
+       ? absValue
+       : absValue.toFixed(decimalPoint);
+
+       label = isNegative ? `-${base}` : `${base}`;
     }
 
     return label;
