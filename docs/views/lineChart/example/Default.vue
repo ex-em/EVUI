@@ -21,11 +21,11 @@
     setup() {
       const chartData = reactive({
         series: {
-          series1: { name: 'series#1', point: false },
-          series2: { name: 'series#2', point: false },
-          series3: { name: 'series#3', point: false },
-          series4: { name: 'series#4', point: false },
-          series5: { name: 'series#5', point: false },
+          series1: { name: '정수', point: false, show: false },
+          series2: { name: '소수점 2자리', point: false },
+          series3: { name: '소수점 3자리', point: false },
+          series4: { name: '소수점 4자리', point: false },
+          series5: { name: '소수점 5자리', point: false },
         },
         labels: [],
         data: {
@@ -82,6 +82,11 @@
           autoScaleRatio: 0.1,
           showAxisTick: true,
           axisLineColor: '#25262E',
+          formatter: (value, data) => {
+            console.log('data', data);
+
+            return `${value}%`;
+          },
         }],
       });
 
@@ -97,12 +102,22 @@
         timeValue = dayjs(timeValue).add(1, 'hour');
         chartData.labels.push(dayjs(timeValue));
 
-        Object.values(chartData.data).forEach((seriesData) => {
+        Object.values(chartData.data).forEach((seriesData, sIndex) => {
           if (isLive.value) {
             seriesData.shift();
           }
 
-          seriesData.push(Math.floor(Math.random() * ((999999 - 5) + 1)) + 5);
+          if (sIndex === 0) {
+            seriesData.push(Math.random() * 10000);
+          } else if (sIndex === 1) {
+            seriesData.push(Math.random() * 0.1);
+          } else if (sIndex === 2) {
+            seriesData.push(Math.random() * 0.01);
+          } else if (sIndex === 3) {
+            seriesData.push(Math.random() * 0.001);
+          } else {
+            seriesData.push(Math.random() * 0.0001);
+          }
         });
       };
 
