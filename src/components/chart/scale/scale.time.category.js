@@ -26,16 +26,6 @@ class TimeCategoryScale extends Scale {
       }
     }
 
-    const { fixWidth, fitDir } = this.labelStyle;
-    if (fixWidth > 0) {
-      return Util.truncateLabelWithEllipsis(
-        dayjs(value).format(this.timeFormat),
-        fixWidth,
-        this.ctx,
-        fitDir,
-      );
-    }
-
     return dayjs(value).format(this.timeFormat);
   }
 

@@ -355,16 +355,16 @@ class Scale {
           ticks[ix] = axisMinForLabel + (ix * stepValue);
 
           linePosition = labelCenter + aliasPixel;
-          labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]), {
+          labelText = this.checkFixWidth(this.getLabelFormat(Math.min(axisMax, ticks[ix]), {
             prev: ticks[ix - 1] ?? '',
-          });
+          }));
 
           const isBlurredLabel = this.options?.selectLabel?.use
             && this.options?.selectLabel?.useLabelOpacity
             && (this.options.horizontal === (this.type === 'y'))
             && selectLabelInfo?.dataIndex?.length
             && !selectLabelInfo?.label
-              .map(t => this.getLabelFormat(Math.min(axisMax, t), {
+              .map(t => this.checkFixWidth(this.getLabelFormat(Math.min(axisMax, t)), {
                 prev: ticks[ix - 1] ?? '',
               })).includes(labelText);
 
@@ -389,9 +389,9 @@ class Scale {
               && options?.selectItem?.showLabelTip
               && hitInfo?.label
               && !this.options?.horizontal) {
-              const selectedLabel = this.getLabelFormat(
+              const selectedLabel = this.checkFixWidth(this.getLabelFormat(
                 Math.min(axisMax, hitInfo.label + (0 * stepValue)),
-              );
+              ));
               if (selectedLabel === labelText) {
                 const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
                 Util.showLabelTip({
@@ -949,6 +949,20 @@ class Scale {
     ctx.fillText(label, textX, textY);
     ctx.closePath();
   }
+
+  /**
+   * Check if the label width is greater than the fix width
+   * @param {string} value label value
+   * @returns
+   */
+  checkFixWidth(value) {
+    const { fixWidth, fitDir } = this.labelStyle;
+    if (fixWidth > 0) {
+      return Util.truncateLabelWithEllipsis(value, fixWidth, this.ctx, fitDir);
+    }
+    return value;
+   }
 }
+
 
 export default Scale;
