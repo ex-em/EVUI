@@ -10,14 +10,16 @@ class LinearScale extends Scale {
    *
    * @returns {string} formatted label
    */
+  getTruthyValue(value) {
+    return truthyNumber(value) ? Number(value.toFixed(this.decimalPoint)) : value;
+  }
+
   getLabelFormat(value, data = {}) {
     if (this.formatter) {
-      const formattedLabel = this.formatter(Number(value.toFixed(this.decimalPoint)), {
+      const formattedLabel = this.formatter(this.getTruthyValue(value), {
         ...data,
         prevOriginalValue: data?.prev,
-        prevDecimalPointValue: truthyNumber(data?.prev)
-        ? Number(data?.prev.toFixed(this.decimalPoint))
-        : null,
+        prevDecimalPointValue: this.getTruthyValue(data?.prev),
         currentOriginalValue: value,
         currentDecimalPointValue: Number(value.toFixed(this.decimalPoint)),
       });
