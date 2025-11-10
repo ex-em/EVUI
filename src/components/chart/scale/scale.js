@@ -355,16 +355,16 @@ class Scale {
           ticks[ix] = axisMinForLabel + (ix * stepValue);
 
           linePosition = labelCenter + aliasPixel;
-          labelText = this.checkFixWidth(this.getLabelFormat(Math.min(axisMax, ticks[ix]), {
+          labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]), {
             prev: ticks[ix - 1] ?? '',
-          }));
+          });
 
           const isBlurredLabel = this.options?.selectLabel?.use
             && this.options?.selectLabel?.useLabelOpacity
             && (this.options.horizontal === (this.type === 'y'))
             && selectLabelInfo?.dataIndex?.length
             && !selectLabelInfo?.label
-              .map(t => this.checkFixWidth(this.getLabelFormat(Math.min(axisMax, t)), {
+              .map(t => this.getLabelFormat(Math.min(axisMax, t), {
                 prev: ticks[ix - 1] ?? '',
               })).includes(labelText);
 
@@ -382,16 +382,16 @@ class Scale {
           if (this.type === 'x') {
             labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
             if (options?.brush?.showLabel || !options?.brush) {
-              ctx.fillText(labelText, labelCenter, labelPoint);
+              ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);
             }
 
             if (!isBlurredLabel
               && options?.selectItem?.showLabelTip
               && hitInfo?.label
               && !this.options?.horizontal) {
-              const selectedLabel = this.checkFixWidth(this.getLabelFormat(
+              const selectedLabel = this.getLabelFormat(
                 Math.min(axisMax, hitInfo.label + (0 * stepValue)),
-              ));
+              );
               if (selectedLabel === labelText) {
                 const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
                 Util.showLabelTip({
@@ -429,7 +429,7 @@ class Scale {
           } else {
             labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
             if (options?.brush?.showLabel || !options?.brush) {
-              ctx.fillText(labelText, labelPoint, labelCenter);
+              ctx.fillText(this.checkFixWidth(labelText), labelPoint, labelCenter);
             }
 
             if (ix === steps) {

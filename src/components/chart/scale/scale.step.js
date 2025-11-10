@@ -223,7 +223,7 @@ class StepScale extends Scale {
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
           const xPoint = alignToGridLine ? labelCenter : labelCenter + (labelGap / 2);
-          ctx.fillText(labelText, xPoint, labelPoint);
+          ctx.fillText(this.checkFixWidth(labelText), xPoint, labelPoint);
 
           if (!isBlurredLabel
             && selectItemOpt?.showLabelTip
@@ -267,7 +267,7 @@ class StepScale extends Scale {
         } else {
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
           const yPoint = alignToGridLine ? labelCenter : labelCenter + (labelGap / 2);
-          ctx.fillText(labelText, labelPoint, yPoint);
+          ctx.fillText(this.checkFixWidth(labelText), labelPoint, yPoint);
           drawnLabels.push(labelText);
 
           if (this.showAxisTick) {
@@ -307,13 +307,13 @@ class StepScale extends Scale {
 
         const lastLabelText = this.getLabelFormat(`${lastLabelValue}`, maxWidth);
         if (this.type === 'x') {
-          ctx.fillText(lastLabelText, labelCenter, labelPoint);
+          ctx.fillText(this.checkFixWidth(lastLabelText), labelCenter, labelPoint);
           if (this.showGrid) {
             ctx.moveTo(linePosition, offsetPoint);
             ctx.lineTo(linePosition, offsetCounterPoint);
           }
         } else {
-          ctx.fillText(lastLabelText, labelPoint, labelCenter);
+          ctx.fillText(this.checkFixWidth(lastLabelText), labelPoint, labelCenter);
           if (this.showGrid) {
             ctx.moveTo(offsetPoint, linePosition);
             ctx.lineTo(offsetCounterPoint, linePosition);
