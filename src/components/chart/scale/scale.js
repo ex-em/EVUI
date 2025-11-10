@@ -1,5 +1,6 @@
 import Canvas from '@/components/chart/helpers/helpers.canvas';
 import { defaultsDeep } from 'lodash-es';
+import { truthyNumber } from '@/common/utils';
 import {
   AXIS_OPTION,
   AXIS_UNITS,
@@ -957,7 +958,8 @@ class Scale {
    */
   checkFixWidth(value) {
     const { fixWidth, fitDir } = this.labelStyle;
-    if (fixWidth > 0) {
+
+    if (truthyNumber(fixWidth) && fixWidth > 0) {
       return Util.truncateLabelWithEllipsis(value, fixWidth, this.ctx, fitDir);
     }
     return value;
