@@ -1,4 +1,4 @@
-import { mobileCheck } from '@/common/utils';
+import { mobileCheck, truthyNumber } from '@/common/utils';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
@@ -196,21 +196,29 @@ class EvChart {
     const notFormattedXLabels = getNotFormattedLabels(this.axesSteps?.x[0]);
     const notFormattedYLabels = getNotFormattedLabels(this.axesSteps?.y[0]);
 
+    const yFixWidth = truthyNumber(this.axesY[0]?.labelStyle?.fixWidth)
+      ? this.axesY[0]?.labelStyle?.fixWidth
+      : 0;
+    const xFixWidth = truthyNumber(this.axesX[0]?.labelStyle?.fixWidth)
+      ? this.axesX[0]?.labelStyle?.fixWidth
+      : 0;
+
     const xMaxWidth = this.axesX[0]?.getLabelWidthHasMaxLength(notFormattedXLabels);
     const yMaxWidth = this.axesY[0]?.getLabelWidthHasMaxLength(notFormattedYLabels);
+
 
     const adjustedRange = {
       x: !isStepXAxisUseFitWidth ? this.axesRange?.x?.map(value => ({
         ...value,
         size: {
-          width: Math.max(xMaxWidth, value.size.width),
+          width: xFixWidth || Math.max(xMaxWidth, value.size.width),
           height: value.size.height,
         },
       })) : this.axesRange?.x,
       y: !isStepYAxisUseFitWidth ? this.axesRange?.y?.map(value => ({
         ...value,
         size: {
-          width: Math.max(yMaxWidth, value.size.width),
+          width: yFixWidth || Math.max(yMaxWidth, value.size.width),
           height: value.size.height,
         },
       })) : this.axesRange?.y,

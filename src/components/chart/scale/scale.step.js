@@ -406,6 +406,17 @@ class StepScale extends Scale {
       }
     }
 
+    const { fixWidth, fitDir } = this.labelStyle;
+
+    if (fixWidth > 0) {
+      return Util.truncateLabelWithEllipsis(
+        Util.labelSignFormat(value, this.decimalPoint),
+        fixWidth,
+        this.ctx,
+        fitDir,
+      );
+    }
+
     return this.labelStyle.fitWidth ? this.fittingString(value, maxWidth) : value;
   }
 
