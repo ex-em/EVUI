@@ -1,7 +1,6 @@
 import dayjs from 'dayjs';
 import { TIME_INTERVALS } from '../helpers/helpers.constant';
 import Scale from './scale';
-import Util from '../helpers/helpers.util';
 
 class TimeScale extends Scale {
   /**
@@ -18,15 +17,6 @@ class TimeScale extends Scale {
       if (typeof formattedLabel === 'string') {
         return formattedLabel;
       }
-    }
-    const { fixWidth, fitDir } = this.labelStyle;
-    if (fixWidth > 0) {
-      return Util.truncateLabelWithEllipsis(
-        dayjs(value).format(this.timeFormat),
-        fixWidth,
-        this.ctx,
-        fitDir,
-      );
     }
 
     return dayjs(value).format(this.timeFormat);
