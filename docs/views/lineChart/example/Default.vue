@@ -83,6 +83,7 @@
           autoScaleRatio: 0.1,
           showAxisTick: true,
           axisLineColor: '#25262E',
+          formatter: value => `${value}%`,
         }],
       });
 
@@ -103,7 +104,9 @@
             seriesData.shift();
           }
 
-          if (sIndex === 0) {
+          if (Math.random() < 0.1) {
+            seriesData.push(null);
+          } else if (sIndex === 0) {
             seriesData.push(Math.random() * 10000);
           } else if (sIndex === 1) {
             seriesData.push(Math.random() * 0.1);
