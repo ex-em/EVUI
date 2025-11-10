@@ -241,7 +241,7 @@ class TimeCategoryScale extends Scale {
 
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelCenter, labelPoint);
+        ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);
         if (!isBlurredLabel
             && this.options?.selectItem?.showLabelTip
             && hitInfo?.label
@@ -289,7 +289,7 @@ class TimeCategoryScale extends Scale {
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-        ctx.fillText(labelText, labelPoint, labelCenter);
+        ctx.fillText(this.checkFixWidth(labelText), labelPoint, labelCenter);
 
         if (this.showAxisTick) {
           ctx.beginPath();
@@ -326,13 +326,13 @@ class TimeCategoryScale extends Scale {
       linePosition = labelCenter + aliasPixel;
 
       if (this.type === 'x') {
-        ctx.fillText(labelLastText, labelCenter, labelPoint);
+        ctx.fillText(this.checkFixWidth(labelLastText), labelCenter, labelPoint);
         if (this.showGrid) {
           ctx.moveTo(linePosition, offsetPoint);
           ctx.lineTo(linePosition, offsetCounterPoint);
         }
       } else {
-        ctx.fillText(labelLastText, labelPoint, labelCenter);
+        ctx.fillText(this.checkFixWidth(labelLastText), labelPoint, labelCenter);
         if (this.showGrid) {
           ctx.moveTo(offsetPoint, linePosition);
           ctx.lineTo(offsetCounterPoint, linePosition);

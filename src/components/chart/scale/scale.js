@@ -1,5 +1,6 @@
 import Canvas from '@/components/chart/helpers/helpers.canvas';
 import { defaultsDeep } from 'lodash-es';
+import { truthyNumber } from '@/common/utils';
 import {
   AXIS_OPTION,
   AXIS_UNITS,
@@ -382,7 +383,7 @@ class Scale {
           if (this.type === 'x') {
             labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
             if (options?.brush?.showLabel || !options?.brush) {
-              ctx.fillText(labelText, labelCenter, labelPoint);
+              ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);
             }
 
             if (!isBlurredLabel
@@ -429,7 +430,7 @@ class Scale {
           } else {
             labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
             if (options?.brush?.showLabel || !options?.brush) {
-              ctx.fillText(labelText, labelPoint, labelCenter);
+              ctx.fillText(this.checkFixWidth(labelText), labelPoint, labelCenter);
             }
 
             if (ix === steps) {
@@ -949,6 +950,21 @@ class Scale {
     ctx.fillText(label, textX, textY);
     ctx.closePath();
   }
+
+  /**
+   * Check if the label width is greater than the fix width
+   * @param {string} value label value
+   * @returns
+   */
+  checkFixWidth(value) {
+    const { fixWidth, fitDir } = this.labelStyle;
+
+    if (truthyNumber(fixWidth) && fixWidth > 0) {
+      return Util.truncateLabelWithEllipsis(value, fixWidth, this.ctx, fitDir);
+    }
+    return value;
+   }
 }
+
 
 export default Scale;
