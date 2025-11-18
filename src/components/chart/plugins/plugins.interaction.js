@@ -224,9 +224,8 @@ const modules = {
         const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
-        const seriesHitInfo = this.getSeriesInfoByPosition(offset);
-        if (seriesHitInfo.sId !== null) {
-          const allSelectedList = this.updateSelectedSeriesInfo(seriesHitInfo.sId, true);
+        if (hitItemId !== null) {
+          const allSelectedList = this.updateSelectedSeriesInfo(hitItemId, true);
 
           if (hitItem) {
             args.label = hitItem.data?.x || hitItem.data?.y;
@@ -338,19 +337,20 @@ const modules = {
       };
 
       const setSelectedSeriesInfo = () => {
-        const itemHitInfo = this.getItemByPosition(offset, false);
-        const hitInfo = this.getSeriesInfoByPosition(offset);
+        const hitInfo = this.findHitItem(offset);
+        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItem = hitInfo.items[hitItemId];
 
-        if (hitInfo.sId !== null) {
-          const allSelectedList = this.updateSelectedSeriesInfo(hitInfo.sId, false);
+        if (hitItemId !== null) {
+          const allSelectedList = this.updateSelectedSeriesInfo(hitItemId, false);
           this.defaultSelectInfo.seriesId = allSelectedList.seriesId;
 
           args.selected = {
             eventTarget: 'series',
             ...cloneDeep(this.defaultSelectInfo),
           };
-          args.label = itemHitInfo.label;
-          args.dataIndex = itemHitInfo.maxIndex;
+          args.label = hitItem.label;
+          args.dataIndex = hitItem.maxIndex;
         }
       };
 
@@ -902,6 +902,7 @@ const modules = {
     let maxv = '';
     let maxg = null;
     let maxSID = null;
+    let minDistance = Infinity;
 
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
     const targetDataIndex = this.findClosestDataIndex(offset, sIds);
@@ -970,8 +971,15 @@ const modules = {
               maxSID = sId;
             }
 
-            if (item.hit) {
-              hitId = sId;
+            // 마우스 위치와의 거리 계산하여 가장 가까운 시리즈 선택
+            if (item.hit && item.data.xp !== undefined && item.data.yp !== undefined) {
+              const distance = (item.data.xp - offset[0]) ** 2
+                + (item.data.yp - offset[1]) ** 2;
+
+              if (distance < minDistance) {
+                minDistance = distance;
+                hitId = sId;
+              }
             }
           }
         }
