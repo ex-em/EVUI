@@ -187,7 +187,7 @@ const modules = {
         const hitItem = hitInfo.items[hitItemId];
 
         if (hitItem) {
-          args.label = hitItem.data?.x || hitItem.data?.y;
+          args.label = hitItem.label;
           args.value = hitItem.data?.o;
           args.seriesId = hitItemId;
           args.dataIndex = hitItem.index;
@@ -211,7 +211,7 @@ const modules = {
         this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
 
         if (hitItem) {
-          args.label = hitItem.data?.x || hitItem.data?.y;
+          args.label = hitItem.label;
           args.seriesId = hitItemId;
           args.value = hitItem.data?.o;
           args.acc = hitItem.data?.acc;
@@ -228,7 +228,7 @@ const modules = {
           const allSelectedList = this.updateSelectedSeriesInfo(hitItemId, true);
 
           if (hitItem) {
-            args.label = hitItem.data?.x || hitItem.data?.y;
+            args.label = hitItem.label;
             args.value = hitItem.data?.o;
             args.seriesId = allSelectedList.seriesId?.at(0);
             args.acc = hitItem.data?.acc;
@@ -959,7 +959,7 @@ const modules = {
             item.id = series.id;
             item.name = formattedSeriesName;
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
-            item.label = isHorizontal ? item.data.y : item.data.x;
+            item.label = isHorizontal ? item.data?.y : item.data?.x;
             items[sId] = item;
 
             const formattedTxt = this.getFormattedTooltipValue({
