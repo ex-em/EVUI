@@ -350,7 +350,7 @@ const modules = {
             ...cloneDeep(this.defaultSelectInfo),
           };
           args.label = hitItem.label;
-          args.dataIndex = hitItem.maxIndex;
+          args.dataIndex = hitItem.index;
         }
       };
 
@@ -886,9 +886,23 @@ const modules = {
 
   /**
    * Find graph item on mouse position
-   * @param {array} offset    return value from getMousePosition()
+   * @param {number[]} offset    return value from getMousePosition()
    *
-   * @returns {object} hit item information
+   * @returns {{
+   *   items: Record<string, {
+   *     data: any,
+   *     hit: boolean,
+   *     color: string,
+   *     name: string,
+   *     id: string,
+   *     index: number,
+   *     label: string | import('dayjs').Dayjs,
+   *     axis: { x: number, y: number },
+   *   }>,
+   *   hitId: string | null,
+   *   maxTip: [string, string],
+   *   maxHighlight: [string, number] | null,
+   * }} hit item information
    */
   findHitItem(offset) {
     const sIds = Object.keys(this.seriesList);
@@ -945,6 +959,7 @@ const modules = {
             item.id = series.id;
             item.name = formattedSeriesName;
             item.axis = { x: series.xAxisIndex, y: series.yAxisIndex };
+            item.label = isHorizontal ? item.data.y : item.data.x;
             items[sId] = item;
 
             const formattedTxt = this.getFormattedTooltipValue({
