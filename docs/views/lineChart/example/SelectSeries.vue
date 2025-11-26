@@ -48,7 +48,7 @@
         <br>
         <br>
         <div class="badge yellow">
-          클릭 이벤트 데이터 (selected)
+          클릭 이벤트 데이터
         </div>
         {{ clickedSeries }}
         <br>
@@ -171,7 +171,7 @@ export default {
 
     const clickedSeries = ref();
     const onClick = (e) => {
-      clickedSeries.value = e.selected;
+      clickedSeries.value = e;
     };
 
     const dblclickedSeries = ref();
