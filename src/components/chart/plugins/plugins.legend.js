@@ -165,7 +165,11 @@ const modules = {
     this.updateStartEndRowIndex();
 
     const elementsToRemove = this.legendBoxDOM.querySelectorAll('.ev-chart-legend-container');
-    [...elementsToRemove]?.forEach?.(element => element.remove());
+    if (elementsToRemove && elementsToRemove.length) {
+      for (const element of elementsToRemove) {
+        element.remove();
+      }
+    }
 
     const totalScrollHeight = this.totalRowCount * this.legendItemHeight;
     const top = this.startRowIndex * this.legendItemHeight;
@@ -189,9 +193,12 @@ const modules = {
       useLegendSeries = Object.entries(this.seriesList)
       .filter(([, series]) => series.showLegend);
     }
-    useLegendSeries?.slice(startIndex, endIndex)?.forEach(([, series]) => {
-      this.addLegend(series);
-    });
+    if (useLegendSeries && useLegendSeries.length) {
+      for (let i = startIndex; i < endIndex; i++) {
+        const [, series] = useLegendSeries[i];
+        this.addLegend(series);
+      }
+    }
   },
 
   /**
@@ -377,9 +384,12 @@ const modules = {
       _colorDOM.style.backgroundColor = _inactiveColor;
       _colorDOM.style.borderColor = _inactiveColor;
       _nameDOM.style.color = _inactiveColor;
-      _valueDOMList?.forEach((dom) => {
-        dom.style.color = _inactiveColor;
-      });
+      if (_valueDOMList && _valueDOMList.length) {
+        for (const dom of _valueDOMList) {
+          const dom = _valueDOMList[i];
+          dom.style.color = _inactiveColor;
+        }
+      }
 
       _series.show = false;
       _targetDOM.dataset.inactive = true;
@@ -415,10 +425,14 @@ const modules = {
       }
 
       _nameDOM.style.color = _activeColor;
-      _valueDOMList?.forEach((dom) => {
-        const style = this.options.legend.table?.columns[dom.dataset.type]?.style;
-        dom.style.color = style?.color ? style.color : _activeColor;
-      });
+      // Use a regular for loop for better performance with large collections
+      if (_valueDOMList && _valueDOMList.length) {
+        for (const dom of _valueDOMList) {
+          const dom = _valueDOMList[i];
+          const style = this.options.legend.table?.columns[dom.dataset.type]?.style;
+          dom.style.color = style?.color ? style.color : _activeColor;
+        }
+      }
 
       _series.show = true;
       _targetDOM.dataset.inactive = false;
@@ -883,20 +897,23 @@ const modules = {
     const aggregations = this.getAggregations();
     const rowDOMList = this.legendBoxDOM?.getElementsByClassName('ev-chart-legend--table__row');
 
-    [...rowDOMList]?.forEach?.((row) => {
-      const valueDOMList = row?.getElementsByClassName('ev-chart-legend--table__value');
+    if (rowDOMList && rowDOMList.length) {
+      for (const row of rowDOMList) {
+        const valueDOMList = row?.getElementsByClassName('ev-chart-legend--table__value');
+        if (valueDOMList && valueDOMList.length) {
+          for (const dom of valueDOMList) {
+            const key = dom.dataset.type;
+            if (key === 'name') {
+              continue;
+            }
 
-      [...valueDOMList]?.forEach?.((dom) => {
-        const key = dom.dataset.type;
-        if (key === 'name') {
-          return;
+            const seriesId = row.series.sId;
+            const value = aggregations?.[seriesId]?.[key];
+            dom.textContent = this.getFormattedValue(columns[key], value);
+          }
         }
-
-        const seriesId = row.series.sId;
-        const value = aggregations?.[seriesId]?.[key];
-        dom.textContent = this.getFormattedValue(columns[key], value);
-      });
-    });
+      }
+    }
   },
 
   /**

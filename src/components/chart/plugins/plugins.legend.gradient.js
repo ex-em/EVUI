@@ -264,9 +264,11 @@ const modules = {
 
       const thumbDOM = targetDOM.getElementsByClassName('ev-chart-legend-thumb')[0];
       const labels = thumbDOM.children;
-      [...labels]?.forEach?.((labelDOM) => {
-        labelDOM.style.opacity = 1;
-      });
+      if (labels && labels.length) {
+        for (const labelDOM of labels) {
+          labelDOM.style.opacity = 1;
+        }
+      }
     }
   },
 
@@ -314,9 +316,11 @@ const modules = {
     const thumbDOM = targetDOM?.getElementsByClassName('ev-chart-legend-thumb')[0];
     if (thumbDOM) {
       const labels = thumbDOM.children;
-      [...labels]?.forEach?.((labelDOM) => {
-        labelDOM.style.opacity = 0.2;
-      });
+      if (labels && labels.length) {
+        for (const labelDOM of labels) {
+          labelDOM.style.opacity = 0.2;
+        }
+      }
     }
   },
 
