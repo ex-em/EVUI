@@ -12,5 +12,12 @@ export default defineConfig({
       docs: path.join(__dirname, 'docs/'),
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        api: 'modern',
+      },
+    },
+  },
   base: '/EVUI/',
 });
