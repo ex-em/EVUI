@@ -13,6 +13,8 @@
 import { computed } from 'vue';
 import { marked } from 'marked';
 import highlight from 'docs/directives/highlight';
+import { gfmHeadingId } from 'marked-gfm-heading-id';
+
 
 export default {
   name: 'Example',
@@ -28,6 +30,8 @@ export default {
     },
   },
   setup(props) {
+    marked.use(gfmHeadingId());
+
     const compiledMd = computed(() => marked(props.source));
 
     return {
