@@ -36,12 +36,12 @@ export default {
     StepAxis: {
       description: 'step axis이지만, alignToLine 옵션을 사용하여 line에 맞춰 표현할 수 있습니다.',
       component: StepAxis,
-      parsedData: parseComponent(StepAxisRaw),
+      parsedData: parse(StepAxisRaw).descriptor,
     },
     HighlightStyle: {
       description: '마우스 hover 시 나타나는 하이라이트 스타일을 변경할 수 있습니다.',
       component: HighlightStyle,
-      parsedData: parseComponent(HighlightStyleRaw),
+      parsedData: parse(HighlightStyleRaw).descriptor,
     },
     Time: {
       description: '실시간으로 데이터를 받아 표현할 수 있습니다. (label line 표시)',
@@ -86,7 +86,7 @@ export default {
     LegendClickMode: {
       description: 'Legend Click Mode',
       component: LegendClickMode,
-      parsedData: parseComponent(LegendClickModeRaw),
+      parsedData: parse(LegendClickModeRaw).descriptor,
     },
   },
 };

@@ -88,12 +88,12 @@ export default {
     'External Tooltip': {
       description: 'Tooltip의 내용을 외부에서 제어할 수 있습니다.',
       component: ExternalTooltip,
-      parsedData: parseComponent(ExternalTooltipRaw),
+      parsedData: parse(ExternalTooltipRaw).descriptor,
     },
     'External Tooltip': {
       description: 'Tooltip의 내용을 외부에서 제어할 수 있습니다.',
       component: ExternalTooltip,
-      parsedData: parseComponent(ExternalTooltipRaw),
+      parsedData: parse(ExternalTooltipRaw).descriptor,
     },
     'Plot line & Plot band': {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
@@ -113,7 +113,7 @@ export default {
     Interpolation: {
       description: 'Interpolation 옵션을 설정하여 null Data를 보간하여 선을 그릴 수 있습니다.',
       component: Interpolation,
-      parsedData: parseComponent(InterpolationRaw),
+      parsedData: parse(InterpolationRaw).descriptor,
     },
     HoverWithGroup: {
       description: '',
@@ -128,12 +128,12 @@ export default {
     Segments: {
       description: 'Segments',
       component: Segments,
-      parsedData: parseComponent(SegmentsRaw),
+      parsedData: parse(SegmentsRaw).descriptor,
     },
     LegendClickMode: {
       description: 'Legend Click Mode',
       component: LegendClickMode,
-      parsedData: parseComponent(LegendClickModeRaw),
+      parsedData: parse(LegendClickModeRaw).descriptor,
     },
   },
 };

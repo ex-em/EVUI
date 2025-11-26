@@ -74,7 +74,7 @@ export default {
     'Select Item': {
       description: '차트에서 선택한 series에 대한 정보를 추출할 수 있는 기능입니다.',
       component: SelectItem,
-      parsedData: parseComponent(SelectItemRaw),
+      parsedData: parse(SelectItemRaw).descriptor,
     },
     'Select Label': {
       description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
@@ -104,12 +104,12 @@ export default {
     Scrollbar: {
       description: '차트에 스크롤바를 추가할 수 있습니다.',
       component: Scrollbar,
-      parsedData: parseComponent(ScrollbarRaw),
+      parsedData: parse(ScrollbarRaw).descriptor,
     },
     LegendClickMode: {
       description: 'Legend Click Mode',
       component: LegendClickMode,
-      parsedData: parseComponent(LegendClickModeRaw),
+      parsedData: parse(LegendClickModeRaw).descriptor,
     },
   },
 };
