@@ -246,7 +246,9 @@
       }, { deep: true, flush: 'post' });
 
       watch(() => props.selectedSeries, (newValue) => {
-        if (newValue.seriesId) {
+        if (!normalizedOptions.selectSeries?.use) {
+          console.warn('[EVUI][Chart] selectSeries.use is false, so selectedSeries is not working');
+        } else if (newValue.seriesId) {
           evChart.selectSeriesByData(newValue.seriesId);
         }
       }, { deep: true, flush: 'post' });

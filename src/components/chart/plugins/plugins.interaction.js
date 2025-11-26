@@ -1304,7 +1304,7 @@ const modules = {
    * Select Series
    * set backup data that selected series information list
    * render chart
-   * @param seriesIdList {number[]}  '
+   * @param seriesIdList {number[]}
    * @returns {boolean}
    */
   selectSeriesByData(seriesIdList) {
