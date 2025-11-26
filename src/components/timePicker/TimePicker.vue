@@ -117,12 +117,12 @@ export default {
         const timeRegexExp = /^(0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/;
         if (Array.isArray(time) && (!timeRegexExp.test(time[0]) || !timeRegexExp.test(time[1]))) {
           // range mode
-          console.warn('Please check the time format in the Timepicker.');
+          console.warn('[EVUI][TimePicker] Please check the time format in the Timepicker.');
           return false;
         }
         if (!Array.isArray(time) && !timeRegexExp.test(time)) {
           // single mode
-          console.warn('Please check the time format in the Timepicker.');
+          console.warn('[EVUI][TimePicker] Please check the time format in the Timepicker.');
           return false;
         }
         return true;

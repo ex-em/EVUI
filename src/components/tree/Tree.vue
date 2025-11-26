@@ -132,7 +132,7 @@ export default {
 
         // check 'value' property and add nodeKey if same value already exists
         if ('value' in node && valueArr.includes(node.value)) {
-          console.warn('The \'value\' of data should be unique.');
+          console.warn('[EVUI][Tree] The \'value\' of data should be unique.');
           node.value += node.nodeKey;
         } else if (!('value' in node)) {
           node.value = node.title + node.nodeKey;

@@ -97,7 +97,7 @@ const useModel = () => {
     const convertedWidth = removeUnit(props.width, 'horizontal');
     const convertedMinWidth = removeUnit(props.minWidth, 'horizontal');
     if (convertedWidth < convertedMinWidth) {
-      console.warn('Since width is less than min-width, it is replaced by min-width.');
+      console.warn('[EVUI][Window] Since width is less than min-width, it is replaced by min-width.');
       basePosition.width = numberToUnit(props.minWidth);
     } else {
       basePosition.width = numberToUnit(props.width);
@@ -106,7 +106,7 @@ const useModel = () => {
     const convertedHeight = removeUnit(props.height, 'vertical');
     const convertedMinHeight = removeUnit(props.minHeight, 'vertical');
     if (convertedHeight < convertedMinHeight) {
-      console.warn('Since height is less than min-height, it is replaced by min-height.');
+      console.warn('[EVUI][Window] Since height is less than min-height, it is replaced by min-height.');
       basePosition.height = numberToUnit(props.minHeight);
     } else {
       basePosition.height = numberToUnit(props.height);
