@@ -337,6 +337,7 @@ import {
 import {
   columnSettingEvent,
 } from '../grid/uses';
+import resize from 'vue-resize-observer';
 
 export default {
   name: 'EvTreeGrid',
@@ -351,6 +352,7 @@ export default {
   },
   directives: {
     observeVisibility: vObserveVisibility,
+    resize,
   },
   props: {
     columns: {

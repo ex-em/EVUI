@@ -33,11 +33,15 @@
   import EvChart from './chart.core';
   import EvChartToolbar from './ChartToolbar';
   import { useModel, useWrapper, useZoomModel } from './uses';
+  import resize from 'vue-resize-observer';
 
   export default {
     name: 'EvChart',
     components: {
       EvChartToolbar,
+    },
+    directives: {
+      resize,
     },
     props: {
       selectedItem: {

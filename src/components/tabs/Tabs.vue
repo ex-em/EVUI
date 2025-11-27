@@ -93,11 +93,13 @@ import {
   onBeforeUpdate, nextTick,
 } from 'vue';
 import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
+import resize from 'vue-resize-observer';
 
 export default {
   name: 'EvTabs',
   directives: {
     observeVisibility: vObserveVisibility,
+    resize,
   },
   props: {
     modelValue: {

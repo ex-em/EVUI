@@ -638,12 +638,14 @@ import {
   dragEvent,
   getUpdatedColumns,
 } from './uses';
+import resize from 'vue-resize-observer';
 
 export default {
   name: 'EvGrid',
   directives: {
     clickoutside,
     observeVisibility: vObserveVisibility,
+    resize,
   },
   components: {
     Toolbar,

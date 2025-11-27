@@ -25,9 +25,13 @@ import EvChart from '../chart/chart.core';
 import { useModel, useWrapper } from '../chart/uses';
 import EvChartBrush from './chartBrush.core';
 import { useBrushModel } from './uses';
+import resize from 'vue-resize-observer';
 
 export default {
   name: 'EvChartBrush',
+  directives: {
+    resize,
+  },
   props: {
     options: {
       type: Object,

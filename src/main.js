@@ -110,6 +110,8 @@ export {
   EvTimePicker,
   EvGrid,
   EvChart,
+  EvChartGroup,
+  EvChartBrush,
   EvMessage,
   EvNotification,
   EvMessageBox,
