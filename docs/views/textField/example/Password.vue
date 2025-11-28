@@ -1,15 +1,9 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-text-field
-      v-model="modelValue1"
-      placeholder="Please enter the password"
-      type="password"
-    />
+    <ev-text-field v-model="modelValue1" placeholder="Please enter the password" type="password" />
     <div class="description">
-      <span class="badge yellow">
-        type="password"
-      </span>
+      <span class="badge yellow"> type="password" </span>
     </div>
   </div>
   <div class="case">

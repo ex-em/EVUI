@@ -53,9 +53,7 @@ export default {
     });
     const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
 
-    const {
-      getNormalizedBrushOptions,
-    } = useBrushModel();
+    const { getNormalizedBrushOptions } = useBrushModel();
 
     const evChartBrushOptions = computed(() => getNormalizedBrushOptions(props.options));
 
@@ -68,8 +66,8 @@ export default {
       getNormalizedOptions,
     } = useModel();
 
-    const evChartData = computed(() => getNormalizedData(
-      (injectEvChartClone.data ?? [])[evChartBrushOptions.value.chartIdx]),
+    const evChartData = computed(() =>
+      getNormalizedData((injectEvChartClone.data ?? [])[evChartBrushOptions.value.chartIdx]),
     );
 
     const evChartOption = computed(() => {
@@ -103,43 +101,47 @@ export default {
         selectSeries: {
           use: false,
         },
-        axesX: [{
-          ...chartOption?.axesX?.[0],
-          title: {
-            use: false,
+        axesX: [
+          {
+            ...chartOption?.axesX?.[0],
+            title: {
+              use: false,
+            },
           },
-        }],
-        axesY: [{
-          ...chartOption?.axesY?.[0],
-          title: {
-            use: false,
+        ],
+        axesY: [
+          {
+            ...chartOption?.axesY?.[0],
+            title: {
+              use: false,
+            },
           },
-        }],
+        ],
       };
 
       return getNormalizedOptions(option);
     });
 
-    const {
-      wrapper: evChartBrushRef,
-      wrapperStyle: evChartBrushStyle,
-    } = useWrapper(
+    const { wrapper: evChartBrushRef, wrapperStyle: evChartBrushStyle } = useWrapper(
       evChartOption.value,
     );
 
-    watch(() => injectBrushSeries.list, () => {
-      if (
-        evChartBrushRef.value
-        && injectBrushSeries.chartIdx === evChartBrushOptions.value.chartIdx
-      ) {
-        evChart.seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
+    watch(
+      () => injectBrushSeries.list,
+      () => {
+        if (
+          evChartBrushRef.value &&
+          injectBrushSeries.chartIdx === evChartBrushOptions.value.chartIdx
+        ) {
+          evChart.seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
 
-        evChart.update({
-          updateSeries: false,
-          updateSelTip: { update: false, keepDomain: false },
-        });
-      }
-    });
+          evChart.update({
+            updateSeries: false,
+            updateSelTip: { update: false, keepDomain: false },
+          });
+        }
+      },
+    );
 
     watch(evChartOption, (newOpt, prevOpt) => {
       if (newOpt.brush.chartIdx <= injectEvChartClone.data?.length - 1) {
@@ -166,33 +168,36 @@ export default {
       }
     });
 
-    watch(() => injectEvChartClone.data, (newData) => {
-      if (evChart) {
-        const data = newData[evChartBrushOptions.value.chartIdx];
+    watch(
+      () => injectEvChartClone.data,
+      (newData) => {
+        if (evChart) {
+          const data = newData[evChartBrushOptions.value.chartIdx];
 
-        if (data) {
-          const isUpdateSeries = !isEqual(data.series, evChart.data.series);
+          if (data) {
+            const isUpdateSeries = !isEqual(data.series, evChart.data.series);
 
-          const seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
+            const seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
 
-          if (typeof seriesList === 'object' && Object.keys(seriesList).length) {
-            Object.keys(data.series).forEach((series) => {
-              if (!('show' in data.series[series])) {
-                data.series[series].show = seriesList[series]?.show ?? true;
-              }
+            if (typeof seriesList === 'object' && Object.keys(seriesList).length) {
+              Object.keys(data.series).forEach((series) => {
+                if (!('show' in data.series[series])) {
+                  data.series[series].show = seriesList[series]?.show ?? true;
+                }
+              });
+            }
+
+            evChart.data = cloneDeep(data);
+
+            evChart.update({
+              updateSeries: isUpdateSeries,
+              updateSelTip: { update: false, keepDomain: false },
+              updateData: false,
             });
           }
-
-          evChart.data = cloneDeep(data);
-
-          evChart.update({
-            updateSeries: isUpdateSeries,
-            updateSelTip: { update: false, keepDomain: false },
-            updateData: false,
-          });
         }
-      }
-    });
+      },
+    );
 
     const createChart = () => {
       let selected;
@@ -234,14 +239,17 @@ export default {
       }
     };
 
-    watch(() => [injectBrushIdx.start, injectBrushIdx.end], () => {
-      if (
-        evChartBrushRef.value
-        && evChartBrushOptions.value.chartIdx <= injectEvChartClone.data?.length - 1
-      ) {
-        drawChartBrush();
-      }
-    });
+    watch(
+      () => [injectBrushIdx.start, injectBrushIdx.end],
+      () => {
+        if (
+          evChartBrushRef.value &&
+          evChartBrushOptions.value.chartIdx <= injectEvChartClone.data?.length - 1
+        ) {
+          drawChartBrush();
+        }
+      },
+    );
 
     onMounted(async () => {
       if (evChartBrushOptions.value.show) {
@@ -300,7 +308,7 @@ export default {
      */
     const onResize = debounce(() => {
       if (evChart && 'resize' in evChart) {
-        const resize = new Promise(resolve => evChart.resize(resolve));
+        const resize = new Promise((resolve) => evChart.resize(resolve));
 
         resize.then((isResizeDone) => {
           if (isResizeDone) {

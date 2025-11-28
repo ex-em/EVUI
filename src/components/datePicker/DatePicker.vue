@@ -4,13 +4,10 @@
     v-clickoutside="clickOutsideDropbox"
     class="ev-date-picker"
     :class="{
-      disabled : $props.disabled,
+      disabled: $props.disabled,
     }"
   >
-    <div
-      ref="datePickerWrapper"
-      class="ev-date-picker__wrapper"
-    >
+    <div ref="datePickerWrapper" class="ev-date-picker__wrapper">
       <template v-if="$props.mode === 'date' || $props.mode === 'dateTime'">
         <span class="ev-date-picker-prefix-icon">
           <i class="ev-icon-calendar" />
@@ -18,7 +15,7 @@
         <input
           v-model.trim="currentValue"
           type="text"
-          :class="['ev-input', {readonly : !$props.enableTextInput}]"
+          :class="['ev-input', { readonly: !$props.enableTextInput }]"
           :placeholder="$props.placeholder"
           :readonly="!$props.enableTextInput"
           :disabled="$props.disabled"
@@ -28,10 +25,7 @@
         />
       </template>
       <template v-else-if="$props.mode === 'dateMulti' || !$props.enableTextInput">
-        <div
-          class="ev-date-picker-tag-wrapper"
-          @click="clickSelectInput"
-        >
+        <div class="ev-date-picker-tag-wrapper" @click="clickSelectInput">
           <span class="ev-date-picker-prefix-icon">
             <i class="ev-icon-calendar" />
           </span>
@@ -43,8 +37,10 @@
             :disabled="$props.disabled"
           />
           <template
-            v-if="$props.mode === 'dateMulti'
-            && ($props.options.multiType === 'date' || !$props.options.tagShorten)"
+            v-if="
+              $props.mode === 'dateMulti' &&
+              ($props.options.multiType === 'date' || !$props.options.tagShorten)
+            "
           >
             <div
               v-for="(item, idx) in mv"
@@ -58,15 +54,12 @@
                 class="ev-tag-suffix"
                 @click.stop="[removeMv(item), changeDropboxPosition()]"
               >
-              <i class="ev-tag-suffix-close ev-icon-error" />
-            </span>
+                <i class="ev-tag-suffix-close ev-icon-error" />
+              </span>
             </div>
           </template>
           <template v-else>
-            <div
-              v-if="mv[0]"
-              class="ev-select-tag num"
-            >
+            <div v-if="mv[0]" class="ev-select-tag num">
               <span class="ev-tag-name"> {{ mv[0] }} </span>
             </div>
             <template v-if="mv[mv.length - 1]">
@@ -81,10 +74,7 @@
         </div>
       </template>
       <template v-else>
-        <div
-          class="ev-date-picker-input-wrapper"
-          @click="clickSelectInput"
-        >
+        <div class="ev-date-picker-input-wrapper" @click="clickSelectInput">
           <span class="ev-date-picker-prefix-icon">
             <i class="ev-icon-calendar" />
           </span>
@@ -126,14 +116,11 @@
           :class="$props.mode"
           :style="dropboxPosition"
         >
-          <div
-            v-if="usedShortcuts.length"
-            class="ev-date-picker-dropbox__button-layout"
-          >
+          <div v-if="usedShortcuts.length" class="ev-date-picker-dropbox__button-layout">
             <ev-button
-                v-if="usedShortcuts.length === 1"
-                :type="usedShortcuts[0].isActive ? 'primary' : 'default'"
-                @click="clickShortcut(usedShortcuts[0].key)"
+              v-if="usedShortcuts.length === 1"
+              :type="usedShortcuts[0].isActive ? 'primary' : 'default'"
+              @click="clickShortcut(usedShortcuts[0].key)"
             >
               {{ usedShortcuts[0].label }}
             </ev-button>
@@ -148,13 +135,8 @@
               </ev-button>
             </ev-button-group>
           </div>
-          <div
-            v-if="usedShortcuts.length"
-            class="ev-date-picker-dropbox__divider"
-          />
-          <div
-            :class="{ 'ev-date-picker-dropbox__calendar':usedShortcuts.length }"
-          >
+          <div v-if="usedShortcuts.length" class="ev-date-picker-dropbox__divider" />
+          <div :class="{ 'ev-date-picker-dropbox__calendar': usedShortcuts.length }">
             <ev-calendar
               key="fromCalendar"
               v-model="mv"
@@ -185,15 +167,21 @@ export default {
       default: '',
       validator: (value) => {
         const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
-        const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
+        const dateTimeReg = new RegExp(
+          /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/,
+        );
         if (Array.isArray(value)) {
-          return value.every(v => !!(!v
-              || (v.length === 10 && dateReg.exec(v)))
-              || (v.length === 19 && dateTimeReg.exec(v)));
+          return value.every(
+            (v) =>
+              !!(!v || (v.length === 10 && dateReg.exec(v))) ||
+              (v.length === 19 && dateTimeReg.exec(v)),
+          );
         }
-        return !!(!value
-          || (value.length === 10 && dateReg.exec(value))
-          || (value.length === 19 && dateTimeReg.exec(value)));
+        return !!(
+          !value ||
+          (value.length === 10 && dateReg.exec(value)) ||
+          (value.length === 19 && dateTimeReg.exec(value))
+        );
       },
     },
     placeholder: {
@@ -215,20 +203,19 @@ export default {
     mode: {
       type: String,
       default: 'date',
-      validator: value => ['date', 'dateTime', 'dateMulti', 'dateRange', 'dateTimeRange']
-        .indexOf(value) !== -1,
+      validator: (value) =>
+        ['date', 'dateTime', 'dateMulti', 'dateRange', 'dateTimeRange'].indexOf(value) !== -1,
     },
     monthNotation: {
       type: String,
       default: 'fullName',
-      validator: value => ['fullName', 'abbrName', 'numberName', 'korName']
-        .indexOf(value) !== -1,
+      validator: (value) => ['fullName', 'abbrName', 'numberName', 'korName'].indexOf(value) !== -1,
     },
     dayOfTheWeekNotation: {
       type: String,
       default: 'abbrUpperName',
-      validator: value => ['abbrUpperName', 'abbrLowerName', 'abbrPascalName', 'abbrKorName']
-        .indexOf(value) !== -1,
+      validator: (value) =>
+        ['abbrUpperName', 'abbrLowerName', 'abbrPascalName', 'abbrKorName'].indexOf(value) !== -1,
     },
     options: {
       type: Object,
@@ -239,13 +226,15 @@ export default {
       }),
       validator: ({ multiType, multiDayLimit, disabledDate, tagShorten, timeFormat }) => {
         const timeReg = new RegExp(/(HH|2[0-3]|[01][0-9]):(mm|[0-5][0-9]):(ss|[0-5][0-9])/);
-        return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
-        && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
-        && (disabledDate ? (typeof disabledDate === 'function' || Array.isArray(disabledDate)) : true)
-        && (tagShorten !== undefined ? typeof tagShorten === 'boolean' : true)
-        && Array.isArray(timeFormat)
-            ? timeFormat.every(v => !!(!v || timeReg.exec(v)))
-            : !!(!timeFormat || (timeReg.exec(timeFormat)));
+        return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true) &&
+          (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true) &&
+          (disabledDate
+            ? typeof disabledDate === 'function' || Array.isArray(disabledDate)
+            : true) &&
+          (tagShorten !== undefined ? typeof tagShorten === 'boolean' : true) &&
+          Array.isArray(timeFormat)
+          ? timeFormat.every((v) => !!(!v || timeReg.exec(v)))
+          : !!(!timeFormat || timeReg.exec(timeFormat));
       },
     },
     shortcuts: {
@@ -260,8 +249,10 @@ export default {
             return false;
           }
           const date = shortcutDate();
-          return (Array.isArray(date) && date.every(d => d instanceof Date) && date[0] <= date[1])
-              || (typeof date === 'object' && date instanceof Date);
+          return (
+            (Array.isArray(date) && date.every((d) => d instanceof Date) && date[0] <= date[1]) ||
+            (typeof date === 'object' && date instanceof Date)
+          );
         });
       },
     },
@@ -270,15 +261,8 @@ export default {
     'update:modelValue': [Array, String],
   },
   setup() {
-    const {
-      mv,
-      currentValue,
-      isClearableIcon,
-      validateValue,
-      removeAllMv,
-      changeMv,
-      removeMv,
-    } = useModel();
+    const { mv, currentValue, isClearableIcon, validateValue, removeAllMv, changeMv, removeMv } =
+      useModel();
 
     const {
       isDropbox,
@@ -292,11 +276,7 @@ export default {
       changeDropboxPosition,
     } = useDropdown();
 
-    const {
-      usedShortcuts,
-      clickShortcut,
-      setActiveShortcut,
-    } = useShortcuts({
+    const { usedShortcuts, clickShortcut, setActiveShortcut } = useShortcuts({
       mv,
       currentValue,
       clickOutsideDropbox,
@@ -339,7 +319,6 @@ export default {
   display: block;
   position: relative;
   width: 100%;
-
 
   &__wrapper {
     position: relative;
@@ -386,7 +365,7 @@ export default {
     align-items: center;
     cursor: pointer;
     &:hover {
-      color: #409EFF;
+      color: #409eff;
     }
   }
 
@@ -428,7 +407,7 @@ export default {
   left: 8px;
   height: 100%;
   align-items: center;
-  color: #C2C5CD;
+  color: #c2c5cd;
 }
 
 .ev-date-picker-dropdown {
@@ -436,9 +415,9 @@ export default {
   top: 0;
   left: 0;
   background-color: white;
-  border: 1px solid #E4E7ED;
+  border: 1px solid #e4e7ed;
   color: #606266;
-  box-shadow: 0 2px 12px 0 rgba(0,0,0,.1);
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   box-sizing: content-box;
   z-index: 100;
@@ -450,9 +429,9 @@ export default {
   height: 24px;
   padding: 0 19px 0 8px;
   margin: 2px 0 2px 6px;
-  background-color: #F4F4F5;
+  background-color: #f4f4f5;
   align-items: center;
-  border: 1px solid #E9E9EB;
+  border: 1px solid #e9e9eb;
   border-radius: 4px;
   color: #909399;
   font-size: $font-size-base;
@@ -470,11 +449,11 @@ export default {
     right: 3px;
     height: 100%;
     align-items: center;
-    color: #0D0D0D;
+    color: #0d0d0d;
     cursor: pointer;
 
     &:hover {
-      color: #409EFF;
+      color: #409eff;
     }
   }
 }
@@ -493,7 +472,7 @@ export default {
     width: 100%;
     height: 2px;
     margin: 8px 0;
-    background-color: #E5E5E5;
+    background-color: #e5e5e5;
   }
 
   &__calendar {

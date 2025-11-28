@@ -1,19 +1,11 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-window
-      v-model:visible="isVisible1"
-      title="WINDOW TITLE"
-    >
+    <ev-window v-model:visible="isVisible1" title="WINDOW TITLE">
       <div>visible prop을 통해 윈도우를 여닫을 수 있습니다.</div>
     </ev-window>
     <div class="description">
-      <button
-        class="btn"
-        @click="clickButton1"
-      >
-        click to open window!
-      </button>
+      <button class="btn" @click="clickButton1">click to open window!</button>
     </div>
   </div>
   <div class="case">
@@ -34,16 +26,11 @@
         </p>
       </template>
       <div>
-        window를 중첩하여 사용할 수 있습니다.<br/>
+        window를 중첩하여 사용할 수 있습니다.<br />
         하단 버튼을 통해 중첩 window를 열어보세요!
       </div>
-      <span class="height-box"/>
-      <button
-        class="nested-btn"
-        @click="clickButton3"
-      >
-        click to nested window!
-      </button>
+      <span class="height-box" />
+      <button class="nested-btn" @click="clickButton3">click to nested window!</button>
       <span class="height-box" />
       <div>default slot의 길이가 길어질 경우 window 중앙에 스크롤이 생깁니다.</div>
       <span class="height-box" />
@@ -58,56 +45,31 @@
       width="40%"
       height="60%"
     >
-      <div>
-        NESTED CONTENTS
-      </div>
+      <div>NESTED CONTENTS</div>
       <template #footer>
         <div>NESTED FOOTER</div>
       </template>
     </ev-window>
     <div class="description">
-      <button
-        class="btn"
-        @click="clickButton2"
-      >
-        click to open window!
-      </button>
+      <button class="btn" @click="clickButton2">click to open window!</button>
     </div>
   </div>
   <div class="case">
     <p class="case-title">Hide Dim Layer (Modeless)</p>
-    <ev-window
-      v-model:visible="isVisible4"
-      title="WINDOW TITLE"
-      :is-modal="false"
-    >
+    <ev-window v-model:visible="isVisible4" title="WINDOW TITLE" :is-modal="false">
       <div>is-modal prop을 활용하여 window 아래 modal 레이어를 지울 수 있습니다.</div>
     </ev-window>
     <div class="description">
-      <button
-        class="btn"
-        @click="clickButton4"
-      >
-        click to open window!
-      </button>
+      <button class="btn" @click="clickButton4">click to open window!</button>
     </div>
   </div>
   <div class="case">
     <p class="case-title">Block Hide Scroll</p>
-    <ev-window
-      v-model:visible="isVisible5"
-      title="WINDOW TITLE"
-      :hide-scroll="false"
-    >
+    <ev-window v-model:visible="isVisible5" title="WINDOW TITLE" :hide-scroll="false">
       <div>hide-scroll prop을 활용하여 body의 스크롤을 보이게 할 수 있습니다.</div>
     </ev-window>
     <div class="description">
-      <button
-        class="btn"
-        @click="clickButton5"
-      >
-        click to open window!
-      </button>
+      <button class="btn" @click="clickButton5">click to open window!</button>
     </div>
   </div>
   <div class="case">
@@ -123,16 +85,9 @@
       @mousedown-mousemove="mousemove"
       @resize="resize"
     >
-      <div>
-        Draggable & Resizable & Maximizable 기능을 사용할 수 있습니다.
-      </div>
+      <div>Draggable & Resizable & Maximizable 기능을 사용할 수 있습니다.</div>
       <span class="height-box" />
-      <button
-        class="nested-btn"
-        @click="clickButton7"
-      >
-        click to open nested window!
-      </button>
+      <button class="nested-btn" @click="clickButton7">click to open nested window!</button>
     </ev-window>
     <ev-window
       v-model:visible="isVisible7"
@@ -145,12 +100,7 @@
       resizable
       maximizable
     >
-      <button
-        class="nested-btn"
-        @click="clickButton8"
-      >
-        click to open nested window!
-      </button>
+      <button class="nested-btn" @click="clickButton8">click to open nested window!</button>
     </ev-window>
     <ev-window
       v-model:visible="isVisible8"
@@ -167,23 +117,14 @@
     </ev-window>
 
     <div class="description">
-      <button
-        class="btn"
-        @click="clickButton6"
-      >
-        click to open window!
-      </button>
+      <button class="btn" @click="clickButton6">click to open window!</button>
     </div>
   </div>
 
   <div class="case">
     <p class="case-title">Esc Key Close</p>
     <!--Window 1개-->
-    <ev-window
-      v-model:visible="isVisible10"
-      title="Esc Close Available Window"
-      :esc-close="true"
-    >
+    <ev-window v-model:visible="isVisible10" title="Esc Close Available Window" :esc-close="true">
       <div>esc-close prop을 통해 윈도우를 여닫을 수 있습니다.</div>
     </ev-window>
 
@@ -198,9 +139,7 @@
       <div>
         Nested + Maximizable Window
         <br />
-        <button class="nested-btn">
-          Esc key로 닫을 수 있습니다.
-        </button>
+        <button class="nested-btn">Esc key로 닫을 수 있습니다.</button>
       </div>
     </ev-window>
     <ev-window
@@ -214,9 +153,7 @@
       <div>
         Resizable Window
         <br />
-        <button class="nested-btn">
-          Esc key로 닫을 수 있습니다.
-        </button>
+        <button class="nested-btn">Esc key로 닫을 수 있습니다.</button>
       </div>
     </ev-window>
     <ev-window
@@ -231,9 +168,7 @@
       <div>
         Draggable Window
         <br />
-        <button class="nested-btn">
-          Esc key로 닫을 수 있습니다.
-        </button>
+        <button class="nested-btn">Esc key로 닫을 수 있습니다.</button>
       </div>
     </ev-window>
     <ev-window
@@ -251,10 +186,7 @@
             esc-close prop 토글
             <ev-icon icon="ev-icon-allow2-right" />
           </label>
-          <ev-toggle
-            v-model="isEscClose"
-            @change="changeEscClose"
-          />
+          <ev-toggle v-model="isEscClose" @change="changeEscClose" />
         </div>
         <p class="nested-btn">
           가장 상단에 위치한 Window의 esc-close prop가 false인 경우,
@@ -264,20 +196,10 @@
     </ev-window>
 
     <div class="description">
-      <button
-        class="btn"
-        @click="clickButton10"
-      >
-        click to open window!
-      </button>
+      <button class="btn" @click="clickButton10">click to open window!</button>
       <br />
       <br />
-      <button
-        class="btn"
-        @click="clickButton11"
-      >
-        click to open different types of windows!
-      </button>
+      <button class="btn" @click="clickButton11">click to open different types of windows!</button>
     </div>
   </div>
   <div class="case">
@@ -292,22 +214,17 @@
     >
       <div>
         <p>
-          <button
-            class="nested-btn"
-            @click="clickButton12"
-          >
-            click to open stacked windows!
-          </button>
+          <button class="nested-btn" @click="clickButton12">click to open stacked windows!</button>
           <br />
           <i class="ev-icon-moon" />
           쌓여있는 윈도우 중 1개를 클릭하면 가장 상단에 올라옵니다.
-          <br/>
+          <br />
           <i class="ev-icon-moon" />
           배경 윈도우는 focusable prop의 값이 false여서 클릭해도 상단으로 배치되지 않습니다.
-          <br/>
+          <br />
           <i class="ev-icon-moon" />
           Esc 키로 개별 윈도우를 닫을 수 있습니다.
-          <br/>
+          <br />
           <i class="ev-icon-moon" />
           배경 윈도우를 닫으면 전체 Window가 닫힙니다.
         </p>
@@ -337,12 +254,7 @@
       </div>
     </ev-window>
     <div class="description">
-      <button
-        class="btn"
-        @click="clickButton13"
-      >
-        click to open window!
-      </button>
+      <button class="btn" @click="clickButton13">click to open window!</button>
     </div>
   </div>
 </template>
@@ -410,10 +322,7 @@ export default {
       }
     };
 
-    const isVisible12 = ref([
-      false, false, false, false, false,
-      false, false,
-    ]);
+    const isVisible12 = ref([false, false, false, false, false, false, false]);
     const clickButton12 = () => {
       for (let i = 0; i < isVisible12.value.length; i++) {
         isVisible12.value[i] = true;
@@ -422,10 +331,16 @@ export default {
 
     const randomColors = Array(isVisible12.value.length)
       .fill(null)
-      .map(() => `rgb(${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())})`);
+      .map(
+        () =>
+          `rgb(${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())}, ${Math.floor(255 * Math.random())})`,
+      );
     const randomPositions = Array(isVisible12.value.length)
       .fill(null)
-      .map(() => `translate(${Math.floor(400 * (Math.random() - 0.5))}px, ${Math.floor(400 * (Math.random() - 0.5))}px)`);
+      .map(
+        () =>
+          `translate(${Math.floor(400 * (Math.random() - 0.5))}px, ${Math.floor(400 * (Math.random() - 0.5))}px)`,
+      );
 
     const isVisible13 = ref(false);
     const clickButton13 = () => {
@@ -446,9 +361,9 @@ export default {
       isEscClose.value = newValue;
     };
 
-    const mousedown = clickedInfo => console.log('mousedown', clickedInfo);
-    const mouseup = event => console.log('mousedown-mouseup', event);
-    const mousemove = clickedInfo => console.log('mousedown-mousemove', clickedInfo);
+    const mousedown = (clickedInfo) => console.log('mousedown', clickedInfo);
+    const mouseup = (event) => console.log('mousedown-mouseup', event);
+    const mousemove = (clickedInfo) => console.log('mousedown-mousemove', clickedInfo);
     const resize = (event, positionInfo) => console.log('resize', event, positionInfo);
 
     return {
@@ -511,7 +426,7 @@ export default {
 .height-box {
   display: block;
   height: 300px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
 }
 .header-right-title {
   margin-left: 10px;

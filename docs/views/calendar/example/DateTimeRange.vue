@@ -10,9 +10,7 @@
       }"
     />
     <div class="description">
-      <span class="badge">
-        date
-      </span>
+      <span class="badge"> date </span>
       {{ calendar9 }}
     </div>
   </div>

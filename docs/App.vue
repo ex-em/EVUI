@@ -1,11 +1,6 @@
 <template>
-  <div
-    class="evui-wrapper"
-    :class="['evui-docs', docsTheme]"
-  >
-    <MainHeader
-      v-model="docsTheme"
-    />
+  <div class="evui-wrapper" :class="['evui-docs', docsTheme]">
+    <MainHeader v-model="docsTheme" />
     <MainNav />
     <MainContent />
   </div>
@@ -76,7 +71,8 @@ $file-path: './assets/fonts/';
   @import './style/lib/highlightjs.github';
 }
 .hljs {
-  &, * {
+  &,
+  * {
     font-size: 14px;
     font-family: consolas, monospace;
   }

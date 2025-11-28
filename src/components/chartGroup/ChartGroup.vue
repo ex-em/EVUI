@@ -1,18 +1,9 @@
 <template>
-  <div
-    v-if="zoomOptions.toolbar.show"
-    ref="evChartToolbarRef"
-  >
-    <ev-chart-toolbar
-      :toolbar="zoomOptions.toolbar"
-      @on-click-toolbar="onClickToolbar"
-    />
+  <div v-if="zoomOptions.toolbar.show" ref="evChartToolbarRef">
+    <ev-chart-toolbar :toolbar="zoomOptions.toolbar" @on-click-toolbar="onClickToolbar" />
   </div>
 
-  <div
-    ref="evChartGroupRef"
-    class="ev-chart-group__wrapper"
-  >
+  <div ref="evChartGroupRef" class="ev-chart-group__wrapper">
     <slot />
   </div>
 </template>
@@ -68,21 +59,25 @@ export default {
     provide('evChartPropsInGroup', evChartPropsInGroup);
     const groupSelectedLabel = computed({
       get: () => props.groupSelectedLabel,
-      set: val => emit('update:groupSelectedLabel', val),
+      set: (val) => emit('update:groupSelectedLabel', val),
     });
     provide('groupSelectedLabel', groupSelectedLabel);
     const groupHoveredLabel = ref(null);
     provide('groupHoveredLabel', groupHoveredLabel);
 
-    watch(() => props.options.syncHover, (newSyncHover) => {
-      if (newSyncHover) {
-        groupHoveredLabel.value = { label: '', horizontal: false };
-      } else {
-        groupHoveredLabel.value = null;
-      }
-    }, {
-      immediate: true,
-    });
+    watch(
+      () => props.options.syncHover,
+      (newSyncHover) => {
+        if (newSyncHover) {
+          groupHoveredLabel.value = { label: '', horizontal: false };
+        } else {
+          groupHoveredLabel.value = null;
+        }
+      },
+      {
+        immediate: true,
+      },
+    );
 
     const {
       evChartZoomOptions,
@@ -111,23 +106,34 @@ export default {
       createEvChartZoom();
     });
 
-    watch(() => evChartInfo.props.data, (evChartProps) => {
-      setDataForUseZoom(evChartProps);
-    }, { deep: true });
+    watch(
+      () => evChartInfo.props.data,
+      (evChartProps) => {
+        setDataForUseZoom(evChartProps);
+      },
+      { deep: true },
+    );
 
-    watch(() => props.options, (zoomOptions) => {
-      const newOpt = getNormalizedOptions(zoomOptions);
+    watch(
+      () => props.options,
+      (zoomOptions) => {
+        const newOpt = getNormalizedOptions(zoomOptions);
 
-      setOptionsForUseZoom(newOpt);
-    }, { deep: true });
+        setOptionsForUseZoom(newOpt);
+      },
+      { deep: true },
+    );
 
-    watch(() => [props.zoomStartIdx, props.zoomEndIdx], ([zoomStartIdx, zoomEndIdx]) => {
-      if (brushIdx.isUseButton || brushIdx.isUseScroll) {
-        return;
-      }
+    watch(
+      () => [props.zoomStartIdx, props.zoomEndIdx],
+      ([zoomStartIdx, zoomEndIdx]) => {
+        if (brushIdx.isUseButton || brushIdx.isUseScroll) {
+          return;
+        }
 
-      controlZoomIdx(zoomStartIdx, zoomEndIdx);
-    });
+        controlZoomIdx(zoomStartIdx, zoomEndIdx);
+      },
+    );
 
     return {
       evChartGroupRef,
@@ -140,5 +146,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @use 'style/chartGroup.scss' as *;
+@use 'style/chartGroup.scss' as *;
 </style>

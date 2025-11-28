@@ -5,22 +5,15 @@
       v-model="calendar1"
       class="case-block"
       :options="{
-        disabledDate: (time) => time.getTime() > Date.now()
+        disabledDate: (time) => time.getTime() > Date.now(),
       }"
     />
-    <ev-calendar
-      v-model="calendar2"
-      class="case-block"
-    />
+    <ev-calendar v-model="calendar2" class="case-block" />
     <div class="description">
-      <span class="badge">
-        date
-      </span>
+      <span class="badge"> date </span>
       {{ calendar1 }}
-      <br><br>
-      <span class="badge">
-        date
-      </span>
+      <br /><br />
+      <span class="badge"> date </span>
       {{ calendar2 }}
     </div>
   </div>
@@ -34,22 +27,14 @@
         timeFormat: 'HH:20:00',
       }"
     />
-    <br>
-    <br>
-    <ev-calendar
-      v-model="calendar4"
-      class="case-block"
-      mode="dateTime"
-    />
+    <br />
+    <br />
+    <ev-calendar v-model="calendar4" class="case-block" mode="dateTime" />
     <div class="description">
-      <span class="badge">
-        dateTime
-      </span>
+      <span class="badge"> dateTime </span>
       {{ calendar3 }}
-      <br><br>
-      <span class="badge">
-        dateTime
-      </span>
+      <br /><br />
+      <span class="badge"> dateTime </span>
       {{ calendar4 }}
     </div>
   </div>
@@ -62,13 +47,11 @@
       :options="{
         multiType: 'date',
         multiDayLimit: 3,
-        disabledDate: (time) => time.getDay() === 0 || time.getDay() === 6
+        disabledDate: (time) => time.getDay() === 0 || time.getDay() === 6,
       }"
     />
     <div class="description">
-      <span class="badge">
-        date
-      </span>
+      <span class="badge"> date </span>
       {{ calendar5 }}
     </div>
   </div>
@@ -80,13 +63,11 @@
       mode="dateMulti"
       :options="{
         multiType: 'weekday',
-        disabledDate: (time) => time.getTime() <= Date.now()
+        disabledDate: (time) => time.getTime() <= Date.now(),
       }"
     />
     <div class="description">
-      <span class="badge">
-        date
-      </span>
+      <span class="badge"> date </span>
       {{ calendar6 }}
     </div>
   </div>
@@ -98,13 +79,11 @@
       mode="dateMulti"
       :options="{
         multiType: 'week',
-        disabledDate: (time) => time.getTime() > Date.now()
+        disabledDate: (time) => time.getTime() > Date.now(),
       }"
     />
     <div class="description">
-      <span class="badge">
-        date
-      </span>
+      <span class="badge"> date </span>
       {{ calendar7 }}
     </div>
   </div>
@@ -115,13 +94,11 @@
       class="case-block"
       mode="dateRange"
       :options="{
-        disabledDate: (time) => time.getDay() === 2 || time.getDay() === 4
+        disabledDate: (time) => time.getDay() === 2 || time.getDay() === 4,
       }"
     />
     <div class="description">
-      <span class="badge">
-        date
-      </span>
+      <span class="badge"> date </span>
       {{ calendar8 }}
     </div>
   </div>

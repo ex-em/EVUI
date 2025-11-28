@@ -1,60 +1,40 @@
 <template>
-  <div
-    ref="zoomRef"
-    class="case"
-  >
+  <div ref="zoomRef" class="case">
     <ev-chart-group
       v-model:zoomStartIdx="zoomStartIdx"
       v-model:zoomEndIdx="zoomEndIdx"
       :options="chartGroupOptions"
     >
-      <ev-chart
-        :data="chartData"
-        :options="chartOptions"
-      />
-      <ev-chart
-        :data="chartData2"
-        :options="chartOptions2"
-      />
-      <ev-chart
-        :data="chartData3"
-        :options="chartOptions3"
-      />
+      <ev-chart :data="chartData" :options="chartOptions" />
+      <ev-chart :data="chartData2" :options="chartOptions2" />
+      <ev-chart :data="chartData3" :options="chartOptions3" />
     </ev-chart-group>
 
     <div class="description">
       <p class="case-title">줌 Start / End 인덱스 조절 (줌 모드에서 사용 가능)</p>
       <div class="input-wrapper">
-        <ev-input-number
-          v-model="zoomStartIdx"
-        />
-        <ev-input-number
-          v-model="zoomEndIdx"
-        />
+        <ev-input-number v-model="zoomStartIdx" />
+        <ev-input-number v-model="zoomEndIdx" />
       </div>
-      <br/>
-      <br/>
+      <br />
+      <br />
       <p class="case-title">줌 버퍼 메모리</p>
-      <ev-input-number
-        v-model="bufferMemoryCnt"
-        :min="1"
-        :max="1000"
-      />
-      <br/>
-      <br/>
+      <ev-input-number v-model="bufferMemoryCnt" :min="1" :max="1000" />
+      <br />
+      <br />
       <ev-button @click="onUpdateChartData">데이터 업데이트</ev-button>
-      <br/>
-      <br/>
+      <br />
+      <br />
       <span class="toggle-label">툴바 생성</span>
-      <ev-toggle v-model="isShowToolbar"/>
-      <br/>
-      <br/>
+      <ev-toggle v-model="isShowToolbar" />
+      <br />
+      <br />
       <span class="toggle-label">토글 레전드</span>
-      <ev-toggle v-model="isShowToggleLegend"/>
-      <br/>
-      <br/>
+      <ev-toggle v-model="isShowToggleLegend" />
+      <br />
+      <br />
       <span class="toggle-label">차트 넓히기</span>
-      <ev-toggle v-model="isExpandChartArea"/>
+      <ev-toggle v-model="isExpandChartArea" />
     </div>
   </div>
 </template>
@@ -168,17 +148,21 @@ export default {
         show: false,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
     });
 
     const chartOptions2 = reactive({
@@ -192,18 +176,22 @@ export default {
         show: false,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
       maxTip: {
         use: true,
         showIndicator: true,
@@ -224,18 +212,22 @@ export default {
         show: false,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
       maxTip: {
         use: true,
         showIndicator: true,
@@ -252,15 +244,15 @@ export default {
       chartData3.labels.push(dayjs(timeValue));
 
       Object.values(chartData.data).forEach((seriesData) => {
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
 
       Object.values(chartData2.data).forEach((seriesData) => {
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
 
       Object.values(chartData3.data).forEach((seriesData) => {
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
     };
 
@@ -309,9 +301,13 @@ export default {
       }
     });
 
-    watch(bufferMemoryCnt, (cnt) => {
-      chartGroupOptions.zoom.bufferMemoryCnt = cnt;
-    }, { immediate: true });
+    watch(
+      bufferMemoryCnt,
+      (cnt) => {
+        chartGroupOptions.zoom.bufferMemoryCnt = cnt;
+      },
+      { immediate: true },
+    );
 
     return {
       chartGroupOptions,

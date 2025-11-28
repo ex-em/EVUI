@@ -1,19 +1,10 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-text-field
-      v-model="modelValue1"
-      placeholder="Search"
-      type="search"
-      @search="searchInput"
-    />
+    <ev-text-field v-model="modelValue1" placeholder="Search" type="search" @search="searchInput" />
     <div class="description">
-      <span class="badge yellow">
-        type="search"
-      </span>
-      <span class="badge">
-        Search Event
-      </span>
+      <span class="badge yellow"> type="search" </span>
+      <span class="badge"> Search Event </span>
       {{ searchValue }}
     </div>
   </div>

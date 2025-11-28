@@ -125,7 +125,7 @@ const chartData =
 | formatter      | function      | null                      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                                        | (value, { prev, isDefaultMaxSameAsMin }) => value + '%' |
 | title          | Object        | ([상세](#axes-title))     | 라벨의 폰트 스타일을 설정                                                                      |                                                         |
 | scrollbar      | Object        | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                               |                                                         |
-| showAxisTick   | Boolean   | true    | 보조 눈금 표시 여부                                     |                                                         |
+| showAxisTick   | Boolean       | true                      | 보조 눈금 표시 여부                                                                            |                                                         |
 
 ##### time type
 
@@ -209,7 +209,7 @@ const chartData =
 | allowResize   | Boolean                     | false                                    | Legend 영역 리사이즈 가능 여부                |                                  |
 | stopClickEvt  | Boolean                     | false                                    | Legend 표시 여부                              | true /false                      |
 | virtualScroll | Boolean                     | false                                    | Legend에 가상 스크롤 적용 여부                | true /false                      |
-| clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
+| clickMode     | 'active' \| 'inactive'      | 'active'                                 | Legend 클릭 시 활성화 여부                    |                                  |
 
 #### dragSelection
 
@@ -243,7 +243,7 @@ const chartData =
 | rowPadding          | Object                              | { top: 0, bottom: 3, right: 20, left: 16 } | 툴팁에 표시될 series Row의 padding 값                   |                                                                     |
 | showAllValueInRange | Boolean                             | false                                      | 동일한 axes값을 가진 전체 series를 Tooltip에 표시       |
 | formatter           | function / Object                   | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
-| returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
+| returnValue         | function                            | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수     | (아래 코드 참고)                                                    |
 
 ```
 const chartOptions = {
@@ -279,20 +279,20 @@ const chartOptions = {
 
 #### returnValue
 
-| 이름 | 타입 | 설명 | 종류(예시) |
-| --- | --- | --- | --- |
-| seriesList | Array<SeriesItem> | 마우스 위치에 해당하는 시리즈 데이터 배열 | |
-| event | MouseEvent | 마우스 이벤트 객체 | |
+| 이름       | 타입              | 설명                                      | 종류(예시) |
+| ---------- | ----------------- | ----------------------------------------- | ---------- |
+| seriesList | Array<SeriesItem> | 마우스 위치에 해당하는 시리즈 데이터 배열 |            |
+| event      | MouseEvent        | 마우스 이벤트 객체                        |            |
 
-  - SeriesItem  
-    | 이름 | 타입 | 설명 | 종류(예시) |
-    | --- | --- | --- | --- |
-    | sId | String | 시리즈 ID | 'series1' |
-    | data | Object | 시리즈 데이터 | { x: Date, y: Number, xp: Number, yp: Number, o: Number } |
-    | color | String | 시리즈 색상 | '#2b99f0' |
-    | name | String | 시리즈 이름 | 'Series 1' |
-    | dataId | String | 데이터 ID | 'data_1' |
-    | index | Number | 데이터 인덱스 | 0 |
+- SeriesItem  
+  | 이름 | 타입 | 설명 | 종류(예시) |
+  | --- | --- | --- | --- |
+  | sId | String | 시리즈 ID | 'series1' |
+  | data | Object | 시리즈 데이터 | { x: Date, y: Number, xp: Number, yp: Number, o: Number } |
+  | color | String | 시리즈 색상 | '#2b99f0' |
+  | name | String | 시리즈 이름 | 'Series 1' |
+  | dataId | String | 데이터 ID | 'data_1' |
+  | index | Number | 데이터 인덱스 | 0 |
 
 #### heatmap color
 

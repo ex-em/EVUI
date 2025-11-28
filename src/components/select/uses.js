@@ -1,12 +1,14 @@
 import {
-  ref, reactive, computed, watch,
-  nextTick, getCurrentInstance, onMounted, onUnmounted,
+  ref,
+  reactive,
+  computed,
+  watch,
+  nextTick,
+  getCurrentInstance,
+  onMounted,
+  onUnmounted,
 } from 'vue';
-import {
-  getRegExp,
-  engToKor,
-  korToEng,
-} from 'korean-regexp';
+import { getRegExp, engToKor, korToEng } from 'korean-regexp';
 
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
@@ -18,12 +20,12 @@ export const useModel = () => {
    */
   const singleMv = {
     get: () => {
-      if (props.items.some(v => v.value === props.modelValue)) {
+      if (props.items.some((v) => v.value === props.modelValue)) {
         return props.modelValue;
       }
       return null;
     },
-    set: value => emit('update:modelValue', value),
+    set: (value) => emit('update:modelValue', value),
   };
   const multiMv = {
     get: () => {
@@ -32,7 +34,7 @@ export const useModel = () => {
       }
       return [];
     },
-    set: value => emit('update:modelValue', value),
+    set: (value) => emit('update:modelValue', value),
   };
   const mv = computed(!props.multiple ? singleMv : multiMv);
 
@@ -41,8 +43,8 @@ export const useModel = () => {
    * single 모드 : { name: 'name', value: 'value' }
    * multiple 모드 : [{ name: 'name', value: 'value' }, {...}]
    */
-  const singleSm = () => props.items.find(v => v.value === mv.value)?.name;
-  const multipleSm = () => props.items.filter(v => props.modelValue.includes(v.value));
+  const singleSm = () => props.items.find((v) => v.value === mv.value)?.name;
+  const multipleSm = () => props.items.filter((v) => props.modelValue.includes(v.value));
   const selectedModel = computed(!props.multiple ? singleSm : multipleSm);
 
   const computedPlaceholder = computed(() => {
@@ -134,11 +136,12 @@ export const useDropdown = (param) => {
     const korean = engToKor(trimText);
     const eng = korToEng(trimText);
 
-    return props.items.filter(({ name }) => (
-      name.search(getRegExp(trimText)) > -1
-        || name.search(getRegExp(korean)) > -1
-        || name.search(getRegExp(eng)) > -1
-        ));
+    return props.items.filter(
+      ({ name }) =>
+        name.search(getRegExp(trimText)) > -1 ||
+        name.search(getRegExp(korean)) > -1 ||
+        name.search(getRegExp(eng)) > -1,
+    );
   });
 
   /**
@@ -191,8 +194,10 @@ export const useDropdown = (param) => {
     if (itemWrapper.value && dropbox.value) {
       await nextTick();
 
-      if (initialDropboxWidth.value === null
-        || initialDropboxWidth.value !== selectWrapper.value.offsetWidth) {
+      if (
+        initialDropboxWidth.value === null ||
+        initialDropboxWidth.value !== selectWrapper.value.offsetWidth
+      ) {
         initialDropboxWidth.value = selectWrapper.value.offsetWidth;
       }
 
@@ -210,24 +215,20 @@ export const useDropdown = (param) => {
       const borderXWidth = parseInt(borderLeftWidth) + parseInt(borderRightWidth);
 
       const scrollbarWidth = itemWrapper.value.offsetWidth - itemWrapper.value.clientWidth;
-      maxWidth += (scrollbarWidth + borderXWidth);
+      maxWidth += scrollbarWidth + borderXWidth;
 
       const windowWidth = window.innerWidth;
       const dropboxRect = dropbox.value.getBoundingClientRect();
       const dropboxLeft = dropboxRect.left;
       const maxAllowedWidth = windowWidth - dropboxLeft - 20;
 
-      const finalWidth = Math.max(
-        Math.min((maxWidth), maxAllowedWidth),
-        initialDropboxWidth.value,
-      );
+      const finalWidth = Math.max(Math.min(maxWidth, maxAllowedWidth), initialDropboxWidth.value);
 
       dropboxWidth.value = `${finalWidth}px`;
     } else {
       dropboxWidth.value = '100%';
     }
   };
-
 
   watch(
     () => isDropbox.value,
@@ -245,7 +246,6 @@ export const useDropdown = (param) => {
       await changeDropboxPosition();
     },
   );
-
 
   if (props.filterable) {
     watch(
@@ -285,7 +285,7 @@ export const useDropdown = (param) => {
       allCheck.value = !allCheck.value;
     }
     if (allCheck.value) {
-      mv.value = filteredItems.value.filter(item => !item.disabled).map(item => item.value);
+      mv.value = filteredItems.value.filter((item) => !item.disabled).map((item) => item.value);
     } else {
       mv.value = [];
     }
@@ -316,7 +316,8 @@ export const useDropdown = (param) => {
       const idx = mv.value.indexOf(val);
       mv.value.splice(idx, 1);
     }
-    allCheck.value = mv.value.length === filteredItems.value.filter(item => !item.disabled).length;
+    allCheck.value =
+      mv.value.length === filteredItems.value.filter((item) => !item.disabled).length;
     mv.value = [...mv.value];
     changeMv();
   };
@@ -327,20 +328,24 @@ export const useDropdown = (param) => {
    * @param val
    * @returns {boolean | array}
    */
-  const singleSelectedCls = val => val === mv.value;
-  const multipleSelectedCls = val => mv.value.includes(val);
+  const singleSelectedCls = (val) => val === mv.value;
+  const multipleSelectedCls = (val) => mv.value.includes(val);
   const selectedItemClass = !props.multiple ? singleSelectedCls : multipleSelectedCls;
 
-  watch(() => mv.value, (curr) => {
-    if (props.multiple && props.checkable) {
-      if (curr.length === 0) {
-        allCheck.value = false;
-      } else {
-        allCheck.value = curr.length === filteredItems.value.filter(item => !item.disabled).length;
+  watch(
+    () => mv.value,
+    (curr) => {
+      if (props.multiple && props.checkable) {
+        if (curr.length === 0) {
+          allCheck.value = false;
+        } else {
+          allCheck.value =
+            curr.length === filteredItems.value.filter((item) => !item.disabled).length;
+        }
+        changeDropboxPosition();
       }
-      changeDropboxPosition();
-    }
-  });
+    },
+  );
 
   const handleResize = () => {
     if (isDropbox.value) {

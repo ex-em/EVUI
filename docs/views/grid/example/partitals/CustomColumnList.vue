@@ -1,35 +1,20 @@
 <template>
-  <ev-window
-    v-model:visible="visible"
-    title="Custom Column List"
-    width="20%"
-    height="40%"
-  >
-    <ev-checkbox-group
-      v-model="checkColumnGroup"
-      class="column-group"
-      @change="onCheckColumn"
-    >
+  <ev-window v-model:visible="visible" title="Custom Column List" width="20%" height="40%">
+    <ev-checkbox-group v-model="checkColumnGroup" class="column-group" @change="onCheckColumn">
       <ev-checkbox
         v-for="(column, idx) in getDisplayColumnList(columnList)"
         :key="`${column.field}_${idx}`"
         :label="column?.field"
       >
-        {{column?.caption}}
+        {{ column?.caption }}
       </ev-checkbox>
     </ev-checkbox-group>
     <template #footer>
-      <ev-button
-        type="primary"
-        @click="onApplyColumn"
-      >
-        OK
-      </ev-button>
+      <ev-button type="primary" @click="onApplyColumn"> OK </ev-button>
     </template>
   </ev-window>
 </template>
 <script>
-
 import { computed, ref, watch } from 'vue';
 
 export default {
@@ -48,11 +33,11 @@ export default {
   setup(props, { emit }) {
     const visible = computed({
       get: () => props.isVisible,
-      set: value => emit('update:isVisible', value),
+      set: (value) => emit('update:isVisible', value),
     });
     const columnList = computed({
       get: () => props.columns,
-      set: value => emit('update:columns', value),
+      set: (value) => emit('update:columns', value),
     });
     const checkColumnGroup = ref([]);
     let lastCheckColumn = null;
@@ -66,8 +51,8 @@ export default {
 
     const setCheckColumn = (columns) => {
       checkColumnGroup.value = columns
-        .filter(column => !column.hiddenDisplay && !column.hide)
-        .map(column => (column.field));
+        .filter((column) => !column.hiddenDisplay && !column.hide)
+        .map((column) => column.field);
     };
 
     const sort = {
@@ -77,8 +62,8 @@ export default {
 
     const getSortingColumns = (columns, type = 'ASC') => {
       const sortingTarget = 'index';
-      const existTargetInColumns = columns.every(
-        column => Object.prototype.hasOwnProperty.call(column, sortingTarget),
+      const existTargetInColumns = columns.every((column) =>
+        Object.prototype.hasOwnProperty.call(column, sortingTarget),
       );
       if (existTargetInColumns) {
         return sort[type](columns, sortingTarget);
@@ -89,14 +74,17 @@ export default {
       if (!visible.value) {
         return columns;
       }
-      return getSortingColumns(columns.filter(column => !column?.hide));
+      return getSortingColumns(columns.filter((column) => !column?.hide));
     };
 
-    watch(() => visible.value, (newVal, prevVal) => {
-      if (newVal && !prevVal) {
-        setCheckColumn(columnList.value);
-      }
-    });
+    watch(
+      () => visible.value,
+      (newVal, prevVal) => {
+        if (newVal && !prevVal) {
+          setCheckColumn(columnList.value);
+        }
+      },
+    );
 
     const onApplyColumn = () => {
       columnList.value.forEach((column) => {

@@ -26,7 +26,6 @@ class TimeCategoryScale extends Scale {
       }
     }
 
-
     return dayjs(value).format(this.timeFormat);
   }
 
@@ -89,10 +88,9 @@ class TimeCategoryScale extends Scale {
       interval = Math.ceil(graphRange / numberOfSteps);
     }
 
-    if (graphMax - graphMin > (numberOfSteps * interval)) {
+    if (graphMax - graphMin > numberOfSteps * interval) {
       interval = Math.ceil((graphMax - graphMin) / numberOfSteps);
     }
-
 
     return {
       steps: numberOfSteps,
@@ -198,9 +196,9 @@ class TimeCategoryScale extends Scale {
     const maxIndex = count === oriSteps ? oriSteps : oriSteps - 1;
 
     for (ix = 0; ix <= maxIndex; ix += count) {
-      ticks[ix] = dayjs(axisMin).valueOf() + (ix * stepValue);
+      ticks[ix] = dayjs(axisMin).valueOf() + ix * stepValue;
 
-      labelCenter = Math.round(startPoint + (graphGap * ix));
+      labelCenter = Math.round(startPoint + graphGap * ix);
       linePosition = labelCenter + aliasPixel;
 
       let prev;
@@ -212,14 +210,18 @@ class TimeCategoryScale extends Scale {
 
       labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]), { prev });
 
-      const isBlurredLabel = this.options?.selectLabel?.use
-        && this.options?.selectLabel?.useLabelOpacity
-        && (this.options.horizontal === (this.type === 'y'))
-        && selectLabelInfo?.dataIndex?.length
-        && !selectLabelInfo?.label
-          .map(t => this.getLabelFormat(Math.min(axisMax, t), {
-            prev,
-          })).includes(labelText);
+      const isBlurredLabel =
+        this.options?.selectLabel?.use &&
+        this.options?.selectLabel?.useLabelOpacity &&
+        this.options.horizontal === (this.type === 'y') &&
+        selectLabelInfo?.dataIndex?.length &&
+        !selectLabelInfo?.label
+          .map((t) =>
+            this.getLabelFormat(Math.min(axisMax, t), {
+              prev,
+            }),
+          )
+          .includes(labelText);
 
       const labelColor = this.labelStyle.color;
       let defaultOpacity = 1;
@@ -233,13 +235,13 @@ class TimeCategoryScale extends Scale {
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);
-        if (!isBlurredLabel
-            && this.options?.selectItem?.showLabelTip
-            && hitInfo?.label
-            && !this.options?.horizontal) {
-          const selectedLabel = this.getLabelFormat(
-            Math.min(axisMax, hitInfo.label + (0 * stepValue)),
-          );
+        if (
+          !isBlurredLabel &&
+          this.options?.selectItem?.showLabelTip &&
+          hitInfo?.label &&
+          !this.options?.horizontal
+        ) {
+          const selectedLabel = this.getLabelFormat(Math.min(axisMax, hitInfo.label));
           if (selectedLabel === labelText) {
             const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
             Util.showLabelTip({
@@ -267,16 +269,16 @@ class TimeCategoryScale extends Scale {
         }
 
         if (
-          ix < oriSteps && this.showGrid && (
-            isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0)
-          )
+          ix < oriSteps &&
+          this.showGrid &&
+          (isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0))
         ) {
-            ctx.beginPath();
-            ctx.strokeStyle = this.gridLineColor;
-            ctx.moveTo(linePosition, offsetPoint);
-            ctx.lineTo(linePosition, offsetCounterPoint);
-            ctx.stroke();
-            ctx.closePath();
+          ctx.beginPath();
+          ctx.strokeStyle = this.gridLineColor;
+          ctx.moveTo(linePosition, offsetPoint);
+          ctx.lineTo(linePosition, offsetCounterPoint);
+          ctx.stroke();
+          ctx.closePath();
         }
       } else {
         labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
@@ -292,28 +294,27 @@ class TimeCategoryScale extends Scale {
         }
 
         if (
-          ix < oriSteps && this.showGrid && (
-            isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0)
-          )) {
-              ctx.beginPath();
-              ctx.strokeStyle = this.gridLineColor;
-              ctx.moveTo(offsetPoint, linePosition);
-              ctx.lineTo(offsetCounterPoint, linePosition);
-              ctx.stroke();
-              ctx.closePath();
+          ix < oriSteps &&
+          this.showGrid &&
+          (isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0))
+        ) {
+          ctx.beginPath();
+          ctx.strokeStyle = this.gridLineColor;
+          ctx.moveTo(offsetPoint, linePosition);
+          ctx.lineTo(offsetCounterPoint, linePosition);
+          ctx.stroke();
+          ctx.closePath();
         }
       }
 
       ctx.stroke();
     }
 
-    if (this.categoryMode && alignToGridLine && (ix * count) === oriSteps) {
+    if (this.categoryMode && alignToGridLine && ix * count === oriSteps) {
       const diffTime = dayjs(labels[1]).diff(dayjs(labels[0]));
-      const labelLastText = this.getLabelFormat(
-        dayjs(ticks[oriSteps - 1] + diffTime),
-      );
+      const labelLastText = this.getLabelFormat(dayjs(ticks[oriSteps - 1] + diffTime));
 
-      labelCenter = Math.round(startPoint + (graphGap * oriSteps));
+      labelCenter = Math.round(startPoint + graphGap * oriSteps);
       linePosition = labelCenter + aliasPixel;
 
       if (this.type === 'x') {

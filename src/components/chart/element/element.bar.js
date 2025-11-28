@@ -67,7 +67,7 @@ class Bar {
 
     // minIndex, maxIndex가 유효하면 실제 그릴 데이터 개수로 보정
     if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
-      totalCount = (maxIndex - minIndex) + 1;
+      totalCount = maxIndex - minIndex + 1;
     }
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
@@ -96,7 +96,7 @@ class Bar {
     let w;
     let h;
 
-    bArea = cArea > (cPad * 2) ? (cArea - (cPad * 2)) : cArea;
+    bArea = cArea > cPad * 2 ? cArea - cPad * 2 : cArea;
     bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
 
     const size = this.calculateBarSize(thickness, bArea);
@@ -129,15 +129,15 @@ class Bar {
         // 스크롤 offset(minIndex)만큼 보정해서 그리기
 
         const categoryPoint = isHorizontal
-          ? ysp - (cArea * screenIndex) - cPad
-          : xsp + (cArea * screenIndex) + cPad;
+          ? ysp - cArea * screenIndex - cPad
+          : xsp + cArea * screenIndex + cPad;
 
         // 기본 위치 설정
         if (isHorizontal) {
           x = xsp;
-          y = Math.round(categoryPoint - ((bArea * barSeriesX) - (h + bPad)));
+          y = Math.round(categoryPoint - (bArea * barSeriesX - (h + bPad)));
         } else {
-          x = Math.round(categoryPoint + ((bArea * barSeriesX) - (w + bPad)));
+          x = Math.round(categoryPoint + (bArea * barSeriesX - (w + bPad)));
           y = ysp;
         }
 
@@ -146,12 +146,20 @@ class Bar {
           const barValue = item.b ? item.o : item.x;
 
           w = Canvas.calculateX(
-            barValue, minmaxX.graphMin, minmaxX.graphMax, xArea, -xZeroPosition,
+            barValue,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea,
+            -xZeroPosition,
           );
 
           if (item.b) {
             x = Canvas.calculateX(
-              item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp - xZeroPosition,
+              item.b,
+              minmaxX.graphMin,
+              minmaxX.graphMax,
+              xArea,
+              xsp - xZeroPosition,
             );
           }
 
@@ -161,12 +169,20 @@ class Bar {
           const barValue = item.b ? item.o : item.y;
 
           h = Canvas.calculateY(
-            barValue, minmaxY.graphMin, minmaxY.graphMax, yArea, -yZeroPosition,
+            barValue,
+            minmaxY.graphMin,
+            minmaxY.graphMax,
+            yArea,
+            -yZeroPosition,
           );
 
           if (item.b) {
             y = Canvas.calculateY(
-              item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp - yZeroPosition,
+              item.b,
+              minmaxY.graphMin,
+              minmaxY.graphMax,
+              yArea,
+              ysp - yZeroPosition,
             );
           }
 
@@ -179,10 +195,8 @@ class Bar {
         const selectLabelOption = param?.selectLabel?.option;
         const selectItemOption = param?.selectItem?.option;
         const selectedLabelList = param?.selectLabel?.selected?.dataIndex ?? [];
-        const {
-          dataIndex: selectedItemDataIndex,
-          seriesID: selectedItemSeriesId,
-        } = param?.selectItem?.selected ?? {};
+        const { dataIndex: selectedItemDataIndex, seriesID: selectedItemSeriesId } =
+          param?.selectItem?.selected ?? {};
 
         let isDownplay = false;
 
@@ -363,9 +377,7 @@ class Bar {
       const ex = sx + w;
       const ey = sy + h;
 
-      const inRange = isHorizontal
-        ? ((ey <= yp) && (yp <= sy))
-        : ((sx <= xp) && (xp <= ex));
+      const inRange = isHorizontal ? ey <= yp && yp <= sy : sx <= xp && xp <= ex;
 
       if (inRange) {
         item.data = barData;
@@ -374,9 +386,7 @@ class Bar {
         return item;
       }
 
-      const shouldGoRight = isHorizontal
-        ? (!(ey < yp))
-        : (sx + 4 < xp);
+      const shouldGoRight = isHorizontal ? !(ey < yp) : sx + 4 < xp;
 
       if (shouldGoRight) {
         s = m + 1;
@@ -455,8 +465,8 @@ class Bar {
     const minXPos = isNegativeValue ? barX - GAP : barX + GAP;
     const minYPos = isNegativeValue ? barY + GAP : barY - GAP;
 
-    const centerXOnBar = barX + (barWidth / 2);
-    const centerYOnBar = isHighlight ? barY + (barHeight / 2) : barY - (barHeight / 2);
+    const centerXOnBar = barX + barWidth / 2;
+    const centerYOnBar = isHighlight ? barY + barHeight / 2 : barY - barHeight / 2;
 
     const drawableBarWidth = Math.abs(barWidth) - GAP;
     const drawableBarHeight = Math.abs(barHeight) - GAP;
@@ -467,9 +477,7 @@ class Bar {
           const xPos = isNegativeValue ? minXPos - textWidth : minXPos;
           ctx.fillText(formattedTxt, xPos, centerYOnBar);
         } else if (!isHorizontal && textHeight < drawableBarHeight) {
-          const yPos = isNegativeValue
-            ? barY + GAP
-            : barY - GAP;
+          const yPos = isNegativeValue ? barY + GAP : barY - GAP;
           ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
@@ -480,7 +488,7 @@ class Bar {
         if (isHorizontal && textWidth < drawableBarWidth) {
           ctx.fillText(formattedTxt, centerXOnBar, centerYOnBar);
         } else if (!isHorizontal && textHeight < drawableBarHeight) {
-          ctx.fillText(formattedTxt, centerXOnBar, barY + (barHeight / 2));
+          ctx.fillText(formattedTxt, centerXOnBar, barY + barHeight / 2);
         }
 
         break;
@@ -488,7 +496,9 @@ class Bar {
 
       case 'out': {
         if (isStacked) {
-          console.warn('[EVUI][Bar Chart] In case of Stack Bar Chart, \'out\' of \'showValue\'\'s align is not supported.');
+          console.warn(
+            "[EVUI][Bar Chart] In case of Stack Bar Chart, 'out' of 'showValue''s align is not supported.",
+          );
           return;
         }
 
@@ -508,9 +518,7 @@ class Bar {
             }
           }
         } else {
-          const yPos = isNegativeValue
-            ? barY + barHeight + GAP
-            : barY + barHeight - GAP;
+          const yPos = isNegativeValue ? barY + barHeight + GAP : barY + barHeight - GAP;
           ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
@@ -520,9 +528,7 @@ class Bar {
       default:
       case 'end': {
         if (isHorizontal && textWidth < drawableBarWidth) {
-          const xPos = isNegativeValue
-            ? barX + barWidth + GAP
-            : barX + barWidth - textWidth - GAP;
+          const xPos = isNegativeValue ? barX + barWidth + GAP : barX + barWidth - textWidth - GAP;
           ctx.fillText(formattedTxt, xPos, centerYOnBar);
         } else if (!isHorizontal) {
           if (isNegativeValue) {
@@ -599,7 +605,7 @@ class Bar {
     const ex = sx + w;
     const ey = sy + h;
 
-    return (sx <= xp) && (xp <= ex) && (ey <= yp) && (yp <= sy);
+    return sx <= xp && xp <= ex && ey <= yp && yp <= sy;
   }
 
   drawRoundedRect(ctx, positions) {

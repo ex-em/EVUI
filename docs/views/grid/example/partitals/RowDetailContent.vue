@@ -1,7 +1,7 @@
 <template>
   <div class="row-detail">
     Row Detail Info
-    <br>
+    <br />
     {{ $props.data }}
   </div>
 </template>
@@ -22,12 +22,12 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  .row-detail {
-    display: flex;
-    width: 100%;
-    height: 100px;
-    padding: 10px;
-    align-items: center;
-    background-color: rgba(250, 222, 76, 0.6);
-  }
+.row-detail {
+  display: flex;
+  width: 100%;
+  height: 100px;
+  padding: 10px;
+  align-items: center;
+  background-color: rgba(250, 222, 76, 0.6);
+}
 </style>

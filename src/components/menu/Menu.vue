@@ -10,15 +10,8 @@
       :comp="component"
       @click="clickMenu"
     >
-      <template
-        v-for="(_, slotName) in $slots"
-        :key="slotName"
-        #[slotName]="slotProps"
-      >
-        <slot
-          :name="slotName"
-          v-bind="slotProps"
-        />
+      <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotProps">
+        <slot :name="slotName" v-bind="slotProps" />
       </template>
     </menu-item>
   </ul>
@@ -53,7 +46,7 @@ export default {
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
-    const prevMenuItem = ref(props.items.filter(item => props.modelValue === item.value));
+    const prevMenuItem = ref(props.items.filter((item) => props.modelValue === item.value));
     const clickMenu = (params) => {
       if (!params.disabled) {
         const newMenuItem = params.item;
@@ -72,7 +65,9 @@ export default {
 </script>
 <style lang="scss">
 .ev-menu {
-  ul, ol, li {
+  ul,
+  ol,
+  li {
     list-style: none;
   }
 }

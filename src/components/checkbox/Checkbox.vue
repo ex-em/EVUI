@@ -1,11 +1,5 @@
 <template>
-  <label
-    class="ev-checkbox"
-    :class="[
-      { disabled, },
-      { checked, },
-    ]"
-  >
+  <label class="ev-checkbox" :class="[{ disabled }, { checked }]">
     <input
       ref="checkbox"
       v-model="mv"
@@ -16,10 +10,7 @@
       :readonly="readonly"
       @change="changeMv"
     />
-    <span
-      ref="checkboxLabel"
-      class="ev-checkbox-label"
-    >
+    <span ref="checkboxLabel" class="ev-checkbox-label">
       <template v-if="$slots.default">
         <slot />
       </template>
@@ -123,13 +114,10 @@ export default {
      * checkbox group을 사용하는 경우 Provide('EvCheckboxGroupChange')가 실행
      * checkbox group을 사용하지 않는 경우 2nd argument 실행
      */
-    const changeMv = inject(
-      'EvCheckboxGroupChange',
-      async (e) => {
-        await nextTick();
-        emit('change', mv.value, e);
-      },
-    );
+    const changeMv = inject('EvCheckboxGroupChange', async (e) => {
+      await nextTick();
+      emit('change', mv.value, e);
+    });
 
     /**
      * props의 indeterminate 값을 감시하여
@@ -144,7 +132,8 @@ export default {
           }
           checkbox.value.indeterminate = val;
         });
-      }, { immediate: true },
+      },
+      { immediate: true },
     );
 
     return {

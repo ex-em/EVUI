@@ -3,16 +3,11 @@
     <p class="case-title">Common</p>
     <div class="loading-wrapper">
       <ev-loading v-model="isLoading1" />
-      <div> TITLE </div>
-      <div> CONTENTS </div>
+      <div>TITLE</div>
+      <div>CONTENTS</div>
     </div>
     <div class="description">
-      <button
-        class="btn"
-        @click="changeLoading1"
-      >
-        click to change loading
-      </button>
+      <button class="btn" @click="changeLoading1">click to change loading</button>
       &nbsp; {{ isLoading1 }}
     </div>
   </div>
@@ -28,41 +23,28 @@
           'font-size': '60px',
         }"
       />
-      <div> TITLE2 </div>
-      <div> CONTENTS2 </div>
+      <div>TITLE2</div>
+      <div>CONTENTS2</div>
     </div>
     <div class="description">
-      <button
-        class="btn"
-        @click="changeLoading2"
-      >
-        click to change loading
-      </button>
+      <button class="btn" @click="changeLoading2">click to change loading</button>
       &nbsp; {{ isLoading2 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Custom Loading</p>
     <div class="loading-wrapper">
-      <ev-loading
-        v-model="isLoading3"
-        :click-outside="true"
-      >
+      <ev-loading v-model="isLoading3" :click-outside="true">
         <i class="ev-icon-configuration-line ev-loading-icon" />
         <div class="loading-text">
           <span>{{ loadingText }}</span>
         </div>
       </ev-loading>
-      <div> TITLE3 </div>
-      <div> CONTENTS3 </div>
+      <div>TITLE3</div>
+      <div>CONTENTS3</div>
     </div>
     <div class="description">
-      <button
-        class="btn"
-        @click="changeLoading3"
-      >
-        click to change loading
-      </button>
+      <button class="btn" @click="changeLoading3">click to change loading</button>
       &nbsp; {{ isLoading3 }}
     </div>
   </div>
@@ -92,7 +74,7 @@ export default {
       if (isLoading3.value) {
         timer = setInterval(() => {
           num++;
-          const dotArr = new Array(num % 5).fill('.');
+          const dotArr = Array.from({ length: num % 5 }, () => '.');
           loadingText.value = `NOW LOADING${dotArr.join('')}`;
         }, 300);
       } else if (!isLoading3.value) {
@@ -121,7 +103,7 @@ export default {
   position: relative;
   width: 400px;
   height: 400px;
-  background-color: #5AC8FA;
+  background-color: #5ac8fa;
   overflow: auto;
 }
 .ev-loading-icon {

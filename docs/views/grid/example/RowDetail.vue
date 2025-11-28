@@ -10,34 +10,23 @@
         customContextMenu: menuItems,
         rowDetail: {
           use: useRowDetail,
-        }
+        },
       }"
       @expand-row="onExpandRow"
       @resize-column="onResizeColumn"
     >
       <template #rowDetail="{ item }">
-        <row-detail-content
-          :data="item.row[2]"
-        />
+        <row-detail-content :data="item.row[2]" />
       </template>
     </ev-grid>
     <div class="description">
       <div class="form-rows">
-        <span class="badge yellow">
-          Use Row Detail
-        </span>
-        <ev-toggle
-            v-model="useRowDetail"
-        />
+        <span class="badge yellow"> Use Row Detail </span>
+        <ev-toggle v-model="useRowDetail" />
       </div>
       <div class="form-row">
-        <span class="badge yellow">
-          Expanded Row
-        </span>
-        <ev-text-field
-          v-model="expandedRowText"
-          type="textarea"
-        />
+        <span class="badge yellow"> Expanded Row </span>
+        <ev-text-field v-model="expandedRowText" type="textarea" />
       </div>
     </div>
   </div>
@@ -55,27 +44,39 @@ export default {
     const menuItems = ref([
       {
         text: 'Menu1',
-        click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
-      }, {
+        click: (param) => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
+      },
+      {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param.contextmenuInfo),
+        click: (param) => console.log('[Menu2]', param.contextmenuInfo),
       },
     ]);
     const columns = [
       {
-        caption: 'Name', field: 'name', type: 'string',
+        caption: 'Name',
+        field: 'name',
+        type: 'string',
       },
       {
-        caption: 'Column1', field: 'column1', type: 'string',
+        caption: 'Column1',
+        field: 'column1',
+        type: 'string',
       },
       {
-        caption: 'Column2', field: 'column2', type: 'string',
+        caption: 'Column2',
+        field: 'column2',
+        type: 'string',
       },
       {
-        caption: 'Column3', field: 'column3', type: 'string',
+        caption: 'Column3',
+        field: 'column3',
+        type: 'string',
       },
       {
-        caption: 'Column4', field: 'column4', type: 'string', width: 100,
+        caption: 'Column4',
+        field: 'column4',
+        type: 'string',
+        width: 100,
       },
     ];
     const rows = ref([]);
@@ -132,7 +133,9 @@ export default {
     display: flex;
     margin-bottom: 5px;
   }
-  .ev-text-field, .ev-input-number, .ev-select {
+  .ev-text-field,
+  .ev-input-number,
+  .ev-select {
     width: 80%;
   }
   .badge {

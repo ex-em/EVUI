@@ -7,15 +7,9 @@
       placeholder="Select a date."
       clearable
     />
-    <ev-date-picker
-      v-model="date1"
-      placeholder="Select a date."
-      disabled
-    />
+    <ev-date-picker v-model="date1" placeholder="Select a date." disabled />
     <div class="description">
-      <span class="badge">
-        date1
-      </span>
+      <span class="badge"> date1 </span>
       {{ date1 }}
     </div>
   </div>
@@ -29,9 +23,7 @@
       }"
     />
     <div class="description">
-      <span class="badge">
-        dateTime1
-      </span>
+      <span class="badge"> dateTime1 </span>
       {{ dateTime1 }}
     </div>
   </div>
@@ -43,14 +35,12 @@
       clearable
       :enable-text-input="true"
       :options="{
-        timeFormat: 'HH:00:ss'
+        timeFormat: 'HH:00:ss',
       }"
       :shortcuts="dateTime2Shortcut"
     />
     <div class="description">
-      <span class="badge">
-        Value
-      </span>
+      <span class="badge"> Value </span>
       {{ dateTime2 }}
     </div>
   </div>
@@ -63,13 +53,11 @@
       :options="{
         multiType: 'date',
         multiDayLimit: 3,
-        disabledDate: (time) => time.getDay() === 0 || time.getDay() === 6
+        disabledDate: (time) => time.getDay() === 0 || time.getDay() === 6,
       }"
     />
     <div class="description">
-      <span class="badge">
-        Value
-      </span>
+      <span class="badge"> Value </span>
       {{ dateMulti1 }}
     </div>
   </div>
@@ -80,13 +68,11 @@
       mode="dateMulti"
       :clearable="true"
       :options="{
-        multiType: 'weekday'
+        multiType: 'weekday',
       }"
     />
     <div class="description">
-      <span class="badge">
-        Value
-      </span>
+      <span class="badge"> Value </span>
       {{ dateMulti2 }}
     </div>
   </div>
@@ -98,35 +84,26 @@
       :clearable="true"
       :options="{
         multiType: 'week',
-        tagShorten: true
+        tagShorten: true,
       }"
     />
     <ev-date-picker
       v-model="dateMulti3"
       mode="dateMulti"
       :options="{
-        multiType: 'week'
+        multiType: 'week',
       }"
     />
     <div class="description">
-      <span class="badge">
-        Value
-      </span>
+      <span class="badge"> Value </span>
       {{ dateMulti3 }}
     </div>
   </div>
   <div class="case ev-date-picker__date-range">
     <p class="case-title">Calendar dateRange mode (enable text input)</p>
-    <ev-date-picker
-        v-model="dateRange2"
-        mode="dateRange"
-        :enable-text-input="true"
-        clearable
-    />
+    <ev-date-picker v-model="dateRange2" mode="dateRange" :enable-text-input="true" clearable />
     <div class="description">
-      <span class="badge">
-        Value
-      </span>
+      <span class="badge"> Value </span>
       {{ dateRange2 }}
     </div>
   </div>
@@ -139,55 +116,43 @@
       :shortcuts="dateTimeRange2Shortcut"
     />
     <div class="description">
-      <span class="badge">
-        Value
-      </span>
+      <span class="badge"> Value </span>
       {{ dateRange1 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Calendar dateTimeRange mode</p>
-    <ev-date-picker
-        v-model="dateTimeRange1"
-        mode="dateTimeRange"
-        clearable
-    />
+    <ev-date-picker v-model="dateTimeRange1" mode="dateTimeRange" clearable />
     <div class="description">
-      <span class="badge">
-        Value
-      </span>
+      <span class="badge"> Value </span>
       {{ dateTimeRange1 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Calendar dateTimeRange mode(shortcuts)</p>
     <ev-date-picker
-        v-model="dateTimeRange2"
-        mode="dateTimeRange"
-        :options="{
-          timeFormat: ['HH:mm:00', 'HH:mm:00'],
-          disabledDate: disabledDateTime,
-        }"
-        :shortcuts="dateTimeRange2Shortcut"
+      v-model="dateTimeRange2"
+      mode="dateTimeRange"
+      :options="{
+        timeFormat: ['HH:mm:00', 'HH:mm:00'],
+        disabledDate: disabledDateTime,
+      }"
+      :shortcuts="dateTimeRange2Shortcut"
     />
     <div class="description">
-      <span class="badge">
-        Value
-      </span>
+      <span class="badge"> Value </span>
       {{ dateTimeRange2 }}
     </div>
     <div class="case ev-date-picker__date-time-range">
       <p class="case-title">Calendar dateTimeRange mode (enable text input)</p>
       <ev-date-picker
-          v-model="dateTimeRange3"
-          mode="dateTimeRange"
-          :enable-text-input="true"
-          clearable
+        v-model="dateTimeRange3"
+        mode="dateTimeRange"
+        :enable-text-input="true"
+        clearable
       />
       <div class="description">
-      <span class="badge">
-        Value
-      </span>
+        <span class="badge"> Value </span>
         {{ dateTimeRange3 }}
       </div>
     </div>
@@ -212,27 +177,29 @@ export default {
     const dateTimeRange2 = ref(['2022-06-07 16:01:01', '2022-06-08 17:10:15']);
     const dateTimeRange3 = ref(['2023-02-14 10:00:00', '2023-02-14 11:00:00']);
 
-    const TODAY_0_O_CLOCK_DATE = new Date(dayjs()
-        .format('YYYY-MM-DD 00:00:00'));
+    const TODAY_0_O_CLOCK_DATE = new Date(dayjs().format('YYYY-MM-DD 00:00:00'));
 
-    const dateTime2Shortcut = [{
-      label: 'Yesterday',
-      value: 'yesterday',
-      shortcutDate: () => new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'day')),
-    }, {
-      label: 'Today',
-      value: 'today',
-      shortcutDate: () => new Date(TODAY_0_O_CLOCK_DATE),
-    }];
+    const dateTime2Shortcut = [
+      {
+        label: 'Yesterday',
+        value: 'yesterday',
+        shortcutDate: () => new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(1, 'day')),
+      },
+      {
+        label: 'Today',
+        value: 'today',
+        shortcutDate: () => new Date(TODAY_0_O_CLOCK_DATE),
+      },
+    ];
 
     const dateTimeRange2Shortcut = [
-        {
-          label: 'LastMonth',
-          value: 'lastMonth',
-          shortcutDate: () => [
-            new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(30, 'd')),
-            new Date(TODAY_0_O_CLOCK_DATE),
-          ],
+      {
+        label: 'LastMonth',
+        value: 'lastMonth',
+        shortcutDate: () => [
+          new Date(dayjs(TODAY_0_O_CLOCK_DATE).subtract(30, 'd')),
+          new Date(TODAY_0_O_CLOCK_DATE),
+        ],
       },
       {
         label: 'LastWeek',
@@ -255,17 +222,19 @@ export default {
         value: 'today',
         shortcutDate: () => [
           new Date(TODAY_0_O_CLOCK_DATE),
-          new Date(+TODAY_0_O_CLOCK_DATE + (1000 * 60 * 30)),
+          new Date(+TODAY_0_O_CLOCK_DATE + 1000 * 60 * 30),
         ],
       },
     ];
 
     // toDate - fromDate 최소 선택 시간: 30분, 최대 선택 날짜: 한달
     const disabledDateTime = computed(() => [
-      time => +time > +new Date(dateTimeRange2.value[1]) - (1000 * 60 * 30)
-            || +time < +new Date(dayjs(dateTimeRange2.value[1]).subtract(1, 'month')),
-      time => (+time < +new Date(dateTimeRange2.value[0]) + (1000 * 60 * 30))
-            || (+time >= +new Date(dayjs(TODAY_0_O_CLOCK_DATE).add(2, 'day'))),
+      (time) =>
+        +time > +new Date(dateTimeRange2.value[1]) - 1000 * 60 * 30 ||
+        +time < +new Date(dayjs(dateTimeRange2.value[1]).subtract(1, 'month')),
+      (time) =>
+        +time < +new Date(dateTimeRange2.value[0]) + 1000 * 60 * 30 ||
+        +time >= +new Date(dayjs(TODAY_0_O_CLOCK_DATE).add(2, 'day')),
     ]);
 
     return {

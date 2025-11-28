@@ -9,16 +9,10 @@
         70: 'Custom Label 70',
       }"
     />
-    <div class="description" style="margin-bottom: 20px;">
-      <span class="badge">
-        min=0
-      </span>
-      <span class="badge">
-        max=100
-      </span>
-      <span class="badge">
-        step=1
-      </span>
+    <div class="description" style="margin-bottom: 20px">
+      <span class="badge"> min=0 </span>
+      <span class="badge"> max=100 </span>
+      <span class="badge"> step=1 </span>
     </div>
     <ev-slider
       v-model="modelValue2"
@@ -30,16 +24,10 @@
         },
       }"
     />
-    <div class="description" style="margin-bottom: 20px;">
-      <span class="badge">
-        min=0
-      </span>
-      <span class="badge">
-        max=100
-      </span>
-      <span class="badge">
-        step=1
-      </span>
+    <div class="description" style="margin-bottom: 20px">
+      <span class="badge"> min=0 </span>
+      <span class="badge"> max=100 </span>
+      <span class="badge"> step=1 </span>
     </div>
   </div>
   <div class="case">
@@ -70,15 +58,9 @@
       :show-tooltip="false"
     />
     <div class="description">
-      <span class="badge">
-        min=0
-      </span>
-      <span class="badge">
-        max=80
-      </span>
-      <span class="badge">
-        step=1
-      </span>
+      <span class="badge"> min=0 </span>
+      <span class="badge"> max=80 </span>
+      <span class="badge"> step=1 </span>
     </div>
   </div>
   <div class="case">
@@ -101,32 +83,26 @@
       }"
     />
     <div class="description">
-      <span class="badge">
-        min=0
-      </span>
-      <span class="badge">
-        max=80
-      </span>
-      <span class="badge">
-        step=1
-      </span>
+      <span class="badge"> min=0 </span>
+      <span class="badge"> max=80 </span>
+      <span class="badge"> step=1 </span>
     </div>
   </div>
 </template>
 
 <script>
-  import { ref } from 'vue';
+import { ref } from 'vue';
 
-  export default {
-    setup() {
-      const modelValue1 = ref();
-      const modelValue2 = ref();
-      const modelValue3 = ref([33.33, 66.66]);
-      return {
-        modelValue1,
-        modelValue2,
-        modelValue3,
-      };
-    },
-  };
+export default {
+  setup() {
+    const modelValue1 = ref();
+    const modelValue2 = ref();
+    const modelValue3 = ref([33.33, 66.66]);
+    return {
+      modelValue1,
+      modelValue2,
+      modelValue3,
+    };
+  },
+};
 </script>

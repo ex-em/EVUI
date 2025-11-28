@@ -87,9 +87,7 @@ class Scatter {
 
     let x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
     const y = Canvas.calculateY(
-      displayOverflow && item.y > minmaxY.graphMax
-        ? minmaxY.graphMax
-        : item.y,
+      displayOverflow && item.y > minmaxY.graphMax ? minmaxY.graphMax : item.y,
       minmaxY.graphMin,
       minmaxY.graphMax,
       yArea,
@@ -122,7 +120,7 @@ class Scatter {
       const isDedupeOn = coordinateDedupe !== false;
       let shouldDraw;
       if (legendHitInfo) {
-        shouldDraw = (legendHitInfo.sId === this.sId);
+        shouldDraw = legendHitInfo.sId === this.sId;
       } else if (isDedupeOn) {
         shouldDraw = duple.get(`${item.x}${item.y}`) === this.sId;
       } else {
@@ -158,7 +156,8 @@ class Scatter {
   realTimeScatterDraw(param) {
     const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
-    const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
+    const pointStyle =
+      typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
 
     for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
@@ -168,7 +167,7 @@ class Scatter {
         const isDedupeOnRT = coordinateDedupe !== false;
         let shouldDraw;
         if (legendHitInfo) {
-          shouldDraw = (legendHitInfo.sId === this.sId);
+          shouldDraw = legendHitInfo.sId === this.sId;
         } else if (isDedupeOnRT) {
           shouldDraw = duple.get(`${item.x}${item.y}`) === this.sId;
         } else {
@@ -207,9 +206,13 @@ class Scatter {
    * @returns {Array} Filtered data items
    */
   findItemsInRange(data, xsp, ysp, xep, yep) {
-    return data.filter(seriesData =>
-      (xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1
-      && ysp - 1 <= seriesData.yp && seriesData.yp <= yep + 1));
+    return data.filter(
+      (seriesData) =>
+        xsp - 1 <= seriesData.xp &&
+        seriesData.xp <= xep + 1 &&
+        ysp - 1 <= seriesData.yp &&
+        seriesData.yp <= yep + 1,
+    );
   }
 
   defaultScatterFindItems(gdata, xsp, ysp, xep, yep) {
@@ -301,10 +304,9 @@ class Scatter {
       const x = data.xp;
       const y = data.yp;
 
-      return (x - pointSize <= xp)
-        && (xp <= x + pointSize)
-        && (y - pointSize <= yp)
-        && (yp <= y + pointSize);
+      return (
+        x - pointSize <= xp && xp <= x + pointSize && y - pointSize <= yp && yp <= y + pointSize
+      );
     });
 
     if (targetIndex > -1) {

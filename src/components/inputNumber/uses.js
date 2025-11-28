@@ -24,10 +24,9 @@ export function getValueCloseToStep(val, { min, max, step }) {
     // 소수점 값일 경우
     let multipleValue = +parseFloat(step * quotient).toFixed(maxPrecision);
     result = +(multipleValue + min).toFixed(maxPrecision);
-    preventStep = quotient === maxQuotient
-      && +(max - result).toFixed(maxPrecision) !== step;
+    preventStep = quotient === maxQuotient && +(max - result).toFixed(maxPrecision) !== step;
 
-    if (remainder > (step / 2) && !preventStep) {
+    if (remainder > step / 2 && !preventStep) {
       result = +(result + step).toFixed(maxPrecision);
     }
     if (result > max) {
@@ -38,13 +37,13 @@ export function getValueCloseToStep(val, { min, max, step }) {
     }
   } else {
     // 소수점 아닐 경우
-    result = (step * quotient) + min;
-    preventStep = quotient === maxQuotient && (max - result) !== step;
-    if (remainder > (step / 2) && !preventStep) {
+    result = step * quotient + min;
+    preventStep = quotient === maxQuotient && max - result !== step;
+    if (remainder > step / 2 && !preventStep) {
       result += step;
     }
     if (result > max) {
-      result = (step * maxQuotient) + min;
+      result = step * maxQuotient + min;
     } else if (result < min) {
       result = min;
     }
@@ -61,9 +60,8 @@ export function useModel() {
   /**
    * 고정 소수점 사용 시, 해당하는 소수점 값 반환
    * */
-  const getPrecisionValue = val => (
-    props.precision && (val || val === 0) ? Number(val).toFixed(props.precision) : val
-  );
+  const getPrecisionValue = (val) =>
+    props.precision && (val || val === 0) ? Number(val).toFixed(props.precision) : val;
 
   /**
    * input 값 validate
@@ -88,14 +86,10 @@ export function useModel() {
         max: props.max,
         step: props.step,
       });
-    } else if ((props.min || props.min === 0)
-      && result < props.min
-    ) {
+    } else if ((props.min || props.min === 0) && result < props.min) {
       // 최소값보다 작을 경우
       result = props.min;
-    } else if ((props.max || props.max === 0)
-      && result > props.max
-    ) {
+    } else if ((props.max || props.max === 0) && result > props.max) {
       // 최대값보다 클 경우
       result = props.max;
     } else {
@@ -119,11 +113,14 @@ export function useModel() {
     validateValue(e.target.value);
   };
 
-  watch(() => props.modelValue, (curr, prev) => {
-    if (curr !== prev) {
-      currentValue.value = getPrecisionValue(curr);
-    }
-  });
+  watch(
+    () => props.modelValue,
+    (curr, prev) => {
+      if (curr !== prev) {
+        currentValue.value = getPrecisionValue(curr);
+      }
+    },
+  );
 
   return {
     currentValue,
@@ -154,8 +151,9 @@ export function useStep(params) {
       const convertedStep = type === 'up' ? props.step : props.step * -1;
       const maxPrecision = Math.max(getPrecision(newValue), getPrecision(props.step));
       const squaredValue = 10 ** maxPrecision;
-      result = (Math.round(newValue * squaredValue)
-        + Math.round(convertedStep * squaredValue)) / squaredValue;
+      result =
+        (Math.round(newValue * squaredValue) + Math.round(convertedStep * squaredValue)) /
+        squaredValue;
     }
 
     if (result >= props.min && result <= props.max) {
@@ -185,7 +183,9 @@ export function useInit(params) {
 
     if (props.step && (props.precision || props.precision === 0)) {
       if (getPrecision(props.step) > props.precision) {
-        console.warn('[EVUI][InputNumber] It cannot be calculated because the step is smaller than the precision setting.');
+        console.warn(
+          '[EVUI][InputNumber] It cannot be calculated because the step is smaller than the precision setting.',
+        );
       }
     }
   };

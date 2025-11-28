@@ -1,9 +1,6 @@
 <template>
   <div class="ev-time-picker">
-    <div
-      v-if="type==='range'"
-      class="ev-time-picker-range"
-    >
+    <div v-if="type === 'range'" class="ev-time-picker-range">
       <div
         :class="{
           error: isWrongType.rangeStart,
@@ -23,10 +20,7 @@
           @blur="blurInputStartTime"
           @change="changeStartTime"
         />
-        <ev-icon
-          icon="ev-icon-time"
-          class="ev-input-prefix"
-        />
+        <ev-icon icon="ev-icon-time" class="ev-input-prefix" />
         <ev-icon
           v-if="clearable"
           icon="ev-icon-error"
@@ -54,10 +48,7 @@
           @blur="blurInputEndTime"
           @change="changeEndTime"
         />
-        <ev-icon
-          icon="ev-icon-time"
-          class="ev-input-prefix"
-        />
+        <ev-icon icon="ev-icon-time" class="ev-input-prefix" />
         <ev-icon
           v-if="clearable"
           icon="ev-icon-error"
@@ -66,10 +57,7 @@
         />
       </div>
     </div>
-    <div
-      v-else
-      class="ev-time-picker-single"
-    >
+    <div v-else class="ev-time-picker-single">
       <div
         :class="{
           error: isWrongType.single,
@@ -89,10 +77,7 @@
           @blur="blurInputTime"
           @change="changeTime"
         />
-        <ev-icon
-          icon="ev-icon-time"
-          class="ev-input-prefix"
-        />
+        <ev-icon icon="ev-icon-time" class="ev-input-prefix" />
         <ev-icon
           v-if="clearable"
           icon="ev-icon-error"
@@ -162,8 +147,8 @@ export default {
       set: (value) => {
         if (props.type === 'range') {
           if (Array.isArray(value)) {
-            const startTime = (value[0] > value[1] ? '00:00' : value[0]);
-            const endTime = (startTime.value > value[1] ? '23:59' : value[1]);
+            const startTime = value[0] > value[1] ? '00:00' : value[0];
+            const endTime = startTime.value > value[1] ? '23:59' : value[1];
 
             emit('update:modelValue', [startTime, endTime]);
           }
@@ -205,7 +190,7 @@ export default {
       if (!validTimeExp(time.value[0])) {
         time.value[0] = previousValue.value[0];
       }
-      if (time.value[1] && (time.value[0] > time.value[1])) {
+      if (time.value[1] && time.value[0] > time.value[1]) {
         time.value[0] = time.value[1];
       }
       previousValue.value[0] = time.value[0];
@@ -216,7 +201,7 @@ export default {
       if (!validTimeExp(time.value[1])) {
         time.value[1] = previousValue.value[1];
       }
-      if (time.value[0] && (time.value[0] > time.value[1])) {
+      if (time.value[0] && time.value[0] > time.value[1]) {
         time.value[1] = previousValue.value[1];
         if (time.value[0] > previousValue.value[1]) {
           time.value[1] = time.value[0];

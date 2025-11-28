@@ -1,5 +1,6 @@
->## Desc
- - 태그는 &lt;ev-chart&gt;(이하 <차트>)으로 정의
+> ## Desc
+
+- 태그는 &lt;ev-chart&gt;(이하 <차트>)으로 정의
 
 ```
 <ev-chart
@@ -8,9 +9,9 @@
 />
 ```
 
->## Props, Event 
+> ## Props, Event
+
 1. [Bar chart](../barChart)
 2. [Line chart](../lineChart)
 3. [Scatter chart](../scatterChart)
 4. [Pie chart](../pieChart)
-

@@ -24,7 +24,7 @@ class EvChart {
     defaultSelectInfo,
     brushSeries,
   ) {
-    Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
+    Object.keys(Model).forEach((key) => Object.assign(this, Model[key]));
 
     if (!options.brush) {
       Object.assign(this, Tooltip);
@@ -78,7 +78,6 @@ class EvChart {
       this.overlayCanvas.style.top = '0px';
       this.overlayCanvas.style.left = '0px';
     }
-
 
     this.isInitLegend = false;
     this.isInitTitle = false;
@@ -175,8 +174,12 @@ class EvChart {
 
   adjustXAndYAxisWidth() {
     // fitWidth(maxWidth에 넘을 시 말줄임표 들어가는 기능)을 사용중인 step Axis인 경우에는 적용 제외
-    const isStepXAxisUseFitWidth = this.options.axesX?.some(axisX => axisX.type === 'step' && axisX.labelStyle?.fitWidth);
-    const isStepYAxisUseFitWidth = this.options.axesY?.some(axisY => axisY.type === 'step' && axisY.labelStyle?.fitWidth);
+    const isStepXAxisUseFitWidth = this.options.axesX?.some(
+      (axisX) => axisX.type === 'step' && axisX.labelStyle?.fitWidth,
+    );
+    const isStepYAxisUseFitWidth = this.options.axesY?.some(
+      (axisY) => axisY.type === 'step' && axisY.labelStyle?.fitWidth,
+    );
 
     const getNotFormattedLabels = (axesSteps) => {
       const { interval, graphMin, graphMax, steps = 0 } = axesSteps ?? {};
@@ -206,22 +209,25 @@ class EvChart {
     const xMaxWidth = this.axesX[0]?.getLabelWidthHasMaxLength(notFormattedXLabels);
     const yMaxWidth = this.axesY[0]?.getLabelWidthHasMaxLength(notFormattedYLabels);
 
-
     const adjustedRange = {
-      x: !isStepXAxisUseFitWidth ? this.axesRange?.x?.map(value => ({
-        ...value,
-        size: {
-          width: xFixWidth || Math.max(xMaxWidth, value.size.width),
-          height: value.size.height,
-        },
-      })) : this.axesRange?.x,
-      y: !isStepYAxisUseFitWidth ? this.axesRange?.y?.map(value => ({
-        ...value,
-        size: {
-          width: yFixWidth || Math.max(yMaxWidth, value.size.width),
-          height: value.size.height,
-        },
-      })) : this.axesRange?.y,
+      x: !isStepXAxisUseFitWidth
+        ? this.axesRange?.x?.map((value) => ({
+            ...value,
+            size: {
+              width: xFixWidth || Math.max(xMaxWidth, value.size.width),
+              height: value.size.height,
+            },
+          }))
+        : this.axesRange?.x,
+      y: !isStepYAxisUseFitWidth
+        ? this.axesRange?.y?.map((value) => ({
+            ...value,
+            size: {
+              width: yFixWidth || Math.max(yMaxWidth, value.size.width),
+              height: value.size.height,
+            },
+          }))
+        : this.axesRange?.y,
     };
 
     this.axesRange = adjustedRange;
@@ -256,11 +262,7 @@ class EvChart {
 
     this.drawTip();
 
-    if (
-      this.bufferCanvas
-      && this.bufferCanvas?.width > 1
-      && this.bufferCanvas?.height > 1
-    ) {
+    if (this.bufferCanvas && this.bufferCanvas?.width > 1 && this.bufferCanvas?.height > 1) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
     }
   }
@@ -309,14 +311,7 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const {
-      maxTip,
-      selectLabel,
-      selectItem,
-      selectSeries,
-      brush,
-      displayOverflow,
-    } = this.options;
+    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow } = this.options;
 
     const opt = {
       ctx: this.bufferCtx,
@@ -488,7 +483,7 @@ class EvChart {
   createAxes(dir, axes = []) {
     const ctx = this.bufferCtx;
 
-    const isHeatMapType = (this.options.type === 'heatMap');
+    const isHeatMapType = this.options.type === 'heatMap';
     const labels = isHeatMapType ? this.data.labels[dir] : this.data.labels;
 
     const options = this.options;
@@ -518,8 +513,12 @@ class EvChart {
    */
   getAxesRange() {
     /* eslint-disable max-len */
-    const axesXMinMax = this.axesX.map((axis, index) => axis.calculateScaleRange(this.minMax.x[index], this.scrollbar.x, this.chartRect));
-    const axesYMinMax = this.axesY.map((axis, index) => axis.calculateScaleRange(this.minMax.y[index], this.scrollbar.y, this.chartRect));
+    const axesXMinMax = this.axesX.map((axis, index) =>
+      axis.calculateScaleRange(this.minMax.x[index], this.scrollbar.x, this.chartRect),
+    );
+    const axesYMinMax = this.axesY.map((axis, index) =>
+      axis.calculateScaleRange(this.minMax.y[index], this.scrollbar.y, this.chartRect),
+    );
     /* eslint-enable max-len */
 
     return { x: axesXMinMax, y: axesYMinMax };
@@ -538,7 +537,8 @@ class EvChart {
         this.axesSteps.x[index],
         hitInfo,
         this.defaultSelectInfo,
-        this.data.labels);
+        this.data.labels,
+      );
     });
 
     this.axesY.forEach((axis, index) => {
@@ -547,7 +547,8 @@ class EvChart {
         this.labelOffset,
         this.axesSteps.y[index],
         hitInfo,
-        this.defaultSelectInfo);
+        this.defaultSelectInfo,
+      );
     });
   }
 
@@ -610,12 +611,13 @@ class EvChart {
    */
   initScale() {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const backingStoreRatio = this.displayCtx.webkitBackingStorePixelRatio
-      || this.displayCtx.mozBackingStorePixelRatio
-      || this.displayCtx.msBackingStorePixelRatio
-      || this.displayCtx.oBackingStorePixelRatio
-      || this.displayCtx.backingStorePixelRatio
-      || 1;
+    const backingStoreRatio =
+      this.displayCtx.webkitBackingStorePixelRatio ||
+      this.displayCtx.mozBackingStorePixelRatio ||
+      this.displayCtx.msBackingStorePixelRatio ||
+      this.displayCtx.oBackingStorePixelRatio ||
+      this.displayCtx.backingStorePixelRatio ||
+      1;
 
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
 
@@ -687,8 +689,8 @@ class EvChart {
     }
 
     const horizontalPadding = padding.left + padding.right + yAxisScrollWidth;
-    const verticalPadding = padding.top + padding.bottom
-        + xAxisTitleHeight + yAxisTitleHeight + xAxisScrollHeight;
+    const verticalPadding =
+      padding.top + padding.bottom + xAxisTitleHeight + yAxisTitleHeight + xAxisScrollHeight;
     const chartWidth = width > horizontalPadding ? width - horizontalPadding : width;
     const chartHeight = height > verticalPadding ? height - verticalPadding : height;
 
@@ -798,8 +800,8 @@ class EvChart {
           }
         }
 
-        labelOffset.left = (lw / 2) > labelOffset.left ? (lw / 2) : labelOffset.left;
-        labelOffset.right = (lw / 2) > labelOffset.right ? (lw / 2) : labelOffset.right;
+        labelOffset.left = lw / 2 > labelOffset.left ? lw / 2 : labelOffset.left;
+        labelOffset.right = lw / 2 > labelOffset.right ? lw / 2 : labelOffset.right;
       }
     });
 
@@ -817,8 +819,8 @@ class EvChart {
           }
         }
 
-        labelOffset.top = (lh / 2) > labelOffset.top ? (lh / 2) : labelOffset.top;
-        labelOffset.bottom = (lh / 2) > labelOffset.bottom ? (lh / 2) : labelOffset.bottom;
+        labelOffset.top = lh / 2 > labelOffset.top ? lh / 2 : labelOffset.top;
+        labelOffset.bottom = lh / 2 > labelOffset.bottom ? lh / 2 : labelOffset.bottom;
       }
     });
 
@@ -911,9 +913,8 @@ class EvChart {
 
     // legend Update
     if (options.legend.show) {
-      const useTable = !!options.legend?.table?.use
-        && options.type !== 'heatMap'
-        && options.type !== 'scatter';
+      const useTable =
+        !!options.legend?.table?.use && options.type !== 'heatMap' && options.type !== 'scatter';
 
       if (!this.isInitLegend) {
         this.initLegend();
@@ -953,10 +954,9 @@ class EvChart {
 
     this.initDefaultSelectInfo();
 
-
     let renderHitInfo = updateInfo?.hitInfo;
     if (!renderHitInfo?.legend && this.legendHover?.sId) {
-      renderHitInfo = { ...(renderHitInfo || {}), legend: this.legendHover };
+      renderHitInfo = { ...renderHitInfo, legend: this.legendHover };
     }
 
     this.render(renderHitInfo);
@@ -992,10 +992,14 @@ class EvChart {
    * @returns {undefined}
    */
   overlayClear() {
-    this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
+    this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
 
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
-      this.overlayCanvas.height / this.clearRectRatio);
+    this.overlayCtx.clearRect(
+      0,
+      0,
+      this.overlayCanvas.width / this.clearRectRatio,
+      this.overlayCanvas.height / this.clearRectRatio,
+    );
   }
 
   /**
@@ -1004,18 +1008,30 @@ class EvChart {
    * @returns {undefined}
    */
   clear() {
-    this.clearRectRatio = (this.pixelRatio < 1) ? this.pixelRatio : 1;
+    this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
     if (this.displayCanvas) {
-      this.displayCtx.clearRect(0, 0, this.displayCanvas.width / this.clearRectRatio,
-        this.displayCanvas.height / this.clearRectRatio);
+      this.displayCtx.clearRect(
+        0,
+        0,
+        this.displayCanvas.width / this.clearRectRatio,
+        this.displayCanvas.height / this.clearRectRatio,
+      );
     }
     if (this.bufferCanvas) {
-      this.bufferCtx.clearRect(0, 0, this.bufferCanvas.width / this.clearRectRatio,
-        this.bufferCanvas.height / this.clearRectRatio);
+      this.bufferCtx.clearRect(
+        0,
+        0,
+        this.bufferCanvas.width / this.clearRectRatio,
+        this.bufferCanvas.height / this.clearRectRatio,
+      );
     }
     if (this.overlayCanvas) {
-      this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width / this.clearRectRatio,
-        this.overlayCanvas.height / this.clearRectRatio);
+      this.overlayCtx.clearRect(
+        0,
+        0,
+        this.overlayCanvas.width / this.clearRectRatio,
+        this.overlayCanvas.height / this.clearRectRatio,
+      );
     }
   }
 
@@ -1152,11 +1168,7 @@ class EvChart {
    * init defaultSelectInfo (for selectLabel, selectSeries options)
    */
   initDefaultSelectInfo() {
-    const {
-      type: chartType,
-      selectLabel,
-      selectSeries,
-    } = this.options;
+    const { type: chartType, selectLabel, selectSeries } = this.options;
 
     if (selectLabel.use) {
       let targetAxis = null;

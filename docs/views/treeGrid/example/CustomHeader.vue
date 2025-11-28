@@ -14,9 +14,9 @@
             v-for="item in customHeaderData"
             :key="item.type"
             :style="{
-              left: `${item.fromTime / totalRenderSec * 100}%`,
-              width: `${(item.toTime - item.fromTime) / totalRenderSec * 100}%`,
-              backgroundColor: item.color
+              left: `${(item.fromTime / totalRenderSec) * 100}%`,
+              width: `${((item.toTime - item.fromTime) / totalRenderSec) * 100}%`,
+              backgroundColor: item.color,
             }"
             :class="`grid-custom-header__content grid-custom-header__content--${item.type}`"
           />
@@ -27,9 +27,11 @@
           <div
             class="grid-custom-cell__content"
             :style="{
-              width: `${(item.data.customCell.toTime - item.data.customCell.fromTime)
-                / totalRenderSec * 100}%`,
-              left: `${item.data.customCell.fromTime / totalRenderSec * 100}%`,
+              width: `${
+                ((item.data.customCell.toTime - item.data.customCell.fromTime) / totalRenderSec) *
+                100
+              }%`,
+              left: `${(item.data.customCell.fromTime / totalRenderSec) * 100}%`,
             }"
           />
         </div>
@@ -99,115 +101,133 @@ export default {
             toTime: 2152,
           },
           expand: true,
-          children: [{
-            id: 'Exem 2',
-            date: '2016-05-02',
-            name: '2',
-            value: 222,
-            customCell: {
-              fromTime: 13,
-              toTime: 1879,
-            },
-            expand: false,
-            children: [{
-              id: 'Exem 3',
+          children: [
+            {
+              id: 'Exem 2',
               date: '2016-05-02',
-              name: '3',
-              value: 3333,
+              name: '2',
+              value: 222,
               customCell: {
                 fromTime: 13,
-                toTime: 871,
-              },
-              uncheckable: true,
-            }, {
-              id: 'Exem 4',
-              date: '2016-05-02',
-              name: '4',
-              customCell: {
-                fromTime: 37,
-                toTime: 529,
+                toTime: 1879,
               },
               expand: false,
-              uncheckable: true,
-              children: [{
-                id: 'Exem 5',
-                date: '2016-05-02',
-                name: '5',
-                customCell: {
-                  fromTime: 37,
-                  toTime: 476,
-                },
-                children: [{
-                  id: 'Exem 51',
+              children: [
+                {
+                  id: 'Exem 3',
                   date: '2016-05-02',
-                  name: '1251',
+                  name: '3',
+                  value: 3333,
+                  customCell: {
+                    fromTime: 13,
+                    toTime: 871,
+                  },
+                  uncheckable: true,
+                },
+                {
+                  id: 'Exem 4',
+                  date: '2016-05-02',
+                  name: '4',
                   customCell: {
                     fromTime: 37,
-                    toTime: 378,
+                    toTime: 529,
                   },
-                  children: [{
-                    id: 'Exem 52',
-                    date: '2016-05-02',
-                    name: '20000',
-                    customCell: {
-                      fromTime: 186,
-                      toTime: 476,
+                  expand: false,
+                  uncheckable: true,
+                  children: [
+                    {
+                      id: 'Exem 5',
+                      date: '2016-05-02',
+                      name: '5',
+                      customCell: {
+                        fromTime: 37,
+                        toTime: 476,
+                      },
+                      children: [
+                        {
+                          id: 'Exem 51',
+                          date: '2016-05-02',
+                          name: '1251',
+                          customCell: {
+                            fromTime: 37,
+                            toTime: 378,
+                          },
+                          children: [
+                            {
+                              id: 'Exem 52',
+                              date: '2016-05-02',
+                              name: '20000',
+                              customCell: {
+                                fromTime: 186,
+                                toTime: 476,
+                              },
+                            },
+                          ],
+                        },
+                      ],
                     },
-                  }],
-                }],
-              }, {
-                id: 'Exem 6',
-                date: '2016-05-02',
-                name: '6',
-                customCell: {
-                  fromTime: 317,
-                  toTime: 529,
+                    {
+                      id: 'Exem 6',
+                      date: '2016-05-02',
+                      name: '6',
+                      customCell: {
+                        fromTime: 317,
+                        toTime: 529,
+                      },
+                    },
+                  ],
                 },
-              }],
-            }],
-          }, {
-            id: 'Exem 7',
-            date: '2016-05-03',
-            name: '7',
-            customCell: {
-              fromTime: 487,
-              toTime: 3474,
+              ],
             },
-            children: [{
-              id: 'Exem 8',
+            {
+              id: 'Exem 7',
               date: '2016-05-03',
-              name: '8',
-              value: 333,
+              name: '7',
               customCell: {
                 fromTime: 487,
-                toTime: 1951,
+                toTime: 3474,
               },
-            }, {
-              id: 'Exem 9',
-              date: '2016-05-03',
-              name: '9',
-              customCell: {
-                fromTime: 762,
-                toTime: 2145,
-              },
-            }, {
-              id: 'Exem 10',
-              date: '2016-05-03',
-              name: '10',
-              customCell: {
-                fromTime: 861,
-                toTime: 2368,
-              },
-            }],
-          }, {
-            id: 'Exem 11',
-            date: '2016-05-04',
-            name: '11',
-            customCell: {
-              fromTime: 2384,
-              toTime: 3474,
+              children: [
+                {
+                  id: 'Exem 8',
+                  date: '2016-05-03',
+                  name: '8',
+                  value: 333,
+                  customCell: {
+                    fromTime: 487,
+                    toTime: 1951,
+                  },
+                },
+                {
+                  id: 'Exem 9',
+                  date: '2016-05-03',
+                  name: '9',
+                  customCell: {
+                    fromTime: 762,
+                    toTime: 2145,
+                  },
+                },
+                {
+                  id: 'Exem 10',
+                  date: '2016-05-03',
+                  name: '10',
+                  customCell: {
+                    fromTime: 861,
+                    toTime: 2368,
+                  },
+                },
+              ],
             },
-          }],
+            {
+              id: 'Exem 11',
+              date: '2016-05-04',
+              name: '11',
+              customCell: {
+                fromTime: 2384,
+                toTime: 3474,
+              },
+            },
+          ],
         },
       ];
     };
@@ -250,7 +270,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   &__content {
     position: absolute;
     height: 100%;
@@ -272,7 +292,7 @@ export default {
   &__content {
     position: absolute;
     height: 100%;
-    background-color: #087AED;
+    background-color: #087aed;
   }
 }
 </style>

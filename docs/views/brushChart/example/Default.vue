@@ -1,38 +1,32 @@
 <template>
-  <div
-    ref="zoomRef"
-    class="case"
-  >
+  <div ref="zoomRef" class="case">
     <ev-chart-group :options="chartGroupOptions">
-      <ev-chart
-        :data="chartData"
-        :options="chartOptions"
-      />
-      <ev-chart-brush :options="brushOptions"/>
+      <ev-chart :data="chartData" :options="chartOptions" />
+      <ev-chart-brush :options="brushOptions" />
     </ev-chart-group>
 
     <div class="description">
       <ev-button @click="onUpdateChartData">데이터 업데이트</ev-button>
-      <br/>
-      <br/>
+      <br />
+      <br />
       <span class="toggle-label"> useDebounce 옵션 사용</span>
-      <ev-toggle v-model="isUseDebounce"/>
-      <br/>
-      <br/>
+      <ev-toggle v-model="isUseDebounce" />
+      <br />
+      <br />
       <span class="toggle-label"> useWheelMove 옵션 사용</span>
-      <ev-toggle v-model="isUseWheelMove"/>
-      <br/>
-      <br/>
+      <ev-toggle v-model="isUseWheelMove" />
+      <br />
+      <br />
       <span class="toggle-label">Brush 생성</span>
-      <ev-toggle v-model="isShowBrush"/>
-      <br/>
-      <br/>
+      <ev-toggle v-model="isShowBrush" />
+      <br />
+      <br />
       <span class="toggle-label">툴바 생성</span>
-      <ev-toggle v-model="isShowToolbar"/>
-      <br/>
-      <br/>
+      <ev-toggle v-model="isShowToolbar" />
+      <br />
+      <br />
       <span class="toggle-label">차트 넓히기</span>
-      <ev-toggle v-model="isExpandChartArea"/>
+      <ev-toggle v-model="isExpandChartArea" />
     </div>
   </div>
 </template>
@@ -85,17 +79,21 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
     });
 
     const brushOptions = reactive({
@@ -111,7 +109,7 @@ export default {
       chartData.labels.push(dayjs(timeValue));
 
       Object.values(chartData.data).forEach((seriesData) => {
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
     };
 

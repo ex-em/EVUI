@@ -1,7 +1,4 @@
-import {
-  ref, reactive, computed, nextTick,
-  getCurrentInstance, defineComponent,
-} from 'vue';
+import { ref, reactive, computed, nextTick, getCurrentInstance, defineComponent } from 'vue';
 import MenuList from './MenuList';
 
 export const useModel = () => {
@@ -103,10 +100,10 @@ export const useMenuList = () => {
   // nested구조 하위 리스트에서 최상단의 ContextMenu에 isShow를 전달할 때 사용하는 변수
   const computedIsShow = computed({
     get: () => props.isShow,
-    set: val => emit('update:isShow', val),
+    set: (val) => emit('update:isShow', val),
   });
   // 자식(.children 속성) 존재 여부
-  const isExistChild = computed(() => !!props.items.some(v => v.children));
+  const isExistChild = computed(() => !!props.items.some((v) => v.children));
   // 마우스오버한 항목에 자식 리스트 정보
   const childrenItems = ref([]);
   // 자식 컴포넌트 보임 여부
@@ -155,8 +152,8 @@ export const useMenuList = () => {
     const elementOffsetTop = e.target.offsetTop;
 
     const isOverflowHeight = browserHeight < parentMenuY + elementOffsetTop + childMenuHeight;
-    const isOverflowWidth = browserWidth < parentMenuX + parentMenuWidth
-                                            + childMenuWidth + RIGHT_BUFFER_PX;
+    const isOverflowWidth =
+      browserWidth < parentMenuX + parentMenuWidth + childMenuWidth + RIGHT_BUFFER_PX;
 
     if (!isOverflowHeight) {
       // dropDown

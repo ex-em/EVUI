@@ -1,84 +1,74 @@
 <template>
   <div class="case">
     <ev-chart-group>
-      <ev-chart
-        :data="chartData"
-        :options="chartOptions"
-      />
-      <ev-chart-brush/>
+      <ev-chart :data="chartData" :options="chartOptions" />
+      <ev-chart-brush />
     </ev-chart-group>
     <div class="description">
-      <div
-        v-for="(option, idx) in titleOptions"
-        :key="idx"
-        class="section"
-      >
-        <h3 v-if="idx===0" class="section-title"> X Axis </h3>
-        <h3 v-else class="section-title"> Y Axis </h3>
+      <div v-for="(option, idx) in titleOptions" :key="idx" class="section">
+        <h3 v-if="idx === 0" class="section-title">X Axis</h3>
+        <h3 v-else class="section-title">Y Axis</h3>
 
         <div class="section-body">
           <div class="section-item">
             <label>use</label>
-            <ev-toggle v-model="option.use"/>
+            <ev-toggle v-model="option.use" />
           </div>
           <div class="section-item">
             <label>text</label>
-            <ev-text-field v-model="option.text"/>
+            <ev-text-field v-model="option.text" />
           </div>
           <div class="section-item">
             <label>fontWeight</label>
-            <ev-input-number
-              v-model="option.fontWeight"
-              :step="100"
-              :min="100"
-              :max="900"
-            />
+            <ev-input-number v-model="option.fontWeight" :step="100" :min="100" :max="900" />
           </div>
           <div class="section-item">
             <label>fontSize</label>
-            <ev-input-number
-              v-model="option.fontSize"
-              :step="1"
-              :min="1"
-              :max="30"
-            />
+            <ev-input-number v-model="option.fontSize" :step="1" :min="1" :max="30" />
           </div>
           <div class="section-item">
             <label>fontFamily</label>
-            <ev-text-field v-model="option.fontFamily"/>
+            <ev-text-field v-model="option.fontFamily" />
           </div>
           <div class="section-item">
             <label>textAlign</label>
             <ev-select
               v-model="option.textAlign"
-              :items="[{
-                name: 'right',
-                value: 'right',
-              }, {
-                name: 'center',
-                value: 'center',
-              }, {
-                name: 'left',
-                value: 'left',
-              }]"
+              :items="[
+                {
+                  name: 'right',
+                  value: 'right',
+                },
+                {
+                  name: 'center',
+                  value: 'center',
+                },
+                {
+                  name: 'left',
+                  value: 'left',
+                },
+              ]"
             />
           </div>
           <div class="section-item">
             <label>fontStyle</label>
             <ev-select
               v-model="option.fontStyle"
-              :items="[{
-                name: 'normal',
-                value: 'normal',
-              }, {
-                name: 'italic',
-                value: 'italic',
-              }]"
+              :items="[
+                {
+                  name: 'normal',
+                  value: 'normal',
+                },
+                {
+                  name: 'italic',
+                  value: 'italic',
+                },
+              ]"
             />
           </div>
           <div class="section-item">
             <label>color</label>
-            <ev-text-field v-model="option.color"/>
+            <ev-text-field v-model="option.color" />
           </div>
         </div>
       </div>
@@ -147,19 +137,23 @@ export default {
       legend: {
         show: false,
       },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'MM/DD',
-        interval: 'day',
-        title: xAxisTitle,
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        title: yAxisTitle,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'MM/DD',
+          interval: 'day',
+          title: xAxisTitle,
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          title: yAxisTitle,
+        },
+      ],
     });
 
     return {
@@ -177,7 +171,7 @@ export default {
 
   &-title {
     padding: 10px;
-    background-color: rgba(#FADE4C, 0.6);
+    background-color: rgba(#fade4c, 0.6);
   }
 
   &-body {
@@ -203,7 +197,9 @@ export default {
         margin-top: 7px;
       }
 
-      .ev-text-field, .ev-input-number, .ev-select {
+      .ev-text-field,
+      .ev-input-number,
+      .ev-select {
         width: auto;
       }
     }

@@ -1,9 +1,6 @@
 <template>
   <i
-    :class="[
-      icon,
-      { [`ev-icon-${size}`]: !!size },
-    ]"
+    :class="[icon, { [`ev-icon-${size}`]: !!size }]"
     :style="{ color }"
     @click="onClick"
     @dblClick="onDblClick"

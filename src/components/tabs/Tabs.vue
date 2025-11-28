@@ -19,28 +19,15 @@
         }"
       >
         <template v-if="hasScroll">
-          <span
-            class="ev-tabs-arrow prev"
-            @click="scrollTab('prev')"
-          >
+          <span class="ev-tabs-arrow prev" @click="scrollTab('prev')">
             <i class="ev-icon-s-arrow-left" />
           </span>
-          <span
-            class="ev-tabs-arrow next"
-            @click="scrollTab('next')"
-          >
+          <span class="ev-tabs-arrow next" @click="scrollTab('next')">
             <i class="ev-icon-s-arrow-right" />
           </span>
         </template>
-        <div
-          ref="listWrapperRef"
-          class="ev-tabs-list-wrapper"
-        >
-          <ul
-            ref="listRef"
-            class="ev-tabs-list"
-            :style="listRefStyle"
-          >
+        <div ref="listWrapperRef" class="ev-tabs-list-wrapper">
+          <ul ref="listRef" class="ev-tabs-list" :style="listRefStyle">
             <li
               v-for="(item, idx) in computedTabList"
               :key="`${item.value}_${idx}`"
@@ -57,22 +44,11 @@
               @dragover.prevent="dragoverTab(item.value)"
               @dragend.prevent="dragendTab"
             >
-              <i
-                v-if="item.iconClass"
-                class="ev-tabs-icon"
-                :class="item.iconClass"
-              />
-              <span
-                class="text"
-                :title="item.text"
-              >
+              <i v-if="item.iconClass" class="ev-tabs-icon" :class="item.iconClass" />
+              <span class="text" :title="item.text">
                 {{ item.text }}
               </span>
-              <span
-                v-if="closable"
-                class="close-icon"
-                @click.stop="removeTab(item.value)"
-              >
+              <span v-if="closable" class="close-icon" @click.stop="removeTab(item.value)">
                 <i class="ev-icon-s-close" />
               </span>
             </li>
@@ -87,11 +63,7 @@
 </template>
 
 <script>
-import {
-  ref, reactive, computed,
-  provide, triggerRef,
-  onBeforeUpdate, nextTick,
-} from 'vue';
+import { ref, reactive, computed, provide, triggerRef, onBeforeUpdate, nextTick } from 'vue';
 import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
 import resize from 'vue-resize-observer';
 
@@ -110,14 +82,14 @@ export default {
       type: Array,
       default: () => [],
       validator: (list) => {
-        const valueList = list.map(v => v.value);
+        const valueList = list.map((v) => v.value);
         const setList = [...new Set(valueList)];
         if (list.length !== setList.length) {
-          console.warn('[EVUI][Tabs] TabPanel \'value\' attribute is duplicate values.');
+          console.warn("[EVUI][Tabs] TabPanel 'value' attribute is duplicate values.");
           return false;
         }
-        if (!list.every(v => Object.hasOwnProperty.call(v, 'value'))) {
-          console.warn('[EVUI][Tabs] TabPanel \'value\' attribute is essential.');
+        if (!list.every((v) => Object.hasOwnProperty.call(v, 'value'))) {
+          console.warn("[EVUI][Tabs] TabPanel 'value' attribute is essential.");
           return false;
         }
         return true;
@@ -159,7 +131,7 @@ export default {
 
     const tabList = computed({
       get: () => props.panels,
-      set: val => emit('update:panels', val),
+      set: (val) => emit('update:panels', val),
     });
     const computedTabList = computed(() => {
       if (!props.draggable) {
@@ -170,7 +142,7 @@ export default {
       }
       return tabCloneList.value;
     });
-    const tabElValueList = tabList.value.map(v => v.value);
+    const tabElValueList = tabList.value.map((v) => v.value);
 
     const listWrapperRef = ref(null);
     const listRef = ref(null);
@@ -209,14 +181,14 @@ export default {
         let shortList;
         if (tabElValueList.length > tabList.value.length) {
           longList = tabElValueList;
-          shortList = tabList.value.map(v => v.value);
+          shortList = tabList.value.map((v) => v.value);
         } else {
-          longList = tabList.value.map(v => v.value);
+          longList = tabList.value.map((v) => v.value);
           shortList = tabElValueList;
         }
-        const removeValue = longList.filter(v => !shortList.includes(v))[0];
+        const removeValue = longList.filter((v) => !shortList.includes(v))[0];
         if (mv.value === removeValue) {
-          const selectedIdx = tabElValueList.findIndex(v => v === removeValue);
+          const selectedIdx = tabElValueList.findIndex((v) => v === removeValue);
           if (selectedIdx === 0) {
             mv.value = tabList.value[0].value;
           } else {
@@ -240,7 +212,7 @@ export default {
       if (tabList.value.length < 2) {
         return;
       }
-      const selectedIdx = tabList.value.findIndex(v => v.value === val);
+      const selectedIdx = tabList.value.findIndex((v) => v.value === val);
       if (selectedIdx < 0) {
         mv.value = tabList.value[0].value;
         return;
@@ -294,12 +266,12 @@ export default {
      * @param val
      * @returns {boolean|boolean}
      */
-    const dragSelectCls = val => props.draggable && dragObj.item?.value === val;
+    const dragSelectCls = (val) => props.draggable && dragObj.item?.value === val;
 
     /**
      *  드래그하기위해 선택한 li의 idx 여부 클래스
      */
-    const selectIdxCls = idx => props.draggable && dragObj.idx === idx;
+    const selectIdxCls = (idx) => props.draggable && dragObj.idx === idx;
 
     /**
      * 탭 드래그 시작 메소드, isDragState모드 시작
@@ -323,8 +295,8 @@ export default {
       if (!props.draggable || dragObj.item?.value === val) {
         return;
       }
-      const dragValueIdx = tabCloneList.value.findIndex(v => v.value === dragObj.item?.value);
-      const targetValueIdx = tabCloneList.value.findIndex(v => v.value === val);
+      const dragValueIdx = tabCloneList.value.findIndex((v) => v.value === dragObj.item?.value);
+      const targetValueIdx = tabCloneList.value.findIndex((v) => v.value === val);
       tabCloneList.value.splice(dragValueIdx, 1);
       tabCloneList.value.splice(targetValueIdx, 0, dragObj.item);
     };
@@ -375,7 +347,8 @@ export default {
 @use '../../style/index.scss' as *;
 
 .ev-tabs {
-  ul, li {
+  ul,
+  li {
     list-style: none;
   }
 
@@ -416,7 +389,7 @@ export default {
     border-radius: 4px 4px 0 0;
     border-bottom: none !important;
     text-align: center;
-    transition: transform .3s;
+    transition: transform 0.3s;
     user-select: none;
 
     @include evThemify() {

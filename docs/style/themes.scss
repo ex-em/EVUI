@@ -3,36 +3,34 @@
 $ev-themes: (
   light: (
     /* common
-    -------------------------- */
-    color-primary: #1A6AFE,
-    color-info: #5AC8FA,
-    color-warning: #FF9500,
-    color-error: #FF3B30,
-    color-selected: #730EF4,
-    color-not-allow: #B01012,
-    color-disabled: #B2B2B2,
+    -------------------------- */ color-primary: #1a6afe,
+    color-info: #5ac8fa,
+    color-warning: #ff9500,
+    color-error: #ff3b30,
+    color-selected: #730ef4,
+    color-not-allow: #b01012,
+    color-disabled: #b2b2b2,
 
     background-color-base: $color-white,
-    border-color-base: #DDDDDD,
+    border-color-base: #dddddd,
     font-color-base: $color-black,
     font-color-nav: #737373,
-    background-color-description: #F8F8F8,
+    background-color-description: #f8f8f8,
   ),
   dark: (
     /* common
-    -------------------------- */
-    color-primary: #007AFF,
-    color-info: #64D2FF,
-    color-warning: #FF9F0A,
-    color-error: #FF453A,
-    color-selected: #791BF2,
-    color-not-allow: #B01012,
+    -------------------------- */ color-primary: #007aff,
+    color-info: #64d2ff,
+    color-warning: #ff9f0a,
+    color-error: #ff453a,
+    color-selected: #791bf2,
+    color-not-allow: #b01012,
     color-disabled: #555555,
 
-    background-color-base: #0D0D0D,
+    background-color-base: #0d0d0d,
     border-color-base: #222222,
     font-color-base: $color-white,
-    font-color-nav: #DDDDDD,
+    font-color-nav: #dddddd,
     background-color-description: #333333,
   ),
 ) !default;

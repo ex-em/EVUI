@@ -1,17 +1,11 @@
 <template>
   <div class="case">
-    <ev-chart
-        :data="chartData"
-        :options="chartOptions"
-    />
+    <ev-chart :data="chartData" :options="chartOptions" />
     <div class="description">
       <span class="toggle-label">HTML Tooltip 사용</span>
-      <ev-toggle
-          v-model="useHtml"
-      />
+      <ev-toggle v-model="useHtml" />
     </div>
   </div>
-
 </template>
 
 <script>
@@ -73,16 +67,20 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
       tooltip: {
         use: true,
         useScrollbar: true,
@@ -90,15 +88,19 @@ export default {
       },
     });
 
-    watch(useHtml, () => {
-      if (useHtml.value) {
-        chartOptions.tooltip.formatter = htmlTooltipFormatter;
-      } else {
-        chartOptions.tooltip.formatter = null;
-      }
-    }, {
-      immediate: true,
-    });
+    watch(
+      useHtml,
+      () => {
+        if (useHtml.value) {
+          chartOptions.tooltip.formatter = htmlTooltipFormatter;
+        } else {
+          chartOptions.tooltip.formatter = null;
+        }
+      },
+      {
+        immediate: true,
+      },
+    );
 
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
     const addRandomChartData = () => {

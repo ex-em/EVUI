@@ -1,39 +1,35 @@
 <template>
   <div class="case">
-    <ev-chart
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <ev-chart :data="chartData" :options="chartOptions" />
     <div class="description">
       <span class="toggle-label">데이터 자동 업데이트</span>
-      <ev-toggle
-        v-model="isLive"
-      />
+      <ev-toggle v-model="isLive" />
     </div>
   </div>
 </template>
 
 <script>
-  import { watch, ref, onBeforeUnmount, onMounted, reactive } from 'vue';
-  import dayjs from 'dayjs';
+import { watch, ref, onBeforeUnmount, onMounted, reactive } from 'vue';
+import dayjs from 'dayjs';
 
-  export default {
-    setup() {
-      const chartOptions = {
-        type: 'bar',
-        width: '100%',
-        height: '80%',
-        thickness: 1,
-        title: {
-          text: 'Chart Title',
-          show: true,
-        },
-        legend: {
-          show: true,
-          position: 'right',
-        },
-        horizontal: false,
-        axesX: [{
+export default {
+  setup() {
+    const chartOptions = {
+      type: 'bar',
+      width: '100%',
+      height: '80%',
+      thickness: 1,
+      title: {
+        text: 'Chart Title',
+        show: true,
+      },
+      legend: {
+        show: true,
+        position: 'right',
+      },
+      horizontal: false,
+      axesX: [
+        {
           type: 'time',
           showGrid: false,
           categoryMode: true,
@@ -44,97 +40,98 @@
               const curr = dayjs(value).format('yy-MM-DD');
               const prev = dayjs(data?.prev).format('yy-MM-DD');
               if (curr === prev) {
-                return dayjs(value)
-                    .format('HH:mm');
+                return dayjs(value).format('HH:mm');
               }
             }
 
-            return dayjs(value)
-                .format('DD HH:mm');
+            return dayjs(value).format('DD HH:mm');
           },
-        }],
-        axesY: [{
+        },
+      ],
+      axesY: [
+        {
           type: 'linear',
           startToZero: true,
           autoScaleRatio: 0.1,
           showGrid: true,
-        }],
-        maxTip: {
-          use: true,
-          tipStyle: {
-            background: '#DBDBDB',
-            textColor: '#000000',
-          },
         },
-      };
-
-      const chartData = reactive({
-        series: {
-          series1: { name: 'series#1' },
-          series2: { name: 'series#2' },
+      ],
+      maxTip: {
+        use: true,
+        tipStyle: {
+          background: '#DBDBDB',
+          textColor: '#000000',
         },
-        labels: [],
-        data: {
-          series1: [],
-          series2: [],
-        },
-      });
+      },
+    };
 
-      const isLive = ref(false);
-      const liveInterval = ref();
-      let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    const chartData = reactive({
+      series: {
+        series1: { name: 'series#1' },
+        series2: { name: 'series#2' },
+      },
+      labels: [],
+      data: {
+        series1: [],
+        series2: [],
+      },
+    });
 
-      const addRandomChartData = () => {
+    const isLive = ref(false);
+    const liveInterval = ref();
+    let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
+
+    const addRandomChartData = () => {
+      if (isLive.value) {
+        chartData.labels.shift();
+      }
+
+      timeValue = dayjs(timeValue).add(1, 'hour');
+      chartData.labels.push(dayjs(timeValue));
+
+      Object.values(chartData.data).forEach((seriesData) => {
         if (isLive.value) {
-          chartData.labels.shift();
+          seriesData.shift();
         }
 
-        timeValue = dayjs(timeValue).add(1, 'hour');
-        chartData.labels.push(dayjs(timeValue));
-
-        Object.values(chartData.data).forEach((seriesData) => {
-          if (isLive.value) {
-            seriesData.shift();
-          }
-
-          seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
-        });
-      };
-
-      onMounted(() => {
-        for (let ix = 0; ix < 60; ix++) {
-          addRandomChartData();
-        }
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
+    };
 
-      watch(isLive, (newValue) => {
-        if (newValue) {
-          addRandomChartData();
-          liveInterval.value = setInterval(addRandomChartData, 1000);
-        } else {
-          clearTimeout(liveInterval.value);
-        }
-      });
+    onMounted(() => {
+      for (let ix = 0; ix < 60; ix++) {
+        addRandomChartData();
+      }
+    });
 
-      onBeforeUnmount(() => {
+    watch(isLive, (newValue) => {
+      if (newValue) {
+        addRandomChartData();
+        liveInterval.value = setInterval(addRandomChartData, 1000);
+      } else {
         clearTimeout(liveInterval.value);
-      });
+      }
+    });
 
-      return {
-        chartData,
-        chartOptions,
-        isLive,
-      };
-    },
-  };
+    onBeforeUnmount(() => {
+      clearTimeout(liveInterval.value);
+    });
+
+    return {
+      chartData,
+      chartOptions,
+      isLive,
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
-  .case {
-    height: 100%;
-  }
-  .toggle-label {
-    vertical-align: top;
-    margin-right: 7px;
-  }
+.case {
+  height: 100%;
+}
+.toggle-label {
+  vertical-align: top;
+  margin-right: 7px;
+}
 </style>

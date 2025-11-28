@@ -1,10 +1,6 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedLabel="selectedLabel"
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <ev-chart v-model:selectedLabel="selectedLabel" :data="chartData" :options="chartOptions" />
     <div class="description">
       <div class="option">
         <span>scrollbar 사용</span>
@@ -16,19 +12,9 @@
       </div>
       <div class="option">
         <span>min</span>
-        <ev-input-number
-          v-model="xMin"
-          :step="xInterval"
-          :min="minDate"
-          :max="xMax - xInterval"
-        />
+        <ev-input-number v-model="xMin" :step="xInterval" :min="minDate" :max="xMax - xInterval" />
         <span>max</span>
-        <ev-input-number
-          v-model="xMax"
-          :step="xInterval"
-          :min="xMin + xInterval"
-          :max="maxDate"
-        />
+        <ev-input-number v-model="xMax" :step="xInterval" :min="xMin + xInterval" :max="maxDate" />
       </div>
       <div class="option">
         <span>y축 range 설정</span>
@@ -36,19 +22,9 @@
       </div>
       <div class="option">
         <span>min</span>
-        <ev-input-number
-          v-model="yMin"
-          :step="1"
-          :min="0"
-          :max="yMax - 1"
-        />
+        <ev-input-number v-model="yMin" :step="1" :min="0" :max="yMax - 1" />
         <span>max</span>
-        <ev-input-number
-          v-model="yMax"
-          :step="1"
-          :min="yMin + 1"
-          :max="LABEL_Y_COUNT - 1"
-        />
+        <ev-input-number v-model="yMax" :step="1" :min="yMin + 1" :max="LABEL_Y_COUNT - 1" />
       </div>
       <label class="badge yellow"> v-model:selectedLabel</label>
       <span>{{ selectedLabel }}</span>
@@ -105,37 +81,41 @@ export default {
       indicator: {
         use: true,
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        categoryMode: true,
-        range: xRange,
-        scrollbar: {
-          use: useScrollbar,
-          showButton: true,
-          background: '#E0E1DD',
-          thumbStyle: {
-            background: '#415A77',
-            radius: 2,
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          categoryMode: true,
+          range: xRange,
+          scrollbar: {
+            use: useScrollbar,
+            showButton: true,
+            background: '#E0E1DD',
+            thumbStyle: {
+              background: '#415A77',
+              radius: 2,
+            },
+          },
+          timeFormat: 'MMM.DD',
+          interval: 'day',
+        },
+      ],
+      axesY: [
+        {
+          type: 'step',
+          showGrid: false,
+          range: yRange,
+          scrollbar: {
+            use: useScrollbar,
+            showButton: false,
+            background: '#E0E1DD',
+            thumbStyle: {
+              background: '#415A77',
+              radius: 2,
+            },
           },
         },
-        timeFormat: 'MMM.DD',
-        interval: 'day',
-      }],
-      axesY: [{
-        type: 'step',
-        showGrid: false,
-        range: yRange,
-        scrollbar: {
-          use: useScrollbar,
-          showButton: false,
-          background: '#E0E1DD',
-          thumbStyle: {
-            background: '#415A77',
-            radius: 2,
-          },
-        },
-      }],
+      ],
       heatMapColor: {
         colorsByRange: [
           { color: '#D9ED92', label: '-30 ℃' },

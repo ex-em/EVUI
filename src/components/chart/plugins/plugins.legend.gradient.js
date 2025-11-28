@@ -90,9 +90,8 @@ const modules = {
       this.clearOverlay();
 
       this.legendDragInfo.dragging = true;
-      this.legendDragInfo.isStart = start !== end
-        ? targetDOM.className.includes('start')
-        : this.legendDragInfo.isStart;
+      this.legendDragInfo.isStart =
+        start !== end ? targetDOM.className.includes('start') : this.legendDragInfo.isStart;
       targetDOM.classList.add('dragging');
       this.legendBoxDOM.addEventListener('mousemove', this.onLegendMouseMove, false);
       this.legendBoxDOM.addEventListener('mouseup', this.onLegendMouseUp, false);
@@ -131,7 +130,9 @@ const modules = {
     this.onLegendMouseUp = () => {
       this.legendDragInfo.dragging = false;
 
-      const targetDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-handle dragging')[0];
+      const targetDOM = this.containerDOM.getElementsByClassName(
+        'ev-chart-legend-handle dragging',
+      )[0];
       targetDOM?.classList.remove('dragging');
       this.legendBoxDOM.removeEventListener('mouseup', this.onLegendMouseUp, false);
     };
@@ -288,7 +289,7 @@ const modules = {
 
     const tooltipDOM = document.createElement('div');
     tooltipDOM.className = 'ev-chart-legend-overlay-tooltip';
-    tooltipDOM.innerText = Math.floor(min + ((max - min) * (value / 100)));
+    tooltipDOM.innerText = Math.floor(min + (max - min) * (value / 100));
 
     const itemDOM = document.createElement('span');
     itemDOM.className = 'ev-chart-legend-overlay-item';
@@ -430,8 +431,8 @@ const modules = {
       thumbStyle += `left:${start}%;width:${end - start}%;`;
     }
 
-    const minText = (min + ((max - min) * (start / 100))).toFixed(decimalPoint);
-    const maxText = (min + ((max - min) * (end / 100))).toFixed(decimalPoint);
+    const minText = (min + (max - min) * (start / 100)).toFixed(decimalPoint);
+    const maxText = (min + (max - min) * (end / 100)).toFixed(decimalPoint);
 
     const thumbDOM = this.containerDOM.getElementsByClassName('ev-chart-legend-thumb')[0];
     thumbDOM.style.cssText = thumbStyle;
@@ -538,7 +539,7 @@ const modules = {
     if (['top', 'bottom'].includes(position)) {
       const containerSize = chartRect.width / 2;
 
-      containerStyle = `left:${(chartRect.width / 2) - (containerSize / 2)}px;`;
+      containerStyle = `left:${chartRect.width / 2 - containerSize / 2}px;`;
       containerStyle += `width:${containerSize}px;`;
       containerStyle += `height:${handleSize}px;`;
       containerStyle += 'padding:4px 0;';
@@ -546,7 +547,7 @@ const modules = {
     } else {
       const containerSize = chartRect.height / 2;
 
-      containerStyle = `top:${(chartRect.height / 2) - (containerSize / 2)}px;`;
+      containerStyle = `top:${chartRect.height / 2 - containerSize / 2}px;`;
       containerStyle += 'left:5px;';
       containerStyle += `width:${handleSize}px;`;
       containerStyle += `height:${containerSize}px;`;

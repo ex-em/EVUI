@@ -1,8 +1,5 @@
 <template>
-  <ev-chart
-    :data="chartData"
-    :options="chartOptions"
-  />
+  <ev-chart :data="chartData" :options="chartOptions" />
 </template>
 
 <script>
@@ -38,20 +35,24 @@ export default {
       overlapping: {
         use: true,
       },
-      axesX: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesX: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesY: [{
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
     };
 
     return {
@@ -62,5 +63,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

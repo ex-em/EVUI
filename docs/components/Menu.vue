@@ -1,10 +1,6 @@
 <template>
   <nav class="evui-navigation">
-    <ev-menu
-      v-model="currentMenu"
-      :items="menu"
-      @change="changeMenu"
-    />
+    <ev-menu v-model="currentMenu" :items="menu" @change="changeMenu" />
   </nav>
 </template>
 
@@ -22,27 +18,30 @@ export default {
       next();
     });
 
-    const menu = router.getRoutes().filter(item => item.name !== 'PageNotFound').reduce((acc, cur) => {
-      const menuInfoObj = {
-        text: cur.name,
-        value: cur.name,
-      };
-      if (!cur.meta.category) {
-        acc.push(menuInfoObj);
-      } else {
-        const idx = acc.findIndex(v => v.text === cur.meta.category);
-        if (idx < 0) {
-          acc.push({
-            text: cur.meta.category,
-            value: cur.meta.category,
-            children: [menuInfoObj],
-          });
+    const menu = router
+      .getRoutes()
+      .filter((item) => item.name !== 'PageNotFound')
+      .reduce((acc, cur) => {
+        const menuInfoObj = {
+          text: cur.name,
+          value: cur.name,
+        };
+        if (!cur.meta.category) {
+          acc.push(menuInfoObj);
         } else {
-          acc[idx].children.push(menuInfoObj);
+          const idx = acc.findIndex((v) => v.text === cur.meta.category);
+          if (idx < 0) {
+            acc.push({
+              text: cur.meta.category,
+              value: cur.meta.category,
+              children: [menuInfoObj],
+            });
+          } else {
+            acc[idx].children.push(menuInfoObj);
+          }
         }
-      }
-      return acc;
-    }, []);
+        return acc;
+      }, []);
 
     const changeMenu = (newVal) => {
       router.push({ name: newVal.value });
@@ -74,7 +73,8 @@ export default {
     border-right: 1px solid themed('border-color-base');
     background-color: themed('background-color-base');
   }
-  ul, li {
+  ul,
+  li {
     list-style: none;
   }
 

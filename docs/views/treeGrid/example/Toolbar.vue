@@ -34,18 +34,8 @@
     >
       <!-- toolbar -->
       <template #toolbar="{ item }">
-        <ev-button
-          type="info"
-          @click="addNode"
-        >
-          Add
-        </ev-button>
-        <ev-button
-          type="info"
-          @click="onClickCustom"
-        >
-          Set Search Value
-        </ev-button>
+        <ev-button type="info" @click="addNode"> Add </ev-button>
+        <ev-button type="info" @click="onClickCustom"> Set Search Value </ev-button>
         <ev-text-field
           v-model="searchVm"
           class="search"
@@ -83,11 +73,14 @@ export default {
       {
         text: 'Menu1',
         click: (param) => {
-          console.log(`[Menu1] Selected Row Data: ${JSON.stringify(param?.selectedRow?.[0]?.data)}`);
+          console.log(
+            `[Menu1] Selected Row Data: ${JSON.stringify(param?.selectedRow?.[0]?.data)}`,
+          );
         },
-      }, {
+      },
+      {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param),
+        click: (param) => console.log('[Menu2]', param),
       },
     ]);
     const borderMV = ref('');
@@ -125,18 +118,11 @@ export default {
         },
         {
           id: 'diserver.ini',
-          children: [
-            { id: 'api' },
-            { id: 'blobs' },
-            { id: 'connection' },
-            { id: 'make' },
-          ],
+          children: [{ id: 'api' }, { id: 'blobs' }, { id: 'connection' }, { id: 'make' }],
         },
         {
           id: 'docstore.ini',
-          children: [
-            { id: 'docstore' },
-          ],
+          children: [{ id: 'docstore' }],
         },
       ];
     };
@@ -199,7 +185,9 @@ export default {
 .form-row {
   width: 50%;
 }
-.ev-text-field, .ev-input-number, .ev-select {
+.ev-text-field,
+.ev-input-number,
+.ev-select {
   width: 30%;
 }
 .badge {

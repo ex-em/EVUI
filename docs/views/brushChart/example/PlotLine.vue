@@ -1,10 +1,7 @@
 <template>
   <ev-chart-group>
-    <ev-chart
-      :data="chartData"
-      :options="chartOptions"
-    />
-    <ev-chart-brush/>
+    <ev-chart :data="chartData" :options="chartOptions" />
+    <ev-chart-brush />
   </ev-chart-group>
 </template>
 
@@ -45,58 +42,70 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        timeFormat: 'MM/DD',
-        interval: 'day',
-        plotLines: [{
-          color: '#FF0000',
-          value: chartData.labels[5],
-          segments: [6, 2],
-          label: {
-            show: true,
-            text: 'X Plot Line',
-            textAlign: 'right',
-          },
-        }],
-        plotBands: [{
-          color: 'rgba(250, 222, 76, 0.8)',
-          from: chartData.labels[2],
-          to: chartData.labels[3],
-          label: {
-            show: true,
-            text: 'X Plot Band ZONE',
-            fontColor: '#FFA500',
-          },
-        }],
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        plotLines: [{
-          color: '#FF0000',
-          value: 50,
-          segments: [6, 2],
-          label: {
-            show: true,
-            text: 'Y Plot Line',
-          },
-        }],
-        plotBands: [{
-          color: 'rgba(250, 222, 76, 0.8)',
-          from: 20,
-          to: 40,
-          label: {
-            show: true,
-            text: 'Y Plot Band',
-            fontColor: '#FFA500',
-            verticalAlign: 'bottom',
-          },
-        }],
-      }],
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          timeFormat: 'MM/DD',
+          interval: 'day',
+          plotLines: [
+            {
+              color: '#FF0000',
+              value: chartData.labels[5],
+              segments: [6, 2],
+              label: {
+                show: true,
+                text: 'X Plot Line',
+                textAlign: 'right',
+              },
+            },
+          ],
+          plotBands: [
+            {
+              color: 'rgba(250, 222, 76, 0.8)',
+              from: chartData.labels[2],
+              to: chartData.labels[3],
+              label: {
+                show: true,
+                text: 'X Plot Band ZONE',
+                fontColor: '#FFA500',
+              },
+            },
+          ],
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          plotLines: [
+            {
+              color: '#FF0000',
+              value: 50,
+              segments: [6, 2],
+              label: {
+                show: true,
+                text: 'Y Plot Line',
+              },
+            },
+          ],
+          plotBands: [
+            {
+              color: 'rgba(250, 222, 76, 0.8)',
+              from: 20,
+              to: 40,
+              label: {
+                show: true,
+                text: 'Y Plot Band',
+                fontColor: '#FFA500',
+                verticalAlign: 'bottom',
+              },
+            },
+          ],
+        },
+      ],
     });
 
     return {
@@ -107,5 +116,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

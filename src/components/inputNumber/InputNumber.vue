@@ -66,7 +66,7 @@ export default {
     step: {
       type: Number,
       default: 1,
-      validator: val => val > 0,
+      validator: (val) => val > 0,
     },
     stepStrictly: {
       type: Boolean,
@@ -75,28 +75,14 @@ export default {
     precision: {
       type: Number,
       default: 0,
-      validator: val => (val >= 0 && val <= 100 && val === parseInt(val, 10)),
+      validator: (val) => val >= 0 && val <= 100 && val === parseInt(val, 10),
     },
   },
-  emits: [
-    'update:modelValue',
-    'focus',
-    'blur',
-    'input',
-    'change',
-  ],
+  emits: ['update:modelValue', 'focus', 'blur', 'input', 'change'],
   setup() {
-    const {
-      currentValue,
-      validateValue,
-      focusInput,
-      blurInput,
-      changeMv,
-    } = useModel();
+    const { currentValue, validateValue, focusInput, blurInput, changeMv } = useModel();
 
-    const {
-      stepValue,
-    } = useStep({
+    const { stepValue } = useStep({
       currentValue,
       validateValue,
     });

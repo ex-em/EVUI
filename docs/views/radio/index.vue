@@ -1,7 +1,5 @@
 <template>
-  <h2 class="content-title">
-    Radio
-  </h2>
+  <h2 class="content-title">Radio</h2>
   <Example
     v-for="(component, index) in components"
     :key="`${component.title}_${index}`"
@@ -11,9 +9,7 @@
     :url="component.url"
     :code-text="component.codeText"
   />
-  <MarkdownView
-    :source="mdText"
-  />
+  <MarkdownView :source="mdText" />
 </template>
 <script>
 import { defineAsyncComponent } from 'vue';
@@ -38,7 +34,8 @@ export default {
     const components = [
       {
         title: 'Default',
-        description: '여러 선택지 중 하나를 고르는 컴포넌트입니다. 라디오 버튼 특성상 하나의 요소만 사용할 수 없으며, <ev-radio-group>을 활용하는 것을 권장합니다.',
+        description:
+          '여러 선택지 중 하나를 고르는 컴포넌트입니다. 라디오 버튼 특성상 하나의 요소만 사용할 수 없으며, <ev-radio-group>을 활용하는 것을 권장합니다.',
         component: defineAsyncComponent(() => Promise.resolve(Default)),
         url: './docs/views/radio/example/Default.vue',
         codeText: {

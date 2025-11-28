@@ -1,6 +1,4 @@
-import {
-  getCurrentInstance, computed, reactive,
-} from 'vue';
+import { getCurrentInstance, computed, reactive } from 'vue';
 
 const getMatrixArr = (row, col) => Array.from(Array(row), () => Array(col).fill(false));
 
@@ -9,9 +7,10 @@ export const useModel = () => {
 
   const mv = computed({
     get: () => {
-      if (props.modelValue.length !== props.rowLabels.length
-        || !props.modelValue[0]
-        || props.modelValue[0].length !== props.colLabels.length
+      if (
+        props.modelValue.length !== props.rowLabels.length ||
+        !props.modelValue[0] ||
+        props.modelValue[0].length !== props.colLabels.length
       ) {
         return getMatrixArr(props.rowLabels.length, props.colLabels.length);
       }
@@ -27,9 +26,10 @@ export const useModel = () => {
    * 초기값 배열의 length와 options의 count가 안맞는 경우 valid체크하는 로직
    */
   const validateValue = () => {
-    if (props.modelValue.length !== props.rowLabels.length
-      || !props.modelValue[0]
-      || props.modelValue[0].length !== props.colLabels.length
+    if (
+      props.modelValue.length !== props.rowLabels.length ||
+      !props.modelValue[0] ||
+      props.modelValue[0].length !== props.colLabels.length
     ) {
       mv.value = [...getMatrixArr(props.rowLabels.length, props.colLabels.length)];
     }

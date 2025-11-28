@@ -17,7 +17,8 @@ export default {
   mdText,
   components: {
     Default: {
-      description: 'Pie Chart는 데이터의 전체 데이터를 기준으로 한 계열의 상대적 크기를 표시합니다.',
+      description:
+        'Pie Chart는 데이터의 전체 데이터를 기준으로 한 계열의 상대적 크기를 표시합니다.',
       component: Default,
       parsedData: parse(DefaultRaw).descriptor,
     },

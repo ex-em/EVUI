@@ -38,7 +38,7 @@ export default {
     htmlType: {
       type: String,
       default: 'button',
-      validator: val => ['button', 'submit', 'reset'].includes(val),
+      validator: (val) => ['button', 'submit', 'reset'].includes(val),
     },
     shape: {
       type: String,
@@ -85,41 +85,28 @@ export default {
   color: $color-white;
   transition: opacity $animate-base;
 
-  @each $type in (
-    'default',
-    'primary',
-    'info',
-    'warning',
-    'error',
-    'ghost',
-    'dashed',
-    'text',
-  ) {
+  @each $type in ('default', 'primary', 'info', 'warning', 'error', 'ghost', 'dashed', 'text') {
     &.type-#{$type} {
       @if $type != 'ghost' and $type != 'dashed' and $type != 'text' {
         @include evThemify() {
           border: 1px solid evThemed($type);
           background-color: evThemed($type);
         }
-      }
-
-      @else if $type == 'ghost' {
+      } @else if $type == 'ghost' {
         background-color: transparent;
 
         @include evThemify() {
           border: 1px solid evThemed('border-base');
           color: evThemed('font-base');
         }
-      }
-      @else if $type == 'dashed' {
+      } @else if $type == 'dashed' {
         background-color: transparent;
 
         @include evThemify() {
           border: 1px dashed evThemed('border-base');
           color: evThemed('font-base');
         }
-      }
-      @else if $type == 'text' {
+      } @else if $type == 'text' {
         border: 1px solid transparent;
         background-color: transparent;
 
@@ -129,10 +116,7 @@ export default {
       }
     }
   }
-  @each $shape, $radius in (
-    'radius': 40px,
-    'circle': 50%,
-  ) {
+  @each $shape, $radius in ('radius': 40px, 'circle': 50%) {
     &.shape-#{$shape} {
       border-radius: $radius;
 
@@ -142,10 +126,7 @@ export default {
       }
     }
   }
-  @each $size, $size-gap in (
-    'large': 5px,
-    'small': -5px,
-  ) {
+  @each $size, $size-gap in ('large': 5px, 'small': -5px) {
     &.size-#{$size} {
       height: $default-height + $size-gap;
       padding: 0 #{$default-padding + $size-gap};
@@ -153,9 +134,7 @@ export default {
 
       @if $size == 'small' {
         font-size: $font-size-base;
-      }
-
-      @else if $size == 'large' {
+      } @else if $size == 'large' {
         font-size: $font-size-large;
       }
     }

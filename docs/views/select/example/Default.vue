@@ -8,69 +8,36 @@
       @change="changeSelect1"
     />
     <div class="description">
-      <button
-        @click="addItem"
-      >
-        addItem
-      </button>
+      <button @click="addItem">addItem</button>
       first selectbox value : {{ selectVal1 }}
     </div>
-    <div class="description">
-      change val : {{ selectEventVal.val }}
-    </div>
+    <div class="description">change val : {{ selectEventVal.val }}</div>
   </div>
   <div class="case">
     <p class="case-title">Disabled Item</p>
-    <ev-select
-      v-model="selectVal3"
-      :items="items3"
-    />
+    <ev-select v-model="selectVal3" :items="items3" />
     <div class="description">
-      <button
-        @click="disableIdx1"
-      >
-        Disable Items[1]
-      </button>
+      <button @click="disableIdx1">Disable Items[1]</button>
       selected value : {{ selectVal3 }}
     </div>
-    <div class="description">
-      items : {{ items3 }}
-    </div>
+    <div class="description">items : {{ items3 }}</div>
   </div>
   <div class="case">
     <p class="case-title">Disabled Select</p>
-    <ev-select
-      v-model="selectVal4"
-      :items="items4"
-      :disabled="isDisabled"
-    />
-    <br>
+    <ev-select v-model="selectVal4" :items="items4" :disabled="isDisabled" />
+    <br />
     <div class="description">
-      <button
-        @click="disableSelect"
-      >
-        Disable Selectbox
-      </button>
+      <button @click="disableSelect">Disable Selectbox</button>
       selected value : {{ selectVal4 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Clearable Select</p>
-    <ev-select
-      v-model="selectVal4"
-      :items="items4"
-      placeholder="Please Select Item."
-      clearable
-    />
+    <ev-select v-model="selectVal4" :items="items4" placeholder="Please Select Item." clearable />
   </div>
   <div class="case">
     <p class="case-title">Filterable Select</p>
-    <ev-select
-      v-model="selectVal4"
-      :items="items4"
-      placeholder="Please Select Item."
-      filterable
-    />
+    <ev-select v-model="selectVal4" :items="items4" placeholder="Please Select Item." filterable />
   </div>
   <div class="case">
     <p class="case-title">Icon</p>
@@ -80,9 +47,7 @@
       placeholder="Please select value."
       @change="changeSelect1"
     />
-    <div class="description">
-      val : {{ selectVal5 }}
-    </div>
+    <div class="description">val : {{ selectVal5 }}</div>
   </div>
   <div class="case">
     <p class="case-title">Checkable Select</p>
@@ -226,7 +191,9 @@ export default {
       },
     ]);
     const isDisabled = ref(true);
-    const disableSelect = () => { isDisabled.value = !isDisabled.value; };
+    const disableSelect = () => {
+      isDisabled.value = !isDisabled.value;
+    };
 
     const selectVal5 = ref();
     const items5 = ref([
@@ -279,5 +246,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

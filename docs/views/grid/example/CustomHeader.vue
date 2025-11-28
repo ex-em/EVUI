@@ -14,9 +14,9 @@
             v-for="item in customHeaderData"
             :key="item.type"
             :style="{
-              left: `${item.fromTime / totalRenderSec * 100}%`,
-              width: `${(item.toTime - item.fromTime) / totalRenderSec * 100}%`,
-              backgroundColor: item.color
+              left: `${(item.fromTime / totalRenderSec) * 100}%`,
+              width: `${((item.toTime - item.fromTime) / totalRenderSec) * 100}%`,
+              backgroundColor: item.color,
             }"
             :class="`grid-custom-header__content grid-custom-header__content--${item.type}`"
           />
@@ -27,8 +27,8 @@
           <div
             class="grid-custom-cell__content"
             :style="{
-              width: `${(item.row[2][3].toTime - item.row[2][3].fromTime) / totalRenderSec * 100}%`,
-              left: `${item.row[2][3].fromTime / totalRenderSec * 100}%`,
+              width: `${((item.row[2][3].toTime - item.row[2][3].fromTime) / totalRenderSec) * 100}%`,
+              left: `${(item.row[2][3].fromTime / totalRenderSec) * 100}%`,
             }"
           />
         </div>
@@ -130,7 +130,7 @@ export default {
   position: relative;
   width: 100%;
   height: 100%;
-  background-color: #EEEEEE;
+  background-color: #eeeeee;
   &__content {
     position: absolute;
     height: 100%;
@@ -149,7 +149,7 @@ export default {
   &__content {
     position: absolute;
     height: 100%;
-    background-color: #087AED;
+    background-color: #087aed;
   }
 }
 </style>

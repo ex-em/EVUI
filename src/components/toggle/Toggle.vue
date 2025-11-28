@@ -8,8 +8,8 @@
     }"
     :style="{
       width: `${width}px`,
-      border: `1px solid ${ modelValue ? activeColor : inactiveColor }`,
-      'background-color': `${ modelValue ? activeColor : inactiveColor }`,
+      border: `1px solid ${modelValue ? activeColor : inactiveColor}`,
+      'background-color': `${modelValue ? activeColor : inactiveColor}`,
     }"
     @click="clickMv"
   />
@@ -80,7 +80,9 @@ export default {
   margin: 0;
   border-radius: 10px;
   box-sizing: border-box;
-  transition: border-color .3s, background-color .3s;
+  transition:
+    border-color 0.3s,
+    background-color 0.3s;
   outline: none;
   cursor: pointer;
 
@@ -89,7 +91,7 @@ export default {
     top: 1px;
     left: 1px;
     border-radius: 100%;
-    transition: all .3s;
+    transition: all 0.3s;
     width: 16px;
     height: 16px;
     background-color: $color-white;
@@ -101,15 +103,13 @@ export default {
   }
 
   &.readonly {
-    opacity: .6;
+    opacity: 0.6;
     cursor: default;
   }
 
   &.disabled {
-    opacity: .6;
+    opacity: 0.6;
     cursor: not-allowed;
   }
 }
-
-
 </style>

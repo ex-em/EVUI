@@ -31,10 +31,8 @@ class LinearScale extends Scale {
       }
     }
 
-
     return Util.labelSignFormat(value, this.decimalPoint);
   }
-
 
   /**
    * Calculate interval
@@ -77,9 +75,9 @@ class LinearScale extends Scale {
       }
 
       _interval = Math.max(
-          Math.abs(min) / (negativeSteps || 1),
-          Math.abs(max) / (positiveSteps || 1),
-        );
+        Math.abs(min) / (negativeSteps || 1),
+        Math.abs(max) / (positiveSteps || 1),
+      );
     } else {
       _interval = (max - min) / steps;
     }
@@ -87,7 +85,7 @@ class LinearScale extends Scale {
     return this.decimalPoint ? _interval : Math.ceil(_interval);
   }
 
-      /**
+  /**
    * Get decimal point from range
    * @param {object} {
    *  graphRange: number,
@@ -96,35 +94,32 @@ class LinearScale extends Scale {
    * }
    * @returns {number} decimal point
    */
-    getDecimalPointFromRange({
-      graphRange,
-      numberOfSteps,
-    }) {
-      if (numberOfSteps <= 0 || graphRange === 0) {
-        return 0;
-      }
-
-      const interval = graphRange / numberOfSteps;
-      if (interval === 0) {
-        return 0;
-      }
-
-      let decimals = 0;
-      let temp = interval;
-
-      while (temp < 1) {
-        temp *= 10;
-        decimals++;
-
-        if (decimals > 10) {
-          break;
-        }
-      }
-
-      return decimals;
+  getDecimalPointFromRange({ graphRange, numberOfSteps }) {
+    if (numberOfSteps <= 0 || graphRange === 0) {
+      return 0;
     }
 
-    /**
+    const interval = graphRange / numberOfSteps;
+    if (interval === 0) {
+      return 0;
+    }
+
+    let decimals = 0;
+    let temp = interval;
+
+    while (temp < 1) {
+      temp *= 10;
+      decimals++;
+
+      if (decimals > 10) {
+        break;
+      }
+    }
+
+    return decimals;
+  }
+
+  /**
    * With range information, calculate how many labels in axis
    * @param {object} range    min/max information
    *
@@ -180,7 +175,7 @@ class LinearScale extends Scale {
       interval = Math.ceil(graphRange / numberOfSteps);
     }
 
-    if (graphRange > (numberOfSteps * interval)) {
+    if (graphRange > numberOfSteps * interval) {
       const tempInterval = graphRange / numberOfSteps;
       interval = this.decimalPoint ? tempInterval : Math.ceil(tempInterval);
     }
@@ -200,85 +195,85 @@ class LinearScale extends Scale {
     };
   }
 
-    /**
+  /**
    * Calculate min/max value, label and size information for axis
    * @param {object} minMax    min/max information
    * @param {object} scrollbarOpt scrollbar option
    *
    * @returns {object} min/max value and label
    */
-    calculateScaleRange(minMax, scrollbarOpt) {
-      let maxValue;
-      let minValue;
-      let isDefaultMaxSameAsMin = false;
+  calculateScaleRange(minMax, scrollbarOpt) {
+    let maxValue;
+    let minValue;
+    let isDefaultMaxSameAsMin = false;
 
-      const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
-      if (Array.isArray(range) && range?.length === 2) {
-        if (this.options.type === 'heatMap') {
-          maxValue = range[1] > +minMax.max ? +minMax.max : range[1];
-          minValue = range[0] < +minMax.min ? +minMax.min : range[0];
-        } else {
-          maxValue = range[1];
-          minValue = range[0];
-        }
-      } else if (typeof range === 'function') {
-        [minValue, maxValue] = range(minMax.min, minMax.max);
+    const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
+    if (Array.isArray(range) && range?.length === 2) {
+      if (this.options.type === 'heatMap') {
+        maxValue = range[1] > +minMax.max ? +minMax.max : range[1];
+        minValue = range[0] < +minMax.min ? +minMax.min : range[0];
       } else {
-        maxValue = minMax.max;
-        minValue = minMax.min;
+        maxValue = range[1];
+        minValue = range[0];
       }
-
-      // autoScaleRatio 적용 케이스
-      if (this.autoScaleRatio) {
-        const temp = maxValue;
-        // 양수 방향에만 autoScaleRatio 적용
-        const _maxValue = maxValue * (this.autoScaleRatio + 1);
-        maxValue = this.decimalPoint ? _maxValue : Math.ceil(_maxValue);
-
-        if (maxValue > 0 && minValue < 0) {
-          // 양수/음수 혼합 케이스 -- 음수 방향에도 maxValue 증가분만큼 더하기
-          const diff = temp - maxValue;
-          minValue += diff;
-        } else if (maxValue < 0 && minValue < 0) {
-          // 전부 음수 케이스 -- 음수 방향에도 autoScaleRatio 적용
-          const _minValue = minValue * (this.autoScaleRatio + 1);
-          minValue = this.decimalPoint ? _minValue : Math.ceil(_minValue);
-        }
-      }
-
-      // 0 기준 축 설정 케이스
-      if (this.startToZero) {
-        if (minValue > 0) {
-          minValue = 0;
-        }
-
-        if (maxValue < 0) {
-          maxValue = 0;
-        }
-      }
-
-      if (maxValue === minValue) {
-        maxValue += 1;
-        isDefaultMaxSameAsMin = true;
-      }
-
-      const minLabel = this.getLabelFormat(minValue);
-      const maxLabel = this.getLabelFormat(maxValue, {
-        isMaxValueSameAsMin: isDefaultMaxSameAsMin,
-      });
-
-      return {
-        min: minValue,
-        max: maxValue,
-        minLabel,
-        maxLabel,
-        size: Util.calcTextSize(
-          maxLabel,
-          Util.getLabelStyle(this.labelStyle),
-          this.labelStyle?.padding,
-        ),
-      };
+    } else if (typeof range === 'function') {
+      [minValue, maxValue] = range(minMax.min, minMax.max);
+    } else {
+      maxValue = minMax.max;
+      minValue = minMax.min;
     }
+
+    // autoScaleRatio 적용 케이스
+    if (this.autoScaleRatio) {
+      const temp = maxValue;
+      // 양수 방향에만 autoScaleRatio 적용
+      const _maxValue = maxValue * (this.autoScaleRatio + 1);
+      maxValue = this.decimalPoint ? _maxValue : Math.ceil(_maxValue);
+
+      if (maxValue > 0 && minValue < 0) {
+        // 양수/음수 혼합 케이스 -- 음수 방향에도 maxValue 증가분만큼 더하기
+        const diff = temp - maxValue;
+        minValue += diff;
+      } else if (maxValue < 0 && minValue < 0) {
+        // 전부 음수 케이스 -- 음수 방향에도 autoScaleRatio 적용
+        const _minValue = minValue * (this.autoScaleRatio + 1);
+        minValue = this.decimalPoint ? _minValue : Math.ceil(_minValue);
+      }
+    }
+
+    // 0 기준 축 설정 케이스
+    if (this.startToZero) {
+      if (minValue > 0) {
+        minValue = 0;
+      }
+
+      if (maxValue < 0) {
+        maxValue = 0;
+      }
+    }
+
+    if (maxValue === minValue) {
+      maxValue += 1;
+      isDefaultMaxSameAsMin = true;
+    }
+
+    const minLabel = this.getLabelFormat(minValue);
+    const maxLabel = this.getLabelFormat(maxValue, {
+      isMaxValueSameAsMin: isDefaultMaxSameAsMin,
+    });
+
+    return {
+      min: minValue,
+      max: maxValue,
+      minLabel,
+      maxLabel,
+      size: Util.calcTextSize(
+        maxLabel,
+        Util.getLabelStyle(this.labelStyle),
+        this.labelStyle?.padding,
+      ),
+    };
+  }
 }
 
 export default LinearScale;

@@ -1,14 +1,10 @@
 <template>
-  <div>
-    COMP2
-  </div>
+  <div>COMP2</div>
 </template>
 
 <script>
 export default {
-  setup() {
-  },
+  setup() {},
 };
 </script>
-<style>
-</style>
+<style></style>

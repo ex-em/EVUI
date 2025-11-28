@@ -368,16 +368,24 @@ const router = createRouter({
     // header 때문에 정확한 위치로 이동하지 않는 문제가 있어서 비동기 로직이 추가 된다.
     if (document.readyState === 'loading') {
       return new Promise((resolve) => {
-        window.addEventListener('load', () => {
-          resolve(result);
-        }, { once: true });
+        window.addEventListener(
+          'load',
+          () => {
+            resolve(result);
+          },
+          { once: true },
+        );
       });
     }
     if (window.event?.type === 'popstate') {
       return new Promise((resolve) => {
-        window.addEventListener('hashchange', () => {
-          resolve(result);
-        }, { once: true });
+        window.addEventListener(
+          'hashchange',
+          () => {
+            resolve(result);
+          },
+          { once: true },
+        );
       });
     }
     return result;

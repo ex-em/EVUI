@@ -1,54 +1,28 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <div
-      class="sample-context"
-      @contextmenu.prevent="openContextMenu"
-    >
+    <div class="sample-context" @contextmenu.prevent="openContextMenu">
       컨텍스트 메뉴 우클릭 영역
-      <ev-context-menu
-        ref="menu"
-        :items="menuItems"
-      />
+      <ev-context-menu ref="menu" :items="menuItems" />
     </div>
     <div class="description">
-      <span class="badge">
-        CLICK RIGHT
-      </span>
+      <span class="badge"> CLICK RIGHT </span>
     </div>
-
   </div>
   <div class="case">
     <p class="case-title">Custom</p>
-    <div
-      class="sample-context"
-      @contextmenu.prevent="menu2.show"
-    >
-      <ev-context-menu
-        ref="menu2"
-        :items="menuItems2"
-      />
+    <div class="sample-context" @contextmenu.prevent="menu2.show">
+      <ev-context-menu ref="menu2" :items="menuItems2" />
       컨텍스트 메뉴 우클릭 영역
     </div>
     <div class="description">
-      <span
-        class="badge"
-        @click="addChild"
-      >
-        ADD CHILD
-      </span>
+      <span class="badge" @click="addChild"> ADD CHILD </span>
     </div>
   </div>
   <div class="case">
     <p class="case-title">Custom Text</p>
-    <div
-      class="sample-context"
-      @contextmenu.prevent="menu3.show"
-    >
-      <ev-context-menu
-        ref="menu3"
-        :items="menuItems3"
-      >
+    <div class="sample-context" @contextmenu.prevent="menu3.show">
+      <ev-context-menu ref="menu3" :items="menuItems3">
         <template #customText="{ item }">
           <span>{{ item.text }} - CUSTOM TEXT</span>
         </template>
@@ -176,7 +150,9 @@ export default {
       menuItems2.value.push({
         text: 'TEXT4',
         iconClass: 'ev-icon-bell-warning',
-        click: () => { console.log('CLICK TEXT4'); },
+        click: () => {
+          console.log('CLICK TEXT4');
+        },
       });
     };
 
@@ -235,6 +211,6 @@ export default {
   height: 400px;
   max-width: 400px;
   max-height: 400px;
-  background: #8D99A7;
+  background: #8d99a7;
 }
 </style>

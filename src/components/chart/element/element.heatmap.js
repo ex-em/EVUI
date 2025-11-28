@@ -83,9 +83,9 @@ class HeatMap {
       const unitB = Math.floor((minB - maxB) / (rangeCount - 1));
 
       for (let ix = 0; ix < rangeCount; ix++) {
-        const r = +minR - (unitR * ix);
-        const g = +minG - (unitG * ix);
-        const b = +minB - (unitB * ix);
+        const r = +minR - unitR * ix;
+        const g = +minG - unitG * ix;
+        const b = +minB - unitB * ix;
 
         colorState.push({
           id: `color#${ix}`,
@@ -144,10 +144,10 @@ class HeatMap {
       const { start, end, selectedValue } = this.colorState[0];
       if (value < 0 || (start <= ratio && ratio <= end)) {
         itemInfo.show = true;
-        itemInfo.isHighlight = selectedValue !== null
-          && (Math.floor(value) === Math.floor(min + ((max - min) * (selectedValue / 100))));
-        itemInfo.dataColor = value < 0
-          ? this.errorColor : this.getColorForGradient(ratio);
+        itemInfo.isHighlight =
+          selectedValue !== null &&
+          Math.floor(value) === Math.floor(min + (max - min) * (selectedValue / 100));
+        itemInfo.dataColor = value < 0 ? this.errorColor : this.getColorForGradient(ratio);
       }
     } else {
       const colorIndex = this.getColorIndexByValue(value);
@@ -172,7 +172,7 @@ class HeatMap {
       if (radius > 0) {
         const minSize = Math.min(w, h);
         let r = radius;
-        if (r > (minSize / 2)) {
+        if (r > minSize / 2) {
           r = Math.floor(minSize / 2);
         }
         ctx.moveTo(x + r, y);
@@ -188,12 +188,7 @@ class HeatMap {
       }
     } else {
       const aliasPixel = Util.aliasPixel(1);
-      ctx.fillRect(
-        x,
-        y - aliasPixel,
-        w + aliasPixel,
-        h + aliasPixel,
-      );
+      ctx.fillRect(x, y - aliasPixel, w + aliasPixel, h + aliasPixel);
     }
     ctx.closePath();
   }
@@ -202,10 +197,10 @@ class HeatMap {
     let point = null;
 
     if (this.labels[dir] && this.labels[dir].length) {
-      let index = this.labels[dir].findIndex(label => label === value);
+      let index = this.labels[dir].findIndex((label) => label === value);
 
       if (index === -1) {
-        index = this.labels[dir].findIndex(label => +label === +value);
+        index = this.labels[dir].findIndex((label) => +label === +value);
       }
 
       const { minIndex, maxIndex, graphMin, graphMax } = minMax;
@@ -223,13 +218,12 @@ class HeatMap {
         }
       }
 
-      const startIndex = minIndex ?? this.labels[dir].findIndex(label => +label === +graphMin);
+      const startIndex = minIndex ?? this.labels[dir].findIndex((label) => +label === +graphMin);
 
       if (index > -1) {
-        index -= (startIndex > -1 ? startIndex : 0);
-        point = dir === 'x'
-          ? startPoint + (this.size.w * index)
-          : startPoint - (this.size.h * (index + 1));
+        index -= startIndex > -1 ? startIndex : 0;
+        point =
+          dir === 'x' ? startPoint + this.size.w * index : startPoint - this.size.h * (index + 1);
       }
     }
 
@@ -280,22 +274,14 @@ class HeatMap {
     const getOpacity = (item, opacity, index) => {
       if (!legendHitInfo) {
         let isDownplay;
-        const {
-          option: selectedItemOpt,
-          selected: selectedItem,
-        } = selectItem;
+        const { option: selectedItemOpt, selected: selectedItem } = selectItem;
 
-        const {
-          option: selectedLabelOpt,
-          selected: selectedLabel,
-        } = selectLabel;
+        const { option: selectedLabelOpt, selected: selectedLabel } = selectLabel;
 
         const isSelectedItem = truthy(selectedItem?.dataIndex) && selectedItem?.dataIndex > -1;
         const isSelectedLabel = selectedLabel?.label?.length > 0;
         if (isSelectedItem) {
-          isDownplay = selectedItemOpt.useSeriesOpacity
-            ? index !== selectedItem?.dataIndex
-            : false;
+          isDownplay = selectedItemOpt.useSeriesOpacity ? index !== selectedItem?.dataIndex : false;
         } else if (isSelectedLabel) {
           isDownplay = selectedLabelOpt.useSeriesOpacity
             ? !selectedLabel?.label?.includes(this.getItemLabel(selectLabel, item))
@@ -317,15 +303,8 @@ class HeatMap {
 
       const value = item.o;
 
-      if (xp !== null && yp !== null
-         && (value !== null && value !== undefined)) {
-        const {
-          show,
-          opacity,
-          dataColor,
-          id,
-          isHighlight,
-        } = this.getItemInfo(value);
+      if (xp !== null && yp !== null && value !== null && value !== undefined) {
+        const { show, opacity, dataColor, id, isHighlight } = this.getItemInfo(value);
 
         let originalOpacity = opacity;
         if (opacity === 1 && Util.getColorStringType(item.dataColor) === 'RGBA') {
@@ -347,7 +326,7 @@ class HeatMap {
           let borderOpt = this.stroke;
           const selectItemOption = selectItem?.option;
           const useSelectItem = selectItemOption?.use && selectItemOption?.showBorder;
-          const isHit = (index === selectItem?.selected?.dataIndex);
+          const isHit = index === selectItem?.selected?.dataIndex;
           if (useSelectItem && isHit) {
             borderOpt = {
               show: selectItemOption?.showBorder,
@@ -365,10 +344,10 @@ class HeatMap {
             // item 사이즈 보다 border 선 굵기가 큰 경우 lineWidth props 무시
             if (lineWidth < w && lineWidth < h) {
               ctx.lineWidth = lineWidth;
-              xp += (lineWidth * 0.5);
-              yp += (lineWidth * 0.5);
-              w -= (lineWidth);
-              h -= (lineWidth);
+              xp += lineWidth * 0.5;
+              yp += lineWidth * 0.5;
+              w -= lineWidth;
+              h -= lineWidth;
             }
           }
 
@@ -389,9 +368,12 @@ class HeatMap {
             });
           }
           if (isHighlight) {
-            this.itemHighlight({
-              data: item,
-            }, overlayCtx);
+            this.itemHighlight(
+              {
+                data: item,
+              },
+              overlayCtx,
+            );
           }
         }
       }
@@ -429,8 +411,8 @@ class HeatMap {
 
     const vw = Math.round(ctx.measureText(formattedTxt).width);
     const vh = fontSize;
-    const centerX = x + (w / 2);
-    const centerY = y + (h / 2);
+    const centerX = x + w / 2;
+    const centerY = y + h / 2;
 
     if (vw >= w || vh >= h || formattedTxt < 0) {
       return;
@@ -438,8 +420,8 @@ class HeatMap {
 
     switch (align) {
       case 'top': {
-        const xPos = centerX - (vw / 2);
-        const yPos = centerY - (vh / 2);
+        const xPos = centerX - vw / 2;
+        const yPos = centerY - vh / 2;
         ctx.fillText(formattedTxt, xPos, yPos);
         break;
       }
@@ -449,8 +431,8 @@ class HeatMap {
         break;
       }
       case 'bottom': {
-        const xPos = centerX - (vw / 2);
-        const yPos = centerY + (vh / 2);
+        const xPos = centerX - vw / 2;
+        const yPos = centerY + vh / 2;
         ctx.fillText(formattedTxt, xPos, yPos);
         break;
       }
@@ -458,7 +440,7 @@ class HeatMap {
         ctx.fillText(formattedTxt, x, centerY);
         break;
       default: {
-        const xPos = centerX - (vw / 2);
+        const xPos = centerX - vw / 2;
         ctx.fillText(formattedTxt, xPos, centerY);
         break;
       }
@@ -483,7 +465,7 @@ class HeatMap {
       const y1 = yp;
       const y2 = yp + h;
 
-      return ((x1 >= xsp && x2 <= xep) && (y1 >= ysp && y2 <= yep));
+      return x1 >= xsp && x2 <= xep && y1 >= ysp && y2 <= yep;
     });
   }
 
@@ -521,7 +503,8 @@ class HeatMap {
 
     ctx.save();
 
-    const dataColor = Util.getColorStringType(gdata.dataColor) === 'RGBA'
+    const dataColor =
+      Util.getColorStringType(gdata.dataColor) === 'RGBA'
         ? item.dataColor
         : Util.colorStringToRgba(gdata.dataColor, 1);
 
@@ -591,10 +574,7 @@ class HeatMap {
     const itemIndex = gdata.findIndex((data) => {
       const { xp: x, yp: y, w: wSize, h: hSize } = data;
 
-      return (x <= xp)
-        && (xp <= x + wSize)
-        && (y <= yp)
-        && (yp <= y + hSize);
+      return x <= xp && xp <= x + wSize && y <= yp && yp <= y + hSize;
     });
 
     if (itemIndex > -1) {
@@ -649,7 +629,7 @@ class HeatMap {
         }
 
         const findItem = labels[dir].findIndex((item, index) => {
-          itemPoint = startPoint + (gap * index);
+          itemPoint = startPoint + gap * index;
           return itemPoint <= target && target <= itemPoint + gap;
         });
 
@@ -674,7 +654,7 @@ class HeatMap {
 
   getFilteredLabel(labels, count, min, max) {
     return labels.length !== count
-      ? labels.filter(label => min <= label && label <= max)
+      ? labels.filter((label) => min <= label && label <= max)
       : labels;
   }
 
@@ -726,10 +706,7 @@ class HeatMap {
   }
 
   getItemLabel(selectLabel, item) {
-    const {
-      option: selectedLabelOpt,
-      selected: selectedLabel,
-    } = selectLabel;
+    const { option: selectedLabelOpt, selected: selectedLabel } = selectLabel;
 
     let targetLabel = this.isHorizontal ? item.y : item.x;
     if (selectedLabelOpt?.useBothAxis && selectedLabel?.targetAxis) {

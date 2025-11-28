@@ -20,11 +20,7 @@
           }}
         </div>
         <div class="ev-chart-tooltip-custom__body">
-          <div
-            v-for="s in tooltip.items"
-            :key="s.sId + ':' + s.index"
-            class="row"
-          >
+          <div v-for="s in tooltip.items" :key="s.sId + ':' + s.index" class="row">
             <span class="color-circle" :style="{ backgroundColor: s.color }" />
             <span class="series-name">{{ s.name }}</span>
             <span class="value">{{ s.data?.y }}</span>
@@ -110,9 +106,7 @@ export default {
     };
 
     const onReplaceScroll = (e) => {
-      const scrollElement = document.querySelector(
-        '.ev-chart-tooltip-custom__body',
-      );
+      const scrollElement = document.querySelector('.ev-chart-tooltip-custom__body');
 
       if (scrollElement && scrollElement.scrollHeight > scrollElement.clientHeight) {
         e.preventDefault();
@@ -148,7 +142,7 @@ export default {
 .ev-chart-tooltip {
   background-color: rgb(76, 76, 76);
   border: 1px solid rgb(102, 102, 102);
-  color: #FFFFFF;
+  color: #ffffff;
 
   &__body {
     max-height: 400px;

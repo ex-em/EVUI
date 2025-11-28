@@ -11,10 +11,7 @@
     }"
   >
     <div class="ev-slider-wrapper">
-      <div
-        ref="sliderLine"
-        class="ev-slider-line"
-      >
+      <div ref="sliderLine" class="ev-slider-line">
         <template v-if="showStep && step">
           <div class="ev-slider-step-wrapper">
             <span
@@ -26,20 +23,10 @@
           </div>
         </template>
         <template v-if="isColorArray && color.length > 1">
-          <div
-            v-if="range"
-            :style="leftThumbStyle"
-            class="ev-slider-thumb left"
-          />
-          <div
-            :style="rightThumbStyle"
-            class="ev-slider-thumb right"
-          />
+          <div v-if="range" :style="leftThumbStyle" class="ev-slider-thumb left" />
+          <div :style="rightThumbStyle" class="ev-slider-thumb right" />
         </template>
-        <div
-          class="ev-slider-thumb"
-          :style="rangeThumbStyle"
-        />
+        <div class="ev-slider-thumb" :style="rangeThumbStyle" />
         <template v-if="markList.length > 0">
           <div class="ev-slider-mark-wrapper">
             <div
@@ -55,10 +42,7 @@
             </div>
           </div>
         </template>
-        <span
-          class="ev-slider-line-layer"
-          @click="clickSlider"
-        />
+        <span class="ev-slider-line-layer" @click="clickSlider" />
       </div>
       <div
         v-if="range"
@@ -67,10 +51,7 @@
         :style="leftHandleStyle"
         @mousedown.stop.prevent="startDrag('left')"
       >
-        <span
-          :style="handleBtnStyle"
-          class="ev-slider-handle-btn"
-        />
+        <span :style="handleBtnStyle" class="ev-slider-handle-btn" />
         <div class="ev-slider-tooltip" v-html="formatValue.left" />
       </div>
       <div
@@ -79,10 +60,7 @@
         :style="rightHandleStyle"
         @mousedown.stop.prevent="startDrag('right')"
       >
-        <span
-          :style="handleBtnStyle"
-          class="ev-slider-handle-btn"
-        />
+        <span :style="handleBtnStyle" class="ev-slider-handle-btn" />
         <div class="ev-slider-tooltip" v-html="formatValue.right" />
       </div>
     </div>
@@ -123,8 +101,7 @@ import { useModel, useStyle, useEvent, useInit } from './uses';
 
 export default {
   name: 'EvSlider',
-  components: {
-  },
+  components: {},
   props: {
     modelValue: {
       type: [Number, Array],
@@ -153,7 +130,7 @@ export default {
     step: {
       type: Number,
       default: 1,
-      validator: val => val > 0,
+      validator: (val) => val > 0,
     },
     mark: {
       type: Object,
@@ -180,10 +157,7 @@ export default {
       default: null,
     },
   },
-  emits: [
-    'update:modelValue',
-    'change',
-  ],
+  emits: ['update:modelValue', 'change'],
   setup() {
     const {
       currentValue,
@@ -209,11 +183,7 @@ export default {
       slider,
     });
 
-    const {
-      startDrag,
-      clickSlider,
-      changeInput,
-    } = useEvent({
+    const { startDrag, clickSlider, changeInput } = useEvent({
       currentValue,
       state,
       slider,
@@ -452,7 +422,8 @@ export default {
     padding-bottom: $handle-height;
   }
   @include state('readonly') {
-    &, * {
+    &,
+    * {
       cursor: default !important;
     }
     .ev-slider-handle {
@@ -465,7 +436,8 @@ export default {
     }
   }
   @include state('disabled') {
-    &, * {
+    &,
+    * {
       cursor: not-allowed !important;
     }
     .ev-slider-thumb {

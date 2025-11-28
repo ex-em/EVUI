@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="ev-checkbox-group"
-    :class="{ 'type-button': type === 'button' }"
-    role="group"
-  >
+  <div class="ev-checkbox-group" :class="{ 'type-button': type === 'button' }" role="group">
     <slot />
   </div>
 </template>
@@ -30,7 +26,7 @@ export default {
   setup(props, { emit }) {
     const mv = computed({
       get: () => props.modelValue,
-      set: labels => emit('update:modelValue', labels),
+      set: (labels) => emit('update:modelValue', labels),
     });
     provide('EvCheckboxGroupMv', mv);
 

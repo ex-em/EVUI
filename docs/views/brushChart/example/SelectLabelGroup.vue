@@ -2,32 +2,20 @@
   <div class="case">
     <ev-chart-group
       v-model:groupSelectedLabel="defaultGroupSelectLabel"
-      v-model:zoomStartIdx='zoomStartIdx'
-      v-model:zoomEndIdx='zoomEndIdx'
+      v-model:zoomStartIdx="zoomStartIdx"
+      v-model:zoomEndIdx="zoomEndIdx"
       :options="chartGroupOptions"
     >
-      <ev-chart
-        :data="chartData"
-        :options="chartOptions"
-        @click="onClick"
-      />
-      <ev-chart
-        :data="chartData2"
-        :options="chartOptions"
-        @click="onClick"
-      />
-      <ev-chart-brush :options="brushOptions"/>
+      <ev-chart :data="chartData" :options="chartOptions" @click="onClick" />
+      <ev-chart :data="chartData2" :options="chartOptions" @click="onClick" />
+      <ev-chart-brush :options="brushOptions" />
     </ev-chart-group>
 
     <div class="description">
-      <div class="badge yellow">
-        기본 선택값 v-model
-      </div>
+      <div class="badge yellow">기본 선택값 v-model</div>
       {{ defaultGroupSelectLabel }}
-      <br><br>
-      <div class="badge yellow">
-        클릭된 라벨
-      </div>
+      <br /><br />
+      <div class="badge yellow">클릭된 라벨</div>
       {{ clickedLabel }}
     </div>
   </div>
@@ -73,17 +61,21 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'YYYY-MM-DD',
-        interval: 'day',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'YYYY-MM-DD',
+          interval: 'day',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
       selectLabel: {
         use: true,
         useClick: true,
@@ -127,7 +119,7 @@ export default {
 
     const clickedLabel = ref("''");
     const onClick = (target) => {
-      clickedLabel.value = target.selected.label.map(label => dayjs(label).format('YYYY-MM-DD'));
+      clickedLabel.value = target.selected.label.map((label) => dayjs(label).format('YYYY-MM-DD'));
     };
 
     const addRandomChartLabel = () => {
@@ -145,10 +137,10 @@ export default {
       let val4;
 
       if (ix < 20 || ix > 40) {
-        val = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-        val2 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-        val3 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-        val4 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
+        val = Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
+        val2 = Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
+        val3 = Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
+        val4 = Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
       }
 
       Object.values(chartData.data).forEach((seriesData, idx) => {
@@ -183,5 +175,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

@@ -34,15 +34,8 @@
     >
       <!-- renderer start -->
       <template #gridButton>
-        <ev-button
-          type="ghost"
-          size="small"
-        >
-          Delete
-        </ev-button>
-        <ev-button size="small">
-          Edit
-        </ev-button>
+        <ev-button type="ghost" size="small"> Delete </ev-button>
+        <ev-button size="small"> Edit </ev-button>
       </template>
       <template #check="{ item }">
         <ev-checkbox
@@ -56,17 +49,19 @@
         <ev-select
           v-model="item.row[2][item.column.index]"
           :items="[
-              {
-                name: 'a',
-                value: 'a',
-              }, {
-                name: 'b',
-                value: 'b',
-              }, {
-                name: 'c',
-                value: 'c',
-              },
-            ]"
+            {
+              name: 'a',
+              value: 'a',
+            },
+            {
+              name: 'b',
+              value: 'b',
+            },
+            {
+              name: 'c',
+              value: 'c',
+            },
+          ]"
           placeholder="Please select value."
           @click.stop=""
           @dblclick.stop=""
@@ -86,9 +81,7 @@
         />
       </template>
       <template #custom="{ item }">
-        <span
-          :class="getStateClass(item.row[2][item.column.index])"
-        >
+        <span :class="getStateClass(item.row[2][item.column.index])">
           <span class="v-chip__content"> {{ item.row[2][item.column.index] }} </span>
         </span>
       </template>
@@ -129,10 +122,11 @@ export default {
     const menuItems = ref([
       {
         text: 'Menu1',
-        click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
-      }, {
+        click: (param) => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
+      },
+      {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param),
+        click: (param) => console.log('[Menu2]', param),
       },
     ]);
     const borderMV = ref('');
@@ -259,7 +253,9 @@ export default {
 .form-row {
   width: 50%;
 }
-.ev-text-field, .ev-input-number, .ev-select {
+.ev-text-field,
+.ev-input-number,
+.ev-select {
   width: 80%;
 }
 .badge {
@@ -276,31 +272,31 @@ export default {
   padding: 0 12px;
   align-items: center;
   cursor: default;
-  color: #FFFFFF;
+  color: #ffffff;
   line-height: 20px;
   max-width: 100%;
   outline: none;
   overflow: hidden;
   text-decoration: none;
-  transition-duration: .28s;
+  transition-duration: 0.28s;
   transition-property: box-shadow, opacity;
-  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   vertical-align: middle;
   white-space: nowrap;
   border-radius: 16px;
   font-size: 14px;
 
   &.green {
-    background-color: #4CAF50;
-    border-color: #4CAF50;
+    background-color: #4caf50;
+    border-color: #4caf50;
   }
   &.yellow {
-    background-color: #F7DF6A;
-    border-color: #F7DF6A;
+    background-color: #f7df6a;
+    border-color: #f7df6a;
   }
   &.red {
-    background-color: #FF4949;
-    border-color: #FF4949;
+    background-color: #ff4949;
+    border-color: #ff4949;
   }
 }
 .v-chip .v-chip__content {

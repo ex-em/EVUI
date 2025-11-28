@@ -1,8 +1,8 @@
 <template>
   <div class="case">
     <ev-chart-group
-      v-model:zoomStartIdx='zoomStartIdx'
-      v-model:zoomEndIdx='zoomEndIdx'
+      v-model:zoomStartIdx="zoomStartIdx"
+      v-model:zoomEndIdx="zoomEndIdx"
       :options="chartGroupOptions"
     >
       <ev-chart
@@ -17,19 +17,15 @@
         :options="chartOptions"
         @click="onClick"
       />
-      <ev-chart-brush :options="brushOptions"/>
+      <ev-chart-brush :options="brushOptions" />
     </ev-chart-group>
 
     <div class="description">
-      <div class="badge yellow">
-        기본 선택값 v-model
-      </div>
+      <div class="badge yellow">기본 선택값 v-model</div>
       {{ defaultSelectLabel }}
       {{ defaultSelectLabel2 }}
-      <br><br>
-      <div class="badge yellow">
-        클릭된 라벨
-      </div>
+      <br /><br />
+      <div class="badge yellow">클릭된 라벨</div>
       {{ clickedLabel }}
     </div>
   </div>
@@ -75,18 +71,22 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        timeFormat: 'YYYY-MM-DD',
-        interval: 'day',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.3,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          timeFormat: 'YYYY-MM-DD',
+          interval: 'day',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.3,
+        },
+      ],
       maxTip: {
         use: true,
         tipStyle: {
@@ -139,7 +139,7 @@ export default {
 
     const clickedLabel = ref("''");
     const onClick = (target) => {
-      clickedLabel.value = target.selected.label.map(label => dayjs(label).format('YYYY-MM-DD'));
+      clickedLabel.value = target.selected.label.map((label) => dayjs(label).format('YYYY-MM-DD'));
     };
 
     const addRandomChartData = () => {
@@ -149,10 +149,10 @@ export default {
       chartData.labels.push(date);
       chartData2.labels.push(date);
 
-      const val = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-      const val2 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-      const val3 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
-      const val4 = Math.floor(Math.random() * ((5000 - 5) + 1)) + 5;
+      const val = Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
+      const val2 = Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
+      const val3 = Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
+      const val4 = Math.floor(Math.random() * (5000 - 5 + 1)) + 5;
 
       Object.values(chartData.data).forEach((seriesData, idx) => {
         seriesData.push(idx ? val : val2);

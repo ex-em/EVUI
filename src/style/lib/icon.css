@@ -1,7 +1,8 @@
 @font-face {
   font-family: 'EVUI';
   src: url('@/style/lib/fonts/EVUI.eot');
-  src: url('@/style/lib/fonts/EVUI.eot#iefix') format('embedded-opentype'),
+  src:
+    url('@/style/lib/fonts/EVUI.eot#iefix') format('embedded-opentype'),
     url('@/style/lib/fonts/EVUI.ttf') format('truetype'),
     url('@/style/lib/fonts/EVUI.woff') format('woff'),
     url('@/style/lib/fonts/EVUI.svg') format('svg');
@@ -10,7 +11,8 @@
   font-display: block;
 }
 
-[class^='ev-icon-'], [class*=' ev-icon-'] {
+[class^='ev-icon-'],
+[class*=' ev-icon-'] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'EVUI' !important;
   speak: none;

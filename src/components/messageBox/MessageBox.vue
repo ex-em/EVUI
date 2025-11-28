@@ -1,9 +1,6 @@
 <template>
   <teleport to="body">
-    <transition
-      name="ev-message-box-fade"
-      appear
-    >
+    <transition name="ev-message-box-fade" appear>
       <div
         v-show="isShow"
         id="ev-message-box-modal"
@@ -21,30 +18,15 @@
           }"
           tabindex="-1"
         >
-          <span
-            v-if="iconClass"
-            class="ev-message-box-icon"
-          >
-            <i
-              :class="iconClass"
-            />
+          <span v-if="iconClass" class="ev-message-box-icon">
+            <i :class="iconClass" />
           </span>
           <div class="ev-message-box-content">
-            <p
-              v-if="title"
-              class="ev-message-box-title"
-            >
+            <p v-if="title" class="ev-message-box-title">
               {{ title }}
             </p>
-            <p
-              v-if="useHTML"
-              class="ev-message-box-message"
-              v-html="message"
-            />
-            <p
-              v-else
-              class="ev-message-box-message"
-            >
+            <p v-if="useHTML" class="ev-message-box-message" v-html="message" />
+            <p v-else class="ev-message-box-message">
               {{ message }}
             </p>
           </div>
@@ -69,11 +51,7 @@
               {{ confirmBtnText }}
             </ev-button>
           </div>
-          <span
-            v-if="showClose"
-            class="ev-message-box-close"
-            @click="closeMsg('cancel')"
-          >
+          <span v-if="showClose" class="ev-message-box-close" @click="closeMsg('cancel')">
             <i class="ev-icon-close" />
           </span>
         </div>
@@ -95,7 +73,7 @@ export default {
     type: {
       type: String,
       default: '',
-      validator: val => ['', 'info', 'success', 'warning', 'error'].includes(val),
+      validator: (val) => ['', 'info', 'success', 'warning', 'error'].includes(val),
     },
     title: {
       type: String,
@@ -221,11 +199,14 @@ export default {
         msgRef.value.focus();
       }
     });
-    watch(() => state.isShow, (val) => {
-      if (!val) {
-        document.removeEventListener('keydown', keydown);
-      }
-    });
+    watch(
+      () => state.isShow,
+      (val) => {
+        if (!val) {
+          document.removeEventListener('keydown', keydown);
+        }
+      },
+    );
     onBeforeUnmount(() => {
       document.removeEventListener('keydown', keydown);
     });
@@ -253,7 +234,7 @@ export default {
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
-  transition: opacity .2s ease-in-out;
+  transition: opacity 0.2s ease-in-out;
 }
 .ev-message-box {
   $padding-vertical: 20px;
@@ -265,9 +246,11 @@ export default {
   margin-bottom: 10px;
   box-sizing: border-box;
   border-radius: $default-radius;
-  background-color: #FDFDFD;
-  border: 1px solid #E3E3E3;
-  transition: opacity .2s ease-in-out, transform .3s ease-in-out;
+  background-color: #fdfdfd;
+  border: 1px solid #e3e3e3;
+  transition:
+    opacity 0.2s ease-in-out,
+    transform 0.3s ease-in-out;
   font-size: $font-size-medium;
   line-height: 1.5em;
 

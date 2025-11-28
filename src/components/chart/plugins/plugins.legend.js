@@ -35,7 +35,6 @@ const modules = {
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
 
-
     if (this.options.legend.virtualScroll && !this.useTable) {
       this.legendTopSpacer = document.createElement('div');
       this.legendTopSpacer.className = 'ev-chart-legend--top-spacer';
@@ -94,7 +93,10 @@ const modules = {
    */
   initLegend() {
     this.isHeatMapType = this.options.type === 'heatMap';
-    this.useTable = !!this.options.legend?.table?.use && this.options.type !== 'heatmap' && this.options.type !== 'scatter';
+    this.useTable =
+      !!this.options.legend?.table?.use &&
+      this.options.type !== 'heatmap' &&
+      this.options.type !== 'scatter';
     this.legendItemHeight = 18;
 
     if (!this.isInitLegend) {
@@ -125,19 +127,22 @@ const modules = {
    * @returns {undefined}
    */
   updateVisibleRowCount() {
-    const isLeftOrRight = this.options.legend.position === 'right' || this.options.legend.position === 'left';
+    const isLeftOrRight =
+      this.options.legend.position === 'right' || this.options.legend.position === 'left';
     const legendBoxHeight = this.legendBoxDOM.clientHeight;
     const legendBoxWidth = this.legendBoxDOM.clientWidth;
 
     const itemWidth = Math.max(this.options.legend.width - 8, 1);
-    const useLegendSeriesCount = Object.values(this.seriesList)
-      .filter(series => series.showLegend !== false)
-      .length;
+    const useLegendSeriesCount = Object.values(this.seriesList).filter(
+      (series) => series.showLegend !== false,
+    ).length;
 
     this.itemsPerRow = isLeftOrRight ? 1 : Math.floor(legendBoxWidth / itemWidth);
     this.totalRowCount = Math.ceil(useLegendSeriesCount / this.itemsPerRow);
-    this.visibleRowCount = legendBoxHeight > this.legendItemHeight
-      ? Math.round(legendBoxHeight / this.legendItemHeight) + 1 : this.totalRowCount;
+    this.visibleRowCount =
+      legendBoxHeight > this.legendItemHeight
+        ? Math.round(legendBoxHeight / this.legendItemHeight) + 1
+        : this.totalRowCount;
   },
 
   /**
@@ -187,11 +192,11 @@ const modules = {
 
     let useLegendSeries = [];
     if (groups) {
-      useLegendSeries = groups.filter(sId => this.seriesList[sId].showLegend)
-        .map(sId => [sId, this.seriesList[sId]]);
+      useLegendSeries = groups
+        .filter((sId) => this.seriesList[sId].showLegend)
+        .map((sId) => [sId, this.seriesList[sId]]);
     } else {
-      useLegendSeries = Object.entries(this.seriesList)
-      .filter(([, series]) => series.showLegend);
+      useLegendSeries = Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
     }
     if (useLegendSeries && useLegendSeries.length) {
       for (let i = startIndex; i < endIndex; i++) {
@@ -291,12 +296,12 @@ const modules = {
 
         for (let index = 0; index < length; index++) {
           const { id, color, label = '' } = colorState[index];
-          const minValue = min + (interval * index);
+          const minValue = min + interval * index;
           let maxValue = minValue + interval;
           if (index < endIndex) {
-            maxValue -= (0.1 ** decimalPoint);
+            maxValue -= 0.1 ** decimalPoint;
           } else {
-            maxValue = max + (0.1 ** decimalPoint);
+            maxValue = max + 0.1 ** decimalPoint;
           }
 
           let name = label;
@@ -386,7 +391,6 @@ const modules = {
       _nameDOM.style.color = _inactiveColor;
       if (_valueDOMList && _valueDOMList.length) {
         for (const dom of _valueDOMList) {
-          const dom = _valueDOMList[i];
           dom.style.color = _inactiveColor;
         }
       }
@@ -428,7 +432,6 @@ const modules = {
       // Use a regular for loop for better performance with large collections
       if (_valueDOMList && _valueDOMList.length) {
         for (const dom of _valueDOMList) {
-          const dom = _valueDOMList[i];
           const style = this.options.legend.table?.columns[dom.dataset.type]?.style;
           dom.style.color = style?.color ? style.color : _activeColor;
         }
@@ -441,12 +444,14 @@ const modules = {
     const hideAllSeries = () => {
       const legendSeries = (() => {
         if (this.data.groups.at(0)) {
-          return this.data.groups.at(0).slice().reverse()
-            .filter(sId => this.seriesList[sId].showLegend)
-            .map(sId => [sId, this.seriesList[sId]]);
+          return this.data.groups
+            .at(0)
+            .slice()
+            .reverse()
+            .filter((sId) => this.seriesList[sId].showLegend)
+            .map((sId) => [sId, this.seriesList[sId]]);
         }
-        return Object.entries(this.seriesList)
-          .filter(([, series]) => series.showLegend);
+        return Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
       })();
       legendSeries.forEach(([, s]) => {
         s.show = false;
@@ -455,12 +460,14 @@ const modules = {
     const showAllSeries = () => {
       const legendSeries = (() => {
         if (this.data.groups.at(0)) {
-          return this.data.groups.at(0).slice().reverse()
-            .filter(sId => this.seriesList[sId].showLegend)
-            .map(sId => [sId, this.seriesList[sId]]);
+          return this.data.groups
+            .at(0)
+            .slice()
+            .reverse()
+            .filter((sId) => this.seriesList[sId].showLegend)
+            .map((sId) => [sId, this.seriesList[sId]]);
         }
-        return Object.entries(this.seriesList)
-          .filter(([, series]) => series.showLegend);
+        return Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
       })();
       legendSeries.forEach(([, s]) => {
         s.show = true;
@@ -502,7 +509,7 @@ const modules = {
         const legendContainerDOMs = Array.from(
           this.legendBoxDOM.getElementsByClassName(classList.container),
         );
-        const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
+        const isActiveAll = legendContainerDOMs.every((dom) => dom.dataset.inactive === 'false');
 
         if (isActiveAll) {
           legendContainerDOMs.forEach((dom) => {
@@ -520,7 +527,7 @@ const modules = {
           this.seriesInfo.count++;
         }
 
-        const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+        const isInactiveAll = legendContainerDOMs.every((dom) => dom.dataset.inactive === 'true');
 
         if (isInactiveAll) {
           legendContainerDOMs.forEach((dom) => {
@@ -646,7 +653,7 @@ const modules = {
       _colorDOM.style.borderColor = _inactiveColor;
       _nameDOM.style.color = _inactiveColor;
 
-      const targetIndex = _series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      const targetIndex = _series.colorState.findIndex((colorItem) => colorItem.id === targetId);
       if (targetIndex > -1) {
         _series.colorState[targetIndex].show = false;
       }
@@ -670,7 +677,7 @@ const modules = {
       _colorDOM.style.backgroundColor = _targetDOM?.series?.color;
       _nameDOM.style.color = _activeColor;
 
-      const targetIndex = _series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      const targetIndex = _series.colorState.findIndex((colorItem) => colorItem.id === targetId);
       if (targetIndex > -1) {
         _series.colorState[targetIndex].show = true;
       }
@@ -711,7 +718,7 @@ const modules = {
       const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
       const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
       const isActive = targetDOM?.dataset.inactive === 'false';
-      const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
+      const activeCount = series.colorState.filter((colorItem) => colorItem.show).length;
 
       if (!colorDOM || !nameDOM) {
         return;
@@ -722,7 +729,7 @@ const modules = {
         const legendContainerDOMs = Array.from(
           this.legendBoxDOM.getElementsByClassName(classList.container),
         );
-        const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
+        const isActiveAll = legendContainerDOMs.every((dom) => dom.dataset.inactive === 'false');
 
         if (isActiveAll) {
           legendContainerDOMs.forEach((dom) => {
@@ -737,7 +744,7 @@ const modules = {
           activeDomAndSeries(targetDOM, opt.color);
         }
 
-        const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+        const isInactiveAll = legendContainerDOMs.every((dom) => dom.dataset.inactive === 'true');
 
         if (isInactiveAll) {
           legendContainerDOMs.forEach((dom) => {
@@ -1025,7 +1032,8 @@ const modules = {
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
       colorDOM.style.backgroundColor = series.show
-        ? Util.rgbaAdjustHalfOpacity(seriesColor) : opt.inactive;
+        ? Util.rgbaAdjustHalfOpacity(seriesColor)
+        : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -1129,7 +1137,8 @@ const modules = {
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
       colorDOM.style.backgroundColor = series.show
-        ? Util.rgbaAdjustHalfOpacity(seriesColor) : opt.inactive;
+        ? Util.rgbaAdjustHalfOpacity(seriesColor)
+        : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -1454,14 +1463,14 @@ const modules = {
         case 'right':
           resizeDOMStyle.left = ghostDOMStyle.left;
           move = +ghostDOMStyle.left.replace('px', '');
-          legendDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
-          boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4 - padding)}px`;
+          legendDOMStyle.width = `${this.wrapperDOM.offsetWidth - move - 4}px`;
+          boxDOMStyle.width = `${this.wrapperDOM.offsetWidth - move - 4 - padding}px`;
           opt.legend.width = this.wrapperDOM.offsetWidth - move - 4;
           wrapperDOMStyle.padding = `${title}px ${this.wrapperDOM.offsetWidth - move}px 0 0`;
           break;
         case 'bottom':
           resizeDOMStyle.bottom = ghostDOMStyle.bottom;
-          move = this.wrapperDOM.offsetHeight - (+ghostDOMStyle.bottom.replace('px', ''));
+          move = this.wrapperDOM.offsetHeight - +ghostDOMStyle.bottom.replace('px', '');
           legendDOMStyle.height = `${this.wrapperDOM.offsetHeight - move}px`;
           boxDOMStyle.height = `${move - title - 4}px`;
           opt.legend.height = this.wrapperDOM.offsetHeight - move;
@@ -1554,7 +1563,6 @@ const modules = {
 
     return formattedTxt;
   },
-
 };
 
 export default modules;

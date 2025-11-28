@@ -1,20 +1,13 @@
 <template>
   <div class="case">
-    <ev-chart
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <ev-chart :data="chartData" :options="chartOptions" />
 
     <div class="description">
       <div class="section">
         <div class="section-body section-body--col">
           <div class="section-item">
             <span class="section-title">Chart Type</span>
-            <ev-select
-              v-model="chartType"
-              :items="chartTypeList"
-              @change="onChangeChartType"
-            />
+            <ev-select v-model="chartType" :items="chartTypeList" @change="onChangeChartType" />
             <span class="section-title">Interpolation</span>
             <ev-select
               v-model="interpolation"
@@ -25,18 +18,13 @@
         </div>
 
         <div
-          v-for="series in chartSeries?.filter(s => chartData.series[s.key]?.show)?.reverse()"
+          v-for="series in chartSeries?.filter((s) => chartData.series[s.key]?.show)?.reverse()"
           :key="series.key"
           class="section-body"
         >
-          <h3 :class="`section-title--${series.key}`">
-            Chart Data - {{ series.key }}
-          </h3>
+          <h3 :class="`section-title--${series.key}`">Chart Data - {{ series.key }}</h3>
           <div class="section-item">
-            <template
-              v-for="(data, jx) in series.data"
-              :key="`${series.key}-${jx}`"
-            >
+            <template v-for="(data, jx) in series.data" :key="`${series.key}-${jx}`">
               <div class="column">
                 <label>{{ new Date(chartData.labels[jx]).getDate() }}</label>
                 <ev-input-number
@@ -133,8 +121,8 @@ export default {
 
     const changeValue = () => {
       Object.keys(chartData.data).forEach((key) => {
-        const series = chartSeries.value.find(s => s.key === key);
-        chartData.data[key] = series.data.map(item => (item.isNull ? null : item.value));
+        const series = chartSeries.value.find((s) => s.key === key);
+        chartData.data[key] = series.data.map((item) => (item.isNull ? null : item.value));
       });
     };
 
@@ -225,10 +213,10 @@ export default {
     padding: 10px;
 
     &--series1 {
-      background-color: #2B99F0;
+      background-color: #2b99f0;
     }
     &--series2 {
-      background-color: #8AC449;
+      background-color: #8ac449;
     }
     &--series3 {
       background-color: rgb(0, 196, 197);

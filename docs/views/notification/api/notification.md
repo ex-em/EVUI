@@ -19,29 +19,25 @@ ctx.$notify({
 
 ```vue
 <template>
-    <ev-button
-      @click="showNotification"
-    >
-      Show Notification
-    </ev-button>
+  <ev-button @click="showNotification"> Show Notification </ev-button>
 </template>
 <script>
-  import { getCurrentInstance } from 'vue';
+import { getCurrentInstance } from 'vue';
 
-  export default {
-    setup() {
+export default {
+  setup() {
     const ctx = getCurrentInstance().appContext.config.globalProperties;
-      const showNotification = () => {
-        ctx.$notify({
-          message: 'message',
-          // options
-        });
-      };
-      return {
-        showNotification,
-      };
-    },
-  }
+    const showNotification = () => {
+      ctx.$notify({
+        message: 'message',
+        // options
+      });
+    };
+    return {
+      showNotification,
+    };
+  },
+};
 </script>
 ```
 
@@ -49,42 +45,38 @@ ctx.$notify({
 
 ```vue
 <template>
-    <ev-button
-      @click="showMsg"
-    >
-      Show Message
-    </ev-button>
+  <ev-button @click="showMsg"> Show Message </ev-button>
 </template>
 <script>
-  import { EvNotification } from 'evui';
+import { EvNotification } from 'evui';
 
-  export default {
-    setup() {
-      const showMsg = () => {
-        EvNotification({
-          message: 'message',
-          // options
-        });
-      };
-      return {
-        showMsg,
-      };
-    },
-  }
+export default {
+  setup() {
+    const showMsg = () => {
+      EvNotification({
+        message: 'message',
+        // options
+      });
+    };
+    return {
+      showMsg,
+    };
+  },
+};
 </script>
 ```
 
 ### Props
 
-| 이름 | 타입 | 디폴트 | 설명 | 종류 |
-| --- | ---- | ----- | ---- | --- |
-| type | String | 'info' | 메시지 스타일 | 'info', 'success', 'warning', 'error' |
-| message | String | '' | 메시지 창에 띄울 문구 | |
-| title | String | '' | 메시지 상단 타이틀 문구 | |
-| position | String | 'top-right' | 메시지 창 위치 | 'top-left', 'top-right', 'bottom-left', 'bottom-right' |
-| duration | Number | 3000 | 메시지 창 유지 시간 | |
-| showClose | Boolean | true | 닫기 버튼 노출 여부 | true, false |
-| iconClass | String | '' | 메시지 창 좌측에 띄울 EVUI 아이콘 명 | |
-| onClose | Function | null | 메시지 창이 닫힌 후 동작 | |
-| onClick | Function | null | 메시지 창 클릭 시 동작 | |
-| useHTML | Boolean | false | 메시지 창 문구에 HTML 사용 여부. 사용 시 message 속성에 함께 작성 | |
+| 이름      | 타입     | 디폴트      | 설명                                                              | 종류                                                   |
+| --------- | -------- | ----------- | ----------------------------------------------------------------- | ------------------------------------------------------ |
+| type      | String   | 'info'      | 메시지 스타일                                                     | 'info', 'success', 'warning', 'error'                  |
+| message   | String   | ''          | 메시지 창에 띄울 문구                                             |                                                        |
+| title     | String   | ''          | 메시지 상단 타이틀 문구                                           |                                                        |
+| position  | String   | 'top-right' | 메시지 창 위치                                                    | 'top-left', 'top-right', 'bottom-left', 'bottom-right' |
+| duration  | Number   | 3000        | 메시지 창 유지 시간                                               |                                                        |
+| showClose | Boolean  | true        | 닫기 버튼 노출 여부                                               | true, false                                            |
+| iconClass | String   | ''          | 메시지 창 좌측에 띄울 EVUI 아이콘 명                              |                                                        |
+| onClose   | Function | null        | 메시지 창이 닫힌 후 동작                                          |                                                        |
+| onClick   | Function | null        | 메시지 창 클릭 시 동작                                            |                                                        |
+| useHTML   | Boolean  | false       | 메시지 창 문구에 HTML 사용 여부. 사용 시 message 속성에 함께 작성 |                                                        |

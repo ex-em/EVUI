@@ -1,26 +1,15 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-scheduler
-      v-model="checkVal1"
-    />
+    <ev-scheduler v-model="checkVal1" />
     <div class="description">
-      <span
-        class="badge"
-        @click="clearVal1"
-      >
-        Clear
-      </span>
+      <span class="badge" @click="clearVal1"> Clear </span>
       {{ checkVal1 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Custom</p>
-    <ev-scheduler
-      v-model="checkVal2"
-      :col-labels="widthLabels()"
-      :row-labels="heightLabels()"
-    />
+    <ev-scheduler v-model="checkVal2" :col-labels="widthLabels()" :row-labels="heightLabels()" />
     <div class="description">
       {{ checkVal2 }}
     </div>
@@ -47,7 +36,9 @@ const lpadToTwoDigits = (num) => {
 export default {
   setup() {
     const checkVal1 = ref([]);
-    const clearVal1 = () => { checkVal1.value = []; };
+    const clearVal1 = () => {
+      checkVal1.value = [];
+    };
 
     const checkVal2 = ref([]);
     const widthLabels = () => {
@@ -80,5 +71,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

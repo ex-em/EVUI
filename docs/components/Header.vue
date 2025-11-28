@@ -3,13 +3,8 @@
     <h1 class="evui-header-logo">EVUI</h1>
     <span class="evui-header-version">{{ `v.${version}` }}</span>
     <p class="evui-header-name">EXEM Visualization UI</p>
-    <span
-      class="evui-header-theme"
-    >
-      <ev-icon
-        :icon="themeIcon"
-        @click="changeTheme"
-      />
+    <span class="evui-header-theme">
+      <ev-icon :icon="themeIcon" @click="changeTheme" />
     </span>
   </header>
 </template>
@@ -31,7 +26,7 @@ export default {
   setup(props, { emit }) {
     const theme = computed({
       get: () => props.modelValue,
-      set: value => emit('update:modelValue', value),
+      set: (value) => emit('update:modelValue', value),
     });
     const changeTheme = () => {
       theme.value = theme.value === 'light' ? 'dark' : 'light';
@@ -48,7 +43,7 @@ export default {
 };
 </script>
 
-<style  lang="scss" scoped>
+<style lang="scss" scoped>
 @import '../style/index.scss';
 
 a {
@@ -82,11 +77,11 @@ a {
     top: 43%;
     left: 110px;
     font-size: $font-size-large;
-    color: #E8E8E8;
+    color: #e8e8e8;
   }
   &-name {
     font-size: $font-size-large;
-    color: #E8E8E8;
+    color: #e8e8e8;
     text-align: center;
     line-height: $header-height;
   }
@@ -102,7 +97,7 @@ a {
   border: none;
   cursor: pointer;
   font-size: 26px;
-  color: #E8E8E8;
+  color: #e8e8e8;
   transition: all $animate-fast;
   &:hover {
     opacity: 0.5;

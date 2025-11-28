@@ -154,7 +154,7 @@ const chartData = {
 | formatter      | function                                    | null                      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                                            | (value, { prev, isDefaultMaxSameAsMin }) => value + '%'                                  |
 | title          | Object                                      | ([상세](#title))          | 라벨의 폰트 스타일을 설정                                                                          |                                                                                          |
 | scrollbar      | Object                                      | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                                   |                                                                                          |
-| showAxisTick   | Boolean   | true    | 보조 눈금 표시 여부                                     |                                                         |
+| showAxisTick   | Boolean                                     | true                      | 보조 눈금 표시 여부                                                                                |                                                                                          |
 
 ##### axesX
 
@@ -195,7 +195,6 @@ const chartData = {
 - Linear Type의 Axis Label은 각 숫자 단위에 맞춰 'K', 'M', 'G'로 숫자를 변환하여 보여줌
   - 예를 들어, Label에 필요한 값이 1,500일 경우 '1.5K'로 표
 - range
-
   - 축의 min 값, max 값을 array로 넘겨줌 ([0, 100])
 
 ##### step type
@@ -225,7 +224,7 @@ const chartData = {
 | maxWidth   | Number                      | undefined | fitWidth이 true일 때, maxWidth까지 영역을 확장하고 그 이후로 Ellipsis 처리 |                                        |
 | fitDir     | String                      | 'right'   | Ellipsis 방향                                                              | ( right => 'aaa...', left => '...aaa') |
 | padding    | Number                      | 0         | (X축, linear, time타입에만 해당) label의 좌우 여백                         | 0                                      |
-| fixWidth   | Number                      | undefined | 라벨 넓이를 강제로 고정합니다. (해당 사이즈보다 커질시 Ellipsis처리)               |                                             |
+| fixWidth   | Number                      | undefined | 라벨 넓이를 강제로 고정합니다. (해당 사이즈보다 커질시 Ellipsis처리)       |                                        |
 
 ##### title
 
@@ -315,7 +314,7 @@ const chartData = {
 | table         | Object                      | ([상세](#legendtable))                   | Table 타입 Legend (값 표시 포함). bar, line, pie 전용 |                                  |
 | stopClickEvt  | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
 | virtualScroll | Boolean                     | false                                    | Legend에 가상 스크롤 적용 여부                        | true /false                      |
-| clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
+| clickMode     | 'active' \| 'inactive'      | 'active'                                 | Legend 클릭 시 활성화 여부                            |                                  |
 
 ##### legendTable
 
@@ -357,7 +356,7 @@ const chartData = {
 | showAllValueInRange | Boolean                             | false                                      | 동일한 axes값을 가진 전체 series를 Tooltip에 표시       |
 | showHeader          | Boolean                             | true                                       | Tooltip의 Header 영역 표시 여부                         |
 | formatter           | function / Object                   | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
-| returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
+| returnValue         | function                            | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수     | (아래 코드 참고)                                                    |
 
 ```ts
 const chartOptions = {
@@ -393,20 +392,20 @@ const chartOptions = {
 
 #### returnValue
 
-| 이름 | 타입 | 설명 | 종류(예시) |
-| --- | --- | --- | --- |
-| seriesList | Array<SeriesItem> | 마우스 위치에 해당하는 시리즈 데이터 배열 | |
-| event | MouseEvent | 마우스 이벤트 객체 | |
+| 이름       | 타입              | 설명                                      | 종류(예시) |
+| ---------- | ----------------- | ----------------------------------------- | ---------- |
+| seriesList | Array<SeriesItem> | 마우스 위치에 해당하는 시리즈 데이터 배열 |            |
+| event      | MouseEvent        | 마우스 이벤트 객체                        |            |
 
-  - SeriesItem  
-    | 이름 | 타입 | 설명 | 종류(예시) |
-    | --- | --- | --- | --- |
-    | sId | String | 시리즈 ID | 'series1' |
-    | data | Object | 시리즈 데이터 | { x: Date, y: Number, xp: Number, yp: Number, o: Number } |
-    | color | String | 시리즈 색상 | '#2b99f0' |
-    | name | String | 시리즈 이름 | 'Series 1' |
-    | dataId | String | 데이터 ID | 'data_1' |
-    | index | Number | 데이터 인덱스 | 0 |
+- SeriesItem  
+  | 이름 | 타입 | 설명 | 종류(예시) |
+  | --- | --- | --- | --- |
+  | sId | String | 시리즈 ID | 'series1' |
+  | data | Object | 시리즈 데이터 | { x: Date, y: Number, xp: Number, yp: Number, o: Number } |
+  | color | String | 시리즈 색상 | '#2b99f0' |
+  | name | String | 시리즈 이름 | 'Series 1' |
+  | dataId | String | 데이터 ID | 'data_1' |
+  | index | Number | 데이터 인덱스 | 0 |
 
 #### indicator
 

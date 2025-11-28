@@ -13,11 +13,7 @@
   </div>
   <div class="case">
     <p class="case-title">Single</p>
-    <ev-time-picker
-      v-model="commonTime"
-      type="single"
-      placeholder="시간 입력"
-    />
+    <ev-time-picker v-model="commonTime" type="single" placeholder="시간 입력" />
     <div class="description">
       <span class="badge">Time</span>
       {{ commonTime }}
@@ -25,19 +21,12 @@
   </div>
   <div class="case clearable-example">
     <p class="case-title">Clearable</p>
-    <ev-time-picker
-      v-model="clearableTime"
-      type="single"
-      clearable
-    />
+    <ev-time-picker v-model="clearableTime" type="single" clearable />
     <div class="description blank-mb">
       <span class="badge">Time</span>
       {{ clearableTime }}
     </div>
-    <ev-time-picker
-      v-model="clearableRangeTime"
-      clearable
-    />
+    <ev-time-picker v-model="clearableRangeTime" clearable />
     <div class="description">
       <span class="badge">Time</span>
       {{ clearableRangeTime }}
@@ -45,19 +34,11 @@
   </div>
   <div class="case">
     <p class="case-title">Disabled</p>
-    <ev-time-picker
-      v-model="disabledTime"
-      type="single"
-      disabled
-    />
+    <ev-time-picker v-model="disabledTime" type="single" disabled />
   </div>
   <div class="case">
     <p class="case-title">ReadOnly</p>
-    <ev-time-picker
-      v-model="readOnlyTime"
-      type="single"
-      readonly
-    />
+    <ev-time-picker v-model="readOnlyTime" type="single" readonly />
   </div>
 </template>
 

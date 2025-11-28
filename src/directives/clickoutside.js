@@ -3,10 +3,7 @@ const clickoutside = {
     const componentEl = el;
     const bubble = binding.modifiers.bubbles;
     const handler = (e) => {
-      if (bubble
-        || (componentEl !== e.target
-          && !componentEl.contains(e.target))
-      ) {
+      if (bubble || (componentEl !== e.target && !componentEl.contains(e.target))) {
         binding.value(e);
       }
     };
@@ -29,8 +26,9 @@ const selectClickoutside = {
     const TAG_NAME_CLS = 'ev-tag-name';
     const TAG_SUFFIX_CLOSE_CLS = 'ev-tag-suffix-close';
     const handler = (e) => {
-      if (e.target.classList.contains(TAG_NAME_CLS)
-        || e.target.classList.contains(TAG_SUFFIX_CLOSE_CLS)
+      if (
+        e.target.classList.contains(TAG_NAME_CLS) ||
+        e.target.classList.contains(TAG_SUFFIX_CLOSE_CLS)
       ) {
         return;
       }
@@ -62,13 +60,18 @@ const datePickerClickoutside = {
     const bubble = binding.modifiers.bubbles;
     const selectDropbox = document.body.getElementsByClassName('ev-date-picker-dropdown');
     const handler = (e) => {
-      if (!selectDropbox
-        && (bubble || (componentEl !== e.target && !componentEl.contains(e.target)))
+      if (
+        !selectDropbox &&
+        (bubble || (componentEl !== e.target && !componentEl.contains(e.target)))
       ) {
         binding.value(e);
-      } else if (selectDropbox && selectDropbox[0]
-        && (selectDropbox[0] !== e.target && !selectDropbox[0].contains(e.target))
-        && (componentEl !== e.target && !componentEl.contains(e.target))
+      } else if (
+        selectDropbox &&
+        selectDropbox[0] &&
+        selectDropbox[0] !== e.target &&
+        !selectDropbox[0].contains(e.target) &&
+        componentEl !== e.target &&
+        !componentEl.contains(e.target)
       ) {
         binding.value(e);
       }
@@ -83,8 +86,4 @@ const datePickerClickoutside = {
   },
 };
 
-export {
-  clickoutside,
-  selectClickoutside,
-  datePickerClickoutside,
-};
+export { clickoutside, selectClickoutside, datePickerClickoutside };

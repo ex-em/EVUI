@@ -50,23 +50,27 @@
         <ev-select
           v-model="item.row[2][item.column.index]"
           :items="[
-              {
-                name: '10gR2',
-                value: '10gR2',
-              }, {
-                name: '19c',
-                value: '19c',
-              }, {
-                name: '12c',
-                value: '12c',
-              }, {
-                name: '11gR2',
-                value: '11gR2',
-              }, {
-                name: '920',
-                value: '920',
-              },
-            ]"
+            {
+              name: '10gR2',
+              value: '10gR2',
+            },
+            {
+              name: '19c',
+              value: '19c',
+            },
+            {
+              name: '12c',
+              value: '12c',
+            },
+            {
+              name: '11gR2',
+              value: '11gR2',
+            },
+            {
+              name: '920',
+              value: '920',
+            },
+          ]"
           placeholder="Please select value."
           @click.stop=""
           @dblclick.stop=""
@@ -77,17 +81,11 @@
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">Current Page</span>
-          <ev-input-number
-            v-model="pageInfo.currentPage"
-            :min="1"
-          />
+          <ev-input-number v-model="pageInfo.currentPage" :min="1" />
         </div>
         <div class="form-row">
           <span class="badge yellow">Visible Page</span>
-          <ev-input-number
-            v-model="pageInfo.visiblePage"
-            :min="7"
-          />
+          <ev-input-number v-model="pageInfo.visiblePage" :min="7" />
         </div>
       </div>
       <div class="form-rows">
@@ -101,16 +99,13 @@
         </div>
         <div class="form-row">
           <span class="badge yellow">Data per page</span>
-          <ev-input-number
-            v-model="pageInfo.perPage"
-            :min="1"
-          />
+          <ev-input-number v-model="pageInfo.perPage" :min="1" />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">Page Info</span>
-          <ev-toggle v-model="pageInfo.showPageInfo"/>
+          <ev-toggle v-model="pageInfo.showPageInfo" />
         </div>
       </div>
     </div>
@@ -163,13 +158,32 @@ export default {
     };
     const getData = (count, startIndex) => {
       const instanceList = [
-        'AIX10G', 'AIX19C', 'AIX9I', 'EXA1_12C', 'EXA2_12C',
-        'HP11G', 'LIN11G', 'LIN19C', 'SUN12C', 'WIN19C', 'EXA1', 'EXA2',
+        'AIX10G',
+        'AIX19C',
+        'AIX9I',
+        'EXA1_12C',
+        'EXA2_12C',
+        'HP11G',
+        'LIN11G',
+        'LIN19C',
+        'SUN12C',
+        'WIN19C',
+        'EXA1',
+        'EXA2',
       ];
       const IPList = [
-        '10.10.30.145', '10.10.32.33', '10.10.30.10', '10.10.31.95', '10.10.31.97',
-        '10.10.32.36', '10.10.32.14', '10.10.100.247', '10.10.32.34',
-        '10.10.32.227', '10.10.31.95', '10.10.31.97',
+        '10.10.30.145',
+        '10.10.32.33',
+        '10.10.30.10',
+        '10.10.31.95',
+        '10.10.31.97',
+        '10.10.32.36',
+        '10.10.32.14',
+        '10.10.100.247',
+        '10.10.32.34',
+        '10.10.32.227',
+        '10.10.31.95',
+        '10.10.31.97',
       ];
       const portList = ['4004', '25080', '25090'];
       const dbVersionList = ['10gR2', '19c', '12c', '11gR2', '920'];

@@ -1,42 +1,21 @@
 <template>
   <article class="article-wrapper">
-    <h3
-      :id="kebabCase(title)"
-      class="article-title"
-    >
-      <a
-        class="article-title-anchor"
-        @click="$router.push({ hash: `#${kebabCase(title)}` })"
-      >
+    <h3 :id="kebabCase(title)" class="article-title">
+      <a class="article-title-anchor" @click="$router.push({ hash: `#${kebabCase(title)}` })">
         ¶
       </a>
       {{ title }}
     </h3>
-    <p
-      class="article-description"
-      v-html="description" />
-    <div
-        :class="['article-example', { 'vertical-mode':verticalMode }]"
-    >
-      <div
-        ref="viewArea"
-        :class="['view', { 'vertical-mode-item':verticalMode }]"
-      >
+    <p class="article-description" v-html="description" />
+    <div :class="['article-example', { 'vertical-mode': verticalMode }]">
+      <div ref="viewArea" :class="['view', { 'vertical-mode-item': verticalMode }]">
         <component :is="component" />
       </div>
       <div
         v-highlight
-        :class="[
-          'code',
-          { 'expend': codeExpend },
-          { 'vertical-mode-item':verticalMode }
-        ]"
+        :class="['code', { expend: codeExpend }, { 'vertical-mode-item': verticalMode }]"
       >
-        <div
-          ref="codeWrapper"
-          class="code-wrapper"
-          :style="{ height: `${viewAreaHeight}px` }"
-        >
+        <div ref="codeWrapper" class="code-wrapper" :style="{ height: `${viewAreaHeight}px` }">
           <pre class="html">
             {{ parsedData?.template?.content }}
           </pre>
@@ -44,10 +23,7 @@
             {{ parsedData?.script?.content }}
           </pre>
         </div>
-        <div
-          class="btn-show-more"
-          @click="clickExpend"
-        >
+        <div class="btn-show-more" @click="clickExpend">
           <i class="ev-icon-document-vertically" />
           {{ codeExpend ? 'Hide the code' : 'Show more code' }}
         </div>

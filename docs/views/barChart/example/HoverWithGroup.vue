@@ -28,11 +28,11 @@
     <div class="description">
       <ev-toggle v-model="syncHover" />
       <span>그룹 호버 동기화</span>
-      <br>
-      <br>
+      <br />
+      <br />
       <span>차트별 호버 동기화</span>
-      <br>
-      <br>
+      <br />
+      <br />
       <div class="hover-options">
         <span>첫번째 차트</span>
         <ev-toggle v-model="syncHoverChart1" />
@@ -43,55 +43,41 @@
         <span>네번째 차트</span>
         <ev-toggle v-model="syncHoverChart4" />
       </div>
-      <br>
-      <br>
+      <br />
+      <br />
       <ev-toggle v-model="isLive" />
       <span>데이터 자동 업데이트</span>
-      <br>
-      <br>
-      <ev-button @click="toggleSelectData">
-        select by v-model
-      </ev-button>
+      <br />
+      <br />
+      <ev-button @click="toggleSelectData"> select by v-model </ev-button>
       <span class="left">
         차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을 변경해서 라벨 선택
       </span>
-      <br>
-      <br>
+      <br />
+      <br />
       <ev-toggle v-model="isFixedPosTop" />
-      <span class="left">
-        tip 위치를 최상단에 고정
-      </span>
-      <br>
-      <br>
-      <ev-button @click="toggleOverflow">
-        Deselect Overflow
-      </ev-button>
+      <span class="left"> tip 위치를 최상단에 고정 </span>
+      <br />
+      <br />
+      <ev-button @click="toggleOverflow"> Deselect Overflow </ev-button>
       <span class="left">
         설정한 limit 를 넘어서 클릭했을때 선입선출로 deselect 를 할지를 옵션으로 선택 가능
       </span>
-      <br>
-      <br>
-      <ev-button @click="updateData">
-        Update Data
-      </ev-button>
-      <span class="left">
-        차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정
-      </span>
-      <br>
-      <br>
+      <br />
+      <br />
+      <ev-button @click="updateData"> Update Data </ev-button>
+      <span class="left"> 차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정 </span>
+      <br />
+      <br />
       <div>
-        <div class="badge yellow">
-          v-model:selectedLabel
-        </div>
+        <div class="badge yellow">v-model:selectedLabel</div>
         {{ defaultSelectLabel }}
-        <br>
-        <br>
-        <div class="badge yellow">
-          클릭 이벤트 데이터 (selected)
-        </div>
+        <br />
+        <br />
+        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
         {{ clickedLabel }}
-        <br>
-        <br>
+        <br />
+        <br />
       </div>
     </div>
   </ev-chart-group>
@@ -173,20 +159,24 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        categoryMode: true,
-        timeFormat: 'mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          categoryMode: true,
+          timeFormat: 'mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectLabel: {
         use: true,
         limit: 2,
@@ -230,20 +220,24 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        categoryMode: true,
-        timeFormat: 'mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          categoryMode: true,
+          timeFormat: 'mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectLabel: {
         use: true,
         limit: 2,
@@ -287,20 +281,24 @@ export default {
         show: true,
         position: 'right',
       },
-      axesY: [{
-        type: 'time',
-        showGrid: false,
-        categoryMode: true,
-        timeFormat: 'mm:ss',
-        interval: 'second',
-      }],
-      axesX: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      axesY: [
+        {
+          type: 'time',
+          showGrid: false,
+          categoryMode: true,
+          timeFormat: 'mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesX: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectLabel: {
         use: true,
         limit: 2,
@@ -344,20 +342,24 @@ export default {
         show: true,
         position: 'right',
       },
-      axesY: [{
-        type: 'time',
-        showGrid: false,
-        categoryMode: true,
-        timeFormat: 'mm:ss',
-        interval: 'second',
-      }],
-      axesX: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      axesY: [
+        {
+          type: 'time',
+          showGrid: false,
+          categoryMode: true,
+          timeFormat: 'mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesX: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectLabel: {
         use: true,
         limit: 2,
@@ -416,8 +418,10 @@ export default {
     };
 
     const updateData = () => {
-      const getRandArr = count => Array(count)
-        .fill(0).map(() => Math.ceil(Math.random() * 100));
+      const getRandArr = (count) =>
+        Array(count)
+          .fill(0)
+          .map(() => Math.ceil(Math.random() * 100));
 
       const chartList = [chartData1, chartData2, chartData3, chartData4];
       chartList.forEach((c) => {
@@ -452,25 +456,25 @@ export default {
         if (isLive.value) {
           seriesData.shift();
         }
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
       Object.values(chartData2.data).forEach((seriesData) => {
         if (isLive.value) {
           seriesData.shift();
         }
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
       Object.values(chartData3.data).forEach((seriesData) => {
         if (isLive.value) {
           seriesData.shift();
         }
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
       Object.values(chartData4.data).forEach((seriesData) => {
         if (isLive.value) {
           seriesData.shift();
         }
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
     };
 
@@ -524,16 +528,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .description {
-    position: relative;
-  }
-  .left {
-    position: absolute;
-    left: 160px;
-    padding-top: 10px;
-  }
-  .hover-options {
-    display: flex;
-    align-items: center;
-  }
+.description {
+  position: relative;
+}
+.left {
+  position: absolute;
+  left: 160px;
+  padding-top: 10px;
+}
+.hover-options {
+  display: flex;
+  align-items: center;
+}
 </style>

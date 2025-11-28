@@ -15,54 +15,34 @@
     <div class="description">
       <ev-toggle v-model="syncHover" />
       <span>그룹 호버 동기화</span>
-      <br>
-      <br>
+      <br />
+      <br />
       <ev-toggle v-model="syncHoverChart1" />
       <span>첫번째 차트 호버 동기화</span>
-      <br>
-      <br>
+      <br />
+      <br />
       <ev-toggle v-model="syncHoverChart2" />
       <span>두번째 차트 호버 동기화</span>
-      <br>
-      <br>
+      <br />
+      <br />
       <ev-toggle v-model="isLive" />
-      <span>
-        데이터 자동 업데이트
-      </span>
-      <br>
-      <br>
-      <ev-button
-        type="primary"
-        shape="radius"
-        @click="changeSelectedSeries('inc')"
-      >
-        +
-      </ev-button>
-      <ev-button
-        type="primary"
-        shape="radius"
-        @click="changeSelectedSeries('dec')"
-      >
-        -
-      </ev-button>
-      <span>
-        v-model:selectedSeries 변경
-      </span>
-      <br>
-      <br>
+      <span> 데이터 자동 업데이트 </span>
+      <br />
+      <br />
+      <ev-button type="primary" shape="radius" @click="changeSelectedSeries('inc')"> + </ev-button>
+      <ev-button type="primary" shape="radius" @click="changeSelectedSeries('dec')"> - </ev-button>
+      <span> v-model:selectedSeries 변경 </span>
+      <br />
+      <br />
       <div>
-        <div class="badge yellow">
-          v-model:selectedSeries
-        </div>
+        <div class="badge yellow">v-model:selectedSeries</div>
         {{ defaultSelectSeries }}
-        <br>
-        <br>
-        <div class="badge yellow">
-          클릭 이벤트 데이터 (selected)
-        </div>
+        <br />
+        <br />
+        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
         {{ clickedSeries }}
-        <br>
-        <br>
+        <br />
+        <br />
       </div>
     </div>
   </ev-chart-group>
@@ -126,17 +106,21 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
       selectSeries: {
         use: true,
         limit: 2,
@@ -166,17 +150,21 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
       selectSeries: {
         use: true,
         limit: 2,
@@ -206,7 +194,7 @@ export default {
       if (selectedList.length === 0) {
         selectedList.push('series1');
       } else {
-        idx = +(selectedList.pop()[6]);
+        idx = +selectedList.pop()[6];
         if (type === 'inc') {
           idx = idx < 5 ? idx + 1 : 1;
         } else {
@@ -236,13 +224,13 @@ export default {
         if (isLive.value) {
           seriesData.shift();
         }
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
       Object.values(chartData2.data).forEach((seriesData) => {
         if (isLive.value) {
           seriesData.shift();
         }
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
     };
 

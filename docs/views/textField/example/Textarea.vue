@@ -1,43 +1,27 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-text-field
-      v-model="modelValue1"
-      placeholder="Please enter the content"
-      type="textarea"
-    />
+    <ev-text-field v-model="modelValue1" placeholder="Please enter the content" type="textarea" />
     <div class="description">
-      <span class="badge yellow">
-        type="textarea"
-      </span>
-      <span class="badge">
-        Text Field Value
-      </span>
+      <span class="badge yellow"> type="textarea" </span>
+      <span class="badge"> Text Field Value </span>
       {{ modelValue1 }}
     </div>
   </div>
 
   <div class="case">
     <p class="case-title">Readonly</p>
-    <ev-text-field
-      v-model="modelValue2"
-      type="textarea"
-      readonly
-    />
+    <ev-text-field v-model="modelValue2" type="textarea" readonly />
   </div>
 
   <div class="case">
     <p class="case-title">Disabled</p>
-    <ev-text-field
-      v-model="modelValue3"
-      type="textarea"
-      disabled
-    />
+    <ev-text-field v-model="modelValue3" type="textarea" disabled />
   </div>
 
   <div class="case">
     <p class="case-title">Max Length</p>
-    <div style="display: flex;">
+    <div style="display: flex">
       <ev-text-field
         v-model="modelValue4"
         placeholder="Please enter the content"
@@ -54,9 +38,9 @@
     </div>
   </div>
 
-    <div class="case">
-    <p class="case-title">Max Length  & maxUnit</p>
-    <div style="display: flex;">
+  <div class="case">
+    <p class="case-title">Max Length & maxUnit</p>
+    <div style="display: flex">
       <ev-text-field
         v-model="modelValue5"
         placeholder="Please enter the content"

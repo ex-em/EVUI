@@ -19,10 +19,7 @@
       @change-column-status="onUpdateColumns"
     >
     </ev-tree-grid>
-    <custom-column-list
-      v-model:columns="gridColumns"
-      v-model:is-visible="isVisible"
-    />
+    <custom-column-list v-model:columns="gridColumns" v-model:is-visible="isVisible" />
   </div>
 </template>
 
@@ -42,8 +39,9 @@ export default {
     const gridSettingMenuItems = ref([
       {
         text: 'Menu1',
-        click: param => console.log(`[Menu1]: ${param}`),
-      }, {
+        click: (param) => console.log(`[Menu1]: ${param}`),
+      },
+      {
         text: 'Custom Column List',
         click: () => {
           isVisible.value = true;
@@ -64,67 +62,85 @@ export default {
           name: '2222',
           value: 123,
           expand: true,
-          children: [{
-            id: 'Exem 2',
-            date: '2016-05-02',
-            name: '2',
-            value: 222,
-            expand: false,
-            children: [{
-              id: 'Exem 3',
+          children: [
+            {
+              id: 'Exem 2',
               date: '2016-05-02',
-              name: '3',
-              value: 3333,
-              uncheckable: true,
-            }, {
-              id: 'Exem 4',
-              date: '2016-05-02',
-              name: '4',
+              name: '2',
+              value: 222,
               expand: false,
-              uncheckable: true,
-              children: [{
-                id: 'Exem 5',
-                date: '2016-05-02',
-                name: '5',
-                children: [{
-                  id: 'Exem 51',
+              children: [
+                {
+                  id: 'Exem 3',
                   date: '2016-05-02',
-                  name: '1251',
-                  children: [{
-                    id: 'Exem 52',
-                    date: '2016-05-02',
-                    name: '20000',
-                  }],
-                }],
-              }, {
-                id: 'Exem 6',
-                date: '2016-05-02',
-                name: '6',
-              }],
-            }],
-          }, {
-            id: 'Exem 7',
-            date: '2016-05-03',
-            name: '7',
-            children: [{
-              id: 'Exem 8',
+                  name: '3',
+                  value: 3333,
+                  uncheckable: true,
+                },
+                {
+                  id: 'Exem 4',
+                  date: '2016-05-02',
+                  name: '4',
+                  expand: false,
+                  uncheckable: true,
+                  children: [
+                    {
+                      id: 'Exem 5',
+                      date: '2016-05-02',
+                      name: '5',
+                      children: [
+                        {
+                          id: 'Exem 51',
+                          date: '2016-05-02',
+                          name: '1251',
+                          children: [
+                            {
+                              id: 'Exem 52',
+                              date: '2016-05-02',
+                              name: '20000',
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      id: 'Exem 6',
+                      date: '2016-05-02',
+                      name: '6',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              id: 'Exem 7',
               date: '2016-05-03',
-              name: '8',
-              value: 333,
-            }, {
-              id: 'Exem 9',
-              date: '2016-05-03',
-              name: '9',
-            }, {
-              id: 'Exem 10',
-              date: '2016-05-03',
-              name: '10',
-            }],
-          }, {
-            id: 'Exem 11',
-            date: '2016-05-04',
-            name: '11',
-          }],
+              name: '7',
+              children: [
+                {
+                  id: 'Exem 8',
+                  date: '2016-05-03',
+                  name: '8',
+                  value: 333,
+                },
+                {
+                  id: 'Exem 9',
+                  date: '2016-05-03',
+                  name: '9',
+                },
+                {
+                  id: 'Exem 10',
+                  date: '2016-05-03',
+                  name: '10',
+                },
+              ],
+            },
+            {
+              id: 'Exem 11',
+              date: '2016-05-04',
+              name: '11',
+            },
+          ],
         },
       ];
     };
@@ -181,7 +197,9 @@ export default {
 .form-row {
   width: 50%;
 }
-.ev-text-field, .ev-input-number, .ev-select {
+.ev-text-field,
+.ev-input-number,
+.ev-select {
   width: 80%;
 }
 .badge {

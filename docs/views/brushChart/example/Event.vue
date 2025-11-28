@@ -8,22 +8,16 @@
         @click="onClick"
         @dbl-click="onDblClick"
       />
-      <ev-chart-brush/>
+      <ev-chart-brush />
     </ev-chart-group>
     <div class="description">
-      <div class="badge yellow">
-        기본 선택값 v-model
-      </div>
+      <div class="badge yellow">기본 선택값 v-model</div>
       {{ defaultSelectItem }}
-      <br><br>
-      <div class="badge yellow">
-        클릭된 라벨
-      </div>
+      <br /><br />
+      <div class="badge yellow">클릭된 라벨</div>
       {{ clickedLabel }}
-      <br><br>
-      <div class="badge yellow">
-        더블 클릭된 라벨
-      </div>
+      <br /><br />
+      <div class="badge yellow">더블 클릭된 라벨</div>
       {{ dblClickedLabel }}
     </div>
   </div>
@@ -67,18 +61,22 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        timeFormat: 'YYYY-MM-DD',
-        interval: 'day',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.3,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          timeFormat: 'YYYY-MM-DD',
+          interval: 'day',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.3,
+        },
+      ],
       selectItem: {
         use: true,
         showTextTip: true,
@@ -131,5 +129,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>
