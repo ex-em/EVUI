@@ -173,7 +173,7 @@ export default {
 <style lang="scss">
 $expand-toggle-icon-size: 13px;
 
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
 
 .ev-tree-view {
   li {

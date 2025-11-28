@@ -159,7 +159,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
 
 .ev-checkbox {
   margin-right: 30px;

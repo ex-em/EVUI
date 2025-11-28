@@ -121,7 +121,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
+@use '../../style/components/input.scss' as *;
 
 .ev-input-number {
   position: relative;
@@ -129,7 +130,6 @@ export default {
 
   @include clearfix();
 
-  @import '../../style/components/input.scss';
   &:hover {
     .ev-input,
     .ev-textarea {

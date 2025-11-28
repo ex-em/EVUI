@@ -314,8 +314,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
-@import '../../style/components/input.scss';
+@use '../../style/index.scss' as *;
+@use '../../style/components/input.scss' as *;
 
 .ev-time-picker {
   width: 100%;

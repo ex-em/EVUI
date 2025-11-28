@@ -1,3 +1,8 @@
+@use 'sass:map';
+@use 'themes.scss' as *;
+
+$ev-theme-map: null !default;
+
 @mixin evThemify($ev-themes: $ev-themes) {
   @each $theme, $map in $ev-themes {
     @if $theme == 'dark' {
@@ -5,8 +10,8 @@
         $ev-theme-map: () !global;
 
         @each $key, $submap in $map {
-          $value: map-get(map-get($ev-themes, $theme), '#{$key}');
-          $ev-theme-map: map-merge($ev-theme-map, ($key: $value)) !global;
+          $value: map.get(map.get($ev-themes, $theme), '#{$key}');
+          $ev-theme-map: map.merge($ev-theme-map, ($key: $value)) !global;
         }
 
         /* stylelint-disable */
@@ -20,8 +25,8 @@
       $ev-theme-map: () !global;
 
       @each $key, $submap in $map {
-        $value: map-get(map-get($ev-themes, $theme), '#{$key}');
-        $ev-theme-map: map-merge($ev-theme-map, ($key: $value)) !global;
+        $value: map.get(map.get($ev-themes, $theme), '#{$key}');
+        $ev-theme-map: map.merge($ev-theme-map, ($key: $value)) !global;
       }
 
       /* stylelint-disable */

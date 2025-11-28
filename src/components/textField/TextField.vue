@@ -258,7 +258,8 @@ export default {
 $icon-width: 14px !default;
 
 @use 'sass:color';
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
+@use '../../style/components/input.scss' as *;
 
 .ev-text-field {
   position: relative;
@@ -266,7 +267,6 @@ $icon-width: 14px !default;
 
   @include clearfix();
 
-  @import '../../style/components/input.scss';
   &:hover {
     .ev-input,
     .ev-textarea {

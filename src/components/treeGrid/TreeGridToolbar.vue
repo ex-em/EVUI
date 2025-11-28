@@ -11,7 +11,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
 .tree-grid-toolbar {
   height: 30px;
   margin-bottom: 10px;

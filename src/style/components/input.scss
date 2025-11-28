@@ -1,3 +1,6 @@
+@use '../index.scss' as *;
+@use '../variables.scss' as *;
+
 .ev-input,
 .ev-textarea {
   width: 100%;

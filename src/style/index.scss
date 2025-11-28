@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-@import 'functions';
-@import 'mixins';
-@import 'variables';
-@import 'themes';
+@forward 'functions';
+@forward 'mixins';
+@forward 'variables';
+@forward 'themes';

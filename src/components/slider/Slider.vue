@@ -252,7 +252,7 @@ export default {
 
 <style lang="scss">
 @use 'sass:color';
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
 
 .ev-slider {
   $line-height: 6px;

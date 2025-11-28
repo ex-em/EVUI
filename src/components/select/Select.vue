@@ -380,7 +380,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
+@use '../../style/components/input.scss' as *;
 
 .ev-select {
   $select-height: $input-default-height;
@@ -390,7 +391,6 @@ export default {
   border-radius: $default-radius;
   cursor: pointer;
 
-  @import '../../style/components/input.scss';
 
   &__wrapper {
     position: relative;

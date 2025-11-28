@@ -219,7 +219,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
 .ev-window-scroll-lock {
   overflow: hidden !important;
 }

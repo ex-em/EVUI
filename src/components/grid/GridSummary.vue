@@ -258,7 +258,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'style/grid.scss';
+@use 'style/grid.scss' as *;
+@use '../../style/index.scss' as *;
+
 .grid-summary {
   width: 100%;
   overflow: hidden;

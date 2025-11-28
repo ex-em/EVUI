@@ -146,7 +146,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
+@use 'sass:list';
 
 #ev-message-modal {
   position: fixed;
@@ -217,11 +218,11 @@ export default {
     'error': (#FEF0F0, #FDE2E2, #F56C6C),
   ) {
     &.type-#{$type} {
-      background-color: nth($color-list, 1);
-      border-color: nth($color-list, 2);
+      background-color: list.nth($color-list, 1);
+      border-color: list.nth($color-list, 2);
       .ev-message-icon,
       .ev-message-content {
-        color: nth($color-list, 3);
+        color: list.nth($color-list, 3);
       }
     }
   }

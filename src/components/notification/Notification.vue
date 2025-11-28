@@ -169,7 +169,7 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
 
 #ev-notification-modal {
   max-height: 100vh;

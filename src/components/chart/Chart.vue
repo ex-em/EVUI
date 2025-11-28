@@ -365,5 +365,5 @@
 </script>
 
 <style lang="scss">
-  @import 'style/chart.scss';
+  @use 'style/chart.scss' as *;
 </style>

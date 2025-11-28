@@ -1535,5 +1535,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import 'style/grid.scss';
+@use 'style/grid.scss' as *;
 </style>

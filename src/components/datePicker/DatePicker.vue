@@ -331,7 +331,8 @@ export default {
 </script>
 
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
+@use '../../style/components/input.scss' as *;
 
 .ev-date-picker {
   $select-height: $input-default-height;
@@ -339,7 +340,6 @@ export default {
   position: relative;
   width: 100%;
 
-  @import '../../style/components/input.scss';
 
   &__wrapper {
     position: relative;

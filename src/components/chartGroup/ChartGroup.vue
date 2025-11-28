@@ -140,5 +140,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  @import 'style/chartGroup.scss';
+  @use 'style/chartGroup.scss' as *;
 </style>

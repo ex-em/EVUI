@@ -1076,5 +1076,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import './style/treeGrid.scss';
+@use './style/treeGrid.scss' as *;
 </style>

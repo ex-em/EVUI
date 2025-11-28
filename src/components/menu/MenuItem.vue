@@ -144,7 +144,7 @@ export default {
 };
 </script>
 <style lang="scss">
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
 
 .ev-menu-item {
   line-height: 1.3em;

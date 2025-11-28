@@ -364,7 +364,7 @@ $ev-calendar-selector-btn-height: 40px;
 $ev-calendar-selector-btn-margin: 10px;
 $calendar-active-color: #409EFF;
 
-@import '../../style/index.scss';
+@use '../../style/index.scss' as *;
 
 .ev-calendar-wrapper {
   display: inline-flex;
