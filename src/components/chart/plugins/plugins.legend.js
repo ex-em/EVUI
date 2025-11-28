@@ -386,7 +386,6 @@ const modules = {
       _nameDOM.style.color = _inactiveColor;
       if (_valueDOMList && _valueDOMList.length) {
         for (const dom of _valueDOMList) {
-          const dom = _valueDOMList[i];
           dom.style.color = _inactiveColor;
         }
       }
@@ -428,7 +427,6 @@ const modules = {
       // Use a regular for loop for better performance with large collections
       if (_valueDOMList && _valueDOMList.length) {
         for (const dom of _valueDOMList) {
-          const dom = _valueDOMList[i];
           const style = this.options.legend.table?.columns[dom.dataset.type]?.style;
           dom.style.color = style?.color ? style.color : _activeColor;
         }
