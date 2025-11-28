@@ -31,14 +31,14 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
-    "bignumber.js": "^9.1.2",
-    "dayjs": "^1.10.4",
+    "bignumber.js": "^9.3.1",
+    "dayjs": "^1.11.19",
     "korean-regexp": "^1.0.10",
-    "sass": "^1.79.3",
+    "sass": "^1.94.2",
     "vite": "^5.4.8",
     "vue": "^3.5.8",
     "vue-resize-observer": "^2.0.15",
-    "vue-router": "^4.0.0-0",
+    "vue-router": "^4.6.3",
     "vue3-observe-visibility": "^1.0.1"
   },
   "devDependencies": {
