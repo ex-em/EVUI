@@ -931,8 +931,13 @@ const modules = {
       }
       this.setLegendColumnHeader();
     } else if (this.options.legend.virtualScroll) {
-      this.updateVisibleRowCount();
-      this.renderVisibleLegends();
+      const isHidden = this.legendDOM?.style?.display === 'none';
+      if (isHidden) {
+        this.legendNeedsUpdate = true;
+      } else {
+        this.updateVisibleRowCount();
+        this.renderVisibleLegends();
+      }
     } else {
       while (legendBoxDOM.hasChildNodes()) {
         legendBoxDOM.removeChild(legendBoxDOM.firstChild);
@@ -1486,6 +1491,12 @@ const modules = {
 
     if (this.legendDOM) {
       this.legendDOM.style.display = 'block';
+    }
+
+    if (this.legendNeedsUpdate && this.options.legend.virtualScroll && !this.useTable) {
+      this.legendNeedsUpdate = false;
+      this.updateVisibleRowCount();
+      this.renderVisibleLegends();
     }
   },
 
