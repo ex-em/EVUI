@@ -468,22 +468,47 @@ class HeatMap {
   }
 
   /**
-   *Returns items in range
-   * @param {object} params  range values
-   *
-   * @returns {array}
+   * 자바스크립트 부동 소수점 오차 때문에 범위를 조정
    */
-  findItems({ xsp, ysp, width, height }) {
-    const gdata = this.data;
-    const xep = xsp + width;
-    const yep = ysp + height;
-    return gdata.filter(({ xp, yp, w, h }) => {
-      const x1 = xp;
-      const x2 = xp + w;
-      const y1 = yp;
-      const y2 = yp + h;
+  getAdjustedBounds({ xp, yp, width, height }) {
+    const PRECISION = 100;
 
-      return ((x1 >= xsp && x2 <= xep) && (y1 >= ysp && y2 <= yep));
+    const adjustedWidth = Math.max(0, width);
+    const adjustedHeight = Math.max(0, height);
+
+    return {
+      xsp: Math.floor(xp * PRECISION) / PRECISION,
+      xep: Math.ceil((xp + adjustedWidth) * PRECISION) / PRECISION,
+      ysp: Math.floor(yp * PRECISION) / PRECISION,
+      yep: Math.ceil((yp + adjustedHeight) * PRECISION) / PRECISION,
+    };
+  }
+
+  /**
+   *Returns items in range
+   */
+  findItems(params) {
+    const gdata = this.data;
+
+    const { xsp, xep, ysp, yep } = this.getAdjustedBounds({
+      xp: params.xsp,
+      yp: params.ysp,
+      width: params.width,
+      height: params.height,
+    });
+
+    return gdata.filter(({ xp, yp, w, h }) => {
+      const { xsp: x1, xep: x2, ysp: y1, yep: y2 } = this.getAdjustedBounds({
+        xp,
+        yp,
+        width: w,
+        height: h,
+      });
+
+      return (
+        (x1 >= xsp && x2 <= xep)
+        && (y1 >= ysp && y2 <= yep)
+      );
     });
   }
 
