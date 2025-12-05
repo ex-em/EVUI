@@ -680,6 +680,8 @@ class HeatMap {
 
         if (findItem > -1) {
           point[key] = ['xsp', 'ysp'].includes(key) ? itemPoint : itemPoint + gap;
+        } else if (target < startPoint) {
+          point[key] = startPoint;
         }
       };
 
