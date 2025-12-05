@@ -469,6 +469,12 @@ class HeatMap {
 
   /**
    * 자바스크립트 부동 소수점 오차 때문에 범위를 조정
+   * @param {object} params - range information
+   * @param {number} params.xp - start x position
+   * @param {number} params.yp - start y position
+   * @param {number} params.width - width
+   * @param {number} params.height - height
+   * @returns {object} adjusted range
    */
   getAdjustedBounds({ xp, yp, width, height }) {
     const PRECISION = 100;
@@ -486,6 +492,12 @@ class HeatMap {
 
   /**
    *Returns items in range
+   * @param {object} params - range information
+   * @param {number} params.xsp - start x position
+   * @param {number} params.width - width
+   * @param {number} params.ysp - start y position
+   * @param {number} params.height - height
+   * @returns {array} items in range
    */
   findItems(params) {
     const gdata = this.data;
@@ -680,8 +692,6 @@ class HeatMap {
 
         if (findItem > -1) {
           point[key] = ['xsp', 'ysp'].includes(key) ? itemPoint : itemPoint + gap;
-        } else if (target < startPoint) {
-          point[key] = startPoint;
         }
       };
 
