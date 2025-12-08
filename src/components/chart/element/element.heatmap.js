@@ -310,6 +310,7 @@ class HeatMap {
 
     this.data.forEach((item, index) => {
       const axisLineWidth = 1;
+
       let xp = this.calculateXY('x', item.x, xsp, minmaxX);
       let yp = this.calculateXY('y', item.y, ysp, minmaxY);
       let w = this.size.w;
@@ -355,20 +356,27 @@ class HeatMap {
             };
           }
 
-          if (borderOpt.show) {
+          if (borderOpt.show && borderOpt.lineWidth > 0) {
             const { color, lineWidth, opacity: borderOpacity } = borderOpt;
-            ctx.strokeStyle = Util.colorStringToRgba(
+
+            const totalStrokeWidth = lineWidth * 2;
+
+            const isBorderDrawable = totalStrokeWidth < w && totalStrokeWidth < h;
+
+            ctx.strokeStyle = isBorderDrawable ? Util.colorStringToRgba(
               color,
               itemOpacity === 1 ? borderOpacity : itemOpacity,
-            );
+            ) : undefined;
 
             // item 사이즈 보다 border 선 굵기가 큰 경우 lineWidth props 무시
-            if (lineWidth < w && lineWidth < h) {
+            if (isBorderDrawable) {
               ctx.lineWidth = lineWidth;
-              xp += (lineWidth * 0.5);
-              yp += (lineWidth * 0.5);
-              w -= (lineWidth);
-              h -= (lineWidth);
+              xp += lineWidth;
+              yp += lineWidth;
+              w -= totalStrokeWidth;
+              h -= totalStrokeWidth;
+            } else {
+              ctx.lineWidth = 0;
             }
           }
 
@@ -595,7 +603,16 @@ class HeatMap {
       borderOpt.color = dataColor;
     }
 
-    this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, borderOpt);
+    const { lineWidth } = borderOpt;
+
+    this.drawItem(
+      ctx,
+      x - lineWidth,
+      y - lineWidth,
+      w + lineWidth * 2,
+      h + lineWidth * 2,
+      borderOpt,
+    );
 
     ctx.restore();
 
