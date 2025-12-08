@@ -363,7 +363,7 @@ class HeatMap {
 
             const totalStrokeWidth = lineWidth * 2;
 
-            isBorderDrawable = totalStrokeWidth < w && totalStrokeWidth < h;
+            isBorderDrawable = totalStrokeWidth < Math.floor(w) && totalStrokeWidth < Math.floor(h);
 
             ctx.strokeStyle = isBorderDrawable ? Util.colorStringToRgba(
               color,
