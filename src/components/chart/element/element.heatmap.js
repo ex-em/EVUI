@@ -586,47 +586,26 @@ class HeatMap {
       lineWidth: 1,
       opacity: 1,
       radius: 0,
-      show: false,
+      show: true,
     };
 
-    if (strokeOpt.use && strokeOpt.width > 0) {
+    if (strokeOpt.use) {
       const { color, width, radius } = strokeOpt;
+      borderOpt.show = true;
+      borderOpt.radius = radius;
 
-      const totalStrokeWidth = width * 2;
+      ctx.lineWidth = width;
+      borderOpt.lineWidth = width;
 
-      const isBorderDrawable = totalStrokeWidth < w && totalStrokeWidth < h;
-
-      if (isBorderDrawable) {
-        borderOpt.show = true;
-        borderOpt.radius = radius;
-
-        ctx.lineWidth = width;
-        borderOpt.lineWidth = width;
-
-        ctx.strokeStyle = color || dataColor;
-        borderOpt.color = color || dataColor;
-
-        x += width;
-        y += width;
-        w -= totalStrokeWidth;
-        h -= totalStrokeWidth;
-      }
-    }
-
-    if (!borderOpt.show) {
+      ctx.strokeStyle = color || dataColor;
+      borderOpt.color = color || dataColor;
+    } else {
+      borderOpt.show = false;
       ctx.strokeStyle = dataColor;
-      ctx.lineWidth = 0;
+      borderOpt.color = dataColor;
     }
 
-    this.drawItem(
-      ctx,
-      x - 0.5,
-      y - 0.5,
-      w + 1,
-      h + 1,
-      h,
-      borderOpt,
-    );
+    this.drawItem(ctx, x - 0.5, y - 0.5, w + 1, h + 1, borderOpt);
 
     ctx.restore();
 
