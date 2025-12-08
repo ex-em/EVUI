@@ -546,10 +546,10 @@ class HeatMap {
     const ctx = context;
     const { stroke: strokeOpt, shadow: shadowOpt } = this.highlight;
 
-    let x = gdata.xp;
-    let y = gdata.yp;
-    let w = gdata.w;
-    let h = gdata.h;
+    const x = gdata.xp;
+    const y = gdata.yp;
+    const w = gdata.w;
+    const h = gdata.h;
     const cId = gdata.cId;
 
     let isShow;
