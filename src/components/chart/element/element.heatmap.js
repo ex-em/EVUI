@@ -546,10 +546,10 @@ class HeatMap {
     const ctx = context;
     const { stroke: strokeOpt, shadow: shadowOpt } = this.highlight;
 
-    const x = gdata.xp;
-    const y = gdata.yp;
-    const w = gdata.w;
-    const h = gdata.h;
+    let x = gdata.xp;
+    let y = gdata.yp;
+    let w = gdata.w;
+    let h = gdata.h;
     const cId = gdata.cId;
 
     let isShow;
@@ -586,33 +586,45 @@ class HeatMap {
       lineWidth: 1,
       opacity: 1,
       radius: 0,
-      show: true,
+      show: false,
     };
 
-    if (strokeOpt.use) {
+    if (strokeOpt.use && strokeOpt.width > 0) {
       const { color, width, radius } = strokeOpt;
-      borderOpt.show = true;
-      borderOpt.radius = radius;
 
-      ctx.lineWidth = width;
-      borderOpt.lineWidth = width;
+      const totalStrokeWidth = width * 2;
 
-      ctx.strokeStyle = color || dataColor;
-      borderOpt.color = color || dataColor;
-    } else {
-      borderOpt.show = false;
-      ctx.strokeStyle = dataColor;
-      borderOpt.color = dataColor;
+      const isBorderDrawable = totalStrokeWidth < w && totalStrokeWidth < h;
+
+      if (isBorderDrawable) {
+        borderOpt.show = true;
+        borderOpt.radius = radius;
+
+        ctx.lineWidth = width;
+        borderOpt.lineWidth = width;
+
+        ctx.strokeStyle = color || dataColor;
+        borderOpt.color = color || dataColor;
+
+        x += width;
+        y += width;
+        w -= totalStrokeWidth;
+        h -= totalStrokeWidth;
+      }
     }
 
-    const { lineWidth } = borderOpt;
+    if (!borderOpt.show) {
+      ctx.strokeStyle = dataColor;
+      ctx.lineWidth = 0;
+    }
 
     this.drawItem(
       ctx,
-      x - lineWidth,
-      y - lineWidth,
-      w + lineWidth * 2,
-      h + lineWidth * 2,
+      x - 0.5,
+      y - 0.5,
+      w + 1,
+      h + 1,
+      h,
       borderOpt,
     );
 
