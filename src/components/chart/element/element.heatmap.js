@@ -356,12 +356,14 @@ class HeatMap {
             };
           }
 
+          let isBorderDrawable = false;
+
           if (borderOpt.show && borderOpt.lineWidth > 0) {
             const { color, lineWidth, opacity: borderOpacity } = borderOpt;
 
             const totalStrokeWidth = lineWidth * 2;
 
-            const isBorderDrawable = totalStrokeWidth < w && totalStrokeWidth < h;
+            isBorderDrawable = totalStrokeWidth < w && totalStrokeWidth < h;
 
             ctx.strokeStyle = isBorderDrawable ? Util.colorStringToRgba(
               color,
@@ -387,7 +389,7 @@ class HeatMap {
           item.w = w;
           item.h = h;
 
-          this.drawItem(ctx, xp, yp, w, h, borderOpt);
+          this.drawItem(ctx, xp, yp, w, h, { ...borderOpt, show: isBorderDrawable });
           ctx.restore();
 
           if (this.showValue.use) {
