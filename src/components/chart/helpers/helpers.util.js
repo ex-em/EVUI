@@ -7,6 +7,10 @@ import {
 } from '@/common/utils';
 import { isNil } from 'lodash-es';
 
+// Text Size 측정용 singleton canvas
+const textMeasureCanvas = document.createElement('canvas');
+const textMeasureCtx = textMeasureCanvas.getContext('2d');
+
 export default {
   /**
    * Transforming hex to rgb code
@@ -209,6 +213,25 @@ export default {
     calc.remove();
 
     return { width, height };
+  },
+
+  /**
+   * Calculate text size with Canvas
+   * @param {string} text         text is needed to check size
+   * @param {string} fontStyle    text font style
+   * @returns {object} text size information
+   */
+  calcTextSizeCanvas(text, fontStyle) {
+    textMeasureCtx.font = fontStyle;
+
+    const metrics = textMeasureCtx.measureText(text);
+
+    return {
+      width: Math.ceil(metrics.width),
+      height: Math.ceil(
+        metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
+      ),
+    };
   },
 
   /**

@@ -116,7 +116,7 @@ class Scale {
       max: maxValue,
       minLabel,
       maxLabel,
-      size: Util.calcTextSize(
+      size: Util.calcTextSizeCanvas(
         maxLabel,
         Util.getLabelStyle(this.labelStyle),
         this.labelStyle?.padding,
@@ -132,7 +132,7 @@ class Scale {
   getLabelWidthHasMaxLength(notFormattedLabels) {
     return (notFormattedLabels ?? []).reduce((max, label) => {
       const formattedLabel = this.getLabelFormat(label);
-      const width = Util.calcTextSize(
+      const width = Util.calcTextSizeCanvas(
           formattedLabel,
           Util.getLabelStyle(this.labelStyle),
       )?.width ?? 0;
