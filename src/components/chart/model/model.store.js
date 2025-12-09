@@ -405,30 +405,42 @@ const modules = {
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
   addSeriesStackDS(data, label, bsIds, sIdx = 0) {
+    const seriesList = this.seriesList;
     const isHorizontal = this.options.horizontal;
     const sdata = [];
+    const basePositionCache = new Map();
 
     const getBaseDataPosition = (baseIndex, dataIndex) => {
-      const nextBaseSeriesIndex = baseIndex - 1;
-      const baseSeries = this.seriesList[bsIds[baseIndex]];
-      const baseDataList = baseSeries.data;
-      const baseData = baseDataList[dataIndex];
-      const position = isHorizontal ? baseData?.x : baseData?.y;
-      const isPassingValue = baseSeries.passingValue === baseData?.o;
-
-      if (isPassingValue || position == null || !baseSeries.show) {
-        if (nextBaseSeriesIndex > -1) {
-          return getBaseDataPosition(nextBaseSeriesIndex, dataIndex);
-        }
-
-        return 0;
+      const key = `${baseIndex}-${dataIndex}`;
+      if (basePositionCache.has(key)) {
+        return basePositionCache.get(key);
       }
 
-      return position;
+      let result = 0;
+      let idx = baseIndex;
+
+      while (idx >= 0) {
+        const baseSeries = seriesList[bsIds[idx]];
+        if (baseSeries.show) {
+          const baseData = baseSeries.data[dataIndex];
+          const position = isHorizontal ? baseData?.x : baseData?.y;
+          if (
+            position != null && baseSeries.passingValue !== baseData?.o
+          ) {
+            result = position;
+            break;
+          }
+        }
+        idx--;
+      }
+
+      basePositionCache.set(key, result);
+      return result;
     };
 
+    const lastBaseIndex = bsIds.length - 1;
     data.forEach((curr, index) => {
-      const baseIndex = bsIds.length - 1 < 0 ? 0 : bsIds.length - 1;
+      const baseIndex = lastBaseIndex < 0 ? 0 : lastBaseIndex;
       let bdata = getBaseDataPosition(baseIndex, index); // base(previous) series data
       let odata = curr; // current series original data
       let ldata = label[index]; // label data
