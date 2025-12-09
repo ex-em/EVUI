@@ -223,14 +223,17 @@ export default {
    */
   calcTextSizeCanvas(text, fontStyle) {
     textMeasureCtx.font = fontStyle;
-
     const metrics = textMeasureCtx.measureText(text);
+
+    const fontSizeMatch = fontStyle.match(/(\d+(?:\.\d+)?)px/);
+    const fontSize = fontSizeMatch ? Number(fontSizeMatch[1]) : 14;
+
+    // DOM 기본 line-height 보정 (대략 1.2 ~ 1.3)
+    const lineHeight = fontSize * 1.2;
 
     return {
       width: Math.ceil(metrics.width),
-      height: Math.ceil(
-        metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent,
-      ),
+      height: Math.ceil(lineHeight),
     };
   },
 
