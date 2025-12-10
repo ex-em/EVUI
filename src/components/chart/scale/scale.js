@@ -127,9 +127,11 @@ class Scale {
   /**
    * return width what has max length
    * @param {string[]} notFormattedLabels
+   * @param {object} chartRect - unused in base class, used in StepScale override
    * @reutrn number maxWidth
    */
-  getLabelWidthHasMaxLength(notFormattedLabels) {
+  // eslint-disable-next-line no-unused-vars
+  getLabelWidthHasMaxLength(notFormattedLabels, chartRect) {
     return (notFormattedLabels ?? []).reduce((max, label) => {
       const formattedLabel = this.getLabelFormat(label);
       const width = Util.calcTextSizeCanvas(
