@@ -174,54 +174,76 @@ class EvChart {
   }
 
   adjustXAndYAxisWidth() {
-    // fitWidth(maxWidth에 넘을 시 말줄임표 들어가는 기능)을 사용중인 step Axis인 경우에는 적용 제외
-    const isStepXAxisUseFitWidth = this.options.axesX?.some(axisX => axisX.type === 'step' && axisX.labelStyle?.fitWidth);
-    const isStepYAxisUseFitWidth = this.options.axesY?.some(axisY => axisY.type === 'step' && axisY.labelStyle?.fitWidth);
-
-    const getNotFormattedLabels = (axesSteps) => {
-      const { interval, graphMin, graphMax, steps = 0 } = axesSteps ?? {};
+    const getNotFormattedLabels = (axesSteps, axisType, axis) => {
+      const {
+        interval,
+        graphMin,
+        graphMax,
+        steps = 0,
+        minIndex,
+        maxIndex,
+        indexInterval,
+      } = axesSteps ?? {};
       let result = [];
 
-      if (interval) {
+      // StepScale의 경우 실제로 표시될 모든 라벨들을 포함
+      if (axis?.type === 'step' && minIndex !== undefined && maxIndex !== undefined && indexInterval !== undefined) {
+        const { labels } = this.data;
+        const axisLabels = axisType === 'x' ? (labels?.x ?? labels ?? []) : (labels?.y ?? labels ?? []);
+        result = [];
+        for (let i = minIndex; i <= maxIndex; i += indexInterval) {
+          if (axisLabels[i] !== undefined) {
+            result.push(axisLabels[i]);
+          }
+        }
+      } else if (interval) {
         result = Array.from({ length: steps }, (_, i) => graphMin + i * interval);
         result.push(graphMax);
       } else {
         const { labels } = this.data;
-        result = labels?.y ?? labels ?? [];
+        result = axisType === 'x' ? (labels?.x ?? labels ?? []) : (labels?.y ?? labels ?? []);
       }
 
       return result;
     };
 
-    const notFormattedXLabels = getNotFormattedLabels(this.axesSteps?.x[0]);
-    const notFormattedYLabels = getNotFormattedLabels(this.axesSteps?.y[0]);
-
-    const yFixWidth = truthyNumber(this.axesY[0]?.labelStyle?.fixWidth)
-      ? this.axesY[0]?.labelStyle?.fixWidth
-      : 0;
-    const xFixWidth = truthyNumber(this.axesX[0]?.labelStyle?.fixWidth)
-      ? this.axesX[0]?.labelStyle?.fixWidth
-      : 0;
-
-    const xMaxWidth = this.axesX[0]?.getLabelWidthHasMaxLength(notFormattedXLabels);
-    const yMaxWidth = this.axesY[0]?.getLabelWidthHasMaxLength(notFormattedYLabels);
-
-
     const adjustedRange = {
-      x: !isStepXAxisUseFitWidth ? this.axesRange?.x?.map(value => ({
-        ...value,
-        size: {
-          width: xFixWidth || Math.max(xMaxWidth, value.size.width),
-          height: value.size.height,
-        },
-      })) : this.axesRange?.x,
-      y: !isStepYAxisUseFitWidth ? this.axesRange?.y?.map(value => ({
-        ...value,
-        size: {
-          width: yFixWidth || Math.max(yMaxWidth, value.size.width),
-          height: value.size.height,
-        },
-      })) : this.axesRange?.y,
+      x: this.axesRange?.x?.map((value, index) => {
+        const axis = this.axesX[index];
+        const axesSteps = this.axesSteps?.x[index];
+        const notFormattedLabels = getNotFormattedLabels(axesSteps, 'x', axis);
+
+        const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth)
+          ? axis.labelStyle.fixWidth
+          : 0;
+        const maxWidth = axis?.getLabelWidthHasMaxLength?.(notFormattedLabels, this.chartRect) ?? 0;
+
+        return {
+          ...value,
+          size: {
+            width: fixWidth || Math.max(maxWidth, value.size.width),
+            height: value.size.height,
+          },
+        };
+      }),
+      y: this.axesRange?.y?.map((value, index) => {
+        const axis = this.axesY[index];
+        const axesSteps = this.axesSteps?.y[index];
+        const notFormattedLabels = getNotFormattedLabels(axesSteps, 'y', axis);
+
+        const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth)
+          ? axis.labelStyle.fixWidth
+          : 0;
+        const maxWidth = axis?.getLabelWidthHasMaxLength?.(notFormattedLabels, this.chartRect) ?? 0;
+
+        return {
+          ...value,
+          size: {
+            width: fixWidth || Math.max(maxWidth, value.size.width),
+            height: value.size.height,
+          },
+        };
+      }),
     };
 
     this.axesRange = adjustedRange;
