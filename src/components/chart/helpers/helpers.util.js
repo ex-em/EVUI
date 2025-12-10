@@ -219,7 +219,7 @@ export default {
    * Calculate text size with Canvas
    * @param {string} text         text is needed to check size
    * @param {string} fontStyle    text font style
-   * @returns {object} text size information
+   * @returns {{width: number; height: number;}} text size information
    */
   calcTextSizeCanvas(text, fontStyle) {
     textMeasureCtx.font = fontStyle;
