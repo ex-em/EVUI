@@ -111,6 +111,10 @@ export default {
           fitDir: 'right',
         },
       }],
+      tooltip: {
+        use: true,
+        formatter: ({ y }) => `${y}`,
+      },
       legend: {
         show: true,
         position: 'bottom',

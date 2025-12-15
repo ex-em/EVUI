@@ -289,12 +289,53 @@ class Scatter {
    * @returns {object} graph item
    */
   findGraphData(offset) {
-    if (this.realTimeScatter) return false;
-
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color, index: null };
     const pointSize = this.pointSize;
+
+    if (this.realTimeScatter) {
+      const dataGroup = this.data[this.sId]?.dataGroup;
+      if (!dataGroup) {
+        return item;
+      }
+
+      let closestItem = null;
+      let itemIndex = 0;
+      let currentIndex = 0;
+
+      for (let i = 0; i < dataGroup.length; i++) {
+        const group = dataGroup[i];
+        if (group?.data) {
+          for (let j = 0; j < group.data.length; j++) {
+            const dataItem = group.data[j];
+            if (dataItem.xp !== null && dataItem.yp !== null) {
+              const x = dataItem.xp;
+              const y = dataItem.yp;
+
+
+              if ((x - pointSize <= xp)
+                && (xp <= x + pointSize)
+                && (y - pointSize <= yp)
+                && (yp <= y + pointSize)) {
+                  closestItem = dataItem;
+                  itemIndex = currentIndex;
+              }
+            }
+            currentIndex++;
+          }
+        }
+      }
+
+      if (closestItem) {
+        item.data = closestItem;
+        item.index = itemIndex;
+        item.hit = true;
+      }
+
+      return item;
+    }
+
     const gdata = this.data;
 
     const targetIndex = gdata.findIndex((data) => {

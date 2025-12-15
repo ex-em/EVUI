@@ -218,6 +218,7 @@ const modules = {
           this.dataSet[key].dataGroup[index].data.push({
             x: item.x,
             y: item.y,
+            o: item.value ?? item.y,
             color: item.color,
           });
 
