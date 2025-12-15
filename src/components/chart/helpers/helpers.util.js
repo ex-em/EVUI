@@ -222,6 +222,10 @@ export default {
    * @returns {object} text size information
    */
   calcTextSizeCanvas(text, fontStyle) {
+    if (!text) {
+      return { width: 2, height: 2 };
+    }
+
     textMeasureCtx.font = fontStyle;
     const metrics = textMeasureCtx.measureText(text);
 
@@ -265,7 +269,7 @@ export default {
   /**
    * Truncate the long string to short string with ellipsis until fitting maxWidth
    * @param {string} str         target string
-   * @param {number} maxWidth    maximum string width on canvas
+   * @param {number} maxWidth    maximum string width on canva
    * @param {Object} ctx         canvas context
    * @param {string} direction   left or right  (default: right)
    */
