@@ -411,7 +411,7 @@ const modules = {
     const basePositionCache = new Map();
 
     const getBaseDataPosition = (baseIndex, dataIndex) => {
-      const key = `${baseIndex}-${dataIndex}`;
+      const key = (baseIndex << 20) | dataIndex;
       if (basePositionCache.has(key)) {
         return basePositionCache.get(key);
       }
@@ -421,11 +421,17 @@ const modules = {
 
       while (idx >= 0) {
         const baseSeries = seriesList[bsIds[idx]];
-        if (baseSeries.show) {
+        if (baseSeries?.show && Array.isArray(baseSeries?.data)) {
           const baseData = baseSeries.data[dataIndex];
-          const position = isHorizontal ? baseData?.x : baseData?.y;
+          const { x = null, y = null, o = null } = baseData ?? {};
+
+          const position = isHorizontal ? x : y;
+
+          const isPassingValue = Util.isNullOrUndefined(baseSeries.passingValue) === false
+          && baseSeries?.passingValue === o;
+
           if (
-            position != null && baseSeries.passingValue !== baseData?.o
+            position != null && !isPassingValue
           ) {
             result = position;
             break;
@@ -440,14 +446,14 @@ const modules = {
 
     const lastBaseIndex = bsIds.length - 1;
     data.forEach((curr, index) => {
-      const baseIndex = lastBaseIndex < 0 ? 0 : lastBaseIndex;
+      const baseIndex = Math.max(0, lastBaseIndex);
       let bdata = getBaseDataPosition(baseIndex, index); // base(previous) series data
       let odata = curr; // current series original data
       let ldata = label[index]; // label data
       let gdata = curr; // current series data which added previous series's value
 
-      if (bdata != null && ldata != null) {
-        if (gdata && typeof gdata === 'object' && (curr.x || curr.y)) {
+      if (ldata != null) {
+        if (gdata && typeof gdata === 'object' && ('x' in gdata || 'y' in gdata)) {
           odata = isHorizontal ? curr.x : curr.y;
           ldata = isHorizontal ? curr.y : curr.x;
         }
