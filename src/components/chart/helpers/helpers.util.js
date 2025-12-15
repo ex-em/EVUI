@@ -232,8 +232,8 @@ export default {
     const lineHeight = fontSize * 1.2;
 
     return {
-      width: Math.ceil(metrics.width),
-      height: Math.ceil(lineHeight),
+      width: Math.max(Math.ceil(metrics.width), 2),
+      height: Math.max(Math.ceil(lineHeight), 2),
     };
   },
 
