@@ -7,6 +7,10 @@ import {
 } from '@/common/utils';
 import { isNil } from 'lodash-es';
 
+// Text Size 측정용 singleton canvas
+const textMeasureCanvas = document.createElement('canvas');
+const textMeasureCtx = textMeasureCanvas.getContext('2d');
+
 export default {
   /**
    * Transforming hex to rgb code
@@ -212,6 +216,32 @@ export default {
   },
 
   /**
+   * Calculate text size with Canvas
+   * @param {string} text         text is needed to check size
+   * @param {string} fontStyle    text font style
+   * @returns {{width: number; height: number;}} text size information
+   */
+  calcTextSizeCanvas(text, fontStyle) {
+    if (!text) {
+      return { width: 2, height: 2 };
+    }
+
+    textMeasureCtx.font = fontStyle;
+    const metrics = textMeasureCtx.measureText(text);
+
+    const fontSizeMatch = fontStyle.match(/(\d+(?:\.\d+)?)px/);
+    const fontSize = fontSizeMatch ? Number(fontSizeMatch[1]) : 14;
+
+    // DOM 기본 line-height 보정 (대략 1.2 ~ 1.3)
+    const lineHeight = fontSize * 1.2;
+
+    return {
+      width: Math.max(Math.ceil(metrics.width), 2),
+      height: Math.max(Math.ceil(lineHeight), 2),
+    };
+  },
+
+  /**
    * Comparing strings
    * @param {array} array    compared array
    *
@@ -239,7 +269,7 @@ export default {
   /**
    * Truncate the long string to short string with ellipsis until fitting maxWidth
    * @param {string} str         target string
-   * @param {number} maxWidth    maximum string width on canvas
+   * @param {number} maxWidth    maximum string width on canva
    * @param {Object} ctx         canvas context
    * @param {string} direction   left or right  (default: right)
    */
