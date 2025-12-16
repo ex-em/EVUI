@@ -530,6 +530,10 @@ const module = {
       this.stopScrolling(e);
     };
 
+    this.throttledUpdateScrollbarRange = throttle((dir, isUp) => {
+      this.updateScrollbarRange(dir, isUp);
+    }, 50, { leading: true, trailing: true });
+
     this.onScrollbarWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
       const tooltipBodyDOM = this.tooltipBodyDOM
@@ -557,7 +561,7 @@ const module = {
 
       // Shift + 휠: 가로 스크롤 (일반 마우스 휠 지원)
       if (this.scrollbar.x?.use && e.shiftKey && Math.abs(e.deltaY) > threshold) {
-        this.updateScrollbarRange('x', e.deltaY > 0);
+        this.throttledUpdateScrollbarRange('x', e.deltaY > 0);
         return;
       }
 
@@ -568,22 +572,22 @@ const module = {
       if (absX > threshold && absY > threshold) {
         // 두 방향 모두 임계값 이상일 때: 더 큰 방향을 우선 처리
         if (absX > absY && this.scrollbar.x?.use) {
-          this.updateScrollbarRange('x', e.deltaX > 0);
+          this.throttledUpdateScrollbarRange('x', e.deltaX > 0);
         } else if (absY > absX && this.scrollbar.y?.use) {
-          this.updateScrollbarRange('y', e.deltaY < 0);
+          this.throttledUpdateScrollbarRange('y', e.deltaY < 0);
         }
         return;
       }
 
       // 가로 스크롤 처리 (deltaX - 트랙패드 좌우 스크롤)
       if (this.scrollbar.x?.use && absX > threshold) {
-        this.updateScrollbarRange('x', e.deltaX > 0);
+        this.throttledUpdateScrollbarRange('x', e.deltaX > 0);
         return;
       }
 
       // 세로 스크롤 처리 (deltaY)
       if (this.scrollbar.y?.use && absY > threshold) {
-        this.updateScrollbarRange('y', e.deltaY < 0);
+        this.throttledUpdateScrollbarRange('y', e.deltaY < 0);
       }
     };
 
@@ -724,6 +728,7 @@ const module = {
       // 가로, 세로 스크롤바 모두 없어지면 휠 이벤트 제거
       if (!this.scrollbar.x?.use && !this.scrollbar.y?.use) {
         this.overlayCanvas?.removeEventListener('wheel', this.onScrollbarWheel, { passive: false });
+        this.throttledUpdateScrollbarRange?.cancel?.();
       }
     }
   },
