@@ -443,7 +443,7 @@ class StepScale extends Scale {
     return (notFormattedLabels ?? []).reduce((max, label) => {
       // ellipsis가 적용된 label의 width를 계산
       const formattedLabel = this.getLabelFormat(label, maxWidth);
-      const width = Util.calcTextSize(
+      const width = Util.calcTextSizeCanvas(
         formattedLabel,
         labelStyle,
       )?.width ?? 0;
