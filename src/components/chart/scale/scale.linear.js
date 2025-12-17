@@ -272,7 +272,7 @@ class LinearScale extends Scale {
         max: maxValue,
         minLabel,
         maxLabel,
-        size: Util.calcTextSize(
+        size: Util.calcTextSizeCanvas(
           maxLabel,
           Util.getLabelStyle(this.labelStyle),
           this.labelStyle?.padding,

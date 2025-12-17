@@ -57,7 +57,7 @@ class StepScale extends Scale {
       maxIndex,
       minLabel: this.getLabelFormat(minValue, maxWidth),
       maxLabel: this.getLabelFormat(maxValue, maxWidth),
-      size: Util.calcTextSize(
+      size: Util.calcTextSizeCanvas(
         this.getLabelFormat(maxValue, maxWidth),
         Util.getLabelStyle(this.labelStyle),
       ),
