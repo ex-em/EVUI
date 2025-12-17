@@ -426,6 +426,31 @@ class StepScale extends Scale {
 
     return Util.truncateLabelWithEllipsis(value, maxWidth, ctx, dir);
   }
+
+  /**
+   * return width what has max length
+   * ellipsis가 적용된 label의 width를 계산 (fontSize 적용)
+   * @param {string[]} notFormattedLabels
+   * @param {object} chartRect
+   * @returns {number} maxWidth
+   */
+  getLabelWidthHasMaxLength(notFormattedLabels, chartRect) {
+    // fontSize를 포함한 labelStyle 가져오기
+    const labelStyle = Util.getLabelStyle(this.labelStyle);
+    const labelCount = notFormattedLabels?.length ?? 0;
+    const maxWidth = this.labelStyle?.maxWidth ?? chartRect?.chartWidth / (labelCount + 2);
+
+    return (notFormattedLabels ?? []).reduce((max, label) => {
+      // ellipsis가 적용된 label의 width를 계산
+      const formattedLabel = this.getLabelFormat(label, maxWidth);
+      const width = Util.calcTextSizeCanvas(
+        formattedLabel,
+        labelStyle,
+      )?.width ?? 0;
+
+      return Math.max(max, width);
+    }, 0);
+  }
 }
 
 export default StepScale;
