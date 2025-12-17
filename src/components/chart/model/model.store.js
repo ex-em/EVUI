@@ -407,41 +407,65 @@ const modules = {
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
   addSeriesStackDS(data, label, bsIds, sIdx = 0) {
+    const seriesList = this.seriesList;
     const isHorizontal = this.options.horizontal;
     const sdata = [];
+    const basePositionCache = new Map();
 
     const getBaseDataPosition = (baseIndex, dataIndex, curr) => {
-      const nextBaseSeriesIndex = baseIndex - 1;
-      const baseSeries = this.seriesList[bsIds[baseIndex]];
-      const baseDataList = baseSeries.data;
-      const baseData = baseDataList[dataIndex];
-      const position = isHorizontal ? baseData?.x : baseData?.y;
-
-      const baseValue = baseData?.o;
-      const isPassingValue = !Util.isNullOrUndefined(baseSeries?.passingValue)
-      && baseSeries?.passingValue === baseValue;
-      const isSameSign = (curr >= 0 && baseValue >= 0) || (curr < 0 && baseValue < 0);
-
-      if (isPassingValue || position == null || !isSameSign || !baseSeries.show) {
-        if (nextBaseSeriesIndex > -1) {
-          return getBaseDataPosition(nextBaseSeriesIndex, dataIndex, curr);
-        }
-
-        return 0;
+      const key = `${baseIndex}-${dataIndex}-${curr >= 0 ? 'pos' : 'neg'}`;
+      if (basePositionCache.has(key)) {
+        return basePositionCache.get(key);
       }
-
-      return position;
+    
+      let result = 0;
+      let idx = baseIndex;
+    
+      while (idx >= 0) {
+        const baseSeries = seriesList[bsIds[idx]];
+        if (!baseSeries?.show) {
+          idx--;
+          continue;
+        }
+    
+        const baseData = baseSeries.data[dataIndex];
+        const position = isHorizontal ? baseData?.x : baseData?.y;
+        const baseValue = baseData?.o;
+    
+        const isPassingValue =
+          !Util.isNullOrUndefined(baseSeries.passingValue) &&
+          baseSeries.passingValue === baseValue;
+    
+        const isSameSign =
+          (curr >= 0 && baseValue >= 0) ||
+          (curr < 0 && baseValue < 0);
+    
+        if (
+          position != null &&
+          !isPassingValue &&
+          isSameSign
+        ) {
+          result = position;
+          break;
+        }
+    
+        idx--;
+      }
+    
+      basePositionCache.set(key, result);
+      return result;
     };
 
+    const lastBaseIndex = bsIds.length - 1;
     data.forEach((curr, index) => {
-      const baseIndex = bsIds.length - 1 < 0 ? 0 : bsIds.length - 1;
+      const baseIndex = Math.max(0, lastBaseIndex);
       let bdata = getBaseDataPosition(baseIndex, index, curr); // base(previous) series data
       let odata = curr; // current series original data
       let ldata = label[index]; // label data
       let gdata = curr; // current series data which added previous series's value
 
       if (bdata != null && ldata != null) {
-        if (gdata && typeof gdata === 'object' && (curr.x || curr.y)) {
+        if (gdata && typeof gdata === 'object' && ('x' in gdata || 'y' in gdata)) {
           odata = isHorizontal ? curr.x : curr.y;
           ldata = isHorizontal ? curr.y : curr.x;
         }
