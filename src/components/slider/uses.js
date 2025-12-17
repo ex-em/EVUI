@@ -30,7 +30,8 @@ export const useModel = () => {
       if (!obj) {
         return [];
       }
-      const style = props.mark.style && typeof props.mark.style === 'object' ? props.mark.style : {};
+      const style =
+        props.mark.style && typeof props.mark.style === 'object' ? props.mark.style : {};
       const keyList = Object.keys(obj);
       const resultList = [];
       let markVal;
@@ -197,7 +198,8 @@ export const useStyle = (params) => {
     const minVal = Math.min(state.leftValue, state.rightValue);
     const maxVal = Math.max(state.leftValue, state.rightValue);
     const mvRange = +(maxVal - minVal).toFixed(2);
-    const leftPosX = slider.valueRange > 0 && props.range
+    const leftPosX =
+      slider.valueRange > 0 && props.range
         ? convertToPercent(+(minVal - props.min).toFixed(2), slider.valueRange)
         : 0;
     const thumbWidth = mvRange > 0 ? convertToPercent(mvRange, slider.valueRange) : 0;
@@ -205,12 +207,14 @@ export const useStyle = (params) => {
     const thumbColor = {};
     if (props.color) {
       if (
-        typeof props.color === 'string'
-        || (Array.isArray(props.color) && props.color.length === 1)
+        typeof props.color === 'string' ||
+        (Array.isArray(props.color) && props.color.length === 1)
       ) {
-        thumbColor.backgroundColor = (typeof props.color === 'string' ? props.color : props.color[0]) || colorDefault;
+        thumbColor.backgroundColor =
+          (typeof props.color === 'string' ? props.color : props.color[0]) || colorDefault;
       } else if (Array.isArray(props.color) && props.color.length > 1) {
-        thumbColor.backgroundColor = (props.range ? props.color[1] : props.color[0]) || colorDefault;
+        thumbColor.backgroundColor =
+          (props.range ? props.color[1] : props.color[0]) || colorDefault;
       }
     }
     return {
@@ -298,7 +302,8 @@ export const useEvent = (params) => {
       } else {
         state.handleType = isReverse ? 'left' : 'right';
       }
-      convertValue = state.handleType === 'left'
+      convertValue =
+        state.handleType === 'left'
           ? [selectedValue, state.rightValue]
           : [state.leftValue, selectedValue];
     } else {
@@ -315,7 +320,8 @@ export const useEvent = (params) => {
 
     let convertValue;
     if (props.range) {
-      convertValue = state.handleType === 'left'
+      convertValue =
+        state.handleType === 'left'
           ? [selectedValue, state.rightValue]
           : [state.leftValue, selectedValue];
     } else {
@@ -350,7 +356,8 @@ export const useEvent = (params) => {
   const changeInput = (val, type) => {
     if (props.showInput && !state.dragging && state.isInit) {
       if (props.range && Array.isArray(currentValue.value)) {
-        const result = type === 'left' ? [val, currentValue.value[1]] : [currentValue.value[0], val];
+        const result =
+          type === 'left' ? [val, currentValue.value[1]] : [currentValue.value[0], val];
         setSliderValue(result);
       } else if (!props.range) {
         setSliderValue(val);

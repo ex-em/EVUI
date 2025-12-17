@@ -8,9 +8,9 @@ export const useModel = () => {
   const mv = computed({
     get: () => {
       if (
-        props.modelValue.length !== props.rowLabels.length
-        || !props.modelValue[0]
-        || props.modelValue[0].length !== props.colLabels.length
+        props.modelValue.length !== props.rowLabels.length ||
+        !props.modelValue[0] ||
+        props.modelValue[0].length !== props.colLabels.length
       ) {
         return getMatrixArr(props.rowLabels.length, props.colLabels.length);
       }
@@ -27,9 +27,9 @@ export const useModel = () => {
    */
   const validateValue = () => {
     if (
-      props.modelValue.length !== props.rowLabels.length
-      || !props.modelValue[0]
-      || props.modelValue[0].length !== props.colLabels.length
+      props.modelValue.length !== props.rowLabels.length ||
+      !props.modelValue[0] ||
+      props.modelValue[0].length !== props.colLabels.length
     ) {
       mv.value = [...getMatrixArr(props.rowLabels.length, props.colLabels.length)];
     }

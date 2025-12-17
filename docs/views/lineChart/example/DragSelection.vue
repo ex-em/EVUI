@@ -92,7 +92,7 @@ export default {
       selectionRange.value = range;
     };
 
-    const convertToDateString = value => dayjs(value).format('MM/DD');
+    const convertToDateString = (value) => dayjs(value).format('MM/DD');
 
     return {
       chartData,

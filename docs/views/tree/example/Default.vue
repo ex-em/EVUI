@@ -379,7 +379,7 @@ export default {
     ]);
 
     const getCheckedNode = (checkedNode) => {
-      checkedNodeInfo.value = checkedNode.map(node => ({ title: node.title, value: node.value }));
+      checkedNodeInfo.value = checkedNode.map((node) => ({ title: node.title, value: node.value }));
     };
 
     const getClickedNode = (clickedNode) => {

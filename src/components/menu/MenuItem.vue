@@ -113,7 +113,8 @@ export default {
   },
   emits: ['click'],
   setup(props, { emit }) {
-    const defaultExpand = props.expandable && props.item.expand !== undefined && typeof props.item.expand === 'boolean'
+    const defaultExpand =
+      props.expandable && props.item.expand !== undefined && typeof props.item.expand === 'boolean'
         ? props.item.expand
         : true;
     const isExpand = ref(defaultExpand);

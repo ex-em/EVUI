@@ -361,9 +361,9 @@ export default {
       isEscClose.value = newValue;
     };
 
-    const mousedown = clickedInfo => console.log('mousedown', clickedInfo);
-    const mouseup = event => console.log('mousedown-mouseup', event);
-    const mousemove = clickedInfo => console.log('mousedown-mousemove', clickedInfo);
+    const mousedown = (clickedInfo) => console.log('mousedown', clickedInfo);
+    const mouseup = (event) => console.log('mousedown-mouseup', event);
+    const mousemove = (clickedInfo) => console.log('mousedown-mousemove', clickedInfo);
     const resize = (event, positionInfo) => console.log('resize', event, positionInfo);
 
     return {

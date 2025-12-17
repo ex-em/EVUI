@@ -89,7 +89,7 @@ export default {
         iconClass: 'ev-icon-getmore',
         showCancelBtn: false,
         focusable: true,
-        onClose: type => console.log(`[ type = '${type}' ] Hide Cancel`),
+        onClose: (type) => console.log(`[ type = '${type}' ] Hide Cancel`),
       });
     };
     const showCancel = () => {
@@ -99,7 +99,7 @@ export default {
         iconClass: 'ev-icon-getmore',
         showConfirmBtn: false,
         focusable: true,
-        onClose: type => console.log(`[ type = '${type}' ] Hide Confirm`),
+        onClose: (type) => console.log(`[ type = '${type}' ] Hide Confirm`),
       });
     };
     const showClose = () => {
@@ -109,7 +109,7 @@ export default {
         iconClass: 'ev-icon-getmore',
         showClose: false,
         focusable: true,
-        onClose: type => console.log(`[ type = '${type}' ] Hide Close`),
+        onClose: (type) => console.log(`[ type = '${type}' ] Hide Close`),
       });
     };
     const showPlain = () => {
@@ -120,7 +120,7 @@ export default {
         showCancelBtn: false,
         showConfirmBtn: false,
         focusable: true,
-        onClose: type => console.log(`[ type = '${type}' ] Hide Cancel, Confirm`),
+        onClose: (type) => console.log(`[ type = '${type}' ] Hide Cancel, Confirm`),
       });
     };
     const showCustomText = () => {

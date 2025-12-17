@@ -124,7 +124,7 @@ export default {
     const generateData = (num) => {
       const data = [];
 
-      const floor = number => Math.floor(number / 1000) * 1000;
+      const floor = (number) => Math.floor(number / 1000) * 1000;
 
       for (let i = 0; i < num; i++) {
         let randomX = 0;

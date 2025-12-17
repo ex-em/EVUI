@@ -38,11 +38,11 @@ export default {
     const gridSettingMenuItems = ref([
       {
         text: 'Menu1',
-        click: param => console.log(`[Menu1]: ${JSON.stringify(param, null, 2)}`),
+        click: (param) => console.log(`[Menu1]: ${JSON.stringify(param, null, 2)}`),
       },
       {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param.contextmenuInfo),
+        click: (param) => console.log('[Menu2]', param.contextmenuInfo),
       },
       {
         text: 'Custom Column List',

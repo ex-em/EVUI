@@ -79,7 +79,7 @@ export default {
           autoScaleRatio: 0.1,
           showAxisTick: true,
           axisLineColor: '#25262E',
-          formatter: value => `${value}%`,
+          formatter: (value) => `${value}%`,
         },
       ],
     });

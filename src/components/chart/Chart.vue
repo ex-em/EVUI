@@ -164,7 +164,8 @@ export default {
       (chartOpt) => {
         const newOpt = getNormalizedOptions(chartOpt);
         const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
-        const isUpdateTooltip = newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
+        const isUpdateTooltip =
+          newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
 
         evChart.options = cloneDeep(newOpt);
 
@@ -188,9 +189,10 @@ export default {
         const newData = props.options.realTimeScatter?.use
           ? { ...chartData, groups: [], labels: [] }
           : getNormalizedData(chartData);
-        const isUpdateSeries = !isEqual(newData.series, evChart.data.series)
-          || !isEqual(newData.groups, evChart.data.groups)
-          || props.options.type === 'heatMap';
+        const isUpdateSeries =
+          !isEqual(newData.series, evChart.data.series) ||
+          !isEqual(newData.groups, evChart.data.groups) ||
+          props.options.type === 'heatMap';
 
         const isUpdateData = !isEqual(newData, evChart.data);
 

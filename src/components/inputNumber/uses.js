@@ -60,8 +60,8 @@ export function useModel() {
   /**
    * 고정 소수점 사용 시, 해당하는 소수점 값 반환
    * */
-  const getPrecisionValue = val =>
-    (props.precision && (val || val === 0) ? Number(val).toFixed(props.precision) : val);
+  const getPrecisionValue = (val) =>
+    props.precision && (val || val === 0) ? Number(val).toFixed(props.precision) : val;
 
   /**
    * input 값 validate
@@ -151,8 +151,9 @@ export function useStep(params) {
       const convertedStep = type === 'up' ? props.step : props.step * -1;
       const maxPrecision = Math.max(getPrecision(newValue), getPrecision(props.step));
       const squaredValue = 10 ** maxPrecision;
-      result = (Math.round(newValue * squaredValue) + Math.round(convertedStep * squaredValue))
-        / squaredValue;
+      result =
+        (Math.round(newValue * squaredValue) + Math.round(convertedStep * squaredValue)) /
+        squaredValue;
     }
 
     if (result >= props.min && result <= props.max) {

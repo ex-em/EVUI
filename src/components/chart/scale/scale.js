@@ -130,10 +130,8 @@ class Scale {
   getLabelWidthHasMaxLength(notFormattedLabels, chartRect) {
     return (notFormattedLabels ?? []).reduce((max, label) => {
       const formattedLabel = this.getLabelFormat(label);
-      const width = Util.calcTextSizeCanvas(
-          formattedLabel,
-          Util.getLabelStyle(this.labelStyle),
-      )?.width ?? 0;
+      const width =
+        Util.calcTextSizeCanvas(formattedLabel, Util.getLabelStyle(this.labelStyle))?.width ?? 0;
 
       return Math.max(max, width);
     }, 0);
@@ -342,10 +340,10 @@ class Scale {
         labelCenter = Math.round(offsetStartPoint + labelGap * ix);
 
         if (
-          labelCenter <= endPoint
-          || this.type !== 'x'
-          || !options?.axesX[0].flow
-          || dataLabels.length === steps + 1
+          labelCenter <= endPoint ||
+          this.type !== 'x' ||
+          !options?.axesX[0].flow ||
+          dataLabels.length === steps + 1
         ) {
           ctx.beginPath();
           ticks[ix] = axisMinForLabel + ix * stepValue;
@@ -362,12 +360,13 @@ class Scale {
             prev: ticks[ix - 1] ?? '',
           });
 
-          const isBlurredLabel = this.options?.selectLabel?.use
-            && this.options?.selectLabel?.useLabelOpacity
-            && this.options.horizontal === (this.type === 'y')
-            && selectLabelInfo?.dataIndex?.length
-            && !selectLabelInfo?.label
-              .map(t =>
+          const isBlurredLabel =
+            this.options?.selectLabel?.use &&
+            this.options?.selectLabel?.useLabelOpacity &&
+            this.options.horizontal === (this.type === 'y') &&
+            selectLabelInfo?.dataIndex?.length &&
+            !selectLabelInfo?.label
+              .map((t) =>
                 this.getLabelFormat(Math.min(axisMax, t), {
                   prev: ticks[ix - 1] ?? '',
                 }),
@@ -392,10 +391,10 @@ class Scale {
             }
 
             if (
-              !isBlurredLabel
-              && options?.selectItem?.showLabelTip
-              && hitInfo?.label
-              && !this.options?.horizontal
+              !isBlurredLabel &&
+              options?.selectItem?.showLabelTip &&
+              hitInfo?.label &&
+              !this.options?.horizontal
             ) {
               const selectedLabel = this.getLabelFormat(
                 Math.min(axisMax, hitInfo.label + 0 * stepValue),
@@ -608,7 +607,7 @@ class Scale {
   drawXPlotBand(fromDataX, toDataX, minX, maxX, minY, maxY) {
     const ctx = this.ctx;
 
-    const checkValidPosition = x => x || x > minX || x < maxX;
+    const checkValidPosition = (x) => x || x > minX || x < maxX;
 
     if (!checkValidPosition(fromDataX) || !checkValidPosition(toDataX)) {
       ctx.closePath();
@@ -702,7 +701,7 @@ class Scale {
   drawYPlotBand(fromDataY, toDataY, minX, maxX, minY, maxY) {
     const ctx = this.ctx;
 
-    const checkValidPosition = y => y || y > minY || y < maxY;
+    const checkValidPosition = (y) => y || y > minY || y < maxY;
 
     if (!checkValidPosition(fromDataY) || !checkValidPosition(toDataY)) {
       ctx.closePath();
@@ -737,11 +736,12 @@ class Scale {
     let label = mergedLabelOpt.text;
     let labelWidth = maxWidth ?? ctx.measureText(label).width;
 
-    const plotLabelAreaWidth = this.type === 'y' ? chartRect.width - chartRect.chartWidth : (maxWidth ?? chartRect.width);
+    const plotLabelAreaWidth =
+      this.type === 'y' ? chartRect.width - chartRect.chartWidth : (maxWidth ?? chartRect.width);
 
     if (
-      plotLabelAreaWidth < ctx.measureText(label).width
-      && mergedLabelOpt.textOverflow === 'ellipsis'
+      plotLabelAreaWidth < ctx.measureText(label).width &&
+      mergedLabelOpt.textOverflow === 'ellipsis'
     ) {
       label = Util.truncateLabelWithEllipsis(mergedLabelOpt.text, plotLabelAreaWidth, ctx);
       labelWidth = ctx.measureText(label).width;

@@ -262,18 +262,18 @@ class LinearScale extends Scale {
       isMaxValueSameAsMin: isDefaultMaxSameAsMin,
     });
 
-      return {
-        min: minValue,
-        max: maxValue,
-        minLabel,
+    return {
+      min: minValue,
+      max: maxValue,
+      minLabel,
+      maxLabel,
+      size: Util.calcTextSizeCanvas(
         maxLabel,
-        size: Util.calcTextSizeCanvas(
-          maxLabel,
-          Util.getLabelStyle(this.labelStyle),
-          this.labelStyle?.padding,
-        ),
-      };
-    }
+        Util.getLabelStyle(this.labelStyle),
+        this.labelStyle?.padding,
+      ),
+    };
+  }
 }
 
 export default LinearScale;

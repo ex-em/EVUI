@@ -145,7 +145,7 @@ export default {
       }
     };
 
-    const getDateString = x => dayjs(x).format('HH:mm:ss');
+    const getDateString = (x) => dayjs(x).format('HH:mm:ss');
 
     return {
       chartData,

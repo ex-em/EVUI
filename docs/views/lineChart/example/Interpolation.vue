@@ -121,8 +121,8 @@ export default {
 
     const changeValue = () => {
       Object.keys(chartData.data).forEach((key) => {
-        const series = chartSeries.value.find(s => s.key === key);
-        chartData.data[key] = series.data.map(item => (item.isNull ? null : item.value));
+        const series = chartSeries.value.find((s) => s.key === key);
+        chartData.data[key] = series.data.map((item) => (item.isNull ? null : item.value));
       });
     };
 

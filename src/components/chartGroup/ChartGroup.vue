@@ -59,7 +59,7 @@ export default {
     provide('evChartPropsInGroup', evChartPropsInGroup);
     const groupSelectedLabel = computed({
       get: () => props.groupSelectedLabel,
-      set: val => emit('update:groupSelectedLabel', val),
+      set: (val) => emit('update:groupSelectedLabel', val),
     });
     provide('groupSelectedLabel', groupSelectedLabel);
     const groupHoveredLabel = ref(null);

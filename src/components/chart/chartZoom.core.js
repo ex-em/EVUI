@@ -136,8 +136,9 @@ export default class EvChartZoom {
     const { dragXsp, dragXep, exceptAxesYChartWidth, chartTitle } = dragSelectionInfo;
     const { options: evChartOptions, data: evChartData } = this.evChartProps;
 
-    const dragChartIdx = evChartOptions.length > 1
-        ? evChartOptions.findIndex(option => (option?.title?.text ?? '') === chartTitle)
+    const dragChartIdx =
+      evChartOptions.length > 1
+        ? evChartOptions.findIndex((option) => (option?.title?.text ?? '') === chartTitle)
         : 0;
 
     if (evChartOptions[dragChartIdx].axesX[0].type === 'time') {
@@ -149,11 +150,11 @@ export default class EvChartZoom {
       const [currentZoomStartIdx, currentZoomEndIdx] = this.zoomAreaMemory.current[0];
 
       let newZoomStartIdx = cloneChartDataLabels.findIndex(
-        label => +label.$d === +zoomStartDate.$d,
+        (label) => +label.$d === +zoomStartDate.$d,
       );
 
       let newZoomEndIdx = cloneChartDataLabels.findLastIndex(
-        label => +label.$d === +zoomEndDate.$d,
+        (label) => +label.$d === +zoomEndDate.$d,
       );
 
       const calculateAxesXPosition = (zoomIdx) => {
@@ -470,7 +471,7 @@ export default class EvChartZoom {
       return requestAnimationFrame(() => animate(responseFinishStatus));
     };
 
-    return new Promise(response => animate(response));
+    return new Promise((response) => animate(response));
   }
 
   setIconStyle(isUseZoomMode) {

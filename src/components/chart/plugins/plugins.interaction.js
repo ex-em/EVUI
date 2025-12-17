@@ -69,7 +69,7 @@ const modules = {
 
         // tooltip이 표시될 때 indicator를 해당 라벨 위치로 이동 (line 차트이거나 line series가 포함된 경우)
         const hasLineSeries = Object.values(this.seriesList || {}).some(
-          series => series.type === 'line',
+          (series) => series.type === 'line',
         );
         if (tooltip.use && (type === 'line' || hasLineSeries)) {
           // indicator를 그리고 실제 위치한 라벨 정보를 받음
@@ -102,12 +102,12 @@ const modules = {
       if (!args.hoveredLabel && !this.isNotUseIndicator()) {
         // line 차트가 아니고 line series가 없거나, tooltip이 없을 때는 일반 indicator 표시
         const hasLineSeries = Object.values(this.seriesList || {}).some(
-          series => series.type === 'line',
+          (series) => series.type === 'line',
         );
         if (
-          (type !== 'line' && !hasLineSeries)
-          || !tooltip.use
-          || !Object.keys(hitInfo.items).length
+          (type !== 'line' && !hasLineSeries) ||
+          !tooltip.use ||
+          !Object.keys(hitInfo.items).length
         ) {
           this.drawIndicator(offset, indicator.color);
         }
@@ -444,11 +444,11 @@ const modules = {
             this.overlayClear();
 
             if (
-              this.options.dragSelection.keepDisplay
-              && (e.layerX < touchInfo.range.x1
-                || e.layerY < touchInfo.range.y1
-                || e.layerX > touchInfo.range.x2
-                || e.layerY > touchInfo.range.y2)
+              this.options.dragSelection.keepDisplay &&
+              (e.layerX < touchInfo.range.x1 ||
+                e.layerY < touchInfo.range.y1 ||
+                e.layerX > touchInfo.range.x2 ||
+                e.layerY > touchInfo.range.y2)
             ) {
               this.isTouchOverlay = false;
             } else {
@@ -504,8 +504,8 @@ const modules = {
       const customTooltip = this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
 
       if (
-        isTooltipVisible
-        || (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)
+        isTooltipVisible ||
+        (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)
       ) {
         e.preventDefault();
 
@@ -531,7 +531,7 @@ const modules = {
     this.overlayCanvas.addEventListener('click', this.onClick);
     this.overlayCanvas.addEventListener('mousedown', this.onMouseDown);
 
-    this.dragTouchSelectionEvent = e => this.dragTouchSelectionDestroy(e);
+    this.dragTouchSelectionEvent = (e) => this.dragTouchSelectionDestroy(e);
     window.addEventListener('click', this.dragTouchSelectionEvent);
   },
 
@@ -617,7 +617,8 @@ const modules = {
         dragInfo.xsp = Math.min(xcp, xep);
         dragInfo.ysp = type === 'scatter' ? Math.min(ycp, yep) : aRange.y1;
         dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-        dragInfo.height = type === 'scatter' ? Math.ceil(Math.abs(yep - ycp)) : aRange.y2 - aRange.y1;
+        dragInfo.height =
+          type === 'scatter' ? Math.ceil(Math.abs(yep - ycp)) : aRange.y2 - aRange.y1;
       }
 
       this.overlayClear();
@@ -776,7 +777,8 @@ const modules = {
 
       const setCurMouseLabelVal = (axes, labelIdx, labelVal) => {
         curMouseTargetVal.labelIdx = labelIdx;
-        curMouseTargetVal.labelVal = axes[0].type === 'time' ? dayjs(labelVal).format(axes[0].timeFormat) : labelVal;
+        curMouseTargetVal.labelVal =
+          axes[0].type === 'time' ? dayjs(labelVal).format(axes[0].timeFormat) : labelVal;
         curMouseTargetVal.originVal = axes[0].type === 'time' ? dayjs(labelVal) : labelVal;
       };
 
@@ -925,7 +927,7 @@ const modules = {
     }
 
     // 2. 모든 시리즈가 동일한 데이터 인덱스 사용
-    const allSeriesIsBar = sIds.every(sId => this.seriesList[sId].type === 'bar');
+    const allSeriesIsBar = sIds.every((sId) => this.seriesList[sId].type === 'bar');
 
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
@@ -1017,7 +1019,7 @@ const modules = {
     const mousePos = isHorizontal ? yp : xp;
 
     // 첫 번째 표시 중인 시리즈를 기준으로 라벨 위치 확인
-    const referenceSeries = sIds.find(sId => this.seriesList[sId]?.show);
+    const referenceSeries = sIds.find((sId) => this.seriesList[sId]?.show);
     if (!referenceSeries || !this.seriesList[referenceSeries]?.data) {
       return -1;
     }
@@ -1096,8 +1098,8 @@ const modules = {
           const hasPassingValueInData = series.hasPassingValueInData;
 
           return (
-            interpolation === 'linear'
-            || (interpolation === 'none' && !!passingValue && hasPassingValueInData)
+            interpolation === 'linear' ||
+            (interpolation === 'none' && !!passingValue && hasPassingValueInData)
           );
         }
 
@@ -1148,7 +1150,8 @@ const modules = {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const tooltipOpt = opt.tooltip;
-    const tooltipValueFormatter = typeof tooltipOpt?.formatter === 'function'
+    const tooltipValueFormatter =
+      typeof tooltipOpt?.formatter === 'function'
         ? tooltipOpt?.formatter
         : tooltipOpt?.formatter?.value;
 
@@ -1213,8 +1216,8 @@ const modules = {
       const series = this.seriesList[sId];
 
       if (series?.show) {
-        const hasData = series.data.find(data =>
-          (isHorizontal ? data?.y === hitItemData : data?.x === hitItemData),
+        const hasData = series.data.find((data) =>
+          isHorizontal ? data?.y === hitItemData : data?.x === hitItemData,
         );
 
         const formattedSeriesName = this.getFormattedTooltipLabel({
@@ -1329,10 +1332,10 @@ const modules = {
       case 'line': {
         result.dataIndex.splice(selectLabelOpt.limit);
 
-        result.label = result.dataIndex.map(i => this.data.labels[i]);
+        result.label = result.dataIndex.map((i) => this.data.labels[i]);
 
         const dataEntries = Object.entries(this.data.data);
-        result.data = result.dataIndex.map(labelIdx =>
+        result.data = result.dataIndex.map((labelIdx) =>
           Object.fromEntries(dataEntries.map(([sId, data]) => [sId, data[labelIdx]])),
         );
         break;
@@ -1350,7 +1353,7 @@ const modules = {
           targetAxisDirection = horizontal ? 'y' : 'x';
         }
 
-        result.label = result.dataIndex.map(i => this.data.labels[targetAxisDirection][i]);
+        result.label = result.dataIndex.map((i) => this.data.labels[targetAxisDirection][i]);
 
         const dataValues = Object.values(this.data.data)[0];
         result.data = dataValues.filter(({ x, y }) =>
@@ -1371,7 +1374,8 @@ const modules = {
    */
   regulateSelectedLabelInfo(labelIndex, targetAxis) {
     const option = this.options?.selectLabel ?? {};
-    const before = targetAxis === null || this.defaultSelectInfo?.targetAxis === targetAxis
+    const before =
+      targetAxis === null || this.defaultSelectInfo?.targetAxis === targetAxis
         ? { ...this.defaultSelectInfo, targetAxis }
         : { dataIndex: [], targetAxis };
 
@@ -1552,16 +1556,20 @@ const modules = {
     const yMinRatio = this.getRatioInRange(range.y1, range.y2, yep);
     const yMaxRatio = this.getRatioInRange(range.y1, range.y2, ysp);
 
-    const xMin = this.isMobile && this.boxOverflow?.x1
+    const xMin =
+      this.isMobile && this.boxOverflow?.x1
         ? Math.min(this.minMax.x[0].min, dataRangeX.graphMin)
         : Math.max(dataRangeX.graphMin + graphWidth * xMinRatio, dataRangeX.graphMin);
-    const xMax = this.isMobile && this.boxOverflow?.x2
+    const xMax =
+      this.isMobile && this.boxOverflow?.x2
         ? Math.max(this.minMax.x[0].max, dataRangeX.graphMax)
         : Math.min(dataRangeX.graphMin + graphWidth * xMaxRatio, dataRangeX.graphMax);
-    const yMin = this.isMobile && this.boxOverflow?.y2
+    const yMin =
+      this.isMobile && this.boxOverflow?.y2
         ? Math.min(this.minMax.y[0].min, dataRangeY.graphMin)
         : Math.max(dataRangeY.graphMin + graphHeight * (1 - yMinRatio), dataRangeY.graphMin);
-    const yMax = this.isMobile && this.boxOverflow?.y1
+    const yMax =
+      this.isMobile && this.boxOverflow?.y1
         ? Math.max(this.minMax.y[0].max, dataRangeY.graphMax)
         : Math.min(dataRangeY.graphMin + graphHeight * (1 - yMaxRatio), dataRangeY.graphMax);
 
@@ -1619,10 +1627,10 @@ const modules = {
    */
   isDeselectItem(hitInfo) {
     return (
-      this.options.selectItem.useDeselectItem
-      && hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex
-      && hitInfo?.sId === this.defaultSelectItemInfo?.seriesID
-      && !isNaN(hitInfo?.maxIndex)
+      this.options.selectItem.useDeselectItem &&
+      hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex &&
+      hitInfo?.sId === this.defaultSelectItemInfo?.seriesID &&
+      !isNaN(hitInfo?.maxIndex)
     );
   },
 
@@ -1646,13 +1654,13 @@ const modules = {
     const yAxisEndPoint = aPos[this.axesY[0].units.rectEnd];
 
     if (
-      inRange(offsetX, this.chartRect.x1, aPos.x1)
-      && inRange(offsetY, yAxisStartPoint, yAxisEndPoint)
+      inRange(offsetX, this.chartRect.x1, aPos.x1) &&
+      inRange(offsetY, yAxisStartPoint, yAxisEndPoint)
     ) {
       return 'yAxis';
     } else if (
-      inRange(offsetX, xAxisStartPoint, xAxisEndPoint)
-      && inRange(offsetY, aPos.y2, this.chartRect.y2)
+      inRange(offsetX, xAxisStartPoint, xAxisEndPoint) &&
+      inRange(offsetY, aPos.y2, this.chartRect.y2)
     ) {
       return 'xAxis';
     } else if (inRange(offsetX, aPos.x1, aPos.x2) && inRange(offsetY, aPos.y1, aPos.y2)) {
@@ -1664,9 +1672,9 @@ const modules = {
 
   isNotUseIndicator() {
     return (
-      this.options.type === 'pie'
-      || this.options.type === 'scatter'
-      || this.options.type === 'heatMap'
+      this.options.type === 'pie' ||
+      this.options.type === 'scatter' ||
+      this.options.type === 'heatMap'
     );
   },
 

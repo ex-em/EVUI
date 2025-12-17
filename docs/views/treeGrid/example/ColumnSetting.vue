@@ -39,7 +39,7 @@ export default {
     const gridSettingMenuItems = ref([
       {
         text: 'Menu1',
-        click: param => console.log(`[Menu1]: ${param}`),
+        click: (param) => console.log(`[Menu1]: ${param}`),
       },
       {
         text: 'Custom Column List',

@@ -57,8 +57,8 @@ export default {
       tooltip: {
         use: true,
         formatter: {
-          html: seriesList =>
-            `<div class="ev-chart-tooltip-custom">${seriesList.map(series => `<div>${series.name}-${series.index}: ${series.data.o}</div>`).join('')}</div>`,
+          html: (seriesList) =>
+            `<div class="ev-chart-tooltip-custom">${seriesList.map((series) => `<div>${series.name}-${series.index}: ${series.data.o}</div>`).join('')}</div>`,
         },
       },
     };

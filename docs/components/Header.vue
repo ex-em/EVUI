@@ -26,7 +26,7 @@ export default {
   setup(props, { emit }) {
     const theme = computed({
       get: () => props.modelValue,
-      set: value => emit('update:modelValue', value),
+      set: (value) => emit('update:modelValue', value),
     });
     const changeTheme = () => {
       theme.value = theme.value === 'light' ? 'dark' : 'light';

@@ -90,7 +90,8 @@ const modules = {
       this.clearOverlay();
 
       this.legendDragInfo.dragging = true;
-      this.legendDragInfo.isStart = start !== end ? targetDOM.className.includes('start') : this.legendDragInfo.isStart;
+      this.legendDragInfo.isStart =
+        start !== end ? targetDOM.className.includes('start') : this.legendDragInfo.isStart;
       targetDOM.classList.add('dragging');
       this.legendBoxDOM.addEventListener('mousemove', this.onLegendMouseMove, false);
       this.legendBoxDOM.addEventListener('mouseup', this.onLegendMouseUp, false);

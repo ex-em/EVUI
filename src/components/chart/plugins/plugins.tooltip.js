@@ -139,23 +139,26 @@ const modules = {
     const tooltipValue = label?.length > maxSeries.length ? label : maxSeries;
     const nw = Math.round(ctx.measureText(tooltipValue).width);
     const vw = Math.round(ctx.measureText(maxValue).width);
-    const expectedContentsWidth = nw + vw + boxPadding.l + boxPadding.r + seriesColorMarginRight + VALUE_MARGIN + SCROLL_WIDTH;
-    const contentsWidth = expectedContentsWidth > opt.maxWidth ? opt.maxWidth : expectedContentsWidth;
+    const expectedContentsWidth =
+      nw + vw + boxPadding.l + boxPadding.r + seriesColorMarginRight + VALUE_MARGIN + SCROLL_WIDTH;
+    const contentsWidth =
+      expectedContentsWidth > opt.maxWidth ? opt.maxWidth : expectedContentsWidth;
 
     // Calculate height of canvas El(tooltip body El) with wrapped line count
     let textLineCnt = opt.textOverflow === 'wrap' ? 0 : seriesLen;
 
     if (opt.textOverflow === 'wrap') {
-      const seriesNameSpaceWidth = opt.maxWidth
-        - (Math.round(ctx.measureText(maxValue).width)
-          + boxPadding.l
-          + boxPadding.r
-          + seriesColorMarginRight
-          + VALUE_MARGIN
-          + SCROLL_WIDTH);
+      const seriesNameSpaceWidth =
+        opt.maxWidth -
+        (Math.round(ctx.measureText(maxValue).width) +
+          boxPadding.l +
+          boxPadding.r +
+          seriesColorMarginRight +
+          VALUE_MARGIN +
+          SCROLL_WIDTH);
 
       // count wrap line
-      const seriesNames = Object.values(items).map(s => s.name);
+      const seriesNames = Object.values(items).map((s) => s.name);
       seriesNames.forEach((name) => {
         if (ctx.measureText(name).width > seriesNameSpaceWidth) {
           let line = '';
@@ -176,7 +179,8 @@ const modules = {
     }
 
     // Calculate height of canvas El(tooltip body El) with useScrollbar, maxHeight option
-    const expectedContentsHeight = boxPadding.t + textLineCnt * this.getTextHeight() + seriesLen * LINE_SPACING + boxPadding.b;
+    const expectedContentsHeight =
+      boxPadding.t + textLineCnt * this.getTextHeight() + seriesLen * LINE_SPACING + boxPadding.b;
 
     let contentsHeight;
     if (opt.useScrollbar && expectedContentsHeight > opt.maxHeight) {
@@ -202,16 +206,19 @@ const modules = {
     const bodyWidth = document.body.clientWidth;
     const bodyHeight = document.body.clientHeight;
     const distanceMouseAndTooltip = 20;
-    const tooltipDOMHeight = this.tooltipDOM?.offsetHeight
-      || this.tooltipHeaderDOM?.offsetHeight + contentsHeight + BODY_PADDING;
+    const tooltipDOMHeight =
+      this.tooltipDOM?.offsetHeight ||
+      this.tooltipHeaderDOM?.offsetHeight + contentsHeight + BODY_PADDING;
     const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
     const maximumPosY = bodyHeight - tooltipDOMHeight - distanceMouseAndTooltip;
     const expectedPosX = mouseX + distanceMouseAndTooltip;
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
     const reversedPosY = mouseY - tooltipDOMHeight - distanceMouseAndTooltip;
-    this.tooltipDOM.style.left = expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
-    this.tooltipDOM.style.top = expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
+    this.tooltipDOM.style.left =
+      expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
+    this.tooltipDOM.style.top =
+      expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
   },
 
   /**
@@ -344,16 +351,18 @@ const modules = {
       this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
       // 2. Draw series name
-      ctx.fillStyle = typeof opt.fontColor.label === 'function'
+      ctx.fillStyle =
+        typeof opt.fontColor.label === 'function'
           ? opt.fontColor.label(curTooltipInfo)
           : (opt.fontColor.label ?? opt.fontColor);
 
-      const seriesNameSpaceWidth = opt.maxWidth
-        - Math.round(ctx.measureText(maxValue).width)
-        - boxPadding.l
-        - boxPadding.r
-        - seriesColorMarginRight
-        - VALUE_MARGIN;
+      const seriesNameSpaceWidth =
+        opt.maxWidth -
+        Math.round(ctx.measureText(maxValue).width) -
+        boxPadding.l -
+        boxPadding.r -
+        seriesColorMarginRight -
+        VALUE_MARGIN;
       const xPos = itemX + seriesColorMarginRight;
       const yPos = itemY;
 
@@ -388,7 +397,8 @@ const modules = {
       ctx.save();
 
       // 3. Draw value
-      ctx.fillStyle = typeof opt.fontColor.value === 'function'
+      ctx.fillStyle =
+        typeof opt.fontColor.value === 'function'
           ? opt.fontColor.value(curTooltipInfo)
           : (opt.fontColor.value ?? opt.fontColor);
       ctx.textAlign = 'right';
@@ -490,7 +500,8 @@ const modules = {
     this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
     // 2. Draw value y names
-    ctx.fillStyle = typeof opt.fontColor.label === 'function'
+    ctx.fillStyle =
+      typeof opt.fontColor.label === 'function'
         ? opt.fontColor.label(curTooltipInfo)
         : (opt.fontColor.label ?? opt.fontColor);
 
@@ -504,7 +515,8 @@ const modules = {
 
     // 3. Draw value
     ctx.textAlign = 'right';
-    ctx.fillStyle = typeof opt.fontColor.value === 'function'
+    ctx.fillStyle =
+      typeof opt.fontColor.value === 'function'
         ? opt.fontColor.value(curTooltipInfo)
         : (opt.fontColor.value ?? opt.fontColor);
     ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
@@ -615,16 +627,18 @@ const modules = {
       this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
 
       // 2. Draw series name
-      ctx.fillStyle = typeof opt.fontColor.label === 'function'
+      ctx.fillStyle =
+        typeof opt.fontColor.label === 'function'
           ? opt.fontColor.label(curTooltipInfo)
           : (opt.fontColor.label ?? opt.fontColor);
 
-      const seriesNameSpaceWidth = opt.maxWidth
-        - Math.round(ctx.measureText(maxValue).width)
-        - boxPadding.l
-        - boxPadding.r
-        - seriesColorMarginRight
-        - VALUE_MARGIN;
+      const seriesNameSpaceWidth =
+        opt.maxWidth -
+        Math.round(ctx.measureText(maxValue).width) -
+        boxPadding.l -
+        boxPadding.r -
+        seriesColorMarginRight -
+        VALUE_MARGIN;
       const xPos = itemX + seriesColorMarginRight;
       const yPos = itemY;
 
@@ -660,7 +674,8 @@ const modules = {
 
       // 3. Draw value
       ctx.textAlign = 'right';
-      ctx.fillStyle = typeof opt.fontColor.value === 'function'
+      ctx.fillStyle =
+        typeof opt.fontColor.value === 'function'
           ? opt.fontColor.value(curTooltipInfo)
           : (opt.fontColor.value ?? opt.fontColor);
       ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
@@ -701,8 +716,10 @@ const modules = {
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
     const reversedPosY = mouseY - tooltipDOMSize?.height - distanceMouseAndTooltip;
-    this.tooltipDOM.style.left = expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
-    this.tooltipDOM.style.top = expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
+    this.tooltipDOM.style.left =
+      expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
+    this.tooltipDOM.style.top =
+      expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
   },
 
   /**
@@ -799,10 +816,10 @@ const modules = {
     const options = this.options;
 
     if (
-      offsetX >= graphPos.x1 - mouseXIp
-      && offsetX <= graphPos.x2 + mouseXIp
-      && offsetY >= graphPos.y1 - mouseYIp
-      && offsetY <= graphPos.y2 + mouseYIp
+      offsetX >= graphPos.x1 - mouseXIp &&
+      offsetX <= graphPos.x2 + mouseXIp &&
+      offsetY >= graphPos.y1 - mouseYIp &&
+      offsetY <= graphPos.y2 + mouseYIp
     ) {
       ctx.beginPath();
       ctx.save();
@@ -836,9 +853,9 @@ const modules = {
     const options = this.options;
 
     if (
-      options.syncHover === false
-      || (!options.horizontal && !options.axesX.every(({ type }) => type === 'time'))
-      || (options.horizontal && !options.axesY.every(({ type }) => type === 'time'))
+      options.syncHover === false ||
+      (!options.horizontal && !options.axesX.every(({ type }) => type === 'time')) ||
+      (options.horizontal && !options.axesY.every(({ type }) => type === 'time'))
     ) {
       return null;
     }
@@ -951,7 +968,7 @@ const modules = {
     }
 
     const matchingLabelIndex = this.data.labels.findIndex(
-      label => label?.valueOf() === dataLabel?.valueOf(),
+      (label) => label?.valueOf() === dataLabel?.valueOf(),
     );
     if (matchingLabelIndex === -1) {
       this.overlayClear();
@@ -960,7 +977,8 @@ const modules = {
 
     const { horizontal } = this.options;
     const { top, bottom, left, right } = this.chartDOM.getBoundingClientRect();
-    const isHoveredChart = inRange(mousePosition[0], left, right) && inRange(mousePosition[1], bottom, top);
+    const isHoveredChart =
+      inRange(mousePosition[0], left, right) && inRange(mousePosition[1], bottom, top);
     if (isHoveredChart) {
       return;
     }
@@ -980,7 +998,7 @@ const modules = {
     if (horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
       // CategoryMode인 경우 라벨들이 균등 간격으로 배치됨
-      const isCategoryMode = this.options.axesY?.some(axis => axis.categoryMode);
+      const isCategoryMode = this.options.axesY?.some((axis) => axis.categoryMode);
       const positionY = isCategoryMode
         ? graphPos.y1 + (chartHeight * (matchingLabelIndex + 0.5)) / labelsCount
         : graphPos.y1 + (chartHeight * matchingLabelIndex) / (labelsCount - 1);
@@ -988,7 +1006,7 @@ const modules = {
     } else {
       const chartWidth = graphPos.x2 - graphPos.x1;
       // CategoryMode인 경우 라벨들이 균등 간격으로 배치됨
-      const isCategoryMode = this.options.axesX?.some(axis => axis.categoryMode);
+      const isCategoryMode = this.options.axesX?.some((axis) => axis.categoryMode);
       const positionX = isCategoryMode
         ? graphPos.x1 + (chartWidth * (matchingLabelIndex + 0.5)) / labelsCount
         : graphPos.x1 + (chartWidth * matchingLabelIndex) / (labelsCount - 1);

@@ -186,33 +186,33 @@ export default {
         );
         if (Array.isArray(value)) {
           return value.every(
-            v =>
-              !!(!v || (v.length === 10 && dateReg.exec(v)))
-              || (v.length === 19 && dateTimeReg.exec(v)),
+            (v) =>
+              !!(!v || (v.length === 10 && dateReg.exec(v))) ||
+              (v.length === 19 && dateTimeReg.exec(v)),
           );
         }
         return !!(
-          !value
-          || (value.length === 10 && dateReg.exec(value))
-          || (value.length === 19 && dateTimeReg.exec(value))
+          !value ||
+          (value.length === 10 && dateReg.exec(value)) ||
+          (value.length === 19 && dateTimeReg.exec(value))
         );
       },
     },
     mode: {
       type: String,
       default: 'date',
-      validator: value =>
+      validator: (value) =>
         ['date', 'dateTime', 'dateMulti', 'dateRange', 'dateTimeRange'].indexOf(value) !== -1,
     },
     monthNotation: {
       type: String,
       default: 'fullName',
-      validator: value => ['fullName', 'abbrName', 'numberName', 'korName'].indexOf(value) !== -1,
+      validator: (value) => ['fullName', 'abbrName', 'numberName', 'korName'].indexOf(value) !== -1,
     },
     dayOfTheWeekNotation: {
       type: String,
       default: 'abbrUpperName',
-      validator: value =>
+      validator: (value) =>
         ['abbrUpperName', 'abbrLowerName', 'abbrPascalName', 'abbrKorName'].indexOf(value) !== -1,
     },
     options: {
@@ -223,13 +223,13 @@ export default {
       }),
       validator: ({ multiType, multiDayLimit, disabledDate, timeFormat }) => {
         const timeReg = new RegExp(/(HH|2[0-3]|[01][0-9]):(mm|[0-5][0-9]):(ss|[0-5][0-9])/);
-        return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
-          && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
-          && (disabledDate
+        return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true) &&
+          (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true) &&
+          (disabledDate
             ? typeof disabledDate === 'function' || Array.isArray(disabledDate)
-            : true)
-          && Array.isArray(timeFormat)
-          ? timeFormat.every(v => !!(!v || timeReg.exec(v)))
+            : true) &&
+          Array.isArray(timeFormat)
+          ? timeFormat.every((v) => !!(!v || timeReg.exec(v)))
           : !!(!timeFormat || timeReg.exec(timeFormat));
       },
     },

@@ -60,7 +60,7 @@ export default {
       'EvRadioGroupMv',
       computed({
         get: () => props.modelValue,
-        set: val => emit('update:modelValue', val),
+        set: (val) => emit('update:modelValue', val),
       }),
     );
 

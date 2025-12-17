@@ -224,15 +224,15 @@ export default {
     const expandColumnIdx = computed(() => {
       const columns = props.orderedColumns || [];
       const visibleExpandIdx = columns.findIndex(
-        column => column.expandColumn && !column.hide && !column.hiddenDisplay,
+        (column) => column.expandColumn && !column.hide && !column.hiddenDisplay,
       );
       if (visibleExpandIdx !== -1) {
         return visibleExpandIdx;
       }
-      const firstVisibleIdx = columns.findIndex(column => !column.hide && !column.hiddenDisplay);
+      const firstVisibleIdx = columns.findIndex((column) => !column.hide && !column.hiddenDisplay);
       return firstVisibleIdx !== -1 ? firstVisibleIdx : 0;
     });
-    const getRowClass = nodeInfo => ({
+    const getRowClass = (nodeInfo) => ({
       row: true,
       'tree-row': true,
       [`tree-row--level-${nodeInfo?.level}`]: true,

@@ -21,7 +21,7 @@ import {
   onUpdated,
 } from 'vue';
 import { cloneDeep, debounce, isEqual } from 'lodash-es';
-import resize from 'vue-resize-observer';
+import vResize from 'vue-resize-observer';
 import EvChart from '../chart/chart.core';
 import { useModel, useWrapper } from '../chart/uses';
 import EvChartBrush from './chartBrush.core';
@@ -30,7 +30,7 @@ import { useBrushModel } from './uses';
 export default {
   name: 'EvChartBrush',
   directives: {
-    resize,
+    resize: vResize,
   },
   props: {
     options: {
@@ -130,8 +130,8 @@ export default {
       () => injectBrushSeries.list,
       () => {
         if (
-          evChartBrushRef.value
-          && injectBrushSeries.chartIdx === evChartBrushOptions.value.chartIdx
+          evChartBrushRef.value &&
+          injectBrushSeries.chartIdx === evChartBrushOptions.value.chartIdx
         ) {
           evChart.seriesList = injectBrushSeries.list[evChartBrushOptions.value.chartIdx];
 
@@ -243,8 +243,8 @@ export default {
       () => [injectBrushIdx.start, injectBrushIdx.end],
       () => {
         if (
-          evChartBrushRef.value
-          && evChartBrushOptions.value.chartIdx <= injectEvChartClone.data?.length - 1
+          evChartBrushRef.value &&
+          evChartBrushOptions.value.chartIdx <= injectEvChartClone.data?.length - 1
         ) {
           drawChartBrush();
         }
@@ -308,7 +308,7 @@ export default {
      */
     const onResize = debounce(() => {
       if (evChart && 'resize' in evChart) {
-        const resize = new Promise(resolve => evChart.resize(resolve));
+        const resize = new Promise((resolve) => evChart.resize(resolve));
 
         resize.then((isResizeDone) => {
           if (isResizeDone) {

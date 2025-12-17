@@ -2,14 +2,14 @@ export const AXIS_UNITS = {
   x: {
     rectStart: 'x1',
     rectEnd: 'x2',
-    rectOffsetCounter: position => (position === 'top' ? 'y2' : 'y1'),
-    rectOffset: position => (position === 'top' ? 'y1' : 'y2'),
+    rectOffsetCounter: (position) => (position === 'top' ? 'y2' : 'y1'),
+    rectOffset: (position) => (position === 'top' ? 'y1' : 'y2'),
   },
   y: {
     rectStart: 'y2',
     rectEnd: 'y1',
-    rectOffsetCounter: position => (position === 'left' ? 'x2' : 'x1'),
-    rectOffset: position => (position === 'left' ? 'x1' : 'x2'),
+    rectOffsetCounter: (position) => (position === 'left' ? 'x2' : 'x1'),
+    rectOffset: (position) => (position === 'left' ? 'x1' : 'x2'),
   },
 };
 

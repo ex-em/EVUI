@@ -157,7 +157,8 @@ class Scatter {
   realTimeScatterDraw(param) {
     const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
-    const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
+    const pointStyle =
+      typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
     let totalCount = 0;
 
@@ -213,11 +214,11 @@ class Scatter {
    */
   findItemsInRange(data, xsp, ysp, xep, yep) {
     return data.filter(
-      seriesData =>
-        xsp - 1 <= seriesData.xp
-        && seriesData.xp <= xep + 1
-        && ysp - 1 <= seriesData.yp
-        && seriesData.yp <= yep + 1,
+      (seriesData) =>
+        xsp - 1 <= seriesData.xp &&
+        seriesData.xp <= xep + 1 &&
+        ysp - 1 <= seriesData.yp &&
+        seriesData.yp <= yep + 1,
     );
   }
 
@@ -321,10 +322,12 @@ class Scatter {
               const x = dataItem.xp;
               const y = dataItem.yp;
 
-              if ((x - pointSize <= xp)
-                && (xp <= x + pointSize)
-                && (y - pointSize <= yp)
-                && (yp <= y + pointSize)) {
+              if (
+                x - pointSize <= xp &&
+                xp <= x + pointSize &&
+                y - pointSize <= yp &&
+                yp <= y + pointSize
+              ) {
                 item.data = dataItem;
                 item.index = currentIndex;
                 item.hit = true;

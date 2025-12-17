@@ -38,8 +38,8 @@ class Line {
 
   useLinearInterpolation() {
     return (
-      this.interpolation === 'linear'
-      || (this.interpolation === 'none' && !!this.passingValue && this.hasPassingValueInData)
+      this.interpolation === 'linear' ||
+      (this.interpolation === 'none' && !!this.passingValue && this.hasPassingValueInData)
     );
   }
 
@@ -94,8 +94,8 @@ class Line {
       extent = this.extent.normal;
     }
 
-    const getOpacity = colorStr =>
-      (colorStr?.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity);
+    const getOpacity = (colorStr) =>
+      colorStr?.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity;
     const mainColor = this.color;
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
@@ -131,9 +131,9 @@ class Line {
     const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    const getXPos = val => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-    const getYPos = val => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-    const includeNegativeValue = this.data.some(data => data.o < 0);
+    const getXPos = (val) => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    const getYPos = (val) => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    const includeNegativeValue = this.data.some((data) => data.o < 0);
     const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
 
     // draw line
@@ -156,8 +156,8 @@ class Line {
       if (isLinearInterpolation && curr.o === null) {
         return;
       } else if (
-        (isNil(prevValid?.y) && !this.isExistGrp)
-        || (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))
+        (isNil(prevValid?.y) && !this.isExistGrp) ||
+        (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))
       ) {
         ctx.moveTo(x, y);
       } else {
@@ -202,18 +202,18 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map(item => item?.o);
+      const valueArray = this.data.map((item) => item?.o);
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
         if (
-          (isLinearInterpolation && isUndefined(valueArray[i]))
-          || (!isLinearInterpolation && isNil(valueArray[i]))
+          (isLinearInterpolation && isUndefined(valueArray[i])) ||
+          (!isLinearInterpolation && isNil(valueArray[i]))
         ) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
-              item => !isNil(item) && item !== null,
+              (item) => !isNil(item) && item !== null,
             );
             needFillDataIndexList.push([start, start + lastNormalValueIndex]);
             start = null;
@@ -268,7 +268,8 @@ class Line {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
-      const isLinearSingle = this.interpolation === 'linear' && this.data.filter(item => item.o !== null).length === 1;
+      const isLinearSingle =
+        this.interpolation === 'linear' && this.data.filter((item) => item.o !== null).length === 1;
 
       this.data.forEach((curr, ix) => {
         if (curr.xp === null || curr.yp === null || curr.o === null) {
@@ -278,7 +279,8 @@ class Line {
         const prevData = this.data[ix - 1]?.o;
         const nextData = this.data[ix + 1]?.o;
 
-        const isSingle = (!isLinearInterpolation && isNil(prevData) && isNil(nextData)) || isLinearSingle;
+        const isSingle =
+          (!isLinearInterpolation && isNil(prevData) && isNil(nextData)) || isLinearSingle;
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
@@ -333,7 +335,7 @@ class Line {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
+    const gdata = this.data.filter((data) => !Util.isNullOrUndefined(data.x));
     const isLinearInterpolation = this.useLinearInterpolation();
 
     if (gdata?.length) {
@@ -350,10 +352,10 @@ class Line {
           }
         }
       } else if (
-        typeof this.beforeFindItemIndex === 'number'
-        && this.beforeFindItemIndex !== -1
-        && this.show
-        && useSelectLabelOrItem
+        typeof this.beforeFindItemIndex === 'number' &&
+        this.beforeFindItemIndex !== -1 &&
+        this.show &&
+        useSelectLabelOrItem
       ) {
         item.data = gdata[this.beforeFindItemIndex];
         item.index = this.beforeFindItemIndex;
@@ -417,7 +419,7 @@ class Line {
         }
 
         // 이진 탐색 후 주변 포인트 추가 확인 (정확도 향상)
-        const foundIdx = validData.findIndex(p => p.originalIndex === closestIndex);
+        const foundIdx = validData.findIndex((p) => p.originalIndex === closestIndex);
         if (foundIdx !== -1) {
           // 앞뒤 2개씩 추가 확인
           for (
@@ -518,7 +520,7 @@ class Line {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data.filter(data => !Util.isNullOrUndefined(data.x));
+    const gdata = this.data.filter((data) => !Util.isNullOrUndefined(data.x));
 
     if (!gdata.length) {
       return item;
@@ -619,7 +621,7 @@ class Line {
   findItems({ xsp, width }) {
     const xep = xsp + width;
 
-    return this.data.filter(seriesData => xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1);
+    return this.data.filter((seriesData) => xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1);
   }
 }
 

@@ -37,10 +37,10 @@ export default {
       type: Array,
       default: () => [],
       validator: (list) => {
-        if (list.some(v => v.children !== undefined && !Array.isArray(v.children))) {
+        if (list.some((v) => v.children !== undefined && !Array.isArray(v.children))) {
           console.warn("[EVUI][ContextMenu] children attribute must be 'Array' type.");
           return false;
-        } else if (list.some(v => v.click !== undefined && typeof v.click !== 'function')) {
+        } else if (list.some((v) => v.click !== undefined && typeof v.click !== 'function')) {
           console.warn("[EVUI][ContextMenu] click attribute must be 'Function' type.");
           return false;
         }

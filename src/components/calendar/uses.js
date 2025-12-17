@@ -63,11 +63,11 @@ const getSideDateStr = (arr, sideDirection) => {
   if (!arr.length) return '';
   if (sideDirection === 'last') {
     return arr.reduce((prev, cur) =>
-      (new Date(prev).getTime() > new Date(cur).getTime() ? prev : cur),
+      new Date(prev).getTime() > new Date(cur).getTime() ? prev : cur,
     );
   }
   return arr.reduce((prev, cur) =>
-    (new Date(prev).getTime() < new Date(cur).getTime() ? prev : cur),
+    new Date(prev).getTime() < new Date(cur).getTime() ? prev : cur,
   );
 };
 
@@ -281,7 +281,7 @@ const compareFromAndToDateTime = (mode, calendarType, targetDate, modelValue) =>
  * @param dateStr
  * @returns {number}
  */
-const getDateMs = dateStr => new Date(`${dateStr}`).getTime();
+const getDateMs = (dateStr) => new Date(`${dateStr}`).getTime();
 
 /**
  * Calendar 년도 범위 구하기
@@ -292,7 +292,8 @@ const getYearRange = (currentYear) => {
   const multipleOf10 = 10 ** (currentYear.toString().length - 1);
   const quotient = Math.floor(currentYear / multipleOf10);
   const remainder = Math.floor(currentYear % (multipleOf10 * quotient));
-  const startYear = quotient * multipleOf10 + Math.floor(remainder / YEAR_CNT_IN_ONE_PAGE) * YEAR_CNT_IN_ONE_PAGE;
+  const startYear =
+    quotient * multipleOf10 + Math.floor(remainder / YEAR_CNT_IN_ONE_PAGE) * YEAR_CNT_IN_ONE_PAGE;
   const endYear = startYear + YEAR_CNT_IN_ONE_PAGE - 1;
   return {
     start: startYear,
@@ -306,7 +307,7 @@ export const useModel = () => {
 
   // 달력 list - 'dateRange | dateTimeRange' 모드인 경우 확장 달력 추가
   const calendarList = computed(() =>
-    (['dateRange', 'dateTimeRange'].includes(props.mode) ? ['main', 'expanded'] : ['main']),
+    ['dateRange', 'dateTimeRange'].includes(props.mode) ? ['main', 'expanded'] : ['main'],
   );
 
   /**
@@ -318,9 +319,9 @@ export const useModel = () => {
   let selectedValue;
   if (props.mode !== 'dateMulti' && props.mode !== 'dateRange' && props.mode !== 'dateTimeRange') {
     if (
-      props.modelValue
-      && ((props.modelValue.length === 10 && dateReg.exec(props.modelValue?.toString()))
-        || (props.modelValue.length === 19 && dateTimeReg.exec(props.modelValue?.toString())))
+      props.modelValue &&
+      ((props.modelValue.length === 10 && dateReg.exec(props.modelValue?.toString())) ||
+        (props.modelValue.length === 19 && dateTimeReg.exec(props.modelValue?.toString())))
     ) {
       if (props.mode === 'dateTime' && timeFormat) {
         const modelValue = getChangedValueByTimeFormat(timeFormat, props.modelValue);
@@ -332,9 +333,9 @@ export const useModel = () => {
       selectedValue = ref('');
     }
   } else if (
-    Array.isArray(props.modelValue)
-    && props.modelValue.every(
-      v => !v || (v.length === 10 && dateReg.exec(v)) || (v.length === 19 && dateTimeReg.exec(v)),
+    Array.isArray(props.modelValue) &&
+    props.modelValue.every(
+      (v) => !v || (v.length === 10 && dateReg.exec(v)) || (v.length === 19 && dateTimeReg.exec(v)),
     )
   ) {
     if (props.mode === 'dateTimeRange' && props.modelValue.length === 2 && timeFormat) {
@@ -356,9 +357,9 @@ export const useModel = () => {
     if (props.mode === 'date' && props.modelValue && typeof props.modelValue !== 'string') {
       console.warn("[EVUI][Calendar] When mode is 'date', v-model must be 'String' type.");
     } else if (
-      props.mode === 'dateTime'
-      && props.modelValue
-      && typeof props.modelValue !== 'string'
+      props.mode === 'dateTime' &&
+      props.modelValue &&
+      typeof props.modelValue !== 'string'
     ) {
       console.warn("[EVUI][Calendar] When mode is 'dateTime', v-model must be 'String' type.");
     } else if (props.mode === 'dateMulti' && props.modelValue && !Array.isArray(props.modelValue)) {
@@ -412,9 +413,9 @@ export const useModel = () => {
   // 'mode: dateRange || dateTimeRange', 인 경우 확장된 달력(연, 월) 페이징 정보
   let expandedCalendarPageInfo;
   if (
-    ['dateRange', 'dateTimeRange'].includes(props.mode)
-    && Array.isArray(selectedValue.value)
-    && selectedValue.value[1]
+    ['dateRange', 'dateTimeRange'].includes(props.mode) &&
+    Array.isArray(selectedValue.value) &&
+    selectedValue.value[1]
   ) {
     const expandedValue = selectedValue.value[1];
     expandedCalendarPageInfo = {
@@ -423,9 +424,12 @@ export const useModel = () => {
     };
 
     if (props.mode === 'dateTimeRange') {
-      expandedCalendarPageInfo.hour = Math.floor(getDateTimeInfoByType(expandedValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
-      expandedCalendarPageInfo.min = Math.floor(getDateTimeInfoByType(expandedValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
-      expandedCalendarPageInfo.sec = Math.floor(getDateTimeInfoByType(expandedValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
+      expandedCalendarPageInfo.hour =
+        Math.floor(getDateTimeInfoByType(expandedValue, 'hour') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
+      expandedCalendarPageInfo.min =
+        Math.floor(getDateTimeInfoByType(expandedValue, 'min') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
+      expandedCalendarPageInfo.sec =
+        Math.floor(getDateTimeInfoByType(expandedValue, 'sec') / CELL_CNT_IN_ONE_PAGE) + 1 || 1;
     }
   } else {
     expandedCalendarPageInfo = {
@@ -626,18 +630,22 @@ export const useCalendarDate = (param) => {
       const timeValue = modelValue?.split(' ')[1] ?? '';
 
       // range 모드인 경우 from 날짜가 to 날짜를 넘는지 확인 || 최소 날짜보다 이전 날짜인지 확인
-      const isInvalidDate = (isRangeMode
-          && !disabledDate
-          && compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value))
-        || +new Date(`${currDate} ${timeValue}`) < MIN_DATE_MS;
+      const isInvalidDate =
+        (isRangeMode &&
+          !disabledDate &&
+          compareFromAndToDateTime(props.mode, calendarType, currDate, selectedValue.value)) ||
+        +new Date(`${currDate} ${timeValue}`) < MIN_DATE_MS;
 
-      const isDisabled = (disabledDate && disabledDate(new Date(`${currDate} ${timeValue}`))) || isInvalidDate;
+      const isDisabled =
+        (disabledDate && disabledDate(new Date(`${currDate} ${timeValue}`))) || isInvalidDate;
 
       const index = +(calendarType !== 'main');
-      const isRangeSelected = isRangeMode
-        && selectedValue.value.length > index
-        && selectedValue.value?.[index]?.includes(currDate);
-      const isSelected = !isDisabled && (isRangeMode ? isRangeSelected : selectedValue.value?.includes(currDate));
+      const isRangeSelected =
+        isRangeMode &&
+        selectedValue.value.length > index &&
+        selectedValue.value?.[index]?.includes(currDate);
+      const isSelected =
+        !isDisabled && (isRangeMode ? isRangeSelected : selectedValue.value?.includes(currDate));
 
       // mode가 dateRange일 때는 이전, 다음달에 selected 를 하지 않는다.
       calendarTableInfo[calendarType][i][j] = {
@@ -700,7 +708,8 @@ export const useCalendarDate = (param) => {
     const disabledDate = props.options?.disabledDate;
     const mainTimeFormat = Array.isArray(timeFormat) ? timeFormat[0] : timeFormat;
     const expandedTimeFormat = Array.isArray(timeFormat) ? timeFormat[1] : '';
-    const mainDateTimeValue = props.mode === 'dateTimeRange' ? selectedValue.value[0] : selectedValue.value;
+    const mainDateTimeValue =
+      props.mode === 'dateTimeRange' ? selectedValue.value[0] : selectedValue.value;
     const expandedDateTimeValue = props.mode === 'dateTimeRange' ? selectedValue.value[1] : '';
     const mainDisabledDate = Array.isArray(disabledDate) ? disabledDate[0] : disabledDate;
     const expandedDisabledDate = Array.isArray(disabledDate) ? disabledDate[1] : disabledDate;
@@ -731,8 +740,8 @@ export const useCalendarDate = (param) => {
       }
 
       return (
-        !disabledDateFunc
-        && compareFromAndToDateTime(props.mode, calendarType, targetDateTimeValue, selectedValue.value)
+        !disabledDateFunc &&
+        compareFromAndToDateTime(props.mode, calendarType, targetDateTimeValue, selectedValue.value)
       );
     };
 
@@ -743,10 +752,12 @@ export const useCalendarDate = (param) => {
       } else if (v === 'min') {
         cnt = MIN_CNT;
       }
-      const mainTimeValue = mainDateTimeValue && mainDateTimeValue.length > 0
+      const mainTimeValue =
+        mainDateTimeValue && mainDateTimeValue.length > 0
           ? getTimeInfoByTimeFormat(mainTimeFormat, mainDateTimeValue, v)
           : -1;
-      const expandedTimeValue = expandedDateTimeValue && expandedDateTimeValue.length > 0
+      const expandedTimeValue =
+        expandedDateTimeValue && expandedDateTimeValue.length > 0
           ? getTimeInfoByTimeFormat(expandedTimeFormat, expandedDateTimeValue, v)
           : -1;
       for (let i = 0; i < cnt; i++) {
@@ -993,7 +1004,7 @@ export const useEvent = (param) => {
     const CURR_DATE_STR = formatDateTime({ year, month, date });
     const isExistCurrDate = props.modelValue
       ? (Array.isArray(props.modelValue)
-          ? props.modelValue?.map(v => v.split(' ')[0])
+          ? (props.modelValue?.map((v) => v?.split(' ')[0]) ?? [])
           : props.modelValue.split(' ')[0]
         ).includes(CURR_DATE_STR)
       : false;
@@ -1006,9 +1017,9 @@ export const useEvent = (param) => {
     if (disabledDate && disabledDate(new Date(CURR_DATE_STR)) && !isExistCurrDate) {
       return;
     } else if (
-      !disabledDate
-      && ['dateRange', 'dateTimeRange'].includes(props.mode)
-      && compareFromAndToDateTime(props.mode, calendarType, CURR_DATE_STR, selectedValue.value)
+      !disabledDate &&
+      ['dateRange', 'dateTimeRange'].includes(props.mode) &&
+      compareFromAndToDateTime(props.mode, calendarType, CURR_DATE_STR, selectedValue.value)
     ) {
       return;
     }
@@ -1181,7 +1192,8 @@ export const useEvent = (param) => {
     const currPage = pageInfo[timeType] - 1;
     const currRowIdx = i - 1;
     const currColIdx = j - 1;
-    const clickedNum = currPage * CELL_CNT_IN_ONE_PAGE + currRowIdx * CELL_CNT_IN_ONE_ROW + currColIdx;
+    const clickedNum =
+      currPage * CELL_CNT_IN_ONE_PAGE + currRowIdx * CELL_CNT_IN_ONE_ROW + currColIdx;
 
     if (timeInfo[timeType][clickedNum]?.isDisabled) {
       return;
@@ -1220,8 +1232,8 @@ export const useEvent = (param) => {
         START_IDX = SEC_START_IDX;
       }
       return (
-        `${targetValue?.substr(0, START_IDX)}`
-        + `${lpadToTwoDigits(clickedNum)}${targetValue?.substr(START_IDX + REPLACE_TEXT_SIZE)}`
+        `${targetValue?.substr(0, START_IDX)}` +
+        `${lpadToTwoDigits(clickedNum)}${targetValue?.substr(START_IDX + REPLACE_TEXT_SIZE)}`
       );
     };
 
@@ -1357,27 +1369,27 @@ export const useEvent = (param) => {
       }
 
       if (
-        currValue[0]
-        && currValue[0] !== fromDate
-        && disabledFromDate
-        && disabledFromDate(new Date(currValue[0]))
+        currValue[0] &&
+        currValue[0] !== fromDate &&
+        disabledFromDate &&
+        disabledFromDate(new Date(currValue[0]))
       ) {
         return true;
       } else if (
-        currValue[1]
-        && currValue[1] !== toDate
-        && disabledToDate
-        && disabledToDate(new Date(currValue[1]))
+        currValue[1] &&
+        currValue[1] !== toDate &&
+        disabledToDate &&
+        disabledToDate(new Date(currValue[1]))
       ) {
         return true;
       } else if (
-        !disabledDate
-        && compareFromAndToDateTime(props.mode, 'main', currValue[0], currValue)
+        !disabledDate &&
+        compareFromAndToDateTime(props.mode, 'main', currValue[0], currValue)
       ) {
         return true;
       }
     } else if (props.mode === 'dateMulti') {
-      return currValue.some(value => disabledDate && disabledDate(new Date(value)));
+      return currValue.some((value) => disabledDate && disabledDate(new Date(value)));
     } else if (disabledDate && disabledDate(new Date(currValue))) {
       return true;
     }

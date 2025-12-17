@@ -26,7 +26,7 @@ export default {
   setup(props, { emit }) {
     const mv = computed({
       get: () => props.modelValue,
-      set: labels => emit('update:modelValue', labels),
+      set: (labels) => emit('update:modelValue', labels),
     });
     provide('EvCheckboxGroupMv', mv);
 

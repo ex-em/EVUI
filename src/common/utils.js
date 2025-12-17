@@ -143,7 +143,7 @@ export function checkNullAndUndefined(value) {
  */
 export function mobileCheck() {
   return (
-    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    || 'ontouchstart' in window
+    /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+    'ontouchstart' in window
   );
 }

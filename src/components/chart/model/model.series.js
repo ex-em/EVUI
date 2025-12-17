@@ -44,7 +44,7 @@ const modules = {
       const isOverlappingBar = type === 'bar' && allGroups.length;
 
       if (isOverlappingBar) {
-        const overlappingIdx = allGroups.findIndex(group => group === key);
+        const overlappingIdx = allGroups.findIndex((group) => group === key);
         barSeries.push({ key, overlappingIdx });
       } else {
         otherSeries.push({ key });

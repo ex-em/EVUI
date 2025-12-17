@@ -38,7 +38,7 @@ export default {
     htmlType: {
       type: String,
       default: 'button',
-      validator: val => ['button', 'submit', 'reset'].includes(val),
+      validator: (val) => ['button', 'submit', 'reset'].includes(val),
     },
     shape: {
       type: String,

@@ -55,9 +55,9 @@ export const useModel = () => {
   let currentValue;
   if (['dateTimeRange', 'dateTime'].includes(props.mode) && timeFormat) {
     if (
-      props.mode === 'dateTimeRange'
-      && Array.isArray(props.modelValue)
-      && props.modelValue.length === 2
+      props.mode === 'dateTimeRange' &&
+      Array.isArray(props.modelValue) &&
+      props.modelValue.length === 2
     ) {
       const [fromDate, toDate] = props.modelValue;
       const [fromTimeFormat, toTimeFormat] = timeFormat;
@@ -81,8 +81,8 @@ export const useModel = () => {
    * @param curr
    */
   const validateValue = (curr) => {
-    const dateRule = targetDate => !!(targetDate.length === 10 && dateReg.exec(targetDate));
-    const dateTimeRule = targetDate =>
+    const dateRule = (targetDate) => !!(targetDate.length === 10 && dateReg.exec(targetDate));
+    const dateTimeRule = (targetDate) =>
       !!(targetDate.length === 19 && dateTimeReg.exec(targetDate));
     const checkValidDate = (targetDate) => {
       const dateValue = targetDate.split(' ')[0];
@@ -99,9 +99,9 @@ export const useModel = () => {
     } else if (props.mode === 'dateTime') {
       isValid = dateTimeRule(curr) && checkValidDate(curr);
     } else if (props.mode === 'dateRange') {
-      isValid = curr.every(value => dateRule(value) && checkValidDate(value));
+      isValid = curr.every((value) => dateRule(value) && checkValidDate(value));
     } else if (props.mode === 'dateTimeRange') {
-      isValid = curr.every(value => dateTimeRule(value) && checkValidDate(value));
+      isValid = curr.every((value) => dateTimeRule(value) && checkValidDate(value));
     }
 
     if (isValid) {
@@ -267,7 +267,7 @@ export const useShortcuts = (param) => {
    * active 되어있는 shortcut 제거
    */
   const clearShortcuts = () => {
-    const targetShortcut = usedShortcuts.find(shortcut => shortcut.isActive);
+    const targetShortcut = usedShortcuts.find((shortcut) => shortcut.isActive);
     if (targetShortcut) {
       targetShortcut.isActive = false;
     }
@@ -278,7 +278,7 @@ export const useShortcuts = (param) => {
    * @param targetKey
    */
   const activeShortcut = (targetKey) => {
-    const targetShortcut = usedShortcuts.find(shortcut => shortcut.key === targetKey);
+    const targetShortcut = usedShortcuts.find((shortcut) => shortcut.key === targetKey);
     if (targetShortcut) {
       targetShortcut.isActive = true;
     }
@@ -334,10 +334,10 @@ export const useShortcuts = (param) => {
     const isRange = ['dateRange', 'dateTimeRange'].includes(props.mode);
 
     if (
-      !usedShortcuts.length
-      || (props.mode === 'dateMulti' && props.options?.multiType !== 'date')
-      || (isRange && !mv.value.length)
-      || (!isRange && !mv.value)
+      !usedShortcuts.length ||
+      (props.mode === 'dateMulti' && props.options?.multiType !== 'date') ||
+      (isRange && !mv.value.length) ||
+      (!isRange && !mv.value)
     ) {
       return;
     }
@@ -418,7 +418,8 @@ export const useShortcuts = (param) => {
       }
     } else {
       const sDate = shortcutDate();
-      mv.value = props.mode === 'dateTime'
+      mv.value =
+        props.mode === 'dateTime'
           ? getChangedValueByTimeFormat(timeFormat, formatDateTime(sDate))
           : formatDate(sDate);
     }
@@ -432,9 +433,9 @@ export const useShortcuts = (param) => {
     (curr) => {
       setActiveShortcut();
       if (
-        props.mode === 'dateMulti'
-        && props?.options?.multiType === 'date'
-        && props?.options?.multiDayLimit > curr.length
+        props.mode === 'dateMulti' &&
+        props?.options?.multiType === 'date' &&
+        props?.options?.multiDayLimit > curr.length
       ) {
         return;
       } else if (props.mode === 'dateRange' || props.mode === 'dateTimeRange') {

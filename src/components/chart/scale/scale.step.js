@@ -85,7 +85,7 @@ class StepScale extends Scale {
     const oriSteps = maxIndex - minIndex + 1;
     let indexInterval = 1;
 
-    const isNumbersArray = this.labels.every(label => !isNaN(label));
+    const isNumbersArray = this.labels.every((label) => !isNaN(label));
     if (this.labelStyle.alignToGridLine && isNumbersArray) {
       indexInterval = this.getIndexInterval(range);
     }
@@ -195,11 +195,12 @@ class StepScale extends Scale {
           targetAxis = horizontal ? 'y' : 'x';
         }
 
-        const isBlurredLabel = selectLabelOpt?.use
-          && selectLabelOpt?.useLabelOpacity
-          && targetAxis === this.type
-          && selectedLabelInfo?.dataIndex?.length
-          && !selectedLabelInfo?.dataIndex?.includes(labelIndex);
+        const isBlurredLabel =
+          selectLabelOpt?.use &&
+          selectLabelOpt?.useLabelOpacity &&
+          targetAxis === this.type &&
+          selectedLabelInfo?.dataIndex?.length &&
+          !selectedLabelInfo?.dataIndex?.includes(labelIndex);
 
         const labelColor = this.labelStyle.color;
         let defaultOpacity = 1;
@@ -282,9 +283,9 @@ class StepScale extends Scale {
         const cellInterval = bnMinus(+labels[1], +labels[0]);
         const lastLabelValue = bnPlus(+labels[labels.length - 1], cellInterval);
         if (
-          isNaN(lastLabelValue)
-          || (indexInterval !== 1
-            && bnMinus(lastLabelValue, drawnLabels[drawnLabels.length - 1]) <= cellInterval)
+          isNaN(lastLabelValue) ||
+          (indexInterval !== 1 &&
+            bnMinus(lastLabelValue, drawnLabels[drawnLabels.length - 1]) <= cellInterval)
         ) {
           return;
         }
@@ -429,10 +430,7 @@ class StepScale extends Scale {
     return (notFormattedLabels ?? []).reduce((max, label) => {
       // ellipsis가 적용된 label의 width를 계산
       const formattedLabel = this.getLabelFormat(label, maxWidth);
-      const width = Util.calcTextSizeCanvas(
-        formattedLabel,
-        labelStyle,
-      )?.width ?? 0;
+      const width = Util.calcTextSizeCanvas(formattedLabel, labelStyle)?.width ?? 0;
 
       return Math.max(max, width);
     }, 0);

@@ -97,7 +97,7 @@ export default {
   setup(props, { emit }) {
     const isShowColumnSetting = computed({
       get: () => props.isShow,
-      set: val => emit('update:isShow', val),
+      set: (val) => emit('update:isShow', val),
     });
 
     const columnSettingWrapper = ref(null);
@@ -108,7 +108,7 @@ export default {
     const searchColumnList = ref([]);
     const applyColumnList = ref([]);
     const columnList = computed(() =>
-      (isSearch.value ? searchColumnList.value : originColumnList.value),
+      isSearch.value ? searchColumnList.value : originColumnList.value,
     );
     const isDisabled = computed(() => !columnList.value.length);
     let timer = null;
@@ -119,7 +119,7 @@ export default {
     });
     const computedIsShowMenuOnClick = computed({
       get: () => props.isShowMenuOnClick,
-      set: val => emit('update:isShowMenuOnClick', val),
+      set: (val) => emit('update:isShowMenuOnClick', val),
     });
 
     const onCheckColumn = (columns) => {
@@ -163,15 +163,15 @@ export default {
     const initValue = () => {
       const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
 
-      checkColumnGroup.value = columns.filter(col => col.originChecked).map(col => col.text);
+      checkColumnGroup.value = columns.filter((col) => col.originChecked).map((col) => col.text);
 
       initSearchValue();
     };
     const onApplyColumn = () => {
-      applyColumnList.value = originColumnList.value.filter(col =>
+      applyColumnList.value = originColumnList.value.filter((col) =>
         checkColumnGroup.value.includes(col.text),
       );
-      const checkedColumns = applyColumnList.value.map(col => col.text);
+      const checkedColumns = applyColumnList.value.map((col) => col.text);
 
       emit('apply-column', checkedColumns);
       isShowColumnSetting.value = false;
@@ -183,14 +183,15 @@ export default {
     const setColumns = () => {
       prevCheckColumnGroup.value = cloneDeep(checkColumnGroup.value);
       originColumnList.value = props.columns
-        .filter(col => !col.hide && col.caption)
+        .filter((col) => !col.hide && col.caption)
         .map((col) => {
-          const prevColumn = prevColumns.value?.find(c => c.field === col.field);
+          const prevColumn = prevColumns.value?.find((c) => c.field === col.field);
           let isChecked = false;
 
           if (prevColumn) {
             const isHiddenChanged = prevColumn?.hiddenDisplay !== col?.hiddenDisplay;
-            isChecked = isHiddenChanged || !prevCheckColumnGroup.value?.length
+            isChecked =
+              isHiddenChanged || !prevCheckColumnGroup.value?.length
                 ? !col?.hiddenDisplay
                 : prevCheckColumnGroup.value.includes(col.field);
           } else {
@@ -206,8 +207,8 @@ export default {
         });
 
       checkColumnGroup.value = originColumnList.value
-        .filter(col => col.checked)
-        .map(col => col.text);
+        .filter((col) => col.checked)
+        .map((col) => col.text);
       applyColumnList.value.length = 0;
       prevColumns.value = cloneDeep(props.columns);
     };
@@ -279,11 +280,11 @@ export default {
       () => props.hiddenColumn,
       (value) => {
         const filterColumns = applyColumnList.value.length
-          ? applyColumnList.value.filter(col => col.text !== value)
-          : originColumnList.value.filter(col => col.text !== value && col.checked);
+          ? applyColumnList.value.filter((col) => col.text !== value)
+          : originColumnList.value.filter((col) => col.text !== value && col.checked);
 
         applyColumnList.value = filterColumns;
-        checkColumnGroup.value = filterColumns.map(col => col.text);
+        checkColumnGroup.value = filterColumns.map((col) => col.text);
       },
     );
 

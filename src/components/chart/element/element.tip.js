@@ -27,7 +27,8 @@ const modules = {
     }
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
-      isExistSelectedLabel = opt.type === 'heatMap' ? this.drawLabelTipForHeatMap() : this.drawTipForSelectedLabel();
+      isExistSelectedLabel =
+        opt.type === 'heatMap' ? this.drawLabelTipForHeatMap() : this.drawTipForSelectedLabel();
     }
 
     const executeDrawIndicator = (tipOpt) => {
@@ -52,7 +53,8 @@ const modules = {
               if (tipOpt.tipText === 'label') {
                 const axisOpt = isHorizontal ? opt.axesY[0] : opt.axesX[0];
                 const label = selArgs.label;
-                selArgs.text = axisOpt.type === 'time' ? dayjs(label).format(axisOpt.timeFormat) : label;
+                selArgs.text =
+                  axisOpt.type === 'time' ? dayjs(label).format(axisOpt.timeFormat) : label;
               } else {
                 selArgs.text = numberWithComma(selArgs.value);
               }
@@ -175,7 +177,8 @@ const modules = {
         value = lastTip.value;
         label = lastTip.label;
       } else if (lastTip.pos !== null) {
-        const item = type === 'bar' ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
+        const item =
+          type === 'bar' ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
 
         value = item.useStack ? item.acc : item.value;
         label = item.label;
@@ -313,9 +316,9 @@ const modules = {
       offset *= isHorizontal ? 1 : -1;
 
       const seriesList = Object.keys(this.seriesList ?? {});
-      const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
+      const visibleSeries = seriesList.filter((sId) => this.seriesList[sId].show);
       const isExistGrp = seriesList.some(
-        sId => this.seriesList[sId].isExistGrp && !this.seriesList[sId].isOverlapping,
+        (sId) => this.seriesList[sId].isExistGrp && !this.seriesList[sId].isOverlapping,
       );
       const groups = this.data.groups?.[0] ?? [];
 
@@ -338,8 +341,8 @@ const modules = {
           const [min, max] = range;
           if (truthyNumber(min) && truthyNumber(max)) {
             labelCount = Math.floor((+max - +min) / interval) + 1;
-            startIndex = type === 'step' ? min : labelAxes.labels.findIndex(v => v === +min);
-            endIndex = type === 'step' ? max : labelAxes.labels.findIndex(v => v === +max);
+            startIndex = type === 'step' ? min : labelAxes.labels.findIndex((v) => v === +min);
+            endIndex = type === 'step' ? max : labelAxes.labels.findIndex((v) => v === +max);
           }
         }
 
@@ -348,7 +351,7 @@ const modules = {
         labelGap = (labelEndPoint - labelStartPoint) / labelCount;
       } else {
         graphX = this.axesSteps.x[0];
-        lineSeries = seriesList.find(sId => this.seriesList[sId]?.type === 'line');
+        lineSeries = seriesList.find((sId) => this.seriesList[sId]?.type === 'line');
         sizeObj = this.seriesList[lineSeries].size;
       }
 
@@ -359,29 +362,33 @@ const modules = {
           if (isExistGrp) {
             const positiveSum = visibleSeries?.reduce(
               (ac, sId) =>
-                (groups.includes(sId) && (selectedData[sId]?.value ?? selectedData[sId]) > 0
+                groups.includes(sId) && (selectedData[sId]?.value ?? selectedData[sId]) > 0
                   ? ac + (selectedData[sId]?.value ?? selectedData[sId])
-                  : ac),
+                  : ac,
               0,
             );
 
-            const nonGroupValues = visibleSeries
-                ?.filter(sId => !groups.includes(sId))
-                ?.map(sId => selectedData[sId]?.value ?? selectedData[sId]) ?? [];
+            const nonGroupValues =
+              visibleSeries
+                ?.filter((sId) => !groups.includes(sId))
+                ?.map((sId) => selectedData[sId]?.value ?? selectedData[sId]) ?? [];
 
-            const maxNonGroupValue = nonGroupValues?.length > 0
+            const maxNonGroupValue =
+              nonGroupValues?.length > 0
                 ? nonGroupValues.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
                 : -Infinity;
 
-            value = positiveSum > 0
+            value =
+              positiveSum > 0
                 ? Math.max(maxNonGroupValue, positiveSum)
                 : Math.max(maxNonGroupValue, 0);
           } else if (visibleSeries.length) {
             const visibleValue = visibleSeries.map(
-              sId => selectedData[sId]?.value ?? selectedData[sId],
+              (sId) => selectedData[sId]?.value ?? selectedData[sId],
             );
 
-            const maxValue = visibleValue.length > 0
+            const maxValue =
+              visibleValue.length > 0
                 ? visibleValue.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
                 : -Infinity;
 
@@ -407,7 +414,8 @@ const modules = {
           );
         }
 
-        dataPos = valuePositionCalcFunction(
+        dataPos =
+          valuePositionCalcFunction(
             value,
             valueAxesSteps.graphMin,
             valueAxesSteps.graphMax,
@@ -576,7 +584,8 @@ const modules = {
    */
   showTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
-    const { type, width, height, x, y, arrowSize, borderRadius, text, opt, textStyle, isNegative } = param;
+    const { type, width, height, x, y, arrowSize, borderRadius, text, opt, textStyle, isNegative } =
+      param;
 
     const ctx = param.context;
 

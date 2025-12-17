@@ -38,10 +38,12 @@ export default {
 
     const noneWhiteSpaceColorStr = colorStr.replace(/ /g, '');
     const isHEX = /^#(?:[A-Fa-f0-9]{3}){1,2}$/.exec(noneWhiteSpaceColorStr);
-    const isRGB = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(
+    const isRGB =
+      /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(
         noneWhiteSpaceColorStr,
       );
-    const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1?)\s*[)]$/.exec(
+    const isRGBA =
+      /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1?)\s*[)]$/.exec(
         noneWhiteSpaceColorStr,
       );
     let result = '';
@@ -231,25 +233,25 @@ export default {
    * @param {string} fontStyle    text font style
    * @returns {{width: number; height: number;}} text size information
    */
-    calcTextSizeCanvas(text, fontStyle) {
-      if (!text) {
-        return { width: 2, height: 2 };
-      }
-  
-      textMeasureCtx.font = fontStyle;
-      const metrics = textMeasureCtx.measureText(text);
-  
-      const fontSizeMatch = fontStyle.match(/(\d+(?:\.\d+)?)px/);
-      const fontSize = fontSizeMatch ? Number(fontSizeMatch[1]) : 14;
-  
-      // DOM 기본 line-height 보정 (대략 1.2 ~ 1.3)
-      const lineHeight = fontSize * 1.2;
-  
-      return {
-        width: Math.max(Math.ceil(metrics.width), 2),
-        height: Math.max(Math.ceil(lineHeight), 2),
-      };
-    },
+  calcTextSizeCanvas(text, fontStyle) {
+    if (!text) {
+      return { width: 2, height: 2 };
+    }
+
+    textMeasureCtx.font = fontStyle;
+    const metrics = textMeasureCtx.measureText(text);
+
+    const fontSizeMatch = fontStyle.match(/(\d+(?:\.\d+)?)px/);
+    const fontSize = fontSizeMatch ? Number(fontSizeMatch[1]) : 14;
+
+    // DOM 기본 line-height 보정 (대략 1.2 ~ 1.3)
+    const lineHeight = fontSize * 1.2;
+
+    return {
+      width: Math.max(Math.ceil(metrics.width), 2),
+      height: Math.max(Math.ceil(lineHeight), 2),
+    };
+  },
 
   /**
    * Comparing strings
@@ -317,7 +319,8 @@ export default {
    * @returns {undefined}
    */
   showLabelTip(param) {
-    const { ctx, width, height, x, y, arrowSize, borderRadius, text, backgroundColor, textColor } = param;
+    const { ctx, width, height, x, y, arrowSize, borderRadius, text, backgroundColor, textColor } =
+      param;
     const sx = x - width / 2;
     const ex = x + width / 2;
     const sy = y - height;

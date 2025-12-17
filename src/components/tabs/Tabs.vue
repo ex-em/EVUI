@@ -82,13 +82,13 @@ export default {
       type: Array,
       default: () => [],
       validator: (list) => {
-        const valueList = list.map(v => v.value);
+        const valueList = list.map((v) => v.value);
         const setList = [...new Set(valueList)];
         if (list.length !== setList.length) {
           console.warn("[EVUI][Tabs] TabPanel 'value' attribute is duplicate values.");
           return false;
         }
-        if (!list.every(v => Object.hasOwnProperty.call(v, 'value'))) {
+        if (!list.every((v) => Object.hasOwnProperty.call(v, 'value'))) {
           console.warn("[EVUI][Tabs] TabPanel 'value' attribute is essential.");
           return false;
         }
@@ -131,7 +131,7 @@ export default {
 
     const tabList = computed({
       get: () => props.panels,
-      set: val => emit('update:panels', val),
+      set: (val) => emit('update:panels', val),
     });
     const computedTabList = computed(() => {
       if (!props.draggable) {
@@ -142,7 +142,7 @@ export default {
       }
       return tabCloneList.value;
     });
-    const tabElValueList = tabList.value.map(v => v.value);
+    const tabElValueList = tabList.value.map((v) => v.value);
 
     const listWrapperRef = ref(null);
     const listRef = ref(null);
@@ -181,14 +181,14 @@ export default {
         let shortList;
         if (tabElValueList.length > tabList.value.length) {
           longList = tabElValueList;
-          shortList = tabList.value.map(v => v.value);
+          shortList = tabList.value.map((v) => v.value);
         } else {
-          longList = tabList.value.map(v => v.value);
+          longList = tabList.value.map((v) => v.value);
           shortList = tabElValueList;
         }
-        const removeValue = longList.filter(v => !shortList.includes(v))[0];
+        const removeValue = longList.filter((v) => !shortList.includes(v))[0];
         if (mv.value === removeValue) {
-          const selectedIdx = tabElValueList.findIndex(v => v === removeValue);
+          const selectedIdx = tabElValueList.findIndex((v) => v === removeValue);
           if (selectedIdx === 0) {
             mv.value = tabList.value[0].value;
           } else {
@@ -212,7 +212,7 @@ export default {
       if (tabList.value.length < 2) {
         return;
       }
-      const selectedIdx = tabList.value.findIndex(v => v.value === val);
+      const selectedIdx = tabList.value.findIndex((v) => v.value === val);
       if (selectedIdx < 0) {
         mv.value = tabList.value[0].value;
         return;
@@ -266,12 +266,12 @@ export default {
      * @param val
      * @returns {boolean|boolean}
      */
-    const dragSelectCls = val => props.draggable && dragObj.item?.value === val;
+    const dragSelectCls = (val) => props.draggable && dragObj.item?.value === val;
 
     /**
      *  드래그하기위해 선택한 li의 idx 여부 클래스
      */
-    const selectIdxCls = idx => props.draggable && dragObj.idx === idx;
+    const selectIdxCls = (idx) => props.draggable && dragObj.idx === idx;
 
     /**
      * 탭 드래그 시작 메소드, isDragState모드 시작
@@ -295,8 +295,8 @@ export default {
       if (!props.draggable || dragObj.item?.value === val) {
         return;
       }
-      const dragValueIdx = tabCloneList.value.findIndex(v => v.value === dragObj.item?.value);
-      const targetValueIdx = tabCloneList.value.findIndex(v => v.value === val);
+      const dragValueIdx = tabCloneList.value.findIndex((v) => v.value === dragObj.item?.value);
+      const targetValueIdx = tabCloneList.value.findIndex((v) => v.value === val);
       tabCloneList.value.splice(dragValueIdx, 1);
       tabCloneList.value.splice(targetValueIdx, 0, dragObj.item);
     };
@@ -358,12 +358,14 @@ export default {
         .text {
           transform: translateX(-5px);
         }
+
         .close-icon {
           opacity: 1;
         }
       }
     }
   }
+
   @include state('stretch') {
     .ev-tabs-title {
       width: 100%;
@@ -383,6 +385,7 @@ export default {
     user-select: none;
     overflow: hidden;
   }
+
   .ev-tabs-list {
     display: flex;
     float: left;
@@ -396,6 +399,7 @@ export default {
       border: 1px solid evThemed('border-base');
     }
   }
+
   .ev-tabs-title {
     position: relative;
     width: 100px;
@@ -407,16 +411,19 @@ export default {
     @include evThemify() {
       background-color: evThemed('background-lighten');
     }
+
     &:not(:first-child) {
       @include evThemify() {
         border-left: 1px solid evThemed('border-base');
       }
     }
+
     &:not(.select-idx):hover {
       @include evThemify() {
         color: evThemed('primary');
       }
     }
+
     &.active {
       background-color: transparent;
 
@@ -425,9 +432,11 @@ export default {
         color: evThemed('primary');
       }
     }
+
     &.has-icon {
       padding-left: 32px;
     }
+
     &.drag-select {
       @include evThemify() {
         background-color: rgba(evThemed('background-base'), 0.3);
@@ -439,6 +448,7 @@ export default {
 
       @include shortening();
     }
+
     .close-icon {
       position: absolute;
       top: 50%;
@@ -449,6 +459,7 @@ export default {
       transition: opacity $animate-base;
     }
   }
+
   .ev-tabs-icon {
     position: absolute;
     left: 10px;
@@ -484,9 +495,11 @@ export default {
           color: evThemed('primary');
         }
       }
+
       &.prev {
         left: 0;
       }
+
       &.next {
         right: 0;
       }

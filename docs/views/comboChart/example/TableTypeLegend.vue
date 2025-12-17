@@ -190,12 +190,12 @@ export default {
             avg: {
               use: useAvg,
               decimalPoint: 4,
-              formatter: value => `${value.toFixed(0)}`,
+              formatter: (value) => `${value.toFixed(0)}`,
             },
             total: {
               use: useTotal,
               decimalPoint: 4,
-              formatter: value => `${value.toFixed(0)}`,
+              formatter: (value) => `${value.toFixed(0)}`,
             },
             last: {
               use: useLast,

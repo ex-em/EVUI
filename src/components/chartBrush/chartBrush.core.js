@@ -156,9 +156,9 @@ export default class EvChartBrush {
       case BRUSH_UPDATE_MODE.GRAB.UP:
       case BRUSH_UPDATE_MODE.GRAB.DOWN:
         if (
-          (this.brushRectX <= 0 && mode === BRUSH_UPDATE_MODE.GRAB.DOWN)
-          || (this.brushRectX + this.brushRectWidth >= brushCanvasWidth
-            && mode === BRUSH_UPDATE_MODE.GRAB.UP)
+          (this.brushRectX <= 0 && mode === BRUSH_UPDATE_MODE.GRAB.DOWN) ||
+          (this.brushRectX + this.brushRectWidth >= brushCanvasWidth &&
+            mode === BRUSH_UPDATE_MODE.GRAB.UP)
         ) {
           this.offsetXAndRectXInterval = null;
         } else {
@@ -173,9 +173,10 @@ export default class EvChartBrush {
       default:
         if (!offsetX) {
           this.brushRectX = brushIdx.start * axesXInterval * pixelRatio;
-          this.brushRectWidth = (brushCanvasWidth
-              - (this.labelEndIdx - (brushIdx.end - brushIdx.start)) * axesXInterval)
-            * pixelRatio;
+          this.brushRectWidth =
+            (brushCanvasWidth -
+              (this.labelEndIdx - (brushIdx.end - brushIdx.start)) * axesXInterval) *
+            pixelRatio;
 
           this.beforeBrushRectX = this.brushRectX;
           this.beforeBrushRectWidth = this.brushRectWidth + this.brushRectX;
@@ -190,7 +191,8 @@ export default class EvChartBrush {
   }
 
   drawBrush(canvasPosInfo, brushPosInfo, evChartRange, brushCanvas) {
-    const { brushButtonWidth, brushCanvasHeight, brushCanvasWidth, axesXInterval, pixelRatio } = canvasPosInfo;
+    const { brushButtonWidth, brushCanvasHeight, brushCanvasWidth, axesXInterval, pixelRatio } =
+      canvasPosInfo;
 
     const { brushRectX, brushRectWidth } = brushPosInfo;
 
@@ -299,19 +301,21 @@ export default class EvChartBrush {
   }
 
   getMousePosition(e) {
-    const calDisToCurMouseX = xPos => Math.abs(this.brushPosInfo[xPos] - e.offsetX);
-    const buttonType = calDisToCurMouseX(BUTTON_TYPE.RIGHT) > calDisToCurMouseX(BUTTON_TYPE.LEFT)
+    const calDisToCurMouseX = (xPos) => Math.abs(this.brushPosInfo[xPos] - e.offsetX);
+    const buttonType =
+      calDisToCurMouseX(BUTTON_TYPE.RIGHT) > calDisToCurMouseX(BUTTON_TYPE.LEFT)
         ? BUTTON_TYPE.LEFT
         : BUTTON_TYPE.RIGHT;
 
-    const isMoveRight = xPos => e.offsetX > this.brushPosInfo[xPos];
-    const isMoveLeft = xPos => e.offsetX < this.brushPosInfo[xPos];
+    const isMoveRight = (xPos) => e.offsetX > this.brushPosInfo[xPos];
+    const isMoveLeft = (xPos) => e.offsetX < this.brushPosInfo[xPos];
 
     const isOutsideBrush = isMoveLeft(BUTTON_TYPE.LEFT) || isMoveRight(BUTTON_TYPE.RIGHT);
     const isInsideBrush = isMoveRight(BUTTON_TYPE.LEFT) && isMoveLeft(BUTTON_TYPE.RIGHT);
 
-    const isInsideButton = e.offsetX + this.brushPosInfo.buttonWidth >= this.brushPosInfo[buttonType]
-      && e.offsetX - this.brushPosInfo.buttonWidth <= this.brushPosInfo[buttonType];
+    const isInsideButton =
+      e.offsetX + this.brushPosInfo.buttonWidth >= this.brushPosInfo[buttonType] &&
+      e.offsetX - this.brushPosInfo.buttonWidth <= this.brushPosInfo[buttonType];
 
     this.curBrushButtonType = isInsideButton && buttonType;
 
@@ -357,7 +361,8 @@ export default class EvChartBrush {
 
   removeBrushWrapper() {
     if (this.evChartBrushRef.value) {
-      const evChartBrushWrapper = this.evChartBrushRef.value.querySelector('.ev-chart-brush-wrapper');
+      const evChartBrushWrapper =
+        this.evChartBrushRef.value.querySelector('.ev-chart-brush-wrapper');
 
       if (evChartBrushWrapper) {
         this.evChartBrushRef.value.removeChild(evChartBrushWrapper);
@@ -399,8 +404,8 @@ export default class EvChartBrush {
       clickIdx = Math.floor(e.offsetX / this.brushPosInfo.axesXInterval);
 
       if (
-        e.offsetX - clickIdx * this.brushPosInfo.axesXInterval
-        > this.brushPosInfo.axesXInterval / 2
+        e.offsetX - clickIdx * this.brushPosInfo.axesXInterval >
+        this.brushPosInfo.axesXInterval / 2
       ) {
         left = Math.floor(middle);
         right = Math.ceil(middle);
@@ -458,7 +463,8 @@ export default class EvChartBrush {
         const isMoveRight = e.offsetX - this.brushPosInfo[this.curBrushButtonType] > moveSensitive;
 
         if (isMoveRight) {
-          mode = this.curBrushButtonType === BUTTON_TYPE.LEFT
+          mode =
+            this.curBrushButtonType === BUTTON_TYPE.LEFT
               ? BRUSH_UPDATE_MODE.BUTTON.DECREASE
               : BRUSH_UPDATE_MODE.BUTTON.INCREASE;
 
@@ -479,7 +485,8 @@ export default class EvChartBrush {
         const isMoveLeft = this.brushPosInfo[this.curBrushButtonType] - e.offsetX > moveSensitive;
 
         if (isMoveLeft) {
-          mode = this.curBrushButtonType === BUTTON_TYPE.LEFT
+          mode =
+            this.curBrushButtonType === BUTTON_TYPE.LEFT
               ? BRUSH_UPDATE_MODE.BUTTON.INCREASE
               : BRUSH_UPDATE_MODE.BUTTON.DECREASE;
 
@@ -577,7 +584,8 @@ export default class EvChartBrush {
 
         if (this.brushIdx.isUseButton || this.isUseBrushGrab) {
           brushStartIdx = brushRectX / axesXInterval;
-          brushEndIdx = this.labelEndIdx - (brushCanvasWidth - (brushRectX + brushRectWidth)) / axesXInterval;
+          brushEndIdx =
+            this.labelEndIdx - (brushCanvasWidth - (brushRectX + brushRectWidth)) / axesXInterval;
 
           if (this.curBrushButtonType === BUTTON_TYPE.LEFT) {
             brushStartIdx = Math.round(brushStartIdx);

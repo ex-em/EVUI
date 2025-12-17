@@ -160,10 +160,10 @@ class Pie {
     const valueWidth = Math.round(ctx.measureText(formattedTxt).width);
 
     if (
-      innerAngle >= valueWidth * ratio
-      && innerAngle >= valueHeight * ratio
-      && radius >= valueWidth * ratio
-      && radius >= valueHeight * ratio
+      innerAngle >= valueWidth * ratio &&
+      innerAngle >= valueHeight * ratio &&
+      radius >= valueWidth * ratio &&
+      radius >= valueHeight * ratio
     ) {
       ctx.save();
       ctx.beginPath();

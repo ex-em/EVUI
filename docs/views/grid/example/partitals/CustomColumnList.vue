@@ -33,11 +33,11 @@ export default {
   setup(props, { emit }) {
     const visible = computed({
       get: () => props.isVisible,
-      set: value => emit('update:isVisible', value),
+      set: (value) => emit('update:isVisible', value),
     });
     const columnList = computed({
       get: () => props.columns,
-      set: value => emit('update:columns', value),
+      set: (value) => emit('update:columns', value),
     });
     const checkColumnGroup = ref([]);
     let lastCheckColumn = null;
@@ -51,8 +51,8 @@ export default {
 
     const setCheckColumn = (columns) => {
       checkColumnGroup.value = columns
-        .filter(column => !column.hiddenDisplay && !column.hide)
-        .map(column => column.field);
+        .filter((column) => !column.hiddenDisplay && !column.hide)
+        .map((column) => column.field);
     };
 
     const sort = {
@@ -62,7 +62,7 @@ export default {
 
     const getSortingColumns = (columns, type = 'ASC') => {
       const sortingTarget = 'index';
-      const existTargetInColumns = columns.every(column =>
+      const existTargetInColumns = columns.every((column) =>
         Object.prototype.hasOwnProperty.call(column, sortingTarget),
       );
       if (existTargetInColumns) {
@@ -74,7 +74,7 @@ export default {
       if (!visible.value) {
         return columns;
       }
-      return getSortingColumns(columns.filter(column => !column?.hide));
+      return getSortingColumns(columns.filter((column) => !column?.hide));
     };
 
     watch(

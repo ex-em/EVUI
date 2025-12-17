@@ -87,7 +87,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 export default {
   name: 'EvTextField',
@@ -145,7 +145,7 @@ export default {
   setup(props, { emit }) {
     const mv = computed({
       get: () => props.modelValue,
-      set: val => emit('update:modelValue', val),
+      set: (val) => emit('update:modelValue', val),
     });
 
     // password visible on/off
@@ -161,9 +161,17 @@ export default {
       if (props.type === 'password') {
         return isPasswordVisible.value ? 'text' : 'password';
       }
-      isPasswordVisible.value = false;
       return props.type === 'search' ? 'text' : props.type;
     });
+
+    watch(
+      () => props.type,
+      (newType) => {
+        if (newType !== 'password') {
+          isPasswordVisible.value = false;
+        }
+      },
+    );
 
     // clear input value
     const clearValue = () => {
@@ -188,10 +196,10 @@ export default {
       emit('blur', e);
     };
 
-    const getByteLength = text => new TextEncoder().encode(text).length;
+    const getByteLength = (text) => new TextEncoder().encode(text).length;
 
     const currentLength = computed(() =>
-      (props.maxUnit === 'byte' ? getByteLength(mv.value || '') : (mv.value || '').length),
+      props.maxUnit === 'byte' ? getByteLength(mv.value || '') : (mv.value || '').length,
     );
 
     const inputMv = (e) => {
@@ -208,7 +216,7 @@ export default {
       emit('input', value, e);
     };
 
-    const changeMv = e => emit('change', mv.value, e);
+    const changeMv = (e) => emit('change', mv.value, e);
 
     return {
       mv,
@@ -249,9 +257,11 @@ $icon-width: 14px !default;
       }
     }
   }
+
   &-wrapper {
     position: relative;
   }
+
   .ev-text-field-icon {
     display: flex;
     position: absolute;
@@ -276,8 +286,10 @@ $icon-width: 14px !default;
   .ev-input {
     padding: 0 calc($input-default-padding + $icon-width) 0 $input-default-padding;
   }
+
   .ev-text-field-icon {
     font-size: 15px;
+
     &:hover {
       @include evThemify() {
         color: evThemed('primary');
@@ -285,12 +297,15 @@ $icon-width: 14px !default;
     }
   }
 }
+
 @include state('show-password') {
   .ev-input {
     padding: 0 calc($input-default-padding + $icon-width) 0 $input-default-padding;
   }
+
   .ev-text-field-icon {
     font-size: 15px;
+
     &:hover,
     &.on {
       @include evThemify() {
@@ -299,12 +314,15 @@ $icon-width: 14px !default;
     }
   }
 }
+
 @include state('type-search') {
   .ev-input {
     padding: 0 calc($input-default-padding + $icon-width) 0 $input-default-padding;
   }
+
   .ev-text-field-icon {
     font-size: 15px;
+
     &:hover {
       @include evThemify() {
         color: evThemed('primary');
@@ -312,6 +330,7 @@ $icon-width: 14px !default;
     }
   }
 }
+
 @include state('show-maxlength') {
   .ev-text-field-maxlength {
     float: right;
@@ -322,11 +341,13 @@ $icon-width: 14px !default;
     @include evThemify() {
       color: evThemed('border-base');
     }
+
     .curr-length {
       @include evThemify() {
         color: color.scale(evThemed('border-base'), $lightness: -10%);
       }
     }
+
     &.max,
     &.max * {
       @include evThemify() {
@@ -335,6 +356,7 @@ $icon-width: 14px !default;
     }
   }
 }
+
 @include state('error') {
   .ev-text-field-error {
     float: left;
@@ -347,25 +369,30 @@ $icon-width: 14px !default;
     }
   }
 }
+
 @include state('ev-text-field-suffix') {
   .ev-input {
     padding: 0 calc($input-default-padding + $icon-width) 0 $input-default-padding;
   }
+
   .icon-suffix {
     font-size: 15px;
     cursor: default;
   }
 }
+
 @include state('ev-text-field-prefix') {
   .ev-input {
     padding: 0 $input-default-padding 0 calc($input-default-padding + $icon-width);
   }
+
   .icon-prefix {
     left: 7px;
     font-size: 15px;
     cursor: default;
   }
 }
+
 @include state('ev-text-field-prefix-suffix') {
   .ev-input {
     padding: 0 calc($input-default-padding + $icon-width);

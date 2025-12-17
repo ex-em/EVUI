@@ -41,7 +41,7 @@ export default {
     type: {
       type: String,
       default: 'info',
-      validator: val => ['info', 'success', 'warning', 'error'].includes(val),
+      validator: (val) => ['info', 'success', 'warning', 'error'].includes(val),
     },
     title: {
       type: String,
@@ -54,7 +54,7 @@ export default {
     position: {
       type: String,
       default: 'top-right',
-      validator: val => ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(val),
+      validator: (val) => ['top-left', 'top-right', 'bottom-left', 'bottom-right'].includes(val),
     },
     duration: {
       type: Number,

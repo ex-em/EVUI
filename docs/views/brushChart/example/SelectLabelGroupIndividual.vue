@@ -139,7 +139,7 @@ export default {
 
     const clickedLabel = ref("''");
     const onClick = (target) => {
-      clickedLabel.value = target.selected.label.map(label => dayjs(label).format('YYYY-MM-DD'));
+      clickedLabel.value = target.selected.label.map((label) => dayjs(label).format('YYYY-MM-DD'));
     };
 
     const addRandomChartData = () => {

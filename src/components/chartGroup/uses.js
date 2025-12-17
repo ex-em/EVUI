@@ -41,7 +41,7 @@ export const useGroupModel = () => {
   const evChartGroupRef = ref();
   const evChartPropsInGroup = ref([]);
   const brushSeries = reactive({ list: [], chartIdx: null });
-  const getNormalizedOptions = options => defaultsDeep({}, options, DEFAULT_OPTIONS);
+  const getNormalizedOptions = (options) => defaultsDeep({}, options, DEFAULT_OPTIONS);
 
   return {
     getNormalizedOptions,

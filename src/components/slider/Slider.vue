@@ -130,7 +130,7 @@ export default {
     step: {
       type: Number,
       default: 1,
-      validator: val => val > 0,
+      validator: (val) => val > 0,
     },
     mark: {
       type: Object,

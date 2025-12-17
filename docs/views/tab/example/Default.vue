@@ -159,7 +159,7 @@ export default {
     ]);
 
     const toggleComp4 = () => {
-      const comp4Idx = tabPanels2.value.findIndex(v => v.value === 'comp4');
+      const comp4Idx = tabPanels2.value.findIndex((v) => v.value === 'comp4');
       if (comp4Idx < 0) {
         tabPanels2.value.push({
           text: 'LABEL4LABEL4LABEL4LABEL4LABEL4',

@@ -122,11 +122,11 @@ export default {
     const menuItems = ref([
       {
         text: 'Menu1',
-        click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
+        click: (param) => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
       },
       {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param),
+        click: (param) => console.log('[Menu2]', param),
       },
     ]);
     const borderMV = ref('');
@@ -246,25 +246,31 @@ export default {
 .description {
   min-width: 200px;
 }
+
 .form-rows {
   display: flex;
   margin-bottom: 5px;
 }
+
 .form-row {
   width: 50%;
 }
+
 .ev-text-field,
 .ev-input-number,
 .ev-select {
   width: 80%;
 }
+
 .badge {
   margin-bottom: 2px;
   margin-right: 5px !important;
 }
+
 .ev-toggle {
   margin-right: 10px;
 }
+
 .v-chip {
   display: inline-flex;
   position: relative;
@@ -290,15 +296,18 @@ export default {
     background-color: #4caf50;
     border-color: #4caf50;
   }
+
   &.yellow {
     background-color: #f7df6a;
     border-color: #f7df6a;
   }
+
   &.red {
     background-color: #ff4949;
     border-color: #ff4949;
   }
 }
+
 .v-chip .v-chip__content {
   display: inline-flex;
   height: 100%;

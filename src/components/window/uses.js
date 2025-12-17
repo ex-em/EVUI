@@ -21,7 +21,7 @@ const useModel = () => {
   const headerRef = ref();
   const isFullExpandWindow = ref(false);
   const maximizableIcon = computed(() =>
-    (isFullExpandWindow.value ? 'ev-icon-compress' : 'ev-icon-expand'),
+    isFullExpandWindow.value ? 'ev-icon-compress' : 'ev-icon-expand',
   );
 
   // body에 #ev-window-modal div append
@@ -290,8 +290,10 @@ const useMouseEvent = (param) => {
       tMinHeight = props.minHeight;
     }
 
-    width = removeUnit(width, 'horizontal') > removeUnit(tMinWidth, 'horizontal') ? width : tMinWidth;
-    height = removeUnit(height, 'vertical') > removeUnit(tMinHeight, 'vertical') ? height : tMinHeight;
+    width =
+      removeUnit(width, 'horizontal') > removeUnit(tMinWidth, 'horizontal') ? width : tMinWidth;
+    height =
+      removeUnit(height, 'vertical') > removeUnit(tMinHeight, 'vertical') ? height : tMinHeight;
 
     dragStyle.top = numberToUnit(top);
     dragStyle.left = numberToUnit(left);
@@ -490,9 +492,9 @@ const useMouseEvent = (param) => {
     }
 
     if (
-      !pressedSpot
-      || (!props.draggable && pressedSpot === 'header')
-      || (!props.resizable && pressedSpot === 'border')
+      !pressedSpot ||
+      (!props.draggable && pressedSpot === 'header') ||
+      (!props.resizable && pressedSpot === 'border')
     ) {
       clickedInfo.state = 'mousedown';
       clickedInfo.pressedSpot = '';
@@ -624,14 +626,14 @@ const activeWindows = (() => {
     },
     remove(inactiveWindow) {
       if (inactiveWindow === null || inactiveWindow === undefined) return;
-      windows = windows.filter(activeWindow => activeWindow.sequence !== inactiveWindow.sequence);
+      windows = windows.filter((activeWindow) => activeWindow.sequence !== inactiveWindow.sequence);
     },
 
     get windows() {
       return windows.slice();
     },
     getWindowBySequence(targetSequence) {
-      return windows.find(activeWindow => activeWindow.sequence === targetSequence);
+      return windows.find((activeWindow) => activeWindow.sequence === targetSequence);
     },
 
     isEmpty() {
@@ -702,7 +704,7 @@ const getActiveWindowsOrderByZIndexAsc = () => {
   };
 
   const activeWindowsSorted = Array.prototype.map
-    .call(activeWindows.windows, activeWindow => ({
+    .call(activeWindows.windows, (activeWindow) => ({
       ...activeWindow,
       zIndex: getZIndexFromElement(activeWindow.elem),
     }))
@@ -785,7 +787,7 @@ const useEscCloseAndFocusable = ({ closeWin, windowRef }) => {
     setZIndexToWindow({ elem: windowRef.value, zIndex: nextZIndex });
   };
 
-  const sameAsCurrent = windowData =>
+  const sameAsCurrent = (windowData) =>
     String(windowData.sequence) === windowRef.value.dataset.sequence;
 
   // 할당하려는 z-index 값이 상한일 때

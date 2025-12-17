@@ -20,7 +20,7 @@ export default {
 
     const menu = router
       .getRoutes()
-      .filter(item => item.name !== 'PageNotFound')
+      .filter((item) => item.name !== 'PageNotFound')
       .reduce((acc, cur) => {
         const menuInfoObj = {
           text: cur.name,
@@ -29,7 +29,7 @@ export default {
         if (!cur.meta.category) {
           acc.push(menuInfoObj);
         } else {
-          const idx = acc.findIndex(v => v.text === cur.meta.category);
+          const idx = acc.findIndex((v) => v.text === cur.meta.category);
           if (idx < 0) {
             acc.push({
               text: cur.meta.category,

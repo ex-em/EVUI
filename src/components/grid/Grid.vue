@@ -706,7 +706,8 @@ export default {
     const ROW_SELECT_INDEX = 3;
     const ROW_EXPAND_INDEX = 4;
     const ROW_DISABLED_INDEX = 6;
-    const { isRenderer, getComponentName, getConvertValue, getColumnIndex, setPixelUnit } = commonFunctions();
+    const { isRenderer, getComponentName, getConvertValue, getColumnIndex, setPixelUnit } =
+      commonFunctions();
     const toolbarRef = ref(null);
     const useGridSetting = computed(() => props.option?.useGridSetting?.use || false);
     const showHeader = computed(() => props.option.showHeader ?? true);
@@ -794,7 +795,7 @@ export default {
       prevPage: 0,
       currentPage: 0,
       pageTotal: computed(() =>
-        (props.option.page?.useClient ? stores.store.length : props.option.page?.total),
+        props.option.page?.useClient ? stores.store.length : props.option.page?.total,
       ),
       perPage: computed(() => props.option.page?.perPage || 20),
       visiblePage: computed(() => props.option.page?.visiblePage || 8),
@@ -867,7 +868,7 @@ export default {
       columnWidth: props.option.columnWidth || 80,
       scrollWidth: props.option.scrollWidth || 17,
       rowHeight: computed(() =>
-        (props.option.rowHeight > rowMinHeight ? props.option.rowHeight : rowMinHeight),
+        props.option.rowHeight > rowMinHeight ? props.option.rowHeight : rowMinHeight,
       ),
       gridWidth: computed(() => (props.width ? setPixelUnit(props.width) : '100%')),
       gridHeight: computed(() => (props.height ? setPixelUnit(props.height) : '100%')),
@@ -972,7 +973,8 @@ export default {
       contextInfo,
     });
 
-    const { setPositionColumnSetting, initColumnSettingInfo, onApplyColumn, setColumnHidden } = columnSettingEvent({
+    const { setPositionColumnSetting, initColumnSettingInfo, onApplyColumn, setColumnHidden } =
+      columnSettingEvent({
         stores,
         columnSettingInfo,
         contextInfo,
@@ -980,7 +982,8 @@ export default {
         onResize,
       });
 
-    const { setContextMenu, onContextMenu, onColumnContextMenu, onGridSettingContextMenu } = contextMenuEvent({
+    const { setContextMenu, onContextMenu, onColumnContextMenu, onGridSettingContextMenu } =
+      contextMenuEvent({
         contextInfo,
         stores,
         selectInfo,
@@ -1009,11 +1012,11 @@ export default {
         contextInfo.menu?.hide(e);
       }
       if (
-        e.type === 'scroll'
-        && !e.target.classList?.contains('table-body')
-        && !e.target.offsetParent?.classList?.contains('ev-select-dropbox')
-        && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')
-        && !e.target.offsetParent?.classList?.contains('ev-text-field-wrapper')
+        e.type === 'scroll' &&
+        !e.target.classList?.contains('table-body') &&
+        !e.target.offsetParent?.classList?.contains('ev-select-dropbox') &&
+        !e.target.offsetParent?.classList?.contains('ev-grid-column-setting') &&
+        !e.target.offsetParent?.classList?.contains('ev-text-field-wrapper')
       ) {
         filterInfo.isShowFilterSetting = false;
         columnSettingInfo.isShowColumnSetting = false;
@@ -1151,8 +1154,9 @@ export default {
       (value) => {
         if (selectInfo.useSelect) {
           stores.store.forEach((row) => {
-            row[ROW_SELECT_INDEX] = value.includes(row[ROW_DATA_INDEX])
-              && !props.disabledRows.includes(row[ROW_DATA_INDEX]);
+            row[ROW_SELECT_INDEX] =
+              value.includes(row[ROW_DATA_INDEX]) &&
+              !props.disabledRows.includes(row[ROW_DATA_INDEX]);
           });
           updateVScroll();
         }
@@ -1296,9 +1300,10 @@ export default {
         // open filtering items box
         isShowFilteringItemsBox.value = true;
         const x = filteringItemsRef.value.getBoundingClientRect().left;
-        const y = window.pageYOffset
-          + filteringItemsRef.value.getBoundingClientRect().top
-          + filteringItemsRef.value.getBoundingClientRect().height;
+        const y =
+          window.pageYOffset +
+          filteringItemsRef.value.getBoundingClientRect().top +
+          filteringItemsRef.value.getBoundingClientRect().height;
         filteringItemsBoxPosition.boxTop = `${y}px`;
         filteringItemsBoxPosition.boxLeft = `${x}px`;
       }
@@ -1313,7 +1318,8 @@ export default {
       if (isInit && isShowColumnFilteringItems.value) {
         hiddenFilteringItemsCount.value = 0;
       }
-      const conditionItems = filteringItemsRef.value?.getElementsByClassName('filtering-items__item');
+      const conditionItems =
+        filteringItemsRef.value?.getElementsByClassName('filtering-items__item');
       const hiddenItemList = [];
       let sumWidth = 0;
       if (conditionItems) {
@@ -1324,8 +1330,8 @@ export default {
           const { width } = itemEl.getBoundingClientRect();
           sumWidth += width + 10;
           if (
-            boxWidth - 150 <= sumWidth
-            && !itemEl.classList.contains('filtering-items__item--count')
+            boxWidth - 150 <= sumWidth &&
+            !itemEl.classList.contains('filtering-items__item--count')
           ) {
             hiddenFilteringItemsCount.value++;
             hiddenItemList.push(itemEl);
@@ -1404,7 +1410,7 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
-    const idColIndex = computed(() => stores.orderedColumns.find(c => c.field === 'id')?.index);
+    const idColIndex = computed(() => stores.orderedColumns.find((c) => c.field === 'id')?.index);
 
     return {
       idColIndex,

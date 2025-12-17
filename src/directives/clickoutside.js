@@ -27,8 +27,8 @@ const selectClickoutside = {
     const TAG_SUFFIX_CLOSE_CLS = 'ev-tag-suffix-close';
     const handler = (e) => {
       if (
-        e.target.classList.contains(TAG_NAME_CLS)
-        || e.target.classList.contains(TAG_SUFFIX_CLOSE_CLS)
+        e.target.classList.contains(TAG_NAME_CLS) ||
+        e.target.classList.contains(TAG_SUFFIX_CLOSE_CLS)
       ) {
         return;
       }
@@ -61,17 +61,17 @@ const datePickerClickoutside = {
     const selectDropbox = document.body.getElementsByClassName('ev-date-picker-dropdown');
     const handler = (e) => {
       if (
-        !selectDropbox
-        && (bubble || (componentEl !== e.target && !componentEl.contains(e.target)))
+        !selectDropbox &&
+        (bubble || (componentEl !== e.target && !componentEl.contains(e.target)))
       ) {
         binding.value(e);
       } else if (
-        selectDropbox
-        && selectDropbox[0]
-        && selectDropbox[0] !== e.target
-        && !selectDropbox[0].contains(e.target)
-        && componentEl !== e.target
-        && !componentEl.contains(e.target)
+        selectDropbox &&
+        selectDropbox[0] &&
+        selectDropbox[0] !== e.target &&
+        !selectDropbox[0].contains(e.target) &&
+        componentEl !== e.target &&
+        !componentEl.contains(e.target)
       ) {
         binding.value(e);
       }

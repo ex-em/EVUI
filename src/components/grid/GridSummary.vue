@@ -132,7 +132,7 @@ export default {
       return convertValue;
     };
 
-    const getColumnIndex = field => columns.value.findIndex(column => column.field === field);
+    const getColumnIndex = (field) => columns.value.findIndex((column) => column.field === field);
     const getSummaryValue = (column) => {
       const { type, field, summaryType, summaryDecimal, summaryOnlyTopParent } = column;
 
@@ -156,7 +156,7 @@ export default {
               return acc;
             }, []);
           } else {
-            columnValues = stores.value.store.map(row => row[ROW_DATA_INDEX][columnIndex]);
+            columnValues = stores.value.store.map((row) => row[ROW_DATA_INDEX][columnIndex]);
           }
           switch (summaryType) {
             case 'sum': {
@@ -168,7 +168,8 @@ export default {
                 return prev;
               }, 0);
 
-              result = sumValue && bnFloor(sumValue, getValidDecimal(summaryDecimal ?? DECIMAL.default));
+              result =
+                sumValue && bnFloor(sumValue, getValidDecimal(summaryDecimal ?? DECIMAL.default));
               break;
             }
             case 'average': {
@@ -179,20 +180,21 @@ export default {
                 }
                 return prev;
               }, 0);
-              result = sumValue
-                && bnFloor(
+              result =
+                sumValue &&
+                bnFloor(
                   bnDivide(sumValue, columnValues.length),
                   getValidDecimal(summaryDecimal ?? DECIMAL.default),
                 );
               break;
             }
             case 'max': {
-              const filteredNullValues = columnValues.filter(value => value != null);
+              const filteredNullValues = columnValues.filter((value) => value != null);
               result = filteredNullValues.length ? Math.max(...filteredNullValues) : '';
               break;
             }
             case 'min': {
-              const filteredNullValues = columnValues.filter(value => value != null);
+              const filteredNullValues = columnValues.filter((value) => value != null);
               result = filteredNullValues.length ? Math.min(...filteredNullValues) : '';
               break;
             }

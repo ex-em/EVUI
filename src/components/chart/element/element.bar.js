@@ -195,7 +195,8 @@ class Bar {
         const selectLabelOption = param?.selectLabel?.option;
         const selectItemOption = param?.selectItem?.option;
         const selectedLabelList = param?.selectLabel?.selected?.dataIndex ?? [];
-        const { dataIndex: selectedItemDataIndex, seriesID: selectedItemSeriesId } = param?.selectItem?.selected ?? {};
+        const { dataIndex: selectedItemDataIndex, seriesID: selectedItemSeriesId } =
+          param?.selectItem?.selected ?? {};
 
         let isDownplay = false;
 

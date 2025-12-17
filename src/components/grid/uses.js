@@ -18,7 +18,7 @@ export const commonFunctions = () => {
    */
   const isRenderer = (column = {}) => !!column?.render?.use;
   const getComponentName = (type = '') => {
-    const setUpperCaseFirstStr = str => str.charAt(0).toUpperCase() + str.slice(1);
+    const setUpperCaseFirstStr = (str) => str.charAt(0).toUpperCase() + str.slice(1);
     const rendererStr = 'Renderer';
     let typeStr = '';
     if (type.indexOf('_') !== -1) {
@@ -57,7 +57,7 @@ export const commonFunctions = () => {
    * @param {string} field - 컬럼 필드명
    * @returns {number} 일치한다면 컬럼 인덱스, 일치하지 않는다면 -1
    */
-  const getColumnIndex = field => props.columns.findIndex(column => column.field === field);
+  const getColumnIndex = (field) => props.columns.findIndex((column) => column.field === field);
   const setPixelUnit = (value) => {
     let size = value;
     const hasPx = size.toString().indexOf('px') >= 0;
@@ -78,9 +78,10 @@ export const commonFunctions = () => {
 };
 
 export const getUpdatedColumns = (stores) => {
-  const baseColumns = (stores.movedColumns?.length ? stores.movedColumns : stores.originColumns) ?? [];
+  const baseColumns =
+    (stores.movedColumns?.length ? stores.movedColumns : stores.originColumns) ?? [];
   const filteredColumnsMap = new Map(
-    (stores.filteredColumns ?? []).map(filtered => [filtered.index, filtered]),
+    (stores.filteredColumns ?? []).map((filtered) => [filtered.index, filtered]),
   );
   return baseColumns.map((column) => {
     const filteredColumn = filteredColumnsMap.get(column.index) ?? {};
@@ -118,8 +119,9 @@ export const scrollEvent = (params) => {
       }
 
       const expandedRowCount = expandedInfo.expandedRows?.length ?? 0;
-      const expandedRowIndexes = expandedInfo.expandedRows?.map(row =>
-          store.findIndex(data => data[ROW_DATA_INDEX] === row),
+      const expandedRowIndexes =
+        expandedInfo.expandedRows?.map((row) =>
+          store.findIndex((data) => data[ROW_DATA_INDEX] === row),
         ) ?? [];
       const totalScrollHeight = store.length * rowHeight + expandedRowCount * expandedRowHeight;
 
@@ -154,7 +156,8 @@ export const scrollEvent = (params) => {
           rowCount += 1;
         }
       } else {
-        rowCount = bodyEl.clientHeight > rowHeight
+        rowCount =
+          bodyEl.clientHeight > rowHeight
             ? Math.ceil(bodyEl.clientHeight / rowHeight)
             : store.length;
         renderRowHeight = rowCount * rowHeight;
@@ -166,9 +169,11 @@ export const scrollEvent = (params) => {
       const tableEl = elementInfo.table;
 
       stores.viewStore = store.slice(firstIndex, lastIndex);
-      scrollInfo.hasVerticalScrollBar = rowCount < store.length || bodyEl.clientHeight < tableEl.clientHeight;
+      scrollInfo.hasVerticalScrollBar =
+        rowCount < store.length || bodyEl.clientHeight < tableEl.clientHeight;
       scrollInfo.vScrollTopHeight = scrollTop;
-      scrollInfo.vScrollBottomHeight = totalScrollHeight - renderRowHeight - scrollInfo.vScrollTopHeight;
+      scrollInfo.vScrollBottomHeight =
+        totalScrollHeight - renderRowHeight - scrollInfo.vScrollTopHeight;
       if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
         pageInfo.prevPage = pageInfo.currentPage;
         pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
@@ -288,7 +293,8 @@ export const resizeEvent = (params) => {
 
       columnWidth = elWidth - result.totalWidth;
       if (columnWidth > 0) {
-        const sharePerEmptyCount = result.emptyCount === 0 ? 0 : Math.floor(columnWidth / result.emptyCount);
+        const sharePerEmptyCount =
+          result.emptyCount === 0 ? 0 : Math.floor(columnWidth / result.emptyCount);
 
         remainWidth = columnWidth - sharePerEmptyCount * result.emptyCount;
         columnWidth = result.emptyCount !== 0 ? sharePerEmptyCount : columnWidth;
@@ -329,7 +335,7 @@ export const resizeEvent = (params) => {
    * grid resize 이벤트를 처리한다.
    */
   const onResize = () => {
-    const propColumnsMap = new Map(props.columns.map(col => [col.field, col.width]));
+    const propColumnsMap = new Map(props.columns.map((col) => [col.field, col.width]));
     nextTick(() => {
       if (resizeInfo.adjust) {
         stores.orderedColumns.forEach((column) => {
@@ -547,7 +553,7 @@ export const checkEvent = (params) => {
    */
   const unCheckedRow = (row) => {
     const index = stores.originStore.findIndex(
-      item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX],
+      (item) => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX],
     );
 
     if (index !== -1) {
@@ -578,9 +584,9 @@ export const checkEvent = (params) => {
       }
 
       const isAllChecked = store
-        .filter(rowData => !props.uncheckable.includes(rowData[ROW_DATA_INDEX]))
-        .filter(rowData => !props.disabledRows.includes(rowData[ROW_DATA_INDEX]))
-        .every(d => d[ROW_CHECK_INDEX]);
+        .filter((rowData) => !props.uncheckable.includes(rowData[ROW_DATA_INDEX]))
+        .filter((rowData) => !props.disabledRows.includes(rowData[ROW_DATA_INDEX]))
+        .every((d) => d[ROW_CHECK_INDEX]);
       if (store.length && isAllChecked) {
         checkInfo.isHeaderChecked = true;
       }
@@ -610,8 +616,9 @@ export const checkEvent = (params) => {
       store = getPagingData();
     }
     store.forEach((row) => {
-      const uncheckable = props.uncheckable.includes(row[ROW_DATA_INDEX])
-        || props.disabledRows.includes(row[ROW_DATA_INDEX]);
+      const uncheckable =
+        props.uncheckable.includes(row[ROW_DATA_INDEX]) ||
+        props.disabledRows.includes(row[ROW_DATA_INDEX]);
       if (isHeaderChecked) {
         if (!checkInfo.checkedRows.includes(row[ROW_DATA_INDEX]) && !uncheckable) {
           checkInfo.checkedRows.push(row[ROW_DATA_INDEX]);
@@ -664,11 +671,11 @@ export const sortEvent = (params) => {
   const { emit } = getCurrentInstance();
 
   const getDefaultSortType = (includeInit = true) =>
-    (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
+    includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc'];
   function OrderQueue() {
     this.orders = getDefaultSortType();
     this.dequeue = () => this.orders.shift();
-    this.enqueue = o => this.orders.push(o);
+    this.enqueue = (o) => this.orders.push(o);
   }
 
   const setSortOptionToOrderedColumns = (column, sortType = 'init') => {
@@ -682,7 +689,7 @@ export const sortEvent = (params) => {
   };
 
   const initializeHiddenColumnsSortType = () => {
-    const hiddenColumns = stores.originColumns.filter(col => col.hiddenDisplay || col.hide);
+    const hiddenColumns = stores.originColumns.filter((col) => col.hiddenDisplay || col.hide);
     if (hiddenColumns.length) {
       hiddenColumns.forEach((col) => {
         col.sortOption = { sortType: 'init' };
@@ -840,7 +847,7 @@ export const sortEvent = (params) => {
 
   const getSortTarget = () =>
     stores.orderedColumns?.find(
-      column =>
+      (column) =>
         column?.sortOption && getDefaultSortType(false).includes(column.sortOption.sortType),
     );
   const hasSortTarget = () => !!getSortTarget();
@@ -878,9 +885,9 @@ export const filterEvent = (params) => {
       checkInfo.isHeaderChecked = rowData.length === checkedCount;
       checkInfo.isHeaderIndeterminate = rowData.length !== checkedCount && checkedCount > 0;
       checkInfo.isHeaderUncheckable = rowData.every(
-        row =>
-          props.uncheckable.includes(row[ROW_DATA_INDEX])
-          || props.disabledRows.includes(row[ROW_DATA_INDEX]),
+        (row) =>
+          props.uncheckable.includes(row[ROW_DATA_INDEX]) ||
+          props.disabledRows.includes(row[ROW_DATA_INDEX]),
       );
     }
   };
@@ -1001,11 +1008,12 @@ export const filterEvent = (params) => {
    * @returns {boolean} 확인 결과
    */
   const getFilteringData = (data, columnType, condition) => {
-    let filterFn = columnType === 'string' || columnType === 'stringNumber' ? stringFilter : numberFilter;
+    let filterFn =
+      columnType === 'string' || columnType === 'stringNumber' ? stringFilter : numberFilter;
     if (columnType === 'boolean') {
       filterFn = booleanFilter;
     }
-    return data.filter(row => filterFn(row, condition, columnType)) || [];
+    return data.filter((row) => filterFn(row, condition, columnType)) || [];
   };
   /**
    * 전체 데이터에서 설정된 필터 적용 후 결과를 filterStore 에 저장한다.
@@ -1179,7 +1187,7 @@ export const contextMenuEvent = (params) => {
     const rowIndex = target.closest('.row')?.dataset?.index;
     let clickedRow = null;
     if (rowIndex) {
-      clickedRow = stores.viewStore.find(row => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
+      clickedRow = stores.viewStore.find((row) => row[ROW_INDEX] === +rowIndex)?.[ROW_DATA_INDEX];
     }
     if (clickedRow) {
       selectInfo.contextmenuInfo = [clickedRow];
@@ -1195,7 +1203,8 @@ export const contextMenuEvent = (params) => {
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
-      const filterable = filterInfo.isFiltering && column.filterable === undefined ? true : column.filterable;
+      const filterable =
+        filterInfo.isFiltering && column.filterable === undefined ? true : column.filterable;
       const columnMenuItems = [
         {
           text: contextInfo.columnMenuTextInfo?.ascending ?? 'Ascending',
@@ -1260,7 +1269,7 @@ export const contextMenuEvent = (params) => {
       if (!sortable && !filterable && !useGridSetting.value) {
         return;
       }
-      contextInfo.columnMenuItems = columnMenuItems.filter(item => !item.hidden);
+      contextInfo.columnMenuItems = columnMenuItems.filter((item) => !item.hidden);
     }
   };
   /**
@@ -1321,7 +1330,7 @@ export const storeEvent = (params) => {
    */
   const setStore = ({ rows, isMakeIndex = true, isInit = false }) => {
     const sortingColumns = stores.orderedColumns.find(
-      column => column?.sortOption && ['asc', 'desc'].includes(column.sortOption.sortType),
+      (column) => column?.sortOption && ['asc', 'desc'].includes(column.sortOption.sortType),
     );
 
     if (isMakeIndex) {
@@ -1346,15 +1355,15 @@ export const storeEvent = (params) => {
       });
 
       if (
-        rows.length !== props.checked.length
-        && (rows.length === props.uncheckable?.length || rows.length === props.disabledRows?.length)
+        rows.length !== props.checked.length &&
+        (rows.length === props.uncheckable?.length || rows.length === props.disabledRows?.length)
       ) {
         hasUnChecked = true;
       }
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
       checkInfo.isHeaderIndeterminate = hasUnChecked && !!checkInfo.checkedRows.length;
       checkInfo.isHeaderUncheckable = rows.every(
-        row => props.uncheckable.includes(row) || props.disabledRows.includes(row),
+        (row) => props.uncheckable.includes(row) || props.disabledRows.includes(row),
       );
       stores.originStore = store;
     }
@@ -1401,8 +1410,8 @@ export const pagingEvent = (params) => {
       searchInfo: {
         searchWord: filterInfo.searchWord,
         searchColumns: stores.orderedColumns
-          .filter(c => !c.hide && (c?.searchable === undefined || c?.searchable))
-          .map(d => d.field),
+          .filter((c) => !c.hide && (c?.searchable === undefined || c?.searchable))
+          .map((d) => d.field),
       },
     });
     if (pageInfo.isInfinite && (eventName?.onSearch || eventName?.onSort)) {
@@ -1442,7 +1451,8 @@ export const columnSettingEvent = (params) => {
     if (contextInfo.gridSettingContextMenuItems.length) {
       // 컨텍스트 메뉴 형태인 경우
       const columnListMenu = contextInfo.gridSettingContextMenuItems.length - 1;
-      const columnListMenuRect = contextInfo.gridSettingMenu?.rootMenuList?.$el?.children[0].children[
+      const columnListMenuRect =
+        contextInfo.gridSettingMenu?.rootMenuList?.$el?.children[0].children[
           columnListMenu
         ].getBoundingClientRect();
 
@@ -1477,23 +1487,23 @@ export const columnSettingEvent = (params) => {
       return;
     }
     column.hiddenDisplay = hidden;
-    const originColumn = stores.originColumns?.find(col => col.index === column.index);
+    const originColumn = stores.originColumns?.find((col) => col.index === column.index);
     if (originColumn && originColumn !== column) {
       originColumn.hiddenDisplay = hidden;
     }
     if (Array.isArray(stores.movedColumns)) {
-      const movedColumn = stores.movedColumns.find(col => col.index === column.index);
+      const movedColumn = stores.movedColumns.find((col) => col.index === column.index);
       if (movedColumn && movedColumn !== column) {
         movedColumn.hiddenDisplay = hidden;
       }
     }
   };
   const setFilteringColumn = () => {
-    columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(col => col.index);
+    columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map((col) => col.index);
 
     const originColumnIdx = stores.originColumns
-      .filter(col => !col.hide || col.hiddenDisplay)
-      .map(col => col.index);
+      .filter((col) => !col.hide || col.hiddenDisplay)
+      .map((col) => col.index);
     const visibleColumnIdx = columnSettingInfo.visibleColumnIdx;
 
     columnSettingInfo.isFilteringColumn = visibleColumnIdx.length !== originColumnIdx.length;
@@ -1505,9 +1515,10 @@ export const columnSettingEvent = (params) => {
     onResize();
   };
   const onApplyColumn = (columnNames) => {
-    const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
-    const isSameColumn = columnNames.length === columns.length
-      && columns.every(col => columnNames.includes(col.field));
+    const columns = stores.orderedColumns.filter((col) => !col.hide && !col.hiddenDisplay);
+    const isSameColumn =
+      columnNames.length === columns.length &&
+      columns.every((col) => columnNames.includes(col.field));
 
     if (isSameColumn) {
       return;
@@ -1532,7 +1543,7 @@ export const columnSettingEvent = (params) => {
     });
   };
   const setColumnHidden = (val) => {
-    const columns = stores.orderedColumns.filter(col => !col.hide && !col.hiddenDisplay);
+    const columns = stores.orderedColumns.filter((col) => !col.hide && !col.hiddenDisplay);
 
     if (columns.length === 1) {
       return;
@@ -1567,7 +1578,7 @@ export const dragEvent = ({ stores }) => {
       ? [...stores.movedColumns]
       : [...stores.originColumns];
     const queue = [...visibleColumns];
-    const visibleIndexSet = new Set(queue.map(column => column.index));
+    const visibleIndexSet = new Set(queue.map((column) => column.index));
     stores.movedColumns = baseColumns.map((column) => {
       if (visibleIndexSet.has(column.index)) {
         return queue.shift();

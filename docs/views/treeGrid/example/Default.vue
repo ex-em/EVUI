@@ -199,7 +199,7 @@ export default {
     const gridSettingMenuItems = ref([
       {
         text: 'Menu1',
-        click: param => console.log(`[Menu1]: ${param}`),
+        click: (param) => console.log(`[Menu1]: ${param}`),
       },
     ]);
     const menuItems = ref([
@@ -213,7 +213,7 @@ export default {
       },
       {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param),
+        click: (param) => console.log('[Menu2]', param),
       },
     ]);
     const highlightMV = ref(-1);

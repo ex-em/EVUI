@@ -24,7 +24,7 @@ class EvChart {
     defaultSelectInfo,
     brushSeries,
   ) {
-    Object.keys(Model).forEach(key => Object.assign(this, Model[key]));
+    Object.keys(Model).forEach((key) => Object.assign(this, Model[key]));
 
     if (!options.brush) {
       Object.assign(this, Tooltip);
@@ -186,9 +186,15 @@ class EvChart {
       let result = [];
 
       // StepScale의 경우 실제로 표시될 모든 라벨들을 포함
-      if (axis?.type === 'step' && minIndex !== undefined && maxIndex !== undefined && indexInterval !== undefined) {
+      if (
+        axis?.type === 'step' &&
+        minIndex !== undefined &&
+        maxIndex !== undefined &&
+        indexInterval !== undefined
+      ) {
         const { labels } = this.data;
-        const axisLabels = axisType === 'x' ? (labels?.x ?? labels ?? []) : (labels?.y ?? labels ?? []);
+        const axisLabels =
+          axisType === 'x' ? (labels?.x ?? labels ?? []) : (labels?.y ?? labels ?? []);
         result = [];
         for (let i = minIndex; i <= maxIndex; i += indexInterval) {
           if (axisLabels[i] !== undefined) {
@@ -212,9 +218,7 @@ class EvChart {
         const axesSteps = this.axesSteps?.x[index];
         const notFormattedLabels = getNotFormattedLabels(axesSteps, 'x', axis);
 
-        const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth)
-          ? axis.labelStyle.fixWidth
-          : 0;
+        const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth) ? axis.labelStyle.fixWidth : 0;
         const maxWidth = axis?.getLabelWidthHasMaxLength?.(notFormattedLabels, this.chartRect) ?? 0;
 
         return {
@@ -230,9 +234,7 @@ class EvChart {
         const axesSteps = this.axesSteps?.y[index];
         const notFormattedLabels = getNotFormattedLabels(axesSteps, 'y', axis);
 
-        const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth)
-          ? axis.labelStyle.fixWidth
-          : 0;
+        const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth) ? axis.labelStyle.fixWidth : 0;
         const maxWidth = axis?.getLabelWidthHasMaxLength?.(notFormattedLabels, this.chartRect) ?? 0;
 
         return {
@@ -626,12 +628,13 @@ class EvChart {
    */
   initScale() {
     const devicePixelRatio = window.devicePixelRatio || 1;
-    const backingStoreRatio = this.displayCtx.webkitBackingStorePixelRatio
-      || this.displayCtx.mozBackingStorePixelRatio
-      || this.displayCtx.msBackingStorePixelRatio
-      || this.displayCtx.oBackingStorePixelRatio
-      || this.displayCtx.backingStorePixelRatio
-      || 1;
+    const backingStoreRatio =
+      this.displayCtx.webkitBackingStorePixelRatio ||
+      this.displayCtx.mozBackingStorePixelRatio ||
+      this.displayCtx.msBackingStorePixelRatio ||
+      this.displayCtx.oBackingStorePixelRatio ||
+      this.displayCtx.backingStorePixelRatio ||
+      1;
 
     this.pixelRatio = devicePixelRatio / backingStoreRatio;
 
@@ -703,7 +706,8 @@ class EvChart {
     }
 
     const horizontalPadding = padding.left + padding.right + yAxisScrollWidth;
-    const verticalPadding = padding.top + padding.bottom + xAxisTitleHeight + yAxisTitleHeight + xAxisScrollHeight;
+    const verticalPadding =
+      padding.top + padding.bottom + xAxisTitleHeight + yAxisTitleHeight + xAxisScrollHeight;
     const chartWidth = width > horizontalPadding ? width - horizontalPadding : width;
     const chartHeight = height > verticalPadding ? height - verticalPadding : height;
 
@@ -926,7 +930,8 @@ class EvChart {
 
     // legend Update
     if (options.legend.show) {
-      const useTable = !!options.legend?.table?.use && options.type !== 'heatMap' && options.type !== 'scatter';
+      const useTable =
+        !!options.legend?.table?.use && options.type !== 'heatMap' && options.type !== 'scatter';
 
       if (!this.isInitLegend) {
         this.initLegend();

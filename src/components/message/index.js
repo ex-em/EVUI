@@ -15,7 +15,8 @@ const message = (options = {}) => {
 
   const container = document.createElement('div');
   const unmount = () => render(null, container);
-  const msgOption = typeof options === 'string' ? { message: options, unmount } : { ...options, unmount };
+  const msgOption =
+    typeof options === 'string' ? { message: options, unmount } : { ...options, unmount };
   const instance = h(componentObj, msgOption);
 
   render(instance, container);

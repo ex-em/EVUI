@@ -73,7 +73,7 @@ export default {
     type: {
       type: String,
       default: '',
-      validator: val => ['', 'info', 'success', 'warning', 'error'].includes(val),
+      validator: (val) => ['', 'info', 'success', 'warning', 'error'].includes(val),
     },
     title: {
       type: String,

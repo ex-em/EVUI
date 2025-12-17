@@ -210,12 +210,13 @@ class TimeCategoryScale extends Scale {
 
       labelText = this.getLabelFormat(Math.min(axisMax, ticks[ix]), { prev });
 
-      const isBlurredLabel = this.options?.selectLabel?.use
-        && this.options?.selectLabel?.useLabelOpacity
-        && this.options.horizontal === (this.type === 'y')
-        && selectLabelInfo?.dataIndex?.length
-        && !selectLabelInfo?.label
-          .map(t =>
+      const isBlurredLabel =
+        this.options?.selectLabel?.use &&
+        this.options?.selectLabel?.useLabelOpacity &&
+        this.options.horizontal === (this.type === 'y') &&
+        selectLabelInfo?.dataIndex?.length &&
+        !selectLabelInfo?.label
+          .map((t) =>
             this.getLabelFormat(Math.min(axisMax, t), {
               prev,
             }),
@@ -235,10 +236,10 @@ class TimeCategoryScale extends Scale {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);
         if (
-          !isBlurredLabel
-          && this.options?.selectItem?.showLabelTip
-          && hitInfo?.label
-          && !this.options?.horizontal
+          !isBlurredLabel &&
+          this.options?.selectItem?.showLabelTip &&
+          hitInfo?.label &&
+          !this.options?.horizontal
         ) {
           const selectedLabel = this.getLabelFormat(
             Math.min(axisMax, hitInfo.label + 0 * stepValue),
@@ -270,9 +271,9 @@ class TimeCategoryScale extends Scale {
         }
 
         if (
-          ix < oriSteps
-          && this.showGrid
-          && (isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0))
+          ix < oriSteps &&
+          this.showGrid &&
+          (isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0))
         ) {
           ctx.beginPath();
           ctx.strokeStyle = this.gridLineColor;
@@ -295,9 +296,9 @@ class TimeCategoryScale extends Scale {
         }
 
         if (
-          ix < oriSteps
-          && this.showGrid
-          && (isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0))
+          ix < oriSteps &&
+          this.showGrid &&
+          (isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0))
         ) {
           ctx.beginPath();
           ctx.strokeStyle = this.gridLineColor;

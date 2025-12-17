@@ -83,8 +83,8 @@ export default {
     const modelValue2 = ref(4);
     const modelValue3 = ref(-6);
     const modelValue4 = ref(12);
-    const format1 = val => `Custom ${val}`;
-    const format2 = val => `<p>Custom</p> <strong>${val}</strong>`;
+    const format1 = (val) => `Custom ${val}`;
+    const format2 = (val) => `<p>Custom</p> <strong>${val}</strong>`;
     return {
       modelValue1,
       modelValue2,

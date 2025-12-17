@@ -136,7 +136,7 @@ export default {
       selectionRange.value = {};
     };
 
-    const getDateString = x => dayjs(x).format('HH:mm:ss');
+    const getDateString = (x) => dayjs(x).format('HH:mm:ss');
 
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 

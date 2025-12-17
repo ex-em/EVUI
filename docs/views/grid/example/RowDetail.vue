@@ -44,11 +44,11 @@ export default {
     const menuItems = ref([
       {
         text: 'Menu1',
-        click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
+        click: (param) => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
       },
       {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param.contextmenuInfo),
+        click: (param) => console.log('[Menu2]', param.contextmenuInfo),
       },
     ]);
     const columns = [

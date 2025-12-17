@@ -93,9 +93,10 @@ const modules = {
    */
   initLegend() {
     this.isHeatMapType = this.options.type === 'heatMap';
-    this.useTable = !!this.options.legend?.table?.use
-      && this.options.type !== 'heatmap'
-      && this.options.type !== 'scatter';
+    this.useTable =
+      !!this.options.legend?.table?.use &&
+      this.options.type !== 'heatmap' &&
+      this.options.type !== 'scatter';
     this.legendItemHeight = 18;
 
     if (!this.isInitLegend) {
@@ -126,18 +127,20 @@ const modules = {
    * @returns {undefined}
    */
   updateVisibleRowCount() {
-    const isLeftOrRight = this.options.legend.position === 'right' || this.options.legend.position === 'left';
+    const isLeftOrRight =
+      this.options.legend.position === 'right' || this.options.legend.position === 'left';
     const legendBoxHeight = this.legendBoxDOM.clientHeight;
     const legendBoxWidth = this.legendBoxDOM.clientWidth;
 
     const itemWidth = Math.max(this.options.legend.width - 8, 1);
     const useLegendSeriesCount = Object.values(this.seriesList).filter(
-      series => series.showLegend !== false,
+      (series) => series.showLegend !== false,
     ).length;
 
     this.itemsPerRow = isLeftOrRight ? 1 : Math.floor(legendBoxWidth / itemWidth);
     this.totalRowCount = Math.ceil(useLegendSeriesCount / this.itemsPerRow);
-    this.visibleRowCount = legendBoxHeight > this.legendItemHeight
+    this.visibleRowCount =
+      legendBoxHeight > this.legendItemHeight
         ? Math.round(legendBoxHeight / this.legendItemHeight) + 1
         : this.totalRowCount;
   },
@@ -190,8 +193,8 @@ const modules = {
     let useLegendSeries = [];
     if (groups) {
       useLegendSeries = groups
-        .filter(sId => this.seriesList[sId].showLegend)
-        .map(sId => [sId, this.seriesList[sId]]);
+        .filter((sId) => this.seriesList[sId].showLegend)
+        .map((sId) => [sId, this.seriesList[sId]]);
     } else {
       useLegendSeries = Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
     }
@@ -445,8 +448,8 @@ const modules = {
             .at(0)
             .slice()
             .reverse()
-            .filter(sId => this.seriesList[sId].showLegend)
-            .map(sId => [sId, this.seriesList[sId]]);
+            .filter((sId) => this.seriesList[sId].showLegend)
+            .map((sId) => [sId, this.seriesList[sId]]);
         }
         return Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
       })();
@@ -461,8 +464,8 @@ const modules = {
             .at(0)
             .slice()
             .reverse()
-            .filter(sId => this.seriesList[sId].showLegend)
-            .map(sId => [sId, this.seriesList[sId]]);
+            .filter((sId) => this.seriesList[sId].showLegend)
+            .map((sId) => [sId, this.seriesList[sId]]);
         }
         return Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
       })();
@@ -506,7 +509,7 @@ const modules = {
         const legendContainerDOMs = Array.from(
           this.legendBoxDOM.getElementsByClassName(classList.container),
         );
-        const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
+        const isActiveAll = legendContainerDOMs.every((dom) => dom.dataset.inactive === 'false');
 
         if (isActiveAll) {
           legendContainerDOMs.forEach((dom) => {
@@ -524,7 +527,7 @@ const modules = {
           this.seriesInfo.count++;
         }
 
-        const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+        const isInactiveAll = legendContainerDOMs.every((dom) => dom.dataset.inactive === 'true');
 
         if (isInactiveAll) {
           legendContainerDOMs.forEach((dom) => {
@@ -650,7 +653,7 @@ const modules = {
       _colorDOM.style.borderColor = _inactiveColor;
       _nameDOM.style.color = _inactiveColor;
 
-      const targetIndex = _series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      const targetIndex = _series.colorState.findIndex((colorItem) => colorItem.id === targetId);
       if (targetIndex > -1) {
         _series.colorState[targetIndex].show = false;
       }
@@ -674,7 +677,7 @@ const modules = {
       _colorDOM.style.backgroundColor = _targetDOM?.series?.color;
       _nameDOM.style.color = _activeColor;
 
-      const targetIndex = _series.colorState.findIndex(colorItem => colorItem.id === targetId);
+      const targetIndex = _series.colorState.findIndex((colorItem) => colorItem.id === targetId);
       if (targetIndex > -1) {
         _series.colorState[targetIndex].show = true;
       }
@@ -715,7 +718,7 @@ const modules = {
       const colorDOM = targetDOM?.getElementsByClassName(classList.color)[0];
       const nameDOM = targetDOM?.getElementsByClassName(classList.name)[0];
       const isActive = targetDOM?.dataset.inactive === 'false';
-      const activeCount = series.colorState.filter(colorItem => colorItem.show).length;
+      const activeCount = series.colorState.filter((colorItem) => colorItem.show).length;
 
       if (!colorDOM || !nameDOM) {
         return;
@@ -726,7 +729,7 @@ const modules = {
         const legendContainerDOMs = Array.from(
           this.legendBoxDOM.getElementsByClassName(classList.container),
         );
-        const isActiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'false');
+        const isActiveAll = legendContainerDOMs.every((dom) => dom.dataset.inactive === 'false');
 
         if (isActiveAll) {
           legendContainerDOMs.forEach((dom) => {
@@ -741,7 +744,7 @@ const modules = {
           activeDomAndSeries(targetDOM, opt.color);
         }
 
-        const isInactiveAll = legendContainerDOMs.every(dom => dom.dataset.inactive === 'true');
+        const isInactiveAll = legendContainerDOMs.every((dom) => dom.dataset.inactive === 'true');
 
         if (isInactiveAll) {
           legendContainerDOMs.forEach((dom) => {
@@ -907,13 +910,11 @@ const modules = {
         if (valueDOMList && valueDOMList.length) {
           for (const dom of valueDOMList) {
             const key = dom.dataset.type;
-            if (key === 'name') {
-              continue;
+            if (key !== 'name') {
+              const seriesId = row.series.sId;
+              const value = aggregations?.[seriesId]?.[key];
+              dom.textContent = this.getFormattedValue(columns[key], value);
             }
-
-            const seriesId = row.series.sId;
-            const value = aggregations?.[seriesId]?.[key];
-            dom.textContent = this.getFormattedValue(columns[key], value);
           }
         }
       }

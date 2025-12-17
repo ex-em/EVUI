@@ -84,10 +84,10 @@ export default {
       }
 
       if (node.checked) {
-        parent.checked = parent.children.every(n => n.checked);
+        parent.checked = parent.children.every((n) => n.checked);
         parent.indeterminate = !parent.checked;
       } else {
-        const fn = n => n.checked || node.indeterminate;
+        const fn = (n) => n.checked || node.indeterminate;
         parent.checked = false;
         parent.indeterminate = parent.children.some(fn);
       }
@@ -143,7 +143,7 @@ export default {
         }
         if (node.children) {
           flatTree[node.nodeKey].children = [];
-          node.children.forEach(child => flattenChildren(child, node));
+          node.children.forEach((child) => flattenChildren(child, node));
         }
       }
 
@@ -156,7 +156,7 @@ export default {
     allNodeInfo = getAllNodeInfo();
 
     function getCheckedNodes() {
-      return allNodeInfo.filter(obj => obj.node.checked).map(obj => obj.node);
+      return allNodeInfo.filter((obj) => obj.node.checked).map((obj) => obj.node);
     }
 
     function rebuildTree() {
@@ -221,13 +221,14 @@ export default {
 
     const makeChildrenVisible = (node) => {
       if (node.children) {
-        const isSearchedChildren = !!node.children.filter(child =>
+        const isSearchedChildren = !!node.children.filter((child) =>
           isIncluded(child.title, props.searchWord),
         )?.length;
         node.children.forEach((child) => {
           makeChildrenVisible(child);
-          child.visible = (isSearchedChildren && isIncluded(child.title, props.searchWord))
-            || !isSearchedChildren;
+          child.visible =
+            (isSearchedChildren && isIncluded(child.title, props.searchWord)) ||
+            !isSearchedChildren;
         });
       }
     };
@@ -259,7 +260,7 @@ export default {
         node.visible = false;
       });
 
-      const filteredNodes = allNodeInfo.filter(nodeObj => isIncluded(nodeObj.node.title, value));
+      const filteredNodes = allNodeInfo.filter((nodeObj) => isIncluded(nodeObj.node.title, value));
 
       filteredNodes.forEach((nodeObj) => {
         const node = nodeObj.node;
@@ -277,7 +278,7 @@ export default {
     }
 
     const isShowEmptyText = computed(
-      () => !treeNodeData.value.length || treeNodeData.value.every(node => !node.visible),
+      () => !treeNodeData.value.length || treeNodeData.value.every((node) => !node.visible),
     );
 
     watch(

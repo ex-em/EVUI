@@ -349,7 +349,7 @@ export default {
     };
 
     const updateData = () => {
-      const getRandArr = count =>
+      const getRandArr = (count) =>
         Array(count)
           .fill(0)
           .map(() => Math.ceil(Math.random() * 100));

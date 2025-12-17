@@ -22,7 +22,7 @@ export default {
     modelValue: {
       type: Number,
       default: 0,
-      validator: val => val >= 0 && val <= 100,
+      validator: (val) => val >= 0 && val <= 100,
     },
     color: {
       type: [String, Array],

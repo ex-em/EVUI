@@ -146,7 +146,7 @@ export default {
     const items2 = computed(() => getComparisonItems(props.column.type));
     const isShowFilterSetting = computed({
       get: () => props.isShow,
-      set: val => emit('update:isShow', val),
+      set: (val) => emit('update:isShow', val),
     });
     const addRow = () => {
       const operator = filteringItems.value.length >= 2 ? filteringItems.value[1].operator : 'and';
@@ -171,14 +171,14 @@ export default {
       }
     };
     const changeOperator = (val) => {
-      filteringItems.value = filteringItems.value.map(item => ({ ...item, operator: val }));
+      filteringItems.value = filteringItems.value.map((item) => ({ ...item, operator: val }));
     };
     const applyFiltering = () => {
       emit(
         'apply-filtering',
         filteringColumn.value.field,
         filteringItems.value.filter(
-          item => item.value || item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty',
+          (item) => item.value || item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty',
         ),
       );
     };
@@ -205,7 +205,7 @@ export default {
       },
     );
 
-    const getSelectTitle = (items, title) => items.find(item => item.value === title)?.name || '';
+    const getSelectTitle = (items, title) => items.find((item) => item.value === title)?.name || '';
 
     const initWrapperDiv = () => {
       const root = document.createElement('div');

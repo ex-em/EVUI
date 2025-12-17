@@ -406,8 +406,8 @@ export default {
       filterStore: [],
       pagingStore: [],
       originStore: [],
-      showTreeStore: computed(() => stores.treeStore.filter(item => item.show)),
-      searchStore: computed(() => stores.treeStore.filter(item => item.isFilter)),
+      showTreeStore: computed(() => stores.treeStore.filter((item) => item.show)),
+      searchStore: computed(() => stores.treeStore.filter((item) => item.isFilter)),
       store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.treeStore)),
       treeRows: props.rows,
       filteredColumns: [],
@@ -423,7 +423,7 @@ export default {
         })),
       ),
       orderedColumns: computed(() =>
-        (stores.filteredColumns.length ? stores.filteredColumns : stores.originColumns),
+        stores.filteredColumns.length ? stores.filteredColumns : stores.originColumns,
       ),
       updatedColumns: computed(() => getUpdatedColumns(stores)),
     });
@@ -518,7 +518,7 @@ export default {
     });
     const styleInfo = reactive({
       showHeader: computed(() =>
-        (props.option.showHeader === undefined ? true : props.option.showHeader),
+        props.option.showHeader === undefined ? true : props.option.showHeader,
       ),
       stripeStyle: computed(() => props.option.style?.stripe || false),
       borderStyle: computed(() => props.option.style?.border || ''),
@@ -602,7 +602,8 @@ export default {
       updatePagingInfo,
     });
 
-    const { setPositionColumnSetting, initColumnSettingInfo, onApplyColumn, setColumnHidden } = columnSettingEvent({
+    const { setPositionColumnSetting, initColumnSettingInfo, onApplyColumn, setColumnHidden } =
+      columnSettingEvent({
         stores,
         columnSettingInfo,
         contextInfo,
@@ -610,7 +611,8 @@ export default {
         onResize,
       });
 
-    const { setContextMenu, onContextMenu, onColumnContextMenu, onGridSettingContextMenu } = contextMenuEvent({
+    const { setContextMenu, onContextMenu, onColumnContextMenu, onGridSettingContextMenu } =
+      contextMenuEvent({
         contextInfo,
         stores,
         selectInfo,
@@ -634,9 +636,9 @@ export default {
         contextInfo.menu?.hide(e);
       }
       if (
-        e.type === 'scroll'
-        && !e.target.classList?.contains('table-body')
-        && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')
+        e.type === 'scroll' &&
+        !e.target.classList?.contains('table-body') &&
+        !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')
       ) {
         columnSettingInfo.isShowColumnSetting = false;
         contextInfo.isShowMenuOnClick = false;
@@ -720,7 +722,7 @@ export default {
         }
         if (store.length) {
           store.forEach((row) => {
-            row.checked = !!value.find(checkedRow => checkedRow.index === row.index);
+            row.checked = !!value.find((checkedRow) => checkedRow.index === row.index);
           });
           checkHeader(store);
         }
@@ -740,7 +742,7 @@ export default {
       (value) => {
         if (selectInfo.useSelect) {
           stores.store.forEach((row) => {
-            row.selected = !!value.find(selectedRow => selectedRow.index === row.index);
+            row.selected = !!value.find((selectedRow) => selectedRow.index === row.index);
           });
           updateVScroll();
         }
@@ -782,7 +784,7 @@ export default {
           setParentShow(parent);
         };
         if (index >= 0) {
-          const highlightNode = stores.store.find(node => node.index === index);
+          const highlightNode = stores.store.find((node) => node.index === index);
           if (!highlightNode) {
             return;
           }
@@ -792,7 +794,7 @@ export default {
           setParentShow(highlightNode);
           // tree 에 보여지는 데이터 기준으로 index 다시 구하기
           const highlightIndex = stores.showTreeStore
-            .map(node => node.index)
+            .map((node) => node.index)
             .indexOf(highlightNode.index);
           if (pageInfo.usePage && !pageInfo.isInfinite) {
             const page = Math.ceil(highlightIndex / pageInfo.perPage);
@@ -893,7 +895,7 @@ export default {
           updateVScroll();
           if (current === pageInfo.highlightPage && pageInfo.isHighlight) {
             const highlightIndex = stores.pagingStore
-              .map(node => node.index)
+              .map((node) => node.index)
               .indexOf(styleInfo.highlightIdx);
             elementInfo.body.scrollTop = resizeInfo.rowHeight * highlightIndex;
             pageInfo.isHighlight = !pageInfo.isHighlight;
@@ -937,9 +939,9 @@ export default {
     }));
     const isHeaderCheckbox = computed(
       () =>
-        checkInfo.useCheckbox.use
-        && checkInfo.useCheckbox.headerCheck
-        && checkInfo.useCheckbox.mode !== 'single',
+        checkInfo.useCheckbox.use &&
+        checkInfo.useCheckbox.headerCheck &&
+        checkInfo.useCheckbox.mode !== 'single',
     );
     const getColumnClass = (column) => {
       const render = isRenderer(column);
@@ -956,15 +958,15 @@ export default {
         width: `${column.width}px`,
         'min-width': render ? `${resizeInfo.rendererMinWidth}px;` : `${resizeInfo.minWidth}px`,
         'margin-right':
-          stores.orderedColumns.length - 1 === index
-          && scrollInfo.hasVerticalScrollBar
-          && scrollInfo.hasHorizontalScrollBar
+          stores.orderedColumns.length - 1 === index &&
+          scrollInfo.hasVerticalScrollBar &&
+          scrollInfo.hasHorizontalScrollBar
             ? `${resizeInfo.scrollWidth}px`
             : '0px',
         'border-right': stores.orderedColumns.length - 1 === index ? 'none' : '1px solid #CFCFCF',
       };
     };
-    const getSlotName = column => `${column}Node`;
+    const getSlotName = (column) => `${column}Node`;
 
     return {
       summaryScroll,

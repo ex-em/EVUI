@@ -31,7 +31,7 @@ const module = {
 
     if (!scrollbarOpt.isInit) {
       scrollbarOpt.type = axisOpt?.[0]?.type;
-      scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
+      scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...(axisOpt?.[0]?.range ?? [])] : null;
 
       this.initScrollbarRange(dir);
       this.createScrollbarLayout(dir);
@@ -110,11 +110,14 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      const isResetPosition = dir === 'x'
+      const isResetPosition =
+        dir === 'x'
           ? this.options.axesX?.[0]?.scrollbar?.resetPosition
           : this.options.axesY?.[0]?.scrollbar?.resetPosition;
       if (isUpdateAxesRange || isResetPosition) {
-        this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
+        this.scrollbar[dir].range = newOpt?.[0]?.range?.length
+          ? [...(newOpt?.[0]?.range ?? [])]
+          : null;
         // range가 업데이트되면 저장된 스크롤 위치를 초기화
         delete this.scrollbar[dir].savedPosition;
       } else if (updateData) {
@@ -534,8 +537,9 @@ const module = {
 
     this.onScrollbarWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
-      const tooltipBodyDOM = this.tooltipBodyDOM
-        || this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
+      const tooltipBodyDOM =
+        this.tooltipBodyDOM ||
+        this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
 
       if (isTooltipVisible && tooltipBodyDOM) {
         const { scrollTop, scrollHeight, clientHeight } = tooltipBodyDOM;

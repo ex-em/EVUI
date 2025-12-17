@@ -93,7 +93,7 @@ export default {
     order: {
       type: String,
       default: 'left',
-      validator: val => ['left', 'right', 'center'].includes(val),
+      validator: (val) => ['left', 'right', 'center'].includes(val),
     },
     pagePerJump: {
       type: [Number, undefined],
@@ -108,7 +108,7 @@ export default {
     const visiblePage = computed(() => (props.visiblePage > 7 ? props.visiblePage : 7));
     const current = computed(() => props.modelValue);
     const pageCount = computed(() =>
-      (props.total === 0 ? 1 : Math.ceil(props.total / props.perPage)),
+      props.total === 0 ? 1 : Math.ceil(props.total / props.perPage),
     );
     const hasPrev = computed(() => current.value > 1);
     const hasNext = computed(() => current.value < pageCount.value);
@@ -133,7 +133,7 @@ export default {
     const getPage = (num, options = {}) => ({
       number: num,
       isCurrent: options.isCurrent ?? current.value === num,
-      click: event => changePage(num, event),
+      click: (event) => changePage(num, event),
       input: (event, inputNum) => changePage(+inputNum, event),
       disabled: options.disabled || false,
       class: options.class || '',

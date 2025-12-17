@@ -46,7 +46,7 @@ export default {
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit }) {
-    const prevMenuItem = ref(props.items.filter(item => props.modelValue === item.value));
+    const prevMenuItem = ref(props.items.filter((item) => props.modelValue === item.value));
     const clickMenu = (params) => {
       if (!params.disabled) {
         const newMenuItem = params.item;

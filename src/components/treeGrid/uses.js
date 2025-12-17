@@ -12,7 +12,7 @@ export const commonFunctions = (params) => {
    */
   const isRenderer = (column = {}) => !!column?.render?.use;
   const getComponentName = (type = '') => {
-    const setUpperCaseFirstStr = str => str.charAt(0).toUpperCase() + str.slice(1);
+    const setUpperCaseFirstStr = (str) => str.charAt(0).toUpperCase() + str.slice(1);
     const rendererStr = 'Renderer';
     let typeStr = '';
     if (type.indexOf('_') !== -1) {
@@ -51,7 +51,7 @@ export const commonFunctions = (params) => {
    * @param {string} field - 컬럼 필드명
    * @returns {number} 일치한다면 컬럼 인덱스, 일치하지 않는다면 -1
    */
-  const getColumnIndex = field => props.columns.findIndex(column => column.field === field);
+  const getColumnIndex = (field) => props.columns.findIndex((column) => column.field === field);
   const setPixelUnit = (value) => {
     let size = value;
     const hasPx = size.toString().indexOf('px') >= 0;
@@ -62,18 +62,20 @@ export const commonFunctions = (params) => {
     return size;
   };
   const checkHeader = (rows) => {
-    checkInfo.isHeaderChecked = !!rows.length && rows.every(row => row.checked);
-    const uncheckableList = rows.filter(row => row.uncheckable);
+    checkInfo.isHeaderChecked = !!rows.length && rows.every((row) => row.checked);
+    const uncheckableList = rows.filter((row) => row.uncheckable);
     if (uncheckableList.length) {
-      const checkedList = rows.filter(row => row.checked);
-      const isAllUncheckable = rows.every(row => uncheckableList.includes(row));
+      const checkedList = rows.filter((row) => row.checked);
+      const isAllUncheckable = rows.every((row) => uncheckableList.includes(row));
 
-      checkInfo.isHeaderChecked = !isAllUncheckable && uncheckableList.length + checkedList.length === rows.length;
+      checkInfo.isHeaderChecked =
+        !isAllUncheckable && uncheckableList.length + checkedList.length === rows.length;
       checkInfo.isHeaderUncheckable = isAllUncheckable;
     }
-    checkInfo.isHeaderIndeterminate = !!rows.length
-      && rows.some(row => row.checked || row.indeterminate)
-      && !checkInfo.isHeaderChecked;
+    checkInfo.isHeaderIndeterminate =
+      !!rows.length &&
+      rows.some((row) => row.checked || row.indeterminate) &&
+      !checkInfo.isHeaderChecked;
   };
   return {
     isRenderer,
@@ -88,7 +90,7 @@ export const commonFunctions = (params) => {
 export const getUpdatedColumns = (stores) => {
   const { originColumns, filteredColumns } = stores;
   return originColumns.map((col) => {
-    const changedCol = filteredColumns.find(fcol => fcol.index === col.index) ?? {};
+    const changedCol = filteredColumns.find((fcol) => fcol.index === col.index) ?? {};
     return {
       ...col,
       ...changedCol,
@@ -118,7 +120,8 @@ export const scrollEvent = (params) => {
     const bodyEl = elementInfo.body;
     if (bodyEl) {
       const rowHeight = resizeInfo.rowHeight;
-      const rowCount = bodyEl.clientHeight > rowHeight ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+      const rowCount =
+        bodyEl.clientHeight > rowHeight ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
       const totalScrollHeight = store.length * rowHeight;
       let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
       if (firstVisibleIndex > store.length - 1) {
@@ -131,9 +134,11 @@ export const scrollEvent = (params) => {
       const tableEl = elementInfo.table;
 
       stores.viewStore = store.slice(firstIndex, lastIndex);
-      scrollInfo.hasVerticalScrollBar = rowCount < store.length || bodyEl.clientHeight < tableEl.clientHeight;
+      scrollInfo.hasVerticalScrollBar =
+        rowCount < store.length || bodyEl.clientHeight < tableEl.clientHeight;
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
-      scrollInfo.vScrollBottomHeight = totalScrollHeight - stores.viewStore.length * rowHeight - scrollInfo.vScrollTopHeight;
+      scrollInfo.vScrollBottomHeight =
+        totalScrollHeight - stores.viewStore.length * rowHeight - scrollInfo.vScrollTopHeight;
       if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
         pageInfo.prevPage = pageInfo.currentPage;
         pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
@@ -235,7 +240,8 @@ export const resizeEvent = (params) => {
 
       columnWidth = elWidth - result.totalWidth;
       if (columnWidth > 0) {
-        const sharePerEmptyCount = result.emptyCount === 0 ? 0 : Math.floor(columnWidth / result.emptyCount);
+        const sharePerEmptyCount =
+          result.emptyCount === 0 ? 0 : Math.floor(columnWidth / result.emptyCount);
 
         remainWidth = columnWidth - sharePerEmptyCount * result.emptyCount;
         columnWidth = result.emptyCount !== 0 ? sharePerEmptyCount : columnWidth;
@@ -401,10 +407,10 @@ export const clickEvent = (params) => {
   let timer = null;
   const onRowClick = (event, row) => {
     if (
-      event.target
-      && event.target.parentElement
-      && (event.target.parentElement.classList.contains('row-checkbox-input')
-        || event.target.closest('td')?.classList?.contains('row-contextmenu'))
+      event.target &&
+      event.target.parentElement &&
+      (event.target.parentElement.classList.contains('row-checkbox-input') ||
+        event.target.closest('td')?.classList?.contains('row-contextmenu'))
     ) {
       return false;
     }
@@ -415,7 +421,7 @@ export const clickEvent = (params) => {
           row.selected = false;
           if (selectInfo.multiple) {
             if (event.ctrlKey) {
-              selectInfo.selectedRow = selectInfo.selectedRow.filter(s => s.index !== row.index);
+              selectInfo.selectedRow = selectInfo.selectedRow.filter((s) => s.index !== row.index);
             } else {
               selectInfo.selectedRow = [row];
             }
@@ -425,9 +431,9 @@ export const clickEvent = (params) => {
         } else {
           row.selected = true;
           if (
-            event.ctrlKey
-            && selectInfo.multiple
-            && (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)
+            event.ctrlKey &&
+            selectInfo.multiple &&
+            (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)
           ) {
             selectInfo.selectedRow.push(row);
           } else {
@@ -465,7 +471,7 @@ export const checkEvent = (params) => {
   const isEachMode = () => checkInfo.useCheckbox.mode === 'each';
 
   const unCheckedRow = (row) => {
-    const index = stores.treeStore.findIndex(item => item.index === row.index);
+    const index = stores.treeStore.findIndex((item) => item.index === row.index);
 
     if (index !== -1) {
       stores.treeStore[index].checked = row.checked;
@@ -484,7 +490,7 @@ export const checkEvent = (params) => {
         }
         if (!node.checked) {
           checkInfo.checkedRows = checkInfo.checkedRows.filter(
-            checked => checked.index !== childNode.index,
+            (checked) => checked.index !== childNode.index,
           );
         }
         childNode.checked = node.checked && !childNode.uncheckable;
@@ -502,21 +508,22 @@ export const checkEvent = (params) => {
 
     const parentNode = node.parent;
     if (parentNode) {
-      const isCheck = parentNode.children.every(n => n.checked);
+      const isCheck = parentNode.children.every((n) => n.checked);
       parentNode.checked = isCheck && !parentNode.uncheckable;
-      const uncheckableList = parentNode.children.filter(n => n.uncheckable);
+      const uncheckableList = parentNode.children.filter((n) => n.uncheckable);
       if (uncheckableList.length) {
-        const checkedList = parentNode.children.filter(n => n.checked);
+        const checkedList = parentNode.children.filter((n) => n.checked);
         if (uncheckableList.length + checkedList.length === parentNode.children.length) {
           parentNode.checked = true;
         }
       }
 
-      parentNode.indeterminate = !isCheck && parentNode.children.some(n => n.checked || n.indeterminate);
+      parentNode.indeterminate =
+        !isCheck && parentNode.children.some((n) => n.checked || n.indeterminate);
 
       if (!parentNode.checked) {
         checkInfo.checkedRows = checkInfo.checkedRows.filter(
-          checked => checked.index !== parentNode.index,
+          (checked) => checked.index !== parentNode.index,
         );
       } else {
         checkInfo.checkedRows.push(parentNode);
@@ -564,7 +571,7 @@ export const checkEvent = (params) => {
         checkInfo.checkedRows = [];
         return;
       }
-      checkInfo.checkedRows = checkInfo.checkedRows.filter(it => it.index !== row.index);
+      checkInfo.checkedRows = checkInfo.checkedRows.filter((it) => it.index !== row.index);
     };
 
     onSingleMode();
@@ -588,19 +595,19 @@ export const checkEvent = (params) => {
    */
   const onCheckAll = (event) => {
     const status = checkInfo.isHeaderChecked;
-    let store = stores.store?.filter(row => row.isFilter);
+    let store = stores.store?.filter((row) => row.isFilter);
     if (pageInfo.isClientPaging) {
       store = getPagingData();
     }
     store.forEach((row) => {
       row.checked = status && !row.uncheckable;
       if (row.checked) {
-        if (!checkInfo.checkedRows.find(checked => checked.index === row.index)) {
+        if (!checkInfo.checkedRows.find((checked) => checked.index === row.index)) {
           checkInfo.checkedRows.push(row);
         }
       } else {
         checkInfo.checkedRows = checkInfo.checkedRows.filter(
-          checked => checked.index !== row.index,
+          (checked) => checked.index !== row.index,
         );
       }
       row.indeterminate = false;
@@ -697,7 +704,7 @@ export const contextMenuEvent = (params) => {
     const rowIndex = target.closest('.row')?.dataset?.index;
 
     if (rowIndex) {
-      const index = stores.viewStore.findIndex(v => v.index === Number(rowIndex));
+      const index = stores.viewStore.findIndex((v) => v.index === Number(rowIndex));
       const rowData = stores.viewStore[index];
       selectInfo.selectedRow = [rowData];
       setContextMenu();
@@ -803,7 +810,7 @@ export const treeEvent = (params) => {
         }
         if (node.children) {
           node.hasChild = true;
-          node.children.forEach(child =>
+          node.children.forEach((child) =>
             setNodeData({
               node: child,
               level: level + 1,
@@ -975,8 +982,8 @@ export const pagingEvent = (params) => {
       searchInfo: {
         searchWord: filterInfo.searchWord,
         searchColumns: stores.orderedColumns
-          .filter(c => !c.hide && (c?.searchable === undefined || c?.searchable))
-          .map(d => d.field),
+          .filter((c) => !c.hide && (c?.searchable === undefined || c?.searchable))
+          .map((d) => d.field),
       },
     });
     if (pageInfo.isInfinite && (eventName?.onSearch || eventName?.onSort)) {
@@ -1007,12 +1014,12 @@ export const sortEvent = ({ sortInfo, stores }) => {
   const { emit } = getCurrentInstance();
 
   const getDefaultSortType = (includeInit = true) =>
-    (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
+    includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc'];
 
   function OrderQueue() {
     this.orders = getDefaultSortType();
     this.dequeue = () => this.orders.shift();
-    this.enqueue = o => this.orders.push(o);
+    this.enqueue = (o) => this.orders.push(o);
   }
 
   const setSortOptionToOrderedColumns = (column, sortType = 'init') => {
@@ -1026,7 +1033,7 @@ export const sortEvent = ({ sortInfo, stores }) => {
   };
 
   const initializeHiddenColumnsSortType = () => {
-    const hiddenColumns = stores.originColumns.filter(col => col.hiddenDisplay || col.hide);
+    const hiddenColumns = stores.originColumns.filter((col) => col.hiddenDisplay || col.hide);
     if (hiddenColumns.length) {
       hiddenColumns.forEach((col) => {
         col.sortOption = { sortType: 'init' };
@@ -1048,7 +1055,7 @@ export const sortEvent = ({ sortInfo, stores }) => {
 
   const setSortInfo = (columns, emitTriggered = true) => {
     const sortByColumnIndex = columns?.findIndex(
-      col => col?.sortable && col?.sortOption?.sortType && col.sortOption.sortType !== 'init',
+      (col) => col?.sortable && col?.sortOption?.sortType && col.sortOption.sortType !== 'init',
     );
     const sortByColumn = columns[sortByColumnIndex];
     if (sortByColumnIndex > -1) {

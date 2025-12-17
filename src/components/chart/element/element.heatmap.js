@@ -144,8 +144,9 @@ class HeatMap {
       const { start, end, selectedValue } = this.colorState[0];
       if (value < 0 || (start <= ratio && ratio <= end)) {
         itemInfo.show = true;
-        itemInfo.isHighlight = selectedValue !== null
-          && Math.floor(value) === Math.floor(min + (max - min) * (selectedValue / 100));
+        itemInfo.isHighlight =
+          selectedValue !== null &&
+          Math.floor(value) === Math.floor(min + (max - min) * (selectedValue / 100));
         itemInfo.dataColor = value < 0 ? this.errorColor : this.getColorForGradient(ratio);
       }
     } else {
@@ -196,10 +197,10 @@ class HeatMap {
     let point = null;
 
     if (this.labels[dir] && this.labels[dir].length) {
-      let index = this.labels[dir].findIndex(label => label === value);
+      let index = this.labels[dir].findIndex((label) => label === value);
 
       if (index === -1) {
-        index = this.labels[dir].findIndex(label => +label === +value);
+        index = this.labels[dir].findIndex((label) => +label === +value);
       }
 
       const { minIndex, maxIndex, graphMin, graphMax } = minMax;
@@ -217,11 +218,12 @@ class HeatMap {
         }
       }
 
-      const startIndex = minIndex ?? this.labels[dir].findIndex(label => +label === +graphMin);
+      const startIndex = minIndex ?? this.labels[dir].findIndex((label) => +label === +graphMin);
 
       if (index > -1) {
         index -= startIndex > -1 ? startIndex : 0;
-        point = dir === 'x' ? startPoint + this.size.w * index : startPoint - this.size.h * (index + 1);
+        point =
+          dir === 'x' ? startPoint + this.size.w * index : startPoint - this.size.h * (index + 1);
       }
     }
 
@@ -549,7 +551,8 @@ class HeatMap {
 
     ctx.save();
 
-    const dataColor = Util.getColorStringType(gdata.dataColor) === 'RGBA'
+    const dataColor =
+      Util.getColorStringType(gdata.dataColor) === 'RGBA'
         ? item.dataColor
         : Util.colorStringToRgba(gdata.dataColor, 1);
 
@@ -701,7 +704,7 @@ class HeatMap {
 
   getFilteredLabel(labels, count, min, max) {
     return labels.length !== count
-      ? labels.filter(label => min <= label && label <= max)
+      ? labels.filter((label) => min <= label && label <= max)
       : labels;
   }
 

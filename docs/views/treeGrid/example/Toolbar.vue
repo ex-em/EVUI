@@ -80,7 +80,7 @@ export default {
       },
       {
         text: 'Menu2',
-        click: param => console.log('[Menu2]', param),
+        click: (param) => console.log('[Menu2]', param),
       },
     ]);
     const borderMV = ref('');
