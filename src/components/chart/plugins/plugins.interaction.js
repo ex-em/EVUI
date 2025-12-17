@@ -1173,6 +1173,7 @@ const modules = {
         formattedTxt = tooltipValueFormatter({
           x: isHorizontal ? value : itemData?.x,
           y: isHorizontal ? itemData?.y : value,
+          o: itemData?.o,
           name: seriesName,
           seriesId,
           dataId,
