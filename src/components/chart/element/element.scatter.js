@@ -24,6 +24,7 @@ class Scatter {
     this.data = [];
     this.type = 'scatter';
     this.realTimeScatter = realTimeScatter;
+    this._rtTotalCount = 0;
   }
 
   /**
@@ -160,10 +161,12 @@ class Scatter {
     const minmaxY = axesSteps.y[this.yAxisIndex];
     const pointStyle = typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
+    let totalCount = 0;
 
     for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
         const item = this.data[this.sId]?.dataGroup[i]?.data[j];
+        totalCount++;
 
         const isDedupeOnRT = coordinateDedupe !== false;
         let shouldDraw;
@@ -194,6 +197,10 @@ class Scatter {
         }
       }
     }
+
+    // findGraphData(realTimeScatter)에서 역순 탐색 시 global index 계산에 사용한다.
+    // draw 단계에서 이미 전체 순회를 하기 때문에 여기서 캐시하면 mousemove마다 카운트용 1패스를 줄일 수 있다.
+    this._rtTotalCount = totalCount;
   }
 
   /**
@@ -289,12 +296,47 @@ class Scatter {
    * @returns {object} graph item
    */
   findGraphData(offset) {
-    if (this.realTimeScatter) return false;
-
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color, index: null };
     const pointSize = this.pointSize;
+
+    if (this.realTimeScatter) {
+      const dataGroup = this.data[this.sId]?.dataGroup;
+      if (!dataGroup) {
+        return item;
+      }
+
+      const totalCount = this._rtTotalCount;
+      let currentIndex = totalCount - 1;
+
+      for (let i = dataGroup.length - 1; i >= 0; i--) {
+        const group = dataGroup[i];
+        if (group?.data) {
+          for (let j = group.data.length - 1; j >= 0; j--) {
+            const dataItem = group.data[j];
+            if (dataItem.xp !== null && dataItem.yp !== null) {
+              const x = dataItem.xp;
+              const y = dataItem.yp;
+
+              if ((x - pointSize <= xp)
+                && (xp <= x + pointSize)
+                && (y - pointSize <= yp)
+                && (yp <= y + pointSize)) {
+                item.data = dataItem;
+                item.index = currentIndex;
+                item.hit = true;
+                return item;
+              }
+            }
+            currentIndex--;
+          }
+        }
+      }
+
+      return item;
+    }
+
     const gdata = this.data;
 
     const targetIndex = gdata.findIndex((data) => {
