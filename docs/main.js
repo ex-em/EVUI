@@ -13,6 +13,4 @@ app.config.globalProperties.$messagebox = EvMessageBox;
 app.config.globalProperties.$messagex = EvMessage;
 app.config.globalProperties.$notify = EvNotification;
 
-app.use(router)
-.use(EVUI)
-.mount('#app');
+app.use(router).use(EVUI).mount('#app');

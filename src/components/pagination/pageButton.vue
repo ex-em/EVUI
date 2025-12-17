@@ -3,7 +3,7 @@
     :class="{
       'is-current': page.isCurrent,
       'is-disabled': disabled || page.disabled,
-      [page.class]: true
+      [page.class]: true,
     }"
     v-bind="$attrs"
     :aria-current="page.isCurrent"
@@ -14,7 +14,6 @@
 </template>
 
 <script>
-
 export default {
   name: 'PageButton',
   props: {

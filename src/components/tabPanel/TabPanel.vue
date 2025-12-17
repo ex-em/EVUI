@@ -1,8 +1,5 @@
 <template>
-  <article
-    v-show="isSelected"
-    class="ev-tab-panel"
-  >
+  <article v-show="isSelected" class="ev-tab-panel">
     <slot />
   </article>
 </template>
@@ -27,8 +24,7 @@ export default {
       default: false,
     },
   },
-  emits: {
-  },
+  emits: {},
   setup(props) {
     const evTabs = inject('evTabs', null);
     const isSelected = computed(() => props.value === evTabs.value);
@@ -44,7 +40,8 @@ export default {
 @use '../../style/index.scss' as *;
 
 .ev-tab {
-  ul, li {
+  ul,
+  li {
     list-style: none;
   }
 

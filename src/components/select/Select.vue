@@ -55,11 +55,7 @@
             @click="clickSelectInput"
           />
           <template v-if="!collapseTags">
-            <div
-              v-for="item in selectedModel"
-              :key="item"
-              class="ev-select-tag"
-            >
+            <div v-for="item in selectedModel" :key="item" class="ev-select-tag">
               <span class="ev-tag-name">
                 {{ item.name }}
               </span>
@@ -78,17 +74,13 @@
               </span>
               <span
                 class="ev-tag-suffix"
-                @click.stop="
-                  [removeMv(selectedModel[0].value), changeDropboxPosition()]
-                "
+                @click.stop="[removeMv(selectedModel[0].value), changeDropboxPosition()]"
               >
                 <i class="ev-tag-suffix-close ev-icon-error" />
               </span>
             </div>
             <div v-if="selectedModel.length > 1" class="ev-select-tag num">
-              <span class="ev-tag-name">
-                + {{ selectedModel.length - 1 }}
-              </span>
+              <span class="ev-tag-name"> + {{ selectedModel.length - 1 }} </span>
             </div>
           </template>
         </div>
@@ -135,9 +127,7 @@
               :class="{
                 selected: allCheck,
               }"
-              @click.self.prevent="
-                [changeAllCheck(false), changeDropboxPosition()]
-              "
+              @click.self.prevent="[changeAllCheck(false), changeDropboxPosition()]"
             >
               <ev-checkbox
                 v-model="allCheck"
@@ -159,15 +149,10 @@
                       }"
                       :title="item.name"
                       @click.self.prevent="
-                        item.disabled
-                          ? []
-                          : [clickItem(item.value), changeDropboxPosition()]
+                        item.disabled ? [] : [clickItem(item.value), changeDropboxPosition()]
                       "
                     >
-                      <ev-checkbox
-                        :label="item.value"
-                        :disabled="item.disabled"
-                      >
+                      <ev-checkbox :label="item.value" :disabled="item.disabled">
                         <i v-if="item.iconClass" :class="item.iconClass" />
                         {{ item.name }}
                       </ev-checkbox>
@@ -192,15 +177,10 @@
                     }"
                     :title="item.name"
                     @click.stop.prevent="
-                      item.disabled
-                        ? []
-                        : [clickItem(item.value), changeDropboxPosition()]
+                      item.disabled ? [] : [clickItem(item.value), changeDropboxPosition()]
                     "
                   >
-                    <ev-checkbox
-                      :model-value="mv === item.value"
-                      :disabled="item.disabled"
-                    >
+                    <ev-checkbox :model-value="mv === item.value" :disabled="item.disabled">
                       <i v-if="item.iconClass" :class="item.iconClass" />
                       {{ item.name }}
                     </ev-checkbox>
@@ -222,9 +202,7 @@
                   }"
                   :title="item.name"
                   @click.stop.prevent="
-                    item.disabled
-                      ? []
-                      : [clickItem(item.value), changeDropboxPosition()]
+                    item.disabled ? [] : [clickItem(item.value), changeDropboxPosition()]
                   "
                 >
                   <i v-if="item.iconClass" :class="item.iconClass" />
@@ -391,13 +369,12 @@ export default {
   border-radius: $default-radius;
   cursor: pointer;
 
-
   &__wrapper {
     position: relative;
   }
   .ev-input {
     padding: 0 30px 0 15px;
-    border: 1px solid #B2B2B2;
+    border: 1px solid #b2b2b2;
     cursor: pointer;
 
     &.multiple {
@@ -415,7 +392,7 @@ export default {
     align-items: center;
 
     &:hover {
-      color: #409EFF;
+      color: #409eff;
     }
   }
 
@@ -447,9 +424,9 @@ export default {
   height: 24px;
   padding: 0 19px 0 8px;
   margin: 2px 0 2px 6px;
-  background-color: #F4F4F5;
+  background-color: #f4f4f5;
   align-items: center;
-  border: 1px solid #E9E9EB;
+  border: 1px solid #e9e9eb;
   border-radius: 4px;
   color: #909399;
   font-size: $font-size-base;
@@ -472,11 +449,11 @@ export default {
     right: 3px;
     height: 100%;
     align-items: center;
-    color: #0D0D0D;
+    color: #0d0d0d;
     cursor: pointer;
 
     &:hover {
-      color: #409EFF;
+      color: #409eff;
     }
   }
 }
@@ -490,8 +467,8 @@ export default {
   position: absolute;
   width: 100%;
   max-height: $select-height * 5;
-  background-color: #FCFCFC;
-  border: 1px solid #E4E7ED;
+  background-color: #fcfcfc;
+  border: 1px solid #e4e7ed;
   color: #606266;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   border-radius: 4px;
@@ -512,7 +489,7 @@ export default {
     min-height: $select-height;
     padding: 0 30px 0 15px;
     border: 0;
-    border-bottom: 1px solid #B2B2B2;
+    border-bottom: 1px solid #b2b2b2;
     outline: 0;
     font-size: $font-size-medium;
     background-color: transparent;
@@ -530,7 +507,7 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 15px;
-  color: #0D0D0D;
+  color: #0d0d0d;
   white-space: nowrap;
   cursor: pointer;
 
@@ -538,12 +515,12 @@ export default {
     opacity: 0.85;
   }
   &.selected {
-    color: #EBEBEB;
-    background-color: #730EF4;
+    color: #ebebeb;
+    background-color: #730ef4;
   }
   &.disabled {
     opacity: 1;
-    color: #C0C4CC;
+    color: #c0c4cc;
     cursor: not-allowed;
   }
 }

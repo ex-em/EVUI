@@ -78,9 +78,7 @@ export const commonFunctions = () => {
 };
 
 export const getUpdatedColumns = (stores) => {
-  const baseColumns = (
-    stores.movedColumns?.length ? stores.movedColumns : stores.originColumns
-  ) ?? [];
+  const baseColumns = (stores.movedColumns?.length ? stores.movedColumns : stores.originColumns) ?? [];
   const filteredColumnsMap = new Map(
     (stores.filteredColumns ?? []).map(filtered => [filtered.index, filtered]),
   );
@@ -120,9 +118,9 @@ export const scrollEvent = (params) => {
       }
 
       const expandedRowCount = expandedInfo.expandedRows?.length ?? 0;
-      const expandedRowIndexes = expandedInfo.expandedRows?.map(
-        row => store.findIndex(data => data[ROW_DATA_INDEX] === row),
-      ) ?? [];
+      const expandedRowIndexes = expandedInfo.expandedRows?.map(row =>
+          store.findIndex(data => data[ROW_DATA_INDEX] === row),
+        ) ?? [];
       const totalScrollHeight = store.length * rowHeight + expandedRowCount * expandedRowHeight;
 
       let firstVisibleIndex = 0;
@@ -157,8 +155,9 @@ export const scrollEvent = (params) => {
         }
       } else {
         rowCount = bodyEl.clientHeight > rowHeight
-          ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
-          renderRowHeight = rowCount * rowHeight;
+            ? Math.ceil(bodyEl.clientHeight / rowHeight)
+            : store.length;
+        renderRowHeight = rowCount * rowHeight;
       }
 
       const lastVisibleIndex = firstVisibleIndex + rowCount + 1;
@@ -167,11 +166,9 @@ export const scrollEvent = (params) => {
       const tableEl = elementInfo.table;
 
       stores.viewStore = store.slice(firstIndex, lastIndex);
-      scrollInfo.hasVerticalScrollBar = rowCount < store.length
-        || bodyEl.clientHeight < tableEl.clientHeight;
+      scrollInfo.hasVerticalScrollBar = rowCount < store.length || bodyEl.clientHeight < tableEl.clientHeight;
       scrollInfo.vScrollTopHeight = scrollTop;
-      scrollInfo.vScrollBottomHeight = totalScrollHeight - renderRowHeight
-        - scrollInfo.vScrollTopHeight;
+      scrollInfo.vScrollBottomHeight = totalScrollHeight - renderRowHeight - scrollInfo.vScrollTopHeight;
       if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
         pageInfo.prevPage = pageInfo.currentPage;
         pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
@@ -261,18 +258,21 @@ export const resizeEvent = (params) => {
       const rowHeight = bodyEl.querySelector('tr')?.offsetHeight || resizeInfo.rowHeight;
       const scrollWidth = elWidth - bodyEl.clientWidth;
 
-      const result = stores.orderedColumns.reduce((acc, cur) => {
-        if (cur.hide || cur.hiddenDisplay) {
-          return acc;
-        }
-        if (cur.width) {
-          acc.totalWidth += cur.width;
-        } else {
-          acc.emptyCount++;
-        }
+      const result = stores.orderedColumns.reduce(
+        (acc, cur) => {
+          if (cur.hide || cur.hiddenDisplay) {
+            return acc;
+          }
+          if (cur.width) {
+            acc.totalWidth += cur.width;
+          } else {
+            acc.emptyCount++;
+          }
 
-        return acc;
-      }, { totalWidth: contextInfo.customContextMenu.length ? 30 : 0, emptyCount: 0 });
+          return acc;
+        },
+        { totalWidth: contextInfo.customContextMenu.length ? 30 : 0, emptyCount: 0 },
+      );
 
       if (rowHeight * props.rows.length > elHeight) {
         elWidth -= scrollWidth;
@@ -288,14 +288,10 @@ export const resizeEvent = (params) => {
 
       columnWidth = elWidth - result.totalWidth;
       if (columnWidth > 0) {
-        const sharePerEmptyCount = result.emptyCount === 0
-            ? 0
-            : Math.floor(columnWidth / result.emptyCount);
+        const sharePerEmptyCount = result.emptyCount === 0 ? 0 : Math.floor(columnWidth / result.emptyCount);
 
-        remainWidth = columnWidth - (sharePerEmptyCount * result.emptyCount);
-        columnWidth = result.emptyCount !== 0
-          ? sharePerEmptyCount
-          : columnWidth;
+        remainWidth = columnWidth - sharePerEmptyCount * result.emptyCount;
+        columnWidth = result.emptyCount !== 0 ? sharePerEmptyCount : columnWidth;
       } else {
         columnWidth = resizeInfo.columnWidth;
       }
@@ -376,7 +372,8 @@ export const resizeEvent = (params) => {
     const headerLeft = headerEl.getBoundingClientRect().left;
     const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
     const minWidth = isRenderer(stores.orderedColumns[columnIndex])
-      ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+      ? resizeInfo.rendererMinWidth
+      : resizeInfo.minWidth;
     const columnRect = columnEl.getBoundingClientRect();
     const resizeLineEl = elementInfo.resizeLine;
     const minLeft = columnRect.left - headerLeft + minWidth;
@@ -463,11 +460,7 @@ export const clickEvent = (params) => {
       if (keyType === 'shift') {
         const rowIndex = row[ROW_INDEX];
         if (lastIndex > -1) {
-          for (
-            let i = Math.min(rowIndex, lastIndex);
-            i <= Math.max(rowIndex, lastIndex);
-            i++
-          ) {
+          for (let i = Math.min(rowIndex, lastIndex); i <= Math.max(rowIndex, lastIndex); i++) {
             if (!selected) {
               stores.originStore[i][ROW_SELECT_INDEX] = true;
               if (lastIndex !== i) {
@@ -475,8 +468,9 @@ export const clickEvent = (params) => {
               }
             } else {
               stores.originStore[i][ROW_SELECT_INDEX] = false;
-              const deselectedIndex = selectInfo.selectedRow
-                .indexOf(stores.originStore[i][ROW_DATA_INDEX]);
+              const deselectedIndex = selectInfo.selectedRow.indexOf(
+                stores.originStore[i][ROW_DATA_INDEX],
+              );
               if (deselectedIndex > -1) {
                 selectInfo.selectedRow.splice(deselectedIndex, 1);
               }
@@ -507,14 +501,16 @@ export const clickEvent = (params) => {
           keyType = 'ctrl';
         }
 
-        if (selectInfo.multiple && keyType) { // multi select
+        if (selectInfo.multiple && keyType) {
+          // multi select
           onMultiSelectByKey(keyType, selected, rowData);
         } else if (isRight || isContextmenu) {
           selectInfo.selectedRow = [...selectInfo.selectedRow];
           if (!selectInfo.selectedRow.includes(rowData)) {
             selectInfo.selectedRow = [rowData];
           }
-        } else if (selected) { // single select
+        } else if (selected) {
+          // single select
           selectInfo.selectedRow = [];
         } else {
           selectInfo.selectedRow = [rowData];
@@ -551,7 +547,8 @@ export const checkEvent = (params) => {
    */
   const unCheckedRow = (row) => {
     const index = stores.originStore.findIndex(
-      item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX]);
+      item => item[ROW_DATA_INDEX] === row[ROW_DATA_INDEX],
+    );
 
     if (index !== -1) {
       stores.originStore[index][ROW_CHECK_INDEX] = row[ROW_CHECK_INDEX];
@@ -666,7 +663,8 @@ export const sortEvent = (params) => {
   const { sortInfo, stores, updatePagingInfo } = params;
   const { emit } = getCurrentInstance();
 
-  const getDefaultSortType = (includeInit = true) => (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
+  const getDefaultSortType = (includeInit = true) =>
+    (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
   function OrderQueue() {
     this.orders = getDefaultSortType();
     this.dequeue = () => this.orders.shift();
@@ -698,7 +696,7 @@ export const sortEvent = (params) => {
     sortInfo.sortColumn = column;
     sortInfo.sortField = column?.field;
     sortInfo.sortOrder = sortType;
-    sortInfo.isSorting = !!(sortType);
+    sortInfo.isSorting = !!sortType;
 
     if (emitTriggered) {
       setSortOptionToOrderedColumns(column, sortType);
@@ -762,8 +760,8 @@ export const sortEvent = (params) => {
     const customSetAsc = sortInfo.sortFunction?.[field] ?? null;
     const setDesc = (a, b) => (a > b ? -1 : 1);
     const setAsc = (a, b) => (a < b ? -1 : 1);
-    const numberSetDesc = (a, b) => ((a === null) - (b === null) || Number(b) - Number(a));
-    const numberSetAsc = (a, b) => ((a === null) - (b === null) || Number(a) - Number(b));
+    const numberSetDesc = (a, b) => (a === null) - (b === null) || Number(b) - Number(a);
+    const numberSetAsc = (a, b) => (a === null) - (b === null) || Number(a) - Number(b);
     if (sortInfo.sortOrder === 'init' || (!sortInfo.sortField && !sortInfo.isSorting)) {
       stores.store.sort((a, b) => {
         if (typeof a[ROW_INDEX] === 'number') {
@@ -840,9 +838,11 @@ export const sortEvent = (params) => {
     }
   };
 
-  const getSortTarget = () => stores.orderedColumns?.find(
-    column => column?.sortOption && getDefaultSortType(false).includes(column.sortOption.sortType),
-  );
+  const getSortTarget = () =>
+    stores.orderedColumns?.find(
+      column =>
+        column?.sortOption && getDefaultSortType(false).includes(column.sortOption.sortType),
+    );
   const hasSortTarget = () => !!getSortTarget();
 
   return { onSort, getSortTarget, setSort, setSortInfo, hasSortTarget };
@@ -876,10 +876,12 @@ export const filterEvent = (params) => {
     });
     if (rowData.length) {
       checkInfo.isHeaderChecked = rowData.length === checkedCount;
-      checkInfo.isHeaderIndeterminate = (rowData.length !== checkedCount) && checkedCount > 0;
-      checkInfo.isHeaderUncheckable = rowData
-        .every(row => props.uncheckable.includes(row[ROW_DATA_INDEX])
-          || props.disabledRows.includes(row[ROW_DATA_INDEX]));
+      checkInfo.isHeaderIndeterminate = rowData.length !== checkedCount && checkedCount > 0;
+      checkInfo.isHeaderUncheckable = rowData.every(
+        row =>
+          props.uncheckable.includes(row[ROW_DATA_INDEX])
+          || props.disabledRows.includes(row[ROW_DATA_INDEX]),
+      );
     }
   };
   /**
@@ -999,8 +1001,7 @@ export const filterEvent = (params) => {
    * @returns {boolean} 확인 결과
    */
   const getFilteringData = (data, columnType, condition) => {
-    let filterFn = columnType === 'string' || columnType === 'stringNumber'
-      ? stringFilter : numberFilter;
+    let filterFn = columnType === 'string' || columnType === 'stringNumber' ? stringFilter : numberFilter;
     if (columnType === 'boolean') {
       filterFn = booleanFilter;
     }
@@ -1032,21 +1033,26 @@ export const filterEvent = (params) => {
           });
         } else if (AND && item.operator === 'or') {
           if (ix > 0) {
-            filterStore.push(...getFilteringData(prevStore, columnType, {
-              ...item,
-              index,
-            }));
-          } else { // ix === 0
+            filterStore.push(
+              ...getFilteringData(prevStore, columnType, {
+                ...item,
+                index,
+              }),
+            );
+          } else {
+            // ix === 0
             filterStore = getFilteringData(prevStore, columnType, {
               ...item,
               index,
             });
           }
         } else if ((ix === 0 && OR) || (ix !== 0 && item.operator === 'or')) {
-          filterStore.push(...getFilteringData(originStore, columnType, {
-            ...item,
-            index,
-          }));
+          filterStore.push(
+            ...getFilteringData(originStore, columnType, {
+              ...item,
+              index,
+            }),
+          );
         } else {
           filterStore = getFilteringData(filterStore, columnType, {
             ...item,
@@ -1076,9 +1082,11 @@ export const filterEvent = (params) => {
       if (searchWord) {
         stores.searchStore = stores.store.filter((row) => {
           let isShow = false;
-          const rowData = columnSettingInfo.isFilteringColumn ? row[ROW_DATA_INDEX]
-            .filter((data, idx) => columnSettingInfo.visibleColumnIdx
-              .includes(idx)) : row[ROW_DATA_INDEX];
+          const rowData = columnSettingInfo.isFilteringColumn
+            ? row[ROW_DATA_INDEX].filter((data, idx) =>
+                columnSettingInfo.visibleColumnIdx.includes(idx),
+              )
+            : row[ROW_DATA_INDEX];
 
           for (let ix = 0; ix < stores.orderedColumns.length; ix++) {
             const column = stores.orderedColumns[ix] || {};
@@ -1141,18 +1149,17 @@ export const contextMenuEvent = (params) => {
     const menuItems = [];
     contextmenuTimer = setTimeout(() => {
       if (contextInfo.customContextMenu.length) {
-        const customItems = contextInfo.customContextMenu.map(
-          (item) => {
-            const menuItem = item;
-            if (menuItem.validate) {
-              menuItem.disabled = !menuItem.validate(menuItem.itemId, selectInfo.selectedRow);
-            }
+        const customItems = contextInfo.customContextMenu.map((item) => {
+          const menuItem = item;
+          if (menuItem.validate) {
+            menuItem.disabled = !menuItem.validate(menuItem.itemId, selectInfo.selectedRow);
+          }
 
-            menuItem.selectedRow = selectInfo.selectedRow ?? [];
-            menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
+          menuItem.selectedRow = selectInfo.selectedRow ?? [];
+          menuItem.contextmenuInfo = selectInfo.contextmenuInfo ?? [];
 
-            return menuItem;
-          });
+          return menuItem;
+        });
 
         menuItems.push(...customItems);
       }
@@ -1188,8 +1195,7 @@ export const contextMenuEvent = (params) => {
   const onColumnContextMenu = (event, column) => {
     if (event.target.className === 'column-name') {
       const sortable = column.sortable === undefined ? true : column.sortable;
-      const filterable = filterInfo.isFiltering
-      && column.filterable === undefined ? true : column.filterable;
+      const filterable = filterInfo.isFiltering && column.filterable === undefined ? true : column.filterable;
       const columnMenuItems = [
         {
           text: contextInfo.columnMenuTextInfo?.ascending ?? 'Ascending',
@@ -1274,9 +1280,7 @@ export const contextMenuEvent = (params) => {
     };
 
     if (contextInfo.customGridSettingContextMenu.length) {
-      contextInfo.gridSettingContextMenuItems = [
-        ...contextInfo.customGridSettingContextMenu,
-      ];
+      contextInfo.gridSettingContextMenuItems = [...contextInfo.customGridSettingContextMenu];
     }
 
     if (useDefaultColumnSetting) {
@@ -1341,15 +1345,17 @@ export const storeEvent = (params) => {
         store.push([idx, checked, row, selected, expanded, uncheckable, disabled]);
       });
 
-      if (rows.length !== props.checked.length
+      if (
+        rows.length !== props.checked.length
         && (rows.length === props.uncheckable?.length || rows.length === props.disabledRows?.length)
       ) {
         hasUnChecked = true;
       }
       checkInfo.isHeaderChecked = rows.length > 0 ? !hasUnChecked : false;
       checkInfo.isHeaderIndeterminate = hasUnChecked && !!checkInfo.checkedRows.length;
-      checkInfo.isHeaderUncheckable = rows.every(row => props.uncheckable.includes(row)
-        || props.disabledRows.includes(row));
+      checkInfo.isHeaderUncheckable = rows.every(
+        row => props.uncheckable.includes(row) || props.disabledRows.includes(row),
+      );
       stores.originStore = store;
     }
     if (filterInfo.isFiltering) {
@@ -1372,14 +1378,7 @@ export const storeEvent = (params) => {
 
 export const pagingEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const {
-    stores,
-    pageInfo,
-    sortInfo,
-    filterInfo,
-    elementInfo,
-    clearCheckInfo,
-  } = params;
+  const { stores, pageInfo, sortInfo, filterInfo, elementInfo, clearCheckInfo } = params;
   const getPagingData = () => {
     const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
     const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
@@ -1432,13 +1431,7 @@ export const pagingEvent = (params) => {
 
 export const columnSettingEvent = (params) => {
   const { props, emit } = getCurrentInstance();
-  const {
-    stores,
-    columnSettingInfo,
-    contextInfo,
-    onSearch,
-    onResize,
-  } = params;
+  const { stores, columnSettingInfo, contextInfo, onSearch, onResize } = params;
 
   const setPositionColumnSetting = (toolbarRef) => {
     if (!columnSettingInfo.isShowColumnSetting) {
@@ -1449,8 +1442,9 @@ export const columnSettingEvent = (params) => {
     if (contextInfo.gridSettingContextMenuItems.length) {
       // 컨텍스트 메뉴 형태인 경우
       const columnListMenu = contextInfo.gridSettingContextMenuItems.length - 1;
-      const columnListMenuRect = contextInfo.gridSettingMenu?.rootMenuList?.$el?.children[0]
-        .children[columnListMenu].getBoundingClientRect();
+      const columnListMenuRect = contextInfo.gridSettingMenu?.rootMenuList?.$el?.children[0].children[
+          columnListMenu
+        ].getBoundingClientRect();
 
       columnSettingInfo.columnSettingPosition.columnListMenuWidth = columnListMenuRect.width;
       columnSettingInfo.columnSettingPosition.top = columnListMenuRect.top;
@@ -1497,11 +1491,12 @@ export const columnSettingEvent = (params) => {
   const setFilteringColumn = () => {
     columnSettingInfo.visibleColumnIdx = stores.filteredColumns.map(col => col.index);
 
-    const originColumnIdx = stores.originColumns.filter(col => (!col.hide || col.hiddenDisplay))
+    const originColumnIdx = stores.originColumns
+      .filter(col => !col.hide || col.hiddenDisplay)
       .map(col => col.index);
     const visibleColumnIdx = columnSettingInfo.visibleColumnIdx;
 
-    columnSettingInfo.isFilteringColumn = (visibleColumnIdx.length !== originColumnIdx.length);
+    columnSettingInfo.isFilteringColumn = visibleColumnIdx.length !== originColumnIdx.length;
 
     // 컬럼을 필터링했을 때, 검색어가 있는 경우 재검색
     if (props.option.searchValue) {
@@ -1542,12 +1537,11 @@ export const columnSettingEvent = (params) => {
     if (columns.length === 1) {
       return;
     }
-    stores.filteredColumns = columns
-      .filter((col) => {
-        const shouldHide = col.field === val;
-        syncHiddenState(col, shouldHide);
-        return !shouldHide;
-      });
+    stores.filteredColumns = columns.filter((col) => {
+      const shouldHide = col.field === val;
+      syncHiddenState(col, shouldHide);
+      return !shouldHide;
+    });
     const baseColumns = getBaseColumns();
     baseColumns.forEach((col) => {
       if (col.field === val) {
@@ -1569,9 +1563,9 @@ export const columnSettingEvent = (params) => {
 export const dragEvent = ({ stores }) => {
   const { emit } = getCurrentInstance();
   const buildMovedColumns = (visibleColumns) => {
-    const baseColumns = (stores.movedColumns?.length
+    const baseColumns = stores.movedColumns?.length
       ? [...stores.movedColumns]
-      : [...stores.originColumns]);
+      : [...stores.originColumns];
     const queue = [...visibleColumns];
     const visibleIndexSet = new Set(queue.map(column => column.index));
     stores.movedColumns = baseColumns.map((column) => {

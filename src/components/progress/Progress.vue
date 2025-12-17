@@ -1,25 +1,13 @@
 <template>
   <div class="ev-progress">
-    <div
-      class="ev-progress-wrapper"
-      :style="wrapperStyle"
-    >
-      <div
-        class="ev-progress-inner"
-        :style="innerStyle"
-      >
-        <div
-          v-if="innerText"
-          class="ev-progress-inner-text"
-        >
+    <div class="ev-progress-wrapper" :style="wrapperStyle">
+      <div class="ev-progress-inner" :style="innerStyle">
+        <div v-if="innerText" class="ev-progress-inner-text">
           {{ innerText }}
         </div>
       </div>
     </div>
-    <div
-      v-if="$slots.default"
-      class="ev-progress-label"
-    >
+    <div v-if="$slots.default" class="ev-progress-label">
       <slot />
     </div>
   </div>
@@ -34,7 +22,7 @@ export default {
     modelValue: {
       type: Number,
       default: 0,
-      validator: val => (val >= 0 && val <= 100),
+      validator: val => val >= 0 && val <= 100,
     },
     color: {
       type: [String, Array],
@@ -49,8 +37,7 @@ export default {
       default: '',
     },
   },
-  emits: {
-  },
+  emits: {},
   setup(props) {
     const wrapperStyle = computed(() => ({
       height: `${props.strokeWidth}px`,
@@ -106,7 +93,7 @@ export default {
     position: relative;
     height: 6px;
     border-radius: 100px;
-    background-color: #EBEEF5;
+    background-color: #ebeef5;
     overflow: hidden;
     flex: 1;
     align-self: center;
@@ -120,13 +107,13 @@ export default {
     border-radius: 100px;
     text-align: right;
     white-space: nowrap;
-    transition: width .6s ease;
+    transition: width 0.6s ease;
   }
 
   &-inner-text {
     display: inline-block;
     margin: 0 5px;
-    color: #FFFFFF;
+    color: #ffffff;
     font-size: 12px;
   }
 

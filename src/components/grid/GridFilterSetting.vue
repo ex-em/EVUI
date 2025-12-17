@@ -2,7 +2,11 @@
   <template v-if="isShowFilterSetting">
     <teleport to="#ev-grid-filter-setting-modal">
       <section
-        v-clickoutside="() => { isShowFilterSetting = false }"
+        v-clickoutside="
+          () => {
+            isShowFilterSetting = false;
+          }
+        "
         class="ev-grid-filter-setting"
         :style="{
           top: $props.position.top,
@@ -11,13 +15,10 @@
       >
         <div class="ev-grid-filter-setting__header">
           <ev-icon icon="ev-icon-filter-list"></ev-icon>
-          <span class="header-title"> Filter ({{$props.column.caption}}) </span>
+          <span class="header-title"> Filter ({{ $props.column.caption }}) </span>
         </div>
         <div class="ev-grid-filter-setting__content">
-          <div
-            v-for="(item, idx) in filteringItems"
-            :key="idx"
-            class="ev-grid-filter-setting__row">
+          <div v-for="(item, idx) in filteringItems" :key="idx" class="ev-grid-filter-setting__row">
             <ev-select
               v-model="item.operator"
               class="ev-grid-filter-setting__row--operator"
@@ -49,23 +50,13 @@
               :disabled="item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'"
               @input="validateValue($props.column.type, item)"
             />
-            <div
-              class="ev-grid-filter-setting__row--button"
-            >
-              <ev-icon
-                icon="ev-icon-trash2"
-                @click="removeRow(idx)"
-              />
+            <div class="ev-grid-filter-setting__row--button">
+              <ev-icon icon="ev-icon-trash2" @click="removeRow(idx)" />
             </div>
           </div>
         </div>
         <div class="ev-grid-filter-setting__footer">
-          <ev-button
-            type="primary"
-            @click="applyFiltering"
-          >
-            OK
-          </ev-button>
+          <ev-button type="primary" @click="applyFiltering"> OK </ev-button>
         </div>
       </section>
     </teleport>
@@ -148,9 +139,7 @@ export default {
       } else if (columnType === 'number' || columnType === 'float') {
         return [...numberItems, ...commonItems];
       } else if (columnType === 'boolean') {
-        return [
-          { name: '=', value: '=' },
-        ];
+        return [{ name: '=', value: '=' }];
       }
       return [];
     };
@@ -188,8 +177,9 @@ export default {
       emit(
         'apply-filtering',
         filteringColumn.value.field,
-        filteringItems.value.filter(item => item.value
-          || item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty'),
+        filteringItems.value.filter(
+          item => item.value || item.comparison === 'isEmpty' || item.comparison === 'isNotEmpty',
+        ),
       );
     };
     watch(
@@ -259,8 +249,8 @@ export default {
 .ev-grid-filter-setting {
   position: absolute;
   width: auto;
-  border: 1px solid #D0D0D0;
-  background: #FFFFFF;
+  border: 1px solid #d0d0d0;
+  background: #ffffff;
   font-size: 12px;
   z-index: 1;
   &__header {
@@ -307,8 +297,8 @@ export default {
   }
   &__content {
     padding: 0 10px;
-    border-top: 1px solid #CED4DA;
-    border-bottom: 1px solid #CED4DA;
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
   }
 
   &__footer {

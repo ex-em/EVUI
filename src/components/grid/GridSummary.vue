@@ -10,20 +10,17 @@
       <li
         v-if="showCheckbox"
         :class="{
-          'column': true,
+          column: true,
           'non-border': !!styleInfo.borderStyle,
         }"
         :style="{
-          'width': `${styleInfo.minWidth}px`,
-          'line-height': `${styleInfo.rowHeight}px`
+          width: `${styleInfo.minWidth}px`,
+          'line-height': `${styleInfo.rowHeight}px`,
         }"
       >
-        <span :style="{'height': `${styleInfo.rowHeight}px`}" />
+        <span :style="{ height: `${styleInfo.rowHeight}px` }" />
       </li>
-      <template
-        v-for="(column, index) in columns"
-        :key="`summary_${index}`"
-      >
+      <template v-for="(column, index) in columns" :key="`summary_${index}`">
         <li
           v-if="!column.hide"
           :class="{
@@ -45,23 +42,14 @@
               height: `${styleInfo.rowHeight}px`,
             }"
           >
-            <div
-              v-if="column.summaryRenderer"
-              :title="getSummaryRenderer(column)"
-            >
+            <div v-if="column.summaryRenderer" :title="getSummaryRenderer(column)">
               {{ getSummaryRenderer(column) }}
             </div>
-            <div
-              v-else
-              :title="getSummaryValue(column)"
-            >
-              {{ getSummaryValue(column)}}
+            <div v-else :title="getSummaryValue(column)">
+              {{ getSummaryValue(column) }}
             </div>
           </span>
-          <span
-            v-else
-            :style="{'height': `${styleInfo.rowHeight}px`}"
-          />
+          <span v-else :style="{ height: `${styleInfo.rowHeight}px` }" />
         </li>
       </template>
     </ul>
@@ -146,13 +134,7 @@ export default {
 
     const getColumnIndex = field => columns.value.findIndex(column => column.field === field);
     const getSummaryValue = (column) => {
-      const {
-        type,
-        field,
-        summaryType,
-        summaryDecimal,
-        summaryOnlyTopParent,
-      } = column;
+      const { type, field, summaryType, summaryDecimal, summaryOnlyTopParent } = column;
 
       let result = '';
       const columnIndex = getColumnIndex(field);
@@ -186,9 +168,7 @@ export default {
                 return prev;
               }, 0);
 
-              result = sumValue && bnFloor(
-                sumValue, getValidDecimal(summaryDecimal ?? DECIMAL.default),
-              );
+              result = sumValue && bnFloor(sumValue, getValidDecimal(summaryDecimal ?? DECIMAL.default));
               break;
             }
             case 'average': {
@@ -199,10 +179,11 @@ export default {
                 }
                 return prev;
               }, 0);
-              result = sumValue && bnFloor(
-                bnDivide(sumValue, columnValues.length),
-                getValidDecimal(summaryDecimal ?? DECIMAL.default),
-              );
+              result = sumValue
+                && bnFloor(
+                  bnDivide(sumValue, columnValues.length),
+                  getValidDecimal(summaryDecimal ?? DECIMAL.default),
+                );
               break;
             }
             case 'max': {

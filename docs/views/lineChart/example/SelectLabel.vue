@@ -15,36 +15,26 @@
     />
     <div class="description">
       <ev-toggle v-model="isUseClick" />
-      <span>
-        클릭 기능 enable ( false 일때는 v-model 값으로 변경 )
-      </span>
-      <br>
-      <br>
+      <span> 클릭 기능 enable ( false 일때는 v-model 값으로 변경 ) </span>
+      <br />
+      <br />
       <ev-toggle v-model="isFixedPosTop" />
-      <span>
-        tip 위치를 최상단에 고정
-      </span>
-      <br>
-      <br>
+      <span> tip 위치를 최상단에 고정 </span>
+      <br />
+      <br />
       <ev-toggle v-model="isLive" />
-      <span>
-        데이터 자동 업데이트
-      </span>
-      <br>
-      <br>
+      <span> 데이터 자동 업데이트 </span>
+      <br />
+      <br />
       <div>
-        <div class="badge yellow">
-          v-model:selectedLabel
-        </div>
+        <div class="badge yellow">v-model:selectedLabel</div>
         {{ defaultSelectLabel }}
-        <br>
-        <br>
-        <div class="badge yellow">
-          클릭 이벤트 데이터 (selected)
-        </div>
+        <br />
+        <br />
+        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
         {{ clickedLabel }}
-        <br>
-        <br>
+        <br />
+        <br />
       </div>
     </div>
   </div>
@@ -109,17 +99,21 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-      }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
       selectLabel: {
         use: true,
         useClick: isUseClick,
@@ -144,17 +138,21 @@ export default {
         show: true,
         position: 'right',
       },
-        axesX: [{
+      axesX: [
+        {
           type: 'time',
           timeFormat: 'HH:mm:ss',
           interval: 'second',
-        }],
-      axesY: [{
-        type: 'linear',
-        showGrid: true,
-        startToZero: true,
-        autoScaleRatio: 0.1,
-      }],
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showGrid: true,
+          startToZero: true,
+          autoScaleRatio: 0.1,
+        },
+      ],
       selectLabel: {
         use: true,
         useClick: isUseClick,
@@ -196,13 +194,13 @@ export default {
         if (isLive.value) {
           seriesData.shift();
         }
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
       Object.values(chartData2.data).forEach((seriesData) => {
         if (isLive.value) {
           seriesData.shift();
         }
-        seriesData.push(Math.floor(Math.random() * ((5000 - 5) + 1)) + 5);
+        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
       });
     };
 
@@ -243,7 +241,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .description {
-    position: relative;
-  }
+.description {
+  position: relative;
+}
 </style>

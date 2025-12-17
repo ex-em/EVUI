@@ -1,12 +1,14 @@
 import {
-  ref, reactive, computed, watch,
-  nextTick, getCurrentInstance, onMounted, onUnmounted,
+  ref,
+  reactive,
+  computed,
+  watch,
+  nextTick,
+  getCurrentInstance,
+  onMounted,
+  onUnmounted,
 } from 'vue';
-import {
-  getRegExp,
-  engToKor,
-  korToEng,
-} from 'korean-regexp';
+import { getRegExp, engToKor, korToEng } from 'korean-regexp';
 
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
@@ -134,11 +136,12 @@ export const useDropdown = (param) => {
     const korean = engToKor(trimText);
     const eng = korToEng(trimText);
 
-    return props.items.filter(({ name }) => (
-      name.search(getRegExp(trimText)) > -1
+    return props.items.filter(
+      ({ name }) =>
+        name.search(getRegExp(trimText)) > -1
         || name.search(getRegExp(korean)) > -1
-        || name.search(getRegExp(eng)) > -1
-        ));
+        || name.search(getRegExp(eng)) > -1,
+    );
   });
 
   /**
@@ -191,8 +194,10 @@ export const useDropdown = (param) => {
     if (itemWrapper.value && dropbox.value) {
       await nextTick();
 
-      if (initialDropboxWidth.value === null
-        || initialDropboxWidth.value !== selectWrapper.value.offsetWidth) {
+      if (
+        initialDropboxWidth.value === null
+        || initialDropboxWidth.value !== selectWrapper.value.offsetWidth
+      ) {
         initialDropboxWidth.value = selectWrapper.value.offsetWidth;
       }
 
@@ -210,24 +215,20 @@ export const useDropdown = (param) => {
       const borderXWidth = parseInt(borderLeftWidth) + parseInt(borderRightWidth);
 
       const scrollbarWidth = itemWrapper.value.offsetWidth - itemWrapper.value.clientWidth;
-      maxWidth += (scrollbarWidth + borderXWidth);
+      maxWidth += scrollbarWidth + borderXWidth;
 
       const windowWidth = window.innerWidth;
       const dropboxRect = dropbox.value.getBoundingClientRect();
       const dropboxLeft = dropboxRect.left;
       const maxAllowedWidth = windowWidth - dropboxLeft - 20;
 
-      const finalWidth = Math.max(
-        Math.min((maxWidth), maxAllowedWidth),
-        initialDropboxWidth.value,
-      );
+      const finalWidth = Math.max(Math.min(maxWidth, maxAllowedWidth), initialDropboxWidth.value);
 
       dropboxWidth.value = `${finalWidth}px`;
     } else {
       dropboxWidth.value = '100%';
     }
   };
-
 
   watch(
     () => isDropbox.value,
@@ -245,7 +246,6 @@ export const useDropdown = (param) => {
       await changeDropboxPosition();
     },
   );
-
 
   if (props.filterable) {
     watch(
@@ -331,16 +331,19 @@ export const useDropdown = (param) => {
   const multipleSelectedCls = val => mv.value.includes(val);
   const selectedItemClass = !props.multiple ? singleSelectedCls : multipleSelectedCls;
 
-  watch(() => mv.value, (curr) => {
-    if (props.multiple && props.checkable) {
-      if (curr.length === 0) {
-        allCheck.value = false;
-      } else {
-        allCheck.value = curr.length === filteredItems.value.filter(item => !item.disabled).length;
+  watch(
+    () => mv.value,
+    (curr) => {
+      if (props.multiple && props.checkable) {
+        if (curr.length === 0) {
+          allCheck.value = false;
+        } else {
+          allCheck.value = curr.length === filteredItems.value.filter(item => !item.disabled).length;
+        }
+        changeDropboxPosition();
       }
-      changeDropboxPosition();
-    }
-  });
+    },
+  );
 
   const handleResize = () => {
     if (isDropbox.value) {

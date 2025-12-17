@@ -8,10 +8,8 @@
     v-bind="value"
     :title="name"
   />
-  <icon-list v-if="$route.name === 'Icon'"/>
-  <markdown-view
-    :source="mdText"
-  />
+  <icon-list v-if="$route.name === 'Icon'" />
+  <markdown-view :source="mdText" />
 </template>
 
 <script>

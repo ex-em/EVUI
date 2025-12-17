@@ -51,7 +51,7 @@ const module = {
       let limitMin;
       let limitMax;
 
-      if ((truthyNumber(min) && truthyNumber(max))) {
+      if (truthyNumber(min) && truthyNumber(max)) {
         if (axesType === 'step') {
           limitMin = 0;
           limitMax = labels.length - 1;
@@ -110,7 +110,9 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      const isResetPosition = dir === 'x' ? this.options.axesX?.[0]?.scrollbar?.resetPosition : this.options.axesY?.[0]?.scrollbar?.resetPosition;
+      const isResetPosition = dir === 'x'
+          ? this.options.axesX?.[0]?.scrollbar?.resetPosition
+          : this.options.axesY?.[0]?.scrollbar?.resetPosition;
       if (isUpdateAxesRange || isResetPosition) {
         this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
         // range가 업데이트되면 저장된 스크롤 위치를 초기화
@@ -246,9 +248,9 @@ const module = {
     const titleHeight = this.options.title?.show ? this.options.title?.height : 0;
     const isXScroll = dir === 'x';
     const scrollHeight = isXScroll ? scrollbarOpt.height : scrollbarOpt.width;
-    const fullSize = isXScroll ? (aPos.x2 - aPos.x1) : (aPos.y2 - aPos.y1);
+    const fullSize = isXScroll ? aPos.x2 - aPos.x1 : aPos.y2 - aPos.y1;
     const buttonSize = scrollbarOpt.showButton ? scrollHeight : 0;
-    const trackSize = fullSize - (buttonSize * 2);
+    const trackSize = fullSize - buttonSize * 2;
 
     // 현재 위치를 보존해야 하는 경우 기존 위치를 저장
     let savedThumbPosition = null;
@@ -348,7 +350,7 @@ const module = {
     let thumbPosition = 0;
     if (axesType === 'step') {
       const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
-      const range = (max - min) + 1;
+      const range = max - min + 1;
       steps = labels.length;
 
       const intervalSize = trackSize / steps;
@@ -357,8 +359,8 @@ const module = {
     } else {
       const axisOpt = dir === 'x' ? this.axesX : this.axesY;
       const minMax = this.minMax[dir]?.[0];
-      const graphRange = (+minMax.max) - (+minMax.min);
-      const range = (+max) - (+min);
+      const graphRange = +minMax.max - +minMax.min;
+      const range = +max - +min;
       if (axesType === 'time') {
         interval = axisOpt?.[0]?.getInterval({
           minValue: minMax.min,
@@ -370,8 +372,8 @@ const module = {
       startValue = +minMax.min;
 
       const intervalSize = trackSize / steps;
-      const count = (range / interval) + 1;
-      const point = (+min - startValue);
+      const count = range / interval + 1;
+      const point = +min - startValue;
       thumbSize = intervalSize * count;
       thumbPosition = intervalSize * (point / interval);
     }
@@ -419,7 +421,7 @@ const module = {
   updateScrollbarRange(dir, isUp) {
     const scrollbarOpt = this.scrollbar[dir];
     const { startValue, range, interval, steps } = scrollbarOpt;
-    const endValue = startValue + (interval * steps);
+    const endValue = startValue + interval * steps;
     const axisOpt = dir === 'x' ? this.axesX[0] : this.axesY[0];
     const [min, max] = range ?? [];
 
@@ -480,7 +482,7 @@ const module = {
         const isXScroll = dir === 'x';
         const clickPoint = isXScroll ? e.clientX : -e.clientY;
         const thumbPosition = isXScroll ? x : -y;
-        isUp = (clickPoint > thumbPosition);
+        isUp = clickPoint > thumbPosition;
       } else {
         return;
       }
@@ -533,7 +535,7 @@ const module = {
     this.onScrollbarWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
       const tooltipBodyDOM = this.tooltipBodyDOM
-      || this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
+        || this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
 
       if (isTooltipVisible && tooltipBodyDOM) {
         const { scrollTop, scrollHeight, clientHeight } = tooltipBodyDOM;
@@ -618,10 +620,7 @@ const module = {
       return;
     }
 
-    const {
-      steps, range, pointInThumb,
-      startValue, interval,
-    } = this.scrollbar[dir];
+    const { steps, range, pointInThumb, startValue, interval } = this.scrollbar[dir];
 
     const trackDOM = containerDOM.getElementsByClassName('ev-chart-scrollbar-track');
     const { x, y, width, height } = trackDOM[0].getBoundingClientRect();
@@ -630,7 +629,7 @@ const module = {
     const sp = isXScroll ? x : y;
     const trackSize = isXScroll ? width : height;
     const intervalSize = trackSize / steps;
-    const endValue = (startValue + ((steps - 1) * interval));
+    const endValue = startValue + (steps - 1) * interval;
 
     let movePoint = isXScroll ? e.clientX : e.clientY;
     if (movePoint < sp) {
@@ -643,7 +642,7 @@ const module = {
     if (isXScroll) {
       move = movePoint - sp - pointInThumb;
     } else {
-      move = (sp + trackSize) - movePoint - pointInThumb;
+      move = sp + trackSize - movePoint - pointInThumb;
     }
 
     if (move <= 0) {
@@ -652,7 +651,7 @@ const module = {
 
     let movedMin;
     let movedMax;
-    const currValue = (Math.round(Math.abs(move) / intervalSize) * interval);
+    const currValue = Math.round(Math.abs(move) / intervalSize) * interval;
     const [min, max] = range;
     if (move > 0) {
       const incrementValue = startValue + (currValue - +min);

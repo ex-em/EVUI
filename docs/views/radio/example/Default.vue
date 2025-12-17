@@ -1,75 +1,32 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-radio
-      v-model="radio1"
-      label="Option A"
-    >Radio Option A</ev-radio>
-    <ev-radio
-      v-model="radio1"
-      label="Option B"
-    >Radio Option B</ev-radio>
-    <ev-radio
-      v-model="radio1"
-      label="Option C"
-    >Radio Option C</ev-radio>
+    <ev-radio v-model="radio1" label="Option A">Radio Option A</ev-radio>
+    <ev-radio v-model="radio1" label="Option B">Radio Option B</ev-radio>
+    <ev-radio v-model="radio1" label="Option C">Radio Option C</ev-radio>
     <div class="description">
-      <span class="badge">
-        Selected Value
-      </span>
+      <span class="badge"> Selected Value </span>
       {{ radio1 }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Disabled</p>
-    <ev-radio
-      v-model="radio2"
-      label="Option A"
-      disabled
-    />
-    <ev-radio
-      v-model="radio2"
-      label="Option B"
-      disabled
-    />
-    <ev-radio
-      v-model="radio2"
-      label="Option C"
-    />
+    <ev-radio v-model="radio2" label="Option A" disabled />
+    <ev-radio v-model="radio2" label="Option B" disabled />
+    <ev-radio v-model="radio2" label="Option C" />
   </div>
   <div class="case">
     <p class="case-title">Event</p>
-    <ev-radio
-      v-model="radio3"
-      label="Option A"
-      @change="changeRadio"
-    />
-    <ev-radio
-      v-model="radio3"
-      label="Option B"
-      @change="changeRadio"
-    />
-    <ev-radio
-      v-model="radio3"
-      label="Option C"
-      @change="changeRadio"
-    />
+    <ev-radio v-model="radio3" label="Option A" @change="changeRadio" />
+    <ev-radio v-model="radio3" label="Option B" @change="changeRadio" />
+    <ev-radio v-model="radio3" label="Option C" @change="changeRadio" />
     <div class="description">
-      <span class="badge">
-        Change Event
-      </span>
+      <span class="badge"> Change Event </span>
       {{ eventText }}
     </div>
     <div class="description">
-      <span class="badge">
-        Button Event
-      </span>
-      <button
-        class="btn"
-        @click="selectValue('Option C')"
-      >
-        Select Option C
-      </button>
+      <span class="badge"> Button Event </span>
+      <button class="btn" @click="selectValue('Option C')">Select Option C</button>
     </div>
   </div>
 </template>
@@ -101,5 +58,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

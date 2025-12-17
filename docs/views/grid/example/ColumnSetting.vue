@@ -18,10 +18,7 @@
       @change-column-status="onUpdateColumns"
     >
     </ev-grid>
-    <custom-column-list
-      v-model:is-visible="isVisible"
-      v-model:columns="gridColumns"
-    />
+    <custom-column-list v-model:is-visible="isVisible" v-model:columns="gridColumns" />
   </div>
 </template>
 
@@ -42,10 +39,12 @@ export default {
       {
         text: 'Menu1',
         click: param => console.log(`[Menu1]: ${JSON.stringify(param, null, 2)}`),
-      }, {
+      },
+      {
         text: 'Menu2',
         click: param => console.log('[Menu2]', param.contextmenuInfo),
-      }, {
+      },
+      {
         text: 'Custom Column List',
         click: () => {
           isVisible.value = true;

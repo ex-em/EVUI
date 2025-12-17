@@ -28,8 +28,10 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if ((typeof chartWidth === 'number' && chartWidth < 0)
-      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+    if (
+      (typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)
+    ) {
       return;
     }
 
@@ -42,7 +44,7 @@ const modules = {
         return;
       }
 
-      let radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+      let radius = outerRadius - ((outerRadius - innerRadius) / pieDataSet.length) * ix;
       if (pieOption?.pieStroke?.use) {
         radius -= pieOption.pieStroke.lineWidth;
       }
@@ -53,7 +55,7 @@ const modules = {
 
       pie.or = radius;
       if (ix < pieDataSet.length - 1) {
-        pie.ir = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1));
+        pie.ir = outerRadius - ((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1);
       } else {
         pie.ir = 1;
       }
@@ -83,7 +85,7 @@ const modules = {
 
             const { selectInfo, legendHitInfo } = hitInfo;
             series.isSelect = selectInfo?.sId === slice.id;
-            series.isDownplay = (legendHitInfo && legendHitInfo.sId !== slice.id);
+            series.isDownplay = legendHitInfo && legendHitInfo.sId !== slice.id;
             series.type = isDoughnut ? 'doughnut' : 'pie';
             series.centerX = centerX;
             series.centerY = centerY;
@@ -125,8 +127,10 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if ((typeof chartWidth === 'number' && chartWidth < 0)
-      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+    if (
+      (typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)
+    ) {
       return;
     }
 
@@ -139,7 +143,7 @@ const modules = {
         return;
       }
 
-      let radius = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * ix);
+      let radius = outerRadius - ((outerRadius - innerRadius) / pieDataSet.length) * ix;
       if (pieOption?.pieStroke?.use) {
         radius -= pieOption.pieStroke.lineWidth;
       }
@@ -150,7 +154,7 @@ const modules = {
 
       pie.or = radius;
       if (ix < pieDataSet.length - 1) {
-        pie.ir = outerRadius - (((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1));
+        pie.ir = outerRadius - ((outerRadius - innerRadius) / pieDataSet.length) * (ix + 1);
       } else {
         pie.ir = 1;
       }
@@ -187,7 +191,7 @@ const modules = {
 
             const { selectInfo, legendHitInfo } = hitInfo;
             series.isSelect = selectInfo?.sId === slice.id;
-            series.isDownplay = (legendHitInfo && legendHitInfo.sId !== slice.id);
+            series.isDownplay = legendHitInfo && legendHitInfo.sId !== slice.id;
             series.type = 'sunburst';
             series.centerX = centerX;
             series.centerY = centerY;
@@ -218,8 +222,10 @@ const modules = {
 
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-    if ((typeof chartWidth === 'number' && chartWidth < 0)
-      || (typeof chartHeight === 'number' && chartHeight < 0)) {
+    if (
+      (typeof chartWidth === 'number' && chartWidth < 0)
+      || (typeof chartHeight === 'number' && chartHeight < 0)
+    ) {
       return;
     }
 

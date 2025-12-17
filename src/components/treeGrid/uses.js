@@ -68,8 +68,7 @@ export const commonFunctions = (params) => {
       const checkedList = rows.filter(row => row.checked);
       const isAllUncheckable = rows.every(row => uncheckableList.includes(row));
 
-      checkInfo.isHeaderChecked = !isAllUncheckable
-        && (uncheckableList.length + checkedList.length === rows.length);
+      checkInfo.isHeaderChecked = !isAllUncheckable && uncheckableList.length + checkedList.length === rows.length;
       checkInfo.isHeaderUncheckable = isAllUncheckable;
     }
     checkInfo.isHeaderIndeterminate = !!rows.length
@@ -119,8 +118,7 @@ export const scrollEvent = (params) => {
     const bodyEl = elementInfo.body;
     if (bodyEl) {
       const rowHeight = resizeInfo.rowHeight;
-      const rowCount = bodyEl.clientHeight > rowHeight
-        ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
+      const rowCount = bodyEl.clientHeight > rowHeight ? Math.ceil(bodyEl.clientHeight / rowHeight) : store.length;
       const totalScrollHeight = store.length * rowHeight;
       let firstVisibleIndex = Math.floor(bodyEl.scrollTop / rowHeight);
       if (firstVisibleIndex > store.length - 1) {
@@ -133,11 +131,9 @@ export const scrollEvent = (params) => {
       const tableEl = elementInfo.table;
 
       stores.viewStore = store.slice(firstIndex, lastIndex);
-      scrollInfo.hasVerticalScrollBar = rowCount < store.length
-        || bodyEl.clientHeight < tableEl.clientHeight;
+      scrollInfo.hasVerticalScrollBar = rowCount < store.length || bodyEl.clientHeight < tableEl.clientHeight;
       scrollInfo.vScrollTopHeight = firstIndex * rowHeight;
-      scrollInfo.vScrollBottomHeight = totalScrollHeight - (stores.viewStore.length * rowHeight)
-        - scrollInfo.vScrollTopHeight;
+      scrollInfo.vScrollBottomHeight = totalScrollHeight - stores.viewStore.length * rowHeight - scrollInfo.vScrollTopHeight;
       if (isScroll && pageInfo.isInfinite && scrollInfo.vScrollBottomHeight === 0) {
         pageInfo.prevPage = pageInfo.currentPage;
         pageInfo.currentPage = Math.ceil(lastIndex / pageInfo.perPage) + 1;
@@ -212,19 +208,22 @@ export const resizeEvent = (params) => {
       const bodyEl = elementInfo.body;
       let elWidth = bodyEl.offsetWidth;
       const elHeight = bodyEl.offsetHeight;
-      const result = stores.orderedColumns.reduce((acc, column) => {
-        if (column.hide || column.hiddenDisplay) {
+      const result = stores.orderedColumns.reduce(
+        (acc, column) => {
+          if (column.hide || column.hiddenDisplay) {
+            return acc;
+          }
+
+          if (column.width) {
+            acc.totalWidth += column.width;
+          } else {
+            acc.emptyCount++;
+          }
+
           return acc;
-        }
-
-        if (column.width) {
-          acc.totalWidth += column.width;
-        } else {
-          acc.emptyCount++;
-        }
-
-        return acc;
-      }, { totalWidth: contextInfo.customContextMenu.length ? 30 : 0, emptyCount: 0 });
+        },
+        { totalWidth: contextInfo.customContextMenu.length ? 30 : 0, emptyCount: 0 },
+      );
 
       if (resizeInfo.rowHeight * store.length > elHeight - resizeInfo.scrollWidth) {
         elWidth -= resizeInfo.scrollWidth;
@@ -236,14 +235,10 @@ export const resizeEvent = (params) => {
 
       columnWidth = elWidth - result.totalWidth;
       if (columnWidth > 0) {
-        const sharePerEmptyCount = result.emptyCount === 0
-            ? 0
-            : Math.floor(columnWidth / result.emptyCount);
+        const sharePerEmptyCount = result.emptyCount === 0 ? 0 : Math.floor(columnWidth / result.emptyCount);
 
-        remainWidth = columnWidth - (sharePerEmptyCount * result.emptyCount);
-        columnWidth = result.emptyCount !== 0
-          ? sharePerEmptyCount
-          : columnWidth;
+        remainWidth = columnWidth - sharePerEmptyCount * result.emptyCount;
+        columnWidth = result.emptyCount !== 0 ? sharePerEmptyCount : columnWidth;
       } else {
         columnWidth = resizeInfo.columnWidth;
       }
@@ -321,7 +316,8 @@ export const resizeEvent = (params) => {
     const headerLeft = headerEl.getBoundingClientRect().left;
     const columnEl = headerEl.querySelector(`li[data-index="${columnIndex}"]`);
     const minWidth = isRenderer(stores.orderedColumns[columnIndex])
-      ? resizeInfo.rendererMinWidth : resizeInfo.minWidth;
+      ? resizeInfo.rendererMinWidth
+      : resizeInfo.minWidth;
     const columnRect = columnEl.getBoundingClientRect();
     const maxRight = bodyEl.getBoundingClientRect().right - headerLeft;
     const resizeLineEl = elementInfo.resizeLine;
@@ -404,9 +400,12 @@ export const clickEvent = (params) => {
    */
   let timer = null;
   const onRowClick = (event, row) => {
-    if (event.target && event.target.parentElement
+    if (
+      event.target
+      && event.target.parentElement
       && (event.target.parentElement.classList.contains('row-checkbox-input')
-        || event.target.closest('td')?.classList?.contains('row-contextmenu'))) {
+        || event.target.closest('td')?.classList?.contains('row-contextmenu'))
+    ) {
       return false;
     }
     clearTimeout(timer);
@@ -425,9 +424,11 @@ export const clickEvent = (params) => {
           }
         } else {
           row.selected = true;
-          if (event.ctrlKey
+          if (
+            event.ctrlKey
             && selectInfo.multiple
-            && (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)) {
+            && (!selectInfo.limitCount || selectInfo.limitCount > selectInfo.selectedRow.length)
+          ) {
             selectInfo.selectedRow.push(row);
           } else {
             selectInfo.selectedRow = [row];
@@ -453,13 +454,7 @@ export const clickEvent = (params) => {
 };
 
 export const checkEvent = (params) => {
-  const {
-    checkInfo,
-    stores,
-    checkHeader,
-    pageInfo,
-    getPagingData,
-  } = params;
+  const { checkInfo, stores, checkHeader, pageInfo, getPagingData } = params;
   const { emit } = getCurrentInstance();
 
   /**
@@ -470,8 +465,7 @@ export const checkEvent = (params) => {
   const isEachMode = () => checkInfo.useCheckbox.mode === 'each';
 
   const unCheckedRow = (row) => {
-    const index = stores.treeStore.findIndex(
-      item => item.index === row.index);
+    const index = stores.treeStore.findIndex(item => item.index === row.index);
 
     if (index !== -1) {
       stores.treeStore[index].checked = row.checked;
@@ -489,8 +483,9 @@ export const checkEvent = (params) => {
           checkInfo.checkedRows.push(childNode);
         }
         if (!node.checked) {
-          checkInfo.checkedRows = checkInfo.checkedRows
-            .filter(checked => checked.index !== childNode.index);
+          checkInfo.checkedRows = checkInfo.checkedRows.filter(
+            checked => checked.index !== childNode.index,
+          );
         }
         childNode.checked = node.checked && !childNode.uncheckable;
 
@@ -517,12 +512,12 @@ export const checkEvent = (params) => {
         }
       }
 
-      parentNode.indeterminate = !isCheck
-        && parentNode.children.some(n => n.checked || n.indeterminate);
+      parentNode.indeterminate = !isCheck && parentNode.children.some(n => n.checked || n.indeterminate);
 
       if (!parentNode.checked) {
-        checkInfo.checkedRows = checkInfo.checkedRows
-          .filter(checked => checked.index !== parentNode.index);
+        checkInfo.checkedRows = checkInfo.checkedRows.filter(
+          checked => checked.index !== parentNode.index,
+        );
       } else {
         checkInfo.checkedRows.push(parentNode);
       }
@@ -604,8 +599,9 @@ export const checkEvent = (params) => {
           checkInfo.checkedRows.push(row);
         }
       } else {
-        checkInfo.checkedRows = checkInfo.checkedRows
-          .filter(checked => checked.index !== row.index);
+        checkInfo.checkedRows = checkInfo.checkedRows.filter(
+          checked => checked.index !== row.index,
+        );
       }
       row.indeterminate = false;
     });
@@ -637,17 +633,16 @@ export const contextMenuEvent = (params) => {
 
     if (useCustom && contextInfo.customContextMenu.length) {
       const row = selectInfo.selectedRow;
-      const customItems = contextInfo.customContextMenu.map(
-        (item) => {
-          const menuItem = item;
-          if (menuItem.validate) {
-            menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
-          }
+      const customItems = contextInfo.customContextMenu.map((item) => {
+        const menuItem = item;
+        if (menuItem.validate) {
+          menuItem.disabled = !menuItem.validate(menuItem.itemId, row);
+        }
 
-          menuItem.selectedRow = row ?? [];
+        menuItem.selectedRow = row ?? [];
 
-          return menuItem;
-        });
+        return menuItem;
+      });
 
       menuItems.push(...customItems);
     }
@@ -730,9 +725,7 @@ export const contextMenuEvent = (params) => {
     };
 
     if (contextInfo.customGridSettingContextMenu.length) {
-      contextInfo.gridSettingContextMenuItems = [
-        ...contextInfo.customGridSettingContextMenu,
-      ];
+      contextInfo.gridSettingContextMenuItems = [...contextInfo.customGridSettingContextMenu];
     }
 
     if (useDefaultColumnSetting) {
@@ -914,7 +907,8 @@ export const filterEvent = (params) => {
             if (columnValue !== null) {
               if (!column.hide && (column?.searchable === undefined || column?.searchable)) {
                 columnValue = getConvertValue(column, columnValue).toString();
-                isSameWord = columnValue.toLowerCase()
+                isSameWord = columnValue
+                  .toLowerCase()
                   .includes(searchWord.toString().toLowerCase());
                 if (isSameWord) {
                   break;
@@ -958,14 +952,7 @@ export const filterEvent = (params) => {
 
 export const pagingEvent = (params) => {
   const { emit } = getCurrentInstance();
-  const {
-    stores,
-    pageInfo,
-    sortInfo,
-    filterInfo,
-    elementInfo,
-    clearCheckInfo,
-  } = params;
+  const { stores, pageInfo, sortInfo, filterInfo, elementInfo, clearCheckInfo } = params;
   const getPagingData = () => {
     const start = (pageInfo.currentPage - 1) * pageInfo.perPage;
     const end = parseInt(start, 10) + parseInt(pageInfo.perPage, 10);
@@ -1019,7 +1006,8 @@ export const pagingEvent = (params) => {
 export const sortEvent = ({ sortInfo, stores }) => {
   const { emit } = getCurrentInstance();
 
-  const getDefaultSortType = (includeInit = true) => (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
+  const getDefaultSortType = (includeInit = true) =>
+    (includeInit ? ['asc', 'desc', 'init'] : ['asc', 'desc']);
 
   function OrderQueue() {
     this.orders = getDefaultSortType();
@@ -1059,7 +1047,9 @@ export const sortEvent = ({ sortInfo, stores }) => {
   };
 
   const setSortInfo = (columns, emitTriggered = true) => {
-    const sortByColumnIndex = columns?.findIndex(col => col?.sortable && col?.sortOption?.sortType && col.sortOption.sortType !== 'init');
+    const sortByColumnIndex = columns?.findIndex(
+      col => col?.sortable && col?.sortOption?.sortType && col.sortOption.sortType !== 'init',
+    );
     const sortByColumn = columns[sortByColumnIndex];
     if (sortByColumnIndex > -1) {
       sortByColumn.index = sortByColumnIndex;
@@ -1068,7 +1058,7 @@ export const sortEvent = ({ sortInfo, stores }) => {
 
     sortInfo.sortColumn = sortByColumn;
     sortInfo.sortField = sortByColumn?.field;
-    sortInfo.isSorting = !!(sortType);
+    sortInfo.isSorting = !!sortType;
     sortInfo.sortOrder = sortType;
 
     setSortOptionToOrderedColumns(sortByColumn, sortType);

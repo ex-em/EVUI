@@ -1,10 +1,6 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:realTimeScatterReset="resetFlag"
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <ev-chart v-model:realTimeScatterReset="resetFlag" :data="chartData" :options="chartOptions" />
     <div class="description">
       <div class="row">
         <div class="row-item">
@@ -12,26 +8,12 @@
           <ev-toggle v-model="isRealTime" />
         </div>
         <div class="row-item">
-          <span class="item-title">
-            데이터 초기화
-          </span>
-          <ev-button
-            class="component"
-            @click="dataReset"
-          >
-            reset
-          </ev-button>
+          <span class="item-title"> 데이터 초기화 </span>
+          <ev-button class="component" @click="dataReset"> reset </ev-button>
         </div>
         <div class="row-item">
-          <span class="item-title">
-            change range (s)
-          </span>
-          <ev-input-number
-            v-model="realTimeScatterRange"
-            class="component"
-            :min="50"
-            :step="50"
-          />
+          <span class="item-title"> change range (s) </span>
+          <ev-input-number v-model="realTimeScatterRange" class="component" :min="50" :step="50" />
         </div>
       </div>
     </div>
@@ -79,38 +61,42 @@ export default {
       width: '100%',
       height: '100%',
       padding: { top: 20, right: 2, bottom: 4, left: 2 },
-      axesX: [{
-        type: 'time',
-        timeFormat: 'HH:mm:ss',
-        interval: 'second',
-        showAxis: true,
-        showGrid: false,
-        axisLineColor: '#C9CFDC',
-        labelStyle: {
-          show: true,
-          fontSize: 12,
-          color: '#25262E',
-          fontFamily: 'Roboto',
-          fitDir: 'right',
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: 'second',
+          showAxis: true,
+          showGrid: false,
+          axisLineColor: '#C9CFDC',
+          labelStyle: {
+            show: true,
+            fontSize: 12,
+            color: '#25262E',
+            fontFamily: 'Roboto',
+            fitDir: 'right',
+          },
+          flow: true,
         },
-        flow: true,
-      }],
-      axesY: [{
-        type: 'linear',
-        showAxis: true,
-        startToZero: false,
-        showGrid: true,
-        axisLineColor: '#C9CFDC',
-        gridLineColor: '#C9CFDC',
-        labelStyle: {
-          show: true,
-          fontSize: 12,
-          color: '#25262E',
-          fontFamily: 'Roboto',
-          fitWidth: false,
-          fitDir: 'right',
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          showAxis: true,
+          startToZero: false,
+          showGrid: true,
+          axisLineColor: '#C9CFDC',
+          gridLineColor: '#C9CFDC',
+          labelStyle: {
+            show: true,
+            fontSize: 12,
+            color: '#25262E',
+            fontFamily: 'Roboto',
+            fitWidth: false,
+            fitDir: 'right',
+          },
         },
-      }],
+      ],
       tooltip: {
         use: true,
         formatter: ({ y }) => `${y}`,
@@ -207,17 +193,24 @@ export default {
       timeoutId = setTimeout(tick, 3000);
     };
 
-    watch(() => isRealTime.value, () => {
-      if (isRealTime.value) {
-        timeoutId = setTimeout(tick, 3000);
-      } else {
-        clearTimeout(timeoutId);
-      }
-    }, { immediate: true });
+    watch(
+      () => isRealTime.value,
+      () => {
+        if (isRealTime.value) {
+          timeoutId = setTimeout(tick, 3000);
+        } else {
+          clearTimeout(timeoutId);
+        }
+      },
+      { immediate: true },
+    );
 
-    watch(() => realTimeScatterRange.value, () => {
-      chartOptions.realTimeScatter.range = realTimeScatterRange.value;
-    });
+    watch(
+      () => realTimeScatterRange.value,
+      () => {
+        chartOptions.realTimeScatter.range = realTimeScatterRange.value;
+      },
+    );
 
     const resetFlag = ref(false);
     const dataReset = () => {

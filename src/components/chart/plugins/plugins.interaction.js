@@ -68,7 +68,9 @@ const modules = {
         }
 
         // tooltip이 표시될 때 indicator를 해당 라벨 위치로 이동 (line 차트이거나 line series가 포함된 경우)
-        const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
+        const hasLineSeries = Object.values(this.seriesList || {}).some(
+          series => series.type === 'line',
+        );
         if (tooltip.use && (type === 'line' || hasLineSeries)) {
           // indicator를 그리고 실제 위치한 라벨 정보를 받음
           const indicatorInfo = this.drawIndicatorForTooltip(hitInfo, indicator.color);
@@ -99,8 +101,14 @@ const modules = {
       // tooltip 기반 indicator가 아직 설정되지 않은 경우에만 일반 indicator 처리
       if (!args.hoveredLabel && !this.isNotUseIndicator()) {
         // line 차트가 아니고 line series가 없거나, tooltip이 없을 때는 일반 indicator 표시
-        const hasLineSeries = Object.values(this.seriesList || {}).some(series => series.type === 'line');
-        if ((type !== 'line' && !hasLineSeries) || !tooltip.use || !Object.keys(hitInfo.items).length) {
+        const hasLineSeries = Object.values(this.seriesList || {}).some(
+          series => series.type === 'line',
+        );
+        if (
+          (type !== 'line' && !hasLineSeries)
+          || !tooltip.use
+          || !Object.keys(hitInfo.items).length
+        ) {
           this.drawIndicator(offset, indicator.color);
         }
         const label = this.getTimeLabel(offset);
@@ -200,13 +208,12 @@ const modules = {
         const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
-        const {
-          labelIndex: clickedLabelIndex,
-        } = this.getLabelInfoByPosition(offset, targetAxis);
+        const { labelIndex: clickedLabelIndex } = this.getLabelInfoByPosition(offset, targetAxis);
 
-        const {
-          dataIndex: dataIndexList,
-        } = this.regulateSelectedLabelInfo(clickedLabelIndex, targetAxis);
+        const { dataIndex: dataIndexList } = this.regulateSelectedLabelInfo(
+          clickedLabelIndex,
+          targetAxis,
+        );
 
         this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
 
@@ -314,13 +321,12 @@ const modules = {
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
-        const {
-          labelIndex: clickedLabelIndex,
-        } = this.getLabelInfoByPosition(offset, targetAxis);
+        const { labelIndex: clickedLabelIndex } = this.getLabelInfoByPosition(offset, targetAxis);
 
-        const {
-          dataIndex: dataIndexList,
-        } = this.regulateSelectedLabelInfo(clickedLabelIndex, targetAxis);
+        const { dataIndex: dataIndexList } = this.regulateSelectedLabelInfo(
+          clickedLabelIndex,
+          targetAxis,
+        );
 
         this.defaultSelectInfo = this.getSelectedLabelInfoWithLabelData(dataIndexList, targetAxis);
 
@@ -437,11 +443,13 @@ const modules = {
             let touchInfo = this.setTouchInfo(e);
             this.overlayClear();
 
-            if (this.options.dragSelection.keepDisplay
+            if (
+              this.options.dragSelection.keepDisplay
               && (e.layerX < touchInfo.range.x1
-              || e.layerY < touchInfo.range.y1
-              || e.layerX > touchInfo.range.x2
-              || e.layerY > touchInfo.range.y2)) {
+                || e.layerY < touchInfo.range.y1
+                || e.layerX > touchInfo.range.x2
+                || e.layerY > touchInfo.range.y2)
+            ) {
               this.isTouchOverlay = false;
             } else {
               touchInfo = this.setTouchBoxDimensions(touchInfo);
@@ -495,8 +503,10 @@ const modules = {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
       const customTooltip = this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
 
-      if (isTooltipVisible
-        || (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)) {
+      if (
+        isTooltipVisible
+        || (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)
+      ) {
         e.preventDefault();
 
         if (isTooltipVisible) {
@@ -607,9 +617,7 @@ const modules = {
         dragInfo.xsp = Math.min(xcp, xep);
         dragInfo.ysp = type === 'scatter' ? Math.min(ycp, yep) : aRange.y1;
         dragInfo.width = Math.ceil(Math.abs(xep - xcp));
-        dragInfo.height = type === 'scatter'
-          ? Math.ceil(Math.abs(yep - ycp))
-          : aRange.y2 - aRange.y1;
+        dragInfo.height = type === 'scatter' ? Math.ceil(Math.abs(yep - ycp)) : aRange.y2 - aRange.y1;
       }
 
       this.overlayClear();
@@ -628,9 +636,10 @@ const modules = {
         const args = {
           e,
           data: this.findSelectedItems(dragInfo),
-          range: type === 'heatMap'
-            ? this.getSelectionRangeForHeatMap(dragInfo)
-            : this.getSelectionRange(dragInfo),
+          range:
+            type === 'heatMap'
+              ? this.getSelectionRangeForHeatMap(dragInfo)
+              : this.getSelectionRange(dragInfo),
         };
 
         this.dragInfoBackup = defaultsDeep({}, dragInfo);
@@ -638,11 +647,7 @@ const modules = {
         if (typeof this.listeners['drag-select'] === 'function' && !this.options?.zoom?.use) {
           this.listeners['drag-select'](args);
         } else {
-          const {
-            xsp,
-            range: chartRange,
-            width: dragWidth,
-          } = dragInfo;
+          const { xsp, range: chartRange, width: dragWidth } = dragInfo;
           const dragXsp = xsp - chartRange.x1;
 
           args.range.dragSelectionInfo = {
@@ -672,7 +677,7 @@ const modules = {
     window.addEventListener('mouseup', dragEnd);
   },
 
-/**
+  /**
    * Draw selection-area
    *
    * @returns {undefined}
@@ -696,10 +701,10 @@ const modules = {
     if (isEqual(newRange, range)) {
       ctx.fillRect(xsp, ysp, width, height);
     } else {
-      const rectWidth = (range.x2 - range.x1);
-      const rectHeight = (range.y2 - range.y1);
-      const newRectWidth = (newRange.x2 - newRange.x1);
-      const newRectHeight = (newRange.y2 - newRange.y1);
+      const rectWidth = range.x2 - range.x1;
+      const rectHeight = range.y2 - range.y1;
+      const newRectWidth = newRange.x2 - newRange.x1;
+      const newRectHeight = newRange.y2 - newRange.y1;
 
       const ratioX = (xsp - range.x1) / rectWidth;
       const ratioY = (ysp - range.y1) / rectHeight;
@@ -776,9 +781,7 @@ const modules = {
       };
 
       const setAxisLabelInfo = (targetAxis) => {
-        const {
-          labelIndex,
-        } = this.getLabelInfoByPosition(offset, location);
+        const { labelIndex } = this.getLabelInfoByPosition(offset, location);
         const { labelVal, labelIdx } = this.getCurMouseLabelVal(targetAxis, offset, labelIndex);
         const axesOpt = targetAxis === 'xAxis' ? axesX : axesY;
 
@@ -874,11 +877,7 @@ const modules = {
    * @returns {undefined}
    */
   dragTouchSelectionDestroy(e) {
-    if (
-      this.options.dragSelection?.use
-      && e.target !== this.overlayCanvas
-      && this.isTouchOverlay
-    ) {
+    if (this.options.dragSelection?.use && e.target !== this.overlayCanvas && this.isTouchOverlay) {
       this.isTouchOverlay = false;
       this.overlayClear();
     }
@@ -988,8 +987,7 @@ const modules = {
 
             // 마우스 위치와의 거리 계산하여 가장 가까운 시리즈 선택
             if (item.hit && item.data.xp !== undefined && item.data.yp !== undefined) {
-              const distance = (item.data.xp - offset[0]) ** 2
-                + (item.data.yp - offset[1]) ** 2;
+              const distance = (item.data.xp - offset[0]) ** 2 + (item.data.yp - offset[1]) ** 2;
 
               if (distance < minDistance) {
                 minDistance = distance;
@@ -1038,11 +1036,11 @@ const modules = {
           let currPos;
 
           if (isHorizontal) {
-            prevPos = prevPoint.h ? prevPoint.yp + (prevPoint.h / 2) : prevPoint.yp;
-            currPos = currPoint.h ? currPoint.yp + (currPoint.h / 2) : currPoint.yp;
+            prevPos = prevPoint.h ? prevPoint.yp + prevPoint.h / 2 : prevPoint.yp;
+            currPos = currPoint.h ? currPoint.yp + currPoint.h / 2 : currPoint.yp;
           } else {
-            prevPos = prevPoint.w ? prevPoint.xp + (prevPoint.w / 2) : prevPoint.xp;
-            currPos = currPoint.w ? currPoint.xp + (currPoint.w / 2) : currPoint.xp;
+            prevPos = prevPoint.w ? prevPoint.xp + prevPoint.w / 2 : prevPoint.xp;
+            currPos = currPoint.w ? currPoint.xp + currPoint.w / 2 : currPoint.xp;
           }
 
           if (prevPos !== null && currPos !== null) {
@@ -1072,9 +1070,9 @@ const modules = {
           // 라벨 위치 계산
           let labelPos;
           if (isHorizontal) {
-            labelPos = point.h ? point.yp + (point.h / 2) : point.yp;
+            labelPos = point.h ? point.yp + point.h / 2 : point.yp;
           } else {
-            labelPos = point.w ? point.xp + (point.w / 2) : point.xp;
+            labelPos = point.w ? point.xp + point.w / 2 : point.xp;
           }
 
           if (labelPos !== null) {
@@ -1097,7 +1095,10 @@ const modules = {
           const interpolation = series.interpolation;
           const hasPassingValueInData = series.hasPassingValueInData;
 
-          return interpolation === 'linear' || (interpolation === 'none' && !!passingValue && hasPassingValueInData);
+          return (
+            interpolation === 'linear'
+            || (interpolation === 'none' && !!passingValue && hasPassingValueInData)
+          );
         }
 
         return false;
@@ -1148,8 +1149,8 @@ const modules = {
     const isHorizontal = !!opt.horizontal;
     const tooltipOpt = opt.tooltip;
     const tooltipValueFormatter = typeof tooltipOpt?.formatter === 'function'
-      ? tooltipOpt?.formatter
-      : tooltipOpt?.formatter?.value;
+        ? tooltipOpt?.formatter
+        : tooltipOpt?.formatter?.value;
 
     let formattedTxt = value;
     if (tooltipValueFormatter) {
@@ -1201,7 +1202,8 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const hitItemId = Object.keys(hitInfo.items)[0];
     const hitItemData = isHorizontal
-      ? hitInfo.items?.[hitItemId]?.data?.y : hitInfo.items?.[hitItemId]?.data?.x;
+      ? hitInfo.items?.[hitItemId]?.data?.y
+      : hitInfo.items?.[hitItemId]?.data?.x;
     let maxSeriesName = '';
     let maxValueTxt = '';
 
@@ -1211,11 +1213,8 @@ const modules = {
       const series = this.seriesList[sId];
 
       if (series?.show) {
-        const hasData = series.data.find(data => (
-            isHorizontal
-              ? data?.y === hitItemData
-              : data?.x === hitItemData
-          ),
+        const hasData = series.data.find(data =>
+          (isHorizontal ? data?.y === hitItemData : data?.x === hitItemData),
         );
 
         const formattedSeriesName = this.getFormattedTooltipLabel({
@@ -1223,7 +1222,7 @@ const modules = {
           seriesId: sId,
           seriesName: series.name,
           itemData: hasData,
-         });
+        });
 
         const formattedValue = this.getFormattedTooltipValue({
           dataId: series.id,
@@ -1333,8 +1332,9 @@ const modules = {
         result.label = result.dataIndex.map(i => this.data.labels[i]);
 
         const dataEntries = Object.entries(this.data.data);
-        result.data = result.dataIndex.map(labelIdx => Object.fromEntries(
-          dataEntries.map(([sId, data]) => [sId, data[labelIdx]])));
+        result.data = result.dataIndex.map(labelIdx =>
+          Object.fromEntries(dataEntries.map(([sId, data]) => [sId, data[labelIdx]])),
+        );
         break;
       }
 
@@ -1354,7 +1354,7 @@ const modules = {
 
         const dataValues = Object.values(this.data.data)[0];
         result.data = dataValues.filter(({ x, y }) =>
-          (result.label.includes(targetAxisDirection === 'y' ? y : x)),
+          result.label.includes(targetAxisDirection === 'y' ? y : x),
         );
         break;
       }
@@ -1372,8 +1372,8 @@ const modules = {
   regulateSelectedLabelInfo(labelIndex, targetAxis) {
     const option = this.options?.selectLabel ?? {};
     const before = targetAxis === null || this.defaultSelectInfo?.targetAxis === targetAxis
-      ? { ...this.defaultSelectInfo, targetAxis }
-      : { dataIndex: [], targetAxis };
+        ? { ...this.defaultSelectInfo, targetAxis }
+        : { dataIndex: [], targetAxis };
 
     const after = cloneDeep(before);
 
@@ -1553,17 +1553,17 @@ const modules = {
     const yMaxRatio = this.getRatioInRange(range.y1, range.y2, ysp);
 
     const xMin = this.isMobile && this.boxOverflow?.x1
-      ? Math.min(this.minMax.x[0].min, dataRangeX.graphMin)
-      : Math.max(dataRangeX.graphMin + graphWidth * xMinRatio, dataRangeX.graphMin);
+        ? Math.min(this.minMax.x[0].min, dataRangeX.graphMin)
+        : Math.max(dataRangeX.graphMin + graphWidth * xMinRatio, dataRangeX.graphMin);
     const xMax = this.isMobile && this.boxOverflow?.x2
-      ? Math.max(this.minMax.x[0].max, dataRangeX.graphMax)
-      : Math.min(dataRangeX.graphMin + graphWidth * xMaxRatio, dataRangeX.graphMax);
+        ? Math.max(this.minMax.x[0].max, dataRangeX.graphMax)
+        : Math.min(dataRangeX.graphMin + graphWidth * xMaxRatio, dataRangeX.graphMax);
     const yMin = this.isMobile && this.boxOverflow?.y2
-      ? Math.min(this.minMax.y[0].min, dataRangeY.graphMin)
-      : Math.max(dataRangeY.graphMin + graphHeight * (1 - yMinRatio), dataRangeY.graphMin);
+        ? Math.min(this.minMax.y[0].min, dataRangeY.graphMin)
+        : Math.max(dataRangeY.graphMin + graphHeight * (1 - yMinRatio), dataRangeY.graphMin);
     const yMax = this.isMobile && this.boxOverflow?.y1
-      ? Math.max(this.minMax.y[0].max, dataRangeY.graphMax)
-      : Math.min(dataRangeY.graphMin + graphHeight * (1 - yMaxRatio), dataRangeY.graphMax);
+        ? Math.max(this.minMax.y[0].max, dataRangeY.graphMax)
+        : Math.min(dataRangeY.graphMin + graphHeight * (1 - yMaxRatio), dataRangeY.graphMax);
 
     return {
       xMin: +xMin.toFixed(3),
@@ -1618,10 +1618,12 @@ const modules = {
    * @returns {boolean}
    */
   isDeselectItem(hitInfo) {
-    return this.options.selectItem.useDeselectItem
+    return (
+      this.options.selectItem.useDeselectItem
       && hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex
       && hitInfo?.sId === this.defaultSelectItemInfo?.seriesID
-      && !isNaN(hitInfo?.maxIndex);
+      && !isNaN(hitInfo?.maxIndex)
+    );
   },
 
   /**
@@ -1650,11 +1652,10 @@ const modules = {
       return 'yAxis';
     } else if (
       inRange(offsetX, xAxisStartPoint, xAxisEndPoint)
-      && inRange(offsetY, aPos.y2, this.chartRect.y2)) {
+      && inRange(offsetY, aPos.y2, this.chartRect.y2)
+    ) {
       return 'xAxis';
-    } else if (
-      inRange(offsetX, aPos.x1, aPos.x2)
-      && inRange(offsetY, aPos.y1, aPos.y2)) {
+    } else if (inRange(offsetX, aPos.x1, aPos.x2) && inRange(offsetY, aPos.y1, aPos.y2)) {
       return 'chartBackground';
     }
 
@@ -1662,7 +1663,11 @@ const modules = {
   },
 
   isNotUseIndicator() {
-    return this.options.type === 'pie' || this.options.type === 'scatter' || this.options.type === 'heatMap';
+    return (
+      this.options.type === 'pie'
+      || this.options.type === 'scatter'
+      || this.options.type === 'heatMap'
+    );
   },
 
   /**

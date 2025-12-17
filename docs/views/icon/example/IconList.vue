@@ -2,11 +2,7 @@
   <article class="article-wrapper">
     <h3 class="article-title">Icon List</h3>
     <div class="evui-icon-list">
-      <div
-        v-for="icon in icons"
-        :key="icon.properties.code"
-        class="glyph fs1"
-      >
+      <div v-for="icon in icons" :key="icon.properties.code" class="glyph fs1">
         <div class="clearfix bshadow0 pbs">
           <ev-icon :icon="`ev-icon-${icon.properties.name}`" />
           <span class="mls">

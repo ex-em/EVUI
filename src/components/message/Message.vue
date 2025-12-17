@@ -1,9 +1,6 @@
 <template>
   <teleport to="#ev-message-modal">
-    <transition
-      name="ev-message-fade"
-      appear
-    >
+    <transition name="ev-message-fade" appear>
       <div
         v-show="isShow"
         ref="msgRef"
@@ -16,30 +13,14 @@
         @mouseenter="clearTimer"
         @mouseleave="startTimer"
       >
-        <span
-          v-if="iconClass"
-          class="ev-message-icon"
-        >
-          <i
-            :class="iconClass"
-          />
+        <span v-if="iconClass" class="ev-message-icon">
+          <i :class="iconClass" />
         </span>
-        <div
-          v-if="useHTML"
-          class="ev-message-content"
-          v-html="message"
-        />
-        <div
-          v-else
-          class="ev-message-content"
-        >
+        <div v-if="useHTML" class="ev-message-content" v-html="message" />
+        <div v-else class="ev-message-content">
           {{ message }}
         </div>
-        <span
-          v-if="showClose"
-          class="ev-message-close"
-          @click="closeMsg"
-        >
+        <span v-if="showClose" class="ev-message-close" @click="closeMsg">
           <i class="ev-icon-close" />
         </span>
       </div>
@@ -171,9 +152,11 @@ export default {
   align-items: center;
   box-sizing: border-box;
   border-radius: $default-radius;
-  border: 1px solid #EBEEF5;
-  background-color: #EDF2FC;
-  transition: opacity .4s ease-in-out, transform .3s ease-in-out;
+  border: 1px solid #ebeef5;
+  background-color: #edf2fc;
+  transition:
+    opacity 0.4s ease-in-out,
+    transform 0.3s ease-in-out;
   font-size: $font-size-medium;
   line-height: 1.5em;
 
@@ -211,12 +194,31 @@ export default {
     }
   }
 
-  @each $type, $color-list in (
-    'info': (#FDFDFD, #EEEEEE, #111111),
-    'success': (#F0F9EB, #E1F3D8, #67C23A),
-    'warning': (#FDF6EC, #FAECD8, #E6A23C),
-    'error': (#FEF0F0, #FDE2E2, #F56C6C),
-  ) {
+  @each $type,
+    $color-list
+      in (
+        'info': (
+            #fdfdfd,
+            #eeeeee,
+            #111111,
+          ),
+        'success': (
+            #f0f9eb,
+            #e1f3d8,
+            #67c23a,
+          ),
+        'warning': (
+            #fdf6ec,
+            #faecd8,
+            #e6a23c,
+          ),
+        'error': (
+            #fef0f0,
+            #fde2e2,
+            #f56c6c,
+          )
+      )
+  {
     &.type-#{$type} {
       background-color: list.nth($color-list, 1);
       border-color: list.nth($color-list, 2);

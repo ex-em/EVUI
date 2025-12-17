@@ -14,12 +14,8 @@
       'ev-text-field-prefix-suffix': $slots['icon-prefix'] && $slots['icon-suffix'],
     }"
   >
-    <div
-      class="ev-text-field-wrapper"
-    >
-      <template
-        v-if="type === 'textarea'"
-      >
+    <div class="ev-text-field-wrapper">
+      <template v-if="type === 'textarea'">
         <textarea
           v-model="mv"
           class="ev-textarea"
@@ -34,7 +30,7 @@
           @change="changeMv"
         />
       </template>
-      <template v-else >
+      <template v-else>
         <input
           v-model="mv"
           class="ev-input"
@@ -60,36 +56,23 @@
         <span
           v-if="type === 'password' && showPassword"
           class="ev-text-field-icon icon-password"
-          :class="{ 'on': isPasswordVisible }"
+          :class="{ on: isPasswordVisible }"
           @click="changePasswordVisible"
         >
-          <i :class="isPasswordVisible ? 'ev-icon-visibility' : 'ev-icon-visibility-off'"/>
+          <i :class="isPasswordVisible ? 'ev-icon-visibility' : 'ev-icon-visibility-off'" />
         </span>
-        <span
-          v-if="type === 'search'"
-          class="ev-text-field-icon icon-search"
-          @click="searchValue"
-        >
-          <i class="ev-icon-search"/>
+        <span v-if="type === 'search'" class="ev-text-field-icon icon-search" @click="searchValue">
+          <i class="ev-icon-search" />
         </span>
-        <span
-          v-if="$slots['icon-suffix']"
-          class="ev-text-field-icon icon-suffix"
-        >
-          <slot name="icon-suffix"/>
+        <span v-if="$slots['icon-suffix']" class="ev-text-field-icon icon-suffix">
+          <slot name="icon-suffix" />
         </span>
-        <span
-          v-if="$slots['icon-prefix']"
-          class="ev-text-field-icon icon-prefix"
-        >
-          <slot name="icon-prefix"/>
+        <span v-if="$slots['icon-prefix']" class="ev-text-field-icon icon-prefix">
+          <slot name="icon-prefix" />
         </span>
       </template>
     </div>
-    <div
-      v-if="errorMsg"
-      class="ev-text-field-error"
-    >
+    <div v-if="errorMsg" class="ev-text-field-error">
       {{ errorMsg }}
     </div>
     <div
@@ -98,7 +81,7 @@
       :class="{ max: currentLength > maxLength }"
     >
       <span class="curr-length">{{ currentLength }}</span> / {{ maxLength
-       }}{{ maxUnit === 'byte' ? ' Bytes' : '' }}
+      }}{{ maxUnit === 'byte' ? ' Bytes' : '' }}
     </div>
   </div>
 </template>
@@ -158,14 +141,7 @@ export default {
       default: 'off',
     },
   },
-  emits: [
-    'update:modelValue',
-    'focus',
-    'blur',
-    'input',
-    'change',
-    'search',
-  ],
+  emits: ['update:modelValue', 'focus', 'blur', 'input', 'change', 'search'],
   setup(props, { emit }) {
     const mv = computed({
       get: () => props.modelValue,
@@ -190,16 +166,16 @@ export default {
     });
 
     // clear input value
-    const clearValue = () => { mv.value = ''; };
+    const clearValue = () => {
+      mv.value = '';
+    };
 
     // search input
     const searchValue = () => {
       emit('search', mv.value);
     };
     const keyupInput = (e) => {
-      if (props.type === 'search'
-        && (e.key === 'Enter' || e.keyCode === 13)
-      ) {
+      if (props.type === 'search' && (e.key === 'Enter' || e.keyCode === 13)) {
         searchValue();
       }
     };
@@ -215,9 +191,7 @@ export default {
     const getByteLength = text => new TextEncoder().encode(text).length;
 
     const currentLength = computed(() =>
-      (props.maxUnit === 'byte'
-        ? getByteLength(mv.value || '')
-        : (mv.value || '').length),
+      (props.maxUnit === 'byte' ? getByteLength(mv.value || '') : (mv.value || '').length),
     );
 
     const inputMv = (e) => {

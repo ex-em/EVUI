@@ -23,7 +23,7 @@ class LogarithmicScale extends Scale {
     }
 
     const rangeMagnitude = Util.calculateMagnitude(maxValue - minValue);
-    maxValue = Math.ceil(maxValue / (10 ** rangeMagnitude)) * (10 ** rangeMagnitude);
+    maxValue = Math.ceil(maxValue / 10 ** rangeMagnitude) * 10 ** rangeMagnitude;
 
     if (this.startToZero) {
       minValue = 0;
@@ -75,7 +75,7 @@ class LogarithmicScale extends Scale {
       numberOfSteps = 5;
     }
 
-    while ((numberOfSteps > maxSteps || (numberOfSteps * 2) < maxSteps) && !skipFitting) {
+    while ((numberOfSteps > maxSteps || numberOfSteps * 2 < maxSteps) && !skipFitting) {
       if (numberOfSteps > maxSteps) {
         interval *= 2;
         numberOfSteps = Math.ceil(graphRange / interval);
@@ -96,7 +96,7 @@ class LogarithmicScale extends Scale {
       steps: numberOfSteps,
       interval,
       graphMin,
-      graphMax: Math.ceil(graphMin + (numberOfSteps * interval)),
+      graphMax: Math.ceil(graphMin + numberOfSteps * interval),
     };
   }
 

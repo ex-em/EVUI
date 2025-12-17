@@ -3,11 +3,11 @@
     <h3>Legend Click Mode Option Test</h3>
     <div class="example-controls">
       <label>
-        <input v-model="legendClickMode" type="radio" value="active">
+        <input v-model="legendClickMode" type="radio" value="active" />
         active (default) - 클릭시 활성화
       </label>
       <label>
-        <input v-model="legendClickMode" type="radio" value="inactive">
+        <input v-model="legendClickMode" type="radio" value="inactive" />
         inactive - 클릭시 비활성화
       </label>
 
@@ -74,27 +74,31 @@ export default {
         position: 'right',
         clickMode: legendClickMode.value,
       },
-      axesX: [{
-        type: 'time',
-        showGrid: false,
-        timeFormat: 'MM/DD',
-        interval: 'day',
-        labelStyle: {
-          color: '#A4A4A4',
-          fontSize: '11px',
-          fontFamily: 'Roboto',
+      axesX: [
+        {
+          type: 'time',
+          showGrid: false,
+          timeFormat: 'MM/DD',
+          interval: 'day',
+          labelStyle: {
+            color: '#A4A4A4',
+            fontSize: '11px',
+            fontFamily: 'Roboto',
+          },
         },
-      }],
-      axesY: [{
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        labelStyle: {
-          color: '#A4A4A4',
-          fontSize: '11px',
-          fontFamily: 'Roboto',
+      ],
+      axesY: [
+        {
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          labelStyle: {
+            color: '#A4A4A4',
+            fontSize: '11px',
+            fontFamily: 'Roboto',
+          },
         },
-      }],
+      ],
     }));
 
     return {
@@ -110,7 +114,7 @@ export default {
 .example-controls {
   margin-bottom: 20px;
   padding: 10px;
-  background-color: #F5F5F5;
+  background-color: #f5f5f5;
   border-radius: 4px;
 
   label {

@@ -35,7 +35,6 @@ const modules = {
     this.legendDOM.appendChild(this.legendBoxDOM);
     this.wrapperDOM.appendChild(this.legendDOM);
 
-
     if (this.options.legend.virtualScroll && !this.useTable) {
       this.legendTopSpacer = document.createElement('div');
       this.legendTopSpacer.className = 'ev-chart-legend--top-spacer';
@@ -94,7 +93,9 @@ const modules = {
    */
   initLegend() {
     this.isHeatMapType = this.options.type === 'heatMap';
-    this.useTable = !!this.options.legend?.table?.use && this.options.type !== 'heatmap' && this.options.type !== 'scatter';
+    this.useTable = !!this.options.legend?.table?.use
+      && this.options.type !== 'heatmap'
+      && this.options.type !== 'scatter';
     this.legendItemHeight = 18;
 
     if (!this.isInitLegend) {
@@ -130,14 +131,15 @@ const modules = {
     const legendBoxWidth = this.legendBoxDOM.clientWidth;
 
     const itemWidth = Math.max(this.options.legend.width - 8, 1);
-    const useLegendSeriesCount = Object.values(this.seriesList)
-      .filter(series => series.showLegend !== false)
-      .length;
+    const useLegendSeriesCount = Object.values(this.seriesList).filter(
+      series => series.showLegend !== false,
+    ).length;
 
     this.itemsPerRow = isLeftOrRight ? 1 : Math.floor(legendBoxWidth / itemWidth);
     this.totalRowCount = Math.ceil(useLegendSeriesCount / this.itemsPerRow);
     this.visibleRowCount = legendBoxHeight > this.legendItemHeight
-      ? Math.round(legendBoxHeight / this.legendItemHeight) + 1 : this.totalRowCount;
+        ? Math.round(legendBoxHeight / this.legendItemHeight) + 1
+        : this.totalRowCount;
   },
 
   /**
@@ -187,14 +189,14 @@ const modules = {
 
     let useLegendSeries = [];
     if (groups) {
-      useLegendSeries = groups.filter(sId => this.seriesList[sId].showLegend)
+      useLegendSeries = groups
+        .filter(sId => this.seriesList[sId].showLegend)
         .map(sId => [sId, this.seriesList[sId]]);
     } else {
-      useLegendSeries = Object.entries(this.seriesList)
-      .filter(([, series]) => series.showLegend);
+      useLegendSeries = Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
     }
     if (useLegendSeries && useLegendSeries.length) {
-      for (let i = startIndex; i < endIndex; i++) {
+      for (let i = startIndex; i < endIndex && i < useLegendSeries.length; i++) {
         const [, series] = useLegendSeries[i];
         this.addLegend(series);
       }
@@ -291,12 +293,12 @@ const modules = {
 
         for (let index = 0; index < length; index++) {
           const { id, color, label = '' } = colorState[index];
-          const minValue = min + (interval * index);
+          const minValue = min + interval * index;
           let maxValue = minValue + interval;
           if (index < endIndex) {
-            maxValue -= (0.1 ** decimalPoint);
+            maxValue -= 0.1 ** decimalPoint;
           } else {
-            maxValue = max + (0.1 ** decimalPoint);
+            maxValue = max + 0.1 ** decimalPoint;
           }
 
           let name = label;
@@ -439,12 +441,14 @@ const modules = {
     const hideAllSeries = () => {
       const legendSeries = (() => {
         if (this.data.groups.at(0)) {
-          return this.data.groups.at(0).slice().reverse()
+          return this.data.groups
+            .at(0)
+            .slice()
+            .reverse()
             .filter(sId => this.seriesList[sId].showLegend)
             .map(sId => [sId, this.seriesList[sId]]);
         }
-        return Object.entries(this.seriesList)
-          .filter(([, series]) => series.showLegend);
+        return Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
       })();
       legendSeries.forEach(([, s]) => {
         s.show = false;
@@ -453,12 +457,14 @@ const modules = {
     const showAllSeries = () => {
       const legendSeries = (() => {
         if (this.data.groups.at(0)) {
-          return this.data.groups.at(0).slice().reverse()
+          return this.data.groups
+            .at(0)
+            .slice()
+            .reverse()
             .filter(sId => this.seriesList[sId].showLegend)
             .map(sId => [sId, this.seriesList[sId]]);
         }
-        return Object.entries(this.seriesList)
-          .filter(([, series]) => series.showLegend);
+        return Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
       })();
       legendSeries.forEach(([, s]) => {
         s.show = true;
@@ -1028,7 +1034,8 @@ const modules = {
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
       colorDOM.style.backgroundColor = series.show
-        ? Util.rgbaAdjustHalfOpacity(seriesColor) : opt.inactive;
+        ? Util.rgbaAdjustHalfOpacity(seriesColor)
+        : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -1132,7 +1139,8 @@ const modules = {
     if (series.type === 'line' && series.fill) {
       colorDOM.style.height = '8px';
       colorDOM.style.backgroundColor = series.show
-        ? Util.rgbaAdjustHalfOpacity(seriesColor) : opt.inactive;
+        ? Util.rgbaAdjustHalfOpacity(seriesColor)
+        : opt.inactive;
       colorDOM.style.border = `1px solid ${seriesColor}`;
     } else {
       colorDOM.style.backgroundColor = seriesColor;
@@ -1457,14 +1465,14 @@ const modules = {
         case 'right':
           resizeDOMStyle.left = ghostDOMStyle.left;
           move = +ghostDOMStyle.left.replace('px', '');
-          legendDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4)}px`;
-          boxDOMStyle.width = `${(this.wrapperDOM.offsetWidth - move - 4 - padding)}px`;
+          legendDOMStyle.width = `${this.wrapperDOM.offsetWidth - move - 4}px`;
+          boxDOMStyle.width = `${this.wrapperDOM.offsetWidth - move - 4 - padding}px`;
           opt.legend.width = this.wrapperDOM.offsetWidth - move - 4;
           wrapperDOMStyle.padding = `${title}px ${this.wrapperDOM.offsetWidth - move}px 0 0`;
           break;
         case 'bottom':
           resizeDOMStyle.bottom = ghostDOMStyle.bottom;
-          move = this.wrapperDOM.offsetHeight - (+ghostDOMStyle.bottom.replace('px', ''));
+          move = this.wrapperDOM.offsetHeight - +ghostDOMStyle.bottom.replace('px', '');
           legendDOMStyle.height = `${this.wrapperDOM.offsetHeight - move}px`;
           boxDOMStyle.height = `${move - title - 4}px`;
           opt.legend.height = this.wrapperDOM.offsetHeight - move;
@@ -1563,7 +1571,6 @@ const modules = {
 
     return formattedTxt;
   },
-
 };
 
 export default modules;

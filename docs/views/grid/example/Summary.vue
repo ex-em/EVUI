@@ -34,41 +34,21 @@
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">Total (MB)</span>
-          <ev-select
-            v-model="totalSummaryType"
-            :items="summaryTypes"
-          />
+          <ev-select v-model="totalSummaryType" :items="summaryTypes" />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Total (MB) Summary Decimal
-          </span>
-          <ev-input-number
-            v-model="totalSummaryDecimal"
-            :step="1"
-            :min="0"
-            :max="20"
-          />
+          <span class="badge yellow"> Total (MB) Summary Decimal </span>
+          <ev-input-number v-model="totalSummaryDecimal" :step="1" :min="0" :max="20" />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">Used (MB)</span>
-          <ev-select
-            v-model="usedSummaryType"
-            :items="summaryTypes"
-          />
+          <ev-select v-model="usedSummaryType" :items="summaryTypes" />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Used (MB) Summary Decimal
-          </span>
-          <ev-input-number
-            v-model="usedSummaryDecimal"
-            :step="1"
-            :min="0"
-            :max="20"
-          />
+          <span class="badge yellow"> Used (MB) Summary Decimal </span>
+          <ev-input-number v-model="usedSummaryDecimal" :step="1" :min="0" :max="20" />
         </div>
       </div>
     </div>
@@ -96,25 +76,29 @@ export default {
     const selected = ref([]);
     const checked = ref([]);
     const columns = ref([
-      { caption: 'Name',
+      {
+        caption: 'Name',
         field: 'name',
         type: 'string',
         summaryRenderer: 'Total', // text 만
       },
-      { caption: 'Total (MB)',
+      {
+        caption: 'Total (MB)',
         field: 'total_mb',
         type: 'number',
         summaryType: totalSummaryType,
         summaryDecimal: totalSummaryDecimal,
         summaryRenderer: 'value: {0}', // text + 해당 컬럼 값 계산
       },
-      { caption: 'Used (MB)',
+      {
+        caption: 'Used (MB)',
         field: 'used_mb',
         type: 'number',
         summaryDecimal: usedSummaryDecimal,
         summaryType: usedSummaryType, // type 만 지정
       },
-      { caption: 'Increment (MB)',
+      {
+        caption: 'Increment (MB)',
         field: 'increment_mb',
         type: 'number',
         summaryType: 'sum',

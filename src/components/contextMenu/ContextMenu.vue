@@ -10,15 +10,8 @@
         :style="menuStyle"
         :comp="comp"
       >
-        <template
-          v-for="(_, slotName) in $slots"
-          :key="slotName"
-          #[slotName]="slotProps"
-        >
-          <slot
-            :name="slotName"
-            v-bind="slotProps"
-          />
+        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotProps">
+          <slot :name="slotName" v-bind="slotProps" />
         </template>
       </menu-list>
     </teleport>
@@ -45,10 +38,10 @@ export default {
       default: () => [],
       validator: (list) => {
         if (list.some(v => v.children !== undefined && !Array.isArray(v.children))) {
-          console.warn('[EVUI][ContextMenu] children attribute must be \'Array\' type.');
+          console.warn("[EVUI][ContextMenu] children attribute must be 'Array' type.");
           return false;
         } else if (list.some(v => v.click !== undefined && typeof v.click !== 'function')) {
-          console.warn('[EVUI][ContextMenu] click attribute must be \'Function\' type.');
+          console.warn("[EVUI][ContextMenu] click attribute must be 'Function' type.");
           return false;
         }
         return true;
@@ -64,18 +57,9 @@ export default {
     },
   },
   setup() {
-    const {
-      comp,
-      initWrapperDiv,
-    } = useModel();
+    const { comp, initWrapperDiv } = useModel();
 
-    const {
-      isShow,
-      rootMenuList,
-      menuStyle,
-      show,
-      hide,
-    } = usePosition();
+    const { isShow, rootMenuList, menuStyle, show, hide } = usePosition();
 
     onBeforeMount(() => initWrapperDiv());
 
@@ -91,5 +75,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

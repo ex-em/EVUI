@@ -2,59 +2,36 @@
   <div class="case">
     <p class="case-title">Common</p>
     <div class="tab-wrapper">
-      <ev-tabs
-        v-model="selectedValue1"
-        v-model:panels="tabPanels1"
-        :closable="true"
-      >
+      <ev-tabs v-model="selectedValue1" v-model:panels="tabPanels1" :closable="true">
         <ev-tab-panel
           v-for="(item, idx) in tabPanels1"
           :key="`${item.name}_${idx}`"
           :text="item.text"
           :value="item.value"
         >
-          <div v-html="item.content"/>
+          <div v-html="item.content" />
         </ev-tab-panel>
       </ev-tabs>
     </div>
     <div class="description">
-      <button
-        class="btn"
-        @click="addItem1"
-      >
-        addItem
-      </button>
+      <button class="btn" @click="addItem1">addItem</button>
       &nbsp;&nbsp;&nbsp;
-      <button
-        class="btn"
-        @click="popItem1"
-      >
-        popItem
-      </button>
+      <button class="btn" @click="popItem1">popItem</button>
       &nbsp;&nbsp;&nbsp;
-      <button
-        class="btn"
-        @click="spliceItem1"
-      >
-        spliceItem1
-      </button>
+      <button class="btn" @click="spliceItem1">spliceItem1</button>
     </div>
   </div>
   <div class="case">
     <p class="case-title">Draggable</p>
     <div class="tab-wrapper">
-      <ev-tabs
-        v-model="selectedValue1"
-        v-model:panels="tabPanels1"
-        :draggable="true"
-      >
+      <ev-tabs v-model="selectedValue1" v-model:panels="tabPanels1" :draggable="true">
         <ev-tab-panel
           v-for="(item, idx) in tabPanels1"
           :key="`${item.name}_${idx}`"
           :text="item.text"
           :value="item.value"
         >
-          <div v-html="item.content"/>
+          <div v-html="item.content" />
         </ev-tab-panel>
       </ev-tabs>
     </div>
@@ -62,22 +39,14 @@
   <div class="case">
     <p class="case-title">With Component</p>
     <div class="tab-wrapper">
-      <ev-tabs
-        v-model="selectedValue2"
-        v-model:panels="tabPanels2"
-        class="example2"
-      >
+      <ev-tabs v-model="selectedValue2" v-model:panels="tabPanels2" class="example2">
         <ev-tab-panel
           v-for="(item, idx) in tabPanels2"
           :key="`${item.name}_${idx}`"
           :text="item.text"
           :value="item.value"
         >
-          <component
-            :is="item.component"
-            v-if="item.component"
-            class="componentCls"
-          />
+          <component :is="item.component" v-if="item.component" class="componentCls" />
         </ev-tab-panel>
       </ev-tabs>
     </div>
@@ -97,21 +66,12 @@
           :text="item.text"
           :value="item.value"
         >
-          <component
-            :is="item.component"
-            v-if="item.component"
-            class="componentCls"
-          />
+          <component :is="item.component" v-if="item.component" class="componentCls" />
         </ev-tab-panel>
       </ev-tabs>
     </div>
     <div class="description">
-      <button
-        class="btn"
-        @click="toggleComp4"
-      >
-        Toggle Component 4
-      </button>
+      <button class="btn" @click="toggleComp4">Toggle Component 4</button>
     </div>
   </div>
 </template>
@@ -196,7 +156,6 @@ export default {
         component: defineAsyncComponent(() => import('./Comp3.vue')),
         iconClass: 'ev-icon-bell',
       },
-
     ]);
 
     const toggleComp4 = () => {
@@ -237,7 +196,7 @@ export default {
 
 .componentCls {
   padding: 20px;
-  border: 1px solid #B2B2B2;
+  border: 1px solid #b2b2b2;
   border-top: none;
   border-radius: 0 0 4px 4px;
 }

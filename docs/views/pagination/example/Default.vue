@@ -18,10 +18,7 @@
         </div>
         <div class="form-row">
           <span class="badge yellow">Visible Page</span>
-          <ev-input-number
-            v-model="visiblePage"
-            :min="7"
-          />
+          <ev-input-number v-model="visiblePage" :min="7" />
         </div>
       </div>
       <div class="form-rows">
@@ -37,19 +34,15 @@
       <div class="form-rows">
         <div class="form-row">
           <span class="badge yellow">Order</span>
-          <ev-select
-            v-model="order"
-            :items="orderItems"
-            placeholder="Please select value."
-          />
+          <ev-select v-model="order" :items="orderItems" placeholder="Please select value." />
         </div>
         <div class="form-row">
           <span class="badge yellow">Page Info</span>
-          <ev-toggle v-model="isPageInfo"/>
+          <ev-toggle v-model="isPageInfo" />
         </div>
         <div class="form-row">
           <span class="badge yellow">Page Per Jump</span>
-          <ev-input-number v-model="pagePerJump"/>
+          <ev-input-number v-model="pagePerJump" />
         </div>
       </div>
     </div>

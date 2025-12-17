@@ -1,45 +1,33 @@
 <template>
   <div class="ev-calendar-wrapper">
-    <template
-      v-for="calendarType in calendarList"
-      :key="calendarType"
-    >
+    <template v-for="calendarType in calendarList" :key="calendarType">
       <div class="ev-calendar-date-area">
         <div class="ev-calendar-header">
-          <div
-            class="move-month-arrow"
-            @click="clickPrevNextBtn(calendarType, 'prev')"
-          >
+          <div class="move-month-arrow" @click="clickPrevNextBtn(calendarType, 'prev')">
             <i class="ev-icon-s-arrow-left move-month-arrow-icon" />
           </div>
           <div class="ev-calendar-year-month-wrapper">
-            <span
-                v-if="selectedListType[calendarType] === 'year'"
-                class="ev-calendar-year-range"
-            >
-              {{ calendarYearRangeInfo[calendarType].start + ' - '
-            + calendarYearRangeInfo[calendarType].end }}
+            <span v-if="selectedListType[calendarType] === 'year'" class="ev-calendar-year-range">
+              {{
+                calendarYearRangeInfo[calendarType].start +
+                ' - ' +
+                calendarYearRangeInfo[calendarType].end
+              }}
             </span>
             <template v-else>
-              <span
-                class="ev-calendar-year"
-                @click="clickYearMonthBtn(calendarType, 'year')"
-              >
+              <span class="ev-calendar-year" @click="clickYearMonthBtn(calendarType, 'year')">
                 {{ calendarPageInfo[calendarType].year }}
               </span>
-                <span
-                  v-if="selectedListType[calendarType] === 'date'"
-                  class="ev-calendar-month"
-                  @click="clickYearMonthBtn(calendarType, 'month')"
-                >
+              <span
+                v-if="selectedListType[calendarType] === 'date'"
+                class="ev-calendar-month"
+                @click="clickYearMonthBtn(calendarType, 'month')"
+              >
                 {{ calendarMonth[calendarType] }}
               </span>
             </template>
           </div>
-          <div
-            class="move-month-arrow"
-            @click="clickPrevNextBtn(calendarType, 'next')"
-          >
+          <div class="move-month-arrow" @click="clickPrevNextBtn(calendarType, 'next')">
             <i class="ev-icon-s-arrow-right move-month-arrow-icon" />
           </div>
         </div>
@@ -50,41 +38,33 @@
             class="ev-calendar-table"
           >
             <thead>
-            <tr>
-              <th
-                v-for="dayOfTheWeek in dayOfTheWeekList"
-                :key="dayOfTheWeek"
-              >
-                {{ dayOfTheWeek }}
-              </th>
-            </tr>
+              <tr>
+                <th v-for="dayOfTheWeek in dayOfTheWeekList" :key="dayOfTheWeek">
+                  {{ dayOfTheWeek }}
+                </th>
+              </tr>
             </thead>
-            <tbody
-              @wheel.prevent="wheelMonth(calendarType, $event)"
-            >
-            <tr
-              v-for="weekInfo in calendarTableInfo[calendarType]"
-              :key="weekInfo"
-            >
-              <td
-                v-for="dateInfo in weekInfo"
-                :key="dateInfo"
-                :class="[
-                  'ev-calendar-date-td',
-                  { [dateInfo.monthType]: !!dateInfo.monthType },
-                  { today: dateInfo.isToday },
-                  { selected: dateInfo.isSelected },
-                ]"
-                @click="clickDate(calendarType, dateInfo)"
-                @[`${calendarEventName}`]="onMousemoveDate(calendarType, $event)"
-              >
-                <div>
-                  <span>
-                    {{ dateInfo.date }}
-                  </span>
-                </div>
-              </td>
-            </tr>
+            <tbody @wheel.prevent="wheelMonth(calendarType, $event)">
+              <tr v-for="weekInfo in calendarTableInfo[calendarType]" :key="weekInfo">
+                <td
+                  v-for="dateInfo in weekInfo"
+                  :key="dateInfo"
+                  :class="[
+                    'ev-calendar-date-td',
+                    { [dateInfo.monthType]: !!dateInfo.monthType },
+                    { today: dateInfo.isToday },
+                    { selected: dateInfo.isSelected },
+                  ]"
+                  @click="clickDate(calendarType, dateInfo)"
+                  @[`${calendarEventName}`]="onMousemoveDate(calendarType, $event)"
+                >
+                  <div>
+                    <span>
+                      {{ dateInfo.date }}
+                    </span>
+                  </div>
+                </td>
+              </tr>
             </tbody>
           </table>
           <table
@@ -94,15 +74,11 @@
               `ev-calendar-selector-table--${selectedListType[calendarType]}`,
             ]"
           >
-            <tbody
-              @wheel.prevent="wheelMonth(calendarType, $event)"
-            >
+            <tbody @wheel.prevent="wheelMonth(calendarType, $event)">
               <tr
-                v-for="rowInfo in (
-                  selectedListType[calendarType] === 'month'
+                v-for="rowInfo in selectedListType[calendarType] === 'month'
                   ? calendarMonthTableInfo[calendarType]
-                  : calendarYearTableInfo[calendarType]
-                )"
+                  : calendarYearTableInfo[calendarType]"
                 :key="rowInfo"
               >
                 <td
@@ -115,7 +91,7 @@
                       'ev-calendar-selector',
                       { selected: colInfo.isSelected },
                       { today: colInfo.today },
-                      { disabled: colInfo.disabled }
+                      { disabled: colInfo.disabled },
                     ]"
                   >
                     {{ colInfo.label }}
@@ -128,19 +104,12 @@
             v-if="selectedListType[calendarType] !== 'date'"
             class="ev-calendar-selector-btn-wrapper"
           >
-            <ev-button
-              @click="clickYearMonthBtn(calendarType, 'date')"
-            >
-              Done
-            </ev-button>
+            <ev-button @click="clickYearMonthBtn(calendarType, 'date')"> Done </ev-button>
           </div>
         </div>
       </div>
 
-      <div
-        v-if="['dateTime', 'dateTimeRange'].includes(mode)"
-        class="ev-calendar-time-area"
-      >
+      <div v-if="['dateTime', 'dateTimeRange'].includes(mode)" class="ev-calendar-time-area">
         <div
           v-if="selectedListType[calendarType] !== 'date'"
           class="ev-calendar-time-area-disabled"
@@ -155,30 +124,25 @@
           </div>
         </div>
         <div class="ev-calendar-time-center">
-          <template
-            v-for="timeType in ['hour', 'min', 'sec']"
-            :key="`${timeType}_table`"
-          >
+          <template v-for="timeType in ['hour', 'min', 'sec']" :key="`${timeType}_table`">
             <table class="ev-calendar-time-table">
-              <tbody
-                @wheel.prevent="wheelTime(calendarType, timeType, $event)"
-              >
-                <tr
-                  v-for="i in 3"
-                  :key="`${timeType}_${i}_tr`"
-                >
+              <tbody @wheel.prevent="wheelTime(calendarType, timeType, $event)">
+                <tr v-for="i in 3" :key="`${timeType}_${i}_tr`">
                   <td
                     v-for="j in 4"
                     :key="`${timeType}_${i}_${j}_td`"
                     :class="[
                       'ev-calendar-time-td',
                       { selected: getTimeInfo(timeType, i, j, calendarType).isSelected },
-                      { disabled: preventTimeEventType[calendarType][timeType]
-                          || getTimeInfo(timeType, i, j, calendarType).isDisabled }
+                      {
+                        disabled:
+                          preventTimeEventType[calendarType][timeType] ||
+                          getTimeInfo(timeType, i, j, calendarType).isDisabled,
+                      },
                     ]"
                     @click="clickTime(calendarType, timeType, i, j)"
                   >
-                    <div> {{ getTimeInfo(timeType, i, j, calendarType).num }} </div>
+                    <div>{{ getTimeInfo(timeType, i, j, calendarType).num }}</div>
                   </td>
                 </tr>
               </tbody>
@@ -186,17 +150,14 @@
           </template>
         </div>
         <div class="ev-calendar-time-side">
-          <template
-            v-for="hmsType in ['hour', 'min', 'sec']"
-            :key="`${hmsType}_btn_area`"
-          >
+          <template v-for="hmsType in ['hour', 'min', 'sec']" :key="`${hmsType}_btn_area`">
             <div
               v-for="arrowType in ['up', 'down']"
               :key="`${hmsType}_${arrowType}_btn`"
               :class="[
                 'ev-calendar-time-side--btn',
                 `arrow-${hmsType}`,
-                { disabled: preventTimeEventType[calendarType][hmsType] }
+                { disabled: preventTimeEventType[calendarType][hmsType] },
               ]"
               @click="clickHmsBtn(calendarType, hmsType, arrowType)"
             >
@@ -220,34 +181,39 @@ export default {
       default: '',
       validator: (value) => {
         const dateReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])/);
-        const dateTimeReg = new RegExp(/[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/);
+        const dateTimeReg = new RegExp(
+          /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]:[0-5][0-9]/,
+        );
         if (Array.isArray(value)) {
-          return value.every(v => !!(!v
-            || (v.length === 10 && dateReg.exec(v)))
-            || (v.length === 19 && dateTimeReg.exec(v)));
+          return value.every(
+            v =>
+              !!(!v || (v.length === 10 && dateReg.exec(v)))
+              || (v.length === 19 && dateTimeReg.exec(v)),
+          );
         }
-        return !!(!value
+        return !!(
+          !value
           || (value.length === 10 && dateReg.exec(value))
-          || (value.length === 19 && dateTimeReg.exec(value)));
+          || (value.length === 19 && dateTimeReg.exec(value))
+        );
       },
     },
     mode: {
       type: String,
       default: 'date',
-      validator: value => ['date', 'dateTime', 'dateMulti', 'dateRange', 'dateTimeRange']
-        .indexOf(value) !== -1,
+      validator: value =>
+        ['date', 'dateTime', 'dateMulti', 'dateRange', 'dateTimeRange'].indexOf(value) !== -1,
     },
     monthNotation: {
       type: String,
       default: 'fullName',
-      validator: value => ['fullName', 'abbrName', 'numberName', 'korName']
-        .indexOf(value) !== -1,
+      validator: value => ['fullName', 'abbrName', 'numberName', 'korName'].indexOf(value) !== -1,
     },
     dayOfTheWeekNotation: {
       type: String,
       default: 'abbrUpperName',
-      validator: value => ['abbrUpperName', 'abbrLowerName', 'abbrPascalName', 'abbrKorName']
-        .indexOf(value) !== -1,
+      validator: value =>
+        ['abbrUpperName', 'abbrLowerName', 'abbrPascalName', 'abbrKorName'].indexOf(value) !== -1,
     },
     options: {
       type: Object,
@@ -258,11 +224,13 @@ export default {
       validator: ({ multiType, multiDayLimit, disabledDate, timeFormat }) => {
         const timeReg = new RegExp(/(HH|2[0-3]|[01][0-9]):(mm|[0-5][0-9]):(ss|[0-5][0-9])/);
         return (multiType ? ['weekday', 'week', 'date'].indexOf(multiType) !== -1 : true)
-        && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
-        && (disabledDate ? (typeof disabledDate === 'function' || Array.isArray(disabledDate)) : true)
-        && Array.isArray(timeFormat)
-            ? timeFormat.every(v => !!(!v || timeReg.exec(v)))
-            : !!(!timeFormat || (timeReg.exec(timeFormat)));
+          && (multiDayLimit ? typeof multiDayLimit === 'number' && multiDayLimit > 0 : true)
+          && (disabledDate
+            ? typeof disabledDate === 'function' || Array.isArray(disabledDate)
+            : true)
+          && Array.isArray(timeFormat)
+          ? timeFormat.every(v => !!(!v || timeReg.exec(v)))
+          : !!(!timeFormat || timeReg.exec(timeFormat));
       },
     },
   },
@@ -362,7 +330,7 @@ export default {
 <style lang="scss">
 $ev-calendar-selector-btn-height: 40px;
 $ev-calendar-selector-btn-margin: 10px;
-$calendar-active-color: #409EFF;
+$calendar-active-color: #409eff;
 
 @use '../../style/index.scss' as *;
 
@@ -407,7 +375,7 @@ $calendar-active-color: #409EFF;
       cursor: not-allowed;
 
       i {
-        color: #C0C4CC;
+        color: #c0c4cc;
       }
     }
   }
@@ -456,7 +424,7 @@ $calendar-active-color: #409EFF;
     height: 30px;
     color: #606266;
     font-weight: 400;
-    border-bottom: 1px solid #EBEEF5;
+    border-bottom: 1px solid #ebeef5;
   }
   td {
     height: 40px;
@@ -489,7 +457,7 @@ $calendar-active-color: #409EFF;
   line-height: 30px;
   margin: 0 auto;
   font-size: 14px;
-  color: #7F7F7F;
+  color: #7f7f7f;
   text-align: center;
   opacity: 1;
   cursor: pointer;
@@ -507,11 +475,11 @@ $calendar-active-color: #409EFF;
   &.selected {
     border-radius: 5px;
     background-color: $calendar-active-color;
-    color: #FFFFFF;
+    color: #ffffff;
   }
 
   &.disabled {
-    color: #C0C4CC;
+    color: #c0c4cc;
     cursor: not-allowed;
   }
 }
@@ -525,7 +493,7 @@ $calendar-active-color: #409EFF;
     height: 35px;
     line-height: 35px;
     border: none;
-    background-color: #EBEBEB;
+    background-color: #ebebeb;
     color: $calendar-active-color;
   }
 }
@@ -542,7 +510,7 @@ $calendar-active-color: #409EFF;
 
   &.prev,
   &.next {
-    color: #C0C4CC;
+    color: #c0c4cc;
   }
 
   &.today {
@@ -566,7 +534,7 @@ $calendar-active-color: #409EFF;
   }
 
   &.selected span {
-    color: #FFFFFF;
+    color: #ffffff;
     background-color: $calendar-active-color;
   }
 
@@ -591,9 +559,9 @@ $calendar-active-color: #409EFF;
   }
 
   &.disabled {
-    background-color: #EEF0F3;
+    background-color: #eef0f3;
     opacity: 1;
-    color: #C0C4CC;
+    color: #c0c4cc;
 
     &:hover {
       cursor: not-allowed;
@@ -604,7 +572,7 @@ $calendar-active-color: #409EFF;
   }
 
   &.in-range:not(.next):not(.prev) div {
-    background-color: #F2F6FC;
+    background-color: #f2f6fc;
   }
 }
 
@@ -614,7 +582,7 @@ $calendar-active-color: #409EFF;
     position: relative;
     width: 195px;
     flex-direction: row;
-    border-left: 1px solid #EBEEF5;
+    border-left: 1px solid #ebeef5;
     color: #606266;
     box-sizing: content-box;
 
@@ -624,7 +592,7 @@ $calendar-active-color: #409EFF;
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: #FFFFFF;
+      background-color: #ffffff;
       opacity: 0.6;
     }
   }
@@ -648,13 +616,13 @@ $calendar-active-color: #409EFF;
     }
   }
   &.selected div {
-    color: #FFFFFF;
+    color: #ffffff;
     background-color: $calendar-active-color;
   }
   &.disabled {
-    background-color: #EEF0F3;
+    background-color: #eef0f3;
     opacity: 1;
-    color: #C0C4CC;
+    color: #c0c4cc;
 
     &:hover {
       cursor: not-allowed;
@@ -668,7 +636,7 @@ $calendar-active-color: #409EFF;
 .ev-calendar-time-side {
   font-size: 10px;
   text-align: center;
-  background-color: #E5E5E5;
+  background-color: #e5e5e5;
 
   &--label {
     width: 33px;
@@ -682,11 +650,11 @@ $calendar-active-color: #409EFF;
     line-height: 55px;
 
     &.disabled {
-      color: #C0C4CC;
+      color: #c0c4cc;
       cursor: not-allowed;
 
       &:hover {
-        color: #C0C4CC;
+        color: #c0c4cc;
       }
     }
 
@@ -697,7 +665,7 @@ $calendar-active-color: #409EFF;
   }
 
   & div:not(:last-child) {
-    border-bottom: 1px solid #EBEEF5;
+    border-bottom: 1px solid #ebeef5;
   }
 }
 .ev-calendar-time-center {
@@ -707,7 +675,7 @@ $calendar-active-color: #409EFF;
   font-size: 12px;
 
   & table:not(:last-child) {
-    border-bottom: 1px solid #EBEEF5;
+    border-bottom: 1px solid #ebeef5;
   }
 }
 .ev-calendar-time-table {

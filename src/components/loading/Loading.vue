@@ -1,11 +1,7 @@
 <template>
   <template v-if="fullscreen">
     <teleport to="body">
-      <div
-        v-if="modelValue"
-        class="ev-loading full-screen"
-        @[`${clickEventName}`]="closeLoading"
-      >
+      <div v-if="modelValue" class="ev-loading full-screen" @[`${clickEventName}`]="closeLoading">
         <div class="ev-loading-spinner">
           <template v-if="$slots.default">
             <slot />
@@ -22,21 +18,13 @@
     </teleport>
   </template>
   <template v-else>
-    <div
-      v-if="modelValue"
-      class="ev-loading"
-      @[`${clickEventName}`]="closeLoading"
-    >
+    <div v-if="modelValue" class="ev-loading" @[`${clickEventName}`]="closeLoading">
       <div class="ev-loading-spinner">
         <template v-if="$slots.default">
           <slot />
         </template>
         <template v-else>
-          <i
-            :class="iconClass || 'ev-icon-refresh2'"
-            class="ev-loading-icon"
-            :style="iconStyle"
-          />
+          <i :class="iconClass || 'ev-icon-refresh2'" class="ev-loading-icon" :style="iconStyle" />
         </template>
       </div>
     </div>
@@ -105,7 +93,7 @@ export default {
   position: absolute;
   top: 50%;
   width: 100%;
-  color: #409EFF;
+  color: #409eff;
   text-align: center;
 }
 .ev-loading-icon {

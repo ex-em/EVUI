@@ -32,17 +32,9 @@
     :style="gridStyle"
   >
     <!-- Table -->
-    <div
-      v-cloak
-      ref="grid"
-      :class="gridClass"
-    >
+    <div v-cloak ref="grid" :class="gridClass">
       <!-- Header -->
-      <div
-        v-show="showHeader"
-        ref="header"
-        :class="headerClass"
-      >
+      <div v-show="showHeader" ref="header" :class="headerClass">
         <ul class="column-list">
           <!-- Header Checkbox -->
           <li
@@ -62,10 +54,7 @@
             />
           </li>
           <!-- Column List -->
-          <template
-            v-for="(column, index) in orderedColumns"
-            :key="index"
-          >
+          <template v-for="(column, index) in orderedColumns" :key="index">
             <li
               v-if="!column.hide && !column.hiddenDisplay"
               :data-index="index"
@@ -80,67 +69,61 @@
                 <!-- Column Name -->
                 <span
                   :title="column.caption"
-                  :class="[
-                    'column-name',
-                    { 'column-name--click' : useGridSetting }
-                  ]"
+                  :class="['column-name', { 'column-name--click': useGridSetting }]"
                   @click="onColumnContextMenu($event, column)"
                   @click.prevent="columnMenu.show"
                 >
                   {{ column.caption }}
-                <!-- Sort Icon -->
-                <span @click.stop="onSort(column)">
-                  <template v-if="!!$slots.sortIcon">
-                    <span
-                      v-if="$props.option?.useSort && !!column?.sortable"
-                      class="column-sort__icon column-sort__icon--basic"
-                      :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                      }"
-                    >
-                     <slot name="sortIcon" />
-                    </span>
-                    <span
-                      v-if="sortField === column.field"
-                      :class="sortIconClass(column)"
-                      :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                      }"
-                    >
-                      <slot :name="`sortIcon_${sortOrder}`" />
-                    </span>
-                  </template>
-                  <template v-else>
-                    <grid-sort-button
-                      v-if="$props.option?.useSort && !!column?.sortable"
-                      class="column-sort__icon column-sort__icon--basic"
-                      :icon="'basic'"
-                      :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                      }"
-                    />
-                    <grid-sort-button
-                      v-if="sortField === column.field"
-                      :class="sortIconClass(column)"
-                      :icon="sortOrder"
-                      :style="{
-                        height: `${rowHeight}px`,
-                        'line-height': `${rowHeight}px`,
-                        visibility: !!sortOrder ? column.hidden : true,
-                      }"
-                    />
-                  </template>
-                </span>
+                  <!-- Sort Icon -->
+                  <span @click.stop="onSort(column)">
+                    <template v-if="!!$slots.sortIcon">
+                      <span
+                        v-if="$props.option?.useSort && !!column?.sortable"
+                        class="column-sort__icon column-sort__icon--basic"
+                        :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                        }"
+                      >
+                        <slot name="sortIcon" />
+                      </span>
+                      <span
+                        v-if="sortField === column.field"
+                        :class="sortIconClass(column)"
+                        :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                        }"
+                      >
+                        <slot :name="`sortIcon_${sortOrder}`" />
+                      </span>
+                    </template>
+                    <template v-else>
+                      <grid-sort-button
+                        v-if="$props.option?.useSort && !!column?.sortable"
+                        class="column-sort__icon column-sort__icon--basic"
+                        :icon="'basic'"
+                        :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                        }"
+                      />
+                      <grid-sort-button
+                        v-if="sortField === column.field"
+                        :class="sortIconClass(column)"
+                        :icon="sortOrder"
+                        :style="{
+                          height: `${rowHeight}px`,
+                          'line-height': `${rowHeight}px`,
+                          visibility: !!sortOrder ? column.hidden : true,
+                        }"
+                      />
+                    </template>
+                  </span>
                 </span>
               </template>
               <!-- Column Resize -->
-              <span
-                class="column-resize"
-                @mousedown.stop.left="onColumnResize(index, $event)"
-              />
+              <span class="column-resize" @mousedown.stop.left="onColumnResize(index, $event)" />
             </li>
           </template>
           <!-- Row Contextmenu Column -->
@@ -153,11 +136,10 @@
             :style="{
               width: '30px',
               'min-width': '30px',
-              'margin-right': (hasVerticalScrollBar || hasHorizontalScrollBar)
-                ? `${scrollWidth}px` : '0px',
+              'margin-right':
+                hasVerticalScrollBar || hasHorizontalScrollBar ? `${scrollWidth}px` : '0px',
             }"
-          >
-          </li>
+          ></li>
         </ul>
       </div>
       <!-- Body -->
@@ -169,10 +151,7 @@
         @contextmenu.prevent="menu.show"
       >
         <!-- vScroll Top -->
-        <div
-          :style="`height: ${vScrollTopHeight}px;`"
-          class="vscroll-spacer"
-        />
+        <div :style="`height: ${vScrollTopHeight}px;`" class="vscroll-spacer" />
         <table ref="table">
           <tbody>
             <tree-grid-node
@@ -203,14 +182,14 @@
               <template
                 v-for="(column, cellIndex) in orderedColumns"
                 :key="cellIndex"
-                v-slot:[getSlotName(column.field)] = "{ item }"
+                v-slot:[getSlotName(column.field)]="{ item }"
               >
                 <template v-if="!!$slots[column.field]">
                   <slot
                     :name="column.field"
                     :item="{
-                       data: item.data,
-                       fieldName: column.field
+                      data: item.data,
+                      fieldName: column.field,
                     }"
                   >
                   </slot>
@@ -221,13 +200,8 @@
                   </span>
                 </template>
               </template>
-              <template
-                v-if="$slots.contextmenuIcon"
-                #contextmenuIconNode
-              >
-                <slot
-                  name="contextmenuIcon"
-                />
+              <template v-if="$slots.contextmenuIcon" #contextmenuIconNode>
+                <slot name="contextmenuIcon" />
               </template>
             </tree-grid-node>
             <tr v-if="!viewStore.length">
@@ -236,20 +210,10 @@
           </tbody>
         </table>
         <!-- vScroll Bottom -->
-        <div
-          :style="`height: ${vScrollBottomHeight}px;`"
-          class="vscroll-spacer"
-        />
+        <div :style="`height: ${vScrollBottomHeight}px;`" class="vscroll-spacer" />
         <!-- Context Menu -->
-        <ev-context-menu
-          ref="menu"
-          :custom-class="contextMenuClass"
-          :items="contextMenuItems"
-        />
-        <ev-context-menu
-          ref="columnMenu"
-          :items="columnMenuItems"
-        />
+        <ev-context-menu ref="menu" :custom-class="contextMenuClass" :items="contextMenuItems" />
+        <ev-context-menu ref="columnMenu" :items="columnMenuItems" />
         <ev-context-menu
           ref="gridSettingMenu"
           :items="gridSettingContextMenuItems"
@@ -257,11 +221,7 @@
         />
       </div>
       <!-- Resize Line -->
-      <div
-        v-show="showResizeLine"
-        ref="resizeLine"
-        class="table-resize-line"
-      />
+      <div v-show="showResizeLine" ref="resizeLine" class="table-resize-line" />
     </div>
   </div>
   <!-- Summary -->
@@ -314,6 +274,7 @@ import {
 } from 'vue';
 import { cloneDeep } from 'lodash-es';
 import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
+import resize from 'vue-resize-observer';
 import TreeGridNode from './TreeGridNode';
 import Toolbar from './TreeGridToolbar';
 import GridPagination from '../grid/GridPagination';
@@ -334,10 +295,7 @@ import {
   getUpdatedColumns,
   sortEvent,
 } from './uses';
-import {
-  columnSettingEvent,
-} from '../grid/uses';
-import resize from 'vue-resize-observer';
+import { columnSettingEvent } from '../grid/uses';
 
 export default {
   name: 'EvTreeGrid',
@@ -408,9 +366,9 @@ export default {
   },
   setup(props) {
     const toolbarRef = ref(null);
-    const useGridSetting = computed(() => (props.option?.useGridSetting?.use || false));
-    const useSummary = computed(() => (props.option?.useSummary || false));
-    const emptyText = computed(() => (props.option.emptyText ?? 'No records'));
+    const useGridSetting = computed(() => props.option?.useGridSetting?.use || false);
+    const useSummary = computed(() => props.option?.useSummary || false);
+    const emptyText = computed(() => props.option.emptyText ?? 'No records');
     const elementInfo = reactive({
       body: null,
       header: null,
@@ -453,33 +411,37 @@ export default {
       store: computed(() => (filterInfo.isSearch ? stores.searchStore : stores.treeStore)),
       treeRows: props.rows,
       filteredColumns: [],
-      originColumns: computed(() => props.columns.map((column, index) => ({
-        index,
-        hiddenDisplay: false,
-        ...column,
-        width: isFinite(column.width) ? column.width : undefined,
-        sortOption: {
-           sortType: column?.sortOption?.sortType || 'init',
-        },
-      }))),
-      orderedColumns: computed(() => (stores.filteredColumns.length
-        ? stores.filteredColumns : stores.originColumns)),
+      originColumns: computed(() =>
+        props.columns.map((column, index) => ({
+          index,
+          hiddenDisplay: false,
+          ...column,
+          width: isFinite(column.width) ? column.width : undefined,
+          sortOption: {
+            sortType: column?.sortOption?.sortType || 'init',
+          },
+        })),
+      ),
+      orderedColumns: computed(() =>
+        (stores.filteredColumns.length ? stores.filteredColumns : stores.originColumns),
+      ),
       updatedColumns: computed(() => getUpdatedColumns(stores)),
     });
     const pageInfo = reactive({
-      usePage: computed(() => (props.option.page?.use || false)),
+      usePage: computed(() => props.option.page?.use || false),
       useClient: props.option.page?.useClient || false,
-      isInfinite: computed(() => (props.option.page?.isInfinite || false)),
+      isInfinite: computed(() => props.option.page?.isInfinite || false),
       startIndex: 0,
       prevPage: 0,
       currentPage: 0,
-      pageTotal: computed(() => (props.option.page?.total || 0)),
-      perPage: computed(() => (props.option.page?.perPage || 20)),
-      visiblePage: computed(() => (props.option.page?.visiblePage || 8)),
-      order: computed(() => (props.option.page?.order || 'center')),
-      showPageInfo: computed(() => (props.option.page?.showPageInfo || false)),
-      isClientPaging: computed(() =>
-        pageInfo.useClient && pageInfo.usePage && !pageInfo.isInfinite),
+      pageTotal: computed(() => props.option.page?.total || 0),
+      perPage: computed(() => props.option.page?.perPage || 20),
+      visiblePage: computed(() => props.option.page?.visiblePage || 8),
+      order: computed(() => props.option.page?.order || 'center'),
+      showPageInfo: computed(() => props.option.page?.showPageInfo || false),
+      isClientPaging: computed(
+        () => pageInfo.useClient && pageInfo.usePage && !pageInfo.isInfinite,
+      ),
       isHighlight: false,
       highlightPage: 0,
     });
@@ -556,7 +518,8 @@ export default {
     });
     const styleInfo = reactive({
       showHeader: computed(() =>
-        (props.option.showHeader === undefined ? true : props.option.showHeader)),
+        (props.option.showHeader === undefined ? true : props.option.showHeader),
+      ),
       stripeStyle: computed(() => props.option.style?.stripe || false),
       borderStyle: computed(() => props.option.style?.border || ''),
       highlightIdx: computed(() => props.option.style?.highlight ?? -1),
@@ -576,11 +539,7 @@ export default {
         row.indeterminate = false;
       });
     };
-    const {
-      getPagingData,
-      updatePagingInfo,
-      changePage,
-    } = pagingEvent({
+    const { getPagingData, updatePagingInfo, changePage } = pagingEvent({
       stores,
       pageInfo,
       sortInfo,
@@ -589,11 +548,7 @@ export default {
       clearCheckInfo,
     });
     const summaryScroll = ref(0);
-    const {
-      updateVScroll,
-      updateHScroll,
-      onScroll,
-    } = scrollEvent({
+    const { updateVScroll, updateHScroll, onScroll } = scrollEvent({
       scrollInfo,
       stores,
       elementInfo,
@@ -604,15 +559,9 @@ export default {
       updatePagingInfo,
     });
 
-    const {
-      onRowClick,
-      onRowDblClick,
-    } = clickEvent(selectInfo);
+    const { onRowClick, onRowDblClick } = clickEvent(selectInfo);
 
-    const {
-      onCheck,
-      onCheckAll,
-    } = checkEvent({
+    const { onCheck, onCheckAll } = checkEvent({
       checkInfo,
       stores,
       checkHeader,
@@ -621,12 +570,7 @@ export default {
       updatePagingInfo,
     });
 
-    const {
-      calculatedColumn,
-      onResize,
-      onShow,
-      onColumnResize,
-    } = resizeEvent({
+    const { calculatedColumn, onResize, onShow, onColumnResize } = resizeEvent({
       resizeInfo,
       elementInfo,
       checkInfo,
@@ -637,20 +581,17 @@ export default {
       contextInfo,
     });
 
-    const {
+    const { setTreeNodeStore, handleExpand } = treeEvent({ stores, onResize });
+
+    const { onSort, initSortInfo, setSortInfo } = sortEvent({
+      sortInfo,
+      stores,
+      updatePagingInfo,
       setTreeNodeStore,
-      handleExpand,
-    } = treeEvent({ stores, onResize });
+      onResize,
+    });
 
-    const {
-        onSort,
-        initSortInfo,
-        setSortInfo,
-    } = sortEvent({ sortInfo, stores, updatePagingInfo, setTreeNodeStore, onResize });
-
-    const {
-      onSearch,
-    } = filterEvent({
+    const { onSearch } = filterEvent({
       stores,
       filterInfo,
       pageInfo,
@@ -661,33 +602,23 @@ export default {
       updatePagingInfo,
     });
 
-    const {
-      setPositionColumnSetting,
-      initColumnSettingInfo,
-      onApplyColumn,
-      setColumnHidden,
-    } = columnSettingEvent({
-      stores,
-      columnSettingInfo,
-      contextInfo,
-      onSearch,
-      onResize,
-    });
+    const { setPositionColumnSetting, initColumnSettingInfo, onApplyColumn, setColumnHidden } = columnSettingEvent({
+        stores,
+        columnSettingInfo,
+        contextInfo,
+        onSearch,
+        onResize,
+      });
 
-    const {
-      setContextMenu,
-      onContextMenu,
-      onColumnContextMenu,
-      onGridSettingContextMenu,
-    } = contextMenuEvent({
-      contextInfo,
-      stores,
-      selectInfo,
-      useGridSetting,
-      columnSettingInfo,
-      setColumnHidden,
-      onSort,
-    });
+    const { setContextMenu, onContextMenu, onColumnContextMenu, onGridSettingContextMenu } = contextMenuEvent({
+        contextInfo,
+        stores,
+        selectInfo,
+        useGridSetting,
+        columnSettingInfo,
+        setColumnHidden,
+        onSort,
+      });
 
     const setGridSetting = (e) => {
       contextInfo.gridSettingContextMenuItems.length = 0;
@@ -702,8 +633,11 @@ export default {
       if (e.type === 'wheel') {
         contextInfo.menu?.hide(e);
       }
-      if (e.type === 'scroll' && !e.target.classList?.contains('table-body')
-        && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')) {
+      if (
+        e.type === 'scroll'
+        && !e.target.classList?.contains('table-body')
+        && !e.target.offsetParent?.classList?.contains('ev-grid-column-setting')
+      ) {
         columnSettingInfo.isShowColumnSetting = false;
         contextInfo.isShowMenuOnClick = false;
         contextInfo.columnMenu?.hide(e);
@@ -734,34 +668,41 @@ export default {
       onResize();
     });
 
-    watch(() => props.option?.useSort, (use) => {
-      const propsHiddenMenuItems = props.option.hiddenColumnMenuItem;
-      const contextInfoHiddenMenuItems = contextInfo.hiddenColumnMenuItem;
+    watch(
+      () => props.option?.useSort,
+      (use) => {
+        const propsHiddenMenuItems = props.option.hiddenColumnMenuItem;
+        const contextInfoHiddenMenuItems = contextInfo.hiddenColumnMenuItem;
 
-      if (use) {
-        contextInfoHiddenMenuItems.ascending = propsHiddenMenuItems?.ascending ?? false;
-        contextInfoHiddenMenuItems.descending = propsHiddenMenuItems?.descending ?? false;
-        setSortInfo(props.columns, false);
-      } else {
-        contextInfoHiddenMenuItems.ascending = true;
-        contextInfoHiddenMenuItems.descending = true;
-        initSortInfo(props.columns);
-      }
-    });
+        if (use) {
+          contextInfoHiddenMenuItems.ascending = propsHiddenMenuItems?.ascending ?? false;
+          contextInfoHiddenMenuItems.descending = propsHiddenMenuItems?.descending ?? false;
+          setSortInfo(props.columns, false);
+        } else {
+          contextInfoHiddenMenuItems.ascending = true;
+          contextInfoHiddenMenuItems.descending = true;
+          initSortInfo(props.columns);
+        }
+      },
+    );
 
-    watch(() => columnSettingInfo.isShowColumnSetting, (isShowColumnSetting) => {
-      if (!isShowColumnSetting) {
-        contextInfo.gridSettingMenu?.hide();
-        return;
-      }
-      setPositionColumnSetting(toolbarRef.value);
-    });
+    watch(
+      () => columnSettingInfo.isShowColumnSetting,
+      (isShowColumnSetting) => {
+        if (!isShowColumnSetting) {
+          contextInfo.gridSettingMenu?.hide();
+          return;
+        }
+        setPositionColumnSetting(toolbarRef.value);
+      },
+    );
 
     watch(
       () => props.columns,
       () => {
         initColumnSettingInfo();
-      }, { deep: true, immediate: true },
+      },
+      { deep: true, immediate: true },
     );
     watch(
       () => props.checked,
@@ -803,7 +744,8 @@ export default {
           });
           updateVScroll();
         }
-      }, { deep: true },
+      },
+      { deep: true },
     );
     watch(
       () => styleInfo.highlightIdx,
@@ -891,7 +833,8 @@ export default {
         stores.treeRows = newData;
         stores.treeStore = setTreeNodeStore();
         onResize();
-      }, { deep: true },
+      },
+      { deep: true },
     );
     watch(
       () => stores.treeStore.length,
@@ -927,14 +870,16 @@ export default {
             }
           }
         });
-      }, { immediate: true },
+      },
+      { immediate: true },
     );
     watch(
       () => props.option.page?.currentPage,
       (value) => {
         const current = !value ? 1 : value;
         pageInfo.currentPage = !props.option.page?.isInfinite ? current : 1;
-      }, { immediate: true },
+      },
+      { immediate: true },
     );
     watch(
       () => pageInfo.currentPage,
@@ -990,11 +935,12 @@ export default {
       'checkbox-all': true,
       'non-border': !!styleInfo.borderStyle,
     }));
-    const isHeaderCheckbox = computed(() => (
-      checkInfo.useCheckbox.use
-      && checkInfo.useCheckbox.headerCheck
-      && checkInfo.useCheckbox.mode !== 'single'
-    ));
+    const isHeaderCheckbox = computed(
+      () =>
+        checkInfo.useCheckbox.use
+        && checkInfo.useCheckbox.headerCheck
+        && checkInfo.useCheckbox.mode !== 'single',
+    );
     const getColumnClass = (column) => {
       const render = isRenderer(column);
       return {
@@ -1009,9 +955,12 @@ export default {
       return {
         width: `${column.width}px`,
         'min-width': render ? `${resizeInfo.rendererMinWidth}px;` : `${resizeInfo.minWidth}px`,
-        'margin-right': (stores.orderedColumns.length - 1 === index
+        'margin-right':
+          stores.orderedColumns.length - 1 === index
           && scrollInfo.hasVerticalScrollBar
-          && scrollInfo.hasHorizontalScrollBar) ? `${resizeInfo.scrollWidth}px` : '0px',
+          && scrollInfo.hasHorizontalScrollBar
+            ? `${resizeInfo.scrollWidth}px`
+            : '0px',
         'border-right': stores.orderedColumns.length - 1 === index ? 'none' : '1px solid #CFCFCF',
       };
     };

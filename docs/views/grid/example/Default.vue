@@ -46,172 +46,79 @@
     <!-- description -->
     <div class="description">
       <div class="form-rows">
-        <span class="badge yellow">
-          Show Header
-        </span>
-        <ev-toggle
-          v-model="showHeaderMV"
-        />
-        <span class="badge yellow">
-          Use Filter
-        </span>
-        <ev-toggle
-          v-model="useFilterMV"
-          readonly
-        />
-        <span class="badge yellow">
-          Use Checkbox
-        </span>
-        <ev-toggle
-          v-model="useCheckboxMV"
-        />
-        <span class="badge yellow">
-          Stripe Style
-        </span>
-        <ev-toggle
-          v-model="stripeMV"
-        />
+        <span class="badge yellow"> Show Header </span>
+        <ev-toggle v-model="showHeaderMV" />
+        <span class="badge yellow"> Use Filter </span>
+        <ev-toggle v-model="useFilterMV" readonly />
+        <span class="badge yellow"> Use Checkbox </span>
+        <ev-toggle v-model="useCheckboxMV" />
+        <span class="badge yellow"> Stripe Style </span>
+        <ev-toggle v-model="stripeMV" />
       </div>
       <div class="form-rows">
-        <span class="badge yellow">
-          Use Selection
-        </span>
-        <ev-toggle
-          v-model="useSelectionMV"
-        />
-        <span class="badge yellow">
-          Multiple Selection
-        </span>
-        <ev-toggle
-          v-model="isSelectionMultiple"
-        />
+        <span class="badge yellow"> Use Selection </span>
+        <ev-toggle v-model="useSelectionMV" />
+        <span class="badge yellow"> Multiple Selection </span>
+        <ev-toggle v-model="isSelectionMultiple" />
       </div>
       <div class="form-rows">
-        <span class="badge yellow">
-          Use Grid Setting
-        </span>
-        <ev-toggle
-          v-model="useGridSettingMV"
-        />
-        <span class="badge yellow">
-          Use Grid Default Setting
-        </span>
-        <ev-toggle
-          v-model="useGridDefaultSettingMV"
-          :disabled="!useGridSettingMV"
-        />
+        <span class="badge yellow"> Use Grid Setting </span>
+        <ev-toggle v-model="useGridSettingMV" />
+        <span class="badge yellow"> Use Grid Default Setting </span>
+        <ev-toggle v-model="useGridDefaultSettingMV" :disabled="!useGridSettingMV" />
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Width
-          </span>
-          <ev-text-field
-            v-model="widthMV"
-          />
+          <span class="badge yellow"> Width </span>
+          <ev-text-field v-model="widthMV" />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Height
-          </span>
-          <ev-text-field
-            v-model="heightMV"
-          />
+          <span class="badge yellow"> Height </span>
+          <ev-text-field v-model="heightMV" />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Row Height
-          </span>
-          <ev-input-number
-            v-model="rowHeightMV"
-            :step="10"
-            :max="150"
-            :min="35"
-          />
+          <span class="badge yellow"> Row Height </span>
+          <ev-input-number v-model="rowHeightMV" :step="10" :max="150" :min="35" />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Column Width
-          </span>
-          <ev-input-number
-            v-model="columnWidthMV"
-            :step="20"
-            :max="300"
-            :min="40"
-          />
+          <span class="badge yellow"> Column Width </span>
+          <ev-input-number v-model="columnWidthMV" :step="20" :max="300" :min="40" />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Checkbox
-          </span>
-          <ev-radio-group
-            v-model="checkboxModeMV"
-            type="button"
-            @change="changeMode"
-          >
+          <span class="badge yellow"> Checkbox </span>
+          <ev-radio-group v-model="checkboxModeMV" type="button" @change="changeMode">
             <ev-radio label="single" />
             <ev-radio label="multi" />
           </ev-radio-group>
-          <span class="badge">
-            Mode
-          </span>{{ checkboxModeMV }}
-          <span class="badge">
-            Count
-          </span>{{ checked.length }}
+          <span class="badge"> Mode </span>{{ checkboxModeMV }} <span class="badge"> Count </span
+          >{{ checked.length }}
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Checked Row
-          </span>
-          <ev-text-field
-            v-model="checkedRowsMV"
-            type="textarea"
-            readonly
-          />
+          <span class="badge yellow"> Checked Row </span>
+          <ev-text-field v-model="checkedRowsMV" type="textarea" readonly />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Clicked Row
-          </span>
-          <ev-text-field
-            v-model="clickedRowMV"
-            type="textarea"
-            readonly
-          />
+          <span class="badge yellow"> Clicked Row </span>
+          <ev-text-field v-model="clickedRowMV" type="textarea" readonly />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Double Clicked Row
-          </span>
-          <ev-text-field
-            v-model="DbClickedRowsMV"
-            type="textarea"
-            readonly
-          />
+          <span class="badge yellow"> Double Clicked Row </span>
+          <ev-text-field v-model="DbClickedRowsMV" type="textarea" readonly />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Highlight
-          </span>
-          <ev-input-number
-            v-model="highlightMV"
-            :step="1"
-            :max="100"
-            :min="-1"
-          />
+          <span class="badge yellow"> Highlight </span>
+          <ev-input-number v-model="highlightMV" :step="1" :max="100" :min="-1" />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Border Style
-          </span>
+          <span class="badge yellow"> Border Style </span>
           <ev-select
             v-model="borderMV"
             :items="items"
@@ -260,7 +167,8 @@ export default {
       {
         text: 'Menu1',
         click: param => console.log(`[Menu1] Selected Row Data: ${param?.selectedRow}`),
-      }, {
+      },
+      {
         text: 'Menu2',
         click: param => console.log('[Menu2]', param.contextmenuInfo),
       },
@@ -335,10 +243,7 @@ export default {
         tableData.value = getData(50, 0);
       } else if (e.eventName?.onScrollEnd && tableData.value.length < 1000) {
         const newData = getData(50, tableData.value.length);
-        tableData.value = [
-          ...tableData.value,
-          ...newData,
-        ];
+        tableData.value = [...tableData.value, ...newData];
       }
     };
     const pageInfo = reactive({

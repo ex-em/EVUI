@@ -8,7 +8,7 @@
         :style="columnSettingStyle"
       >
         <div class="ev-grid-column-setting__header">
-          <p class="header-title"> {{ textInfo.title }} </p>
+          <p class="header-title">{{ textInfo.title }}</p>
           <ev-text-field
             v-model="searchVm"
             type="search"
@@ -18,10 +18,7 @@
         </div>
         <div class="ev-grid-column-setting__content">
           <template v-if="columnList.length">
-            <ev-checkbox-group
-              v-model="checkColumnGroup"
-              @change="onCheckColumn"
-            >
+            <ev-checkbox-group v-model="checkColumnGroup" @change="onCheckColumn">
               <ev-checkbox
                 v-for="(column, idx) in columnList"
                 :key="`column_${idx}`"
@@ -34,15 +31,11 @@
             </ev-checkbox-group>
           </template>
           <template v-else>
-            <p class="is-empty"> {{ textInfo.empty }} </p>
+            <p class="is-empty">{{ textInfo.empty }}</p>
           </template>
         </div>
         <div class="ev-grid-column-setting__footer">
-          <ev-button
-            type="primary"
-            :disabled="isDisabled"
-            @click="onApplyColumn"
-          >
+          <ev-button type="primary" :disabled="isDisabled" @click="onApplyColumn">
             {{ textInfo.ok }}
           </ev-button>
         </div>
@@ -52,14 +45,7 @@
 </template>
 
 <script>
-import {
-  computed,
-  nextTick,
-  onBeforeMount,
-  reactive,
-  ref,
-  watch,
-} from 'vue';
+import { computed, nextTick, onBeforeMount, reactive, ref, watch } from 'vue';
 import { cloneDeep } from 'lodash-es';
 import { clickoutside } from '@/directives/clickoutside';
 
@@ -121,8 +107,9 @@ export default {
     const originColumnList = ref([]);
     const searchColumnList = ref([]);
     const applyColumnList = ref([]);
-    const columnList = computed(() => (isSearch.value
-      ? searchColumnList.value : originColumnList.value));
+    const columnList = computed(() =>
+      (isSearch.value ? searchColumnList.value : originColumnList.value),
+    );
     const isDisabled = computed(() => !columnList.value.length);
     let timer = null;
     let lastCheckedColumn = null;
@@ -138,7 +125,8 @@ export default {
     const onCheckColumn = (columns) => {
       if (columns?.length === 1) {
         lastCheckedColumn = columns[0];
-      } else if (columns?.length < 1) { // 최소 한개 컬럼은 선택되도록
+      } else if (columns?.length < 1) {
+        // 최소 한개 컬럼은 선택되도록
         if (lastCheckedColumn == null) {
           lastCheckedColumn = originColumnList.value[0]?.text;
         }
@@ -175,15 +163,14 @@ export default {
     const initValue = () => {
       const columns = applyColumnList.value.length ? applyColumnList.value : originColumnList.value;
 
-      checkColumnGroup.value = columns
-        .filter(col => col.originChecked)
-        .map(col => col.text);
+      checkColumnGroup.value = columns.filter(col => col.originChecked).map(col => col.text);
 
       initSearchValue();
     };
     const onApplyColumn = () => {
-      applyColumnList.value = originColumnList.value
-        .filter(col => checkColumnGroup.value.includes(col.text));
+      applyColumnList.value = originColumnList.value.filter(col =>
+        checkColumnGroup.value.includes(col.text),
+      );
       const checkedColumns = applyColumnList.value.map(col => col.text);
 
       emit('apply-column', checkedColumns);
@@ -204,8 +191,8 @@ export default {
           if (prevColumn) {
             const isHiddenChanged = prevColumn?.hiddenDisplay !== col?.hiddenDisplay;
             isChecked = isHiddenChanged || !prevCheckColumnGroup.value?.length
-              ? !col?.hiddenDisplay
-              : prevCheckColumnGroup.value.includes(col.field);
+                ? !col?.hiddenDisplay
+                : prevCheckColumnGroup.value.includes(col.field);
           } else {
             isChecked = !col.hiddenDisplay;
           }
@@ -252,7 +239,8 @@ export default {
       const { top, left, columnListMenuWidth } = props.position;
       let columnSettingLeft;
 
-      if (columnListMenuWidth) { // 컨텍스트 메뉴일 때
+      if (columnListMenuWidth) {
+        // 컨텍스트 메뉴일 때
         columnSettingLeft = left;
 
         if (docWidth < left + columnSettingWidth) {
@@ -268,26 +256,36 @@ export default {
 
     onBeforeMount(() => initWrapperDiv());
 
-    watch(() => props.columns, () => {
-      setColumns();
-    }, { immediate: true, deep: true });
+    watch(
+      () => props.columns,
+      () => {
+        setColumns();
+      },
+      { immediate: true, deep: true },
+    );
 
-    watch(() => isShowColumnSetting.value, async () => {
-      initValue();
+    watch(
+      () => isShowColumnSetting.value,
+      async () => {
+        initValue();
 
-      if (isShowColumnSetting.value) {
-        await setPosition();
-      }
-    });
+        if (isShowColumnSetting.value) {
+          await setPosition();
+        }
+      },
+    );
 
-    watch(() => props.hiddenColumn, (value) => {
-      const filterColumns = applyColumnList.value.length
-        ? applyColumnList.value.filter(col => col.text !== value)
-        : originColumnList.value.filter(col => (col.text !== value && col.checked));
+    watch(
+      () => props.hiddenColumn,
+      (value) => {
+        const filterColumns = applyColumnList.value.length
+          ? applyColumnList.value.filter(col => col.text !== value)
+          : originColumnList.value.filter(col => col.text !== value && col.checked);
 
-      applyColumnList.value = filterColumns;
-      checkColumnGroup.value = filterColumns.map(col => col.text);
-    });
+        applyColumnList.value = filterColumns;
+        checkColumnGroup.value = filterColumns.map(col => col.text);
+      },
+    );
 
     return {
       columnSettingWrapper,
@@ -310,8 +308,8 @@ export default {
 .ev-grid-column-setting {
   position: absolute;
   width: 180px;
-  border: 1px solid #D0D0D0;
-  background: #FFFFFF;
+  border: 1px solid #d0d0d0;
+  background: #ffffff;
   font-size: 12px;
   z-index: 1;
   &__header {
@@ -325,8 +323,8 @@ export default {
   &__content {
     height: 120px;
     padding: 0 10px;
-    border-top: 1px solid #CED4DA;
-    border-bottom: 1px solid #CED4DA;
+    border-top: 1px solid #ced4da;
+    border-bottom: 1px solid #ced4da;
     overflow: auto;
 
     .ev-checkbox {

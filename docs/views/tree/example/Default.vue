@@ -1,61 +1,38 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-tree
-      :data="commonData"
-      @click-node="getClickedNode"
-    />
+    <ev-tree :data="commonData" @click-node="getClickedNode" />
     <div class="description">
-      <div class="badge yellow">
-        클릭된 노드
-      </div>
+      <div class="badge yellow">클릭된 노드</div>
       {{ clickedNodeInfo }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Checkbox</p>
-    <ev-tree
-      :data="checkboxExampleData"
-      :use-checkbox="true"
-      @check="getCheckedNode"
-    />
+    <ev-tree :data="checkboxExampleData" :use-checkbox="true" @check="getCheckedNode" />
     <div class="description">
-      <div class="badge yellow">
-        체크박스 선택된 노드들
-      </div>
+      <div class="badge yellow">체크박스 선택된 노드들</div>
       {{ checkedNodeInfo }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Dblclick-node</p>
-    <ev-tree
-      :data="dbClickedData"
-      @dblclick-node="getDblClickedNode"
-    />
+    <ev-tree :data="dbClickedData" @dblclick-node="getDblClickedNode" />
     <div class="description">
-      <div class="badge yellow">
-        더블 클릭된 노드
-      </div>
+      <div class="badge yellow">더블 클릭된 노드</div>
       {{ dbclickedNodeInfo }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">Disabled</p>
-    <ev-tree :data="disableExData"/>
-    <div class="description">
-      'disabled' 속성 추가 시 클릭이 불가 합니다.
-    </div>
+    <ev-tree :data="disableExData" />
+    <div class="description">'disabled' 속성 추가 시 클릭이 불가 합니다.</div>
   </div>
   <div class="case">
     <p class="case-title">ContextMenu</p>
-    <ev-tree
-      :data="contextmenuExData"
-      :context-menu-items="menuItems"
-    />
+    <ev-tree :data="contextmenuExData" :context-menu-items="menuItems" />
     <div class="description">
-      <div class="badge yellow">
-        클릭한 컨텍스메뉴명
-      </div>
+      <div class="badge yellow">클릭한 컨텍스메뉴명</div>
       {{ contextMenuInfo }}
     </div>
   </div>
@@ -72,7 +49,7 @@
   </div>
   <div class="case">
     <p class="case-title">IconClass</p>
-    <ev-tree :data="iconClassExData"/>
+    <ev-tree :data="iconClassExData" />
     <div class="description">
       'iconClass'속성을 사용하면 트리 노드 내부에 아이콘을 추가 수 있습니다.
     </div>
@@ -83,12 +60,7 @@
       <span>부모가 검색될 경우 자식 노드까지 보일지 여부</span>
       <ev-toggle v-model="searchIncludeChildren" />
     </div>
-    <ev-text-field
-      v-model="searchVm"
-      placeholder="Search"
-      type="search"
-      @search="searchInput"
-    />
+    <ev-text-field v-model="searchVm" placeholder="Search" type="search" @search="searchInput" />
     <ev-tree
       :data="searchExData"
       :use-checkbox="true"
@@ -96,7 +68,8 @@
       :search-include-children="searchIncludeChildren"
     />
     <div class="description">
-      'ev-text-field' 컴포넌트를 사용해 필터링할 단어를 검색하면 'ev-tree' 컴포넌트 내부에서 검색되는 구조입니다.
+      'ev-text-field' 컴포넌트를 사용해 필터링할 단어를 검색하면 'ev-tree' 컴포넌트 내부에서
+      검색되는 구조입니다.
     </div>
   </div>
 </template>
@@ -338,10 +311,12 @@ export default {
                       {
                         title: 'Team A',
                         iconClass: 'ev-icon-folder',
-                        children: [{
-                          title: 'I am a member of Team A.',
-                          iconClass: 'ev-icon-user2',
-                        }],
+                        children: [
+                          {
+                            title: 'I am a member of Team A.',
+                            iconClass: 'ev-icon-user2',
+                          },
+                        ],
                       },
                     ],
                   },
@@ -391,11 +366,15 @@ export default {
     const menuItems = ref([
       {
         text: 'ContextMenu1',
-        click: () => { contextMenuInfo.value = 'ContextMenu1'; },
+        click: () => {
+          contextMenuInfo.value = 'ContextMenu1';
+        },
       },
       {
         text: 'ContextMenu2',
-        click: () => { contextMenuInfo.value = 'ContextMenu2'; },
+        click: () => {
+          contextMenuInfo.value = 'ContextMenu2';
+        },
       },
     ]);
 

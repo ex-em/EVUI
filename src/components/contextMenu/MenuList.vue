@@ -10,27 +10,16 @@
         @click="handleItemClick(item)"
         @mouseenter="handleMouseEnter($event, item)"
       >
-        <i
-          v-if="!!item.iconClass"
-          class="ev-menu-li-prefix"
-          :class="item.iconClass"
-        />
+        <i v-if="!!item.iconClass" class="ev-menu-li-prefix" :class="item.iconClass" />
         <span class="ev-menu-li-text">
-          <slot
-            v-if="item.slotKey"
-            :name="item.slotKey"
-            :item="item"
-          >
+          <slot v-if="item.slotKey" :name="item.slotKey" :item="item">
             {{ item.text }}
           </slot>
           <template v-else>
             {{ item.text }}
           </template>
         </span>
-        <i
-          v-if="item.children || item.isShowMenu"
-          class="ev-menu-li-suffix ev-icon-arrow-right2"
-        />
+        <i v-if="item.children || item.isShowMenu" class="ev-menu-li-suffix ev-icon-arrow-right2" />
       </li>
     </ul>
     <template v-if="isExistChild">
@@ -43,15 +32,8 @@
         :items="childrenItems"
         :style="menuStyle"
       >
-        <template
-          v-for="(_, slotName) in $slots"
-          :key="slotName"
-          #[slotName]="slotProps"
-        >
-          <slot
-            :name="slotName"
-            v-bind="slotProps"
-          />
+        <template v-for="(_, slotName) in $slots" :key="slotName" #[slotName]="slotProps">
+          <slot :name="slotName" v-bind="slotProps" />
         </template>
       </component>
     </template>
@@ -73,10 +55,10 @@ export default {
       default: () => [],
       validator: (list) => {
         if (list.some(v => v.children !== undefined && !Array.isArray(v.children))) {
-          console.warn('[EVUI][ContextMenu] children attribute must be \'Array\' type.');
+          console.warn("[EVUI][ContextMenu] children attribute must be 'Array' type.");
           return false;
         } else if (list.some(v => v.click !== undefined && typeof v.click !== 'function')) {
-          console.warn('[EVUI][ContextMenu] click attribute must be \'Function\' type.');
+          console.warn("[EVUI][ContextMenu] click attribute must be 'Function' type.");
           return false;
         }
         return true;
@@ -133,8 +115,8 @@ export default {
 .ev-menu-ul {
   list-style: none;
   position: absolute;
-  border: 1px solid #D0D0D0;
-  background-color: #EEEEEE;
+  border: 1px solid #d0d0d0;
+  background-color: #eeeeee;
   z-index: 100;
 }
 
@@ -148,16 +130,16 @@ export default {
   }
 
   &:not(:last-child) {
-    border-bottom: 1px dotted #D0D0D0;
+    border-bottom: 1px dotted #d0d0d0;
   }
 
   &:hover {
-    background-color: #ECF5FF;
+    background-color: #ecf5ff;
     cursor: pointer;
   }
 
   &.disabled {
-    color: #B2B2B2;
+    color: #b2b2b2;
   }
 
   &.disabled:hover {

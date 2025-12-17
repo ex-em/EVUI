@@ -1,76 +1,34 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-button
-      type="info"
-      @click="showInfo"
-    >
-      Show Info
-    </ev-button>
-    <ev-button
-      type="primary"
-      @click="showSuccess"
-    >
-      Show Success
-    </ev-button>
-    <ev-button
-      type="warning"
-      @click="showWarning"
-    >
-      Show Warning
-    </ev-button>
-    <ev-button
-      type="error"
-      @click="showError"
-    >
-      Show Error
-    </ev-button>
+    <ev-button type="info" @click="showInfo"> Show Info </ev-button>
+    <ev-button type="primary" @click="showSuccess"> Show Success </ev-button>
+    <ev-button type="warning" @click="showWarning"> Show Warning </ev-button>
+    <ev-button type="error" @click="showError"> Show Error </ev-button>
   </div>
   <div class="case">
     <p class="case-title">With Close Button</p>
-    <ev-button
-      @click="showClose"
-    >
-      Show Close
-    </ev-button>
+    <ev-button @click="showClose"> Show Close </ev-button>
   </div>
   <div class="case">
     <p class="case-title">Custom Duration</p>
-    <ev-button
-      @click="showDuration"
-    >
-      Show Duration
-    </ev-button>
+    <ev-button @click="showDuration"> Show Duration </ev-button>
   </div>
   <div class="case">
     <p class="case-title">Icon</p>
-    <ev-button
-      @click="showIcon"
-    >
-      Show Icon
-    </ev-button>
+    <ev-button @click="showIcon"> Show Icon </ev-button>
   </div>
   <div class="case">
     <p class="case-title">After Closing</p>
-    <ev-button
-      @click="showOnClose"
-    >
-      Show onClose
-    </ev-button>
+    <ev-button @click="showOnClose"> Show onClose </ev-button>
     <div class="description">
-      <span class="badge">
-        After close behavior
-      </span>
+      <span class="badge"> After close behavior </span>
       {{ onCloseMsg }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">HTML</p>
-    <ev-button
-      @click="showHTML"
-    >
-      Show HTML
-    </ev-button>
+    <ev-button @click="showHTML"> Show HTML </ev-button>
   </div>
   <div class="case">
     <p class="case-title">Close from outside</p>

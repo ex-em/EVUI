@@ -1,7 +1,4 @@
-import {
-  ref, reactive, computed, nextTick,
-  getCurrentInstance, defineComponent,
-} from 'vue';
+import { ref, reactive, computed, nextTick, getCurrentInstance, defineComponent } from 'vue';
 import MenuList from './MenuList';
 
 export const useModel = () => {
@@ -155,8 +152,7 @@ export const useMenuList = () => {
     const elementOffsetTop = e.target.offsetTop;
 
     const isOverflowHeight = browserHeight < parentMenuY + elementOffsetTop + childMenuHeight;
-    const isOverflowWidth = browserWidth < parentMenuX + parentMenuWidth
-                                            + childMenuWidth + RIGHT_BUFFER_PX;
+    const isOverflowWidth = browserWidth < parentMenuX + parentMenuWidth + childMenuWidth + RIGHT_BUFFER_PX;
 
     if (!isOverflowHeight) {
       // dropDown

@@ -1,8 +1,5 @@
 <template>
-  <transition
-    name="ev-notification-fade"
-    appear
-  >
+  <transition name="ev-notification-fade" appear>
     <div
       v-show="isShow"
       class="ev-notification"
@@ -16,38 +13,19 @@
       @mouseleave="startTimer"
       @click="clickMsg"
     >
-      <span
-        v-if="iconClass"
-        class="ev-notification-icon"
-      >
-        <i
-          :class="iconClass"
-        />
+      <span v-if="iconClass" class="ev-notification-icon">
+        <i :class="iconClass" />
       </span>
       <div class="ev-notification-content">
-        <p
-          v-if="title"
-          class="title"
-        >
+        <p v-if="title" class="title">
           {{ title }}
         </p>
-        <p
-          v-if="useHTML"
-          class="message"
-          v-html="message"
-        />
-        <p
-          v-else
-          class="message"
-        >
+        <p v-if="useHTML" class="message" v-html="message" />
+        <p v-else class="message">
           {{ message }}
         </p>
       </div>
-      <span
-        v-if="showClose"
-        class="ev-notification-close"
-        @click="closeMsg"
-      >
+      <span v-if="showClose" class="ev-notification-close" @click="closeMsg">
         <i class="ev-icon-close" />
       </span>
     </div>
@@ -193,9 +171,7 @@ export default {
           opacity: 0;
           transform: translateX(-100%);
         }
-      }
-
-      @else if $position == 'top-right' {
+      } @else if $position == 'top-right' {
         top: 0;
         right: 0;
 
@@ -207,8 +183,7 @@ export default {
           opacity: 0;
           transform: translateX(100%);
         }
-      }
-      @else if $position == 'bottom-left' {
+      } @else if $position == 'bottom-left' {
         left: 0;
         bottom: 0;
 
@@ -220,8 +195,7 @@ export default {
           opacity: 0;
           transform: translateX(-100%);
         }
-      }
-      @else if $position == 'bottom-right' {
+      } @else if $position == 'bottom-right' {
         bottom: 0;
         right: 0;
 
@@ -249,7 +223,9 @@ export default {
   align-items: center;
   box-sizing: border-box;
   border-radius: $default-radius;
-  transition: opacity .3s ease-in-out, transform .2s ease-in-out;
+  transition:
+    opacity 0.3s ease-in-out,
+    transform 0.2s ease-in-out;
   font-size: $font-size-medium;
   line-height: 1.5em;
 
@@ -297,11 +273,9 @@ export default {
   @each $type in ('info', 'success', 'warning', 'error') {
     &.type-#{$type} {
       @if $type == 'info' {
-        background-color: #FDFDFD;
-        border: 1px solid #E3E3E3;
-      }
-
-      @else {
+        background-color: #fdfdfd;
+        border: 1px solid #e3e3e3;
+      } @else {
         @include evThemify() {
           background-color: evThemed($type);
         }

@@ -2,39 +2,28 @@
   <nav class="pagination">
     <!-- Page Info -->
     <small v-if="showPageInfo" class="pagination-info">
-      <template v-if="perPage === 1">
-        {{ firstData }} / {{ total }}
-      </template>
+      <template v-if="perPage === 1"> {{ firstData }} / {{ total }} </template>
       <template v-else>
-        {{ firstData }} - {{ Math.min(current * perPage, total) }}
-        / {{ total }}
+        {{ firstData }} - {{ Math.min(current * perPage, total) }} / {{ total }}
       </template>
     </small>
 
     <ul class="pagination-list" :style="listClasses">
       <!-- Jump -->
-      <li v-if="$props.pagePerJump"
-        class="step-button"
-        :class="{'is-disabled': !hasPrev}">
+      <li v-if="$props.pagePerJump" class="step-button" :class="{ 'is-disabled': !hasPrev }">
         <page-button
           class="pagination-previous"
           :disabled="!hasPrev"
-          :page="getPage(prevJumpPage, {isCurrent: false})"
+          :page="getPage(prevJumpPage, { isCurrent: false })"
         >
-          <ev-icon icon="ev-icon-s-double-left"/>
+          <ev-icon icon="ev-icon-s-double-left" />
         </page-button>
       </li>
 
       <!-- Previous -->
-      <li
-        class="step-button"
-      :class="{'is-disabled': !hasPrev}">
-        <page-button
-          class="pagination-previous"
-          :disabled="!hasPrev"
-          :page="getPage(current - 1)"
-        >
-          <ev-icon icon="ev-icon-s-arrow-left"/>
+      <li class="step-button" :class="{ 'is-disabled': !hasPrev }">
+        <page-button class="pagination-previous" :disabled="!hasPrev" :page="getPage(current - 1)">
+          <ev-icon icon="ev-icon-s-arrow-left" />
         </page-button>
       </li>
 
@@ -44,36 +33,27 @@
           <span>&hellip;</span>
         </li>
         <li v-else :class="{ 'is-current': page.isCurrent, 'is-page': true }" @click="page.click">
-          <page-button :page="page"/>
+          <page-button :page="page" />
         </li>
       </template>
 
       <!-- Next -->
-      <li
-      class="step-button"
-      :class="{'is-disabled': !hasNext}">
-        <page-button
-          class="pagination-next"
-          :disabled="!hasNext"
-          :page="getPage(current + 1)"
-        >
-          <ev-icon icon="ev-icon-s-arrow-right"/>
+      <li class="step-button" :class="{ 'is-disabled': !hasNext }">
+        <page-button class="pagination-next" :disabled="!hasNext" :page="getPage(current + 1)">
+          <ev-icon icon="ev-icon-s-arrow-right" />
         </page-button>
       </li>
 
       <!-- Jump -->
-      <li v-if="$props.pagePerJump"
-      class="step-button"
-      :class="{'is-disabled': !hasNext}">
+      <li v-if="$props.pagePerJump" class="step-button" :class="{ 'is-disabled': !hasNext }">
         <page-button
           class="pagination-previous"
           :disabled="!hasNext"
-          :page="getPage(nextJumpPage, {isCurrent: false})"
+          :page="getPage(nextJumpPage, { isCurrent: false })"
         >
-          <ev-icon icon="ev-icon-s-double-right"/>
+          <ev-icon icon="ev-icon-s-double-right" />
         </page-button>
       </li>
-
     </ul>
   </nav>
 </template>
@@ -127,16 +107,15 @@ export default {
   setup(props, { emit }) {
     const visiblePage = computed(() => (props.visiblePage > 7 ? props.visiblePage : 7));
     const current = computed(() => props.modelValue);
-    const pageCount = computed(() => (props.total === 0
-      ? 1 : Math.ceil(props.total / props.perPage)));
+    const pageCount = computed(() =>
+      (props.total === 0 ? 1 : Math.ceil(props.total / props.perPage)),
+    );
     const hasPrev = computed(() => current.value > 1);
     const hasNext = computed(() => current.value < pageCount.value);
 
-    const prevJumpPage = computed(
-      () => Math.max(current.value - props.pagePerJump, 1),
-    );
-    const nextJumpPage = computed(
-      () => Math.min(current.value + props.pagePerJump, pageCount.value),
+    const prevJumpPage = computed(() => Math.max(current.value - props.pagePerJump, 1));
+    const nextJumpPage = computed(() =>
+      Math.min(current.value + props.pagePerJump, pageCount.value),
     );
 
     const firstData = computed(() => {
@@ -176,10 +155,7 @@ export default {
         return [];
       }
 
-      const maxLength = Math.min(
-        Math.max(0, totalVisible) || pageCount.value,
-        pageCount.value,
-      );
+      const maxLength = Math.min(Math.max(0, totalVisible) || pageCount.value, pageCount.value);
       if (pageCount.value <= maxLength) {
         return onRange(1, pageCount.value);
       }
@@ -208,11 +184,7 @@ export default {
         const start = current.value - left + 1;
         return [getPage(1), getPage(-1), ...onRange(start, pageCount.value)];
       }
-      return [
-        ...onRange(1, left),
-        getPage(-1),
-        ...onRange(right, pageCount.value),
-      ];
+      return [...onRange(1, left), getPage(-1), ...onRange(right, pageCount.value)];
     });
     const listClasses = computed(() => ({ 'justify-content': props.order, flex: '3 1 0%' }));
 
@@ -261,7 +233,7 @@ export default {
     background-size: 16px;
     cursor: pointer;
     &:hover {
-      color: #1A6AFE;
+      color: #1a6afe;
     }
   }
   &-info {
@@ -271,13 +243,13 @@ export default {
   .is-current {
     pointer-events: none;
     cursor: not-allowed;
-    background-color: #1A6AFE;
-    color: #FFFFFF;
+    background-color: #1a6afe;
+    color: #ffffff;
     border-radius: 4px;
   }
   .is-page {
     &:hover {
-      color: #1A6AFE;
+      color: #1a6afe;
     }
   }
   .pagination-ellipsis {
@@ -288,7 +260,7 @@ export default {
     pointer-events: none;
     cursor: not-allowed;
     opacity: 0.5;
-    color: #C0C4CC;
+    color: #c0c4cc;
   }
   &-list {
     display: flex;

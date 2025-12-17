@@ -42,9 +42,9 @@ class TimeBar extends Bar {
 
     let bArea;
     if (this.isExistGrp) {
-      bArea = (cArea - (cPad * 2));
+      bArea = cArea - cPad * 2;
     } else {
-      bArea = (cArea - (cPad * 2)) / showSeriesCount;
+      bArea = (cArea - cPad * 2) / showSeriesCount;
     }
 
     const getSize = () => {
@@ -85,7 +85,7 @@ class TimeBar extends Bar {
         x = Canvas.calculateSubX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
         if (x < xsp) {
           subW -= xsp - x;
-          x = (x + w < xsp) ? null : xsp;
+          x = x + w < xsp ? null : xsp;
         } else if (x + w > xep) {
           subW -= subW - (xep - x);
         }
@@ -107,10 +107,12 @@ class TimeBar extends Bar {
         } else {
           w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea);
         }
-      } else if (item.b) { // vertical stack bar chart
+      } else if (item.b) {
+        // vertical stack bar chart
         h = Canvas.calculateY(item.y - item.b, minmaxY.graphMin, minmaxY.graphMax, yArea);
         y = Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-      } else { // vertical bar chart
+      } else {
+        // vertical bar chart
         h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
       }
 

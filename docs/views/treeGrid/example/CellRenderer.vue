@@ -15,19 +15,8 @@
     >
       <!-- renderer start -->
       <template #gridButton>
-        <ev-button
-          type="ghost"
-          size="small"
-          @click="onRowDelete"
-        >
-          Delete
-        </ev-button>
-        <ev-button
-          size="small"
-          @click="onRowEdit"
-        >
-          Edit
-        </ev-button>
+        <ev-button type="ghost" size="small" @click="onRowDelete"> Delete </ev-button>
+        <ev-button size="small" @click="onRowEdit"> Edit </ev-button>
       </template>
       <template #check="{ item }">
         <ev-checkbox
@@ -51,9 +40,7 @@
         />
       </template>
       <template #custom="{ item }">
-        <span
-          :class="getStateClass(item.data[item.fieldName])"
-        >
+        <span :class="getStateClass(item.data[item.fieldName])">
           <span class="v-chip__content"> {{ item.data[item.fieldName] }} </span>
         </span>
       </template>
@@ -80,81 +67,101 @@ export default {
       headerCheck: true,
     });
     const getData = () => {
-      tableData.value = [{
-        check: true,
-        slide: [33.33, 66.66],
-        inputNumber: 10,
-        custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-        expand: true,
-        children: [{
+      tableData.value = [
+        {
           check: true,
           slide: [33.33, 66.66],
           inputNumber: 10,
           custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-          expand: false,
-          children: [{
-            check: true,
-            slide: [33.33, 66.66],
-            inputNumber: 10,
-            custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-          }, {
-            check: true,
-            slide: [33.33, 66.66],
-            inputNumber: 10,
-            custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-            expand: false,
-            children: [{
+          expand: true,
+          children: [
+            {
               check: true,
               slide: [33.33, 66.66],
               inputNumber: 10,
               custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-              children: [{
-                check: true,
-                slide: [33.33, 66.66],
-                inputNumber: 10,
-                custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-                children: [{
+              expand: false,
+              children: [
+                {
                   check: true,
                   slide: [33.33, 66.66],
                   inputNumber: 10,
                   custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-                }],
-              }],
-            }, {
+                },
+                {
+                  check: true,
+                  slide: [33.33, 66.66],
+                  inputNumber: 10,
+                  custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+                  expand: false,
+                  children: [
+                    {
+                      check: true,
+                      slide: [33.33, 66.66],
+                      inputNumber: 10,
+                      custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+                      children: [
+                        {
+                          check: true,
+                          slide: [33.33, 66.66],
+                          inputNumber: 10,
+                          custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+                          children: [
+                            {
+                              check: true,
+                              slide: [33.33, 66.66],
+                              inputNumber: 10,
+                              custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      check: true,
+                      slide: [33.33, 66.66],
+                      inputNumber: 10,
+                      custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+                    },
+                  ],
+                },
+              ],
+            },
+            {
               check: true,
               slide: [33.33, 66.66],
               inputNumber: 10,
               custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-            }],
-          }],
-        }, {
-          check: true,
-          slide: [33.33, 66.66],
-          inputNumber: 10,
-          custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-          children: [{
-            check: true,
-            slide: [33.33, 66.66],
-            inputNumber: 10,
-            custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-          }, {
-            check: true,
-            slide: [33.33, 66.66],
-            inputNumber: 10,
-            custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-          }, {
-            check: true,
-            slide: [33.33, 66.66],
-            inputNumber: 10,
-            custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-          }],
-        }, {
-          check: true,
-          slide: [33.33, 66.66],
-          inputNumber: 10,
-          custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
-        }],
-      }];
+              children: [
+                {
+                  check: true,
+                  slide: [33.33, 66.66],
+                  inputNumber: 10,
+                  custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+                },
+                {
+                  check: true,
+                  slide: [33.33, 66.66],
+                  inputNumber: 10,
+                  custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+                },
+                {
+                  check: true,
+                  slide: [33.33, 66.66],
+                  inputNumber: 10,
+                  custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+                },
+              ],
+            },
+            {
+              check: true,
+              slide: [33.33, 66.66],
+              inputNumber: 10,
+              custom: Math.floor(Math.random() * (99 - 10 + 1)) + 10,
+            },
+          ],
+        },
+      ];
     };
     const columns = ref([
       {
@@ -234,7 +241,9 @@ export default {
 .form-row {
   width: 50%;
 }
-.ev-text-field, .ev-input-number, .ev-select {
+.ev-text-field,
+.ev-input-number,
+.ev-select {
   width: 80%;
 }
 .badge {
@@ -251,31 +260,31 @@ export default {
   padding: 0 12px;
   align-items: center;
   cursor: default;
-  color: #FFFFFF;
+  color: #ffffff;
   line-height: 20px;
   max-width: 100%;
   outline: none;
   overflow: hidden;
   text-decoration: none;
-  transition-duration: .28s;
+  transition-duration: 0.28s;
   transition-property: box-shadow, opacity;
-  transition-timing-function: cubic-bezier(.4,0,.2,1);
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   vertical-align: middle;
   white-space: nowrap;
   border-radius: 16px;
   font-size: 14px;
 
   &.green {
-    background-color: #4CAF50;
-    border-color: #4CAF50;
+    background-color: #4caf50;
+    border-color: #4caf50;
   }
   &.yellow {
-    background-color: #F7DF6A;
-    border-color: #F7DF6A;
+    background-color: #f7df6a;
+    border-color: #f7df6a;
   }
   &.red {
-    background-color: #FF4949;
-    border-color: #FF4949;
+    background-color: #ff4949;
+    border-color: #ff4949;
   }
 }
 .v-chip .v-chip__content {

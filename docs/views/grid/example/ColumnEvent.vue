@@ -20,17 +20,11 @@
     <div class="description column-event-description">
       <div class="form-row column-event-description__sort-type">
         <span class="badge yellow">Initial Sorting Type of Column B</span>
-        <ev-text-field
-          model-value="desc"
-          class="component"
-          readonly
-        />
+        <ev-text-field model-value="desc" class="component" readonly />
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Change Grid Column Event
-          </span>
+          <span class="badge yellow"> Change Grid Column Event </span>
           <ev-text-field
             v-model="columnEventsInfo.info"
             class="custom-text-area"
@@ -39,9 +33,7 @@
           />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Resize Column Width
-          </span>
+          <span class="badge yellow"> Resize Column Width </span>
           <ev-text-field
             v-model="columnEventsInfo.resize"
             class="custom-text-area"
@@ -52,9 +44,7 @@
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Change Column Position
-          </span>
+          <span class="badge yellow"> Change Column Position </span>
           <ev-text-field
             v-model="columnEventsInfo.order"
             class="custom-text-area"
@@ -63,9 +53,7 @@
           />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Grid Column Setting(Column Show/Hide Status)
-          </span>
+          <span class="badge yellow"> Grid Column Setting(Column Show/Hide Status) </span>
           <ev-text-field
             v-model="columnEventsInfo.status"
             class="custom-text-area"

@@ -17,7 +17,8 @@ export default {
   mdText,
   components: {
     'Line & Bar': {
-      description: 'Line과 Bar를 조합하여 2가지 계열을 나타냅니다. Bar 차트가 들어가므로 Step Axis의 TimeMode를 사용하여 구현합니다.',
+      description:
+        'Line과 Bar를 조합하여 2가지 계열을 나타냅니다. Bar 차트가 들어가므로 Step Axis의 TimeMode를 사용하여 구현합니다.',
       component: LineBar,
       parsedData: parse(LineBarRaw).descriptor,
     },
@@ -27,12 +28,14 @@ export default {
       parsedData: parse(LineStackBarRaw).descriptor,
     },
     'StackLine & Bar': {
-      description: 'StackLine과 Bar를 조합하여 2가지 계열을 나타냅니다. Stack-Line은 null을 받지 않으므로 0으로 기본데이터 세팅이 필요합니다.',
+      description:
+        'StackLine과 Bar를 조합하여 2가지 계열을 나타냅니다. Stack-Line은 null을 받지 않으므로 0으로 기본데이터 세팅이 필요합니다.',
       component: StackLineBar,
       parsedData: parse(StackLineBarRaw).descriptor,
     },
     'StackLine & StackBar': {
-      description: 'StackLine과 StackBar를 조합하여 2가지 계열을 나타냅니다. Stack-Line은 null을 받지 않으므로 0으로 기본데이터 세팅이 필요합니다.',
+      description:
+        'StackLine과 StackBar를 조합하여 2가지 계열을 나타냅니다. Stack-Line은 null을 받지 않으므로 0으로 기본데이터 세팅이 필요합니다.',
       component: StackLineStackBar,
       parsedData: parse(StackLineStackBarRaw).descriptor,
     },

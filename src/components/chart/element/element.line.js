@@ -16,7 +16,7 @@ class Line {
 
     ['color', 'pointFill', 'fillColor'].forEach((colorProp) => {
       if (this[colorProp] === undefined) {
-        this[colorProp] = colorProp === 'pointFill' ? this.color : COLOR[(sIdx) % COLOR.length];
+        this[colorProp] = colorProp === 'pointFill' ? this.color : COLOR[sIdx % COLOR.length];
       }
     });
     this.type = 'line';
@@ -37,7 +37,10 @@ class Line {
   }
 
   useLinearInterpolation() {
-    return this.interpolation === 'linear' || (this.interpolation === 'none' && !!this.passingValue && this.hasPassingValueInData);
+    return (
+      this.interpolation === 'linear'
+      || (this.interpolation === 'none' && !!this.passingValue && this.hasPassingValueInData)
+    );
   }
 
   /**
@@ -63,9 +66,13 @@ class Line {
     }
 
     const {
-      ctx, chartRect,
-      labelOffset, axesSteps,
-      selectLabel, selectSeries, legendHitInfo,
+      ctx,
+      chartRect,
+      labelOffset,
+      axesSteps,
+      selectLabel,
+      selectSeries,
+      legendHitInfo,
       isBrush,
     } = param;
 
@@ -87,7 +94,8 @@ class Line {
       extent = this.extent.normal;
     }
 
-    const getOpacity = colorStr => (colorStr?.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity);
+    const getOpacity = colorStr =>
+      (colorStr?.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity);
     const mainColor = this.color;
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
@@ -120,7 +128,7 @@ class Line {
       this.size.comboOffset = barAreaByCombo;
     }
 
-    const xsp = chartRect.x1 + labelOffset.left + (barAreaByCombo / 2);
+    const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
     const getXPos = val => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
@@ -147,8 +155,10 @@ class Line {
 
       if (isLinearInterpolation && curr.o === null) {
         return;
-      } else if ((isNil(prevValid?.y) && !this.isExistGrp)
-        || (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))) {
+      } else if (
+        (isNil(prevValid?.y) && !this.isExistGrp)
+        || (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))
+      ) {
         ctx.moveTo(x, y);
       } else {
         ctx.lineTo(x, y);
@@ -161,7 +171,6 @@ class Line {
     if (this.segments) {
       ctx.setLineDash([]);
     }
-
 
     // draw fill
     if (this.fill && this.data.length) {
@@ -193,16 +202,19 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map(item => (item?.o));
+      const valueArray = this.data.map(item => item?.o);
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
       for (let i = 0; i < valueArray.length + 1; i++) {
-        if ((isLinearInterpolation && isUndefined(valueArray[i]))
-          || (!isLinearInterpolation && isNil(valueArray[i]))) {
+        if (
+          (isLinearInterpolation && isUndefined(valueArray[i]))
+          || (!isLinearInterpolation && isNil(valueArray[i]))
+        ) {
           if (start !== null && end !== null) {
             const temp = valueArray.slice(start, i);
             const lastNormalValueIndex = temp.findLastIndex(
-              item => !isNil(item) && item !== null);
+              item => !isNil(item) && item !== null,
+            );
             needFillDataIndexList.push([start, start + lastNormalValueIndex]);
             start = null;
             end = null;
@@ -239,7 +251,7 @@ class Line {
             for (let jx = endIndex; jx >= startIndex; jx--) {
               const nextData = this.data[jx];
               const xp = getXPos(nextData.x);
-              const bp = nextData.o === null ? getYPos(0) : getYPos(nextData.b) ?? getYPos(0);
+              const bp = nextData.o === null ? getYPos(0) : (getYPos(nextData.b) ?? getYPos(0));
               ctx.lineTo(xp, bp);
             }
 
@@ -266,8 +278,7 @@ class Line {
         const prevData = this.data[ix - 1]?.o;
         const nextData = this.data[ix + 1]?.o;
 
-        const isSingle = (!isLinearInterpolation && isNil(prevData) && isNil(nextData))
-          || isLinearSingle;
+        const isSingle = (!isLinearInterpolation && isNil(prevData) && isNil(nextData)) || isLinearSingle;
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
           ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
@@ -338,7 +349,12 @@ class Line {
             item.hit = true;
           }
         }
-      } else if (typeof this.beforeFindItemIndex === 'number' && this.beforeFindItemIndex !== -1 && this.show && useSelectLabelOrItem) {
+      } else if (
+        typeof this.beforeFindItemIndex === 'number'
+        && this.beforeFindItemIndex !== -1
+        && this.show
+        && useSelectLabelOrItem
+      ) {
         item.data = gdata[this.beforeFindItemIndex];
         item.index = this.beforeFindItemIndex;
       } else {
@@ -404,9 +420,11 @@ class Line {
         const foundIdx = validData.findIndex(p => p.originalIndex === closestIndex);
         if (foundIdx !== -1) {
           // 앞뒤 2개씩 추가 확인
-          for (let i = Math.max(0, foundIdx - 2);
+          for (
+            let i = Math.max(0, foundIdx - 2);
             i <= Math.min(validData.length - 1, foundIdx + 2);
-            i++) {
+            i++
+          ) {
             const point = validData[i];
             const xDistance = Math.abs(xp - point.xp);
             if (xDistance < closestXDistance) {
@@ -521,17 +539,14 @@ class Line {
       const x = gdata[m].xp;
 
       // X 좌표가 감지 범위 내에 있는 경우
-      if ((x - xpInterval <= xp) && (xp <= x + xpInterval)) {
+      if (x - xpInterval <= xp && xp <= x + xpInterval) {
         // 중간점 주변 데이터들과 거리 비교
         const checkStart = Math.max(0, m - 2);
         const checkEnd = Math.min(gdata.length - 1, m + 2);
 
         for (let i = checkStart; i <= checkEnd; i++) {
           if (gdata[i].xp !== null && gdata[i].yp !== null) {
-            const distance = Math.sqrt(
-              ((xp - gdata[i].xp) ** 2)
-              + ((yp - gdata[i].yp) ** 2),
-            );
+            const distance = Math.sqrt((xp - gdata[i].xp) ** 2 + (yp - gdata[i].yp) ** 2);
 
             if (distance < closestDistance) {
               closestDistance = distance;
@@ -604,7 +619,7 @@ class Line {
   findItems({ xsp, width }) {
     const xep = xsp + width;
 
-    return this.data.filter(seriesData => (xsp - 1 <= seriesData.xp) && (seriesData.xp <= xep + 1));
+    return this.data.filter(seriesData => xsp - 1 <= seriesData.xp && seriesData.xp <= xep + 1);
   }
 }
 

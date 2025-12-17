@@ -1,99 +1,41 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-button
-      type="info"
-      @click="showInfo"
-    >
-      Show Info
-    </ev-button>
-    <ev-button
-      type="primary"
-      @click="showSuccess"
-    >
-      Show Success
-    </ev-button>
-    <ev-button
-      type="warning"
-      @click="showWarning"
-    >
-      Show Warning
-    </ev-button>
-    <ev-button
-      type="error"
-      @click="showError"
-    >
-      Show Error
-    </ev-button>
+    <ev-button type="info" @click="showInfo"> Show Info </ev-button>
+    <ev-button type="primary" @click="showSuccess"> Show Success </ev-button>
+    <ev-button type="warning" @click="showWarning"> Show Warning </ev-button>
+    <ev-button type="error" @click="showError"> Show Error </ev-button>
   </div>
   <div class="case">
     <p class="case-title">Title</p>
-    <ev-button
-      @click="showTitle"
-    >
-      Show Title
-    </ev-button>
+    <ev-button @click="showTitle"> Show Title </ev-button>
   </div>
   <div class="case">
     <p class="case-title">Icon</p>
-    <ev-button
-      @click="showIcon"
-    >
-      Show Icon
-    </ev-button>
+    <ev-button @click="showIcon"> Show Icon </ev-button>
   </div>
   <div class="case">
     <p class="case-title">On/Off Element And Focusable</p>
-    <ev-button
-      @click="showConfirm"
-    >
-      Hide Cancel
-    </ev-button>
-    <ev-button
-      @click="showCancel"
-    >
-      Hide Confirm
-    </ev-button>
-    <ev-button
-      @click="showClose"
-    >
-      Hide Close
-    </ev-button>
-    <ev-button
-      @click="showPlain"
-    >
-      Hide Cancel, Confirm
-    </ev-button>
+    <ev-button @click="showConfirm"> Hide Cancel </ev-button>
+    <ev-button @click="showCancel"> Hide Confirm </ev-button>
+    <ev-button @click="showClose"> Hide Close </ev-button>
+    <ev-button @click="showPlain"> Hide Cancel, Confirm </ev-button>
   </div>
   <div class="case">
     <p class="case-title">Custom Button Text</p>
-    <ev-button
-      @click="showCustomText"
-    >
-      Custom Text
-    </ev-button>
+    <ev-button @click="showCustomText"> Custom Text </ev-button>
   </div>
   <div class="case">
     <p class="case-title">After Closing</p>
-    <ev-button
-      @click="showOnClose"
-    >
-      Show onClose
-    </ev-button>
+    <ev-button @click="showOnClose"> Show onClose </ev-button>
     <div class="description">
-      <span class="badge">
-        After close behavior
-      </span>
+      <span class="badge"> After close behavior </span>
       {{ onCloseMsg }}
     </div>
   </div>
   <div class="case">
     <p class="case-title">HTML</p>
-    <ev-button
-      @click="showHTML"
-    >
-      Show HTML
-    </ev-button>
+    <ev-button @click="showHTML"> Show HTML </ev-button>
   </div>
 </template>
 

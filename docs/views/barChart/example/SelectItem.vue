@@ -27,32 +27,22 @@
     />
     <div class="description">
       <ev-toggle v-model="isFixedPosTop" />
-      <span class="left">
-        tip 위치를 최상단에 고정
-      </span>
-      <br>
-      <br>
-      <ev-button @click="updateData">
-        Update Data
-      </ev-button>
-      <span class="left">
-        차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정
-      </span>
-      <br>
-      <br>
+      <span class="left"> tip 위치를 최상단에 고정 </span>
+      <br />
+      <br />
+      <ev-button @click="updateData"> Update Data </ev-button>
+      <span class="left"> 차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정 </span>
+      <br />
+      <br />
       <div>
-        <div class="badge yellow">
-          v-model:selectedItem
-        </div>
+        <div class="badge yellow">v-model:selectedItem</div>
         {{ defaultSelectItem }}
-        <br>
-        <br>
-        <div class="badge yellow">
-          클릭 이벤트 데이터 (selected)
-        </div>
+        <br />
+        <br />
+        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
         {{ clickedLabel }}
-        <br>
-        <br>
+        <br />
+        <br />
       </div>
     </div>
   </div>
@@ -128,21 +118,25 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesX: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesY: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesY: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectItem: {
         use: true,
         useClick: true,
@@ -167,21 +161,25 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesX: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesY: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesY: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectItem: {
         use: true,
         useClick: true,
@@ -206,21 +204,25 @@ export default {
         show: true,
         position: 'right',
       },
-      axesY: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesY: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesX: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesX: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectItem: {
         use: true,
         useClick: true,
@@ -245,21 +247,25 @@ export default {
         show: true,
         position: 'right',
       },
-      axesY: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesY: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesX: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesX: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectItem: {
         use: true,
         useClick: true,
@@ -281,8 +287,10 @@ export default {
     const defaultSelectItem = ref();
 
     const updateData = () => {
-      const getRandArr = count => Array(count)
-        .fill(0).map(() => Math.ceil(Math.random() * 100));
+      const getRandArr = count =>
+        Array(count)
+          .fill(0)
+          .map(() => Math.ceil(Math.random() * 100));
 
       const chartList = [chartData1, chartData2, chartData3, chartData4];
       chartList.forEach((c) => {
@@ -292,7 +300,6 @@ export default {
         });
       });
     };
-
 
     return {
       chart,
@@ -315,12 +322,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .description {
-    position: relative;
-  }
-  .left {
-    position: absolute;
-    left: 160px;
-    padding-top: 10px;
-  }
+.description {
+  position: relative;
+}
+.left {
+  position: absolute;
+  left: 160px;
+  padding-top: 10px;
+}
 </style>

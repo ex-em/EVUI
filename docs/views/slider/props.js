@@ -13,7 +13,8 @@ export default {
   mdText,
   components: {
     Default: {
-      description: 'Range Slider 컴포넌트입니다. 마우스 클릭 및 드래그로 값을 조절할 수 있으며, step 속성으로 이동 단위를 설정할 수 있습니다.',
+      description:
+        'Range Slider 컴포넌트입니다. 마우스 클릭 및 드래그로 값을 조절할 수 있으며, step 속성으로 이동 단위를 설정할 수 있습니다.',
       component: Default,
       parsedData: parse(DefaultRaw).descriptor,
     },

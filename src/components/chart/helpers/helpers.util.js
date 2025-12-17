@@ -1,11 +1,5 @@
-import {
-  billions,
-  millions,
-  quadrillion,
-  trillion,
-  truthy,
-} from '@/common/utils';
 import { isNil } from 'lodash-es';
+import { billions, millions, quadrillion, trillion, truthy } from '@/common/utils';
 
 // Text Size 측정용 singleton canvas
 const textMeasureCanvas = document.createElement('canvas');
@@ -44,8 +38,12 @@ export default {
 
     const noneWhiteSpaceColorStr = colorStr.replace(/ /g, '');
     const isHEX = /^#(?:[A-Fa-f0-9]{3}){1,2}$/.exec(noneWhiteSpaceColorStr);
-    const isRGB = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(noneWhiteSpaceColorStr);
-    const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1?)\s*[)]$/.exec(noneWhiteSpaceColorStr);
+    const isRGB = /^rgb[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*(?:,(?![)])|(?=[)]))){3}[)]$/.exec(
+        noneWhiteSpaceColorStr,
+      );
+    const isRGBA = /^rgba[(](?:\s*0*(?:\d\d?(?:\.\d+)?(?:\s*%)?|\.\d+\s*%|100(?:\.0*)?\s*%|(?:1\d\d|2[0-4]\d|25[0-5])(?:\.\d+)?)\s*,){3}\s*0*(?:\.\d+|1?)\s*[)]$/.exec(
+        noneWhiteSpaceColorStr,
+      );
     let result = '';
 
     if (isHEX) {
@@ -171,7 +169,9 @@ export default {
     const assignLabelWith = (v, target, lb) => {
       let base;
       if (v % target === 0) {
-        base = isNil(decimalPoint) ? `${v / target}${lb}` : `${(v / target).toFixed(decimalPoint)}${lb}`;
+        base = isNil(decimalPoint)
+          ? `${v / target}${lb}`
+          : `${(v / target).toFixed(decimalPoint)}${lb}`;
       } else {
         base = `${(v / target).toFixed(1)}${lb}`;
       }
@@ -191,11 +191,9 @@ export default {
       label = assignLabelWith(absValue, 1000, 'K');
     } else {
       // 1000 미만 처리
-       const base = isNil(decimalPoint)
-       ? absValue
-       : absValue.toFixed(decimalPoint);
+      const base = isNil(decimalPoint) ? absValue : absValue.toFixed(decimalPoint);
 
-       label = isNegative ? `-${base}` : `${base}`;
+      label = isNegative ? `-${base}` : `${base}`;
     }
 
     return label;
@@ -319,20 +317,9 @@ export default {
    * @returns {undefined}
    */
   showLabelTip(param) {
-    const {
-      ctx,
-      width,
-      height,
-      x,
-      y,
-      arrowSize,
-      borderRadius,
-      text,
-      backgroundColor,
-      textColor,
-    } = param;
-    const sx = x - (width / 2);
-    const ex = x + (width / 2);
+    const { ctx, width, height, x, y, arrowSize, borderRadius, text, backgroundColor, textColor } = param;
+    const sx = x - width / 2;
+    const ex = x + width / 2;
     const sy = y - height;
     const ey = y;
 
@@ -361,7 +348,7 @@ export default {
     ctx.fillStyle = textColor || '#FFF';
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(`${text}`, x, sy + (height / 2));
+    ctx.fillText(`${text}`, x, sy + height / 2);
     ctx.restore();
     ctx.beginPath();
   },

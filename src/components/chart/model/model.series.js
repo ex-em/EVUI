@@ -54,8 +54,7 @@ const modules = {
     // 큰 값을 가지는 series가 먼저 그려지도록 groups에서 지정한 순서의 역순으로 정렬
     barSeries.sort((a, b) => b.overlappingIdx - a.overlappingIdx);
 
-    return [...barSeries, ...otherSeries]
-        .map(({ key }) => key);
+    return [...barSeries, ...otherSeries].map(({ key }) => key);
   },
 
   /**

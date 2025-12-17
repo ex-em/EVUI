@@ -15,11 +15,7 @@
       @contextmenu.prevent="showContextMenu"
     />
     <div v-if="isShowEmptyText">{{ emptyText }}</div>
-    <ev-context-menu
-      v-if="contextMenuItems.length"
-      ref="contextMenu"
-      :items="contextMenuItems"
-    />
+    <ev-context-menu v-if="contextMenuItems.length" ref="contextMenu" :items="contextMenuItems" />
   </div>
 </template>
 
@@ -111,7 +107,8 @@ export default {
       }
     }
 
-    function getAllNodeInfo() { // return the array to easily search parents and children
+    function getAllNodeInfo() {
+      // return the array to easily search parents and children
       let keyCounter = 0;
       const flatTree = [];
       const valueArr = [];
@@ -132,7 +129,7 @@ export default {
 
         // check 'value' property and add nodeKey if same value already exists
         if ('value' in node && valueArr.includes(node.value)) {
-          console.warn('[EVUI][Tree] The \'value\' of data should be unique.');
+          console.warn("[EVUI][Tree] The 'value' of data should be unique.");
           node.value += node.nodeKey;
         } else if (!('value' in node)) {
           node.value = node.title + node.nodeKey;
@@ -162,7 +159,8 @@ export default {
       return allNodeInfo.filter(obj => obj.node.checked).map(obj => obj.node);
     }
 
-    function rebuildTree() { // rebuild the tree through checked nodes
+    function rebuildTree() {
+      // rebuild the tree through checked nodes
       const checkedNodes = getCheckedNodes();
       checkedNodes.forEach((node) => {
         updateTreeDown(node, { checked: true });
@@ -218,17 +216,18 @@ export default {
       showContextMenu(e);
     };
 
-    const isIncluded = (value, searchWord) => value.toLowerCase()
-        .includes(searchWord.toLowerCase());
+    const isIncluded = (value, searchWord) =>
+      value.toLowerCase().includes(searchWord.toLowerCase());
 
     const makeChildrenVisible = (node) => {
       if (node.children) {
-        const isSearchedChildren = !!(node.children
-            .filter(child => isIncluded(child.title, props.searchWord))?.length);
+        const isSearchedChildren = !!node.children.filter(child =>
+          isIncluded(child.title, props.searchWord),
+        )?.length;
         node.children.forEach((child) => {
           makeChildrenVisible(child);
           child.visible = (isSearchedChildren && isIncluded(child.title, props.searchWord))
-              || !isSearchedChildren;
+            || !isSearchedChildren;
         });
       }
     };
@@ -260,8 +259,7 @@ export default {
         node.visible = false;
       });
 
-      const filteredNodes = allNodeInfo
-          .filter(nodeObj => isIncluded(nodeObj.node.title, value));
+      const filteredNodes = allNodeInfo.filter(nodeObj => isIncluded(nodeObj.node.title, value));
 
       filteredNodes.forEach((nodeObj) => {
         const node = nodeObj.node;
@@ -278,33 +276,40 @@ export default {
       });
     }
 
-    const isShowEmptyText = computed(() => !treeNodeData.value.length
-        || treeNodeData.value.every(node => !node.visible));
+    const isShowEmptyText = computed(
+      () => !treeNodeData.value.length || treeNodeData.value.every(node => !node.visible),
+    );
 
-    watch(() => props.data, (newData) => {
-      treeNodeData.value = newData;
-      allNodeInfo = getAllNodeInfo();
-    }, {
-      deep: true,
-    });
-
+    watch(
+      () => props.data,
+      (newData) => {
+        treeNodeData.value = newData;
+        allNodeInfo = getAllNodeInfo();
+      },
+      {
+        deep: true,
+      },
+    );
 
     let timer;
-    watch(() => props.searchWord, (newSearchWord) => {
-      if (timer) {
-        clearTimeout(timer);
-      }
-      timer = setTimeout(() => {
-        if (newSearchWord) {
-          filterNode(newSearchWord);
-        } else {
-          allNodeInfo.forEach((nodeObj) => {
-            const node = nodeObj.node;
-            node.visible = true;
-          });
+    watch(
+      () => props.searchWord,
+      (newSearchWord) => {
+        if (timer) {
+          clearTimeout(timer);
         }
-      }, 200);
-    });
+        timer = setTimeout(() => {
+          if (newSearchWord) {
+            filterNode(newSearchWord);
+          } else {
+            allNodeInfo.forEach((nodeObj) => {
+              const node = nodeObj.node;
+              node.visible = true;
+            });
+          }
+        }, 200);
+      },
+    );
 
     onMounted(() => {
       rebuildTree();
@@ -334,5 +339,4 @@ export default {
 };
 </script>
 
-<style lang="scss">
-</style>
+<style lang="scss"></style>

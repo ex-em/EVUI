@@ -27,9 +27,7 @@ const modules = {
     }
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
-      isExistSelectedLabel = opt.type === 'heatMap'
-      ? this.drawLabelTipForHeatMap()
-      : this.drawTipForSelectedLabel();
+      isExistSelectedLabel = opt.type === 'heatMap' ? this.drawLabelTipForHeatMap() : this.drawTipForSelectedLabel();
     }
 
     const executeDrawIndicator = (tipOpt) => {
@@ -41,11 +39,7 @@ const modules = {
             return;
           }
 
-          const selArgs = this.calculateTipInfo(
-            seriesInfo,
-            'sel',
-            tipInfo,
-          );
+          const selArgs = this.calculateTipInfo(seriesInfo, 'sel', tipInfo);
 
           if (selArgs) {
             let isSamePos = false;
@@ -63,7 +57,13 @@ const modules = {
                 selArgs.text = numberWithComma(selArgs.value);
               }
 
-              this.drawTextTip({ opt: tipOpt, tipType: 'sel', seriesOpt: seriesInfo, isSamePos, ...selArgs });
+              this.drawTextTip({
+                opt: tipOpt,
+                tipType: 'sel',
+                seriesOpt: seriesInfo,
+                isSamePos,
+                ...selArgs,
+              });
             }
 
             if (tipOpt.showIndicator) {
@@ -175,8 +175,7 @@ const modules = {
         value = lastTip.value;
         label = lastTip.label;
       } else if (lastTip.pos !== null) {
-        const item = type === 'bar'
-          ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
+        const item = type === 'bar' ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
 
         value = item.useStack ? item.acc : item.value;
         label = item.label;
@@ -194,7 +193,7 @@ const modules = {
       if (scrollbarOpt?.use) {
         const [min, max] = scrollbarOpt?.range ?? [];
         if (ldata >= min && ldata <= max) {
-          ldata -= (min ?? 0);
+          ldata -= min ?? 0;
         } else {
           return false;
         }
@@ -202,12 +201,12 @@ const modules = {
 
       if (isHorizontal) {
         halfBarSize = Math.round(size.h / 2);
-        cp = ysp - (size.cat * ldata) - size.cPad;
-        dp = (cp - ((size.bar * size.ix) - (size.h + size.bPad))) - halfBarSize;
+        cp = ysp - size.cat * ldata - size.cPad;
+        dp = cp - (size.bar * size.ix - (size.h + size.bPad)) - halfBarSize;
       } else {
         halfBarSize = Math.round(size.w / 2);
-        cp = xsp + (size.cat * ldata) + size.cPad;
-        dp = cp + ((size.bar * size.ix) - (size.w + size.bPad)) + halfBarSize;
+        cp = xsp + size.cat * ldata + size.cPad;
+        dp = cp + (size.bar * size.ix - (size.w + size.bPad)) + halfBarSize;
       }
     } else if (type === 'line') {
       dp = Canvas.calculateX(
@@ -215,16 +214,10 @@ const modules = {
         graphX.graphMin,
         graphX.graphMax,
         xArea - size.comboOffset,
-        xsp + (size.comboOffset / 2),
+        xsp + size.comboOffset / 2,
       );
     } else if (type === 'scatter') {
-      dp = Canvas.calculateX(
-        ldata,
-        graphX.graphMin,
-        graphX.graphMax,
-        xArea,
-        xsp,
-      );
+      dp = Canvas.calculateX(ldata, graphX.graphMin, graphX.graphMax, xArea, xsp);
     }
 
     const sizeObj = { xArea, yArea, graphX, graphY, xsp, xep, ysp };
@@ -321,8 +314,9 @@ const modules = {
 
       const seriesList = Object.keys(this.seriesList ?? {});
       const visibleSeries = seriesList.filter(sId => this.seriesList[sId].show);
-      const isExistGrp = seriesList
-          .some(sId => this.seriesList[sId].isExistGrp && !this.seriesList[sId].isOverlapping);
+      const isExistGrp = seriesList.some(
+        sId => this.seriesList[sId].isExistGrp && !this.seriesList[sId].isOverlapping,
+      );
       const groups = this.data.groups?.[0] ?? [];
 
       let labelPos;
@@ -363,33 +357,35 @@ const modules = {
 
         if (!labelTipOpt.fixedPosTop) {
           if (isExistGrp) {
-            const positiveSum = visibleSeries?.reduce((ac, sId) => (
-              groups.includes(sId) && (selectedData[sId]?.value ?? selectedData[sId]) > 0
-                ? ac + (selectedData[sId]?.value ?? selectedData[sId])
-                : ac), 0);
+            const positiveSum = visibleSeries?.reduce(
+              (ac, sId) =>
+                (groups.includes(sId) && (selectedData[sId]?.value ?? selectedData[sId]) > 0
+                  ? ac + (selectedData[sId]?.value ?? selectedData[sId])
+                  : ac),
+              0,
+            );
 
             const nonGroupValues = visibleSeries
-              ?.filter(sId => !groups.includes(sId))
-              ?.map(sId => selectedData[sId]?.value ?? selectedData[sId]) ?? [];
+                ?.filter(sId => !groups.includes(sId))
+                ?.map(sId => selectedData[sId]?.value ?? selectedData[sId]) ?? [];
 
             const maxNonGroupValue = nonGroupValues?.length > 0
-              ? nonGroupValues.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
-              : -Infinity;
+                ? nonGroupValues.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
+                : -Infinity;
 
             value = positiveSum > 0
-              ? Math.max(maxNonGroupValue, positiveSum)
-              : Math.max(maxNonGroupValue, 0);
+                ? Math.max(maxNonGroupValue, positiveSum)
+                : Math.max(maxNonGroupValue, 0);
           } else if (visibleSeries.length) {
-            const visibleValue = visibleSeries
-              .map(sId => selectedData[sId]?.value ?? selectedData[sId]);
+            const visibleValue = visibleSeries.map(
+              sId => selectedData[sId]?.value ?? selectedData[sId],
+            );
 
             const maxValue = visibleValue.length > 0
-              ? visibleValue.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
-              : -Infinity;
+                ? visibleValue.reduce((max, val) => Math.max(max, val ?? -Infinity), -Infinity)
+                : -Infinity;
 
-            value = maxValue > 0 || this.options.type !== 'bar'
-              ? maxValue
-              : 0;
+            value = maxValue > 0 || this.options.type !== 'bar' ? maxValue : 0;
           }
         }
 
@@ -399,25 +395,25 @@ const modules = {
           }
 
           const labelIndex = dataIndex[i] - startIndex;
-          const labelCenter = Math.round(labelStartPoint + (labelGap * labelIndex));
-          labelPos = labelCenter + (labelGap / 2);
+          const labelCenter = Math.round(labelStartPoint + labelGap * labelIndex);
+          labelPos = labelCenter + labelGap / 2;
         } else {
           labelPos = labelPositionCalcFunction(
             label[i],
             graphX.graphMin,
             graphX.graphMax,
             chartWidth - sizeObj.comboOffset,
-            aPos.x1 + (sizeObj.comboOffset / 2),
+            aPos.x1 + sizeObj.comboOffset / 2,
           );
         }
 
         dataPos = valuePositionCalcFunction(
-          value,
-          valueAxesSteps.graphMin,
-          valueAxesSteps.graphMax,
-          valueSpace,
-          valueStartPoint,
-        ) + offset;
+            value,
+            valueAxesSteps.graphMin,
+            valueAxesSteps.graphMax,
+            valueSpace,
+            valueStartPoint,
+          ) + offset;
 
         this.showTip({
           context: this.bufferCtx,
@@ -464,8 +460,8 @@ const modules = {
       const gp = aPos[valueAxes.units.rectEnd] + offset;
 
       dataIndex?.forEach((index) => {
-        const labelCenter = Math.round(labelStartPoint + (labelGap * index));
-        const dp = labelCenter + (labelGap / 2);
+        const labelCenter = Math.round(labelStartPoint + labelGap * index);
+        const dp = labelCenter + labelGap / 2;
 
         this.showTip({
           context: this.bufferCtx,
@@ -494,12 +490,7 @@ const modules = {
 
     const arrowSize = 4;
     const borderRadius = 4;
-    const {
-      fontSize,
-      fontFamily,
-      fontWeight,
-      height: maxTipHeight,
-    } = opt.tipStyle;
+    const { fontSize, fontFamily, fontWeight, height: maxTipHeight } = opt.tipStyle;
     const textStyle = `normal normal ${fontWeight} ${fontSize}px ${fontFamily}`;
 
     let offset = 1;
@@ -538,12 +529,12 @@ const modules = {
     const maxTipWidth = Math.round(Math.max(ctx.measureText(text).width + 12, 40));
 
     if (!isHorizontal) {
-      if (dp + (maxTipWidth / 2) > xep - 10) {
+      if (dp + maxTipWidth / 2 > xep - 10) {
         maxTipType = 'right';
-        tdp -= (maxTipWidth / 2) - (arrowSize * 2);
-      } else if (dp - (maxTipWidth / 2) < xsp + 10) {
+        tdp -= maxTipWidth / 2 - arrowSize * 2;
+      } else if (dp - maxTipWidth / 2 < xsp + 10) {
         maxTipType = 'left';
-        tdp += (maxTipWidth / 2) - (arrowSize * 2);
+        tdp += maxTipWidth / 2 - arrowSize * 2;
       }
     }
 
@@ -555,8 +546,8 @@ const modules = {
         type: maxTipType,
         width: maxTipWidth,
         height: maxTipHeight,
-        x: isHorizontal ? gp + (maxTipWidth / 2) : tdp,
-        y: isHorizontal ? tdp + (maxTipHeight / 2) : gp,
+        x: isHorizontal ? gp + maxTipWidth / 2 : tdp,
+        y: isHorizontal ? tdp + maxTipHeight / 2 : gp,
         opt,
         arrowSize,
         borderRadius,
@@ -585,21 +576,19 @@ const modules = {
    */
   showTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
-    const {
-      type, width, height, x, y, arrowSize, borderRadius, text, opt, textStyle, isNegative,
-    } = param;
+    const { type, width, height, x, y, arrowSize, borderRadius, text, opt, textStyle, isNegative } = param;
 
     const ctx = param.context;
 
-    let sx = x - (width / 2);
-    let ex = x + (width / 2);
+    let sx = x - width / 2;
+    let ex = x + width / 2;
     const sy = y - height;
     const ey = y;
 
     if (isNegative) {
       if (isHorizontal) {
-        sx = x - (width / 2) - width;
-        ex = x - (width / 2);
+        sx = x - width / 2 - width;
+        ex = x - width / 2;
       }
     }
 
@@ -627,14 +616,14 @@ const modules = {
     if (isHorizontal) {
       if (isNegative) {
         ctx.moveTo(ex, ey);
-        ctx.lineTo(ex, sy + borderRadius + (arrowSize / 2));
-        ctx.lineTo(ex + arrowSize, ey - (height / 2));
-        ctx.lineTo(ex, ey - borderRadius - (arrowSize / 2));
+        ctx.lineTo(ex, sy + borderRadius + arrowSize / 2);
+        ctx.lineTo(ex + arrowSize, ey - height / 2);
+        ctx.lineTo(ex, ey - borderRadius - arrowSize / 2);
       } else {
         ctx.moveTo(sx, sy);
-        ctx.lineTo(sx, sy + borderRadius + (arrowSize / 2));
-        ctx.lineTo(sx - arrowSize, ey - (height / 2));
-        ctx.lineTo(sx, ey - borderRadius - (arrowSize / 2));
+        ctx.lineTo(sx, sy + borderRadius + arrowSize / 2);
+        ctx.lineTo(sx - arrowSize, ey - height / 2);
+        ctx.lineTo(sx, ey - borderRadius - arrowSize / 2);
       }
 
       ctx.closePath();
@@ -643,9 +632,9 @@ const modules = {
       if (isNegative) {
         if (type === 'left') {
           ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
-          ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
+          ctx.lineTo(sx + borderRadius + arrowSize * 2, ey);
         } else if (type === 'right') {
-          ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
+          ctx.lineTo(ex - arrowSize * 2 - borderRadius, ey);
           ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
         } else {
           ctx.lineTo(x - arrowSize, ey);
@@ -656,10 +645,10 @@ const modules = {
         if (type === 'left') {
           ctx.moveTo(sx, sy);
           ctx.lineTo(sx + borderRadius + arrowSize, ey + arrowSize);
-          ctx.lineTo(sx + borderRadius + (arrowSize * 2), ey);
+          ctx.lineTo(sx + borderRadius + arrowSize * 2, ey);
         } else if (type === 'right') {
           ctx.moveTo(ex, sy);
-          ctx.lineTo(ex - (arrowSize * 2) - borderRadius, ey);
+          ctx.lineTo(ex - arrowSize * 2 - borderRadius, ey);
           ctx.lineTo(ex - arrowSize - borderRadius, ey + arrowSize);
         } else {
           ctx.lineTo(x - arrowSize, ey);
@@ -678,7 +667,7 @@ const modules = {
     ctx.fillStyle = opt.tipTextColor ?? opt.tipStyle.textColor;
     ctx.textBaseline = 'middle';
     ctx.textAlign = 'center';
-    ctx.fillText(`${text}`, sx + (width / 2), sy + (height / 2));
+    ctx.fillText(`${text}`, sx + width / 2, sy + height / 2);
     ctx.restore();
   },
 
@@ -700,7 +689,7 @@ const modules = {
     ctx.beginPath();
     ctx.moveTo(x, cy);
     if (isHorizontal) {
-        ctx.lineTo(x + 6, cy - 6);
+      ctx.lineTo(x + 6, cy - 6);
       ctx.lineTo(x + 6, cy + 6);
     } else {
       ctx.lineTo(x + 6, cy - 6);

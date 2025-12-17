@@ -1,34 +1,22 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-progress
-      v-model="progressVal1"
-    />
-    <br>
-    <ev-progress
-      v-model="progressVal1"
-      color="#67C23A"
-    >
+    <ev-progress v-model="progressVal1" />
+    <br />
+    <ev-progress v-model="progressVal1" color="#67C23A">
       <div class="label-cls">
         <p>{{ progressVal1 }} %</p>
       </div>
     </ev-progress>
-    <br>
-    <ev-progress
-      v-model="progressVal1"
-      color="#F56C6C"
-    >
+    <br />
+    <ev-progress v-model="progressVal1" color="#F56C6C">
       <div class="label-cls">
         <p>{{ progressVal1 }} / 100</p>
       </div>
     </ev-progress>
-    <br>
-    <ev-progress
-      v-model="progressVal1"
-      color="#FADE4C"
-      :stroke-width="15"
-    />
-    <br>
+    <br />
+    <ev-progress v-model="progressVal1" color="#FADE4C" :stroke-width="15" />
+    <br />
     <ev-progress
       v-model="progressVal1"
       :color="customColors"
@@ -36,12 +24,7 @@
       :inner-text="`${progressVal1}%`"
     />
     <div class="description">
-      <button
-        class="btn"
-        @click="changeVal1"
-      >
-        Change Value : {{ progressVal1 }}
-      </button>
+      <button class="btn" @click="changeVal1">Change Value : {{ progressVal1 }}</button>
     </div>
   </div>
 </template>

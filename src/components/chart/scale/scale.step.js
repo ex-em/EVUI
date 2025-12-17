@@ -20,8 +20,7 @@ class StepScale extends Scale {
    * @returns {object} min/max value and label
    */
   calculateScaleRange(minMax, scrollbarOpt, chartRect) {
-    const stepMinMax = this.labelStyle.alignToGridLine
-      ? minMax : Util.getStringMinMax(this.labels);
+    const stepMinMax = this.labelStyle.alignToGridLine ? minMax : Util.getStringMinMax(this.labels);
     let maxValue = stepMinMax.max;
     let minValue = stepMinMax.min;
 
@@ -81,14 +80,9 @@ class StepScale extends Scale {
    * @returns {object} steps, interval, min/max graph value
    */
   calculateSteps(range) {
-    const {
-      minValue,
-      maxValue,
-      minIndex,
-      maxIndex,
-    } = range;
+    const { minValue, maxValue, minIndex, maxIndex } = range;
 
-    const oriSteps = (maxIndex - minIndex) + 1;
+    const oriSteps = maxIndex - minIndex + 1;
     let indexInterval = 1;
 
     const isNumbersArray = this.labels.every(label => !isNaN(label));
@@ -188,15 +182,11 @@ class StepScale extends Scale {
       for (index = 0; index < steps; index += indexInterval) {
         const labelIndex = startIndex + index;
         const item = this.labels[labelIndex];
-        labelCenter = Math.round(startPoint + (labelGap * index));
+        labelCenter = Math.round(startPoint + labelGap * index);
         linePosition = labelCenter + aliasPixel;
         labelText = this.getLabelFormat(item, maxWidth);
 
-        const {
-          selectLabel: selectLabelOpt,
-          selectItem: selectItemOpt,
-          horizontal,
-        } = this.options;
+        const { selectLabel: selectLabelOpt, selectItem: selectItemOpt, horizontal } = this.options;
 
         let targetAxis;
         if (selectedLabelInfo?.targetAxis) {
@@ -222,13 +212,10 @@ class StepScale extends Scale {
 
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
-          const xPoint = alignToGridLine ? labelCenter : labelCenter + (labelGap / 2);
+          const xPoint = alignToGridLine ? labelCenter : labelCenter + labelGap / 2;
           ctx.fillText(this.checkFixWidth(labelText), xPoint, labelPoint);
 
-          if (!isBlurredLabel
-            && selectItemOpt?.showLabelTip
-            && hitInfo?.label
-            && !horizontal) {
+          if (!isBlurredLabel && selectItemOpt?.showLabelTip && hitInfo?.label && !horizontal) {
             const selectedLabel = hitInfo.label;
             if (selectedLabel === labelText) {
               const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
@@ -236,7 +223,7 @@ class StepScale extends Scale {
                 ctx: this.ctx,
                 width: Math.round(ctx.measureText(selectedLabel).width) + 10,
                 height,
-                x: labelCenter + (labelGap / 2),
+                x: labelCenter + labelGap / 2,
                 y: labelPoint + (height - 2),
                 borderRadius: 2,
                 arrowSize: 3,
@@ -250,8 +237,8 @@ class StepScale extends Scale {
           if (this.showAxisTick) {
             ctx.beginPath();
             ctx.strokeStyle = this.axisLineColor;
-            ctx.moveTo(labelCenter + (labelGap / 2), offsetPoint);
-            ctx.lineTo(labelCenter + (labelGap / 2), offsetPoint + AXIS_TICK_LENGTH);
+            ctx.moveTo(labelCenter + labelGap / 2, offsetPoint);
+            ctx.lineTo(labelCenter + labelGap / 2, offsetPoint + AXIS_TICK_LENGTH);
             ctx.stroke();
             ctx.closePath();
           }
@@ -266,7 +253,7 @@ class StepScale extends Scale {
           }
         } else {
           labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
-          const yPoint = alignToGridLine ? labelCenter : labelCenter + (labelGap / 2);
+          const yPoint = alignToGridLine ? labelCenter : labelCenter + labelGap / 2;
           ctx.fillText(this.checkFixWidth(labelText), labelPoint, yPoint);
           drawnLabels.push(labelText);
 
@@ -280,12 +267,12 @@ class StepScale extends Scale {
           }
 
           if (index > 0 && this.showGrid) {
-              ctx.beginPath();
-              ctx.strokeStyle = this.gridLineColor;
-              ctx.moveTo(offsetPoint, linePosition);
-              ctx.lineTo(offsetCounterPoint, linePosition);
-              ctx.stroke();
-              ctx.closePath();
+            ctx.beginPath();
+            ctx.strokeStyle = this.gridLineColor;
+            ctx.moveTo(offsetPoint, linePosition);
+            ctx.lineTo(offsetCounterPoint, linePosition);
+            ctx.stroke();
+            ctx.closePath();
           }
         }
         ctx.stroke();
@@ -295,14 +282,14 @@ class StepScale extends Scale {
         const cellInterval = bnMinus(+labels[1], +labels[0]);
         const lastLabelValue = bnPlus(+labels[labels.length - 1], cellInterval);
         if (
-            isNaN(lastLabelValue)
-            || (indexInterval !== 1
+          isNaN(lastLabelValue)
+          || (indexInterval !== 1
             && bnMinus(lastLabelValue, drawnLabels[drawnLabels.length - 1]) <= cellInterval)
         ) {
           return;
         }
 
-        labelCenter = Math.round(startPoint + (labelGap * labels.length));
+        labelCenter = Math.round(startPoint + labelGap * labels.length);
         linePosition = labelCenter + aliasPixel;
 
         const lastLabelText = this.getLabelFormat(`${lastLabelValue}`, maxWidth);
@@ -341,8 +328,8 @@ class StepScale extends Scale {
 
         const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
         const { from = 0, to = labels.length, label: labelOpt } = mergedPlotBandOpt;
-        const fromPos = Math.round(startPoint + (labelGap * from));
-        const toPos = Math.round(startPoint + (labelGap * to));
+        const fromPos = Math.round(startPoint + labelGap * from);
+        const toPos = Math.round(startPoint + labelGap * to);
 
         this.setPlotBandStyle(mergedPlotBandOpt);
 
@@ -368,7 +355,7 @@ class StepScale extends Scale {
 
         const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
         const { value, label: labelOpt } = mergedPlotLineOpt;
-        const dataPos = Math.round(startPoint + (labelGap * value)) + (labelGap / 2);
+        const dataPos = Math.round(startPoint + labelGap * value) + labelGap / 2;
 
         this.setPlotLineStyle(mergedPlotLineOpt);
 
@@ -405,7 +392,6 @@ class StepScale extends Scale {
         return formattedLabel;
       }
     }
-
 
     return this.labelStyle.fitWidth ? this.fittingString(value, maxWidth) : value;
   }

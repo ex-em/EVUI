@@ -79,16 +79,10 @@ class Pie {
    */
   findGraphData([offsetX, offsetY]) {
     const item = { data: null, hit: false, color: null, index: -1 };
-    const {
-      radius,
-      startAngle,
-      endAngle,
-      centerX,
-      centerY,
-    } = this;
+    const { radius, startAngle, endAngle, centerX, centerY } = this;
 
     const distance = Math.sqrt((offsetX - centerX) ** 2 + (offsetY - centerY) ** 2);
-    const radian = (2.5 * Math.PI) - Math.atan2((offsetX - centerX), (offsetY - centerY));
+    const radian = 2.5 * Math.PI - Math.atan2(offsetX - centerX, offsetY - centerY);
     const isPointInPath = radius > distance && radian >= startAngle && radian <= endAngle;
 
     if (this.show && isPointInPath) {
@@ -165,7 +159,8 @@ class Pie {
     const valueHeight = fontSize + 4;
     const valueWidth = Math.round(ctx.measureText(formattedTxt).width);
 
-    if (innerAngle >= valueWidth * ratio
+    if (
+      innerAngle >= valueWidth * ratio
       && innerAngle >= valueHeight * ratio
       && radius >= valueWidth * ratio
       && radius >= valueHeight * ratio
@@ -182,8 +177,8 @@ class Pie {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
 
-      const halfRadius = (radius / 2) + this.doughnutHoleSize;
-      const centerAngle = ((this.endAngle - this.startAngle) / 2) + this.startAngle;
+      const halfRadius = radius / 2 + this.doughnutHoleSize;
+      const centerAngle = (this.endAngle - this.startAngle) / 2 + this.startAngle;
       const xPos = halfRadius * Math.cos(centerAngle) + this.centerX;
       const yPos = halfRadius * Math.sin(centerAngle) + this.centerY;
 

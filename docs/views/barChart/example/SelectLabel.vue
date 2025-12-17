@@ -26,49 +26,35 @@
       @click="onClick"
     />
     <div class="description">
-      <ev-button @click="toggleSelectData">
-        select by v-model
-      </ev-button>
+      <ev-button @click="toggleSelectData"> select by v-model </ev-button>
       <span class="left">
         차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을 변경해서 라벨 선택
       </span>
-      <br>
-      <br>
+      <br />
+      <br />
       <ev-toggle v-model="isFixedPosTop" />
-      <span class="left">
-        tip 위치를 최상단에 고정
-      </span>
-      <br>
-      <br>
-      <ev-button @click="toggleOverflow">
-        Deselect Overflow
-      </ev-button>
+      <span class="left"> tip 위치를 최상단에 고정 </span>
+      <br />
+      <br />
+      <ev-button @click="toggleOverflow"> Deselect Overflow </ev-button>
       <span class="left">
         설정한 limit 를 넘어서 클릭했을때 선입선출로 deselect 를 할지를 옵션으로 선택 가능
       </span>
-      <br>
-      <br>
-      <ev-button @click="updateData">
-        Update Data
-      </ev-button>
-      <span class="left">
-        차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정
-      </span>
-      <br>
-      <br>
+      <br />
+      <br />
+      <ev-button @click="updateData"> Update Data </ev-button>
+      <span class="left"> 차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정 </span>
+      <br />
+      <br />
       <div>
-        <div class="badge yellow">
-          v-model:selectedLabel
-        </div>
+        <div class="badge yellow">v-model:selectedLabel</div>
         {{ defaultSelectLabel }}
-        <br>
-        <br>
-        <div class="badge yellow">
-          클릭 이벤트 데이터 (selected)
-        </div>
+        <br />
+        <br />
+        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
         {{ clickedLabel }}
-        <br>
-        <br>
+        <br />
+        <br />
       </div>
     </div>
   </div>
@@ -144,21 +130,25 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesX: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesY: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesY: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectLabel: {
         use: true,
         limit: 2,
@@ -190,21 +180,25 @@ export default {
         show: true,
         position: 'right',
       },
-      axesX: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesX: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesY: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesY: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectLabel: {
         use: true,
         limit: 2,
@@ -236,21 +230,25 @@ export default {
         show: true,
         position: 'right',
       },
-      axesY: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesY: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesX: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesX: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectLabel: {
         use: true,
         limit: 2,
@@ -282,21 +280,25 @@ export default {
         show: true,
         position: 'right',
       },
-      axesY: [{
-        type: 'step',
-        showGrid: false,
-        labelStyle: {
-          fitWidth: true,
-          fitDir: 'left',
+      axesY: [
+        {
+          type: 'step',
+          showGrid: false,
+          labelStyle: {
+            fitWidth: true,
+            fitDir: 'left',
+          },
         },
-      }],
-      axesX: [{
-        showAxis: true,
-        type: 'linear',
-        startToZero: true,
-        autoScaleRatio: 0.1,
-        showGrid: false,
-      }],
+      ],
+      axesX: [
+        {
+          showAxis: true,
+          type: 'linear',
+          startToZero: true,
+          autoScaleRatio: 0.1,
+          showGrid: false,
+        },
+      ],
       selectLabel: {
         use: true,
         limit: 2,
@@ -347,8 +349,10 @@ export default {
     };
 
     const updateData = () => {
-      const getRandArr = count => Array(count)
-        .fill(0).map(() => Math.ceil(Math.random() * 100));
+      const getRandArr = count =>
+        Array(count)
+          .fill(0)
+          .map(() => Math.ceil(Math.random() * 100));
 
       const chartList = [chartData1, chartData2, chartData3, chartData4];
       chartList.forEach((c) => {
@@ -358,7 +362,6 @@ export default {
         });
       });
     };
-
 
     return {
       chart,
@@ -384,12 +387,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-  .description {
-    position: relative;
-  }
-  .left {
-    position: absolute;
-    left: 160px;
-    padding-top: 10px;
-  }
+.description {
+  position: relative;
+}
+.left {
+  position: absolute;
+  left: 160px;
+  padding-top: 10px;
+}
 </style>

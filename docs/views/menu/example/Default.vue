@@ -1,11 +1,7 @@
 <template>
   <div class="case">
     <p class="case-title">Common</p>
-    <ev-menu
-      v-model="menu"
-      :items="menuItems"
-      @change="menuChange"
-    />
+    <ev-menu v-model="menu" :items="menuItems" @change="menuChange" />
     <div class="description">
       <span class="badge">Selected Menu Name</span>
       {{ menu }}

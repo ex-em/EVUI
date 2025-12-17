@@ -49,8 +49,9 @@ const modules = {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
 
-            const hasPassingValueInData = data?.[seriesID]
-            ?.some(item => item === series.passingValue);
+            const hasPassingValueInData = data?.[seriesID]?.some(
+              item => item === series.passingValue,
+            );
 
             series.hasPassingValueInData = hasPassingValueInData;
 
@@ -130,23 +131,18 @@ const modules = {
 
       const dataGroupLastTime = this.dataSet[key].dataGroup.at(-1)?.data?.at(-1)?.x || Date.now();
 
-      this.dataSet[key].toTime = lastTime
-        || (dataGroupLastTime ? Math.floor(dataGroupLastTime / 1000) * 1000 : 0);
+      this.dataSet[key].toTime = lastTime || (dataGroupLastTime ? Math.floor(dataGroupLastTime / 1000) * 1000 : 0);
       this.dataSet[key].fromTime = this.dataSet[key].toTime - this.dataSet[key].length * 1000;
       this.dataSet[key].endIndex = this.dataSet[key].length - 1;
 
-      if (
-        (this.dataSet[key].toTime - lastTime) / 1000
-        > this.dataSet[key].length && key === ''
-      ) {
+      if ((this.dataSet[key].toTime - lastTime) / 1000 > this.dataSet[key].length && key === '') {
         return;
       }
 
       let gapCount = (lastTime - this.dataSet[key].toTime) / 1000;
       if (gapCount > 0) {
         this.dataSet[key].toTime = lastTime;
-        this.dataSet[key].fromTime = lastTime
-          - this.dataSet[key].length * 1000;
+        this.dataSet[key].fromTime = lastTime - this.dataSet[key].length * 1000;
       }
 
       for (let i = 0; i < this.dataSet[key].length; i++) {
@@ -173,22 +169,16 @@ const modules = {
           this.dataSet[key].endIndex = this.dataSet[key].length - 1;
         } else {
           while (gapCount > 0) {
-            if (
-              this.dataSet[key].dataGroup[this.dataSet[key].startIndex]
-               === null
-            ) {
+            if (this.dataSet[key].dataGroup[this.dataSet[key].startIndex] === null) {
               this.dataSet[key].dataGroup[this.dataSet[key].startIndex] = {
                 data: [],
                 max: 0,
                 min: Infinity,
               };
             } else {
-              this.dataSet[key]
-                .dataGroup[this.dataSet[key].startIndex].data.length = 0;
-              this.dataSet[key]
-                .dataGroup[this.dataSet[key].startIndex].max = 0;
-              this.dataSet[key]
-                .dataGroup[this.dataSet[key].startIndex].min = Infinity;
+              this.dataSet[key].dataGroup[this.dataSet[key].startIndex].data.length = 0;
+              this.dataSet[key].dataGroup[this.dataSet[key].startIndex].max = 0;
+              this.dataSet[key].dataGroup[this.dataSet[key].startIndex].min = Infinity;
             }
 
             ++this.dataSet[key].startIndex;
@@ -211,8 +201,7 @@ const modules = {
         const xAxisTime = Math.floor(item.x / 1000) * 1000;
 
         if (this.dataSet[key].fromTime <= xAxisTime) {
-          let index = this.dataSet[key].endIndex
-          - (this.dataSet[key].toTime - xAxisTime) / 1000;
+          let index = this.dataSet[key].endIndex - (this.dataSet[key].toTime - xAxisTime) / 1000;
           if (index < 0) {
             index = this.dataSet[key].length + index;
           }
@@ -418,29 +407,29 @@ const modules = {
       if (basePositionCache.has(key)) {
         return basePositionCache.get(key);
       }
-    
+
       let result = 0;
       let idx = baseIndex;
-    
+
       while (idx >= 0) {
         const baseSeries = seriesList[bsIds[idx]];
         if (!baseSeries?.show) {
           idx--;
           continue;
         }
-    
+
         const baseData = baseSeries.data[dataIndex];
         const position = isHorizontal ? baseData?.x : baseData?.y;
         const baseValue = baseData?.o;
-    
+
         const isPassingValue =
           !Util.isNullOrUndefined(baseSeries.passingValue) &&
           baseSeries.passingValue === baseValue;
-    
+
         const isSameSign =
           (curr >= 0 && baseValue >= 0) ||
           (curr < 0 && baseValue < 0);
-    
+
         if (
           position != null &&
           !isPassingValue &&
@@ -449,10 +438,10 @@ const modules = {
           result = position;
           break;
         }
-    
+
         idx--;
       }
-    
+
       basePositionCache.set(key, result);
       return result;
     };
@@ -515,11 +504,8 @@ const modules = {
       }
 
       if (ldata !== null) {
-        const isPassingValueWithStack = isBase
-          && !Util.isNullOrUndefined(passingValue)
-          && gdata === passingValue;
-        sdata.push(this.addData(isPassingValueWithStack ? 0 : gdata, ldata, gdata,
-        ));
+        const isPassingValueWithStack = isBase && !Util.isNullOrUndefined(passingValue) && gdata === passingValue;
+        sdata.push(this.addData(isPassingValueWithStack ? 0 : gdata, ldata, gdata));
       }
     });
 
@@ -626,47 +612,50 @@ const modules = {
     if (data.length) {
       const usePassingValue = !Util.isNullOrUndefined(passingValue);
 
-      return data.reduce((acc, p, index) => {
-        const minmax = acc;
-        const px = p.x?.value || p.x;
-        const py = p.y?.value || p.y;
-        const po = p.o?.value || p.o;
+      return data.reduce(
+        (acc, p, index) => {
+          const minmax = acc;
+          const px = p.x?.value || p.x;
+          const py = p.y?.value || p.y;
+          const po = p.o?.value || p.o;
 
-        if ((usePassingValue ? (po !== passingValue && px <= minmax.minX) : px <= minmax.minX)) {
-          minmax.minX = (px === null) ? 0 : px;
-        }
-
-        if ((usePassingValue ? (po !== passingValue && py <= minmax.minY) : py <= minmax.minY)) {
-          minmax.minY = (py === null) ? 0 : py;
-        }
-
-        if ((usePassingValue ? (po !== passingValue && px >= minmax.maxX) : px >= minmax.maxX)) {
-          minmax.maxX = (px === null) ? 0 : px;
-
-          if (isHorizontal && px !== null) {
-            minmax.maxDomain = py;
-            minmax.maxDomainIndex = index;
+          if (usePassingValue ? po !== passingValue && px <= minmax.minX : px <= minmax.minX) {
+            minmax.minX = px === null ? 0 : px;
           }
-        }
 
-        if ((usePassingValue ? (po !== passingValue && py >= minmax.maxY) : py >= minmax.maxY)) {
-          minmax.maxY = (py === null) ? 0 : py;
-
-          if (!isHorizontal && py !== null) {
-            minmax.maxDomain = px;
-            minmax.maxDomainIndex = index;
+          if (usePassingValue ? po !== passingValue && py <= minmax.minY : py <= minmax.minY) {
+            minmax.minY = py === null ? 0 : py;
           }
-        }
 
-        return minmax;
-      }, {
-        minX: data[0].x,
-        minY: data[0].y,
-        maxX: data[0].x,
-        maxY: data[0].y,
-        maxDomain: isHorizontal ? data[0].y : data[0].x,
-        maxDomainIndex: 0,
-      });
+          if (usePassingValue ? po !== passingValue && px >= minmax.maxX : px >= minmax.maxX) {
+            minmax.maxX = px === null ? 0 : px;
+
+            if (isHorizontal && px !== null) {
+              minmax.maxDomain = py;
+              minmax.maxDomainIndex = index;
+            }
+          }
+
+          if (usePassingValue ? po !== passingValue && py >= minmax.maxY : py >= minmax.maxY) {
+            minmax.maxY = py === null ? 0 : py;
+
+            if (!isHorizontal && py !== null) {
+              minmax.maxDomain = px;
+              minmax.maxDomainIndex = index;
+            }
+          }
+
+          return minmax;
+        },
+        {
+          minX: data[0].x,
+          minY: data[0].y,
+          maxX: data[0].x,
+          maxY: data[0].y,
+          maxDomain: isHorizontal ? data[0].y : data[0].x,
+          maxDomainIndex: 0,
+        },
+      );
     }
 
     return def;
@@ -696,11 +685,7 @@ const modules = {
       }
     });
 
-    if (
-      isExistError
-      && !isGradient
-      && colorState.length === rangeCount
-    ) {
+    if (isExistError && !isGradient && colorState.length === rangeCount) {
       colorState.push({
         id: `color#${rangeCount}`,
         color: colorOpt.error,
@@ -711,7 +696,7 @@ const modules = {
     }
 
     let interval = maxValue > minValue ? Math.floor((maxValue - minValue) / rangeCount) : 1;
-    if ((maxValue - minValue) <= rangeCount) {
+    if (maxValue - minValue <= rangeCount) {
       if (decimalPoint > 0) {
         interval = +((maxValue - minValue) / rangeCount).toFixed(decimalPoint);
       } else {
@@ -805,12 +790,9 @@ const modules = {
         return null;
       }
 
-      itemPosition = [this.getItemByPosition(
-        [dataInfo.xp, dataInfo.yp],
-        useApproximate,
-        dataIndex,
-        true,
-      )];
+      itemPosition = [
+        this.getItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate, dataIndex, true),
+      ];
     } else {
       const seriesList = Object.entries(this.seriesList);
       let firShowSeriesID;
@@ -867,12 +849,7 @@ const modules = {
    *
    * @returns {object} clicked item information
    */
-  getItemByPosition(
-    offset,
-    useApproximate = false,
-    dataIndex,
-    useSelectLabelOrItem = false,
-  ) {
+  getItemByPosition(offset, useApproximate = false, dataIndex, useSelectLabelOrItem = false) {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
@@ -891,13 +868,7 @@ const modules = {
       const findFn = useApproximate ? series.findApproximateData : series.findGraphData;
 
       if (findFn) {
-        const item = findFn.call(
-          series,
-          offset,
-          isHorizontal,
-          dataIndex,
-          useSelectLabelOrItem,
-        );
+        const item = findFn.call(series, offset, isHorizontal, dataIndex, useSelectLabelOrItem);
         const data = item.data;
         const index = item.index;
 
@@ -922,7 +893,6 @@ const modules = {
               } else {
                 acc += data.y;
               }
-
 
               if (maxType === 'bar' && useStack) {
                 if (item.hit) {
@@ -981,9 +951,8 @@ const modules = {
     };
 
     const seriesList = this.data.series;
-    const pointSize = Object.values(seriesList).sort(
-      (a, b) => b.pointSize ?? 0 - a.pointSize ?? 0,
-    )[0]?.pointSize ?? 3; // default pointSize 3
+    const pointSize = Object.values(seriesList).sort((a, b) => b.pointSize ?? 0 - a.pointSize ?? 0)[0]?.pointSize
+      ?? 3; // default pointSize 3
     const { horizontal, selectLabel } = this.options;
 
     let scale;
@@ -1075,10 +1044,9 @@ const modules = {
       switch (chartType) {
         case 'bar':
         case 'line': {
-          result = (
-            (horizontal && !isXAxis)
-            || (!horizontal && isXAxis)
-          ) ? this.data.labels[labelIndex] : '';
+          result = (horizontal && !isXAxis) || (!horizontal && isXAxis)
+              ? this.data.labels[labelIndex]
+              : '';
           break;
         }
         case 'heatMap': {
@@ -1105,10 +1073,7 @@ const modules = {
         interval: labelValInterval,
         graphMin,
       } = this.axesSteps[targetAxisDirection][0];
-      const {
-        width: labelWidth,
-        height: labelHeight,
-      } = this.axesRange[targetAxisDirection][0].size;
+      const { width: labelWidth, height: labelHeight } = this.axesRange[targetAxisDirection][0].size;
       const axes = isXAxis ? this.axesX : this.axesY;
       const axisStartPoint = aPos[axes[0].units.rectStart];
       const axisEndPoint = aPos[axes[0].units.rectEnd];
@@ -1118,10 +1083,10 @@ const modules = {
       const labelStep = Math.floor((curMousePosInAxis + labelMidLength) / labelPosInterval);
 
       if (
-        ((labelPosInterval * labelStep) + labelMidLength > curMousePosInAxis)
-        && ((labelPosInterval * labelStep) - labelMidLength < curMousePosInAxis)
+        labelPosInterval * labelStep + labelMidLength > curMousePosInAxis
+        && labelPosInterval * labelStep - labelMidLength < curMousePosInAxis
       ) {
-        result = (labelStep * labelValInterval) + graphMin;
+        result = labelStep * labelValInterval + graphMin;
       }
 
       return result;
@@ -1155,65 +1120,72 @@ const modules = {
     };
 
     if (keys.length) {
-      return keys.reduce((acc, key) => {
-        const minmax = acc;
-        const series = this.seriesList[key];
-        const smm = series.minMax;
-        const axisX = series.xAxisIndex;
-        const axisY = series.yAxisIndex;
+      return keys.reduce(
+        (acc, key) => {
+          const minmax = acc;
+          const series = this.seriesList[key];
+          const smm = series.minMax;
+          const axisX = series.xAxisIndex;
+          const axisY = series.yAxisIndex;
 
-        if (!minmax.x[axisX]) {
-          minmax.x[axisX] = { min: null, max: null, maxSID: null };
-        }
-        if (!minmax.y[axisY]) {
-          minmax.y[axisY] = { min: null, max: null, maxSID: null };
-        }
+          if (!minmax.x[axisX]) {
+            minmax.x[axisX] = { min: null, max: null, maxSID: null };
+          }
+          if (!minmax.y[axisY]) {
+            minmax.y[axisY] = { min: null, max: null, maxSID: null };
+          }
 
-        if (smm && series.show) {
-          if (!isHorizontal) {
-            if (smm.minX !== null
-                && ((minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)))) {
-              minmax.x[axisX].min = smm.minX;
+          if (smm && series.show) {
+            if (!isHorizontal) {
+              if (
+                smm.minX !== null
+                && (minmax.x[axisX].min === null || smm.minX < minmax.x[axisX].min)
+              ) {
+                minmax.x[axisX].min = smm.minX;
+              }
+              if (minmax.y[axisY].min === null || smm.minY < minmax.y[axisY].min) {
+                minmax.y[axisY].min = smm.minY;
+              }
+            } else {
+              if (minmax.x[axisX].min === null || smm.minX < minmax.x[axisX].min) {
+                minmax.x[axisX].min = smm.minX;
+              }
+              if (
+                smm.minY !== null
+                && (minmax.y[axisY].min === null || smm.minY < minmax.y[axisY].min)
+              ) {
+                minmax.y[axisY].min = smm.minY;
+              }
             }
-            if (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min)) {
-              minmax.y[axisY].min = smm.minY;
+
+            const isExistGrp = this.seriesList[key].isExistGrp;
+            const maxXisNegative = minmax.x[axisX].max < 0;
+
+            if (isExistGrp && maxXisNegative) {
+              minmax.x[axisX].max = smm.maxX;
+              minmax.x[axisX].maxSID = key;
+            } else if (!minmax.x[axisX].max || smm.maxX >= minmax.x[axisX].max) {
+              minmax.x[axisX].max = smm.maxX;
+              minmax.x[axisX].maxSID = key;
             }
-          } else {
-            if (minmax.x[axisX].min === null || (smm.minX < minmax.x[axisX].min)) {
-              minmax.x[axisX].min = smm.minX;
-            }
-            if (smm.minY !== null
-                && (minmax.y[axisY].min === null || (smm.minY < minmax.y[axisY].min))) {
-              minmax.y[axisY].min = smm.minY;
+
+            const maxYisNegative = minmax.y[axisY].max < 0;
+            if (isExistGrp && maxYisNegative) {
+              minmax.y[axisY].max = smm.maxY;
+              minmax.y[axisY].maxSID = key;
+            } else if (!minmax.y[axisY].max || smm.maxY >= minmax.y[axisY].max) {
+              minmax.y[axisY].max = smm.maxY;
+              minmax.y[axisY].maxSID = key;
             }
           }
 
-          const isExistGrp = this.seriesList[key].isExistGrp;
-          const maxXisNegative = minmax.x[axisX].max < 0;
-
-          if (isExistGrp && maxXisNegative) {
-            minmax.x[axisX].max = smm.maxX;
-            minmax.x[axisX].maxSID = key;
-          } else if (!minmax.x[axisX].max || smm.maxX >= minmax.x[axisX].max) {
-            minmax.x[axisX].max = smm.maxX;
-            minmax.x[axisX].maxSID = key;
-          }
-
-          const maxYisNegative = minmax.y[axisY].max < 0;
-          if (isExistGrp && maxYisNegative) {
-            minmax.y[axisY].max = smm.maxY;
-            minmax.y[axisY].maxSID = key;
-          } else if (!minmax.y[axisY].max || smm.maxY >= minmax.y[axisY].max) {
-            minmax.y[axisY].max = smm.maxY;
-            minmax.y[axisY].maxSID = key;
-          }
-        }
-
-        return minmax;
-      }, {
-        x: [{ min: null, max: null, maxSID: null }],
-        y: [{ min: null, max: null, maxSID: null }],
-      });
+          return minmax;
+        },
+        {
+          x: [{ min: null, max: null, maxSID: null }],
+          y: [{ min: null, max: null, maxSID: null }],
+        },
+      );
     }
 
     return def;
@@ -1320,21 +1292,26 @@ const modules = {
 
     seriesIds?.forEach((sId) => {
       const dataList = allData[sId].map(data => (data?.value ? data.value : data));
-      const last = (dataList[dataList.length - 1]);
+      const last = dataList[dataList.length - 1];
 
-      const dataListExcludedNull = dataList.filter(value => value !== undefined && value !== null);
-      const min = (Math.min(...dataListExcludedNull));
-      const max = (Math.max(...dataListExcludedNull));
-      const total = (dataListExcludedNull.reduce((a, b) => a + b, 0));
-      const avg = (total / dataListExcludedNull.length || 0);
+      const dataListExcludedNull = dataList.filter(
+        value => value !== undefined && value !== null,
+      );
+      const min = Math.min(...dataListExcludedNull);
+      const max = Math.max(...dataListExcludedNull);
+      const total = dataListExcludedNull.reduce((a, b) => a + b, 0);
+      const avg = total / dataListExcludedNull.length || 0;
 
-      if (!Util.checkSafeInteger(min)
+      if (
+        !Util.checkSafeInteger(min)
         || !Util.checkSafeInteger(max)
         || !Util.checkSafeInteger(avg)
         || !Util.checkSafeInteger(total)
         || !Util.checkSafeInteger(last)
       ) {
-        console.warn('[EVUI][Chart] The aggregated value exceeds 9007199254740991 or less than -9007199254740991.');
+        console.warn(
+          '[EVUI][Chart] The aggregated value exceeds 9007199254740991 or less than -9007199254740991.',
+        );
       }
 
       aggregationDataSet[sId] = { min, max, avg, total, last };

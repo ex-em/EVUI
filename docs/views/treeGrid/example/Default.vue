@@ -45,50 +45,24 @@
     </ev-tree-grid>
     <div class="description">
       <div class="form-rows">
-        <span class="badge yellow">
-          Show Header
-        </span>
-        <ev-toggle
-          v-model="showHeaderMV"
-        />
-        <span class="badge yellow">
-          Use Checkbox
-        </span>
-        <ev-toggle
-          v-model="useCheckboxMV"
-        />
-        <span class="badge yellow">
-          Stripe Style
-        </span>
-        <ev-toggle
-          v-model="stripeMV"
-        />
+        <span class="badge yellow"> Show Header </span>
+        <ev-toggle v-model="showHeaderMV" />
+        <span class="badge yellow"> Use Checkbox </span>
+        <ev-toggle v-model="useCheckboxMV" />
+        <span class="badge yellow"> Stripe Style </span>
+        <ev-toggle v-model="stripeMV" />
       </div>
       <div class="form-rows">
-        <span class="badge yellow">
-          Use Selection
-        </span>
-        <ev-toggle
-          v-model="useSelection.use"
-        />
-        <span class="badge yellow">
-          Multiple Selection
-        </span>
-        <ev-toggle
-          v-model="useSelection.multiple"
-        />
-        <span class="badge yellow">
-          Use Grid Setting
-        </span>
-        <ev-toggle
-          v-model="useGridSettingMV"
-        />
+        <span class="badge yellow"> Use Selection </span>
+        <ev-toggle v-model="useSelection.use" />
+        <span class="badge yellow"> Multiple Selection </span>
+        <ev-toggle v-model="useSelection.multiple" />
+        <span class="badge yellow"> Use Grid Setting </span>
+        <ev-toggle v-model="useGridSettingMV" />
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Expand Column Index
-          </span>
+          <span class="badge yellow"> Expand Column Index </span>
           <ev-input-number
             v-model="expandColumnMV"
             :step="1"
@@ -98,9 +72,7 @@
           />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Limit Count
-          </span>
+          <span class="badge yellow"> Limit Count </span>
           <ev-select
             v-model="useSelection.limitCount"
             :items="limitItems"
@@ -112,180 +84,88 @@
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Width
-          </span>
-          <ev-text-field
-            v-model="widthMV"
-          />
+          <span class="badge yellow"> Width </span>
+          <ev-text-field v-model="widthMV" />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Height
-          </span>
-          <ev-text-field
-            v-model="heightMV"
-          />
+          <span class="badge yellow"> Height </span>
+          <ev-text-field v-model="heightMV" />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Row Height
-          </span>
-          <ev-input-number
-            v-model="rowHeightMV"
-            :step="10"
-            :max="150"
-            :min="10"
-          />
+          <span class="badge yellow"> Row Height </span>
+          <ev-input-number v-model="rowHeightMV" :step="10" :max="150" :min="10" />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Column Width
-          </span>
-          <ev-input-number
-            v-model="columnWidthMV"
-            :step="20"
-            :max="300"
-            :min="40"
-          />
+          <span class="badge yellow"> Column Width </span>
+          <ev-input-number v-model="columnWidthMV" :step="20" :max="300" :min="40" />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Checkbox
-          </span>
-          <ev-radio-group
-            v-model="checkboxModeMV"
-            type="button"
-            @change="changeMode"
-          >
+          <span class="badge yellow"> Checkbox </span>
+          <ev-radio-group v-model="checkboxModeMV" type="button" @change="changeMode">
             <ev-radio label="single" />
             <ev-radio label="multi" />
             <ev-radio label="each" />
           </ev-radio-group>
           <span>Header Check</span>
-          <ev-toggle
-            v-model="headerCheckMV"
-          />
+          <ev-toggle v-model="headerCheckMV" />
           <span class="badge">Count</span>
           <span>{{ checked.length }}</span>
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Checked Row
-          </span>
-          <ev-text-field
-            v-model="checkedRowsMV"
-            type="textarea"
-            readonly
-          />
+          <span class="badge yellow"> Checked Row </span>
+          <ev-text-field v-model="checkedRowsMV" type="textarea" readonly />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Clicked Row
-          </span>
-          <ev-text-field
-            v-model="clickedRowMV"
-            type="textarea"
-            readonly
-          />
+          <span class="badge yellow"> Clicked Row </span>
+          <ev-text-field v-model="clickedRowMV" type="textarea" readonly />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Double Clicked Row
-          </span>
-          <ev-text-field
-            v-model="DbClickedRowsMV"
-            type="textarea"
-            readonly
-          />
+          <span class="badge yellow"> Double Clicked Row </span>
+          <ev-text-field v-model="DbClickedRowsMV" type="textarea" readonly />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Toggled Row
-          </span>
-          <ev-text-field
-            v-model="toggledRowMV"
-            type="textarea"
-            readonly
-          />
+          <span class="badge yellow"> Toggled Row </span>
+          <ev-text-field v-model="toggledRowMV" type="textarea" readonly />
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Highlight
-          </span>
-          <ev-input-number
-            v-model="highlightMV"
-            :step="1"
-            :max="100"
-          />
+          <span class="badge yellow"> Highlight </span>
+          <ev-input-number v-model="highlightMV" :step="1" :max="100" />
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Border Style
-          </span>
-          <ev-select
-            v-model="borderMV"
-            :items="borderItems"
-            placeholder="Please select value."
-          />
-          <button
-            class="btn"
-            @click="onReset('border')"
-          >
-            <ev-icon
-              icon="ev-icon-trash3"
-              size="small"
-            />Reset
+          <span class="badge yellow"> Border Style </span>
+          <ev-select v-model="borderMV" :items="borderItems" placeholder="Please select value." />
+          <button class="btn" @click="onReset('border')">
+            <ev-icon icon="ev-icon-trash3" size="small" />Reset
           </button>
         </div>
       </div>
       <div class="form-rows">
         <div class="form-row">
-          <span class="badge yellow">
-            Expand/Collapse Icon
-          </span>
-          <ev-select
-            v-model="iconMV"
-            :items="iconItems"
-            placeholder="Please select value."
-          />
-          <button
-            class="btn"
-            @click="onReset('treeIcon')"
-          >
-            <ev-icon
-              icon="ev-icon-trash3"
-              size="small"
-            />Reset
+          <span class="badge yellow"> Expand/Collapse Icon </span>
+          <ev-select v-model="iconMV" :items="iconItems" placeholder="Please select value." />
+          <button class="btn" @click="onReset('treeIcon')">
+            <ev-icon icon="ev-icon-trash3" size="small" />Reset
           </button>
         </div>
         <div class="form-row">
-          <span class="badge yellow">
-            Data Icon
-          </span>
+          <span class="badge yellow"> Data Icon </span>
           <ev-select
             v-model="dataIconMV"
             :items="dataIconItems"
             placeholder="Please select value."
           />
-          <button
-            class="btn"
-            @click="onReset('dataIcon')"
-          >
-            <ev-icon
-              icon="ev-icon-trash3"
-              size="small"
-            />Reset
+          <button class="btn" @click="onReset('dataIcon')">
+            <ev-icon icon="ev-icon-trash3" size="small" />Reset
           </button>
         </div>
       </div>
@@ -326,9 +206,12 @@ export default {
       {
         text: 'Menu1',
         click: (param) => {
-          console.log(`[Menu1] Selected Row Data: ${JSON.stringify(param?.selectedRow?.[0]?.data)}`);
+          console.log(
+            `[Menu1] Selected Row Data: ${JSON.stringify(param?.selectedRow?.[0]?.data)}`,
+          );
         },
-      }, {
+      },
+      {
         text: 'Menu2',
         click: param => console.log('[Menu2]', param),
       },
@@ -385,19 +268,19 @@ export default {
       dataIconMV.value = '';
     };
     const onReset = (type) => {
-        switch (type) {
-          case 'border':
-            borderMV.value = '';
-            break;
-          case 'treeIcon':
-            iconMV.value = '';
-            break;
-          case 'dataIcon':
-            dataIconMV.value = '';
-            break;
-          default:
-            break;
-        }
+      switch (type) {
+        case 'border':
+          borderMV.value = '';
+          break;
+        case 'treeIcon':
+          iconMV.value = '';
+          break;
+        case 'dataIcon':
+          dataIconMV.value = '';
+          break;
+        default:
+          break;
+      }
     };
     const onClickCheckbox = (e) => {
       console.log(`checkbox component click: ${e}`);
@@ -441,67 +324,85 @@ export default {
           name: '2222',
           value: 123,
           expand: true,
-          children: [{
-            id: 'Exem 2',
-            date: '2016-05-02',
-            name: '2',
-            value: 222,
-            expand: false,
-            children: [{
-              id: 'Exem 3',
+          children: [
+            {
+              id: 'Exem 2',
               date: '2016-05-02',
-              name: '3',
-              value: 3333,
-              uncheckable: true,
-            }, {
-              id: 'Exem 4',
-              date: '2016-05-02',
-              name: '4',
+              name: '2',
+              value: 222,
               expand: false,
-              uncheckable: true,
-              children: [{
-                id: 'Exem 5',
-                date: '2016-05-02',
-                name: '5',
-                children: [{
-                  id: 'Exem 51',
+              children: [
+                {
+                  id: 'Exem 3',
                   date: '2016-05-02',
-                  name: '1251',
-                  children: [{
-                    id: 'Exem 52',
-                    date: '2016-05-02',
-                    name: '20000',
-                  }],
-                }],
-              }, {
-                id: 'Exem 6',
-                date: '2016-05-02',
-                name: '6',
-              }],
-            }],
-          }, {
-            id: 'Exem 7',
-            date: '2016-05-03',
-            name: '7',
-            children: [{
-              id: 'Exem 8',
+                  name: '3',
+                  value: 3333,
+                  uncheckable: true,
+                },
+                {
+                  id: 'Exem 4',
+                  date: '2016-05-02',
+                  name: '4',
+                  expand: false,
+                  uncheckable: true,
+                  children: [
+                    {
+                      id: 'Exem 5',
+                      date: '2016-05-02',
+                      name: '5',
+                      children: [
+                        {
+                          id: 'Exem 51',
+                          date: '2016-05-02',
+                          name: '1251',
+                          children: [
+                            {
+                              id: 'Exem 52',
+                              date: '2016-05-02',
+                              name: '20000',
+                            },
+                          ],
+                        },
+                      ],
+                    },
+                    {
+                      id: 'Exem 6',
+                      date: '2016-05-02',
+                      name: '6',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              id: 'Exem 7',
               date: '2016-05-03',
-              name: '8',
-              value: 333,
-            }, {
-              id: 'Exem 9',
-              date: '2016-05-03',
-              name: '9',
-            }, {
-              id: 'Exem 10',
-              date: '2016-05-03',
-              name: '10',
-            }],
-          }, {
-            id: 'Exem 11',
-            date: '2016-05-04',
-            name: '11',
-          }],
+              name: '7',
+              children: [
+                {
+                  id: 'Exem 8',
+                  date: '2016-05-03',
+                  name: '8',
+                  value: 333,
+                },
+                {
+                  id: 'Exem 9',
+                  date: '2016-05-03',
+                  name: '9',
+                },
+                {
+                  id: 'Exem 10',
+                  date: '2016-05-03',
+                  name: '10',
+                },
+              ],
+            },
+            {
+              id: 'Exem 11',
+              date: '2016-05-04',
+              name: '11',
+            },
+          ],
         },
       ];
     };
@@ -621,7 +522,9 @@ export default {
 .form-row {
   width: 50%;
 }
-.ev-text-field, .ev-input-number, .ev-select {
+.ev-text-field,
+.ev-input-number,
+.ev-select {
   width: 80%;
 }
 .badge {

@@ -19,28 +19,15 @@
         }"
       >
         <template v-if="hasScroll">
-          <span
-            class="ev-tabs-arrow prev"
-            @click="scrollTab('prev')"
-          >
+          <span class="ev-tabs-arrow prev" @click="scrollTab('prev')">
             <i class="ev-icon-s-arrow-left" />
           </span>
-          <span
-            class="ev-tabs-arrow next"
-            @click="scrollTab('next')"
-          >
+          <span class="ev-tabs-arrow next" @click="scrollTab('next')">
             <i class="ev-icon-s-arrow-right" />
           </span>
         </template>
-        <div
-          ref="listWrapperRef"
-          class="ev-tabs-list-wrapper"
-        >
-          <ul
-            ref="listRef"
-            class="ev-tabs-list"
-            :style="listRefStyle"
-          >
+        <div ref="listWrapperRef" class="ev-tabs-list-wrapper">
+          <ul ref="listRef" class="ev-tabs-list" :style="listRefStyle">
             <li
               v-for="(item, idx) in computedTabList"
               :key="`${item.value}_${idx}`"
@@ -57,22 +44,11 @@
               @dragover.prevent="dragoverTab(item.value)"
               @dragend.prevent="dragendTab"
             >
-              <i
-                v-if="item.iconClass"
-                class="ev-tabs-icon"
-                :class="item.iconClass"
-              />
-              <span
-                class="text"
-                :title="item.text"
-              >
+              <i v-if="item.iconClass" class="ev-tabs-icon" :class="item.iconClass" />
+              <span class="text" :title="item.text">
                 {{ item.text }}
               </span>
-              <span
-                v-if="closable"
-                class="close-icon"
-                @click.stop="removeTab(item.value)"
-              >
+              <span v-if="closable" class="close-icon" @click.stop="removeTab(item.value)">
                 <i class="ev-icon-s-close" />
               </span>
             </li>
@@ -87,11 +63,7 @@
 </template>
 
 <script>
-import {
-  ref, reactive, computed,
-  provide, triggerRef,
-  onBeforeUpdate, nextTick,
-} from 'vue';
+import { ref, reactive, computed, provide, triggerRef, onBeforeUpdate, nextTick } from 'vue';
 import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
 import resize from 'vue-resize-observer';
 
@@ -113,11 +85,11 @@ export default {
         const valueList = list.map(v => v.value);
         const setList = [...new Set(valueList)];
         if (list.length !== setList.length) {
-          console.warn('[EVUI][Tabs] TabPanel \'value\' attribute is duplicate values.');
+          console.warn("[EVUI][Tabs] TabPanel 'value' attribute is duplicate values.");
           return false;
         }
         if (!list.every(v => Object.hasOwnProperty.call(v, 'value'))) {
-          console.warn('[EVUI][Tabs] TabPanel \'value\' attribute is essential.');
+          console.warn("[EVUI][Tabs] TabPanel 'value' attribute is essential.");
           return false;
         }
         return true;
@@ -375,7 +347,8 @@ export default {
 @use '../../style/index.scss' as *;
 
 .ev-tabs {
-  ul, li {
+  ul,
+  li {
     list-style: none;
   }
 
@@ -416,7 +389,7 @@ export default {
     border-radius: 4px 4px 0 0;
     border-bottom: none !important;
     text-align: center;
-    transition: transform .3s;
+    transition: transform 0.3s;
     user-select: none;
 
     @include evThemify() {

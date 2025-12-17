@@ -1,9 +1,5 @@
 <template>
-  <div
-    class="ev-radio-group"
-    :class="{ 'type-button': type === 'button' }"
-    role="group"
-  >
+  <div class="ev-radio-group" :class="{ 'type-button': type === 'button' }" role="group">
     <slot />
   </div>
 </template>
