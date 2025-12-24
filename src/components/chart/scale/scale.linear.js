@@ -125,11 +125,11 @@ class LinearScale extends Scale {
 
 
   /**
-   * 주어진 값에 대한 적절한 틱 스텝을 계산합니다.
+   * 주어진 값에 대한 적절한 간격을 계산합니다.
    * @param value - 계산할 값 (양수, 음수 모두 가능)
-   * @returns 계산된 틱 스텝 값 (유효하지 않은 경우 0 반환)
+   * @returns 계산된 간격 값 (유효하지 않은 경우 0 반환)
    */
-  getNiceStep(value) {
+  getNiceInterval(value) {
     if (!Number.isFinite(value) || value === 0) return 0;
 
     // 절댓값을 사용하여 nice step 계산
@@ -145,9 +145,9 @@ class LinearScale extends Scale {
       }
     }
 
-    const niceStep = fraction * 10 ** exponent;
+    const niceInterval = fraction * 10 ** exponent;
     // 원래 값의 부호 유지 (음수면 음수, 양수면 양수)
-    return value < 0 ? -niceStep : niceStep;
+    return value < 0 ? -niceInterval : niceInterval;
   }
 
   getStepsWithNiceScale({ max, min, maxSteps }) {
@@ -170,19 +170,19 @@ class LinearScale extends Scale {
     for (let i = 0; i < segmentCandidates.length; i++) {
       const segments = segmentCandidates[i];
       const rawStep = (max - min) / segments;
-      const niceStep = this.getNiceStep(rawStep);
+      const niceInterval = this.getNiceInterval(rawStep);
       
-      if (niceStep > 0) {
-        const absNiceStep = Math.abs(niceStep);
-        const niceMin = Math.floor(min / niceStep) * niceStep;
-        const candidateYAxisMax = niceMin + niceStep * segments;
+      if (niceInterval > 0) {
+        const absNiceInterval = Math.abs(niceInterval);
+        const niceMin = Math.floor(min / niceInterval) * niceInterval;
+        const candidateYAxisMax = niceMin + niceInterval * segments;
         const overshootAmount = candidateYAxisMax - max; // 여유(overshoot)
 
         // 더 나은 후보를 찾으면 업데이트
         if (overshootAmount >= 0 && overshootAmount < bestOvershootAmount) {
           bestMaxValue = candidateYAxisMax;
           bestMinValue = niceMin;
-          bestInterval = absNiceStep;
+          bestInterval = absNiceInterval;
           bestOvershootAmount = overshootAmount;
           bestSteps = segments;
         }
@@ -247,6 +247,11 @@ class LinearScale extends Scale {
     }
 
     if (this.fixedSteps) {
+      this.decimalPoint = this?.getDecimalPointFromRange?.({
+        graphRange,
+        numberOfSteps,
+      });
+
       return {
         steps: numberOfSteps,
         interval,
