@@ -171,8 +171,10 @@
         }
       });
       watch(isSpeedUpMode, (newValue) => {
-        clearInterval(liveInterval.value);
-        liveInterval.value = setInterval(addRandomChartData, newValue ? 100 : 1000);
+        if (isLive.value && newValue) {
+          clearInterval(liveInterval.value);
+          liveInterval.value = setInterval(addRandomChartData, newValue ? 100 : 1000);
+        }
       });
       watch(chartHeight, (newValue) => {
         chartOptions.height = `${newValue}%`;
