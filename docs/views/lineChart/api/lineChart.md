@@ -146,6 +146,8 @@ const chartData =
 | formatter      | function | null                  | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용       | (value, { prev, isDefaultMaxSameAsMin }) => value + '%' |
 | title          | Object   | ([상세](#title))      | 라벨의 폰트 스타일을 설정                                     |                                                         |
 | showAxisTick   | Boolean   | true    | 보조 눈금 표시 여부                                     |                                                         |
+| fixedSteps  | Boolean  | false    | range와 interval로 설정한 값을 그대로 사용하여 step을 고정. 자동 스케일 조정을 비활성화하며, 원하는 간격으로 축을 표시할 때 사용  | |
+| niceScale   | Boolean  | false    | 축 타입이 linear 인 경우 nice scale 알고리즘을 적용하여 최적의 최대값과 간격을 계산하여 축을 그림
 
 ##### axesX
 
