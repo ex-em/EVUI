@@ -454,6 +454,8 @@ const module = {
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
+        updateByScrollbar: true,
+        lightUpdate: minValue > 1,
       });
     }
   },
