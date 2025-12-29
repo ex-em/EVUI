@@ -171,7 +171,7 @@
         }
       });
       watch(isSpeedUpMode, (newValue) => {
-        if (isLive.value && newValue) {
+        if (isLive.value) {
           clearInterval(liveInterval.value);
           liveInterval.value = setInterval(addRandomChartData, newValue ? 100 : 1000);
         }
