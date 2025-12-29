@@ -16,7 +16,7 @@ class Scatter {
 
     ['color', 'pointFill', 'fillColor', 'overflowColor'].forEach((colorProp) => {
       if (this[colorProp] === undefined) {
-        this[colorProp] = COLOR[sIdx];
+        this[colorProp] = COLOR[sIdx % COLOR.length];
       }
     });
 
