@@ -73,10 +73,17 @@ class Bar {
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
 
+    const xMin = minmaxX.graphMin;
+    const xMax = minmaxX.graphMax;
+    const yMin = minmaxY.graphMin;
+    const yMax = minmaxY.graphMax;
+    const xScalingFactor = Canvas.getScalingFactor(xArea, xMin, xMax);
+    const yScalingFactor = Canvas.getScalingFactor(yArea, yMin, yMax);
+
     const xAxisPosition = chartRect.x1 + labelOffset.left;
     const yAxisPosition = chartRect.y2 - labelOffset.bottom;
-    const xZeroPosition = Canvas.calculateX(0, minmaxX.graphMin, minmaxX.graphMax, xArea);
-    const yZeroPosition = Canvas.calculateY(0, minmaxY.graphMin, minmaxY.graphMax, yArea);
+    const xZeroPosition = Canvas.getXPos(0, xMin, xMax, xScalingFactor, 0);
+    const yZeroPosition = Canvas.getYPos(0, yMin, yMax, yScalingFactor, 0);
 
     const xsp = isHorizontal ? xAxisPosition + xZeroPosition : xAxisPosition;
     const ysp = isHorizontal ? yAxisPosition : yAxisPosition + yZeroPosition;
@@ -145,22 +152,10 @@ class Bar {
         if (isHorizontal) {
           const barValue = item.b ? item.o : item.x;
 
-          w = Canvas.calculateX(
-            barValue,
-            minmaxX.graphMin,
-            minmaxX.graphMax,
-            xArea,
-            -xZeroPosition,
-          );
+          w = Canvas.getXPos(barValue, xMin, xMax, xScalingFactor, -xZeroPosition);
 
           if (item.b) {
-            x = Canvas.calculateX(
-              item.b,
-              minmaxX.graphMin,
-              minmaxX.graphMax,
-              xArea,
-              xsp - xZeroPosition,
-            );
+            x = Canvas.getXPos(item.b, xMin, xMax, xScalingFactor, xsp - xZeroPosition);
           }
 
           const minimumBarWidth = barValue > 0 ? -1 : 1;
@@ -168,22 +163,10 @@ class Bar {
         } else {
           const barValue = item.b ? item.o : item.y;
 
-          h = Canvas.calculateY(
-            barValue,
-            minmaxY.graphMin,
-            minmaxY.graphMax,
-            yArea,
-            -yZeroPosition,
-          );
+          h = Canvas.getYPos(barValue, yMin, yMax, yScalingFactor, -yZeroPosition);
 
           if (item.b) {
-            y = Canvas.calculateY(
-              item.b,
-              minmaxY.graphMin,
-              minmaxY.graphMax,
-              yArea,
-              ysp - yZeroPosition,
-            );
+            y = Canvas.getYPos(item.b, yMin, yMax, yScalingFactor, ysp - yZeroPosition);
           }
 
           const minimumBarHeight = barValue > 0 ? -1 : 1;

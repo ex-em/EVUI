@@ -131,8 +131,15 @@ class Line {
     const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    const getXPos = (val) => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-    const getYPos = (val) => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    const xMin = minmaxX.graphMin;
+    const xMax = minmaxX.graphMax;
+    const yMin = minmaxY.graphMin;
+    const yMax = minmaxY.graphMax;
+    const xScalingFactor = Canvas.getScalingFactor(xArea, xMin, xMax);
+    const yScalingFactor = Canvas.getScalingFactor(yArea, yMin, yMax);
+
+    const getXPos = (val) => Canvas.getXPos(val, xMin, xMax, xScalingFactor, xsp);
+    const getYPos = (val) => Canvas.getYPos(val, yMin, yMax, yScalingFactor, ysp);
     const includeNegativeValue = this.data.some((data) => data.o < 0);
     const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
 

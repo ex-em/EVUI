@@ -95,16 +95,18 @@ class Scatter {
   }
 
   /**
-   * Calculate x and y coordinates for a data item in the series.
-   * @param {object} item - The data item for which coordinates are to be calculated.
+   * Calculate scaling factors for position calculations.
+   * Call this once per draw cycle and store in param._scaling.
    * @param {object} param - The parameter object passed to the draw function.
    *
    * @returns {undefined}
    */
-  calcItem(item, param) {
-    const { chartRect, labelOffset, axesSteps, displayOverflow } = param;
+  initScalingFactors(param) {
+    if (param._scaling) {
+      return;
+    }
 
-    let aliasPixel;
+    const { chartRect, labelOffset, axesSteps } = param;
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
@@ -113,18 +115,40 @@ class Scatter {
     const xsp = chartRect.x1 + labelOffset.left;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    let x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-    const y = Canvas.calculateY(
-      displayOverflow && item.y > minmaxY.graphMax ? minmaxY.graphMax : item.y,
-      minmaxY.graphMin,
-      minmaxY.graphMax,
-      yArea,
+    const xMin = minmaxX.graphMin;
+    const xMax = minmaxX.graphMax;
+    const yMin = minmaxY.graphMin;
+    const yMax = minmaxY.graphMax;
+
+    param._scaling = {
+      xMin,
+      xMax,
+      yMin,
+      yMax,
+      xScalingFactor: Canvas.getScalingFactor(xArea, xMin, xMax),
+      yScalingFactor: Canvas.getScalingFactor(yArea, yMin, yMax),
+      xsp,
       ysp,
-    );
+    };
+  }
+
+  /**
+   * Calculate x and y coordinates for a data item in the series.
+   * @param {object} item - The data item for which coordinates are to be calculated.
+   * @param {object} param - The parameter object passed to the draw function.
+   *
+   * @returns {undefined}
+   */
+  calcItem(item, param) {
+    const { displayOverflow } = param;
+    const { xMin, xMax, yMin, yMax, xScalingFactor, yScalingFactor, xsp, ysp } = param._scaling;
+
+    let x = Canvas.getXPos(item.x, xMin, xMax, xScalingFactor, xsp);
+    const yValue = displayOverflow && item.y > yMax ? yMax : item.y;
+    const y = Canvas.getYPos(yValue, yMin, yMax, yScalingFactor, ysp);
 
     if (x !== null) {
-      aliasPixel = Util.aliasPixel(x);
-      x += aliasPixel;
+      x += Util.aliasPixel(x);
     }
 
     item.xp = x;
@@ -140,6 +164,8 @@ class Scatter {
   defaultScatterDraw(param) {
     const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    this.initScalingFactors(param);
 
     // Adjusted because Real Time Scatter is drawn from the back.
     for (let i = 0; i < this.data.length; i++) {
@@ -187,6 +213,8 @@ class Scatter {
       typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
     let totalCount = 0;
+
+    this.initScalingFactors(param);
 
     for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {

@@ -36,6 +36,13 @@ class TimeBar extends Bar {
     const ysp = chartRect.y2 - labelOffset.bottom;
     const xep = chartRect.x2 - labelOffset.right;
 
+    const xMin = minmaxX.graphMin;
+    const xMax = minmaxX.graphMax;
+    const yMin = minmaxY.graphMin;
+    const yMax = minmaxY.graphMax;
+    const xScalingFactor = Canvas.getScalingFactor(xArea, xMin, xMax);
+    const yScalingFactor = Canvas.getScalingFactor(yArea, yMin, yMax);
+
     const dArea = isHorizontal ? yArea : xArea;
     const cArea = dArea / (this.data.length || 1);
     const cPad = 2;
@@ -80,9 +87,9 @@ class TimeBar extends Bar {
 
       if (isHorizontal) {
         x = xsp;
-        y = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+        y = Canvas.getYPos(item.y, yMin, yMax, yScalingFactor, ysp);
       } else {
-        x = Canvas.calculateSubX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+        x = Canvas.calculateSubX(item.x, xMin, xMax, xArea, xsp);
         if (x < xsp) {
           subW -= xsp - x;
           x = x + w < xsp ? null : xsp;
@@ -102,18 +109,18 @@ class TimeBar extends Bar {
 
       if (isHorizontal) {
         if (item.b) {
-          w = Canvas.calculateX(item.x - item.b, minmaxX.graphMin, minmaxX.graphMax, xArea);
-          x = Canvas.calculateX(item.b, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+          w = Canvas.getXPos(item.x - item.b, xMin, xMax, xScalingFactor, 0);
+          x = Canvas.getXPos(item.b, xMin, xMax, xScalingFactor, xsp);
         } else {
-          w = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea);
+          w = Canvas.getXPos(item.x, xMin, xMax, xScalingFactor, 0);
         }
       } else if (item.b) {
         // vertical stack bar chart
-        h = Canvas.calculateY(item.y - item.b, minmaxY.graphMin, minmaxY.graphMax, yArea);
-        y = Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+        h = Canvas.getYPos(item.y - item.b, yMin, yMax, yScalingFactor, 0);
+        y = Canvas.getYPos(item.b, yMin, yMax, yScalingFactor, ysp);
       } else {
         // vertical bar chart
-        h = Canvas.calculateY(item.y, minmaxY.graphMin, minmaxY.graphMax, yArea);
+        h = Canvas.getYPos(item.y, yMin, yMax, yScalingFactor, 0);
       }
 
       if (x !== null && y !== null) {

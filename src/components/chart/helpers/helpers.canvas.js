@@ -2,6 +2,55 @@ import Util from './helpers.util';
 
 export default {
   /**
+   * Calculate scaling factor for X/Y position calculation
+   * @param {number} area      width or height for axis
+   * @param {number} min       min value
+   * @param {number} max       max value
+   *
+   * @returns {number} scaling factor
+   */
+  getScalingFactor(area, min, max) {
+    return area / (max - min);
+  },
+
+  /**
+   * Calculate X position (optimized version with pre-calculated scalingFactor)
+   * @param {number|null|undefined} value         graph value
+   * @param {number} min           min value
+   * @param {number} max           max value
+   * @param {number} scalingFactor pre-calculated scaling factor
+   * @param {number} startPoint    startPoint
+   *
+   * @returns {number|null} position
+   */
+  getXPos(value, min, max, scalingFactor, startPoint) {
+    if (value === null || value === undefined || value > max || value < min) {
+      return null;
+    }
+    return Math.ceil(startPoint + scalingFactor * (value - min));
+  },
+
+  /**
+   * Calculate Y position (optimized version with pre-calculated scalingFactor)
+   * @param {number|null|undefined} value         graph value
+   * @param {number} min           min value
+   * @param {number} max           max value
+   * @param {number} scalingFactor pre-calculated scaling factor
+   * @param {number} startPoint    startPoint
+   *
+   * @returns {number|null} position
+   */
+  getYPos(value, min, max, scalingFactor, startPoint) {
+    if (value === null || value === undefined || value > max || value < min) {
+      return null;
+    }
+    const calcY = startPoint
+      ? startPoint - scalingFactor * (value - (min || 0))
+      : -(scalingFactor * (value - (min || 0)));
+    return Math.floor(calcY);
+  },
+
+  /**
    * Calculate X position
    * @param {number|null|undefined}    value         graph value
    * @param {number} min           min value

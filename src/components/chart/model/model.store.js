@@ -588,59 +588,65 @@ const modules = {
    * @returns {object} min/max info for series
    */
   getSeriesMinMax(data, passingValue) {
-    const def = { minX: null, minY: null, maxX: null, maxY: null, maxDomain: null };
-    const isHorizontal = this.options.horizontal;
-
-    if (data.length) {
-      const usePassingValue = !Util.isNullOrUndefined(passingValue);
-
-      return data.reduce(
-        (acc, p, index) => {
-          const minmax = acc;
-          const px = p.x?.value || p.x;
-          const py = p.y?.value || p.y;
-          const po = p.o?.value || p.o;
-
-          if (usePassingValue ? po !== passingValue && px <= minmax.minX : px <= minmax.minX) {
-            minmax.minX = px === null ? 0 : px;
-          }
-
-          if (usePassingValue ? po !== passingValue && py <= minmax.minY : py <= minmax.minY) {
-            minmax.minY = py === null ? 0 : py;
-          }
-
-          if (usePassingValue ? po !== passingValue && px >= minmax.maxX : px >= minmax.maxX) {
-            minmax.maxX = px === null ? 0 : px;
-
-            if (isHorizontal && px !== null) {
-              minmax.maxDomain = py;
-              minmax.maxDomainIndex = index;
-            }
-          }
-
-          if (usePassingValue ? po !== passingValue && py >= minmax.maxY : py >= minmax.maxY) {
-            minmax.maxY = py === null ? 0 : py;
-
-            if (!isHorizontal && py !== null) {
-              minmax.maxDomain = px;
-              minmax.maxDomainIndex = index;
-            }
-          }
-
-          return minmax;
-        },
-        {
-          minX: data[0].x,
-          minY: data[0].y,
-          maxX: data[0].x,
-          maxY: data[0].y,
-          maxDomain: isHorizontal ? data[0].y : data[0].x,
-          maxDomainIndex: 0,
-        },
-      );
+    const len = data.length;
+    if (!len) {
+      return { minX: null, minY: null, maxX: null, maxY: null, maxDomain: null };
     }
 
-    return def;
+    const isHorizontal = this.options.horizontal;
+    const usePassingValue = !Util.isNullOrUndefined(passingValue);
+
+    let minX = data[0].x;
+    let minY = data[0].y;
+    let maxX = data[0].x;
+    let maxY = data[0].y;
+    let maxDomain = isHorizontal ? data[0].y : data[0].x;
+    let maxDomainIndex = 0;
+
+    for (let i = 0; i < len; i++) {
+      const p = data[i];
+      const px = p.x?.value ?? p.x;
+      const py = p.y?.value ?? p.y;
+      const po = p.o?.value ?? p.o;
+      const isValid = !usePassingValue || po !== passingValue;
+
+      if (isValid) {
+        if (px !== null) {
+          if (px < minX) {
+            minX = px;
+          }
+          if (px > maxX) {
+            maxX = px;
+            if (isHorizontal) {
+              maxDomain = py;
+              maxDomainIndex = i;
+            }
+          }
+        }
+
+        if (py !== null) {
+          if (py < minY) {
+            minY = py;
+          }
+          if (py > maxY) {
+            maxY = py;
+            if (!isHorizontal) {
+              maxDomain = px;
+              maxDomainIndex = i;
+            }
+          }
+        }
+      }
+    }
+
+    return {
+      minX: minX ?? 0,
+      minY: minY ?? 0,
+      maxX: maxX ?? 0,
+      maxY: maxY ?? 0,
+      maxDomain,
+      maxDomainIndex,
+    };
   },
 
   getSeriesValueOptForHeatMap(series) {
