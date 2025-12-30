@@ -35,6 +35,7 @@ import pieChartProps from 'docs/views/pieChart/props';
 import treeGridProps from 'docs/views/treeGrid/props';
 import paginationProps from 'docs/views/pagination/props';
 import heatMapProps from 'docs/views/heatMap/props';
+import benchmarkProps from 'docs/views/benchmark/props';
 
 const routes = [
   {
@@ -299,6 +300,15 @@ const routes = [
     name: 'BrushChart',
     component: PageView,
     props: brushChartProps,
+    meta: {
+      category: 'Chart',
+    },
+  },
+  {
+    path: '/benchmark',
+    name: 'Benchmark',
+    component: PageView,
+    props: benchmarkProps,
     meta: {
       category: 'Chart',
     },
