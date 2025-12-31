@@ -857,13 +857,15 @@ class EvChart {
     const groups = this.data.groups;
     const series = this.data.series;
 
-    const { updateSeries, updateSelTip, updateLegend, updateData, updateTooltip } = updateInfo;
+    const { updateSeries, updateSelTip, updateLegend, updateData, updateTooltip, updateByScrollbar, lightUpdate } = updateInfo;
 
     if (!this.isInit) {
       return;
     }
 
-    this.updateScrollbar?.(updateData);
+    if (updateByScrollbar) {
+      this.updateScrollbar?.(updateData);
+    }
 
     this.resetProps();
 
@@ -901,53 +903,57 @@ class EvChart {
         this.lastHitInfo = null;
       }
     }
-
-    if (groups.length) {
-      this.addGroupInfo(groups);
-    }
-
-    if (this.options.realTimeScatter?.use) {
-      if (!this.dataSet) {
-        this.dataSet = {};
+    
+    if (!lightUpdate) {
+      // group update
+      if (groups.length) {
+        this.addGroupInfo(groups);
       }
-      this.createRealTimeScatterDataSet(data);
-    } else {
-      this.createDataSet(data, labels);
-    }
 
-    // title update
-    if (options.title.show) {
-      if (!this.isInitTitle) {
-        this.initTitle();
+      // dataSet update
+      if (this.options.realTimeScatter?.use) {
+        if (!this.dataSet) {
+          this.dataSet = {};
+        }
+        this.createRealTimeScatterDataSet(data);
       } else {
-        this.updateTitle();
+        this.createDataSet(data, labels);
       }
-
-      this.showTitle();
-    } else if (this.isInitTitle) {
-      this.hideTitle();
-    }
-
-    // legend Update
-    if (options.legend.show) {
-      const useTable =
-        !!options.legend?.table?.use && options.type !== 'heatMap' && options.type !== 'scatter';
-
-      if (!this.isInitLegend) {
-        this.initLegend();
-      } else if (updateSeries) {
-        this.updateLegend();
-      } else if (updateLegend) {
-        this.forceUpdateLegend();
-      } else if (useTable && updateData) {
-        this.updateLegendTableValues();
+      
+      // title update
+      if (options.title.show) {
+        if (!this.isInitTitle) {
+          this.initTitle();
+        } else {
+          this.updateTitle();
+        }
+  
+        this.showTitle();
+      } else if (this.isInitTitle) {
+        this.hideTitle();
       }
+      
+      // legend Update
+      if (options.legend.show) {
+        const useTable =
+          !!options.legend?.table?.use && options.type !== 'heatMap' && options.type !== 'scatter';
 
-      this.setLegendPosition();
-      this.updateLegendContainerSize();
-      this.showLegend();
-    } else if (this.isInitLegend) {
-      this.hideLegend();
+        if (!this.isInitLegend) {
+          this.initLegend();
+        } else if (updateSeries) {
+          this.updateLegend();
+        } else if (updateLegend) {
+          this.forceUpdateLegend();
+        } else if (useTable && updateData) {
+          this.updateLegendTableValues();
+        }
+
+        this.setLegendPosition();
+        this.updateLegendContainerSize();
+        this.showLegend();
+      } else if (this.isInitLegend) {
+        this.hideLegend();
+      }
     }
 
     // Tooltip Update
@@ -962,8 +968,6 @@ class EvChart {
         this.setDefaultTooltipLayout();
       }
     }
-
-    this.chartRect = this.getChartRect();
 
     this.minMax = this.getStoreMinMax();
     this.axesX = this.createAxes('x', options.axesX);

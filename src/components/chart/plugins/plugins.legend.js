@@ -581,6 +581,7 @@ const modules = {
         hitInfo: {
           legend: null,
         },
+        lightUpdate: true,
       });
     };
 
@@ -607,6 +608,7 @@ const modules = {
         hitInfo: {
           legend: legendHitInfo,
         },
+        lightUpdate: true,
       });
     };
 
@@ -789,6 +791,7 @@ const modules = {
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
+        lightUpdate: true,
       });
     };
 
@@ -821,6 +824,7 @@ const modules = {
         hitInfo: {
           legend: legendHitInfo,
         },
+        lightUpdate: true,
       });
     };
 
