@@ -19,7 +19,7 @@ import {
   computed,
 } from 'vue';
 import { cloneDeep, isEqual, debounce } from 'lodash-es';
-import resize from 'vue-resize-observer';
+import { resize } from '@/directives/resize';
 import EvChart from './chart.core';
 import EvChartToolbar from './ChartToolbar';
 import { useModel, useWrapper, useZoomModel } from './uses';
@@ -348,14 +348,6 @@ export default {
       }
     });
 
-    const redraw = () => {
-      if (evChart && 'update' in evChart) {
-        evChart.update({
-          updateSeries: true,
-          updateSelTip: { update: true, keepDomain: false },
-        });
-      }
-    };
 
     const onResize = debounce(() => {
       if (evChart && 'resize' in evChart) {
@@ -373,7 +365,6 @@ export default {
       wrapper,
       wrapperStyle,
       onResize,
-      redraw,
 
       evChartToolbarRef,
       injectIsChartGroup,
