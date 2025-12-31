@@ -119,6 +119,8 @@ export const AXIS_OPTION = {
   range: null,
   interval: null,
   decimalPoint: 'auto',
+  fixedSteps: false, // range/interval 로 steps 사용, 자동 스케일 조정 비활성화
+  niceScale: false, // nice scale 알고리즘 사용
   labelStyle: {
     show: true,
     fontSize: 12,
@@ -254,3 +256,5 @@ export const TIME_INTERVALS = {
     size: 3.154e10,
   },
 };
+
+export const NICE_FRACTIONS = Object.freeze([1, 2, 2.5, 5, 10]);

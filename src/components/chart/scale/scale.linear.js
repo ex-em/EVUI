@@ -1,6 +1,7 @@
 import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
+import { NICE_FRACTIONS } from '../helpers/helpers.constant';
 
 class LinearScale extends Scale {
   /**
@@ -11,7 +12,9 @@ class LinearScale extends Scale {
    * @returns {string} formatted label
    */
   getTruthyValue(value) {
-    return truthyNumber(value) ? Number(value.toFixed(this.decimalPoint)) : value;
+    return truthyNumber(value) && !this.fixedSteps
+      ? Number(value.toFixed(this.decimalPoint))
+      : value;
   }
 
   getLabelFormat(value, data = {}) {
@@ -31,7 +34,7 @@ class LinearScale extends Scale {
       }
     }
 
-    return Util.labelSignFormat(value, this.decimalPoint);
+    return Util.labelSignFormat(value, this.fixedSteps ? null : this.decimalPoint);
   }
 
   /**
@@ -119,6 +122,81 @@ class LinearScale extends Scale {
     return decimals;
   }
 
+
+
+  /**
+   * 주어진 값에 대한 적절한 간격을 계산합니다.
+   * @param value - 계산할 값 (양수, 음수 모두 가능)
+   * @returns 계산된 간격 값 (유효하지 않은 경우 0 반환)
+   */
+  getNiceInterval(value) {
+    if (!Number.isFinite(value) || value === 0) return 0;
+
+    // 절댓값을 사용하여 nice step 계산
+    const absValue = Math.abs(value);
+    const exponent = Math.floor(Math.log10(absValue));
+    const normalized = absValue / 10 ** exponent;
+
+    let fraction = 10;
+    for (let i = 0; i < NICE_FRACTIONS.length; i++) {
+      if (NICE_FRACTIONS[i] >= normalized) {
+        fraction = NICE_FRACTIONS[i];
+        break;
+      }
+    }
+
+    const niceInterval = fraction * 10 ** exponent;
+    // 원래 값의 부호 유지 (음수면 음수, 양수면 양수)
+    return value < 0 ? -niceInterval : niceInterval;
+  }
+
+  getStepsWithNiceScale({ max, min, maxSteps }) {
+    let bestMaxValue = Infinity;
+    let bestMinValue = min;
+    let bestInterval = 0;
+    let bestSteps = 0;
+    let bestOvershootAmount = Infinity;
+
+    // maxSteps - 1(최소 2개 이상인데 maxSteps가 1인 경우는 최소 1부터)부터 maxSteps + 1 범위의 세그먼트 후보를 검토
+    const minSegments = maxSteps > 1 ? Math.max(2, maxSteps - 1) : 1;
+    const maxSegments = maxSteps + 1;
+    const segmentCandidates = [];
+
+    for (let segments = minSegments; segments <= maxSegments; segments++) {
+      segmentCandidates.push(segments);
+    }
+
+    // 최적 후보 찾기
+    for (let i = 0; i < segmentCandidates.length; i++) {
+      const segments = segmentCandidates[i];
+      const rawStep = (max - min) / segments;
+      const niceInterval = this.getNiceInterval(rawStep);
+      
+      if (niceInterval > 0) {
+        const absNiceInterval = Math.abs(niceInterval);
+        const niceMin = Math.floor(min / niceInterval) * niceInterval;
+        const candidateYAxisMax = niceMin + niceInterval * segments;
+        const overshootAmount = candidateYAxisMax - max; // 여유(overshoot)
+
+        // 더 나은 후보를 찾으면 업데이트
+        if (overshootAmount >= 0 && overshootAmount < bestOvershootAmount) {
+          bestMaxValue = candidateYAxisMax;
+          bestMinValue = niceMin;
+          bestInterval = absNiceInterval;
+          bestOvershootAmount = overshootAmount;
+          bestSteps = segments;
+        }
+      }
+    }
+
+    return {
+      max: bestMaxValue,
+      min: bestMinValue,
+      interval: bestInterval,
+      steps: bestSteps,
+    };
+  }
+
   /**
    * With range information, calculate how many labels in axis
    * @param {object} range    min/max information
@@ -168,6 +246,20 @@ class LinearScale extends Scale {
       }
     }
 
+    if (this.fixedSteps) {
+      this.decimalPoint = this?.getDecimalPointFromRange?.({
+        graphRange,
+        numberOfSteps,
+      });
+
+      return {
+        steps: numberOfSteps,
+        interval,
+        graphMin,
+        graphMax,
+      };
+    }
+
     // 최대 스텝 수 조정
     while (numberOfSteps > maxSteps) {
       interval *= 2;
@@ -178,6 +270,36 @@ class LinearScale extends Scale {
     if (graphRange > numberOfSteps * interval) {
       const tempInterval = graphRange / numberOfSteps;
       interval = this.decimalPoint ? tempInterval : Math.ceil(tempInterval);
+    }
+
+    if (this.niceScale) {
+      const {
+        max: bestMax,
+        min: bestMin,
+        steps: bestStep,
+        interval: bestInterval,
+      } = this.getStepsWithNiceScale({
+        max: maxValue,
+        min: minValue,
+        maxSteps: numberOfSteps,
+      });
+
+      // 유효한 후보를 찾은 경우
+      const isValidCandidate = Number.isFinite(bestMax) && bestStep !== 0;
+      if (isValidCandidate) {
+        const hasDecimal = bestInterval.toString().includes('.');
+
+        // interval이 0.25 인 경우 decimalPoint가 1이면 반올림 되므로 0.25의 경우 decimalPoint가 auto인 경우 2가 되도록 처리
+        this.decimalPoint = hasDecimal && this.decimalPoint === 'auto'
+            ? bestInterval.toString().split('.')[1]?.length : this.decimalPoint;
+
+        return {
+          steps: bestStep,
+          interval: bestInterval,
+          graphMin: bestMin,
+          graphMax: bestMax,
+        };
+      }
     }
 
     if (this.decimalPoint === 'auto') {

@@ -178,6 +178,15 @@ class Scale {
       }
     }
 
+    if (this.fixedSteps) {
+      return {
+        steps: numberOfSteps,
+        interval,
+        graphMin,
+        graphMax,
+      };
+    }
+
     while (numberOfSteps > maxSteps) {
       interval *= 2;
       numberOfSteps = Math.round(graphRange / interval);
