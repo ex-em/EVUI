@@ -616,7 +616,8 @@ const modules = {
 
     if (this.options.legend.virtualScroll && !this.useTable) {
       this.legendBoxDOM.addEventListener('resize', this.updateVisibleRowCount);
-      this.legendBoxDOM.addEventListener('scroll', this.renderVisibleLegends.bind(this));
+      this.boundRenderVisibleLegends = this.renderVisibleLegends.bind(this);
+      this.legendBoxDOM.addEventListener('scroll', this.boundRenderVisibleLegends);
     }
 
     this.initResizeEvent();

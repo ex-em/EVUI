@@ -1122,7 +1122,7 @@ class EvChart {
         }
         if (this.options.legend.virtualScroll && !this.useTable) {
           this.legendBoxDOM.removeEventListener('resize', this.updateVisibleRowCount);
-          this.legendBoxDOM.removeEventListener('scroll', this.renderVisibleLegends);
+          this.legendBoxDOM.removeEventListener('scroll', this.boundRenderVisibleLegends);
         }
       }
 
@@ -1164,6 +1164,9 @@ class EvChart {
     this.displayCanvas = null;
     this.bufferCanvas = null;
     this.overlayCanvas = null;
+    this.displayCtx = null;
+    this.bufferCtx = null;
+    this.overlayCtx = null;
 
     while (target.hasChildNodes()) {
       target.removeChild(target.firstChild);
