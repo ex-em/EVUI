@@ -23,6 +23,7 @@ module.exports = {
         peerDependencies: true,
       },
     ],
+    "import/prefer-default-export": "off",
     // don't require .vue extension when importing
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
