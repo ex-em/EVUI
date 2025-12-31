@@ -39,7 +39,6 @@
     "sass": "^1.94.2",
     "vite": "^5.4.8",
     "vue": "^3.5.8",
-    "vue-resize-observer": "^2.0.15",
     "vue-router": "^4.6.3",
     "vue3-observe-visibility": "^1.0.1"
   },
@@ -61,6 +60,6 @@
     "typescript": "^5.0.0"
   },
   "peerDependencies": {
-    "vue": "*"
+    "vue": "^3.5.8"
   }
 }
