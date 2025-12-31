@@ -36,11 +36,6 @@ import LargeScrollbarRaw from './example/LargeScrollbar?raw';
 export default {
   mdText,
   components: {
-    LargeScrollbar: {
-      description: '차트에 스크롤바를 추가할 수 있습니다. (대용량 데이터 테스트)',
-      component: LargeScrollbar,
-      parsedData: parse(LargeScrollbarRaw).descriptor,
-    },
     Default: {
       description:
         'Bar Chart(막대그래프)는 표현 값에 비례 하여 높이와 길이를 가진 직사각형 막대로 데이터를 표현하는 차트입니다.',
@@ -117,6 +112,11 @@ export default {
       description: '차트에 스크롤바를 추가할 수 있습니다.',
       component: Scrollbar,
       parsedData: parse(ScrollbarRaw).descriptor,
+    },
+    LargeScrollbar: {
+      description: '대용량 데이터 차트에 스크롤바를 추가할 수 있습니다',
+      component: LargeScrollbar,
+      parsedData: parse(LargeScrollbarRaw).descriptor,
     },
     LegendClickMode: {
       description: 'Legend Click Mode',
