@@ -128,6 +128,13 @@ class Bar {
     const startIndex = truthyNumber(minIndex) ? minIndex : 0;
     const endIndex = truthyNumber(maxIndex) ? maxIndex : this.data.length - 1;
 
+    // Cache visible window for hit-testing (binary search) and tooltip index search.
+    // Important: do NOT mutate this.data by remapping visible items into [0..N).
+    // That can cause order shifts and broken tooltips when render() is called frequently (e.g. scrolling).
+    this.visibleStartIndex = startIndex;
+    this.visibleEndIndex = endIndex;
+    this.visibleItems = []; // 화면에 표시된 항목만 별도 저장 (히트 테스트용)
+
     // 스크롤 범위 내에서만 루프 돌림
     for (let i = startIndex; i <= endIndex; i++) {
       const screenIndex = i - startIndex; // 현재 화면상의 위치 인덱스
@@ -215,7 +222,9 @@ class Bar {
           positions: { x, y, w, h },
         });
 
-        if (showValue.use) {
+        // Scrolling can trigger many renders; drawing value labels is expensive (measureText per bar).
+        // We'll restore value labels on the full render after scroll ends.
+        if (showValue.use && !param.isScroll) {
           this.drawValueLabels({
             context: ctx,
             data: item,
@@ -238,9 +247,8 @@ class Bar {
         item.h = isHorizontal ? -h : h; // eslint-disable-line
         item.index = i; // 실제 데이터 인덱스 (스크롤 offset 포함)
 
-        // 검색(hitInfo) 로직은 this.data[0..filteredCount-1] 범위만 검사하므로,
-        // 현재 화면에 그린 항목을 배열 앞쪽으로 매핑해준다.
-        this.data[screenIndex] = item;
+        // 히트 테스트용 배열에 저장 (원본 데이터 배열은 건드리지 않음)
+        this.visibleItems[screenIndex] = item;
       }
     }
   }
@@ -347,15 +355,25 @@ class Bar {
   binarySearchBar(offset, isHorizontal) {
     const [xp, yp] = offset;
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data;
-    const totalCount = this.filteredCount ?? gdata.length;
+    const gdata = this.visibleItems;
 
+    // visibleItems가 비어있으면 즉시 반환
+    if (!gdata?.length) {
+      return item;
+    }
+
+    // visibleItems는 0부터 시작하는 배열 (draw()에서 screenIndex로 저장)
     let s = 0;
-    let e = totalCount - 1;
+    let e = gdata.length - 1;
 
     while (s <= e) {
       const m = Math.floor((s + e) / 2);
       const barData = gdata[m];
+
+      if (!barData) {
+        break;
+      }
+
       const { xp: sx, yp: sy, w, h } = barData;
       const ex = sx + w;
       const ey = sy + h;

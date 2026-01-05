@@ -174,6 +174,7 @@ export default {
           updateSelTip: { update: false, keepDomain: false },
           updateLegend: isUpdateLegendType,
           updateTooltip: isUpdateTooltip,
+          updateByScrollbar: true,
         });
 
         if (!injectIsChartGroup) {

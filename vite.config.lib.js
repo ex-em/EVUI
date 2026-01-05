@@ -16,6 +16,7 @@ export default defineConfig({
         globals: {
           vue: 'Vue',
         },
+        sourcemap: true,
       },
     },
   },

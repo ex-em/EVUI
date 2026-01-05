@@ -1024,13 +1024,28 @@ const modules = {
       return -1;
     }
 
-    const referenceData = this.seriesList[referenceSeries].data;
+    const referenceSeriesObj = this.seriesList[referenceSeries];
+    const referenceData = referenceSeriesObj.data;
+
+    // If we're in a scrolled bar chart, only search within the visible window.
+    // (Bar series only has correct xp/yp for items that were actually drawn.)
+    const isReferenceBar = referenceSeriesObj.type === 'bar';
+    const visibleStart =
+      isReferenceBar && typeof referenceSeriesObj.visibleStartIndex === 'number'
+        ? referenceSeriesObj.visibleStartIndex
+        : 0;
+    const visibleEnd =
+      isReferenceBar && typeof referenceSeriesObj.visibleEndIndex === 'number'
+        ? referenceSeriesObj.visibleEndIndex
+        : referenceData.length - 1;
+    const startIdx = Math.max(0, visibleStart);
+    const endIdx = Math.min(referenceData.length - 1, visibleEnd);
 
     // 데이터 간격 계산 - 모든 데이터(null 포함)의 평균 간격 사용
     let avgInterval = 50;
-    if (referenceData.length > 1) {
+    if (endIdx - startIdx >= 1) {
       const intervals = [];
-      for (let i = 1; i < referenceData.length; i++) {
+      for (let i = startIdx + 1; i <= endIdx; i++) {
         const prevPoint = referenceData[i - 1];
         const currPoint = referenceData[i];
         if (prevPoint && currPoint) {
@@ -1059,7 +1074,7 @@ const modules = {
     let closestIndex = -1;
 
     // 각 라벨에서 가장 가까운 것 찾기
-    for (let i = 0; i < referenceData.length; i++) {
+    for (let i = startIdx; i <= endIdx; i++) {
       // 이 라벨에 유효한 데이터가 있는 시리즈가 하나 이상 있는지 확인
       const hasValidData = sIds.some((sId) => {
         const series = this.seriesList[sId];

@@ -5,6 +5,90 @@ import { checkNullAndUndefined } from '../../../common/utils';
 
 const module = {
   /**
+   * Schedule a lightweight re-render for scrollbar interactions.
+   * - Batch wheel/drag events into a single frame (rAF)
+   * - After interaction ends, do a full render once (restores expensive work like axis width/showValue)
+   * @param {boolean} [isScroll=true]
+   */
+  requestScrollbarRender(isScroll = true) {
+    if (!this.__evuiScrollbarRafId) {
+      this.__evuiScrollbarRafId = requestAnimationFrame(() => {
+        this.__evuiScrollbarRafId = null;
+        // Apply any pending wheel steps right before rendering to avoid a second rAF hop.
+        const pending = this.__evuiPendingWheelSteps;
+        if (pending) {
+          const { x, y } = pending;
+          pending.x = 0;
+          pending.y = 0;
+          if (x) this.applyScrollbarStepsNoRender('x', x);
+          if (y) this.applyScrollbarStepsNoRender('y', y);
+        }
+        // Scrollbar range change does not require full update() path.
+        this.render?.({ isScroll });
+      });
+    }
+
+    if (this.__evuiScrollbarEndTimer) {
+      clearTimeout(this.__evuiScrollbarEndTimer);
+    }
+    // A slightly longer debounce prevents "full render" from firing during tiny pauses while scrolling,
+    // and keeps expensive work (axis width/showValue) off the hot path.
+    this.__evuiScrollbarEndTimer = setTimeout(() => {
+      this.__evuiScrollbarEndTimer = null;
+      this.render?.();
+    }, 100);
+  },
+
+  /**
+   * Apply multi-step range changes at once (used for batched wheel/trackpad input).
+   * @param {'x'|'y'} dir
+   * @param {number} signedSteps positive => isUp(true), negative => isUp(false)
+   */
+  applyScrollbarStepsNoRender(dir, signedSteps) {
+    const scrollbarOpt = this.scrollbar[dir];
+    const { startValue, range, interval, steps } = scrollbarOpt;
+    if (!range || !interval || !steps || !signedSteps) {
+      return;
+    }
+
+    const endValue = startValue + interval * steps;
+    const [min, max] = range ?? [];
+
+    if (!truthyNumber(min) || !truthyNumber(max)) {
+      return;
+    }
+
+    const delta = interval * signedSteps;
+    let nextMin = min + delta;
+    let nextMax = max + delta;
+
+    // NOTE: existing single-step logic treats `maxValue >= endValue` as out-of-range,
+    // so the maximum allowed value is (endValue - interval).
+    const maxAllowed = endValue - interval;
+    const width = max - min;
+
+    if (nextMin < startValue) {
+      nextMin = startValue;
+      nextMax = startValue + width;
+    } else if (nextMax > maxAllowed) {
+      nextMax = maxAllowed;
+      nextMin = maxAllowed - width;
+    }
+
+    if (nextMin === min && nextMax === max) {
+      return;
+    }
+
+    scrollbarOpt.range = [nextMin, nextMax];
+    delete scrollbarOpt.savedPosition;
+  },
+
+  applyScrollbarSteps(dir, signedSteps) {
+    this.applyScrollbarStepsNoRender(dir, signedSteps);
+    this.requestScrollbarRender(true);
+  },
+
+  /**
    * init scrollbar information
    */
   initScrollbar() {
@@ -450,13 +534,7 @@ const module = {
 
       // 사용자가 스크롤할 때는 저장된 위치를 초기화
       delete scrollbarOpt.savedPosition;
-
-      this.update({
-        updateSeries: false,
-        updateSelTip: { update: false, keepDomain: false },
-        updateByScrollbar: true,
-        lightUpdate: minValue > 1,
-      });
+      this.requestScrollbarRender(true);
     }
   },
 
@@ -522,7 +600,8 @@ const module = {
       this.scrolling(e);
     };
 
-    this.onScrollbarMove = throttle(onScrollbarMove, 5);
+    // 60fps 수준으로 제한 (mousemove 폭주 방지)
+    this.onScrollbarMove = throttle(onScrollbarMove, 16);
 
     this.onScrollbarUp = (e) => {
       e.preventDefault();
@@ -563,36 +642,31 @@ const module = {
 
       const threshold = 1; // 최소 스크롤 임계값
 
-      // Shift + 휠: 가로 스크롤 (일반 마우스 휠 지원)
-      if (this.scrollbar.x?.use && e.shiftKey && Math.abs(e.deltaY) > threshold) {
-        this.updateScrollbarRange('x', e.deltaY > 0);
-        return;
+      if (!this.__evuiPendingWheelSteps) {
+        this.__evuiPendingWheelSteps = { x: 0, y: 0 };
       }
 
-      // 대각선 스크롤 처리: 더 큰 방향을 우선으로 처리
+      const addWheelStep = (dir, isUp) => {
+        this.__evuiPendingWheelSteps[dir] += isUp ? 1 : -1;
+      };
+
+      // Choose dominant direction for trackpad diagonal scroll.
       const absX = Math.abs(e.deltaX);
       const absY = Math.abs(e.deltaY);
 
-      if (absX > threshold && absY > threshold) {
-        // 두 방향 모두 임계값 이상일 때: 더 큰 방향을 우선 처리
-        if (absX > absY && this.scrollbar.x?.use) {
-          this.updateScrollbarRange('x', e.deltaX > 0);
-        } else if (absY > absX && this.scrollbar.y?.use) {
-          this.updateScrollbarRange('y', e.deltaY < 0);
-        }
-        return;
+      // Shift + 휠: 가로 스크롤 (일반 마우스 휠 지원)
+      if (this.scrollbar.x?.use && e.shiftKey && Math.abs(e.deltaY) > threshold) {
+        addWheelStep('x', e.deltaY > 0);
+      } else if (absX > threshold && absX >= absY && this.scrollbar.x?.use) {
+        // horizontal dominates
+        addWheelStep('x', e.deltaX > 0);
+      } else if (absY > threshold && this.scrollbar.y?.use) {
+        // vertical dominates (or only vertical)
+        addWheelStep('y', e.deltaY < 0);
       }
 
-      // 가로 스크롤 처리 (deltaX - 트랙패드 좌우 스크롤)
-      if (this.scrollbar.x?.use && absX > threshold) {
-        this.updateScrollbarRange('x', e.deltaX > 0);
-        return;
-      }
-
-      // 세로 스크롤 처리 (deltaY)
-      if (this.scrollbar.y?.use && absY > threshold) {
-        this.updateScrollbarRange('y', e.deltaY < 0);
-      }
+      // Single rAF hop: schedule render, and apply pending steps right before draw.
+      this.requestScrollbarRender(true);
     };
 
     if (this.scrollbar.x.use && !this.scrollbar.x.isInit) {
@@ -673,11 +747,7 @@ const module = {
 
     // 사용자가 드래그로 스크롤할 때는 저장된 위치를 초기화
     delete this.scrollbar[dir].savedPosition;
-
-    this.update({
-      updateSeries: false,
-      updateSelTip: { update: false, keepDomain: false },
-    });
+    this.requestScrollbarRender(true);
   },
 
   /**
