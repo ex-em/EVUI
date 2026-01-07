@@ -145,10 +145,13 @@ export default {
         let randomY = 0;
         if (!isInit) {
           randomX = floor(Date.now() + getRandomInt(-3000, 0)); // -3초 ~ 현재
-          randomY = floor(getRandomInt(3000, 95000));
+          randomY = floor(getRandomInt(3000, 95000)); // 업데이트 시에는 작은 값만
         } else {
           randomX = floor(Date.now() + getRandomInt(-300000, 0)); // -5분 ~ 현재
-          randomY = floor(getRandomInt(3000, 57000));
+          // 처음 5개만 큰 값
+          randomY = i < 5
+            ? floor(getRandomInt(150000, 200000))
+            : floor(getRandomInt(3000, 57000));
         }
         const randomType = getRandomInt(0, 1);
 
