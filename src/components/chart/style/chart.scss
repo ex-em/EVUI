@@ -323,6 +323,16 @@
     overflow-y: hidden;
   }
 
+  .ev-chart-tooltip-scroll-container {
+    position: relative;
+
+    .ev-chart-tooltip-canvas {
+      position: sticky;
+      top: 0;
+      display: block;
+    }
+  }
+
   .ev-chart-tooltip-custom {
     overflow-x: hidden;
     overflow-y: hidden;

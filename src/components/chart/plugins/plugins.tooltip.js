@@ -46,11 +46,31 @@ const modules = {
         this.tooltipDOM.style.display = 'none';
       };
     }
+
+    // Virtual scroll: scroll event handler for tooltip body
+    if (this.options.tooltip.useScrollbar) {
+      this.tooltipBodyDOM.addEventListener('scroll', () => {
+        if (!this._tooltipScrollRafId) {
+          this._tooltipScrollRafId = requestAnimationFrame(() => {
+            this._tooltipScrollRafId = null;
+            if (this._tooltipScrollInfo && this._lastHitInfo) {
+              this._tooltipScrollInfo.scrollTop = this.tooltipBodyDOM.scrollTop;
+              this.redrawTooltipContent();
+            }
+          });
+        }
+      });
+    }
+
     this.isInitTooltip = true;
   },
 
   setDefaultTooltipLayout() {
-    this.tooltipBodyDOM.appendChild(this.tooltipCanvas);
+    // scrollContainer: spacer for virtual scroll (maintains full scroll height)
+    this.tooltipScrollContainer = document.createElement('div');
+    this.tooltipScrollContainer.className = 'ev-chart-tooltip-scroll-container';
+    this.tooltipScrollContainer.appendChild(this.tooltipCanvas);
+    this.tooltipBodyDOM.appendChild(this.tooltipScrollContainer);
     this.tooltipDOM.appendChild(this.tooltipHeaderDOM);
     this.tooltipDOM.appendChild(this.tooltipBodyDOM);
   },
@@ -146,6 +166,28 @@ const modules = {
 
     // Calculate height of canvas El(tooltip body El) with wrapped line count
     let textLineCnt = opt.textOverflow === 'wrap' ? 0 : seriesLen;
+    const itemLineCountsForWrap = []; // Store line count per item for wrap mode
+
+    // Build seriesList with same order as drawTooltip (alignSeriesList + sortByValue)
+    const alignedSeriesKeys = this.alignSeriesList(seriesKeys);
+    const seriesList = alignedSeriesKeys.map((key) => ({
+      data: items[key].data,
+      name: items[key].name,
+    }));
+
+    if (opt.sortByValue) {
+      seriesList.sort((a, b) => {
+        let prev = a.data.o;
+        let next = b.data.o;
+        if (prev === null || prev === undefined) {
+          prev = isHorizontal ? a.data.x : a.data.y;
+        }
+        if (next === null || next === undefined) {
+          next = isHorizontal ? b.data.x : b.data.y;
+        }
+        return next - prev;
+      });
+    }
 
     if (opt.textOverflow === 'wrap') {
       const seriesNameSpaceWidth =
@@ -157,9 +199,9 @@ const modules = {
           VALUE_MARGIN +
           SCROLL_WIDTH);
 
-      // count wrap line
-      const seriesNames = Object.values(items).map((s) => s.name);
-      seriesNames.forEach((name) => {
+      // count wrap line per item - use same order as drawTooltip
+      seriesList.forEach(({ name }) => {
+        let itemLineCnt = 1; // At least 1 line per item
         if (ctx.measureText(name).width > seriesNameSpaceWidth) {
           let line = '';
           for (let jx = 0; jx < name.length; jx++) {
@@ -167,23 +209,26 @@ const modules = {
             const temp = `${line}${char}`;
             if (ctx.measureText(temp).width > seriesNameSpaceWidth) {
               line = char;
-              textLineCnt += 1;
+              itemLineCnt += 1;
             } else {
               line = temp;
             }
           }
         }
-        textLineCnt += 1;
+        itemLineCountsForWrap.push(itemLineCnt);
+        textLineCnt += itemLineCnt;
       });
       ctx.restore();
     }
 
     // Calculate height of canvas El(tooltip body El) with useScrollbar, maxHeight option
+    const itemHeight = this.getTextHeight() + LINE_SPACING;
     const expectedContentsHeight =
       boxPadding.t + textLineCnt * this.getTextHeight() + seriesLen * LINE_SPACING + boxPadding.b;
 
     let contentsHeight;
-    if (opt.useScrollbar && expectedContentsHeight > opt.maxHeight) {
+    const useVirtualScroll = opt.useScrollbar && expectedContentsHeight > opt.maxHeight;
+    if (useVirtualScroll) {
       this.tooltipBodyDOM.style.overflowY = 'auto';
       contentsHeight = opt.maxHeight;
     } else {
@@ -191,11 +236,70 @@ const modules = {
       contentsHeight = expectedContentsHeight;
     }
 
+    // Virtual scroll: save scroll info for redrawing visible items only
+    const isWrapMode = opt.textOverflow === 'wrap';
+    const textHeight = this.getTextHeight();
+
+    // Calculate item heights and cumulative heights for wrap mode
+    let itemHeights = [];
+    const cumulativeHeights = [0];
+
+    if (isWrapMode && itemLineCountsForWrap.length > 0) {
+      // Each item height = (lineCount * textHeight) + LINE_SPACING
+      itemHeights = itemLineCountsForWrap.map(
+        (lineCount) => lineCount * textHeight + LINE_SPACING,
+      );
+      // Build cumulative heights for binary search
+      let cumulative = 0;
+      for (let i = 0; i < itemHeights.length; i++) {
+        cumulative += itemHeights[i];
+        cumulativeHeights.push(cumulative);
+      }
+    }
+
+    const visibleItems = Math.ceil(contentsHeight / itemHeight) + 1;
+
+    // Reset everything if textOverflow option changed
+    const prevTextOverflow = this._lastTextOverflow;
+    const currentTextOverflow = opt.textOverflow;
+    if (prevTextOverflow !== currentTextOverflow) {
+      this.tooltipBodyDOM.scrollTop = 0;
+      this._tooltipScrollInfo = null;
+      this._lastSeriesList = null;
+      this._lastHitInfo = null;
+      this._lastTextOverflow = currentTextOverflow;
+      // Clear canvas
+      this.tooltipCtx.clearRect(0, 0, this.tooltipCanvas.width, this.tooltipCanvas.height);
+    }
+
+    const currentScrollTop = this.tooltipBodyDOM.scrollTop || 0;
+
+    this._tooltipScrollInfo = {
+      itemHeight,
+      visibleItems,
+      scrollTop: currentScrollTop,
+      useVirtualScroll,
+      boxPadding,
+      // Wrap mode specific
+      isWrapMode,
+      itemHeights,
+      cumulativeHeights,
+      textHeight,
+    };
+
     // set width / height to all DOM elements (canvas, tooltip(wrapper), header, body)
+    // Virtual scroll: canvas height is limited to visible area, scrollContainer has full height
+    const canvasHeight = useVirtualScroll ? contentsHeight : expectedContentsHeight;
     this.tooltipCanvas.width = contentsWidth * this.pixelRatio;
-    this.tooltipCanvas.height = expectedContentsHeight * this.pixelRatio;
+    this.tooltipCanvas.height = canvasHeight * this.pixelRatio;
     this.tooltipCanvas.style.width = `${contentsWidth}px`;
-    this.tooltipCanvas.style.height = `${expectedContentsHeight}px`;
+    this.tooltipCanvas.style.height = `${canvasHeight}px`;
+
+    // scrollContainer maintains full scroll height for scrollbar
+    if (this.tooltipScrollContainer) {
+      this.tooltipScrollContainer.style.height = `${expectedContentsHeight}px`;
+    }
+
     this.tooltipHeaderDOM.style.width = `${contentsWidth}px`;
     this.tooltipHeaderDOM.style.height = 'auto';
     this.tooltipDOM.style.height = 'auto';
@@ -315,15 +419,85 @@ const modules = {
 
     this.setTooltipDOMStyle(opt);
 
-    let textLineCnt = 1;
-    for (let ix = 0; ix < seriesList.length; ix++) {
+    // Save for virtual scroll redraw
+    this._lastHitInfo = hitInfo;
+    this._lastSeriesList = seriesList;
+    this._lastMaxValue = maxValue;
+
+    // Virtual scroll: calculate visible range
+    const scrollInfo = this._tooltipScrollInfo;
+    let startIdx = 0;
+    let endIdx = seriesList.length;
+    let scrollOffset = 0;
+    let startYOffset = 0; // Y offset for the first visible item
+
+    // Check if wrap mode data is valid (itemHeights must match seriesList)
+    const isValidWrapMode =
+      scrollInfo?.useVirtualScroll &&
+      scrollInfo.isWrapMode &&
+      scrollInfo.cumulativeHeights?.length > 1 &&
+      scrollInfo.itemHeights?.length === seriesList.length;
+
+    if (scrollInfo?.useVirtualScroll) {
+      if (isValidWrapMode) {
+        // Wrap mode: use binary search to find startIdx
+        const cumHeights = scrollInfo.cumulativeHeights;
+        const scrollTop = scrollInfo.scrollTop;
+
+        // Binary search for startIdx
+        let low = 0;
+        let high = cumHeights.length - 2;
+        while (low < high) {
+          const mid = Math.floor((low + high) / 2);
+          if (cumHeights[mid + 1] <= scrollTop) {
+            low = mid + 1;
+          } else {
+            high = mid;
+          }
+        }
+        startIdx = low;
+
+        // Calculate how many items fit in visible area
+        const visibleHeight = scrollInfo.boxPadding.t + opt.maxHeight;
+        let accHeight = cumHeights[startIdx];
+        endIdx = startIdx;
+        while (endIdx < seriesList.length && accHeight < scrollTop + visibleHeight) {
+          accHeight += scrollInfo.itemHeights[endIdx];
+          endIdx++;
+        }
+        endIdx = Math.min(endIdx + 1, seriesList.length);
+
+        // Calculate scroll offset within the first visible item
+        scrollOffset = scrollTop - cumHeights[startIdx];
+        startYOffset = -scrollOffset;
+      } else {
+        // Fixed height mode: simple division
+        const itemHeight = scrollInfo.itemHeight;
+        startIdx = Math.floor(scrollInfo.scrollTop / itemHeight);
+        endIdx = Math.min(startIdx + scrollInfo.visibleItems + 2, seriesList.length);
+        scrollOffset = scrollInfo.scrollTop % itemHeight;
+        y -= scrollOffset;
+      }
+    }
+
+    let textLineCnt = 1 + startIdx;
+    let wrapYOffset = startYOffset; // Track Y position for wrap mode
+    for (let ix = startIdx; ix < endIdx; ix++) {
       const gdata = seriesList[ix].data;
       const color = seriesList[ix].color;
       const name = seriesList[ix].name;
       const valueText = gdata.formatted;
 
       let itemX = x + 4;
-      let itemY = y + textLineCnt * textHeight;
+      // Virtual scroll: calculate relative position within visible area
+      let itemY;
+      if (isValidWrapMode) {
+        itemY = y + wrapYOffset + textHeight;
+      } else if (scrollInfo?.useVirtualScroll) {
+        itemY = y + (textLineCnt - startIdx) * textHeight;
+      } else {
+        itemY = y + textLineCnt * textHeight;
+      }
       itemX += Util.aliasPixel(itemX);
       itemY += Util.aliasPixel(itemY);
 
@@ -406,8 +580,13 @@ const modules = {
       ctx.restore();
       ctx.closePath();
 
-      // 4. add lineSpacing
-      y += LINE_SPACING;
+      // 4. add lineSpacing and update offsets
+      if (isValidWrapMode) {
+        // Wrap mode: itemHeights already includes LINE_SPACING
+        wrapYOffset += scrollInfo.itemHeights[ix];
+      } else {
+        y += LINE_SPACING;
+      }
       textLineCnt += 1;
     }
 
@@ -1014,6 +1193,223 @@ const modules = {
     }
 
     this.drawIndicator(indicatorPosition, this.options.indicator.color);
+  },
+
+  /**
+   * Redraw tooltip content for virtual scroll
+   * Called when tooltip body is scrolled
+   *
+   * @returns {undefined}
+   */
+  redrawTooltipContent() {
+    if (!this._lastHitInfo || !this._lastSeriesList || !this._tooltipScrollInfo) {
+      return;
+    }
+
+    const ctx = this.tooltipCtx;
+    const seriesList = this._lastSeriesList;
+    const maxValue = this._lastMaxValue;
+    const opt = this.options.tooltip;
+    const scrollInfo = this._tooltipScrollInfo;
+
+    // Safety check: if options changed, scrollInfo may be stale
+    const currentIsWrapMode = opt.textOverflow === 'wrap';
+    if (scrollInfo.isWrapMode !== currentIsWrapMode) {
+      // Options changed, skip redraw - will be redrawn on next mousemove
+      return;
+    }
+
+    // Safety check for wrap mode: ensure itemHeights array is valid
+    if (
+      scrollInfo.isWrapMode &&
+      (!scrollInfo.itemHeights || scrollInfo.itemHeights.length !== seriesList.length)
+    ) {
+      return;
+    }
+
+    const boxPadding = { ...scrollInfo.boxPadding };
+    const textHeight = this.getTextHeight();
+    const seriesColorMarginRight = this.getColorMargin();
+    const isHorizontal = this.options.horizontal;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, this.tooltipCanvas.width, this.tooltipCanvas.height);
+
+    // Calculate visible range based on mode
+    let startIdx = 0;
+    let endIdx = seriesList.length;
+    let scrollOffset = 0;
+    let startYOffset = 0;
+
+    if (scrollInfo.isWrapMode && scrollInfo.cumulativeHeights.length > 1) {
+      // Wrap mode: use binary search to find startIdx
+      const cumHeights = scrollInfo.cumulativeHeights;
+      const scrollTop = scrollInfo.scrollTop;
+
+      // Binary search for startIdx
+      let low = 0;
+      let high = cumHeights.length - 2;
+      while (low < high) {
+        const mid = Math.floor((low + high) / 2);
+        if (cumHeights[mid + 1] <= scrollTop) {
+          low = mid + 1;
+        } else {
+          high = mid;
+        }
+      }
+      startIdx = low;
+
+      // Calculate how many items fit in visible area
+      const visibleHeight = scrollInfo.boxPadding.t + opt.maxHeight;
+      let accHeight = cumHeights[startIdx];
+      endIdx = startIdx;
+      while (endIdx < seriesList.length && accHeight < scrollTop + visibleHeight) {
+        accHeight += scrollInfo.itemHeights[endIdx];
+        endIdx++;
+      }
+      endIdx = Math.min(endIdx + 1, seriesList.length);
+
+      // Calculate scroll offset within the first visible item
+      scrollOffset = scrollTop - cumHeights[startIdx];
+      startYOffset = -scrollOffset;
+    } else {
+      // Fixed height mode: simple division
+      const itemHeight = scrollInfo.itemHeight;
+      startIdx = Math.floor(scrollInfo.scrollTop / itemHeight);
+      endIdx = Math.min(startIdx + scrollInfo.visibleItems + 2, seriesList.length);
+      scrollOffset = scrollInfo.scrollTop % itemHeight;
+    }
+
+    let x = 2;
+    let y = 2;
+
+    x += Util.aliasPixel(x);
+    y += Util.aliasPixel(y);
+
+    ctx.save();
+    ctx.scale(this.pixelRatio, this.pixelRatio);
+
+    if (this.tooltipBodyDOM.style.overflowY === 'auto') {
+      boxPadding.r += SCROLL_WIDTH;
+    }
+
+    x += boxPadding.l;
+    if (!scrollInfo.isWrapMode) {
+      y += boxPadding.t - scrollOffset;
+    } else {
+      y += boxPadding.t;
+    }
+
+    ctx.font = this.getFontStyle('contents');
+
+    let textLineCnt = 1 + startIdx;
+    let wrapYOffset = startYOffset; // Track Y position for wrap mode
+    for (let ix = startIdx; ix < endIdx; ix++) {
+      const gdata = seriesList[ix].data;
+      const color = seriesList[ix].color;
+      const name = seriesList[ix].name;
+      const valueText = gdata.formatted;
+
+      let itemX = x + 4;
+      // Calculate itemY based on mode
+      let itemY;
+      if (scrollInfo.isWrapMode) {
+        itemY = y + wrapYOffset + textHeight;
+      } else {
+        itemY = y + (textLineCnt - startIdx) * textHeight;
+      }
+      itemX += Util.aliasPixel(itemX);
+      itemY += Util.aliasPixel(itemY);
+
+      ctx.beginPath();
+
+      if (typeof color !== 'string') {
+        ctx.fillStyle = Canvas.createGradient(
+          ctx,
+          isHorizontal,
+          { x: itemX - 4, y: itemY, w: 12, h: -12 },
+          color,
+        );
+      } else {
+        ctx.fillStyle = color;
+      }
+
+      const curTooltipInfo = {
+        id: seriesList[ix].id,
+        name: seriesList[ix].name,
+        value: valueText,
+        dataId: seriesList[ix].dataId,
+      };
+
+      // 1. Draw series color
+      this.drawSeriesColorShape(ctx, opt.colorShape, { x: itemX, y: itemY });
+
+      // 2. Draw series name
+      ctx.fillStyle =
+        typeof opt.fontColor.label === 'function'
+          ? opt.fontColor.label(curTooltipInfo)
+          : (opt.fontColor.label ?? opt.fontColor);
+
+      const seriesNameSpaceWidth =
+        opt.maxWidth -
+        Math.round(ctx.measureText(maxValue).width) -
+        boxPadding.l -
+        boxPadding.r -
+        seriesColorMarginRight -
+        VALUE_MARGIN;
+      const xPos = itemX + seriesColorMarginRight;
+      const yPos = itemY;
+
+      if (seriesNameSpaceWidth > ctx.measureText(name).width) {
+        ctx.fillText(name, xPos, yPos);
+      } else if (opt.textOverflow === 'wrap') {
+        // Draw with wrap
+        let line = '';
+        let yPosWithWrap = yPos;
+
+        for (let jx = 0; jx < name.length; jx++) {
+          const char = name[jx];
+          const temp = `${line}${char}`;
+
+          if (ctx.measureText(temp).width > seriesNameSpaceWidth) {
+            ctx.fillText(line, xPos, yPosWithWrap);
+            line = char;
+            textLineCnt += 1;
+            yPosWithWrap += textHeight;
+          } else {
+            line = temp;
+          }
+        }
+        ctx.fillText(line, xPos, yPosWithWrap);
+      } else {
+        // Draw with ellipsis
+        const shortSeriesName = Util.truncateLabelWithEllipsis(name, seriesNameSpaceWidth, ctx);
+        ctx.fillText(shortSeriesName, xPos, yPos);
+      }
+
+      ctx.save();
+
+      // 3. Draw value
+      ctx.fillStyle =
+        typeof opt.fontColor.value === 'function'
+          ? opt.fontColor.value(curTooltipInfo)
+          : (opt.fontColor.value ?? opt.fontColor);
+      ctx.textAlign = 'right';
+      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.restore();
+      ctx.closePath();
+
+      // 4. add lineSpacing and update offsets
+      if (scrollInfo.isWrapMode) {
+        // Wrap mode: itemHeights already includes LINE_SPACING
+        wrapYOffset += scrollInfo.itemHeights[ix];
+      } else {
+        y += LINE_SPACING;
+      }
+      textLineCnt += 1;
+    }
+
+    ctx.restore();
   },
 
   /**

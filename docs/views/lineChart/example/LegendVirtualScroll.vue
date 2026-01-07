@@ -12,7 +12,11 @@ export default {
       series: Array(1000)
         .fill(0)
         .reduce((acc, _, idx) => {
-          acc[`series${idx + 1}`] = { name: `series#${idx + 1}`, fill: true, point: true };
+          acc[`series${idx + 1}`] = {
+            name: `series#${idx + 1} long name for wrap test`,
+            fill: true,
+            point: true,
+          };
           return acc;
         }, {}),
       groups: [
@@ -47,6 +51,10 @@ export default {
       },
       tooltip: {
         use: true,
+        useScrollbar: true,
+        maxHeight: 200,
+        textOverflow: 'wrap',
+        maxWidth: 300,
       },
       axesX: [
         {
