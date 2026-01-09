@@ -922,33 +922,33 @@ class EvChart {
       }
 
       // dataSet update
-    if (this.options.realTimeScatter?.use) {
-      if (!this.dataSet) {
-        this.dataSet = {};
-      }
-      this.createRealTimeScatterDataSet(data);
-    } else {
-      this.createDataSet(data, labels);
-    }
-
-    // title update
-    if (options.title.show) {
-      if (!this.isInitTitle) {
-        this.initTitle();
+      if (this.options.realTimeScatter?.use) {
+        if (!this.dataSet) {
+          this.dataSet = {};
+        }
+        this.createRealTimeScatterDataSet(data);
       } else {
-        this.updateTitle();
+        this.createDataSet(data, labels);
       }
 
-      this.showTitle();
-    } else if (this.isInitTitle) {
-      this.hideTitle();
-    }
+      // title update
+      if (options.title.show) {
+        if (!this.isInitTitle) {
+          this.initTitle();
+        } else {
+          this.updateTitle();
+        }
 
-    // legend Update
-    if (options.legend.show) {
-      const useTable = !!options.legend?.table?.use
-        && options.type !== 'heatMap'
-        && options.type !== 'scatter';
+        this.showTitle();
+      } else if (this.isInitTitle) {
+        this.hideTitle();
+      }
+
+      // legend Update
+      if (options.legend.show) {
+        const useTable = !!options.legend?.table?.use
+          && options.type !== 'heatMap'
+          && options.type !== 'scatter';
 
         if (!this.isInitLegend) {
           this.initLegend();
