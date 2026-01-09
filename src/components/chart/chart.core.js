@@ -860,13 +860,23 @@ class EvChart {
     const groups = this.data.groups;
     const series = this.data.series;
 
-    const { updateSeries, updateSelTip, updateLegend, updateData, updateTooltip } = updateInfo;
+    const {
+      updateSeries,
+      updateSelTip,
+      updateLegend,
+      updateData,
+      updateTooltip,
+      updateByScrollbar,
+      lightUpdate,
+    } = updateInfo;
 
     if (!this.isInit) {
       return;
     }
 
-    this.updateScrollbar?.(updateData);
+    if (updateByScrollbar) {
+      this.updateScrollbar?.(updateData);
+    }
 
     this.resetProps();
 
@@ -905,10 +915,13 @@ class EvChart {
       }
     }
 
-    if (groups.length) {
-      this.addGroupInfo(groups);
-    }
+    if (!lightUpdate) {
+      // group update
+      if (groups.length) {
+        this.addGroupInfo(groups);
+      }
 
+      // dataSet update
     if (this.options.realTimeScatter?.use) {
       if (!this.dataSet) {
         this.dataSet = {};
@@ -937,21 +950,22 @@ class EvChart {
         && options.type !== 'heatMap'
         && options.type !== 'scatter';
 
-      if (!this.isInitLegend) {
-        this.initLegend();
-      } else if (updateSeries) {
-        this.updateLegend();
-      } else if (updateLegend) {
-        this.forceUpdateLegend();
-      } else if (useTable && updateData) {
-        this.updateLegendTableValues();
-      }
+        if (!this.isInitLegend) {
+          this.initLegend();
+        } else if (updateSeries) {
+          this.updateLegend();
+        } else if (updateLegend) {
+          this.forceUpdateLegend();
+        } else if (useTable && updateData) {
+          this.updateLegendTableValues();
+        }
 
-      this.setLegendPosition();
-      this.updateLegendContainerSize();
-      this.showLegend();
-    } else if (this.isInitLegend) {
-      this.hideLegend();
+        this.setLegendPosition();
+        this.updateLegendContainerSize();
+        this.showLegend();
+      } else if (this.isInitLegend) {
+        this.hideLegend();
+      }
     }
 
     // Tooltip Update
@@ -966,8 +980,6 @@ class EvChart {
         this.setDefaultTooltipLayout();
       }
     }
-
-    this.chartRect = this.getChartRect();
 
     this.minMax = this.getStoreMinMax();
     this.axesX = this.createAxes('x', options.axesX);

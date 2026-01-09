@@ -430,11 +430,11 @@ export default {
         ...chartData1.value,
         labels: Array(10)
           .fill(0)
-          .map((_, i) =>
+          .map((_, i) => (
             i % 2 === 0
               ? `Short ${i + 1}`
               : `Very Long Label Name That Will Be Truncated ${i + 1}`
-          ),
+          )),
         data: {
           series1: getRandArr(10),
           series2: getRandArr(10),
@@ -446,11 +446,11 @@ export default {
         ...chartData2.value,
         labels: Array(10)
           .fill(0)
-          .map((_, i) =>
+          .map((_, i) => (
             i % 2 === 0
               ? `Short ${i + 1}`
               : `Very Long Label Name That Will Be Truncated ${i + 1}`
-          ),
+          )),
         data: {
           series1: getRandArr(10),
           series2: getRandArr(10),
@@ -465,11 +465,11 @@ export default {
       const len = getRandLength();
       const labels = Array(len)
         .fill(0)
-        .map((_, i) =>
+        .map((_, i) => (
           i % 2 === 0
             ? `Short ${i + 1}`
             : `Very Long Label Name That Will Be Truncated ${i + 1}`
-        );
+        ));
       const series1 = getRandArr(len);
       const series2 = getRandArr(len);
 
@@ -498,11 +498,11 @@ export default {
         ...chartData1.value,
         labels: Array(10)
           .fill(0)
-          .map((_, i) =>
+          .map((_, i) => (
             i % 2 === 0
               ? `Short ${i + 1}`
               : `Very Long Label Name That Will Be Truncated ${i + 1}`
-          ),
+          )),
         data: {
           series1: getRandArr(10),
           series2: getRandArr(10),
@@ -513,11 +513,11 @@ export default {
         ...chartData2.value,
         labels: Array(10)
           .fill(0)
-          .map((_, i) =>
+          .map((_, i) => (
             i % 2 === 0
               ? `Short ${i + 1}`
               : `Very Long Label Name That Will Be Truncated ${i + 1}`
-          ),
+          )),
         data: {
           series1: getRandArr(10),
           series2: getRandArr(10),
@@ -531,11 +531,11 @@ export default {
         ...chartData1.value,
         labels: Array(7)
           .fill(0)
-          .map((_, i) =>
+          .map((_, i) => (
             i % 2 === 0
               ? `Short ${i + 1}`
               : `Very Long Label Name That Will Be Truncated ${i + 1}`
-          ),
+          )),
         data: {
           series1: getRandArr(7),
           series2: getRandArr(7),
@@ -546,11 +546,11 @@ export default {
         ...chartData2.value,
         labels: Array(7)
           .fill(0)
-          .map((_, i) =>
+          .map((_, i) => (
             i % 2 === 0
               ? `Short ${i + 1}`
               : `Very Long Label Name That Will Be Truncated ${i + 1}`
-          ),
+          )),
         data: {
           series1: getRandArr(7),
           series2: getRandArr(7),

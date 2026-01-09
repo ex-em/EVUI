@@ -16,7 +16,7 @@ class Bar {
     }
 
     if (this.color === undefined) {
-      this.color = COLOR[sIdx];
+      this.color = COLOR[sIdx % COLOR.length];
     }
 
     this.type = 'bar';
