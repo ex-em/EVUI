@@ -30,6 +30,8 @@ import Scrollbar from './example/Scrollbar';
 import ScrollbarRaw from '!!raw-loader!./example/Scrollbar';
 import LegendClickMode from './example/LegendClickMode';
 import LegendClickModeRaw from '!!raw-loader!./example/LegendClickMode';
+import LargeScrollbar from './example/LargeScrollbar';
+import LargeScrollbarRaw from '!!raw-loader!./example/LargeScrollbar';
 
 export default {
   mdText,
@@ -105,6 +107,11 @@ export default {
       description: '차트에 스크롤바를 추가할 수 있습니다.',
       component: Scrollbar,
       parsedData: parseComponent(ScrollbarRaw),
+    },
+    LargeScrollbar: {
+      description: '대용량 데이터 차트에 스크롤바를 추가할 수 있습니다',
+      component: LargeScrollbar,
+      parsedData: parseComponent(LargeScrollbarRaw),
     },
     LegendClickMode: {
       description: 'Legend Click Mode',
