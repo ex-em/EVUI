@@ -867,11 +867,7 @@ class EvChart {
       this.updateScrollbar?.(updateData);
     }
 
-    const preservedPieDataSet = lightUpdate ? this.pieDataSet : null;
     this.resetProps();
-    if (lightUpdate && preservedPieDataSet) {
-      this.pieDataSet = preservedPieDataSet;
-    }
 
     this.updateSeries = updateSeries;
     if (updateSeries) {
@@ -1008,7 +1004,6 @@ class EvChart {
     this.axesRange = null;
     this.labelOffset = null;
     this.chartRect = null;
-    this.pieDataSet = [];
   }
 
   /**
