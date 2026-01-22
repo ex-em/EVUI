@@ -1,5 +1,5 @@
 import { defaultsDeep, isNil, isUndefined } from 'lodash-es';
-import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
+import { COLOR, LINE_OPTION, CHART_OPACITY } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
 
@@ -22,7 +22,7 @@ class Line {
     this.type = 'line';
     this.sId = sId;
     this.extent = {
-      downplay: { opacity: 0.1, lineWidth: 1 },
+      downplay: { opacity: CHART_OPACITY.HIGH, lineWidth: 1 },
       normal: { opacity: 1, lineWidth: 1 },
       highlight: { opacity: 1, lineWidth: 2 },
     };

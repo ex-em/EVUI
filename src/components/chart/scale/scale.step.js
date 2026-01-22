@@ -4,6 +4,7 @@ import { bnMinus, bnPlus } from '@/common/utils.bignumber';
 import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
+import { CHART_OPACITY } from '../helpers/helpers.constant';
 
 class StepScale extends Scale {
   constructor(type, axisOpt, ctx, labels, options) {
@@ -209,7 +210,10 @@ class StepScale extends Scale {
           defaultOpacity = Util.getOpacity(labelColor);
         }
 
-        ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
+        ctx.fillStyle = Util.colorStringToRgba(
+          labelColor,
+          isBlurredLabel ? CHART_OPACITY.HIGH : defaultOpacity,
+        );
 
         if (this.type === 'x') {
           labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;

@@ -1,3 +1,8 @@
+export const CHART_OPACITY = {
+  DEFAULT: 0.1,
+  HIGH: 0.3,
+};
+
 export const AXIS_UNITS = {
   x: {
     rectStart: 'x1',

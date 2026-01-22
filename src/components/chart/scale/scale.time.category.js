@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import { TIME_INTERVALS } from '../helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
+import { CHART_OPACITY, TIME_INTERVALS } from '../helpers/helpers.constant';
 
 class TimeCategoryScale extends Scale {
   constructor(type, axisOpt, ctx, labels, options) {
@@ -230,8 +231,15 @@ class TimeCategoryScale extends Scale {
         defaultOpacity = Util.getOpacity(labelColor);
       }
 
-      ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
-
+      const chartType = this.options?.type;
+      const isComboChart = !chartType || this.options?.combo;
+      const isBarLineCombo = chartType === 'bar' || chartType === 'line' || isComboChart;
+      const downplayOpacity = isBarLineCombo ? CHART_OPACITY.HIGH : CHART_OPACITY.DEFAULT;
+      ctx.fillStyle = Util.colorStringToRgba(
+        labelColor,
+        isBlurredLabel ? downplayOpacity : defaultOpacity,
+      );
+      
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);
