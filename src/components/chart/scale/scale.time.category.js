@@ -1,8 +1,7 @@
 import dayjs from 'dayjs';
-import { TIME_INTERVALS } from '../helpers/helpers.constant';
+import { TIME_INTERVALS, CHART_OPACITY } from '../helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
-import { CHART_OPACITY, TIME_INTERVALS } from '../helpers/helpers.constant';
 
 class TimeCategoryScale extends Scale {
   constructor(type, axisOpt, ctx, labels, options) {
