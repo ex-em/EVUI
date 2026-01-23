@@ -212,7 +212,7 @@ class StepScale extends Scale {
 
         ctx.fillStyle = Util.colorStringToRgba(
           labelColor,
-          isBlurredLabel ? DEFAULT_OPACITY : defaultOpacity,
+          isBlurredLabel ? (this.options?.opacity ?? DEFAULT_OPACITY) : defaultOpacity,
         );
 
         if (this.type === 'x') {

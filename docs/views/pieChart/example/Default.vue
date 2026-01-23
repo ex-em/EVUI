@@ -1,10 +1,16 @@
 <template>
   <div class="case">
     <ev-chart :data="chartData" :options="chartOptions" />
+    <div class="description">
+      <div class="badge yellow">opacity</div>
+      <ev-input-number v-model="opacity" :min="0" :max="1" :step="0.1" :precision="1" />
+    </div>
   </div>
 </template>
 
 <script>
+import { ref } from 'vue';
+
 export default {
   setup() {
     const chartData = {
@@ -20,9 +26,12 @@ export default {
       },
     };
 
+    const opacity = ref(0.3);
     const chartOptions = {
       type: 'pie',
       width: '100%',
+      height: '100%',
+      opacity: opacity,
       title: {
         text: 'Chart Title',
         show: true,
@@ -39,14 +48,8 @@ export default {
     return {
       chartData,
       chartOptions,
+      opacity,
     };
   },
 };
 </script>
-
-<style lang="scss" scoped>
-.case {
-  height: 100%;
-  background-color: #eeeeee;
-}
-</style>

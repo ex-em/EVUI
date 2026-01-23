@@ -81,7 +81,7 @@ const modules = {
       return new Bar(id, opt, index, isHorizontal);
     } else if (type === 'pie') {
       this.seriesInfo.charts.pie.push(id);
-      return new Pie(id, opt, index);
+      return new Pie(id, opt, index, this.options);
     } else if (type === 'heatMap') {
       this.seriesInfo.charts.heatMap.push(id);
       const { heatMapColor, legend } = this.options;

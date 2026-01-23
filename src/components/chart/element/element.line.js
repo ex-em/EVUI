@@ -94,6 +94,10 @@ class Line {
       extent = this.extent.normal;
     }
 
+    if (extent === this.extent.downplay && param.opacity !== undefined) {
+      extent = { ...extent, opacity: param.opacity };
+    }
+
     const getOpacity = (colorStr) =>
       colorStr?.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity;
     const mainColor = this.color;

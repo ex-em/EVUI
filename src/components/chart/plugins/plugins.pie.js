@@ -23,6 +23,11 @@ const modules = {
     let series;
     let percentage;
 
+    let opacityOption = this.options?.opacity;
+    if (opacityOption && typeof opacityOption === 'object' && 'value' in opacityOption) {
+      opacityOption = opacityOption.value;
+    }
+
     const centerX = chartRect.width / 2;
     const centerY = chartRect.height / 2;
 
@@ -95,7 +100,7 @@ const modules = {
             series.endAngle = endAngle;
             series.data = { o: value, percentage };
 
-            series.draw(ctx, strokeOptions);
+            series.draw(ctx, strokeOptions, opacityOption);
             startAngle += sliceAngle;
           }
         }
@@ -116,6 +121,11 @@ const modules = {
     const pieDataSet = this.pieDataSet;
     const pieOption = this.options;
     const padding = this.options.padding;
+
+    let opacityOption = this.options?.opacity;
+    if (opacityOption && typeof opacityOption === 'object' && 'value' in opacityOption) {
+      opacityOption = opacityOption.value;
+    }
 
     this.calculateAngle();
 
@@ -201,7 +211,7 @@ const modules = {
             series.endAngle = slice.ea;
             series.data = { o: slice.value };
 
-            series.draw(ctx, strokeOptions);
+            series.draw(ctx, strokeOptions, opacityOption);
           }
         }
       }

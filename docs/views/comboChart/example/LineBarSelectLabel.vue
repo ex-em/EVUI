@@ -13,6 +13,10 @@
       <br />
       <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
       {{ clickedLabel }}
+      <br />
+      <br />
+      <div class="badge yellow">opacity</div>
+      <ev-input-number v-model="opacity" :min="0" :max="1" :step="0.1" :precision="1" />
     </div>
   </div>
 </template>
@@ -35,10 +39,12 @@ export default {
       },
     });
 
+    const opacity = ref(0.3);
     const chartOptions = {
       width: '100%',
       height: '80%',
       thickness: 0.8,
+      opacity: opacity,
       title: {
         text: 'Chart Title',
         show: true,
@@ -114,6 +120,7 @@ export default {
 
     return {
       chartData,
+      opacity,
       chartOptions,
       defaultSelectLabel,
       clickedLabel,

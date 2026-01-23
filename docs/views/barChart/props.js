@@ -32,6 +32,8 @@ import LegendClickMode from './example/LegendClickMode';
 import LegendClickModeRaw from './example/LegendClickMode?raw';
 import LargeScrollbar from './example/LargeScrollbar';
 import LargeScrollbarRaw from './example/LargeScrollbar?raw';
+import Opacity from './example/Opacity';
+import OpacityRaw from './example/Opacity?raw';
 
 export default {
   mdText,
@@ -122,6 +124,11 @@ export default {
       description: 'Legend Click Mode',
       component: LegendClickMode,
       parsedData: parse(LegendClickModeRaw).descriptor,
+    },
+    Opacity: {
+      description: 'Opacity 옵션을 주어 비 선택 요소의 opacity를 설정할 수 있습니다',
+      component: Opacity,
+      parsedData: parse(OpacityRaw).descriptor,
     },
   },
 };

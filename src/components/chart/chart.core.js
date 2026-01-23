@@ -328,7 +328,12 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow } = this.options;
+    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow, opacity } = this.options;
+
+    let opacityValue = opacity;
+    if (opacity && typeof opacity === 'object' && 'value' in opacity) {
+      opacityValue = opacity.value;
+    }
 
     const opt = {
       ctx: this.bufferCtx,
@@ -342,6 +347,7 @@ class EvChart {
       overlayCtx: this.overlayCtx,
       isBrush: !!brush,
       displayOverflow,
+      opacity: opacityValue,
     };
 
     let showIndex = 0;
@@ -1004,7 +1010,7 @@ class EvChart {
     this.axesRange = null;
     this.labelOffset = null;
     this.chartRect = null;
-    this.pieDataSet = [];
+    // this.pieDataSet = [];
   }
 
   /**

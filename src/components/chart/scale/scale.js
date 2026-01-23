@@ -392,7 +392,7 @@ class Scale {
 
           ctx.fillStyle = Util.colorStringToRgba(
             labelColor,
-            isBlurredLabel ? DEFAULT_OPACITY : defaultOpacity,
+            isBlurredLabel ? (this.options?.opacity ?? DEFAULT_OPACITY) : defaultOpacity,
           );
 
           let labelPoint;

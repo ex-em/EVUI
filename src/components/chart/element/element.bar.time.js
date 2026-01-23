@@ -131,6 +131,7 @@ class TimeBar extends Bar {
             { x, y, w, h },
             barColor,
             opacity === DEFAULT_OPACITY,
+            param.opacity,
           );
         } else {
           ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);

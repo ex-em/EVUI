@@ -219,11 +219,12 @@ class Bar {
             { x, y, w, h },
             barColor,
             isDownplay,
+            param.opacity,
           );
         } else {
           const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
-          const opacity = isDownplay ? DEFAULT_OPACITY : noneDownplayOpacity;
-
+          const opacity = isDownplay ? (param.opacity ?? DEFAULT_OPACITY) : noneDownplayOpacity;
+          
           ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);
         }
 
@@ -270,7 +271,7 @@ class Bar {
    *
    * @returns {undefined}
    */
-  itemHighlight(item, context, index) {
+  itemHighlight(item, context, index, opacity) {
     const showValue = this.showValue;
 
     const gdata = item.data;
@@ -288,7 +289,7 @@ class Bar {
 
     const color = item.data.dataColor || this.color;
     if (typeof color !== 'string') {
-      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, color);
+      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, color, false, opacity);
       ctx.fillStyle = grd;
       ctx.shadowColor = color[color.length - 1][1];
     } else {
