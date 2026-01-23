@@ -1,5 +1,5 @@
 import { merge } from 'lodash-es';
-import { PIE_OPTION, COLOR } from '../helpers/helpers.constant';
+import { PIE_OPTION, COLOR, DEFAULT_OPACITY } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 
 class Pie {
@@ -47,7 +47,7 @@ class Pie {
 
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
-    const opacity = this.isDownplay ? 0.1 : noneDownplayOpacity;
+    const opacity = this.isDownplay ? DEFAULT_OPACITY : noneDownplayOpacity;
 
     ctx.beginPath();
     slice.moveTo(this.centerX, this.centerY);
@@ -169,7 +169,7 @@ class Pie {
       ctx.beginPath();
 
       const noneDownplayOpacity = textColor.includes('rgba') ? Util.getOpacity(textColor) : 1;
-      const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+      const opacity = this.state === 'downplay' ? DEFAULT_OPACITY : noneDownplayOpacity;
 
       ctx.font = `normal normal normal ${fontSize}px Roboto`;
       ctx.fillStyle = Util.colorStringToRgba(textColor, opacity);

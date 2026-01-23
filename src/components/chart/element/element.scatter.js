@@ -1,5 +1,5 @@
 import { merge } from 'lodash-es';
-import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
+import { COLOR, DEFAULT_OPACITY, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
 
@@ -91,7 +91,7 @@ class Scatter {
       isDownplay = selectInfo?.seriesID !== this.sId || selectInfo?.dataIndex !== dataIndex;
     }
 
-    return isDownplay ? 0.1 : noneDownplayOpacity;
+    return isDownplay ? DEFAULT_OPACITY : noneDownplayOpacity;
   }
 
   /**

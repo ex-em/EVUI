@@ -1,3 +1,4 @@
+import { DEFAULT_OPACITY } from './helpers.constant';
 import Util from './helpers.util';
 
 export default {
@@ -255,7 +256,7 @@ export default {
       const stopIdx = stops[ix][0] ?? 0;
       const stopColor = stops[ix][1] ?? 'rgba(255, 255, 255, 0)';
       const noneDownplayOpacity = stopColor.includes('rgba') ? Util.getOpacity(stopColor) : 1;
-      const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
+      const opacity = isDownplay ? DEFAULT_OPACITY : noneDownplayOpacity;
 
       gradient.addColorStop(stopIdx, Util.colorStringToRgba(stopColor, opacity));
     }

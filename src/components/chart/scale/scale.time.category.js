@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { TIME_INTERVALS, CHART_OPACITY } from '../helpers/helpers.constant';
+import { TIME_INTERVALS, DEFAULT_OPACITY } from '../helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
@@ -230,13 +230,9 @@ class TimeCategoryScale extends Scale {
         defaultOpacity = Util.getOpacity(labelColor);
       }
 
-      const chartType = this.options?.type;
-      const isComboChart = !chartType || this.options?.combo;
-      const isBarLineCombo = chartType === 'bar' || chartType === 'line' || isComboChart;
-      const downplayOpacity = isBarLineCombo ? CHART_OPACITY.HIGH : CHART_OPACITY.DEFAULT;
       ctx.fillStyle = Util.colorStringToRgba(
         labelColor,
-        isBlurredLabel ? downplayOpacity : defaultOpacity,
+        isBlurredLabel ? DEFAULT_OPACITY : defaultOpacity,
       );
       
       if (this.type === 'x') {
