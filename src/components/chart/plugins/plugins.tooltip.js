@@ -943,9 +943,10 @@ const modules = {
     }
 
     const { horizontal } = this.options;
-    const { top, bottom, left, right } = this.chartDOM.getBoundingClientRect();
-    const isHoveredChart = inRange(mousePosition[0], left, right)
-      && inRange(mousePosition[1], bottom, top);
+    const rect = this.chartDOM.getBoundingClientRect();
+    const [mouseX, mouseY] = mousePosition;
+    const isHoveredChart = inRange(mouseX, rect.left, rect.right)
+      && inRange(mouseY, rect.bottom, rect.top);
     if (isHoveredChart) {
       return;
     }
@@ -964,19 +965,39 @@ const modules = {
 
     if (horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
-      // CategoryMode인 경우 라벨들이 균등 간격으로 배치됨
       const isCategoryMode = this.options.axesY?.some(axis => axis.categoryMode);
-      const positionY = isCategoryMode
-        ? graphPos.y1 + (chartHeight * (matchingLabelIndex + 0.5)) / labelsCount
-        : graphPos.y1 + (chartHeight * matchingLabelIndex) / (labelsCount - 1);
+      const isTimeAxis = this.options.axesY?.some(axis => axis.type === 'time');
+
+      let positionY;
+      if (isCategoryMode) {
+        positionY = graphPos.y1 + (chartHeight * (matchingLabelIndex + 0.5)) / labelsCount;
+      } else if (isTimeAxis) {
+        // 틱 위치와 동일하게 graphMin/graphMax 사용
+        const axisStep = this.axesSteps?.y?.[0];
+        const graphMin = axisStep?.graphMin ?? +this.data.labels?.[0];
+        const graphMax = axisStep?.graphMax ?? +this.data.labels?.[this.data.labels.length - 1];
+        positionY = graphPos.y1 + (chartHeight * (+dataLabel - graphMin)) / (graphMax - graphMin);
+      } else {
+        positionY = graphPos.y1 + (chartHeight * matchingLabelIndex) / (labelsCount - 1);
+      }
       indicatorPosition = [graphPos.x2, positionY];
     } else {
       const chartWidth = graphPos.x2 - graphPos.x1;
-      // CategoryMode인 경우 라벨들이 균등 간격으로 배치됨
       const isCategoryMode = this.options.axesX?.some(axis => axis.categoryMode);
-      const positionX = isCategoryMode
-        ? graphPos.x1 + (chartWidth * (matchingLabelIndex + 0.5)) / labelsCount
-        : graphPos.x1 + (chartWidth * matchingLabelIndex) / (labelsCount - 1);
+      const isTimeAxis = this.options.axesX?.some(axis => axis.type === 'time');
+
+      let positionX;
+      if (isCategoryMode) {
+        positionX = graphPos.x1 + (chartWidth * (matchingLabelIndex + 0.5)) / labelsCount;
+      } else if (isTimeAxis) {
+        // 틱 위치와 동일하게 graphMin/graphMax 사용
+        const axisStep = this.axesSteps?.x?.[0];
+        const graphMin = axisStep?.graphMin ?? +this.data.labels?.[0];
+        const graphMax = axisStep?.graphMax ?? +this.data.labels?.[this.data.labels.length - 1];
+        positionX = graphPos.x1 + (chartWidth * (+dataLabel - graphMin)) / (graphMax - graphMin);
+      } else {
+        positionX = graphPos.x1 + (chartWidth * matchingLabelIndex) / (labelsCount - 1);
+      }
       indicatorPosition = [positionX, graphPos.y2];
     }
 
