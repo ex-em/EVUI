@@ -40,7 +40,7 @@ export default {
     });
 
     const opacity = ref(0.3);
-    const chartOptions = {
+    const chartOptions = reactive({
       width: '100%',
       height: '80%',
       thickness: 0.8,
@@ -89,7 +89,7 @@ export default {
         useSeriesOpacity: true,
         useLabelOpacity: true,
       },
-    };
+    });
 
     const defaultSelectLabel = ref({
       dataIndex: [2],
