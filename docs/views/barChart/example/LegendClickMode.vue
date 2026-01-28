@@ -18,6 +18,10 @@
       </p>
     </div>
     <ev-chart :data="chartData" :options="chartOptions" />
+    <div class="result">
+      <div class="badge yellow">클릭된 시리즈 ID</div>
+      {{ clickedSeriesIds }}
+    </div>
   </div>
 </template>
 
@@ -78,10 +82,18 @@ export default {
       ],
     }));
 
+    const clickedSeriesIds = ref([]);
+
+    const handleClickLegend = (e) => {
+      clickedSeriesIds.value = e.data.seriesIds;
+    };
+
     return {
       legendClickMode,
       chartData,
       chartOptions,
+      clickedSeriesIds,
+      handleClickLegend,
     };
   },
 };

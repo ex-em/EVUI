@@ -81,6 +81,7 @@ export default {
     'update:zoomStartIdx',
     'update:zoomEndIdx',
     'update:realTimeScatterReset',
+    'click-legend',
   ],
   setup(props, { emit }) {
     let evChart = null;
@@ -159,26 +160,34 @@ export default {
       }
     };
 
+    const updateChartOptions = debounce((chartOpt) => {
+      if (!evChart) {
+        return;
+      }
+
+      const newOpt = getNormalizedOptions(chartOpt);
+      const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
+      const isUpdateTooltip =
+        newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
+
+      evChart.options = cloneDeep(newOpt);
+
+      evChart.update({
+        updateSeries: false,
+        updateSelTip: { update: false, keepDomain: false },
+        updateLegend: isUpdateLegendType,
+        updateTooltip: isUpdateTooltip,
+      });
+
+      if (!injectIsChartGroup) {
+        setOptionsForUseZoom(newOpt);
+      }
+    }, props.resizeTimeout || 100);
+
     watch(
       () => props.options,
       (chartOpt) => {
-        const newOpt = getNormalizedOptions(chartOpt);
-        const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
-        const isUpdateTooltip =
-          newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
-
-        evChart.options = cloneDeep(newOpt);
-
-        evChart.update({
-          updateSeries: false,
-          updateSelTip: { update: false, keepDomain: false },
-          updateLegend: isUpdateLegendType,
-          updateTooltip: isUpdateTooltip,
-        });
-
-        if (!injectIsChartGroup) {
-          setOptionsForUseZoom(newOpt);
-        }
+        updateChartOptions(chartOpt);
       },
       { deep: true, flush: 'post' },
     );
@@ -331,6 +340,8 @@ export default {
     });
 
     onBeforeUnmount(() => {
+      updateChartOptions.cancel();
+
       if (evChart && 'destroy' in evChart) {
         evChart.destroy();
       }

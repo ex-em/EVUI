@@ -216,5 +216,6 @@ const chartOptions = {
 | --------- | ------------ | ---------------------------------------------- |
 | click     | selectedItem | 클릭된 series의 value, seriesID 값을 반환      |
 | dbl-click | selectedItem | 더블 클릭된 series의 value, seriesID 값을 반환 |
+| click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 
 - 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환

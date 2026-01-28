@@ -393,6 +393,10 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
         injectGroupHoveredLabel.value.label = null;
       }
     },
+    'click-legend': async (e) => {
+      await nextTick();
+      emit('click-legend', e);
+    },
   };
 
   return {
