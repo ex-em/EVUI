@@ -561,7 +561,7 @@ const modules = {
         this.brushSeries.chartIdx = chartIdx;
       }
 
-      if (!opt.clickEmitOnly) {
+      if (this.options.eventBehavior?.legendClick !== 'emitOnly') {
         this.update({
           updateSeries: false,
           updateSelTip: { update: true, keepDomain: true },

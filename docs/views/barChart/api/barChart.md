@@ -129,6 +129,7 @@ const chartData = {
 | selectLabel  | Object                    | ([상세](#selectlabel))                    | 차트 라벨 선택 기능 활성화 여부 및 속성                                                                                                                                                |                                 |
 | padding      | Object                    | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값                                                                                                                                                                   |                                 |
 | syncHover    | boolean                   | true                                      | options.syncHover가 true인 EvChartGroup으로 감싼경우, 해당 차트에서는 그룹으로 묶긴 차트들 사이의 syncHover선을 그리고싶지 않을 때 사용하는 속성 (time관련된 축을 가질때만 적용됩니다) |                                 |
+| eventBehavior | Object                    | ([상세](#eventbehavior))                  | 이벤트별 동작 설정                                                                 |                                 |
 
 #### axesX axesY
 
@@ -318,7 +319,6 @@ const chartData = {
 | stopClickEvt  | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
 | virtualScroll | Boolean                     | false                                    | Legend에 가상 스크롤 적용 여부                        | true /false                      |
 | clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
-| clickEmitOnly | Boolean                     | false                                    | true이면 클릭 시 차트 갱신 없이 click-legend만 emit (이중 렌더 방지) | true/false | 
 
 ##### legendTable
 
@@ -487,6 +487,14 @@ const chartOptions = {
 | fixedPosTop         | Boolean                     | false     | tip의 위치를 최대값으로 고정                                               |            |
 | useApproximateValue | Boolean                     | false     | 가까운 label을 선택                                                        |            |
 | tipBackground       | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상                                                               |            |
+
+#### eventBehavior
+
+이벤트별 동작을 설정하는 옵션 객체.
+
+| 이름         | 타입   | 디폴트   | 설명                                                                 | 종류(예시)           |
+| ----------- | ------ | -------- | -------------------------------------------------------------------- | -------------------- |
+| legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
 
 ### 5. resize-timeout
 

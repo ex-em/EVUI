@@ -80,6 +80,7 @@ const chartData =
   | realTimeScatter | Object | ([상세](#realtimescatter)) | 실시간으로 데이터를 처리하는 real time scatter로 변경 여부 및 속성 | |
   | seriesReverse | Boolean | false | 시리즈 순서 반대로 표시 여부 | |
   | coordinateDedupe | Boolean | true | 좌표 중복 제거 여부 | |
+  | eventBehavior | Object | ([상세](#eventbehavior)) | 이벤트별 동작 설정 | |
 
 #### axesX axesY
 
@@ -217,7 +218,6 @@ const chartData =
 | stopClickEvt| Boolean | false | Legend 표시 여부 | true /false |
 | virtualScroll | Boolean | false | Legend에 가상 스크롤 적용 여부  | true /false |
 | clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
-| clickEmitOnly | Boolean                     | false                                    | true이면 클릭 시 차트 갱신 없이 click-legend만 emit (이중 렌더 방지) | true/false | 
 
 #### dragSelection
 
@@ -230,6 +230,14 @@ const chartData =
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
 
 - PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
+
+#### eventBehavior
+
+이벤트별 동작을 설정하는 옵션 객체.
+
+| 이름         | 타입   | 디폴트   | 설명                                                                 | 종류(예시)           |
+| ----------- | ------ | -------- | -------------------------------------------------------------------- | -------------------- |
+| legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
 
 #### tooltip
 

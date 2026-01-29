@@ -79,6 +79,7 @@ const chartData =
 | doughnutHoleSize | number          | 0                                              | 내부 hole 사이즈                                                | 0 ~ 1                           |
 | pieStroke        | Object          | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션         |                                 |
 | tooltip          | Object          | ([상세](#tooltip))                             | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성                |                                 |
+| eventBehavior    | Object          | ([상세](#eventbehavior))                       | 이벤트별 동작 설정                                             |                                 |
 
 #### title
 
@@ -108,7 +109,6 @@ const chartData =
 | stopClickEvt  | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
 | virtualScroll | Boolean                     | false                                    | Legend에 가상 스크롤 적용 여부                        | true /false                      |
 | clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
-| clickEmitOnly | Boolean                     | false                                    | true이면 클릭 시 차트 갱신 없이 click-legend만 emit (이중 렌더 방지) | true/false | 
 
 ##### legendTable
 
@@ -205,6 +205,14 @@ const chartOptions = {
 | 이름 | 타입    | 디폴트 | 설명                  | 종류(예시) |
 | ---- | ------- | ------ | --------------------- | ---------- |
 | use  | Boolean | false  | 차트 아이템 선택 기능 |            |
+
+#### eventBehavior
+
+이벤트별 동작을 설정하는 옵션 객체.
+
+| 이름         | 타입   | 디폴트   | 설명                                                                 | 종류(예시)           |
+| ----------- | ------ | -------- | -------------------------------------------------------------------- | -------------------- |
+| legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
 
 ### 4. resize-timeout
 
