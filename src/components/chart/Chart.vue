@@ -160,43 +160,26 @@ export default {
       }
     };
 
-    const applyOptionsToChart = (newOpt) => {
-      const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
-      const isUpdateTooltip =
-        newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
-
-      evChart.options = cloneDeep(newOpt);
-
-      
-
-      return { isUpdateLegendType, isUpdateTooltip };
-    };
-
-    const updateChartOptions = debounce((chartOpt) => {
-      if (!evChart) {
-        return;
-      }
-
-      const newOpt = getNormalizedOptions(chartOpt);
-      const { isUpdateLegendType, isUpdateTooltip } = applyOptionsToChart(newOpt);
-
-      evChart.update({
-        updateSeries: false,
-        updateSelTip: { update: false, keepDomain: false },
-        updateLegend: isUpdateLegendType,
-        updateTooltip: isUpdateTooltip,
-      });
-
-      if (!injectIsChartGroup) {
-        setOptionsForUseZoom(newOpt);
-      }
-
-    }, props.resizeTimeout || 100);
-
     watch(
       () => props.options,
       (chartOpt) => {
-        updateChartOptions(chartOpt);
+        const newOpt = getNormalizedOptions(chartOpt);
+        const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
+        const isUpdateTooltip =
+          newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
+
+        evChart.options = cloneDeep(newOpt);
+
+        evChart.update({
+          updateSeries: false,
+          updateSelTip: { update: false, keepDomain: false },
+          updateLegend: isUpdateLegendType,
+          updateTooltip: isUpdateTooltip,
+        });
+
+        if (!injectIsChartGroup) {
+          setOptionsForUseZoom(newOpt);
+        }
       },
       { deep: true, flush: 'post' },
     );
@@ -204,10 +187,6 @@ export default {
     watch(
       () => props.data,
       (chartData) => {
-        if (!evChart) {
-          return;
-        }
-
         const newData = props.options.realTimeScatter?.use
           ? { ...chartData, groups: [], labels: [] }
           : getNormalizedData(chartData);
@@ -220,18 +199,10 @@ export default {
 
         evChart.data = props.options.realTimeScatter?.use ? newData : cloneDeep(newData);
 
-        // data와 options가 동시에 바뀐 경우 한 번에 반영 (options debounce로 인한 이중 렌더 방지)
-        const newOpt = getNormalizedOptions(props.options);
-        const { isUpdateLegendType, isUpdateTooltip } = applyOptionsToChart(newOpt);
-
-        updateChartOptions.cancel();
-
         evChart.update({
           updateSeries: isUpdateSeries,
           updateSelTip: { update: true, keepDomain: false },
           updateData: isUpdateData,
-          updateLegend: isUpdateLegendType,
-          updateTooltip: isUpdateTooltip,
         });
 
         if (!injectIsChartGroup && isUpdateData) {
@@ -318,7 +289,7 @@ export default {
         }
       },
     );
-
+ 
     watch(
       () => props.options.realTimeScatter?.use,
       (use) => {
@@ -361,8 +332,6 @@ export default {
     });
 
     onBeforeUnmount(() => {
-      updateChartOptions.cancel();
-
       if (evChart && 'destroy' in evChart) {
         evChart.destroy();
       }

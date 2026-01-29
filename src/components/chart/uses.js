@@ -32,6 +32,7 @@ const DEFAULT_OPTIONS = {
     allowResize: false,
     virtualScroll: false,
     clickMode: 'active',
+    clickEmitOnly: false,
     table: {
       use: false,
       columns: {

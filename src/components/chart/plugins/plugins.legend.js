@@ -561,10 +561,12 @@ const modules = {
         this.brushSeries.chartIdx = chartIdx;
       }
 
-      this.update({
-        updateSeries: false,
-        updateSelTip: { update: true, keepDomain: true },
-      });
+      if (!opt.clickEmitOnly) {
+        this.update({
+          updateSeries: false,
+          updateSelTip: { update: true, keepDomain: true },
+        });
+      }
 
       // click-legend event 발생
       const activeSeries = Object.values(this.seriesList).filter((series) => series.show);
@@ -785,10 +787,10 @@ const modules = {
         }
       }
 
-      this.update({
-        updateSeries: false,
-        updateSelTip: { update: true, keepDomain: true },
-      });
+        this.update({
+          updateSeries: false,
+          updateSelTip: { update: true, keepDomain: true },
+        });
     };
 
     /**

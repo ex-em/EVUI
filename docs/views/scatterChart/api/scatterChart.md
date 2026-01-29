@@ -217,6 +217,7 @@ const chartData =
 | stopClickEvt| Boolean | false | Legend 표시 여부 | true /false |
 | virtualScroll | Boolean | false | Legend에 가상 스크롤 적용 여부  | true /false |
 | clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
+| clickEmitOnly | Boolean                     | false                                    | true이면 클릭 시 차트 갱신 없이 click-legend만 emit (이중 렌더 방지) | true/false | 
 
 #### dragSelection
 
