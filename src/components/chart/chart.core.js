@@ -903,7 +903,7 @@ class EvChart {
         this.lastHitInfo = null;
       }
     }
-    
+
     if (!lightUpdate) {
       // group update
       if (groups.length) {
@@ -919,7 +919,7 @@ class EvChart {
       } else {
         this.createDataSet(data, labels);
       }
-      
+
       // title update
       if (options.title.show) {
         if (!this.isInitTitle) {
@@ -927,12 +927,12 @@ class EvChart {
         } else {
           this.updateTitle();
         }
-  
+
         this.showTitle();
       } else if (this.isInitTitle) {
         this.hideTitle();
       }
-      
+
       // legend Update
       if (options.legend.show) {
         const useTable =
@@ -1004,7 +1004,6 @@ class EvChart {
     this.axesRange = null;
     this.labelOffset = null;
     this.chartRect = null;
-    this.pieDataSet = [];
   }
 
   /**
