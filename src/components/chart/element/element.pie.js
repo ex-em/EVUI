@@ -47,9 +47,7 @@ class Pie {
 
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
-
-    this.unSelectedOpacity = unSelectedOpacity;
-    const opacity = this.isDownplay ? this.unSelectedOpacity : noneDownplayOpacity;
+    const opacity = this.isDownplay ? unSelectedOpacity : noneDownplayOpacity;
 
     ctx.beginPath();
     slice.moveTo(this.centerX, this.centerY);

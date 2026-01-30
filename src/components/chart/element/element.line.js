@@ -106,7 +106,7 @@ class Line {
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
     const pointFillColorOpacity = getOpacity(pointFillColor);
-    const fillOpacity = this.fillOpacity;
+     const fillOpacity = this.extent.downplay ? this.fillOpacity * extent.opacity : this.fillOpacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
 
     ctx.beginPath();
