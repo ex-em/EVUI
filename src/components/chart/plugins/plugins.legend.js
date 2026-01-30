@@ -561,10 +561,28 @@ const modules = {
         this.brushSeries.chartIdx = chartIdx;
       }
 
-      this.update({
-        updateSeries: false,
-        updateSelTip: { update: true, keepDomain: true },
-      });
+      if (this.options.eventBehavior?.legendClick !== 'emitOnly') {
+        this.update({
+          updateSeries: false,
+          updateSelTip: { update: true, keepDomain: true },
+        });
+      }
+
+      // click-legend event 발생
+      const activeSeries = Object.values(this.seriesList).filter((series) => series.show);
+      const activeSeriesIds = activeSeries.map((series) => series.sId);
+      const isActiveAll = activeSeriesIds.length === Object.values(this.seriesList).length;
+      const args = {
+        e,
+        data: {
+          seriesIds: isActiveAll ? [] : activeSeriesIds,
+          isActiveAll,
+        },
+      };
+
+      if (typeof this.listeners['click-legend'] === 'function') {
+        this.listeners['click-legend'](args);
+      }
     };
 
     /**
@@ -769,10 +787,10 @@ const modules = {
         }
       }
 
-      this.update({
-        updateSeries: false,
-        updateSelTip: { update: true, keepDomain: true },
-      });
+        this.update({
+          updateSeries: false,
+          updateSelTip: { update: true, keepDomain: true },
+        });
     };
 
     /**

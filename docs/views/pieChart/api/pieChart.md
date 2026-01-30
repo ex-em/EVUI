@@ -79,6 +79,7 @@ const chartData =
 | doughnutHoleSize | number          | 0                                              | 내부 hole 사이즈                                                | 0 ~ 1                           |
 | pieStroke        | Object          | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션         |                                 |
 | tooltip          | Object          | ([상세](#tooltip))                             | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성                |                                 |
+| eventBehavior    | Object          | ([상세](#eventbehavior))                       | 이벤트별 동작 설정                                             |                                 |
 
 #### title
 
@@ -205,6 +206,14 @@ const chartOptions = {
 | ---- | ------- | ------ | --------------------- | ---------- |
 | use  | Boolean | false  | 차트 아이템 선택 기능 |            |
 
+#### eventBehavior
+
+이벤트별 동작을 설정하는 옵션 객체.
+
+| 이름         | 타입   | 디폴트   | 설명                                                                 | 종류(예시)           |
+| ----------- | ------ | -------- | -------------------------------------------------------------------- | -------------------- |
+| legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
+
 ### 4. resize-timeout
 
 - Default : 0
@@ -216,5 +225,6 @@ const chartOptions = {
 | --------- | ------------ | ---------------------------------------------- |
 | click     | selectedItem | 클릭된 series의 value, seriesID 값을 반환      |
 | dbl-click | selectedItem | 더블 클릭된 series의 value, seriesID 값을 반환 |
+| click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 
 - 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
