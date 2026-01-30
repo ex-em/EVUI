@@ -4,7 +4,6 @@ import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
 
 const DEFAULT_OPTIONS = {
-  unSelectedOpacity: 0.3,
   padding: {
     top: 20,
     right: 2,
@@ -64,6 +63,7 @@ const DEFAULT_OPTIONS = {
   },
   itemHighlight: true,
   seriesHighlight: true,
+  unSelectedOpacity: 0.3,
   useSelect: false,
   doughnutHoleSize: 0,
   pieStroke: {
