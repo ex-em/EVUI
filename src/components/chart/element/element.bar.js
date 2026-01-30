@@ -268,10 +268,11 @@ class Bar {
    * @param {object}  item       object for drawing series data
    * @param {CanvasRenderingContext2D}  context    canvas context
    * @param {number}  index      label index
+   * @param {number}  unSelectedOpacity - opacity when not selected (0-1)
    *
    * @returns {undefined}
    */
-  itemHighlight(item, context, index, opacity) {
+  itemHighlight(item, context, index, unSelectedOpacity) {
     const showValue = this.showValue;
 
     const gdata = item.data;
@@ -289,7 +290,7 @@ class Bar {
 
     const color = item.data.dataColor || this.color;
     if (typeof color !== 'string') {
-      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, color, false, opacity);
+      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, color, false, unSelectedOpacity);
       ctx.fillStyle = grd;
       ctx.shadowColor = color[color.length - 1][1];
     } else {
