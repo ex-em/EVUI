@@ -230,8 +230,11 @@ class TimeCategoryScale extends Scale {
         defaultOpacity = Util.getOpacity(labelColor);
       }
 
-      ctx.fillStyle = Util.colorStringToRgba(labelColor, isBlurredLabel ? 0.1 : defaultOpacity);
-
+      ctx.fillStyle = Util.colorStringToRgba(
+        labelColor,
+        isBlurredLabel ? this.options?.unSelectedOpacity : defaultOpacity,
+      );
+      
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);

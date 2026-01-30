@@ -238,10 +238,11 @@ export default {
    * @param positions
    * @param stops
    * @param isDownplay
+   * @param unSelectedOpacity
    *
    * @returns {object} gradient
    */
-  createGradient(ctx, isHorizontal, positions, stops, isDownplay) {
+  createGradient(ctx, isHorizontal, positions, stops, isDownplay, unSelectedOpacity) {
     const { x, y, w, h } = positions;
     let gradient;
 
@@ -255,7 +256,7 @@ export default {
       const stopIdx = stops[ix][0] ?? 0;
       const stopColor = stops[ix][1] ?? 'rgba(255, 255, 255, 0)';
       const noneDownplayOpacity = stopColor.includes('rgba') ? Util.getOpacity(stopColor) : 1;
-      const opacity = isDownplay ? 0.1 : noneDownplayOpacity;
+      const opacity = isDownplay ? unSelectedOpacity : noneDownplayOpacity;
 
       gradient.addColorStop(stopIdx, Util.colorStringToRgba(stopColor, opacity));
     }

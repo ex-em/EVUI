@@ -22,7 +22,7 @@ class Line {
     this.type = 'line';
     this.sId = sId;
     this.extent = {
-      downplay: { opacity: 0.1, lineWidth: 1 },
+      downplay: { opacity: 0.3, lineWidth: 1 },
       normal: { opacity: 1, lineWidth: 1 },
       highlight: { opacity: 1, lineWidth: 2 },
     };
@@ -53,6 +53,7 @@ class Line {
    * @property {object} [selectSeries] - 선택된 시리즈 정보
    * @property {object} [legendHitInfo] - 범례 히트 정보
    * @property {boolean} [isBrush] - 브러시 사용 여부
+   * @property {number} [unSelectedOpacity] - 비선택 시 opacity (0~1)
    */
   /**
    * Draw series data
@@ -74,6 +75,7 @@ class Line {
       selectSeries,
       legendHitInfo,
       isBrush,
+      unSelectedOpacity,
     } = param;
 
     // about selectLabel
@@ -94,13 +96,17 @@ class Line {
       extent = this.extent.normal;
     }
 
+    if (extent === this.extent.downplay) {
+      extent = { ...extent, opacity: unSelectedOpacity};
+    }
+
     const getOpacity = (colorStr) =>
       colorStr?.includes('rgba') ? Util.getOpacity(colorStr) : extent.opacity;
     const mainColor = this.color;
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
     const pointFillColorOpacity = getOpacity(pointFillColor);
-    const fillOpacity = this.fillOpacity;
+     const fillOpacity = this.extent.downplay ? this.fillOpacity * extent.opacity : this.fillOpacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
 
     ctx.beginPath();

@@ -119,7 +119,7 @@ class TimeBar extends Bar {
       if (x !== null && y !== null) {
         const barColor = item.dataColor || this.color;
         const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
-        const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+        const opacity = this.state === 'downplay' ? param.unSelectedOpacity : noneDownplayOpacity;
 
         if (typeof barColor !== 'string') {
           w = w !== subW ? subW : w;
@@ -129,7 +129,8 @@ class TimeBar extends Bar {
             isHorizontal,
             { x, y, w, h },
             barColor,
-            opacity === 0.1,
+            this.state === 'downplay',
+            param.unSelectedOpacity,
           );
         } else {
           ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);

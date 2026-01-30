@@ -63,6 +63,7 @@ const DEFAULT_OPTIONS = {
   },
   itemHighlight: true,
   seriesHighlight: true,
+  unSelectedOpacity: 0.3,
   useSelect: false,
   doughnutHoleSize: 0,
   pieStroke: {

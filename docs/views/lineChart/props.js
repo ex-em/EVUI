@@ -38,6 +38,8 @@ import LegendClickMode from './example/LegendClickMode';
 import LegendClickModeRaw from './example/LegendClickMode?raw';
 import NiceScale from './example/NiceScale';
 import NiceScaleRaw from './example/NiceScale?raw';
+import UnSelectedOpacity from './example/UnSelectedOpacity';
+import UnSelectedOpacityRaw from './example/UnSelectedOpacity?raw';
 
 export default {
   mdText,
@@ -74,6 +76,11 @@ export default {
       description: '선택한 시리즈가 하이라이트 되어 보이는 기능입니다.',
       component: SelectSeries,
       parsedData: parse(SelectSeriesRaw).descriptor,
+    },
+    UnSelectedOpacity: {
+      description: 'unSelectedOpacity 옵션으로 비선택 요소의 opacity를 설정할 수 있습니다',
+      component: UnSelectedOpacity,
+      parsedData: parse(UnSelectedOpacityRaw).descriptor,
     },
     DragSelection: {
       description: 'Drag Select 이벤트 등록이 가능 합니다',

@@ -35,11 +35,11 @@ class Pie {
    * Draw series data
    * @param context
    * @param strokeOptions
-   *
+   * @param unSelectedOpacity
    *
    * @returns {undefined}
    */
-  draw(context, strokeOptions) {
+  draw(context, strokeOptions, unSelectedOpacity) {
     const ctx = context ?? this.ctx;
     const slice = new Path2D();
 
@@ -47,7 +47,7 @@ class Pie {
 
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
-    const opacity = this.isDownplay ? 0.1 : noneDownplayOpacity;
+    const opacity = this.isDownplay ? unSelectedOpacity : noneDownplayOpacity;
 
     ctx.beginPath();
     slice.moveTo(this.centerX, this.centerY);
@@ -169,7 +169,7 @@ class Pie {
       ctx.beginPath();
 
       const noneDownplayOpacity = textColor.includes('rgba') ? Util.getOpacity(textColor) : 1;
-      const opacity = this.state === 'downplay' ? 0.1 : noneDownplayOpacity;
+      const opacity = this.state === 'downplay' ? this.unSelectedOpacity : noneDownplayOpacity;
 
       ctx.font = `normal normal normal ${fontSize}px Roboto`;
       ctx.fillStyle = Util.colorStringToRgba(textColor, opacity);

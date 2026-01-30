@@ -84,14 +84,13 @@ class Scatter {
     const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
     let isDownplay = false;
 
-    const { selectInfo, legendHitInfo } = param;
+    const { selectInfo, legendHitInfo, unSelectedOpacity } = param;
     if (legendHitInfo) {
       isDownplay = legendHitInfo.sId !== this.sId;
     } else if (selectInfo) {
       isDownplay = selectInfo?.seriesID !== this.sId || selectInfo?.dataIndex !== dataIndex;
     }
-
-    return isDownplay ? 0.1 : noneDownplayOpacity;
+    return isDownplay ? unSelectedOpacity : noneDownplayOpacity;
   }
 
   /**
