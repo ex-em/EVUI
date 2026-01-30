@@ -1017,7 +1017,6 @@ class EvChart {
     this.axesRange = null;
     this.labelOffset = null;
     this.chartRect = null;
-    this.pieDataSet = [];
   }
 
   /**
