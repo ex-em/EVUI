@@ -81,6 +81,7 @@ export default {
     'update:zoomStartIdx',
     'update:zoomEndIdx',
     'update:realTimeScatterReset',
+    'click-legend',
   ],
   setup(props, { emit }) {
     let evChart = null;
@@ -288,7 +289,7 @@ export default {
         }
       },
     );
-
+ 
     watch(
       () => props.options.realTimeScatter?.use,
       (use) => {

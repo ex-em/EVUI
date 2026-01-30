@@ -125,6 +125,7 @@ const chartData =
 | selectItem | Object          | ([상세](#selectitem))                     | 차트 아이템 선택 기능 활성화 여부 및 속성                                                                                                                                              |                                 |
 | padding    | Object          | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값                                                                                                                                                                   |
 | syncHover  | boolean         | true                                      | options.syncHover가 true인 EvChartGroup으로 감싼경우, 해당 차트에서는 그룹으로 묶긴 차트들 사이의 syncHover선을 그리고싶지 않을 때 사용하는 속성 (time관련된 축을 가질때만 적용됩니다) |
+| eventBehavior | Object      | ([상세](#eventbehavior))                  | 이벤트별 동작 설정 | | 
 
 #### axesX axesY
 
@@ -258,7 +259,7 @@ const chartData =
 | table         | Object                      | ([상세](#legendtable))                   | Table 타입 Legend (값 표시 포함). bar, line, pie 전용 |                                  |
 | stopClickEvt  | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
 | virtualScroll | Boolean                     | false                                    | Legend에 가상 스크롤 적용 여부                        | true /false                      |
-| clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
+| clickMode     | 'active' \| 'inactive'      | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
 
 ##### legendTable
 
@@ -451,10 +452,19 @@ const chartOptions = {
 | fillColor   | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상               |              |
 | opacity     | Number                      | 0.65      | 선택 영역 불투명도           | 0 ~ 1        |
 
+#### eventBehavior
+
+이벤트별 동작을 설정하는 옵션 객체.
+
+| 이름         | 타입    | 디폴트    | 설명                                                                 | 종류(예시)           |
+| ----------- | ------- | --------- | -------------------------------------------------------------------- | -------------------- |
+| legendClick | String  | 'update'  | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
+
 ### 6. resize-timeout
 
 - Default : 0
 - debounce 사용. 연속으로 이벤트가 발생한 경우, 마지막 이벤트가 끝난 시점을 기준으로 `주어진 시간 (resize-timeout)` 이후 콜백 실행
+
 
 ### 7. Event
 
@@ -464,5 +474,8 @@ const chartOptions = {
 | dbl-click   | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환                                                                                                                                                                                                                                                                                     |
 | mouse-move  |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환                                                                                                                                                                |
 | drag-select | data, range  | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
+| click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 
 - 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
+
+
