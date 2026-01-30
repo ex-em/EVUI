@@ -1,5 +1,3 @@
-export const DEFAULT_OPACITY = 0.3;
-
 export const AXIS_UNITS = {
   x: {
     rectStart: 'x1',

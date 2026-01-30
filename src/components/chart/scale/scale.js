@@ -7,7 +7,6 @@ import {
   PLOT_LINE_OPTION,
   PLOT_LINE_LABEL_OPTION,
   PLOT_BAND_OPTION,
-  DEFAULT_OPACITY,
 } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 
@@ -392,7 +391,7 @@ class Scale {
 
           ctx.fillStyle = Util.colorStringToRgba(
             labelColor,
-            isBlurredLabel ? (this.options?.opacity ?? DEFAULT_OPACITY) : defaultOpacity,
+            isBlurredLabel ? this.options?.unSelectedOpacity: defaultOpacity,
           );
 
           let labelPoint;

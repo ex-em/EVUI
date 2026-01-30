@@ -14,8 +14,8 @@
       @click="onClick"
     />
     <div class="description">
-      <div class="badge yellow">opacity</div>
-      <ev-input-number v-model="opacity" :min="0" :max="1" :step="0.1" />
+      <div class="badge yellow">unSelectedOpacity</div>
+      <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" />
     </div>
   </div>
 </template>
@@ -44,12 +44,12 @@ export default {
       },
     };
 
-    const opacity = ref(0.3);
+    const unSelectedOpacity = ref(0.3);
     const chartOptions = reactive({
       type: 'bar',
       thickness: 0.8,
       width: '100%',
-      opacity: opacity,
+      unSelectedOpacity,
       legend: {
         show: true,
         position: 'right',
@@ -87,7 +87,7 @@ export default {
       type: 'bar',
       thickness: 0.8,
       width: '100%',
-      opacity: opacity,
+      unSelectedOpacity,
       legend: {
         show: true,
         position: 'right',
@@ -138,7 +138,7 @@ export default {
       chart,
       chart2,
       chartData,
-      opacity,
+      unSelectedOpacity,
       chartOptions,
       chartOptions2,
       selectedItem,

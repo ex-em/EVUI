@@ -4,7 +4,6 @@ import { bnMinus, bnPlus } from '@/common/utils.bignumber';
 import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
-import { DEFAULT_OPACITY } from '../helpers/helpers.constant';
 
 class StepScale extends Scale {
   constructor(type, axisOpt, ctx, labels, options) {
@@ -212,7 +211,7 @@ class StepScale extends Scale {
 
         ctx.fillStyle = Util.colorStringToRgba(
           labelColor,
-          isBlurredLabel ? (this.options?.opacity ?? DEFAULT_OPACITY) : defaultOpacity,
+          isBlurredLabel ? this.options?.unSelectedOpacity  : defaultOpacity,
         );
 
         if (this.type === 'x') {

@@ -1,6 +1,6 @@
 import { defaultsDeep } from 'lodash-es';
 import { truthy, truthyNumber } from '@/common/utils';
-import { COLOR, BAR_OPTION, DEFAULT_OPACITY } from '../helpers/helpers.constant';
+import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
@@ -219,11 +219,11 @@ class Bar {
             { x, y, w, h },
             barColor,
             isDownplay,
-            param.opacity,
+            param.unSelectedOpacity,
           );
         } else {
           const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
-          const opacity = isDownplay ? (param.opacity ?? DEFAULT_OPACITY) : noneDownplayOpacity;
+          const opacity = isDownplay ? param.unSelectedOpacity : noneDownplayOpacity;
           
           ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);
         }

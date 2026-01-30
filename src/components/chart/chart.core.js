@@ -328,13 +328,9 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow, opacity } = this.options;
-
-    let opacityValue = opacity;
-    if (opacity && typeof opacity === 'object' && 'value' in opacity) {
-      opacityValue = opacity.value;
-    }
-
+    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow, unSelectedOpacity } =
+      this.options;
+      
     const opt = {
       ctx: this.bufferCtx,
       chartRect: this.chartRect,
@@ -347,7 +343,7 @@ class EvChart {
       overlayCtx: this.overlayCtx,
       isBrush: !!brush,
       displayOverflow,
-      opacity: opacityValue,
+      unSelectedOpacity,
     };
 
     let showIndex = 0;
@@ -423,11 +419,13 @@ class EvChart {
               this.drawSunburst({
                 selectInfo,
                 legendHitInfo,
+                unSelectedOpacity: opt.unSelectedOpacity,
               });
             } else {
               this.drawPie({
                 selectInfo,
                 legendHitInfo,
+                unSelectedOpacity: opt.unSelectedOpacity,
               });
             }
 

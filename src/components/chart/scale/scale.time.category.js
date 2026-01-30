@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { TIME_INTERVALS, DEFAULT_OPACITY } from '../helpers/helpers.constant';
+import { TIME_INTERVALS } from '../helpers/helpers.constant';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
@@ -232,7 +232,7 @@ class TimeCategoryScale extends Scale {
 
       ctx.fillStyle = Util.colorStringToRgba(
         labelColor,
-        isBlurredLabel ? (this.options?.opacity ?? DEFAULT_OPACITY) : defaultOpacity,
+        isBlurredLabel ? this.options?.unSelectedOpacity : defaultOpacity,
       );
       
       if (this.type === 'x') {

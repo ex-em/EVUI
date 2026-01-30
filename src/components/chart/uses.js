@@ -4,6 +4,7 @@ import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
 
 const DEFAULT_OPTIONS = {
+  unSelectedOpacity: 0.3,
   padding: {
     top: 20,
     right: 2,

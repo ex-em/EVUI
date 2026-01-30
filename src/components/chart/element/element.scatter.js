@@ -1,5 +1,5 @@
 import { merge } from 'lodash-es';
-import { COLOR, DEFAULT_OPACITY, LINE_OPTION } from '../helpers/helpers.constant';
+import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
 
@@ -84,14 +84,13 @@ class Scatter {
     const noneDownplayOpacity = colorStr.includes('rgba') ? Util.getOpacity(colorStr) : 1;
     let isDownplay = false;
 
-    const { selectInfo, legendHitInfo } = param;
+    const { selectInfo, legendHitInfo, unSelectedOpacity } = param;
     if (legendHitInfo) {
       isDownplay = legendHitInfo.sId !== this.sId;
     } else if (selectInfo) {
       isDownplay = selectInfo?.seriesID !== this.sId || selectInfo?.dataIndex !== dataIndex;
     }
-
-    return isDownplay ? DEFAULT_OPACITY : noneDownplayOpacity;
+    return isDownplay ? unSelectedOpacity : noneDownplayOpacity;
   }
 
   /**

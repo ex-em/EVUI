@@ -1,5 +1,5 @@
 import { merge } from 'lodash-es';
-import { PIE_OPTION, COLOR, DEFAULT_OPACITY } from '../helpers/helpers.constant';
+import { PIE_OPTION, COLOR } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 
 class Pie {
@@ -35,11 +35,11 @@ class Pie {
    * Draw series data
    * @param context
    * @param strokeOptions
-   *
+   * @param unSelectedOpacity
    *
    * @returns {undefined}
    */
-  draw(context, strokeOptions, opacityOption) {
+  draw(context, strokeOptions, unSelectedOpacity) {
     const ctx = context ?? this.ctx;
     const slice = new Path2D();
 
@@ -48,8 +48,8 @@ class Pie {
     const color = this.color;
     const noneDownplayOpacity = color.includes('rgba') ? Util.getOpacity(color) : 1;
 
-    this.opacity = opacityOption;
-    const opacity = this.isDownplay ? (this.opacity ?? DEFAULT_OPACITY) : noneDownplayOpacity;
+    this.unSelectedOpacity = unSelectedOpacity;
+    const opacity = this.isDownplay ? this.unSelectedOpacity : noneDownplayOpacity;
 
     ctx.beginPath();
     slice.moveTo(this.centerX, this.centerY);
@@ -171,7 +171,7 @@ class Pie {
       ctx.beginPath();
 
       const noneDownplayOpacity = textColor.includes('rgba') ? Util.getOpacity(textColor) : 1;
-      const opacity = this.state === 'downplay' ? (this.opacity ?? DEFAULT_OPACITY) : noneDownplayOpacity;
+      const opacity = this.state === 'downplay' ? this.unSelectedOpacity : noneDownplayOpacity;
 
       ctx.font = `normal normal normal ${fontSize}px Roboto`;
       ctx.fillStyle = Util.colorStringToRgba(textColor, opacity);

@@ -1,7 +1,6 @@
 import Canvas from '../helpers/helpers.canvas';
 import Bar from './element.bar';
 import Util from '../helpers/helpers.util';
-import { DEFAULT_OPACITY } from '../helpers/helpers.constant';
 
 class TimeBar extends Bar {
   /**
@@ -120,7 +119,7 @@ class TimeBar extends Bar {
       if (x !== null && y !== null) {
         const barColor = item.dataColor || this.color;
         const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
-        const opacity = this.state === 'downplay' ? DEFAULT_OPACITY : noneDownplayOpacity;
+        const opacity = this.state === 'downplay' ? param.unSelectedOpacity : noneDownplayOpacity;
 
         if (typeof barColor !== 'string') {
           w = w !== subW ? subW : w;
@@ -130,8 +129,8 @@ class TimeBar extends Bar {
             isHorizontal,
             { x, y, w, h },
             barColor,
-            opacity === DEFAULT_OPACITY,
-            param.opacity,
+            this.state === 'downplay',
+            param.unSelectedOpacity,
           );
         } else {
           ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);

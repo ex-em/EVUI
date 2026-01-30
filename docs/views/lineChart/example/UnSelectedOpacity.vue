@@ -13,8 +13,8 @@
         :options="chartOptions2"
       /> 
       <div class="description">
-        <div class="badge yellow">opacity</div>
-        <ev-input-number v-model="opacity" :min="0" :max="1" :step="0.1" :precision="1" />
+        <div class="badge yellow">unSelectedOpacity</div>
+        <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" :precision="1" />
       </div>
     </div>
 </template>
@@ -70,12 +70,12 @@ export default {
       },
     });
 
-    const opacity = ref(0.3);
+    const unSelectedOpacity = ref(0.3);
     const chartOptions1 = ref({
       type: 'line',
       width: '100%',
       height: '80%',
-      opacity: opacity,
+      unSelectedOpacity,
       title: {
         show: 'Selected Label',
       },
@@ -112,7 +112,7 @@ export default {
       type: 'line',
       width: '100%',
       height: '80%',
-      opacity: opacity,
+      unSelectedOpacity,
       title: {
         show: 'Selected Series',
       },
@@ -150,7 +150,7 @@ export default {
       chart2,
       chartData1,
       chartData2,
-      opacity,
+      unSelectedOpacity,
       chartOptions1,
       chartOptions2,
       selectedLabel,
