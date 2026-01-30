@@ -257,8 +257,11 @@ class Line {
             for (let jx = endIndex; jx >= startIndex; jx--) {
               const nextData = this.data[jx];
               const xp = getXPos(nextData.x);
-              const bp = nextData.o === null ? getYPos(0) : (getYPos(nextData.b) ?? getYPos(0));
-              ctx.lineTo(xp, bp);
+
+              if(nextData.o !== null) {
+                const bp = getYPos(nextData.b) ?? getYPos(0);
+                ctx.lineTo(xp, bp);
+              }
             }
 
             ctx.closePath();
