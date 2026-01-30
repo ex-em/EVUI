@@ -233,19 +233,36 @@ const modules = {
         }
       }
 
+      // 실제 차트에 그려지는 데이터(fromTime ~ toTime 범위)에서만 min/max 계산
       const tempMinMax = {
-        maxY: 0,
+        maxY: -Infinity,
         minY: Infinity,
       };
 
-      for (let i = 0; i < this.dataSet[key].length; i++) {
-        if (this.dataSet[key].dataGroup[i].max > tempMinMax.maxY) {
-          tempMinMax.maxY = this.dataSet[key].dataGroup[i].max;
-        }
+      const { fromTime, toTime } = this.dataSet[key];
 
-        if (this.dataSet[key].dataGroup[i].min < tempMinMax.minY) {
-          tempMinMax.minY = this.dataSet[key].dataGroup[i].min;
+      for (let i = 0; i < this.dataSet[key].length; i++) {
+        const groupData = this.dataSet[key].dataGroup[i].data;
+        for (let j = 0; j < groupData.length; j++) {
+          const item = groupData[j];
+          // 현재 시간 범위 내의 데이터만 minMax 계산에 포함
+          if (item.x >= fromTime && item.x <= toTime) {
+            if (item.y > tempMinMax.maxY) {
+              tempMinMax.maxY = item.y;
+            }
+            if (item.y < tempMinMax.minY) {
+              tempMinMax.minY = item.y;
+            }
+          }
         }
+      }
+
+      // 유효한 데이터가 없는 경우 기본값 설정
+      if (!Number.isFinite(tempMinMax.maxY)) {
+        tempMinMax.maxY = 0;
+      }
+      if (!Number.isFinite(tempMinMax.minY)) {
+        tempMinMax.minY = 0;
       }
 
       minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
