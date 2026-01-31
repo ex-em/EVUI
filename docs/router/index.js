@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Intro from 'docs/views/Intro.vue';
 import PageView from 'docs/views/PageView';
+import Playground from 'docs/views/playground/Playground';
 import tabProps from 'docs/views/tab/props';
 import buttonProps from 'docs/views/button/props';
 import checkboxProps from 'docs/views/checkbox/props';
@@ -299,6 +300,14 @@ const routes = [
     name: 'BrushChart',
     component: PageView,
     props: brushChartProps,
+    meta: {
+      category: 'Chart',
+    },
+  },
+  {
+    path: '/playground',
+    name: 'Playground',
+    component: Playground,
     meta: {
       category: 'Chart',
     },

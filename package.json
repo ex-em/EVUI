@@ -33,12 +33,14 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
+    "@vue-monaco/editor": "^0.0.6",
     "bignumber.js": "^9.3.1",
     "dayjs": "^1.11.19",
+    "json5": "^2.2.3",
     "korean-regexp": "^1.0.10",
     "sass": "^1.94.2",
     "vite": "^5.4.8",
-    "vue": "^3.5.8",
+    "vue": "*",
     "vue-resize-observer": "^2.0.15",
     "vue-router": "^4.6.3",
     "vue3-observe-visibility": "^1.0.1"
