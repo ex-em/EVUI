@@ -787,7 +787,12 @@ const modules = {
   drawItemsHighlight(hitInfo, ctx) {
     Object.keys(hitInfo.items).forEach((sId) => {
       const series = this.seriesList[sId];
-      series.itemHighlight(hitInfo.items[sId], ctx, hitInfo.items[sId].index, this.options?.unSelectedOpacity);
+      series.itemHighlight(
+        hitInfo.items[sId],
+        ctx,
+        hitInfo.items[sId].index,
+        this.options?.unSelectedOpacity,
+      );
 
       if (Util.isDoughnutHole(series.type)) {
         this.drawDoughnutHole(ctx);

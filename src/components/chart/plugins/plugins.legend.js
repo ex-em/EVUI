@@ -787,10 +787,10 @@ const modules = {
         }
       }
 
-        this.update({
-          updateSeries: false,
-          updateSelTip: { update: true, keepDomain: true },
-        });
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: true, keepDomain: true },
+      });
     };
 
     /**

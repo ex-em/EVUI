@@ -23,7 +23,6 @@ const modules = {
     let series;
     let percentage;
 
-
     const centerX = chartRect.width / 2;
     const centerY = chartRect.height / 2;
 

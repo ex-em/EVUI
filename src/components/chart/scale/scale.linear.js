@@ -122,8 +122,6 @@ class LinearScale extends Scale {
     return decimals;
   }
 
-
-
   /**
    * 주어진 값에 대한 적절한 간격을 계산합니다.
    * @param value - 계산할 값 (양수, 음수 모두 가능)
@@ -171,7 +169,7 @@ class LinearScale extends Scale {
       const segments = segmentCandidates[i];
       const rawStep = (max - min) / segments;
       const niceInterval = this.getNiceInterval(rawStep);
-      
+
       if (niceInterval > 0) {
         const absNiceInterval = Math.abs(niceInterval);
         const niceMin = Math.floor(min / niceInterval) * niceInterval;
@@ -290,8 +288,10 @@ class LinearScale extends Scale {
         const hasDecimal = bestInterval.toString().includes('.');
 
         // interval이 0.25 인 경우 decimalPoint가 1이면 반올림 되므로 0.25의 경우 decimalPoint가 auto인 경우 2가 되도록 처리
-        this.decimalPoint = hasDecimal && this.decimalPoint === 'auto'
-            ? bestInterval.toString().split('.')[1]?.length : this.decimalPoint;
+        this.decimalPoint =
+          hasDecimal && this.decimalPoint === 'auto'
+            ? bestInterval.toString().split('.')[1]?.length
+            : this.decimalPoint;
 
         return {
           steps: bestStep,

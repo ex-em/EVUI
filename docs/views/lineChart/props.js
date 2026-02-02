@@ -149,7 +149,8 @@ export default {
       parsedData: parse(LegendClickModeRaw).descriptor,
     },
     NiceScale: {
-      description: '축 타입이 linear인 경우 자동으로 최적의 최대 값과 간격을 계산하여 축을 그립니다.',
+      description:
+        '축 타입이 linear인 경우 자동으로 최적의 최대 값과 간격을 계산하여 축을 그립니다.',
       component: NiceScale,
       parsedData: parse(NiceScaleRaw).descriptor,
     },

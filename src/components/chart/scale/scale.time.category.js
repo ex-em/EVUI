@@ -234,7 +234,7 @@ class TimeCategoryScale extends Scale {
         labelColor,
         isBlurredLabel ? this.options?.unSelectedOpacity : defaultOpacity,
       );
-      
+
       if (this.type === 'x') {
         labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
         ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);

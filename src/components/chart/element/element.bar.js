@@ -224,7 +224,7 @@ class Bar {
         } else {
           const noneDownplayOpacity = barColor.includes('rgba') ? Util.getOpacity(barColor) : 1;
           const opacity = isDownplay ? param.unSelectedOpacity : noneDownplayOpacity;
-          
+
           ctx.fillStyle = Util.colorStringToRgba(barColor, opacity);
         }
 
@@ -290,7 +290,14 @@ class Bar {
 
     const color = item.data.dataColor || this.color;
     if (typeof color !== 'string') {
-      const grd = Canvas.createGradient(ctx, this.isHorizontal, { x, y, w, h }, color, false, unSelectedOpacity);
+      const grd = Canvas.createGradient(
+        ctx,
+        this.isHorizontal,
+        { x, y, w, h },
+        color,
+        false,
+        unSelectedOpacity,
+      );
       ctx.fillStyle = grd;
       ctx.shadowColor = color[color.length - 1][1];
     } else {

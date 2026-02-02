@@ -97,7 +97,7 @@ class Line {
     }
 
     if (extent === this.extent.downplay) {
-      extent = { ...extent, opacity: unSelectedOpacity};
+      extent = { ...extent, opacity: unSelectedOpacity };
     }
 
     const getOpacity = (colorStr) =>
@@ -106,7 +106,7 @@ class Line {
     const mainColorOpacity = getOpacity(mainColor);
     const pointFillColor = this.pointFill;
     const pointFillColorOpacity = getOpacity(pointFillColor);
-     const fillOpacity = this.extent.downplay ? this.fillOpacity * extent.opacity : this.fillOpacity;
+    const fillOpacity = this.extent.downplay ? this.fillOpacity * extent.opacity : this.fillOpacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
 
     ctx.beginPath();
@@ -258,7 +258,7 @@ class Line {
               const nextData = this.data[jx];
               const xp = getXPos(nextData.x);
 
-              if(nextData.o !== null) {
+              if (nextData.o !== null) {
                 const bp = getYPos(nextData.b) ?? getYPos(0);
                 ctx.lineTo(xp, bp);
               }

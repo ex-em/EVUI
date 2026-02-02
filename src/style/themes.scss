@@ -1,4 +1,4 @@
-@use "variables" as *;
+@use 'variables' as *;
 
 $ev-themes: (
   light: (
@@ -29,7 +29,7 @@ $ev-themes: (
     grid-row-selected: #dbf0f9,
     grid-cell-text: rgba(#191919, 0.8),
     grid-row-stripe: #e5e5e5,
-    grid-background: #ffffff
+    grid-background: #ffffff,
   ),
   dark: (
     /* primary color
@@ -54,6 +54,6 @@ $ev-themes: (
     tooltip-background: #555555,
 
     /* grid
-    -------------------------- */ grid-background: #0d0d0d
-  )
+    -------------------------- */ grid-background: #0d0d0d,
+  ),
 ) !default;

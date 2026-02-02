@@ -289,7 +289,7 @@ export default {
         }
       },
     );
- 
+
     watch(
       () => props.options.realTimeScatter?.use,
       (use) => {

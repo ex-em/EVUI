@@ -30,11 +30,14 @@ export default {
 
     const chartData = {
       series: {
-        series1: { name: 'series#1', color: [
+        series1: {
+          name: 'series#1',
+          color: [
             [0, '#FF6767'],
             [0.5, '#FFD1B9'],
             [1, '#FF9A67'],
-          ] },
+          ],
+        },
         series2: { name: 'series#2' },
       },
       labels: ['value1', 'value2', 'value3', 'value4', 'value5'],
@@ -125,7 +128,7 @@ export default {
     });
 
     const selectedLabel = ref({
-      targetAxis: "xAxis",
+      targetAxis: 'xAxis',
       dataIndex: [1],
     });
 

@@ -328,9 +328,16 @@ class EvChart {
    * @returns {undefined}
    */
   drawSeries(hitInfo) {
-    const { maxTip, selectLabel, selectItem, selectSeries, brush, displayOverflow, unSelectedOpacity } =
-      this.options;
-      
+    const {
+      maxTip,
+      selectLabel,
+      selectItem,
+      selectSeries,
+      brush,
+      displayOverflow,
+      unSelectedOpacity,
+    } = this.options;
+
     const opt = {
       ctx: this.bufferCtx,
       chartRect: this.chartRect,
@@ -861,7 +868,15 @@ class EvChart {
     const groups = this.data.groups;
     const series = this.data.series;
 
-    const { updateSeries, updateSelTip, updateLegend, updateData, updateTooltip, updateByScrollbar, lightUpdate } = updateInfo;
+    const {
+      updateSeries,
+      updateSelTip,
+      updateLegend,
+      updateData,
+      updateTooltip,
+      updateByScrollbar,
+      lightUpdate,
+    } = updateInfo;
 
     if (!this.isInit) {
       return;
