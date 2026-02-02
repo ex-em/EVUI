@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { bnPlus, bnMinus, bnMultiply, bnDivide, bnFloor } from '@/common/utils.bignumber';
+import { bnPlus, bnMinus, bnMultiply, bnDivide, bnFloor } from './utils.bignumber';
 
 describe('utils.bignumber', () => {
   describe('bnPlus', () => {

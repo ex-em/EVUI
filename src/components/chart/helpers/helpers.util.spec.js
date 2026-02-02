@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import Util from '@/components/chart/helpers/helpers.util';
+import Util from './helpers.util';
 
 describe('helpers.util', () => {
   describe('hexToRgb', () => {
