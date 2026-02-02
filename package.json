@@ -17,7 +17,9 @@
     "prepare": "husky",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:visual": "vitest --config vitest.config.browser.js",
+    "test:visual:update": "vitest --config vitest.config.browser.js --update"
   },
   "files": [
     "dist"
@@ -50,8 +52,11 @@
     "@commitlint/config-conventional": "^20.3.1",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
+    "@vitest/browser": "^4.0.18",
+    "@vitest/browser-playwright": "^4.0.18",
     "@vitest/coverage-v8": "^4.0.18",
     "@vue/compiler-sfc": "^3.5.8",
+    "@vue/test-utils": "^2.4.6",
     "eslint": "^8.57.1",
     "eslint-config-exem": "^3.0.3",
     "eslint-config-prettier": "^10.1.8",
@@ -63,6 +68,7 @@
     "lodash-es": "^4.17.15",
     "marked": "^14.1.2",
     "marked-gfm-heading-id": "^4.1.3",
+    "playwright": "^1.58.1",
     "prettier": "^3.7.4",
     "sass": "^1.94.2",
     "husky": "^9.1.7",
@@ -73,7 +79,8 @@
     "typescript": "^5.0.0",
     "vite": "^5.4.8",
     "vue-router": "^4.6.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "vitest-browser-vue": "^2.0.2"
   },
   "peerDependencies": {
     "vue": "*"
