@@ -13,7 +13,7 @@ import {
   getPrecision,
   checkNullAndUndefined,
   getSize,
-} from '@/common/utils';
+} from './utils';
 
 describe('utils', () => {
   describe('getQuantity', () => {

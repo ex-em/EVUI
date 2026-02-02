@@ -1,5 +1,6 @@
-import Line from '@/components/chart/element/element.line';
-import { LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
+import { describe, it, expect } from 'vitest';
+import Line from './element.line';
+import { LINE_OPTION } from '../helpers/helpers.constant';
 
 describe('Chart Interpolation', () => {
   describe('LINE_OPTION 기본값 테스트', () => {

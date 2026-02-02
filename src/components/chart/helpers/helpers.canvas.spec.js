@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import Canvas from '@/components/chart/helpers/helpers.canvas';
+import Canvas from './helpers.canvas';
 
 describe('helpers.canvas', () => {
   describe('calculateX', () => {
