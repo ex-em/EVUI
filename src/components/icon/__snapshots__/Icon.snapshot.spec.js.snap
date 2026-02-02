@@ -1,0 +1,17 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EvIcon Snapshot > 다양한 아이콘 상태 > check 아이콘 스냅샷 1`] = `"<i class="ev-icon-check" style="color: green;"></i>"`;
+
+exports[`EvIcon Snapshot > 다양한 아이콘 상태 > close 아이콘 스냅샷 1`] = `"<i class="ev-icon-close ev-icon-large"></i>"`;
+
+exports[`EvIcon Snapshot > 다양한 아이콘 상태 > menu 아이콘 스냅샷 1`] = `"<i class="ev-icon-menu ev-icon-small" style="color: gray;"></i>"`;
+
+exports[`EvIcon Snapshot > 다양한 아이콘 상태 > search 아이콘 스냅샷 1`] = `"<i class="ev-icon-search"></i>"`;
+
+exports[`EvIcon Snapshot > 파일 스냅샷 > color가 적용된 아이콘 1`] = `"<i class="ev-icon-warning" style="color: rgb(255, 0, 0);"></i>"`;
+
+exports[`EvIcon Snapshot > 파일 스냅샷 > size가 적용된 아이콘 1`] = `"<i class="ev-icon-check ev-icon-large"></i>"`;
+
+exports[`EvIcon Snapshot > 파일 스냅샷 > 기본 아이콘 렌더링 1`] = `"<i class="ev-icon-search"></i>"`;
+
+exports[`EvIcon Snapshot > 파일 스냅샷 > 모든 props가 적용된 아이콘 1`] = `"<i class="ev-icon-error ev-icon-small" style="color: blue;"></i>"`;
