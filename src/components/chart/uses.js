@@ -32,6 +32,7 @@ const DEFAULT_OPTIONS = {
     allowResize: false,
     virtualScroll: false,
     clickMode: 'active',
+    external: false,
     table: {
       use: false,
       columns: {
@@ -400,6 +401,10 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
     'click-legend': async (e) => {
       await nextTick();
       emit('click-legend', e);
+    },
+    'update:legendData': async (legendData) => {
+      await nextTick();
+      emit('update:legendData', legendData);
     },
   };
 

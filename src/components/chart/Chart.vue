@@ -69,6 +69,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    legendData: {
+      type: Array,
+      default: () => [],
+    },
   },
   emits: [
     'click',
@@ -82,6 +86,7 @@ export default {
     'update:zoomEndIdx',
     'update:realTimeScatterReset',
     'click-legend',
+    'update:legendData',
   ],
   setup(props, { emit }) {
     let evChart = null;
@@ -156,6 +161,10 @@ export default {
 
         if (!injectIsChartGroup && normalizedOptions.zoom.toolbar.show) {
           createEvChartZoom();
+        }
+
+        if (normalizedOptions.legend.show && normalizedOptions.legend.external) {
+          evChart.emitLegendData();
         }
       }
     };
@@ -349,6 +358,18 @@ export default {
       }
     });
 
+    const toggleSeries = (sId) => {
+      evChart?.toggleSeries(sId);
+    };
+
+    const highlightSeries = (sId) => {
+      evChart?.highlightSeries(sId);
+    };
+
+    const unhighlightSeries = () => {
+      evChart?.unhighlightSeries();
+    };
+
     const redraw = () => {
       if (evChart && 'update' in evChart) {
         evChart.update({
@@ -375,6 +396,9 @@ export default {
       wrapperStyle,
       onResize,
       redraw,
+      toggleSeries,
+      highlightSeries,
+      unhighlightSeries,
 
       evChartToolbarRef,
       injectIsChartGroup,

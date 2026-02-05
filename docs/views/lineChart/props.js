@@ -30,6 +30,8 @@ import HoverWithGroup from './example/HoverWithGroup';
 import HoverWithGroupRaw from './example/HoverWithGroup?raw';
 import LegendVirtualScroll from './example/LegendVirtualScroll';
 import LegendVirtualScrollRaw from './example/LegendVirtualScroll?raw';
+import ExternalLegend from './example/ExternalLegend';
+import ExternalLegendRaw from './example/ExternalLegend?raw';
 import Segments from './example/Segments';
 import SegmentsRaw from './example/Segments?raw';
 import Interpolation from './example/Interpolation';
@@ -137,6 +139,12 @@ export default {
       description: 'Legend Virtual Scroll',
       component: LegendVirtualScroll,
       parsedData: parse(LegendVirtualScrollRaw).descriptor,
+    },
+    ExternalLegend: {
+      description:
+        'External Legend를 사용하여 차트 외부에서 범례를 커스터마이징할 수 있습니다.',
+      component: ExternalLegend,
+      parsedData: parse(ExternalLegendRaw).descriptor,
     },
     Segments: {
       description: 'Segments',
