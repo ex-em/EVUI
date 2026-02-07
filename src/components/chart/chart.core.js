@@ -1166,6 +1166,8 @@ class EvChart {
       color,
       type: series.type,
       show: series.show,
+      fill: series.fill,
+      fillColor: series.fillColor
     };
   }
 
