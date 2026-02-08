@@ -173,6 +173,7 @@ export default {
       () => props.options,
       (chartOpt) => {
         const newOpt = getNormalizedOptions(chartOpt);
+        const prevLegendShow = evChart.options?.legend?.show ?? false;
         const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
         const isUpdateTooltip =
           newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
@@ -185,6 +186,14 @@ export default {
           updateLegend: isUpdateLegendType,
           updateTooltip: isUpdateTooltip,
         });
+
+        if (
+          newOpt.legend.show &&
+          newOpt.legend.external &&
+          !prevLegendShow
+        ) {
+          evChart.emitLegendData();
+        }
 
         if (!injectIsChartGroup) {
           setOptionsForUseZoom(newOpt);
