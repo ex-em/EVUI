@@ -67,7 +67,9 @@ describe('EvIcon Snapshot', () => {
         },
       });
 
-      expect(wrapper.html()).toMatchInlineSnapshot(`"<i class="ev-icon-user ev-icon-medium" style="color: rgb(51, 51, 51);"></i>"`);
+      expect(wrapper.html()).toMatchInlineSnapshot(
+        `"<i class="ev-icon-user ev-icon-medium" style="color: rgb(51, 51, 51);"></i>"`,
+      );
     });
   });
 
