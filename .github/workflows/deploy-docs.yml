@@ -12,23 +12,15 @@ jobs:
 
     steps:
       - name: Use Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Use Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v4
         with:
           node-version: 20.x
 
-      - name: Cache node module
-        uses: actions/cache@v3
-        id: cache
-        with:
-          path: node_modules
-          key: npm-packages-${{ hashFiles('**/package-lock.json') }}
-
       - name: Install Dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: npm install
+        run: npm ci
 
       - name: Build Docs
         run: npm run build:docs
