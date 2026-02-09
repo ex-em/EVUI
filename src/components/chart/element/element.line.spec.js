@@ -49,7 +49,6 @@ describe('Chart Interpolation', () => {
     });
   });
 
-
   describe('기존 로직 호환 테스트', () => {
     it('기존 사용법: passingValue만 설정, hasPassingValueInData === true, useLinearInterpolation === true', () => {
       // 기존 사용법: passingValue만 설정
