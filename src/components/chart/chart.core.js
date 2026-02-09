@@ -1097,7 +1097,6 @@ class EvChart {
 
     this.initRect();
     this.initScale();
-    this.chartRect = this.getChartRect();
     this.drawChart();
     if (this.dragInfoBackup) {
       this.drawSelectionArea?.(this.dragInfoBackup);
