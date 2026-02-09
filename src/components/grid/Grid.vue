@@ -585,7 +585,7 @@ import {
 } from 'vue';
 import { cloneDeep } from 'lodash-es';
 import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
-import resize from 'vue-resize-observer';
+import { resize } from '@/directives/resize';
 import { clickoutside } from '@/directives/clickoutside';
 import Toolbar from './GridToolbar';
 import GridPagination from './GridPagination';

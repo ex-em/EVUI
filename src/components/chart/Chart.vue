@@ -19,7 +19,7 @@ import {
   computed,
 } from 'vue';
 import { cloneDeep, isEqual, debounce } from 'lodash-es';
-import resize from 'vue-resize-observer';
+import { resize } from '@/directives/resize';
 import EvChart from './chart.core';
 import EvChartToolbar from './ChartToolbar';
 import { useModel, useWrapper, useZoomModel } from './uses';

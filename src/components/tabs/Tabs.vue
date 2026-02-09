@@ -65,7 +65,7 @@
 <script>
 import { ref, reactive, computed, provide, triggerRef, onBeforeUpdate, nextTick } from 'vue';
 import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
-import resize from 'vue-resize-observer';
+import { resize } from '@/directives/resize';
 
 export default {
   name: 'EvTabs',
