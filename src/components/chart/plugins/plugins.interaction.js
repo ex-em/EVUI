@@ -1,4 +1,4 @@
-import { cloneDeep, defaultsDeep, inRange, isEqual } from 'lodash-es';
+import { cloneDeep, defaultsDeep, inRange, isEqual, isNil } from 'lodash-es';
 import dayjs from 'dayjs';
 import { numberWithComma } from '@/common/utils';
 import throttle from '@/common/utils.throttle';
@@ -347,7 +347,7 @@ const modules = {
         const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
-        if (hitItemId !== null) {
+        if (!isNil(hitItemId)) {
           const allSelectedList = this.updateSelectedSeriesInfo(hitItemId, false);
           this.defaultSelectInfo.seriesId = allSelectedList.seriesId;
 
