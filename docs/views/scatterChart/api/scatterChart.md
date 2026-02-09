@@ -27,7 +27,27 @@ const selectedItem = ref({
 });
 ```
 
-### 2. data
+### 2. v-model:legend-data
+
+- option에서 [legend](#legend)의 `external`이 `true`일 때 유효한 바인딩
+- 차트 내부에 범례를 그리지 않고, 바인딩한 배열로 외부에서 범례를 렌더링할 때 사용
+- 차트가 갱신될 때마다 `{ sId, name, color, type, show }` 형태의 범례 아이템 배열로 갱신됨
+- 외부 범례에서 클릭/호버 시 ref로 노출되는 `toggleSeries(sId)`, `highlightSeries(sId)`, `unhighlightSeries()` 메서드 사용
+
+#### Example
+
+```
+const legendItems = ref([]);
+// legendItems[i]: { sId: string, name: string, color: string, type: string, show: boolean }
+<ev-chart
+  ref="chartRef"
+  v-model:legend-data="legendItems"
+  :options="{ legend: { show: true, external: true } }"
+  ...
+/>
+```
+
+### 3. data
 
   | 이름 | 타입 | 디폴트 | 설명 | 종류 |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
@@ -61,7 +81,7 @@ const chartData =
 };
 ```
 
-### 3. options
+### 4. options
 
   | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
   |------------ |-----------|---------|-------------------------|---------------------------------------------------|
@@ -215,9 +235,10 @@ const chartData =
 | height | Number | 24 | Legend의 높이 *('top', 'bottom'의 경우 조절)* | |
 | padding | Object | { top: 0, right: 0, left: 0, bottom: 0 } | Legend 내부 padding 값 | |
 | allowResize | Boolean | false | Legend 영역 리사이즈 가능 여부 | |
-| stopClickEvt| Boolean | false | Legend 표시 여부 | true /false |
-| virtualScroll | Boolean | false | Legend에 가상 스크롤 적용 여부  | true /false |
-| clickMode       | 'active' \| 'inactive'       | 'active'                                 | Legend 클릭 시 활성화 여부                             |                                  |
+| stopClickEvt  | Boolean | false | Legend 표시 여부 | true /false |
+| virtualScroll | Boolean | false | Legend에 가상 스크롤 적용 여부 | true /false |
+| clickMode     | 'active' \| 'inactive' | 'active' | Legend 클릭 시 활성화 여부 | |
+| external      | Boolean | false | 범례를 차트 외부에서 렌더링할지 여부. true이면 차트 내부에 범례를 그리지 않고, `v-model:legend-data`로 전달된 배열을 외부에서 렌더링할 수 있음. ref로 `toggleSeries(sId)`, `highlightSeries(sId)`, `unhighlightSeries()` 사용 | true / false |
 
 #### dragSelection
 

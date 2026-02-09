@@ -138,6 +138,11 @@ class EvChart {
     this.isInit = true;
   }
 
+  _updateSeriesCount() {
+    this.seriesInfo.count = Object.values(this.seriesList)
+      .filter((s) => s.show).length;
+  }
+
   /**
    * Initialize chart rectangle
    *
@@ -153,12 +158,14 @@ class EvChart {
       this.showTitle();
     }
 
-    if (opt.legend.show) {
+    if (opt.legend.show && !opt.legend.external) {
       if (!this.isInitLegend) {
         this.initLegend();
       }
 
       this.setLegendPosition();
+    } else if (opt.legend.show && opt.legend.external) {
+      this._updateSeriesCount();
     }
 
     if (opt.axesX?.[0]?.scrollbar?.use || opt.axesY?.[0]?.scrollbar?.use) {
@@ -909,7 +916,7 @@ class EvChart {
 
       this.createSeriesSet(series, options.type, options.horizontal, groups);
 
-      if (this.legendDOM) {
+      if (this.legendDOM && !options.legend.external) {
         this.updateLegend();
       }
     }
@@ -953,7 +960,7 @@ class EvChart {
       }
 
       // legend Update
-      if (options.legend.show) {
+      if (options.legend.show && !options.legend.external) {
         const useTable =
           !!options.legend?.table?.use && options.type !== 'heatMap' && options.type !== 'scatter';
 
@@ -970,6 +977,11 @@ class EvChart {
         this.setLegendPosition();
         this.updateLegendContainerSize();
         this.showLegend();
+      } else if (options.legend.show && options.legend.external) {
+        if (updateSeries || updateData) {
+          this._updateSeriesCount();
+          this.emitLegendData();
+        }
       } else if (this.isInitLegend) {
         this.hideLegend();
       }
@@ -1123,6 +1135,185 @@ class EvChart {
   }
 
   /**
+   * Get legend series list respecting group order
+   *
+   * @returns {Array} array of [sId, series] pairs
+   */
+  _getLegendSeries() {
+    const groups = this.data.groups?.at(0);
+    if (groups) {
+      return groups
+        .filter((sId) => this.seriesList[sId]?.showLegend)
+        .map((sId) => [sId, this.seriesList[sId]]);
+    }
+    return Object.entries(this.seriesList)
+      .filter(([, series]) => series.showLegend);
+  }
+
+  /**
+   * Convert series object to plain legend item
+   *
+   * @param {object} series  series object
+   * @returns {object} legend item
+   */
+  _seriesToLegendItem(series) {
+    const color = typeof series.color !== 'string'
+      ? series.color[series.color.length - 1][1]
+      : series.color;
+    return {
+      sId: series.sId,
+      name: series.name,
+      color,
+      type: series.type,
+      show: series.show,
+      fill: series.fill,
+      fillColor: series.fillColor
+    };
+  }
+
+  /**
+   * Build legend data array from current seriesList
+   *
+   * @returns {Array} legend items
+   */
+  buildLegendData() {
+    return this._getLegendSeries()
+      .map(([, series]) => this._seriesToLegendItem(series));
+  }
+
+  /**
+   * Emit legend data through listeners
+   *
+   * @returns {undefined}
+   */
+  emitLegendData() {
+    if (typeof this.listeners['update:legendData'] === 'function') {
+      this.listeners['update:legendData'](this.buildLegendData());
+    }
+  }
+
+  /**
+   * Toggle series visibility (for external legend)
+   *
+   * @param {string} sId  series ID to toggle
+   * @returns {undefined}
+   */
+  toggleSeries(sId) {
+    const series = this.seriesList[sId];
+    if (!series) {
+      return;
+    }
+
+    const opt = this.options.legend;
+    const legendSeries = this._getLegendSeries();
+
+    if (opt.clickMode === 'active') {
+      const isActiveAll = legendSeries.every(([, s]) => s.show);
+
+      if (isActiveAll) {
+        legendSeries.forEach(([, s]) => { s.show = false; });
+        series.show = true;
+        this.seriesInfo.count = 1;
+      } else if (series.show) {
+        series.show = false;
+        this.seriesInfo.count--;
+      } else {
+        series.show = true;
+        this.seriesInfo.count++;
+      }
+
+      const isInactiveAll = legendSeries.every(([, s]) => !s.show);
+      if (isInactiveAll) {
+        legendSeries.forEach(([, s]) => { s.show = true; });
+        this.seriesInfo.count = legendSeries.length;
+      }
+    } else {
+      if (series.show && this.seriesInfo.count === 1) {
+        return;
+      }
+
+      if (series.show) {
+        series.show = false;
+        this.seriesInfo.count--;
+      } else {
+        series.show = true;
+        this.seriesInfo.count++;
+      }
+    }
+
+    if (this.brushSeries) {
+      const { chartIdx } = this.data;
+      const seriesList = [...this.brushSeries.list];
+      seriesList[chartIdx] = this.seriesList;
+      this.brushSeries.list = seriesList;
+      this.brushSeries.chartIdx = chartIdx;
+    }
+
+    if (this.options.eventBehavior?.legendClick !== 'emitOnly') {
+      this.update({
+        updateSeries: false,
+        updateSelTip: { update: true, keepDomain: true },
+      });
+    }
+
+    const activeSeries = Object.values(this.seriesList).filter((s) => s.show);
+    const activeSeriesIds = activeSeries.map((s) => s.sId);
+    const isActiveAll = activeSeriesIds.length === Object.values(this.seriesList).length;
+    const args = {
+      data: {
+        seriesIds: isActiveAll ? [] : activeSeriesIds,
+        isActiveAll,
+      },
+    };
+
+    if (typeof this.listeners['click-legend'] === 'function') {
+      this.listeners['click-legend'](args);
+    }
+
+    if (this.options.legend.show && this.options.legend.external) {
+      this.emitLegendData();
+    }
+  }
+
+  /**
+   * Highlight a series (for external legend hover)
+   *
+   * @param {string} sId  series ID to highlight
+   * @returns {undefined}
+   */
+  highlightSeries(sId) {
+    const legendHitInfo = { sId, type: this.options.type };
+    this.legendHover = legendHitInfo;
+
+    this.update({
+      updateSeries: false,
+      updateSelTip: { update: false, keepDomain: false },
+      hitInfo: {
+        legend: legendHitInfo,
+      },
+      lightUpdate: true,
+    });
+  }
+
+  /**
+   * Remove series highlight (for external legend mouse leave)
+   *
+   * @returns {undefined}
+   */
+  unhighlightSeries() {
+    this.legendHover = null;
+
+    this.update({
+      updateSeries: false,
+      updateSelTip: { update: false, keepDomain: false },
+      hitInfo: {
+        legend: null,
+      },
+      lightUpdate: true,
+    });
+  }
+
+  /**
    * destroy chart component
    *
    * @returns {undefined}
@@ -1134,7 +1325,7 @@ class EvChart {
 
     const target = this.target;
 
-    if (this.options.legend.show) {
+    if (this.options.legend.show && !this.options.legend.external) {
       if (this.legendBoxDOM) {
         this.legendBoxDOM.removeEventListener('click', this.onLegendBoxClick);
         this.legendBoxDOM.removeEventListener('mouseover', this.onLegendBoxOver);

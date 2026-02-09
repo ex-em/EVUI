@@ -69,6 +69,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    legendData: {
+      type: Array,
+      default: () => [],
+    },
   },
   emits: [
     'click',
@@ -82,6 +86,7 @@ export default {
     'update:zoomEndIdx',
     'update:realTimeScatterReset',
     'click-legend',
+    'update:legendData',
   ],
   setup(props, { emit }) {
     let evChart = null;
@@ -157,6 +162,10 @@ export default {
         if (!injectIsChartGroup && normalizedOptions.zoom.toolbar.show) {
           createEvChartZoom();
         }
+
+        if (normalizedOptions.legend.show && normalizedOptions.legend.external) {
+          evChart.emitLegendData();
+        }
       }
     };
 
@@ -164,6 +173,7 @@ export default {
       () => props.options,
       (chartOpt) => {
         const newOpt = getNormalizedOptions(chartOpt);
+        const prevLegendShow = evChart.options?.legend?.show ?? false;
         const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
         const isUpdateTooltip =
           newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
@@ -176,6 +186,14 @@ export default {
           updateLegend: isUpdateLegendType,
           updateTooltip: isUpdateTooltip,
         });
+
+        if (
+          newOpt.legend.show &&
+          newOpt.legend.external &&
+          !prevLegendShow
+        ) {
+          evChart.emitLegendData();
+        }
 
         if (!injectIsChartGroup) {
           setOptionsForUseZoom(newOpt);
@@ -349,6 +367,18 @@ export default {
       }
     });
 
+    const toggleSeries = (sId) => {
+      evChart?.toggleSeries(sId);
+    };
+
+    const highlightSeries = (sId) => {
+      evChart?.highlightSeries(sId);
+    };
+
+    const unhighlightSeries = () => {
+      evChart?.unhighlightSeries();
+    };
+
     const redraw = () => {
       if (evChart && 'update' in evChart) {
         evChart.update({
@@ -375,6 +405,9 @@ export default {
       wrapperStyle,
       onResize,
       redraw,
+      toggleSeries,
+      highlightSeries,
+      unhighlightSeries,
 
       evChartToolbarRef,
       injectIsChartGroup,
