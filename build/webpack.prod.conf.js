@@ -14,7 +14,7 @@ function resolve (dir) {
 }
 
 const webpackConfig = merge(webpackBaseConfig, {
-  mode: 'development',
+  mode: 'production',
   devtool: 'source-map',
   entry: resolve('./src/index.js'),
   output: {
@@ -35,9 +35,8 @@ const webpackConfig = merge(webpackBaseConfig, {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.EnvironmentPlugin(['NODE_ENV']),
+    new webpack.EnvironmentPlugin({ NODE_ENV: 'production' }),
     new CompressionPlugin({
       filename: '[path].gz[query]',
       algorithm: 'gzip',
@@ -45,9 +44,7 @@ const webpackConfig = merge(webpackBaseConfig, {
       threshold: 10240,
       minRatio: 0.8
     }),
-    new CleanWebpackPlugin(),
     new FriendlyErrorsPlugin(),
-    // new CleanWebpackPlugin([resolve('./dist')], { allowExternal : true }),
     new VueLoaderPlugin(),
   ]
 });
