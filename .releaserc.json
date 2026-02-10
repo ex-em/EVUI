@@ -1,5 +1,6 @@
 {
-  "branches": ["3.0", "3.4"],
+  "tagFormat": "${version}",
+  "branches": ["3.4"],
   "plugins": [
     ["@semantic-release/commit-analyzer", {
       "releaseRules": [
