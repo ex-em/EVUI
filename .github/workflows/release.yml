@@ -50,3 +50,16 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npx semantic-release ${{ inputs.dry-run && '--dry-run' || '' }}
+
+      - name: Create version bump PR
+        if: ${{ !inputs.dry-run }}
+        uses: peter-evans/create-pull-request@v7
+        with:
+          commit-message: 'chore(release): update package.json and CHANGELOG.md'
+          title: 'chore(release): version bump'
+          branch: release/version-bump
+          delete-branch: true
+          base: '3.4'
+          add-paths: |
+            package.json
+            CHANGELOG.md
