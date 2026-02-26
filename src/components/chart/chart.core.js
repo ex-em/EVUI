@@ -207,8 +207,8 @@ class EvChart {
       return result;
     };
 
-    const adjustedRange = {
-      x: this.axesRange?.x?.map((value, index) => {
+    const remeasureRange = currentRange => ({
+      x: currentRange?.x?.map((value, index) => {
         const axis = this.axesX[index];
         const axesSteps = this.axesSteps?.x[index];
         const notFormattedLabels = getNotFormattedLabels(axesSteps, 'x', axis);
@@ -226,7 +226,7 @@ class EvChart {
           },
         };
       }),
-      y: this.axesRange?.y?.map((value, index) => {
+      y: currentRange?.y?.map((value, index) => {
         const axis = this.axesY[index];
         const axesSteps = this.axesSteps?.y[index];
         const notFormattedLabels = getNotFormattedLabels(axesSteps, 'y', axis);
@@ -244,12 +244,17 @@ class EvChart {
           },
         };
       }),
-    };
+    });
 
-    this.axesRange = adjustedRange;
-    this.labelOffset = this.getLabelOffset(adjustedRange);
+    this.axesRange = remeasureRange(this.axesRange);
+    this.labelOffset = this.getLabelOffset(this.axesRange);
     this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
+
+    // 새로운 step 기준으로 라벨 너비를 다시 측정하여 잘림 방지
+    // TODO: 추후 개선 (3.4.200 이후 버전)
+    this.axesRange = remeasureRange(this.axesRange);
+    this.labelOffset = this.getLabelOffset(this.axesRange);
   }
 
   /**
