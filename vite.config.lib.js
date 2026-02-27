@@ -6,7 +6,10 @@ import path from 'path';
 export default defineConfig({
   build: {
     lib: {
-      entry: path.resolve(__dirname, 'src/main.js'),
+      entry: {
+        main: path.resolve(__dirname, 'src/main.js'),
+        resolver: path.resolve(__dirname, 'src/resolver.js'),
+      },
       formats: ['es'],
     },
     rollupOptions: {
