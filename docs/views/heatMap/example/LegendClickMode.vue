@@ -25,10 +25,11 @@
         inactive, 처음 클릭시 해당 시리즈만 감춤, 마지막 남은 범례 클릭시 무시
       </p>
     </div>
-    <ev-chart
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <ev-chart :data="chartData" :options="chartOptions" @click-legend="handleClickLegend" />
+    <div class="result">
+      <div class="badge yellow">클릭된 시리즈 ID</div>
+      {{ clickedSeriesIndices }}
+    </div>
   </div>
 </template>
 
@@ -91,10 +92,18 @@ import { reactive, ref, computed } from 'vue';
         },
       }));
 
+      const clickedSeriesIndices = ref([]);
+
+      const handleClickLegend = (e) => {
+        clickedSeriesIndices.value = e.data.seriesIndices;
+      };
+
       return {
         chartData,
         chartOptions,
         legendClickMode,
+        clickedSeriesIndices,
+        handleClickLegend,
       };
     },
   };

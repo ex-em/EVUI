@@ -34,70 +34,71 @@
   import EvChartToolbar from './ChartToolbar';
   import { useModel, useWrapper, useZoomModel } from './uses';
 
-  export default {
-    name: 'EvChart',
-    components: {
-      EvChartToolbar,
+export default {
+  name: 'EvChart',
+  components: {
+    EvChartToolbar,
+  },
+  props: {
+    selectedItem: {
+      type: Object,
+      default: null,
     },
-    props: {
-      selectedItem: {
-        type: Object,
-        default: null,
-      },
-      selectedLabel: {
-        type: Object,
-        default: null,
-      },
-      selectedSeries: {
-        type: Object,
-        default: null,
-      },
-      options: {
-        type: Object,
-        default: () => ({}),
-      },
-      data: {
-        type: Object,
-        default: () => ({}),
-      },
-      resizeTimeout: {
-        type: Number,
-        default: 0,
-      },
-      zoomStartIdx: {
-        type: Number,
-        default: 0,
-      },
-      zoomEndIdx: {
-        type: Number,
-        default: 0,
-      },
-      realTimeScatterReset: {
-        type: Boolean,
-        default: false,
-      },
+    selectedLabel: {
+      type: Object,
+      default: null,
     },
-    emits: [
-      'click',
-      'dbl-click',
-      'drag-select',
-      'mouse-move',
-      'update:selectedItem',
-      'update:selectedLabel',
-      'update:selectedSeries',
-      'update:zoomStartIdx',
-      'update:zoomEndIdx',
-      'update:realTimeScatterReset',
-    ],
-    setup(props, { emit }) {
-      let evChart = null;
-      const isMounted = ref(false);
-      const injectIsChartGroup = inject('isChartGroup', false);
-      const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
-      const injectGroupSelectedLabel = inject('groupSelectedLabel', null);
-      const injectGroupHoveredLabel = inject('groupHoveredLabel', null);
-      const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
-      const injectEvChartPropsInGroup = inject('evChartPropsInGroup', []);
+    selectedSeries: {
+      type: Object,
+      default: null,
+    },
+    options: {
+      type: Object,
+      default: () => ({}),
+    },
+    data: {
+      type: Object,
+      default: () => ({}),
+    },
+    resizeTimeout: {
+      type: Number,
+      default: 0,
+    },
+    zoomStartIdx: {
+      type: Number,
+      default: 0,
+    },
+    zoomEndIdx: {
+      type: Number,
+      default: 0,
+    },
+    realTimeScatterReset: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: [
+    'click',
+    'dbl-click',
+    'drag-select',
+    'mouse-move',
+    'update:selectedItem',
+    'update:selectedLabel',
+    'update:selectedSeries',
+    'update:zoomStartIdx',
+    'update:zoomEndIdx',
+    'update:realTimeScatterReset',
+    'click-legend',
+  ],
+  setup(props, { emit }) {
+    let evChart = null;
+    const isMounted = ref(false);
+    const injectIsChartGroup = inject('isChartGroup', false);
+    const injectBrushSeries = inject('brushSeries', { list: [], chartIdx: null });
+    const injectGroupSelectedLabel = inject('groupSelectedLabel', null);
+    const injectGroupHoveredLabel = inject('groupHoveredLabel', null);
+    const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
+    const injectEvChartPropsInGroup = inject('evChartPropsInGroup', []);
 
       const {
         eventListeners,
@@ -269,9 +270,12 @@
 
           emit('update:realTimeScatterReset', false);
         }
-      });
+      },
+    );
 
-      watch(() => props.options.realTimeScatter?.use, (use) => {
+    watch(
+      () => props.options.realTimeScatter?.use,
+      (use) => {
         evChart.options.realTimeScatter.use = use ?? false;
 
         evChart.update({
