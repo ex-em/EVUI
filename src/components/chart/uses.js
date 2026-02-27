@@ -248,6 +248,9 @@ const DEFAULT_OPTIONS = {
   },
   seriesReverse: false,
   coordinateDedupe: true,
+  eventBehavior: {
+    legendClick: 'update',
+  },
 };
 
 const DEFAULT_DATA = {
@@ -401,6 +404,10 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
       if (injectGroupHoveredLabel?.value) {
         injectGroupHoveredLabel.value.label = null;
       }
+    },
+    'click-legend': async (e) => {
+      await nextTick();
+      emit('click-legend', e);
     },
   };
 

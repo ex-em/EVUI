@@ -80,6 +80,7 @@ const chartData =
   | realTimeScatter | Object | ([상세](#realtimescatter)) | 실시간으로 데이터를 처리하는 real time scatter로 변경 여부 및 속성 | |
   | seriesReverse | Boolean | false | 시리즈 순서 반대로 표시 여부 | |
   | coordinateDedupe | Boolean | true | 좌표 중복 제거 여부 | |
+  | eventBehavior | Object | ([상세](#eventbehavior)) | 이벤트별 동작 설정 | | 
 
 #### axesX axesY
 
@@ -333,6 +334,14 @@ const chartOptions = {
 | tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
 | tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
 
+#### eventBehavior
+
+이벤트별 동작을 설정하는 옵션 객체.
+
+| 이름         | 타입   | 디폴트   | 설명                                                                 | 종류(예시)           |
+| ----------- | ------ | -------- | -------------------------------------------------------------------- | -------------------- |
+| legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
+
 - 3.4 버전부터 없어지는 옵션입니다.
 
 ##### tipStyle
@@ -357,6 +366,7 @@ const chartOptions = {
  |------|----------|------|
  | mouse-move |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환                                                                                                                                 |
  | drag-select | data, range | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
+| click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 
 - drag-select는  `dragSelection` 옵션의 `use`값이 `true` 일 때 이벤트를 발생 시킬 수 있다.
  그리고 선택영역은 그래프에 표시된 데이터의 중앙이 포함 되어야 선택영역 내 데이터로 인식 한다.
