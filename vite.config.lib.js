@@ -7,15 +7,22 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, 'src/main.js'),
-      name: 'evui',
-      fileName: 'index',
+      formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue'],
+      external: [
+        'vue',
+        'lodash-es',
+        'dayjs',
+        'bignumber.js',
+        'korean-regexp',
+        'vue-resize-observer',
+        'vue3-observe-visibility',
+      ],
       output: {
-        globals: {
-          vue: 'Vue',
-        },
+        preserveModules: true,
+        preserveModulesRoot: 'src',
+        entryFileNames: '[name].js',
       },
     },
   },
