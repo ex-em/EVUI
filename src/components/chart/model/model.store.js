@@ -96,13 +96,13 @@ const modules = {
       const key = keys[x];
       const data = datas[key];
       const storeLength = data?.length;
-      let lastTime = 0;
 
-      if (!this.isInit || this.updateSeries) {
+      // 1) init / updateSeries 시 dataset shape 보장
+      if (!this.isInit || this.updateSeries || !this.dataSet[key]) {
         const defaultValues = {
           dataGroup: [],
           startIndex: 0,
-          endIndex: 0,
+          endIndex: null,
           length: 0,
           fromTime: 0,
           toTime: 0,
@@ -114,122 +114,126 @@ const modules = {
         };
       }
 
-      this.dataSet[key].length = this.options.realTimeScatter.range || 300;
+      const dataset = this.dataSet[key];
+      const dataGroup = dataset.dataGroup;
 
+      // 2) range(length) 결정 + 변경 감지
+      const nextLength = this.options.realTimeScatter.range || 300;
+      const lengthChanged = dataset.length !== nextLength;
+      dataset.length = nextLength;
+      const length = dataset.length;
+
+      // 3) 이번 배치의 lastTime(초 단위) 계산
+      let lastTime = 0;
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
-
-        if (lastTime < item.x) {
+        if (item && lastTime < item.x) {
           lastTime = item.x;
         }
       }
 
-      lastTime = Math.floor(lastTime / 1000) * 1000;
+      lastTime = lastTime ? Math.floor(lastTime / 1000) * 1000 : 0;
 
-      const dataGroupLastTime = this.dataSet[key].dataGroup.at(-1)?.data?.at(-1)?.x || Date.now();
+      const dataGroupLastTime = dataGroup.at(-1)?.data?.at(-1)?.x || Date.now();
+      const fallbackTime = Math.floor(dataGroupLastTime / 1000) * 1000;
 
-      this.dataSet[key].toTime = lastTime
-        || (dataGroupLastTime ? Math.floor(dataGroupLastTime / 1000) * 1000 : 0);
-      this.dataSet[key].fromTime = this.dataSet[key].toTime - this.dataSet[key].length * 1000;
-      this.dataSet[key].endIndex = this.dataSet[key].length - 1;
+      // 4) prevToTime은 덮기 전 값 (없으면 fallback)
+      const prevToTime = dataset.toTime || fallbackTime;
 
-      if (
-        (this.dataSet[key].toTime - lastTime) / 1000
-        > this.dataSet[key].length && key === ''
-      ) {
+      // 5) nextToTime 결정: 새 데이터가 있으면 lastTime, 없으면 이전 유지
+      const nextToTime = lastTime || prevToTime;
+
+      // 6) endIndex/startIndex 초기화 (최초 1회) + length 변경 시 재구성
+      if (dataset.endIndex == null || lengthChanged) {
+        dataset.startIndex = 0;
+        dataset.endIndex = length - 1;
+
+        // dataGroup 크기 맞추고 모두 reset
+        dataGroup.length = length;
+        for (let i = 0; i < length; i++) {
+          dataGroup[i] = dataGroup[i] || { data: [], max: 0, min: Infinity };
+          dataGroup[i].data.length = 0;
+          dataGroup[i].max = 0;
+          dataGroup[i].min = Infinity;
+        }
+
+        // toTime/fromTime도 새 기준으로 맞춤
+        dataset.toTime = nextToTime;
+        dataset.fromTime = dataset.toTime - length * 1000;
+      }
+
+      // 7) gapCount 계산 (반드시 정수) — prevToTime 기준
+      const rawGap = (nextToTime - prevToTime) / 1000;
+      const gapCount = Number.isFinite(rawGap) ? Math.max(0, Math.floor(rawGap)) : 0;
+
+      // 8) to/from 갱신
+      dataset.toTime = nextToTime;
+      dataset.fromTime = dataset.toTime - length * 1000;
+
+      // (원래 코드에 있던 early return 유지)
+      if (lastTime && (dataset.toTime - lastTime) / 1000 > length && key === '') {
         return;
       }
 
-      let gapCount = (lastTime - this.dataSet[key].toTime) / 1000;
-      if (gapCount > 0) {
-        this.dataSet[key].toTime = lastTime;
-        this.dataSet[key].fromTime = lastTime
-          - this.dataSet[key].length * 1000;
-      }
+      const resetDataGroup = (group) => {
+        group.data.length = 0;
+        group.max = 0;
+        group.min = Infinity;
+      };
 
-      for (let i = 0; i < this.dataSet[key].length; i++) {
-        const defaultValues = {
-          data: [],
-          max: 0,
-          min: Infinity,
-        };
-
-        this.dataSet[key].dataGroup[i] = {
-          ...defaultValues,
-          ...this.dataSet[key].dataGroup[i],
-        };
-      }
-      if (gapCount > 0) {
-        if (gapCount >= this.dataSet[key].length) {
-          for (let i = 0; i < this.dataSet[key].length; i++) {
-            this.dataSet[key].dataGroup[i].data.length = 0;
-            this.dataSet[key].dataGroup[i].max = 0;
-            this.dataSet[key].dataGroup[i].min = Infinity;
-          }
-
-          this.dataSet[key].startIndex = 0;
-          this.dataSet[key].endIndex = this.dataSet[key].length - 1;
-        } else {
-          while (gapCount > 0) {
-            if (
-              this.dataSet[key].dataGroup[this.dataSet[key].startIndex]
-               === null
-            ) {
-              this.dataSet[key].dataGroup[this.dataSet[key].startIndex] = {
-                data: [],
-                max: 0,
-                min: Infinity,
-              };
-            } else {
-              this.dataSet[key]
-                .dataGroup[this.dataSet[key].startIndex].data.length = 0;
-              this.dataSet[key]
-                .dataGroup[this.dataSet[key].startIndex].max = 0;
-              this.dataSet[key]
-                .dataGroup[this.dataSet[key].startIndex].min = Infinity;
-            }
-
-            ++this.dataSet[key].startIndex;
-
-            if (this.dataSet[key].startIndex >= this.dataSet[key].length) {
-              this.dataSet[key].startIndex = 0;
-            }
-
-            ++this.dataSet[key].endIndex;
-            if (this.dataSet[key].endIndex >= this.dataSet[key].length) {
-              this.dataSet[key].endIndex = 0;
-            }
-            --gapCount;
-          }
+      // 9) dataGroup 슬롯 확보
+      for (let i = 0; i < length; i++) {
+        if (!dataGroup[i]) {
+          dataGroup[i] = { data: [], max: 0, min: Infinity };
+        } else if (!dataGroup[i].data) {
+          dataGroup[i].data = [];
+          dataGroup[i].max = 0;
+          dataGroup[i].min = Infinity;
         }
       }
 
-      for (let i = 0; i < storeLength; i++) {
-        const item = data[i];
-        const xAxisTime = Math.floor(item.x / 1000) * 1000;
+      // 10) gap만큼 링 전진 + 지나간 버킷 clear
+      if (gapCount > 0) {
+        if (gapCount >= length) {
+          for (let i = 0; i < length; i++) resetDataGroup(dataGroup[i]);
+          dataset.startIndex = 0;
+          dataset.endIndex = length - 1;
+        } else {
+          let currentStart = dataset.startIndex;
+          let currentEnd = dataset.endIndex;
 
-        if (this.dataSet[key].fromTime <= xAxisTime) {
-          let index = this.dataSet[key].endIndex
-          - (this.dataSet[key].toTime - xAxisTime) / 1000;
-          if (index < 0) {
-            index = this.dataSet[key].length + index;
+          for (let i = 0; i < gapCount; i++) {
+            resetDataGroup(dataGroup[currentStart]);
+            currentStart = (currentStart + 1) % length;
+            currentEnd = (currentEnd + 1) % length;
           }
 
-          this.dataSet[key].dataGroup[index].data.push({
-            x: item.x,
-            y: item.y,
-            o: item.value ?? item.y,
-            color: item.color,
-          });
+          dataset.startIndex = currentStart;
+          dataset.endIndex = currentEnd;
+        }
+      }
 
-          this.dataSet[key].dataGroup[index].max = Math.max(
-            this.dataSet[key].dataGroup[index].max,
-            item.y,
-          );
-          this.dataSet[key].dataGroup[index].min = Math.min(
-            this.dataSet[key].dataGroup[index].min,
-            item.y,
-          );
+      // 11) 데이터 push (윈도우 안에 들어오는 것만)
+      for (let i = 0; i < storeLength; i++) {
+        const item = data[i];
+        if (item) {
+          const xAxisTime = Math.floor(item.x / 1000) * 1000;
+
+          if (dataset.fromTime <= xAxisTime) {
+            let index = dataset.endIndex - (dataset.toTime - xAxisTime) / 1000;
+            if (index < 0) index = length + index;
+
+            const group = dataGroup[index];
+            group.data.push({
+              x: item.x,
+              y: item.y,
+              o: item.value ?? item.y,
+              color: item.color,
+            });
+
+            group.max = Math.max(group.max, item.y);
+            group.min = Math.min(group.min, item.y);
+          }
         }
       }
 
@@ -239,10 +243,10 @@ const modules = {
         minY: Infinity,
       };
 
-      const { fromTime, toTime } = this.dataSet[key];
+      const { fromTime, toTime } = dataset;
 
-      for (let i = 0; i < this.dataSet[key].length; i++) {
-        const groupData = this.dataSet[key].dataGroup[i].data;
+      for (let i = 0; i < length; i++) {
+        const groupData = dataGroup[i].data;
         for (let j = 0; j < groupData.length; j++) {
           const item = groupData[j];
           // 현재 시간 범위 내의 데이터만 minMax 계산에 포함
@@ -267,8 +271,8 @@ const modules = {
 
       minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
       minMaxValues.minY = Math.min(minMaxValues.minY, tempMinMax.minY);
-      minMaxValues.fromTime = this.dataSet[key].fromTime;
-      minMaxValues.toTime = this.dataSet[key].toTime;
+      minMaxValues.fromTime = dataset.fromTime;
+      minMaxValues.toTime = dataset.toTime;
     }
 
     this.seriesInfo.charts.scatter.forEach((seriesID) => {
