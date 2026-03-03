@@ -1,6 +1,6 @@
 <template>
   <article class="article-wrapper">
-    <h3 class="article-title">API</h3>
+    <h3 id="api" class="article-title">API</h3>
     <div
       v-highlight
       class="markdown"
