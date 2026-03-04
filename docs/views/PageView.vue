@@ -4,21 +4,40 @@
   </h2>
 
   <!-- Article Breadcrumb -->
-  <nav
+  <div
     v-if="articleNames.length"
-    ref="breadcrumbRef"
-    class="article-breadcrumb"
+    class="article-breadcrumb-wrapper"
   >
-    <a
-      v-for="name in articleNames"
-      :key="name"
-      :class="['breadcrumb-item', { active: activeArticle === toKebab(name) }]"
-      :title="name"
-      @click="scrollToArticle(name)"
+    <button
+      v-if="canScrollLeft"
+      class="breadcrumb-scroll-btn breadcrumb-scroll-btn-left"
+      @click="scrollLeft"
     >
-      {{ name }}
-    </a>
-  </nav>
+      <i class="ev-icon-s-arrow-left" />
+    </button>
+    <nav
+      ref="breadcrumbRef"
+      class="article-breadcrumb"
+      @scroll="updateScrollButtons"
+    >
+      <a
+        v-for="name in articleNames"
+        :key="name"
+        :class="['breadcrumb-item', { active: activeArticle === toKebab(name) }]"
+        :title="name"
+        @click="scrollToArticle(name)"
+      >
+        {{ name }}
+      </a>
+    </nav>
+    <button
+      v-if="canScrollRight"
+      class="breadcrumb-scroll-btn breadcrumb-scroll-btn-right"
+      @click="scrollRight"
+    >
+      <i class="ev-icon-s-arrow-right" />
+    </button>
+  </div>
 
   <example
     v-for="(value, name, index) in components"
@@ -61,6 +80,8 @@ export default {
     const currentMenu = computed(() => router.currentRoute?.value.name);
     const activeArticle = ref('');
     const breadcrumbRef = ref(null);
+    const canScrollLeft = ref(false);
+    const canScrollRight = ref(false);
     let ticking = false;
 
     const toKebab = name => kebabCase(name);
@@ -112,6 +133,30 @@ export default {
       }
     };
 
+    // 스크롤 버튼 표시 상태 업데이트
+    const updateScrollButtons = () => {
+      const container = breadcrumbRef.value;
+      if (!container) return;
+      
+      const { scrollLeft, scrollWidth, clientWidth } = container;
+      canScrollLeft.value = scrollLeft > 0;
+      canScrollRight.value = scrollLeft < scrollWidth - clientWidth - 1;
+    };
+
+    // 왼쪽으로 스크롤
+    const scrollLeft = () => {
+      const container = breadcrumbRef.value;
+      if (!container) return;
+      container.scrollBy({ left: -200, behavior: 'smooth' });
+    };
+
+    // 오른쪽으로 스크롤
+    const scrollRight = () => {
+      const container = breadcrumbRef.value;
+      if (!container) return;
+      container.scrollBy({ left: 200, behavior: 'smooth' });
+    };
+
     // active breadcrumb 아이템이 보이도록 자동 스크롤
     watch(activeArticle, () => {
       nextTick(() => {
@@ -125,6 +170,7 @@ export default {
             activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
           }
         }
+        updateScrollButtons();
       });
     });
 
@@ -133,16 +179,34 @@ export default {
       activeArticle.value = '';
       nextTick(() => {
         updateActiveArticle();
+        updateScrollButtons();
       });
     });
 
+    // articleNames 변경 시 스크롤 버튼 상태 업데이트
+    watch(articleNames, () => {
+      nextTick(() => {
+        updateScrollButtons();
+      });
+    });
+
+    // 창 크기 변경 시 스크롤 버튼 상태 업데이트
+    const handleResize = () => {
+      updateScrollButtons();
+    };
+
     onMounted(() => {
       window.addEventListener('scroll', handleScroll, { passive: true });
-      nextTick(() => updateActiveArticle());
+      window.addEventListener('resize', handleResize, { passive: true });
+      nextTick(() => {
+        updateActiveArticle();
+        updateScrollButtons();
+      });
     });
 
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
     });
 
     return {
@@ -150,8 +214,13 @@ export default {
       articleNames,
       activeArticle,
       breadcrumbRef,
+      canScrollLeft,
+      canScrollRight,
       toKebab,
       scrollToArticle,
+      scrollLeft,
+      scrollRight,
+      updateScrollButtons,
     };
   },
 };
@@ -161,20 +230,26 @@ export default {
 @import '../style/index.scss';
 
 /* ── Article Breadcrumb ── */
-.article-breadcrumb {
-  display: flex;
-  gap: 6px;
+.article-breadcrumb-wrapper {
   position: sticky;
   top: $header-height;
   z-index: 4;
-  padding: 12px 0;
+  display: flex;
+  align-items: center;
   margin-bottom: 10px;
-  overflow-x: auto;
 
   @include themify() {
     background-color: themed('background-color-base');
     border-bottom: 1px solid themed('border-color-base');
   }
+}
+
+.article-breadcrumb {
+  display: flex;
+  gap: 6px;
+  padding: 12px 0;
+  overflow-x: auto;
+  flex: 1;
 
   /* 스크롤바 숨김 */
   &::-webkit-scrollbar {
@@ -182,6 +257,49 @@ export default {
   }
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+.breadcrumb-scroll-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all $animate-fast;
+  flex-shrink: 0;
+  z-index: 5;
+
+  @include themify() {
+    background-color: themed('background-color-description');
+    color: themed('font-color-nav');
+    border: 1px solid themed('border-color-base');
+  }
+
+  &:hover {
+    background-color: $color-blue;
+    color: $color-white;
+    border-color: $color-blue;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  i {
+    font-size: 16px;
+  }
+}
+
+.breadcrumb-scroll-btn-left {
+  margin-right: 8px;
+}
+
+.breadcrumb-scroll-btn-right {
+  margin-left: 8px;
 }
 
 .breadcrumb-item {
