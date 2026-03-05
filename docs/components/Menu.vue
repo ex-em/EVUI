@@ -200,9 +200,9 @@ export default {
 /* ── Search Bar ── */
 .evui-nav-search {
   display: flex;
-  align-items: center;
-  padding: 12px 16px;
   position: relative;
+  padding: 12px 16px;
+  align-items: center;
   min-width: $nav-width;
 
   @include themify() {
@@ -230,9 +230,9 @@ export default {
   transition: border-color $animate-fast, background-color $animate-fast;
 
   @include themify() {
+    border: 1px solid themed('border-color-base');
     background-color: themed('background-color-description');
     color: themed('font-color-base');
-    border: 1px solid themed('border-color-base');
   }
 
   &:focus {
@@ -286,25 +286,25 @@ export default {
 
 /* ── Toggle Button ── */
 .evui-nav-toggle {
+  display: flex;
   position: fixed;
+  z-index: 15;
   top: calc(#{$header-height} + 14px);
   left: calc(#{$nav-width} - 14px);
-  z-index: 15;
   width: 28px;
   height: 28px;
+  justify-content: center;
+  align-items: center;
   border-radius: 50%;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   transition: left $animate-base, background-color $animate-fast, color $animate-fast;
   font-size: 12px;
 
   @include themify() {
     background-color: themed('background-color-base');
-    color: themed('font-color-nav');
     border: 1px solid themed('border-color-base');
+    color: themed('font-color-nav');
   }
 
   &:hover {

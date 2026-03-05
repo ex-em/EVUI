@@ -276,37 +276,36 @@ export default {
     width: 50%;
     padding: 15px 20px;
     border-right: 1px solid $color-yellow;
-    transition: width $animate-fast;
   }
   .resize-handle {
+    position: relative;
+    z-index: 2;
     width: 6px;
+    margin: 0 -3px;
     cursor: col-resize;
     background: transparent;
     flex-shrink: 0;
-    position: relative;
-    z-index: 2;
-    margin: 0 -3px;
     &:hover,
     &:active {
       background: rgba($color-blue, 0.3);
     }
   }
   .btn-toggle-code {
+    display: flex;
     position: absolute;
+    z-index: 3;
     top: 50%;
     right: -14px;
-    transform: translateY(-50%);
     width: 28px;
     height: 48px;
-    display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    transform: translateY(-50%);
     border: 1px solid $color-yellow;
     border-radius: 0 6px 6px 0;
     cursor: pointer;
     font-size: 14px;
     transition: all $animate-fast;
-    z-index: 3;
 
     @include themify() {
       background-color: themed('background-color-base');
@@ -376,7 +375,6 @@ export default {
     position: relative;
     width: 50%;
     overflow: hidden;
-    transition: width $animate-fast;
     .code-wrapper {
       height: 100px;
       min-height: 350px;
@@ -455,8 +453,8 @@ export default {
     // narrow 모드: 토글 버튼을 하단 중앙으로 이동
     .btn-toggle-code.is-narrow {
       top: auto;
-      right: 50%;
       bottom: -14px;
+      right: 50%;
       transform: translateX(50%);
       width: 48px;
       height: 28px;
