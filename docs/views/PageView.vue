@@ -137,7 +137,7 @@ export default {
     const updateScrollButtons = () => {
       const container = breadcrumbRef.value;
       if (!container) return;
-      
+
       const { scrollLeft, scrollWidth, clientWidth } = container;
       canScrollLeft.value = scrollLeft > 0;
       canScrollRight.value = scrollLeft < scrollWidth - clientWidth - 1;
@@ -231,10 +231,10 @@ export default {
 
 /* ── Article Breadcrumb ── */
 .article-breadcrumb-wrapper {
-  position: sticky;
-  top: $header-height;
-  z-index: 4;
   display: flex;
+  position: sticky;
+  z-index: 4;
+  top: $header-height;
   align-items: center;
   margin-bottom: 10px;
 
@@ -261,11 +261,11 @@ export default {
 
 .breadcrumb-scroll-btn {
   display: flex;
-  align-items: center;
-  justify-content: center;
   width: 32px;
   height: 32px;
   padding: 0;
+  justify-content: center;
+  align-items: center;
   border: none;
   border-radius: 50%;
   cursor: pointer;
@@ -274,9 +274,9 @@ export default {
   z-index: 5;
 
   @include themify() {
+    border: 1px solid themed('border-color-base');
     background-color: themed('background-color-description');
     color: themed('font-color-nav');
-    border: 1px solid themed('border-color-base');
   }
 
   &:hover {
@@ -304,8 +304,8 @@ export default {
 
 .breadcrumb-item {
   display: inline-flex;
-  align-items: center;
   padding: 5px 14px;
+  align-items: center;
   border-radius: 16px;
   font-size: 12px;
   font-weight: 500;
@@ -316,9 +316,9 @@ export default {
   flex-shrink: 0;
 
   @include themify() {
-    color: themed('font-color-nav');
     background-color: themed('background-color-description');
     border: 1px solid themed('border-color-base');
+    color: themed('font-color-nav');
   }
 
   &:hover {
