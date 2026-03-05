@@ -360,7 +360,7 @@ const router = createRouter({
   routes,
   scrollBehavior(to) {
     // hash 가 존재하는 경우 hash 위치로 스크롤 하되, header 높이만큼 더 올려야 한다.
-    const result = to.hash ? { el: to.hash, top: 60 } : { top: 0 };
+    const result = to.hash ? { el: to.hash, top: 120 } : { top: 0 };
 
     // 사용자가 직접 url 에 hash 를 입력한 경우나, hash 가 존재하는 url 링크를 타고와서 이동하는 경우에는
     // vue-router 에서 scrollBehavior 를 이용한 스크롤이 이동된 뒤에
