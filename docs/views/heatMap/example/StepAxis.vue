@@ -152,14 +152,6 @@ export default {
 
 <style lang="scss" scoped>
 .case {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-
-  :deep(.ev-chart) {
-    flex: auto;
-  }
-
   .description {
     display: flex;
     flex-direction: column;
