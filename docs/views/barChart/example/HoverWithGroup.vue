@@ -1,30 +1,34 @@
 <template>
-  <ev-chart-group :options="{ syncHover }">
-    <ev-chart
-      ref="chart"
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData2"
-      :options="chartOptions2"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData3"
-      :options="chartOptions3"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData4"
-      :options="chartOptions4"
-      @click="onClick"
-    />
+  <div class="case">
+    <resizable-wrapper>
+      <ev-chart-group :options="{ syncHover }">
+        <ev-chart
+          ref="chart"
+          v-model:selectedLabel="defaultSelectLabel"
+          :data="chartData1"
+          :options="chartOptions1"
+          @click="onClick"
+        />
+        <ev-chart
+          v-model:selectedLabel="defaultSelectLabel"
+          :data="chartData2"
+          :options="chartOptions2"
+          @click="onClick"
+        />
+        <ev-chart
+          v-model:selectedLabel="defaultSelectLabel"
+          :data="chartData3"
+          :options="chartOptions3"
+          @click="onClick"
+        />
+        <ev-chart
+          v-model:selectedLabel="defaultSelectLabel"
+          :data="chartData4"
+          :options="chartOptions4"
+          @click="onClick"
+        />
+      </ev-chart-group>
+    </resizable-wrapper>
     <div class="description">
       <ev-toggle v-model="syncHover" />
       <span>그룹 호버 동기화</span>
@@ -94,7 +98,7 @@
         <br>
       </div>
     </div>
-  </ev-chart-group>
+  </div>
 </template>
 
 <script>
@@ -165,6 +169,7 @@ export default {
       type: 'bar',
       thickness: 0.8,
       width: '100%',
+      height: '25%',
       horizontal: false,
       title: {
         show: false,
@@ -222,6 +227,7 @@ export default {
       type: 'bar',
       thickness: 0.8,
       width: '100%',
+      height: '25%',
       horizontal: false,
       title: {
         show: false,
@@ -279,6 +285,7 @@ export default {
       type: 'bar',
       thickness: 0.8,
       width: '100%',
+      height: '25%',
       horizontal: true,
       title: {
         show: false,
@@ -336,6 +343,7 @@ export default {
       type: 'bar',
       thickness: 0.8,
       width: '100%',
+      height: '25%',
       horizontal: true,
       title: {
         show: false,

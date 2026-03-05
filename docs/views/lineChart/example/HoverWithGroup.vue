@@ -1,17 +1,22 @@
 <template>
-  <ev-chart-group :options="{ syncHover }">
-    <ev-chart
-      v-model:selectedSeries="defaultSelectSeries"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedSeries="defaultSelectSeries"
-      :data="chartData2"
-      :options="chartOptions2"
-      @click="onClick"
-    />
+  <div class="case">
+    <resizable-wrapper>
+      <ev-chart-group :options="{ syncHover }">
+        <ev-chart
+          v-model:selectedSeries="defaultSelectSeries"
+          :data="chartData1"
+          :options="chartOptions1"
+          @click="onClick"
+        />
+        <ev-chart
+          v-model:selectedSeries="defaultSelectSeries"
+          :data="chartData2"
+          :options="chartOptions2"
+          @click="onClick"
+        />
+     </ev-chart-group>
+    </resizable-wrapper>
+
     <div class="description">
       <ev-toggle v-model="syncHover" />
       <span>그룹 호버 동기화</span>
@@ -65,7 +70,8 @@
         <br>
       </div>
     </div>
-  </ev-chart-group>
+  </div>
+
 </template>
 
 <script>
@@ -118,7 +124,7 @@ export default {
       syncHover: syncHoverChart1.value,
       type: 'line',
       width: '100%',
-      height: '80%',
+      height: '50%',
       title: {
         show: false,
       },
@@ -158,7 +164,7 @@ export default {
       syncHover: syncHoverChart2.value,
       type: 'line',
       width: '100%',
-      height: '80%',
+      height: '50%',
       title: {
         show: false,
       },
