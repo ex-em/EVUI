@@ -190,7 +190,7 @@ export default {
         const onMouseMove = (ev) => {
           const rect = container.getBoundingClientRect();
           let ratio = ((ev.clientX - rect.left) / rect.width) * 100;
-          ratio = Math.min(Math.max(ratio, 20), 85);
+          ratio = Math.min(Math.max(ratio, 5), 95);
           viewRatio.value = ratio;
         };
         const onMouseUp = () => {
@@ -329,6 +329,7 @@ export default {
     border-radius: 4px;
     font-size: 13px;
     word-break: break-all;
+    overflow-x: auto;
 
     @include themify() {
       background-color: themed('background-color-description');
