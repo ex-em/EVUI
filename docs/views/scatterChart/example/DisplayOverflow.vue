@@ -1,20 +1,51 @@
 <template>
   <div class="case">
-    <ev-chart
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <resizable-wrapper>
+      <ev-chart
+        :data="chartData"
+        :options="chartOptions"
+      />
+    </resizable-wrapper>
+
     <div class="description">
       <div class="row">
         <div class="row-item">
           <span class="item-title">
+            Min Value
+          </span>
+          <ev-input-number
+            v-model="minValue"
+            class="component"
+            :min="0"
+          />
+          <span class="item-title">
             Max Value
           </span>
-            <ev-input-number
-              v-model="maxValue"
+          <ev-input-number
+            v-model="maxValue"
+            class="component"
+            :min="1"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            Decimal Point
+          </span>
+          <ev-input-number
+            v-model="decimalPoint"
+            class="component"
+            :disabled="isAutoDecimal"
+            :min="0"
+          />
+          <div class="row-item">
+            <span class="item-title">
+            is Auto
+            </span>
+            <ev-toggle
+              v-model="isAutoDecimal"
               class="component"
-              :min="1"
             />
+          </div>
         </div>
         <div class="row-item">
           <span class="item-title">
@@ -63,14 +94,17 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
             { x: 184, y: 78 }, { x: 175, y: 62 }, { x: 184, y: 81 },
             { x: 180, y: 76 }, { x: 177, y: 83 }, { x: 192, y: 90, color: '#FF0000' },
             { x: 176, y: 74 }, { x: 174, y: 71 }, { x: 184, y: 79 },
-            { x: 192, y: 93, color: '#FF0000' }, { x: 171, y: 70 }, { x: 173, y: 72 },
+            { x: 10, y: 4, color: '#FF0000' }, { x: 171, y: 70 }, { x: 173, y: 72 },
             { x: 176, y: 85 }, { x: 176, y: 78 }, { x: 180, y: 77 },
             { x: 172, y: 66 }, { x: 176, y: 86 }, { x: 173, y: 81 },
           ],
         },
       });
 
-      const maxValue = ref(60);
+      const maxValue = ref(7);
+      const minValue = ref(0);
+      const decimalPoint = ref(0);
+      const isAutoDecimal = ref(true);
       const displayOverflow = ref(true);
 
       const chartOptions = computed(() => ({
@@ -102,12 +136,12 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
         axesY: [{
           type: 'linear',
           showAxis: true,
-          startToZero: false,
+          startToZero: true,
           autoScaleRatio: null,
           showGrid: true,
           axisLineColor: '#C9CFDC',
           gridLineColor: '#C9CFDC',
-          interval: 1,
+          decimalPoint: isAutoDecimal.value ? 'auto' : decimalPoint.value,
           labelStyle: {
             show: true,
             fontSize: 12,
@@ -119,7 +153,7 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
           plotLines: [],
           plotBands: [],
           formatter: null,
-          range: [0, maxValue.value],
+          range: [minValue.value, maxValue.value],
         }],
         title: {
           text: '',
@@ -152,6 +186,9 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
       return {
         chartData,
         maxValue,
+        minValue,
+        decimalPoint,
+        isAutoDecimal,
         displayOverflow,
         chartOptions,
       };
@@ -167,20 +204,28 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
 
   .row {
     display: flex;
+    flex-direction: column;
     margin-top: 15px;
     justify-content: space-between;
+    gap: 30px;
+
     .row-item {
       flex: 1;
       display: flex;
+      justify-content: flex-start;
+      align-items: center;
+
       .item-title {
         line-height: 33px;
         margin-right: 3px;
         min-width: 80px;
+        text-align: right;
+        white-space: nowrap;
       }
-    }
-    .check-box {
-      display: flex;
-      margin-left: 4px;
+
+      .component {
+        max-width: 200px;
+      }
     }
   }
 </style>

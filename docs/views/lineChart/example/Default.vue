@@ -1,9 +1,11 @@
 <template>
   <div class="case">
-    <ev-chart
+    <resizable-wrapper>
+      <ev-chart
       :data="chartData"
       :options="chartOptions"
     />
+    </resizable-wrapper>
     <div class="description">
       <span class="toggle-label">데이터 자동 업데이트</span>
       <ev-toggle
@@ -40,7 +42,7 @@
       const chartOptions = reactive({
         type: 'line',
         width: '100%',
-        height: '80%',
+        height: '100%',
         padding: {
           top: 20,
           right: 2,
@@ -58,7 +60,10 @@
         axesX: [{
           type: 'time',
           timeFormat: 'DD HH:mm',
-          interval: 'hour',
+          interval: {
+            time: 1,
+            unit: 'hour',
+          },
           formatter: (value, data) => {
             if (data?.prev) {
               const curr = dayjs(value).format('yy-MM-DD');
