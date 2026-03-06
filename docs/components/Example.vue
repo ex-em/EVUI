@@ -342,7 +342,6 @@ export default {
     border-radius: 4px;
     font-size: 13px;
     word-break: break-all;
-    overflow-x: auto;
 
     @include themify() {
       background-color: themed('background-color-description');
