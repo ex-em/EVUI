@@ -187,6 +187,11 @@ class Scale {
         // 분기 B: Range + Interval 호환 -> 둘 다 적용
         interval = resolvedInterval;
         numberOfSteps = Math.round(graphRange / interval);
+        // numberOfSteps가 maxSteps를 초과하면 interval을 증가시켜 조정
+        while (numberOfSteps > maxSteps) {
+          interval *= 2;
+          numberOfSteps = Math.round(graphRange / interval);
+        }
       } else {
         // 분기 A: Range 전용 -> steps에서 interval 계산
         numberOfSteps = Math.max(1, maxSteps);
