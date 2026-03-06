@@ -96,6 +96,9 @@ export default {
       { wrapper: null, evChartGroupRef },
       groupSelectedLabel,
       evChartPropsInGroup,
+      (newValue) => {
+        groupSelectedLabel.value = newValue;
+      },
     );
 
     provide('evChartClone', evChartClone);

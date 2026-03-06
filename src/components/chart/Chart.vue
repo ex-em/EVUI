@@ -130,6 +130,13 @@ export default {
           { wrapper, evChartGroupRef: null },
           props.selectedLabel ? selectedLabel : selectedItem,
           injectEvChartPropsInGroup,
+          (newValue) => {
+            if (props.selectedLabel) {
+              emit('update:selectedLabel', newValue);
+            } else {
+              emit('update:selectedItem', newValue);
+            }
+          },
         );
 
     const createChart = () => {
@@ -234,20 +241,18 @@ export default {
       watch(
         () => injectBrushIdx.start,
         (curBrushStartIdx, prevBrushStartIdx) => {
+          const delta = curBrushStartIdx - (prevBrushStartIdx ?? 0);
+
           if (selectedLabel?.value) {
-            for (let idx = 0; idx < selectedLabel.value.dataIndex.length; idx++) {
-              if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
-                selectedLabel.value.dataIndex[idx] -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
-              } else {
-                selectedLabel.value.dataIndex[idx] += prevBrushStartIdx - curBrushStartIdx;
-              }
-            }
+            emit('update:selectedLabel', {
+              ...selectedLabel.value,
+              dataIndex: selectedLabel.value.dataIndex.map((val) => val - delta),
+            });
           } else if (selectedItem?.value) {
-            if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
-              selectedItem.value.dataIndex -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
-            } else {
-              selectedItem.value.dataIndex += prevBrushStartIdx - curBrushStartIdx;
-            }
+            emit('update:selectedItem', {
+              ...selectedItem.value,
+              dataIndex: selectedItem.value.dataIndex - delta,
+            });
           }
         },
       );

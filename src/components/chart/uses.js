@@ -308,7 +308,7 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
 
     return normalizedOptions;
   };
-  const getNormalizedData = (data) => defaultsDeep(data, DEFAULT_DATA);
+  const getNormalizedData = (data) => defaultsDeep({}, data, DEFAULT_DATA);
 
   const selectItemInfo = cloneDeep(props.selectedItem);
   const selectLabelInfo = cloneDeep(props.selectedLabel ?? injectGroupSelectedLabel?.value);
@@ -341,7 +341,7 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
 
           case 'label': {
             if (injectGroupSelectedLabel?.value) {
-              injectGroupSelectedLabel.value.dataIndex = dataIndex;
+              injectGroupSelectedLabel.value = { dataIndex, targetAxis };
             } else {
               emit('update:selectedLabel', {
                 dataIndex,
@@ -395,7 +395,7 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
     },
     'mouse-leave': () => {
       if (injectGroupHoveredLabel?.value) {
-        injectGroupHoveredLabel.value.label = null;
+        injectGroupHoveredLabel.value = { ...injectGroupHoveredLabel.value, label: null };
       }
     },
     'click-legend': async (e) => {
@@ -451,6 +451,7 @@ export const useZoomModel = (
   { wrapper: evChartWrapper, evChartGroupRef },
   selectedLabelOrItem,
   evChartPropsInGroup,
+  onUpdateSelectedLabelOrItem,
 ) => {
   const { props, emit } = getCurrentInstance();
 
@@ -661,22 +662,19 @@ export const useZoomModel = (
   watch(
     () => [brushIdx.start, brushIdx.end],
     ([curBrushStartIdx, curBrushEndIdx], [prevBrushStartIdx]) => {
-      if (selectedLabelOrItem?.value) {
+      if (selectedLabelOrItem?.value && onUpdateSelectedLabelOrItem) {
+        const delta = curBrushStartIdx - (prevBrushStartIdx ?? 0);
+
         if (typeof selectedLabelOrItem.value.dataIndex === 'number') {
-          if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
-            selectedLabelOrItem.value.dataIndex -= curBrushStartIdx - (prevBrushStartIdx ?? 0);
-          } else {
-            selectedLabelOrItem.value.dataIndex += prevBrushStartIdx - curBrushStartIdx;
-          }
+          onUpdateSelectedLabelOrItem({
+            ...selectedLabelOrItem.value,
+            dataIndex: selectedLabelOrItem.value.dataIndex - delta,
+          });
         } else {
-          for (let idx = 0; idx < selectedLabelOrItem.value.dataIndex.length; idx++) {
-            if (curBrushStartIdx >= (prevBrushStartIdx ?? 0)) {
-              selectedLabelOrItem.value.dataIndex[idx] -=
-                curBrushStartIdx - (prevBrushStartIdx ?? 0);
-            } else {
-              selectedLabelOrItem.value.dataIndex[idx] += prevBrushStartIdx - curBrushStartIdx;
-            }
-          }
+          onUpdateSelectedLabelOrItem({
+            ...selectedLabelOrItem.value,
+            dataIndex: selectedLabelOrItem.value.dataIndex.map((val) => val - delta),
+          });
         }
       }
 
