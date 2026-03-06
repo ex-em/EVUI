@@ -97,7 +97,8 @@ class Scale {
       }
     }
 
-    if (this.startToZero) {
+    const hasUserRange = Array.isArray(this.range) && this.range.length === 2;
+    if (this.startToZero && !hasUserRange) {
       minValue = 0;
     }
 
@@ -153,16 +154,117 @@ class Scale {
     const { maxValue, minValue } = range;
     let { maxSteps } = range;
 
+    const hasUserRange = Array.isArray(this.range) && this.range.length === 2;
+
+    // 사용자 interval로 인식하는 경우: 숫자 또는 객체({ time, unit }) 형태만
+    // 문자열('hour', 'second' 등)은 기존 로직(분기 D)으로 처리
+    const hasUserInterval = typeof this.interval === 'number'
+      || (typeof this.interval === 'object' && this.interval !== null);
+
+    // range와 interval 충돌 여부 판별
+    // graphRange가 interval로 정수 분할되지 않으면 충돌 -> interval 무시
+    let useUserInterval = hasUserInterval;
+    const resolvedInterval = hasUserInterval ? this.getInterval(range) : null;
+    if (hasUserRange && hasUserInterval && resolvedInterval != null && resolvedInterval !== 0) {
+      const rangeSize = maxValue - minValue;
+      const stepsFromInterval = rangeSize / resolvedInterval;
+      if (Math.abs(stepsFromInterval - Math.round(stepsFromInterval)) > 1e-10) {
+        useUserInterval = false;
+      }
+    }
+
+    // 분기 A/B: range가 배열로 설정된 경우
+    // graphMin/graphMax를 minValue/maxValue에 정확히 고정
+    if (hasUserRange) {
+      const graphMin = minValue;
+      const graphMax = maxValue;
+      const graphRange = graphMax - graphMin;
+
+      let interval;
+      let numberOfSteps;
+
+      if (useUserInterval && resolvedInterval != null && resolvedInterval !== 0) {
+        // 분기 B: Range + Interval 호환 -> 둘 다 적용
+        interval = resolvedInterval;
+        numberOfSteps = Math.round(graphRange / interval);
+      } else {
+        // 분기 A: Range 전용 -> steps에서 interval 계산
+        numberOfSteps = Math.max(1, maxSteps);
+        interval = graphRange / numberOfSteps;
+      }
+
+      // 최소 2 steps 보장 (range 양 끝 + 중간 최소 1개)
+      numberOfSteps = Math.max(1, numberOfSteps);
+
+      if (this.decimalPoint === 'auto') {
+        this.decimalPoint = this?.getDecimalPointFromRange?.({
+          graphRange,
+          numberOfSteps,
+        });
+      }
+
+      return {
+        steps: numberOfSteps,
+        interval,
+        graphMin,
+        graphMax,
+      };
+    }
+
+    // 분기 C: interval만 설정된 경우 (range 미설정)
+    // interval 고정, numberOfSteps는 maxSteps를 초과할 수 없음
+    if (useUserInterval) {
+      let interval = resolvedInterval;
+      const numMinValue = +minValue;
+      const numMaxValue = +maxValue;
+      let increase = numMinValue;
+
+      while (increase < numMaxValue) {
+        increase += interval;
+      }
+
+      const graphMax = increase;
+      const graphMin = numMinValue;
+      const graphRange = graphMax - graphMin;
+      let numberOfSteps = Math.round(graphRange / interval);
+
+      // numberOfSteps가 maxSteps를 초과하면 interval을 배수로 늘려 맞춤
+      let iterationCount = 0;
+      const MAX_ITERATIONS = 100;
+      while (numberOfSteps > maxSteps && interval > 0 && iterationCount < MAX_ITERATIONS) {
+        interval *= 2;
+        numberOfSteps = Math.round(graphRange / interval);
+        iterationCount++;
+      }
+
+      if (this.decimalPoint === 'auto') {
+        this.decimalPoint = this?.getDecimalPointFromRange?.({
+          graphRange,
+          numberOfSteps,
+        });
+      }
+
+      return {
+        steps: numberOfSteps,
+        interval,
+        graphMin,
+        graphMax,
+      };
+    }
+
+    // 분기 D: 기존 로직 (range, interval 모두 미설정)
     let interval = this.getInterval(range);
-    let increase = minValue;
+    const numMinValue = +minValue;
+    const numMaxValue = +maxValue;
+    let increase = numMinValue;
     let numberOfSteps;
 
-    while (increase < maxValue) {
+    while (increase < numMaxValue) {
       increase += interval;
     }
 
     const graphMax = increase;
-    const graphMin = minValue;
+    const graphMin = numMinValue;
     const graphRange = graphMax - graphMin;
 
     numberOfSteps = Math.round(graphRange / interval);
@@ -339,7 +441,7 @@ class Scale {
 
       if (this.type === 'x' && options?.axesX[0].flow && dataLabels.length !== steps + 1) {
         const axisMinByMinutes = Math.floor(axisMin / size) * size;
-        if (axisMinByMinutes !== +axisMin) {
+        if (axisMinByMinutes !== +axisMin && (axisMax - axisMin) !== 0) {
           axisMinForLabel = axisMinByMinutes + size;
           offsetStartPoint += (distance / (axisMax - axisMin)) * (axisMinForLabel - axisMin);
         }
