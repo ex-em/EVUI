@@ -26,7 +26,22 @@
             class="component"
             :min="1"
           />
+          <span class="item-title">
+            Interval
+          </span>
+          <ev-input-number
+            v-model="interval"
+            class="component"
+            :min="0"
+          />
         </div>
+      </div>
+      <div class="row">
+        <div class="sub-description">
+          range 옵션과 interval 옵션이 호환되지 않는다면, interval 옵션은 무시됩니다.
+        </div>
+      </div>
+      <div class="row">
         <div class="row-item">
           <span class="item-title">
             Decimal Point
@@ -47,13 +62,15 @@
             />
           </div>
         </div>
+      </div>
+      <div class="row">
         <div class="row-item">
           <span class="item-title">
             Display Overflow
           </span>
           <ev-checkbox
             v-model="displayOverflow"
-            class="check-box"
+            class="component"
           />
         </div>
       </div>
@@ -101,11 +118,12 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
         },
       });
 
-      const maxValue = ref(7);
+      const maxValue = ref(10);
       const minValue = ref(0);
       const decimalPoint = ref(0);
       const isAutoDecimal = ref(true);
       const displayOverflow = ref(true);
+      const interval = ref(5);
 
       const chartOptions = computed(() => ({
         type: 'scatter',
@@ -154,6 +172,7 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
           plotBands: [],
           formatter: null,
           range: [minValue.value, maxValue.value],
+          interval: interval.value,
         }],
         title: {
           text: '',
@@ -191,6 +210,7 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
         isAutoDecimal,
         displayOverflow,
         chartOptions,
+        interval,
       };
     },
   };
@@ -226,6 +246,12 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
       .component {
         max-width: 200px;
       }
+    }
+
+    .sub-description {
+      font-size: 12px;
+      color: #666;
+      text-align: right;
     }
   }
 </style>

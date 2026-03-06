@@ -43,6 +43,25 @@
           />
         </div>
       </div>
+      <div class="row">
+        <div class="sub-description">
+          range 옵션과 interval 옵션이 호환되지 않는다면, interval 옵션은 무시됩니다.
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            Range
+          </span>
+          <ev-date-picker
+            v-model="rangeDateTimes"
+            mode="dateTimeRange"
+            :options="{
+              timeFormat: ['HH:mm:ss', 'HH:mm:ss'],
+            }"
+        />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -53,21 +72,25 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
+    const now = dayjs();
+    const threeHoursAgo = now.subtract(3, 'hour');
+    const sixHoursAgo = now.subtract(6, 'hour');
+    const twelveHoursAgo = now.subtract(12, 'hour');
+    const twentyFourHoursAgo = now.subtract(24, 'hour');
+    const threeDaysAgo = now.subtract(3, 'day');
+
     // 최근 3시간 이내의 10초 간격 데이터 생성
-    const generateTimeSeriesData = () => {
-      const now = dayjs();
-      const threeHoursAgo = now.subtract(3, 'hour');
+    const generateTimeSeriesData = (start, end) => {
       const dataPoints = [];
 
-      // 3시간 = 10800초, 10초 간격이면 1080개의 데이터 포인트
-      let currentTime = threeHoursAgo;
-      while (currentTime.isBefore(now) || currentTime.isSame(now)) {
-        const y = Math.floor(Math.random() * 100) + 1; // 1-100 사이의 랜덤 값
+      let currentTime = end;
+      while (currentTime.isBefore(start) || currentTime.isSame(start)) {
+        const y = Math.floor(Math.random() * 100) + 1;
         dataPoints.push({
           x: currentTime.valueOf(),
           y,
         });
-        currentTime = currentTime.add(10, 'second');
+        currentTime = currentTime.add(1, 'minute');
       }
 
       return dataPoints;
@@ -75,14 +98,24 @@ export default {
 
     const chartData = reactive({
       series: {
-        series1: { name: 'series#1' },
-        series2: { name: 'series#2' },
+        series1: { name: '현재~3시간전' },
+        series2: { name: '3시간전~6시간전' },
+        series3: { name: '6시간~12시간전' },
+        series4: { name: '12시간~24시간전' },
+        series5: { name: '24시간~3일전' },
       },
       data: {
-        series1: generateTimeSeriesData(),
+        series1: generateTimeSeriesData(now, threeHoursAgo),
+        series2: generateTimeSeriesData(threeHoursAgo, sixHoursAgo),
+        series3: generateTimeSeriesData(sixHoursAgo, twelveHoursAgo),
+        series4: generateTimeSeriesData(twelveHoursAgo, twentyFourHoursAgo),
+        series5: generateTimeSeriesData(twentyFourHoursAgo, threeDaysAgo),
       },
     });
 
+    console.log('chartData', chartData);
+
+    const rangeDateTimes = ref([threeHoursAgo.format('YYYY-MM-DD HH:mm:ss'), now.format('YYYY-MM-DD HH:mm:ss')]);
     const intervalValue = ref(10);
     const intervalUnit = ref('second');
 
@@ -92,11 +125,15 @@ export default {
       height: '100%',
       axesX: [{
         type: 'time',
-        timeFormat: 'HH:mm:ss',
+        timeFormat: 'DD HH:mm:ss',
         interval: {
           time: intervalValue.value,
           unit: intervalUnit.value,
         },
+        range: [
+          dayjs(rangeDateTimes.value[0]).valueOf(),
+          dayjs(rangeDateTimes.value[1]).valueOf(),
+        ],
       }],
       axesY: [{
         type: 'linear',
@@ -123,13 +160,8 @@ export default {
         show: false,
       },
       legend: {
-        show: false,
-        position: 'right',
-        color: '#353740',
-        inactive: '#aaa',
-        width: 140,
-        height: 24,
-        padding: { top: 0, right: 0, bottom: 0, left: 0 },
+        show: true,
+        position: 'bottom',
       },
       tooltip: {
         use: false,
@@ -150,6 +182,7 @@ export default {
       intervalValue,
       intervalUnit,
       chartOptions,
+      rangeDateTimes,
     };
   },
 };
@@ -177,9 +210,10 @@ export default {
         text-align: right;
       }
     }
-    .check-box {
-      display: flex;
-      margin-left: 4px;
+    .sub-description {
+      font-size: 12px;
+      color: #666;
+      text-align: right;
     }
   }
 </style>
