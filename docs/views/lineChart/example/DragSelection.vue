@@ -1,26 +1,28 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" @drag-select="onDragSelect" />
-    <div class="description">
-      <div class="badge yellow">선택 영역 내 데이터</div>
-      <br /><br />
-      <div v-for="(row, rowIndex) in selectionItems" :key="rowIndex">
-        <span> Series Name : {{ row.seriesName }} </span>
-        <br />
-        <div v-for="(item, itemIndex) in row.items" :key="itemIndex">
-          <span>x : {{ convertToDateString(item.x) }}</span>
-          <span>y : {{ item.y }}</span>
-        </div>
-        <br /><br />
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" @drag-select="onDragSelect" />
+    </resizable-wrapper>
+  </div>
+  <div class="description">
+    <div class="badge yellow">선택 영역 내 데이터</div>
+    <br /><br />
+    <div v-for="(row, rowIndex) in selectionItems" :key="rowIndex">
+      <span> Series Name : {{ row.seriesName }} </span>
+      <br />
+      <div v-for="(item, itemIndex) in row.items" :key="itemIndex">
+        <span>x : {{ convertToDateString(item.x) }}</span>
+        <span>y : {{ item.y }}</span>
       </div>
-      <div class="badge yellow">범위 값</div>
       <br /><br />
-      <div v-if="selectionRange.xMin">
-        <p>X min : {{ convertToDateString(selectionRange.xMin) }}</p>
-        <p>X max : {{ convertToDateString(selectionRange.xMax) }}</p>
-        <p>Y min : {{ selectionRange.yMin }}</p>
-        <p>Y max : {{ selectionRange.yMax }}</p>
-      </div>
+    </div>
+    <div class="badge yellow">범위 값</div>
+    <br /><br />
+    <div v-if="selectionRange.xMin">
+      <p>X min : {{ convertToDateString(selectionRange.xMin) }}</p>
+      <p>X max : {{ convertToDateString(selectionRange.xMax) }}</p>
+      <p>Y min : {{ selectionRange.yMin }}</p>
+      <p>Y max : {{ selectionRange.yMax }}</p>
     </div>
   </div>
 </template>

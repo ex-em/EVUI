@@ -1,47 +1,52 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedSeries="defaultSelectSeries"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-      @dbl-click="onDblClick"
-    />
-    <ev-chart
-      v-model:selectedSeries="defaultSelectSeries"
-      :data="chartData2"
-      :options="chartOptions2"
-      @click="onClick"
-      @dbl-click="onDblClick"
-    />
-    <div class="description">
-      <ev-toggle v-model="isLive" />
-      <span> 데이터 자동 업데이트 </span>
+    <resizable-wrapper height="50%">
+      <ev-chart
+        v-model:selectedSeries="defaultSelectSeries"
+        :data="chartData1"
+        :options="chartOptions1"
+        @click="onClick"
+        @dbl-click="onDblClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="50%">
+      <ev-chart
+        v-model:selectedSeries="defaultSelectSeries"
+        :data="chartData2"
+        :options="chartOptions2"
+        @click="onClick"
+        @dbl-click="onDblClick"
+      />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <ev-toggle v-model="isLive" />
+    <span> 데이터 자동 업데이트 </span>
+    <br />
+    <br />
+    <ev-button type="primary" shape="radius" @click="changeSelectedSeries('inc')"> + </ev-button>
+    <ev-button type="primary" shape="radius" @click="changeSelectedSeries('dec')"> - </ev-button>
+    <span> v-model:selectedSeries 변경 </span>
+    <br />
+    <br />
+    <div>
+      <div class="badge yellow">v-model:selectedSeries</div>
+      {{ defaultSelectSeries }}
       <br />
       <br />
-      <ev-button type="primary" shape="radius" @click="changeSelectedSeries('inc')"> + </ev-button>
-      <ev-button type="primary" shape="radius" @click="changeSelectedSeries('dec')"> - </ev-button>
-      <span> v-model:selectedSeries 변경 </span>
+      <div class="badge yellow">클릭 이벤트 데이터</div>
+      {{ clickedSeries }}
       <br />
       <br />
-      <div>
-        <div class="badge yellow">v-model:selectedSeries</div>
-        {{ defaultSelectSeries }}
-        <br />
-        <br />
-        <div class="badge yellow">클릭 이벤트 데이터</div>
-        {{ clickedSeries }}
-        <br />
-        <br />
-        <div class="badge yellow">더블클릭 이벤트 데이터 (seriesId)</div>
-        {{ dblclickedSeries }}
-        <br />
-        <br />
-        <div class="badge yellow">더블클릭 이벤트 데이터 (value)</div>
-        {{ dblclickedValue }}
-        <br />
-        <br />
-      </div>
+      <div class="badge yellow">더블클릭 이벤트 데이터 (seriesId)</div>
+      {{ dblclickedSeries }}
+      <br />
+      <br />
+      <div class="badge yellow">더블클릭 이벤트 데이터 (value)</div>
+      {{ dblclickedValue }}
+      <br />
+      <br />
     </div>
   </div>
 </template>

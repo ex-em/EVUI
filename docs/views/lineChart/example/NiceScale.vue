@@ -1,18 +1,15 @@
 <template>
   <div class="case">
     <div class="chart-container">
-      <div class="chart-wrapper" :style="{ height: `${chartHeight}px` }">
+      <resizable-wrapper>
         <ev-chart :data="chartData" :options="chartOptions" />
-      </div>
+      </resizable-wrapper>
     </div>
+
     <div class="description">
       <div class="control-item">
         <span class="toggle-label">데이터 자동 업데이트</span>
         <ev-toggle v-model="isLive" />
-      </div>
-      <div class="control-item">
-        <span class="toggle-label">Height (%)</span>
-        <ev-input-number v-model="chartHeight" :step="10" :min="200" :max="300" />
       </div>
       <div class="control-item">
         <span class="toggle-label">데이터 업데이트 속도 증가</span>
@@ -49,17 +46,10 @@ export default {
         series5: [],
       },
     });
-    const chartHeight = ref(250);
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
       height: '100%',
-      padding: {
-        top: 20,
-        right: 2,
-        left: 2,
-        bottom: 4,
-      },
       title: {
         text: 'Chart Title',
         show: true,
@@ -147,11 +137,7 @@ export default {
         seriesData.push(Math.floor(Math.random() * (range + 1)) + newMin);
       });
     };
-    onMounted(() => {
-      for (let ix = 0; ix < 60; ix++) {
-        addRandomChartData();
-      }
-    });
+    
     watch(isLive, (newValue) => {
       if (newValue) {
         addRandomChartData();
@@ -160,23 +146,28 @@ export default {
         clearInterval(liveInterval.value);
       }
     });
+    
     watch(isSpeedUpMode, (newValue) => {
       if (isLive.value) {
         clearInterval(liveInterval.value);
         liveInterval.value = setInterval(addRandomChartData, newValue ? 100 : 1000);
       }
     });
-    watch(chartHeight, (newValue) => {
-      chartOptions.height = `${newValue}%`;
+
+    onMounted(() => {
+      for (let ix = 0; ix < 60; ix++) {
+        addRandomChartData();
+      }
     });
+    
     onBeforeUnmount(() => {
       clearInterval(liveInterval.value);
     });
+
     return {
       chartData,
       chartOptions,
       isLive,
-      chartHeight,
       isSpeedUpMode,
     };
   },
@@ -184,18 +175,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.case {
-  height: 100%;
-}
-.chart-container {
-  height: 300px;
-}
-.description {
-  display: flex;
-  gap: 20px;
-  margin-top: 10px;
-  height: 55px;
-}
 .control-item {
   display: flex;
   align-items: center;
