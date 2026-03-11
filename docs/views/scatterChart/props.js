@@ -14,6 +14,8 @@ import RealTimeScatter from './example/RealTimeScatter';
 import RealTimeScatterRaw from './example/RealTimeScatter?raw';
 import AxesScaleChange from './example/AxesScaleChange';
 import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
+import TimeAxis from './example/TimeAxis';
+import TimeAxisRaw from './example/TimeAxis?raw';
 
 export default {
   mdText,
@@ -39,9 +41,19 @@ export default {
       parsedData: parse(PlotLineRaw).descriptor,
     },
     'Display Overflow': {
-      description: 'range 옵션으로 지정한 Y축의 최댓값을 표시합니다.',
+      description: '축의 max값보다 큰 값을 표시할지의 여부를 결정합니다.',
       component: DisplayOverflow,
       parsedData: parse(DisplayOverflowRaw).descriptor,
+    },
+    'Time Axis': {
+      description: 'Time Axis를 표시합니다. range, interval 옵션을 사용하여 축의 범위와 간격을 지정할 수 있습니다.',
+      component: TimeAxis,
+      parsedData: parse(TimeAxisRaw),
+    },
+    'Time Axis': {
+      description: 'Time Axis를 표시합니다. range, interval 옵션을 사용하여 축의 범위와 간격을 지정할 수 있습니다.',
+      component: TimeAxis,
+      parsedData: parse(TimeAxisRaw),
     },
     RealTimeScatter: {
       description: '실시간으로 대량의 데이터를 처리합니다.',
