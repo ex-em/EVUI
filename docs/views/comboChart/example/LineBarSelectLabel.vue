@@ -1,23 +1,26 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData"
-      :options="chartOptions"
-      @click="onClick"
-    />
-    <div class="description">
-      <div class="badge yellow">v-model:selectedLabel</div>
-      {{ defaultSelectLabel }}
-      <br />
-      <br />
-      <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
-      {{ clickedLabel }}
-      <br />
-      <br />
-      <div class="badge yellow">unSelectedOpacity</div>
-      <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" :precision="1" />
-    </div>
+    <resizable-wrapper>
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData"
+        :options="chartOptions"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="badge yellow">v-model:selectedLabel</div>
+    {{ defaultSelectLabel }}
+    <br />
+    <br />
+    <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
+    {{ clickedLabel }}
+    <br />
+    <br />
+    <div class="badge yellow">unSelectedOpacity</div>
+    <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" :precision="1" />
   </div>
 </template>
 
@@ -42,7 +45,7 @@ export default {
     const unSelectedOpacity = ref(0.3);
     const chartOptions = reactive({
       width: '100%',
-      height: '80%',
+      height: '100%',
       thickness: 0.8,
       unSelectedOpacity,
       title: {
@@ -131,7 +134,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.description {
-  position: relative;
-}
 </style>
