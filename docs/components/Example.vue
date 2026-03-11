@@ -6,14 +6,34 @@
       </a>
       {{ title }}
     </h3>
-    <p class="article-description" v-html="description" />
-    <div :class="['article-example', { 'vertical-mode': verticalMode }]">
-      <div ref="viewArea" :class="['view', { 'vertical-mode-item': verticalMode }]">
+    <p
+      class="article-description"
+      v-html="description" />
+    <div
+        :class="['article-example', { 'vertical-mode':verticalMode }]"
+    >
+      <div
+        ref="viewArea"
+        :class="['view', { 'vertical-mode-item':verticalMode }]"
+        :style="viewStyle"
+      >
         <component :is="component" />
       </div>
       <div
+        v-show="canResize"
+        ref="resizeHandle"
+        class="resize-handle"
+        @mousedown="startResize"
+      />
+      <div
+        v-show="codeVisible"
         v-highlight
-        :class="['code', { expend: codeExpend }, { 'vertical-mode-item': verticalMode }]"
+        :class="[
+          'code',
+          { 'expend': codeExpend },
+          { 'vertical-mode-item':verticalMode }
+        ]"
+        :style="codeStyle"
       >
         <div ref="codeWrapper" class="code-wrapper" :style="{ height: `${viewAreaHeight}px` }">
           <pre class="html">
@@ -28,12 +48,19 @@
           {{ codeExpend ? 'Hide the code' : 'Show more code' }}
         </div>
       </div>
+      <button
+        :class="['btn-toggle-code', { 'is-narrow': isNarrow }]"
+        :title="codeVisible ? 'Hide code' : 'Show code'"
+        @click="toggleCode"
+      >
+        <i :class="toggleIcon" />
+      </button>
     </div>
   </article>
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { kebabCase } from 'lodash-es';
 import highlight from 'docs/directives/highlight';
 
@@ -80,6 +107,103 @@ export default {
       viewAreaHeight.value = viewArea.value.offsetHeight;
     });
 
+    // --- 반응형 감지 (1280px 기준) ---
+    const NARROW_QUERY = '(max-width: 1280px)';
+    const mql = window.matchMedia(NARROW_QUERY);
+    const isNarrow = ref(mql.matches);
+
+    // --- code 토글 & 드래그 리사이즈 ---
+    const codeVisible = ref(true);
+    const resizeHandle = ref(null);
+    const viewRatio = ref(null); // wide 모드: 가로 비율 (%)
+    const narrowViewHeight = ref(null); // narrow 모드: view 높이 (px)
+
+    const onMediaChange = (e) => {
+      isNarrow.value = e.matches;
+      viewRatio.value = null;
+      narrowViewHeight.value = null;
+    };
+    mql.addEventListener('change', onMediaChange);
+    onUnmounted(() => mql.removeEventListener('change', onMediaChange));
+
+    const toggleCode = () => {
+      codeVisible.value = !codeVisible.value;
+      viewRatio.value = null;
+      narrowViewHeight.value = null;
+    };
+
+    // wide 모드: 가로 비율 스타일 / narrow 모드: 세로 높이 스타일
+    const viewStyle = computed(() => {
+      if (isNarrow.value) {
+        if (narrowViewHeight.value != null) return { height: `${narrowViewHeight.value}px` };
+        return {};
+      }
+      if (!codeVisible.value) return { width: '100%', borderRight: 'none' };
+      if (viewRatio.value != null) return { width: `${viewRatio.value}%` };
+      return {};
+    });
+    const codeStyle = computed(() => {
+      if (isNarrow.value) return {};
+      if (viewRatio.value != null) return { width: `${100 - viewRatio.value}%` };
+      return {};
+    });
+
+    // 양쪽 모드 모두 리사이즈 가능
+    const canResize = computed(() => codeVisible.value);
+
+    // narrow(상하 배치) → 상하 화살표, wide(좌우 배치) → 좌우 화살표
+    const toggleIcon = computed(() => {
+      if (isNarrow.value) {
+        return codeVisible.value ? 'ev-icon-arrow-down' : 'ev-icon-arrow-up';
+      }
+      return codeVisible.value ? 'ev-icon-arrow-right' : 'ev-icon-arrow-left';
+    });
+
+    const startResize = (e) => {
+      e.preventDefault();
+      const narrow = isNarrow.value;
+      const cursorStyle = narrow ? 'row-resize' : 'col-resize';
+
+      document.body.style.cursor = cursorStyle;
+      document.body.style.userSelect = 'none';
+
+      if (narrow) {
+        // --- narrow 모드: 세로 리사이즈 (view 높이 조절) ---
+        const startY = e.clientY;
+        const startHeight = viewArea.value.offsetHeight;
+        const onMouseMove = (ev) => {
+          const delta = ev.clientY - startY;
+          const newHeight = Math.max(80, startHeight + delta);
+          narrowViewHeight.value = newHeight;
+        };
+        const onMouseUp = () => {
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+        };
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      } else {
+        // --- wide 모드: 가로 리사이즈 (좌우 비율 조절) ---
+        const container = viewArea.value.parentElement;
+        const onMouseMove = (ev) => {
+          const rect = container.getBoundingClientRect();
+          let ratio = ((ev.clientX - rect.left) / rect.width) * 100;
+          ratio = Math.min(Math.max(ratio, 20), 85);
+          viewRatio.value = ratio;
+        };
+        const onMouseUp = () => {
+          document.removeEventListener('mousemove', onMouseMove);
+          document.removeEventListener('mouseup', onMouseUp);
+          document.body.style.cursor = '';
+          document.body.style.userSelect = '';
+        };
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      }
+    };
+
     return {
       kebabCase,
       codeExpend,
@@ -87,6 +211,17 @@ export default {
       clickExpend,
       viewArea,
       viewAreaHeight,
+      isNarrow,
+      codeVisible,
+      toggleCode,
+      resizeHandle,
+      viewRatio,
+      narrowViewHeight,
+      viewStyle,
+      codeStyle,
+      canResize,
+      toggleIcon,
+      startResize,
     };
   },
 };
@@ -134,13 +269,52 @@ export default {
 }
 .article-example {
   display: flex;
+  position: relative;
   border: 1px solid $color-yellow;
   border-radius: 4px;
   .view {
-    //flex: 1;
     width: 50%;
     padding: 15px 20px;
     border-right: 1px solid $color-yellow;
+    transition: width $animate-fast;
+  }
+  .resize-handle {
+    width: 6px;
+    cursor: col-resize;
+    background: transparent;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+    margin: 0 -3px;
+    &:hover,
+    &:active {
+      background: rgba($color-blue, 0.3);
+    }
+  }
+  .btn-toggle-code {
+    position: absolute;
+    top: 50%;
+    right: -14px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $color-yellow;
+    border-radius: 0 6px 6px 0;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all $animate-fast;
+    z-index: 3;
+
+    @include themify() {
+      background-color: themed('background-color-base');
+      color: themed('font-color-base');
+    }
+    &:hover {
+      background-color: rgba($color-yellow, 0.5);
+    }
   }
   .case {
     padding: 15px 0;
@@ -201,8 +375,8 @@ export default {
   .code {
     position: relative;
     width: 50%;
-    //max-width: 700px;
     overflow: hidden;
+    transition: width $animate-fast;
     .code-wrapper {
       height: 100px;
       min-height: 350px;
@@ -250,13 +424,21 @@ export default {
   .article-example {
     display: block;
     .view {
-      width: 100%;
+      width: 100% !important;
       border-right: 0;
       border-bottom: 1px solid $color-yellow;
+      overflow: auto;
+    }
+    // narrow 모드: 리사이즈 핸들을 가로 바로 전환
+    .resize-handle {
+      width: 100% !important;
+      height: 6px;
+      margin: -3px 0;
+      cursor: row-resize;
     }
     .code {
       max-width: none;
-      width: 100%;
+      width: 100% !important;
       .code-wrapper {
         height: 40px !important;
         transition: all $animate-fast;
@@ -269,6 +451,16 @@ export default {
           height: 300px !important;
         }
       }
+    }
+    // narrow 모드: 토글 버튼을 하단 중앙으로 이동
+    .btn-toggle-code.is-narrow {
+      top: auto;
+      right: 50%;
+      bottom: -14px;
+      transform: translateX(50%);
+      width: 48px;
+      height: 28px;
+      border-radius: 0 0 6px 6px;
     }
   }
 }

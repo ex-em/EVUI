@@ -1,7 +1,15 @@
 <template>
-  <div class="evui-wrapper" :class="['evui-docs', docsTheme]">
-    <MainHeader v-model="docsTheme" />
-    <MainNav />
+  <div
+    class="evui-wrapper"
+    :class="['evui-docs', docsTheme, { 'nav-collapsed': isNavCollapsed }]"
+  >
+    <MainHeader
+      v-model="docsTheme"
+    />
+    <MainNav
+      :collapsed="isNavCollapsed"
+      @toggle-collapse="toggleNav"
+    />
     <MainContent />
   </div>
 </template>
@@ -21,9 +29,16 @@ export default {
   },
   setup() {
     const docsTheme = ref('light');
+    const isNavCollapsed = ref(false);
+
+    const toggleNav = () => {
+      isNavCollapsed.value = !isNavCollapsed.value;
+    };
 
     return {
       docsTheme,
+      isNavCollapsed,
+      toggleNav,
     };
   },
 };
@@ -63,6 +78,11 @@ $file-path: './assets/fonts/';
   position: relative;
   padding: $header-height 0 0 $nav-width;
   font-size: $font-size-base;
+  transition: padding-left $animate-base;
+
+  &.nav-collapsed {
+    padding-left: 0;
+  }
 }
 .dark {
   @import './style/lib/highlightjs.hybrid';
