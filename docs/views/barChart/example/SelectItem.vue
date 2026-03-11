@@ -1,49 +1,57 @@
 <template>
   <div class="case">
-    <ev-chart
-      ref="chart"
-      v-model:selectedItem="defaultSelectItem"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedItem="defaultSelectItem"
-      :data="chartData2"
-      :options="chartOptions2"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedItem="defaultSelectItem"
-      :data="chartData3"
-      :options="chartOptions3"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedItem="defaultSelectItem"
-      :data="chartData4"
-      :options="chartOptions4"
-      @click="onClick"
-    />
-    <div class="description">
-      <ev-toggle v-model="isFixedPosTop" />
-      <span class="left"> tip 위치를 최상단에 고정 </span>
+    <resizable-wrapper height="25%">
+      <ev-chart
+        ref="chart"
+        v-model:selectedItem="defaultSelectItem"
+        :data="chartData1"
+        :options="chartOptions1"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="25%">
+      <ev-chart
+        v-model:selectedItem="defaultSelectItem"
+        :data="chartData2"
+        :options="chartOptions2"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="25%">
+      <ev-chart
+        v-model:selectedItem="defaultSelectItem"
+        :data="chartData3"
+        :options="chartOptions3"
+        @click="onClick"
+        />
+    </resizable-wrapper>
+    <resizable-wrapper height="25%">
+      <ev-chart
+        v-model:selectedItem="defaultSelectItem"
+        :data="chartData4"
+        :options="chartOptions4"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+  </div>
+  <div class="description">
+    <ev-toggle v-model="isFixedPosTop" />
+    <span class="left"> tip 위치를 최상단에 고정 </span>
+    <br />
+    <br />
+    <ev-button @click="updateData"> Update Data </ev-button>
+    <span class="left"> 차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정 </span>
+    <br />
+    <br />
+    <div>
+      <div class="badge yellow">v-model:selectedItem</div>
+      {{ defaultSelectItem }}
       <br />
       <br />
-      <ev-button @click="updateData"> Update Data </ev-button>
-      <span class="left"> 차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정 </span>
+      <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
+      {{ clickedLabel }}
       <br />
       <br />
-      <div>
-        <div class="badge yellow">v-model:selectedItem</div>
-        {{ defaultSelectItem }}
-        <br />
-        <br />
-        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
-        {{ clickedLabel }}
-        <br />
-        <br />
-      </div>
     </div>
   </div>
 </template>
