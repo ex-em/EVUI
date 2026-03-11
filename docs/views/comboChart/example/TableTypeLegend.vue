@@ -1,91 +1,93 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
 
-    <div class="description">
-      <div class="section-body">
-        <h2>Common</h2>
+  <div class="description">
+    <div class="section-body">
+      <h2>Common</h2>
 
-        <div class="section-item">
-          <label>데이터 자동 업데이트</label>
-          <ev-toggle v-model="isLive" />
-        </div>
+      <div class="section-item">
+        <label>데이터 자동 업데이트</label>
+        <ev-toggle v-model="isLive" />
+      </div>
 
-        <div class="section-item" />
+      <div class="section-item" />
 
-        <div class="section-item">
-          <label title="legend 표시 여부"> show </label>
-          <ev-toggle v-model="show" />
-        </div>
+      <div class="section-item">
+        <label title="legend 표시 여부"> show </label>
+        <ev-toggle v-model="show" />
+      </div>
 
-        <div class="section-item">
-          <label title="legend 위치">position</label>
-          <ev-select
-            v-model="position"
-            :items="[
-              {
-                name: 'right',
-                value: 'right',
-              },
-              {
-                name: 'bottom',
-                value: 'bottom',
-              },
-              {
-                name: 'top',
-                value: 'top',
-              },
-              {
-                name: 'left',
-                value: 'left',
-              },
-            ]"
-          />
-        </div>
+      <div class="section-item">
+        <label title="legend 위치">position</label>
+        <ev-select
+          v-model="position"
+          :items="[
+            {
+              name: 'right',
+              value: 'right',
+            },
+            {
+              name: 'bottom',
+              value: 'bottom',
+            },
+            {
+              name: 'top',
+              value: 'top',
+            },
+            {
+              name: 'left',
+              value: 'left',
+            },
+          ]"
+        />
+      </div>
 
-        <div class="section-item">
-          <label title="legend 영역 너비(position - left, right에만 해당)"> width </label>
-          <ev-input-number v-model="width" :step="10" :min="0" :max="500" />
-        </div>
+      <div class="section-item">
+        <label title="legend 영역 너비(position - left, right에만 해당)"> width </label>
+        <ev-input-number v-model="width" :step="10" :min="0" :max="500" />
+      </div>
 
-        <div class="section-item">
-          <label title="legend 영역 높이(position - top, bottom에만 해당)"> height </label>
-          <ev-input-number v-model="height" :step="1" :min="0" :max="300" />
-        </div>
+      <div class="section-item">
+        <label title="legend 영역 높이(position - top, bottom에만 해당)"> height </label>
+        <ev-input-number v-model="height" :step="1" :min="0" :max="300" />
+      </div>
 
-        <h2>Table</h2>
+      <h2>Table</h2>
 
-        <div class="section-item">
-          <label title="Table 기능 사용 여부">use</label>
-          <ev-toggle v-model="useTable" />
-        </div>
+      <div class="section-item">
+        <label title="Table 기능 사용 여부">use</label>
+        <ev-toggle v-model="useTable" />
+      </div>
 
-        <div class="section-item" />
+      <div class="section-item" />
 
-        <div class="section-item">
-          <label title="Table - minimum 값 표시 여부">min</label>
-          <ev-toggle v-model="useMin" />
-        </div>
+      <div class="section-item">
+        <label title="Table - minimum 값 표시 여부">min</label>
+        <ev-toggle v-model="useMin" />
+      </div>
 
-        <div class="section-item">
-          <label title="Table - maximum 값 표시 여부">max</label>
-          <ev-toggle v-model="useMax" />
-        </div>
+      <div class="section-item">
+        <label title="Table - maximum 값 표시 여부">max</label>
+        <ev-toggle v-model="useMax" />
+      </div>
 
-        <div class="section-item">
-          <label title="Table - average 값 표시 여부">avg</label>
-          <ev-toggle v-model="useAvg" />
-        </div>
+      <div class="section-item">
+        <label title="Table - average 값 표시 여부">avg</label>
+        <ev-toggle v-model="useAvg" />
+      </div>
 
-        <div class="section-item">
-          <label title="Table - total 값 표시 여부">total</label>
-          <ev-toggle v-model="useTotal" />
-        </div>
+      <div class="section-item">
+        <label title="Table - total 값 표시 여부">total</label>
+        <ev-toggle v-model="useTotal" />
+      </div>
 
-        <div class="section-item">
-          <label title="Table - current 값 표시 여부">last</label>
-          <ev-toggle v-model="useLast" />
-        </div>
+      <div class="section-item">
+        <label title="Table - current 값 표시 여부">last</label>
+        <ev-toggle v-model="useLast" />
       </div>
     </div>
   </div>

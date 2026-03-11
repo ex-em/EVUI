@@ -1,12 +1,15 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <b>막대 데이터값이 4500보다 큰 경우 빨간색으로 표시</b>
-      <br />
-      <span class="toggle-label">데이터 자동 업데이트</span>
-      <ev-toggle v-model="isLive" />
-    </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <b>막대 데이터값이 4500보다 큰 경우 빨간색으로 표시</b>
+    <br />
+    <span class="toggle-label">데이터 자동 업데이트</span>
+    <ev-toggle v-model="isLive" />
   </div>
 </template>
 
@@ -30,7 +33,7 @@ export default {
 
     const chartOptions = {
       width: '100%',
-      height: '80%',
+      height: '100%',
       thickness: 0.8,
       title: {
         text: 'Chart Title',
@@ -113,9 +116,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.case {
-  height: 100%;
-}
 .toggle-label {
   vertical-align: top;
   margin-right: 7px;
