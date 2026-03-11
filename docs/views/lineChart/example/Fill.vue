@@ -1,5 +1,7 @@
 <template>
-  <ev-chart :data="chartData" :options="chartOptions" />
+  <resizable-wrapper>
+    <ev-chart :data="chartData" :options="chartOptions" />
+  </resizable-wrapper>
 </template>
 
 <script>
@@ -29,6 +31,7 @@ export default {
     const chartOptions = {
       type: 'line',
       width: '100%',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,

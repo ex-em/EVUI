@@ -1,16 +1,21 @@
 <template>
   <div class="case">
+    <resizable-wrapper>
+      <ev-chart
+        ref="chartRef"
+        :key="legendShow"
+        v-model:legend-data="legendItems"
+        :data="chartData"
+        :options="chartOptions"
+      />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
     <div class="controls">
       <span>범례 On/Off: </span>
       <ev-toggle v-model="legendShow" />
     </div>
-    <ev-chart
-      ref="chartRef"
-      :key="legendShow"
-      v-model:legend-data="legendItems"
-      :data="chartData"
-      :options="chartOptions"
-    />
     <div v-if="legendShow && chartOptions.legend.external" class="external-legend">
       <div
         v-for="item in legendItems"
@@ -73,6 +78,7 @@ export default {
     const chartOptions = computed(() => ({
       type: 'line',
       width: '100%',
+      height: '100%',
       title: {
         text: 'External Legend',
         show: true,
@@ -136,14 +142,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.case {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  max-height: 320px;
-  overflow: hidden;
-}
-
 .controls {
   display: flex;
   align-items: center;
@@ -153,10 +151,6 @@ export default {
   border-radius: 4px;
   margin-bottom: 8px;
   font-size: 12px;
-}
-
-.ev-chart {
-  flex: 1;
 }
 
 :deep(.ev-chart-container) {

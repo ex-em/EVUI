@@ -1,41 +1,46 @@
 <template>
   <div class="case">
-    <ev-chart
-      ref="chart"
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData2"
-      :options="chartOptions2"
-      @click="onClick"
-    />
-    <div class="description">
-      <ev-toggle v-model="isUseClick" />
-      <span> 클릭 기능 enable ( false 일때는 v-model 값으로 변경 ) </span>
+    <resizable-wrapper height="50%">
+      <ev-chart
+        ref="chart"
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData1"
+        :options="chartOptions1"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="50%">
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData2"
+        :options="chartOptions2"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+  </div>
+  
+  <div class="description">
+    <ev-toggle v-model="isUseClick" />
+    <span> 클릭 기능 enable ( false 일때는 v-model 값으로 변경 ) </span>
+    <br />
+    <br />
+    <ev-toggle v-model="isFixedPosTop" />
+    <span> tip 위치를 최상단에 고정 </span>
+    <br />
+    <br />
+    <ev-toggle v-model="isLive" />
+    <span> 데이터 자동 업데이트 </span>
+    <br />
+    <br />
+    <div>
+      <div class="badge yellow">v-model:selectedLabel</div>
+      {{ defaultSelectLabel }}
       <br />
       <br />
-      <ev-toggle v-model="isFixedPosTop" />
-      <span> tip 위치를 최상단에 고정 </span>
+      <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
+      {{ clickedLabel }}
       <br />
       <br />
-      <ev-toggle v-model="isLive" />
-      <span> 데이터 자동 업데이트 </span>
-      <br />
-      <br />
-      <div>
-        <div class="badge yellow">v-model:selectedLabel</div>
-        {{ defaultSelectLabel }}
-        <br />
-        <br />
-        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
-        {{ clickedLabel }}
-        <br />
-        <br />
-      </div>
     </div>
   </div>
 </template>

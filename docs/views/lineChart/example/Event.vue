@@ -1,22 +1,24 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData"
-      :options="chartOptions"
-      @click="onClick"
-      @dbl-click="onDblClick"
-    />
-    <div class="description">
-      <div class="badge yellow">기본 선택값 v-model</div>
-      {{ defaultSelectLabel }}
-      <br /><br />
-      <div class="badge yellow">클릭된 라벨</div>
-      {{ clickedLabel }}
-      <br /><br />
-      <div class="badge yellow">더블 클릭된 라벨</div>
-      {{ dblClickedLabel }}
-    </div>
+    <resizable-wrapper>
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData"
+        :options="chartOptions"
+        @click="onClick"
+        @dbl-click="onDblClick"
+      />
+    </resizable-wrapper>
+  </div>
+  <div class="description">
+    <div class="badge yellow">기본 선택값 v-model</div>
+    {{ defaultSelectLabel }}
+    <br /><br />
+    <div class="badge yellow">클릭된 라벨</div>
+    {{ clickedLabel }}
+    <br /><br />
+    <div class="badge yellow">더블 클릭된 라벨</div>
+    {{ dblClickedLabel }}
   </div>
 </template>
 

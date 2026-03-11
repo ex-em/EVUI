@@ -1,10 +1,12 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <span class="toggle-label">HTML Tooltip 사용</span>
-      <ev-toggle v-model="useHtml" />
-    </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+  <div class="description">
+    <span class="toggle-label">HTML Tooltip 사용</span>
+    <ev-toggle v-model="useHtml" />
   </div>
 </template>
 
@@ -58,7 +60,7 @@ export default {
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
-      height: '80%',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
