@@ -1,59 +1,64 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData2"
-      :options="chartOptions2"
-      @click="onClick"
-    />
-    <div class="description">
-      <div class="option">
-        <ev-toggle v-model="isLive" />
-        <span>데이터 자동 업데이트</span>
-      </div>
-      <div class="option">
-        <ev-toggle v-model="isUseClick" />
-        <span>클릭 기능 enable ( false 일때는 v-model 값으로만 변경 )</span>
-      </div>
-      <div class="option">
-        <ev-button @click="updateSelectedLabel"> select by v-model </ev-button>
-        <span>
-          차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을 변경해서 라벨 선택
-        </span>
-      </div>
-      <div class="option">
-        <ev-toggle v-model="isDeselctOverflow" />
-        <span>
-          DeselectOverflow: 설정한 limit 를 넘어서 클릭했을때 선입선출로 deselect 를 할지를 옵션으로
-          선택 가능
-        </span>
-      </div>
-      <div class="option">
-        <ev-toggle v-model="useSeriesOpacity" />
-        <span> useSeriesOpacity: 시리즈 opacity 변경 여부 </span>
-      </div>
-      <div class="option">
-        <ev-toggle v-model="useLabelOpacity" />
-        <span> useLabelOpacity: Axes Label opacity 변경 여부 </span>
-      </div>
-      <div class="option">
-        <ev-input-number v-model="limit" :min="1" :max="7" />
-        <span> limit: 선택할 라벨의 최대 갯수 </span>
-      </div>
-      <div>
-        <div class="badge yellow">v-model:selectedLabel</div>
-        {{ defaultSelectLabel }}
-        <br />
-        <br />
-        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
-        {{ clickedLabel }}
-      </div>
+    <resizable-wrapper height="50%">
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData1"
+        :options="chartOptions1"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="50%">
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData2"
+        :options="chartOptions2"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="option">
+      <ev-toggle v-model="isLive" />
+      <span>데이터 자동 업데이트</span>
+    </div>
+    <div class="option">
+      <ev-toggle v-model="isUseClick" />
+      <span>클릭 기능 enable ( false 일때는 v-model 값으로만 변경 )</span>
+    </div>
+    <div class="option">
+      <ev-button @click="updateSelectedLabel"> select by v-model </ev-button>
+      <span>
+        차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을 변경해서 라벨 선택
+      </span>
+    </div>
+    <div class="option">
+      <ev-toggle v-model="isDeselctOverflow" />
+      <span>
+        DeselectOverflow: 설정한 limit 를 넘어서 클릭했을때 선입선출로 deselect 를 할지를 옵션으로
+        선택 가능
+      </span>
+    </div>
+    <div class="option">
+      <ev-toggle v-model="useSeriesOpacity" />
+      <span> useSeriesOpacity: 시리즈 opacity 변경 여부 </span>
+    </div>
+    <div class="option">
+      <ev-toggle v-model="useLabelOpacity" />
+      <span> useLabelOpacity: Axes Label opacity 변경 여부 </span>
+    </div>
+    <div class="option">
+      <ev-input-number v-model="limit" :min="1" :max="7" />
+      <span> limit: 선택할 라벨의 최대 갯수 </span>
+    </div>
+    <div>
+      <div class="badge yellow">v-model:selectedLabel</div>
+      {{ defaultSelectLabel }}
+      <br />
+      <br />
+      <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
+      {{ clickedLabel }}
     </div>
   </div>
 </template>
@@ -175,7 +180,7 @@ export default {
     const chartOptions1 = reactive({
       type: 'heatMap',
       width: '100%',
-      height: '300px',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
@@ -229,7 +234,7 @@ export default {
     const chartOptions2 = reactive({
       type: 'heatMap',
       width: '100%',
-      height: '300px',
+      height: '100%',
       horizontal: true,
       title: {
         text: 'Chart Title',
@@ -355,8 +360,6 @@ export default {
 
 <style lang="scss" scoped>
 .description {
-  position: relative;
-
   .option {
     display: flex;
     gap: 10px;

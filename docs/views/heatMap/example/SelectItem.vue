@@ -1,43 +1,46 @@
 <template>
   <div class="case">
-    <ev-chart
-      ref="evChartRef"
-      v-model:selectedItem="defaultSelectItem"
-      :data="chartData"
-      :options="chartOptions"
-      @click="onClick"
-    />
-    <div class="description">
-      <div class="option">
-        <ev-toggle v-model="useSeriesOpacity" />
-        <span>useSeriesOpacity</span>
-      </div>
-      <div class="option">
-        <ev-toggle v-model="showBorder" />
-        <span>showBorder</span>
-      </div>
-      <div class="option">
-        <ev-toggle v-model="useClick" />
-        <span>클릭 기능 enable ( false 일때는 v-model 값으로만 변경 )</span>
-      </div>
-      <div class="option">
-        <ev-button @click="updateSelectedItem"> select by v-model </ev-button>
-        <span>
-          차트 클릭이 아닌 v-model:selectedItem 에 바인딩한 dataIndex를 변경하여 항목 선택
-        </span>
-      </div>
-      <div class="option">
-        <ev-toggle v-model="useDeselectItem" />
-        <span>선택된 항목을 클릭했을 때 deselect 여부</span>
-      </div>
-      <div>
-        <div class="badge yellow">v-model:selectedItem</div>
-        {{ defaultSelectItem }}
-        <br />
-        <br />
-        <div class="badge yellow">클릭 이벤트 데이터</div>
-        {{ clickedItem }}
-      </div>
+    <resizable-wrapper>
+      <ev-chart
+        ref="evChartRef"
+        v-model:selectedItem="defaultSelectItem"
+        :data="chartData"
+        :options="chartOptions"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="option">
+      <ev-toggle v-model="useSeriesOpacity" />
+      <span>useSeriesOpacity</span>
+    </div>
+    <div class="option">
+      <ev-toggle v-model="showBorder" />
+      <span>showBorder</span>
+    </div>
+    <div class="option">
+      <ev-toggle v-model="useClick" />
+      <span>클릭 기능 enable ( false 일때는 v-model 값으로만 변경 )</span>
+    </div>
+    <div class="option">
+      <ev-button @click="updateSelectedItem"> select by v-model </ev-button>
+      <span>
+        차트 클릭이 아닌 v-model:selectedItem 에 바인딩한 dataIndex를 변경하여 항목 선택
+      </span>
+    </div>
+    <div class="option">
+      <ev-toggle v-model="useDeselectItem" />
+      <span>선택된 항목을 클릭했을 때 deselect 여부</span>
+    </div>
+    <div>
+      <div class="badge yellow">v-model:selectedItem</div>
+      {{ defaultSelectItem }}
+      <br />
+      <br />
+      <div class="badge yellow">클릭 이벤트 데이터</div>
+      {{ clickedItem }}
     </div>
   </div>
 </template>
@@ -90,7 +93,7 @@ export default {
     const chartOptions = reactive({
       type: 'heatMap',
       width: '100%',
-      height: '300px',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
@@ -170,8 +173,6 @@ export default {
 
 <style lang="scss" scoped>
 .description {
-  position: relative;
-
   .option {
     display: flex;
     gap: 10px;
