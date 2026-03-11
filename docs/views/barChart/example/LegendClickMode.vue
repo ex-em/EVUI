@@ -1,5 +1,10 @@
 <template>
   <div class="case">
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" @click-legend="handleClickLegend" />
+    </resizable-wrapper>
+  </div>
+  <div class="description">
     <h3>Legend Click Mode Option Test</h3>
     <div class="example-controls">
       <label>
@@ -17,7 +22,7 @@
         inactive, 처음 클릭시 해당 시리즈만 감춤, 마지막 남은 범례 클릭시 무시
       </p>
     </div>
-    <ev-chart :data="chartData" :options="chartOptions" @click-legend="handleClickLegend" />
+
     <div class="result">
       <div class="badge yellow">클릭된 시리즈 ID</div>
       {{ clickedSeriesIds }}

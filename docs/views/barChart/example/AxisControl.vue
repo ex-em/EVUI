@@ -1,19 +1,21 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="hover-options">
-        <span>axisXShow</span>
-        <ev-toggle v-model="axisXShow" />
-        <span>axisYShow</span>
-        <ev-toggle v-model="axisYShow" />
-        <span>gridXShow</span>
-        <ev-toggle v-model="gridXShow" />
-        <span>gridYShow</span>
-        <ev-toggle v-model="gridYShow" />
-        <span>formatterApply: () => ''</span>
-        <ev-toggle v-model="formatterApply" />
-      </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+  <div class="description">
+    <div class="hover-options">
+      <span>axisXShow</span>
+      <ev-toggle v-model="axisXShow" />
+      <span>axisYShow</span>
+      <ev-toggle v-model="axisYShow" />
+      <span>gridXShow</span>
+      <ev-toggle v-model="gridXShow" />
+      <span>gridYShow</span>
+      <ev-toggle v-model="gridYShow" />
+      <span>formatterApply: () => ''</span>
+      <ev-toggle v-model="formatterApply" />
     </div>
   </div>
 </template>

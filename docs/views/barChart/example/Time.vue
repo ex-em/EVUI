@@ -1,6 +1,8 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
     <div class="description">
       <span class="toggle-label">데이터 자동 업데이트</span>
       <ev-toggle v-model="isLive" />
@@ -17,7 +19,7 @@ export default {
     const chartOptions = {
       type: 'bar',
       width: '100%',
-      height: '80%',
+      height: '100%',
       thickness: 1,
       title: {
         text: 'Chart Title',

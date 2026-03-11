@@ -1,61 +1,69 @@
 <template>
   <div class="case">
-    <ev-chart
-      ref="chart"
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData2"
-      :options="chartOptions2"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData3"
-      :options="chartOptions3"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData4"
-      :options="chartOptions4"
-      @click="onClick"
-    />
-    <div class="description">
-      <ev-button @click="toggleSelectData"> select by v-model </ev-button>
-      <span class="left">
-        차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을 변경해서 라벨 선택
-      </span>
+    <resizable-wrapper height="25%">
+      <ev-chart
+        ref="chart"
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData1"
+        :options="chartOptions1"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="25%">
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData2"
+        :options="chartOptions2"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="25%">
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData3"
+        :options="chartOptions3"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="25%">
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData4"
+        :options="chartOptions4"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+  </div> 
+  <div class="description">
+    <ev-button @click="toggleSelectData"> select by v-model </ev-button>
+    <span class="left">
+      차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을 변경해서 라벨 선택
+    </span>
+    <br />
+    <br />
+    <ev-toggle v-model="isFixedPosTop" />
+    <span class="left"> tip 위치를 최상단에 고정 </span>
+    <br />
+    <br />
+    <ev-button @click="toggleOverflow"> Deselect Overflow </ev-button>
+    <span class="left">
+      설정한 limit 를 넘어서 클릭했을때 선입선출로 deselect 를 할지를 옵션으로 선택 가능
+    </span>
+    <br />
+    <br />
+    <ev-button @click="updateData"> Update Data </ev-button>
+    <span class="left"> 차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정 </span>
+    <br />
+    <br />
+    <div>
+      <div class="badge yellow">v-model:selectedLabel</div>
+      {{ defaultSelectLabel }}
       <br />
       <br />
-      <ev-toggle v-model="isFixedPosTop" />
-      <span class="left"> tip 위치를 최상단에 고정 </span>
+      <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
+      {{ clickedLabel }}
       <br />
       <br />
-      <ev-button @click="toggleOverflow"> Deselect Overflow </ev-button>
-      <span class="left">
-        설정한 limit 를 넘어서 클릭했을때 선입선출로 deselect 를 할지를 옵션으로 선택 가능
-      </span>
-      <br />
-      <br />
-      <ev-button @click="updateData"> Update Data </ev-button>
-      <span class="left"> 차트 데이터를 변경하면 팁의 위치만 변경, 라벨은 고정 </span>
-      <br />
-      <br />
-      <div>
-        <div class="badge yellow">v-model:selectedLabel</div>
-        {{ defaultSelectLabel }}
-        <br />
-        <br />
-        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
-        {{ clickedLabel }}
-        <br />
-        <br />
-      </div>
     </div>
   </div>
 </template>

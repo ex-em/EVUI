@@ -1,13 +1,15 @@
 <template>
   <div class="case">
-    <ev-chart
-      ref="chart"
-      v-model:selectedItem="defaultSelectItem"
-      :data="chartData"
-      :options="chartOptions"
-      @click="onClick"
-      @dbl-click="onDblClick"
-    />
+    <resizable-wrapper>
+      <ev-chart
+        ref="chart"
+        v-model:selectedItem="defaultSelectItem"
+        :data="chartData"
+        :options="chartOptions"
+        @click="onClick"
+        @dbl-click="onDblClick"
+      />
+    </resizable-wrapper>
     <div class="description">
       <ev-button @click="toggleSelectData"> select toggle 1 - 2 </ev-button>
       <br /><br />
