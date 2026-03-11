@@ -1,28 +1,106 @@
 <template>
   <div class="case">
-    <ev-chart
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <resizable-wrapper>
+      <ev-chart
+        :data="chartData"
+        :options="chartOptions"
+      />
+    </resizable-wrapper>
+
     <div class="description">
       <div class="row">
-        <div class="row-item">
-          <span class="item-title">
-            Max Value
-          </span>
-            <ev-input-number
-              v-model="maxValue"
-              class="component"
-              :min="1"
-            />
-        </div>
         <div class="row-item">
           <span class="item-title">
             Display Overflow
           </span>
           <ev-checkbox
             v-model="displayOverflow"
-            class="check-box"
+            class="component"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <h3> YAxis Options</h3>
+      </div>
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            use Range
+          </span>
+          <ev-toggle
+            v-model="useRange"
+            class="component"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            Min Value
+          </span>
+          <ev-input-number
+            v-model="minValue"
+            class="component"
+            :min="0"
+            :disabled="!useRange"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            Max Value
+          </span>
+          <ev-input-number
+            v-model="maxValue"
+            class="component"
+            :min="0"
+            :disabled="!useRange"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            use Interval
+          </span>
+          <ev-toggle
+            v-model="useInterval"
+            class="component"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            Interval
+          </span>
+          <ev-input-number
+            v-model="interval"
+            class="component"
+            :min="0"
+            :disabled="!useInterval"
+          />
+        </div>
+      </div>
+      <div class="row">
+        <div class="sub-description">
+          range 옵션과 interval 옵션이 호환되지 않는다면, interval 옵션은 무시됩니다.
+        </div>
+      </div>
+      <div class="row">
+        <div class="row-item">
+          <span class="item-title">
+            is Auto Decimal
+          </span>
+          <ev-toggle
+            v-model="isAutoDecimal"
+            class="component"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
+            Decimal Point
+          </span>
+          <ev-input-number
+            v-model="decimalPoint"
+            class="component"
+            :disabled="isAutoDecimal"
+            :min="0"
           />
         </div>
       </div>
@@ -63,15 +141,21 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
             { x: 184, y: 78 }, { x: 175, y: 62 }, { x: 184, y: 81 },
             { x: 180, y: 76 }, { x: 177, y: 83 }, { x: 192, y: 90, color: '#FF0000' },
             { x: 176, y: 74 }, { x: 174, y: 71 }, { x: 184, y: 79 },
-            { x: 192, y: 93, color: '#FF0000' }, { x: 171, y: 70 }, { x: 173, y: 72 },
+            { x: 10, y: 4, color: '#FF0000' }, { x: 171, y: 70 }, { x: 173, y: 72 },
             { x: 176, y: 85 }, { x: 176, y: 78 }, { x: 180, y: 77 },
             { x: 172, y: 66 }, { x: 176, y: 86 }, { x: 173, y: 81 },
           ],
         },
       });
 
-      const maxValue = ref(60);
+      const maxValue = ref(10);
+      const minValue = ref(0);
+      const decimalPoint = ref(0);
+      const isAutoDecimal = ref(true);
       const displayOverflow = ref(true);
+      const interval = ref(5);
+      const useInterval = ref(false);
+      const useRange = ref(true);
 
       const chartOptions = computed(() => ({
         type: 'scatter',
@@ -80,46 +164,13 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
         padding: { top: 20, right: 2, bottom: 4, left: 2 },
         axesX: [{
           type: 'linear',
-          showAxis: true,
-          startToZero: true,
-          autoScaleRatio: null,
-          showGrid: true,
-          axisLineColor: '#C9CFDC',
-          gridLineColor: '#C9CFDC',
-          interval: null,
-          labelStyle: {
-            show: true,
-            fontSize: 12,
-            color: '#25262E',
-            fontFamily: 'Roboto',
-            fitWidth: false,
-            fitDir: 'right',
-          },
-          plotLines: [],
-          plotBands: [],
-          formatter: null,
         }],
         axesY: [{
           type: 'linear',
-          showAxis: true,
-          startToZero: false,
-          autoScaleRatio: null,
-          showGrid: true,
-          axisLineColor: '#C9CFDC',
-          gridLineColor: '#C9CFDC',
-          interval: 1,
-          labelStyle: {
-            show: true,
-            fontSize: 12,
-            color: '#25262E',
-            fontFamily: 'Roboto',
-            fitWidth: false,
-            fitDir: 'right',
-          },
-          plotLines: [],
-          plotBands: [],
-          formatter: null,
-          range: [0, maxValue.value],
+          startToZero: true,
+          decimalPoint: isAutoDecimal.value ? 'auto' : decimalPoint.value,
+          range: useRange.value ? [minValue.value, maxValue.value] : null,
+          interval: useInterval.value ? interval.value : null,
         }],
         title: {
           text: '',
@@ -152,8 +203,14 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
       return {
         chartData,
         maxValue,
+        minValue,
+        decimalPoint,
+        isAutoDecimal,
         displayOverflow,
         chartOptions,
+        interval,
+        useInterval,
+        useRange,
       };
     },
   };
@@ -167,20 +224,32 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
 
   .row {
     display: flex;
+    flex-direction: row;
     margin-top: 15px;
-    justify-content: space-between;
+    gap: 10px;
+
     .row-item {
-      flex: 1;
       display: flex;
+      align-items: center;
+      gap: 3px;
+
       .item-title {
         line-height: 33px;
         margin-right: 3px;
         min-width: 80px;
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .component {
+        max-width: 200px;
       }
     }
-    .check-box {
-      display: flex;
-      margin-left: 4px;
+
+    .sub-description {
+      font-size: 12px;
+      color: #666;
+      text-align: right;
     }
   }
 </style>
