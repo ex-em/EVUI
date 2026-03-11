@@ -1,34 +1,36 @@
 <template>
   <div class="case">
-    <ev-chart v-model:selectedLabel="selectedLabel" :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="option">
-        <span>scrollbar 사용</span>
-        <ev-toggle v-model="useScrollbar" />
-      </div>
-      <div class="option">
-        <span>x축 range 설정</span>
-        <ev-toggle v-model="useRangeX" />
-      </div>
-      <div class="option">
-        <span>min</span>
-        <ev-input-number v-model="xMin" :step="xInterval" :min="minDate" :max="xMax - xInterval" />
-        <span>max</span>
-        <ev-input-number v-model="xMax" :step="xInterval" :min="xMin + xInterval" :max="maxDate" />
-      </div>
-      <div class="option">
-        <span>y축 range 설정</span>
-        <ev-toggle v-model="useRangeY" />
-      </div>
-      <div class="option">
-        <span>min</span>
-        <ev-input-number v-model="yMin" :step="1" :min="0" :max="yMax - 1" />
-        <span>max</span>
-        <ev-input-number v-model="yMax" :step="1" :min="yMin + 1" :max="LABEL_Y_COUNT - 1" />
-      </div>
-      <label class="badge yellow"> v-model:selectedLabel</label>
-      <span>{{ selectedLabel }}</span>
+    <resizable-wrapper>
+      <ev-chart v-model:selectedLabel="selectedLabel" :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+  <div class="description">
+    <div class="option">
+      <span>scrollbar 사용</span>
+      <ev-toggle v-model="useScrollbar" />
     </div>
+    <div class="option">
+      <span>x축 range 설정</span>
+      <ev-toggle v-model="useRangeX" />
+    </div>
+    <div class="option">
+      <span>min</span>
+      <ev-input-number v-model="xMin" :step="xInterval" :min="minDate" :max="xMax - xInterval" />
+      <span>max</span>
+      <ev-input-number v-model="xMax" :step="xInterval" :min="xMin + xInterval" :max="maxDate" />
+    </div>
+    <div class="option">
+      <span>y축 range 설정</span>
+      <ev-toggle v-model="useRangeY" />
+    </div>
+    <div class="option">
+      <span>min</span>
+      <ev-input-number v-model="yMin" :step="1" :min="0" :max="yMax - 1" />
+      <span>max</span>
+      <ev-input-number v-model="yMax" :step="1" :min="yMin + 1" :max="LABEL_Y_COUNT - 1" />
+    </div>
+    <label class="badge yellow"> v-model:selectedLabel</label>
+    <span>{{ selectedLabel }}</span>
   </div>
 </template>
 
@@ -73,7 +75,7 @@ export default {
     const chartOptions = reactive({
       type: 'heatMap',
       width: '100%',
-      height: '300px',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
@@ -211,8 +213,6 @@ export default {
 
 <style lang="scss" scoped>
 .description {
-  position: relative;
-
   .option {
     display: flex;
     gap: 10px;

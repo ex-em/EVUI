@@ -1,19 +1,22 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedItem="selectedItem"
-      v-model:selectedLabel="selectedLabel"
-      :data="chartData"
-      :options="chartOptions"
-    />
-    <div class="description">
-      <label class="badge yellow"> v-model:selectedItem </label>
-      <span>{{ selectedItem }}</span>
-      <br />
-      <br />
-      <label class="badge yellow"> v-model:selectedLabel</label>
-      <span>{{ selectedLabel }}</span>
-    </div>
+    <resizable-wrapper>
+      <ev-chart
+        v-model:selectedItem="selectedItem"
+        v-model:selectedLabel="selectedLabel"
+        :data="chartData"
+        :options="chartOptions"
+      />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <label class="badge yellow"> v-model:selectedItem </label>
+    <span>{{ selectedItem }}</span>
+    <br />
+    <br />
+    <label class="badge yellow"> v-model:selectedLabel</label>
+    <span>{{ selectedLabel }}</span>
   </div>
 </template>
 
@@ -65,7 +68,7 @@ export default {
     const chartOptions = reactive({
       type: 'heatMap',
       width: '100%',
-      height: '300px',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
