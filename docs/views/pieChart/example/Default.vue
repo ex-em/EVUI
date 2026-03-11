@@ -1,10 +1,13 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="badge yellow">unSelectedOpacity</div>
-      <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" :precision="1" />
-    </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="badge yellow">unSelectedOpacity</div>
+    <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" :precision="1" />
   </div>
 </template>
 

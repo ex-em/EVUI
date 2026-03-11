@@ -1,22 +1,24 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> doughnutHoleSize </span>
-          <ev-input-number
-            v-model="doughnutHoleSize"
-            :step="0.1"
-            :precision="1"
-            :min="0"
-            :max="0.8"
-          />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> fontSize </span>
-          <ev-input-number v-model="fontSize" :step="1" :precision="0" :min="1" :max="30" />
-        </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+  <div class="description">
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> doughnutHoleSize </span>
+        <ev-input-number
+          v-model="doughnutHoleSize"
+          :step="0.1"
+          :precision="1"
+          :min="0"
+          :max="0.8"
+        />
+      </div>
+      <div class="row-item">
+        <span class="item-title"> fontSize </span>
+        <ev-input-number v-model="fontSize" :step="1" :precision="0" :min="1" :max="30" />
       </div>
     </div>
   </div>

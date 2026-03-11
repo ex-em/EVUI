@@ -1,25 +1,28 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedItem="defaultSelectItem"
-      :data="chartData"
-      :options="chartOptions"
-      @click="onClick"
-      @dbl-click="onDblClick"
-    />
-    <div class="description">
-      <ev-button @click="toggleSelectData"> select toggle 1 - 2 </ev-button>
+    <resizable-wrapper>
+      <ev-chart
+        v-model:selectedItem="defaultSelectItem"
+        :data="chartData"
+        :options="chartOptions"
+        @click="onClick"
+        @dbl-click="onDblClick"
+      />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <ev-button @click="toggleSelectData"> select toggle 1 - 2 </ev-button>
+    <br /><br />
+    <div>
+      <div class="badge yellow">기본 선택값 v-model</div>
+      {{ defaultSelectItem }}
       <br /><br />
-      <div>
-        <div class="badge yellow">기본 선택값 v-model</div>
-        {{ defaultSelectItem }}
-        <br /><br />
-        <div class="badge yellow">클릭된 정보</div>
-        {{ clickedInfo }}
-        <br /><br />
-        <div class="badge yellow">더블 클릭된 정보</div>
-        {{ dblClickedInfo }}
-      </div>
+      <div class="badge yellow">클릭된 정보</div>
+      {{ clickedInfo }}
+      <br /><br />
+      <div class="badge yellow">더블 클릭된 정보</div>
+      {{ dblClickedInfo }}
     </div>
   </div>
 </template>
@@ -45,7 +48,7 @@ export default {
     const chartOptions = {
       type: 'pie',
       width: '100%',
-      height: '50%',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
@@ -93,7 +96,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.case {
-  height: 100%;
-}
 </style>
