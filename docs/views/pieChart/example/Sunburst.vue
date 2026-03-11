@@ -1,6 +1,8 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
   </div>
 </template>
 
