@@ -1,38 +1,41 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedItem="defaultSelectItem"
-      :data="chartData"
-      :options="chartOptions"
-      @click="onClick"
-    />
-    <div class="description">
-      <div class="row">
-        <div class="row-item">
-          <label class="item-title"> showTextTip </label>
-          <ev-toggle v-model="showTextTip" />
-        </div>
-        <div class="row-item">
-          <label class="item-title"> showTip </label>
-          <ev-toggle v-model="showTip" />
-        </div>
-        <div class="row-item">
-          <label class="item-title"> showIndicator </label>
-          <ev-toggle v-model="showIndicator" />
-        </div>
-        <div class="row-item">
-          <label class="item-title"> useSeriesOpacity </label>
-          <ev-toggle v-model="useSeriesOpacity" />
-        </div>
+    <resizable-wrapper>
+      <ev-chart
+        v-model:selectedItem="defaultSelectItem"
+        :data="chartData"
+        :options="chartOptions"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="row">
+      <div class="row-item">
+        <label class="item-title"> showTextTip </label>
+        <ev-toggle v-model="showTextTip" />
       </div>
-      <div class="row">
-        <div class="badge yellow">기본 선택값 v-model</div>
-        {{ defaultSelectItem }}
+      <div class="row-item">
+        <label class="item-title"> showTip </label>
+        <ev-toggle v-model="showTip" />
       </div>
-      <div class="row">
-        <div class="badge yellow">클릭된 Item 정보</div>
-        {{ clickedInfo }}
+      <div class="row-item">
+        <label class="item-title"> showIndicator </label>
+        <ev-toggle v-model="showIndicator" />
       </div>
+      <div class="row-item">
+        <label class="item-title"> useSeriesOpacity </label>
+        <ev-toggle v-model="useSeriesOpacity" />
+      </div>
+    </div>
+    <div class="row">
+      <div class="badge yellow">기본 선택값 v-model</div>
+      {{ defaultSelectItem }}
+    </div>
+    <div class="row">
+      <div class="badge yellow">클릭된 Item 정보</div>
+      {{ clickedInfo }}
     </div>
   </div>
 </template>
