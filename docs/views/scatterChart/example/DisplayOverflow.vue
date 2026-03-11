@@ -1,16 +1,19 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> Max Value </span>
-          <ev-input-number v-model="maxValue" class="component" :min="1" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> Display Overflow </span>
-          <ev-checkbox v-model="displayOverflow" class="check-box" />
-        </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> Max Value </span>
+        <ev-input-number v-model="maxValue" class="component" :min="1" />
+      </div>
+      <div class="row-item">
+        <span class="item-title"> Display Overflow </span>
+        <ev-checkbox v-model="displayOverflow" class="check-box" />
       </div>
     </div>
   </div>

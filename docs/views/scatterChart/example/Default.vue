@@ -1,16 +1,19 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> Point size </span>
-          <ev-input-number v-model="pointSize" class="component" :min="1" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> Point style </span>
-          <ev-select v-model="pointStyle" :items="pointStyleList" class="component" />
-        </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+  
+  <div class="description">
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> Point size </span>
+        <ev-input-number v-model="pointSize" class="component" :min="1" />
+      </div>
+      <div class="row-item">
+        <span class="item-title"> Point style </span>
+        <ev-select v-model="pointStyle" :items="pointStyleList" class="component" />
       </div>
     </div>
   </div>

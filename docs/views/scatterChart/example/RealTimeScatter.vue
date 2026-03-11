@@ -1,20 +1,23 @@
 <template>
   <div class="case">
-    <ev-chart v-model:realTimeScatterReset="resetFlag" :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="row">
-        <div class="row-item">
-          <label>데이터 자동 업데이트</label>
-          <ev-toggle v-model="isRealTime" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> 데이터 초기화 </span>
-          <ev-button class="component" @click="dataReset"> reset </ev-button>
-        </div>
-        <div class="row-item">
-          <span class="item-title"> change range (s) </span>
-          <ev-input-number v-model="realTimeScatterRange" class="component" :min="50" :step="50" />
-        </div>
+    <resizable-wrapper>
+      <ev-chart v-model:realTimeScatterReset="resetFlag" :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="row">
+      <div class="row-item">
+        <label>데이터 자동 업데이트</label>
+        <ev-toggle v-model="isRealTime" />
+      </div>
+      <div class="row-item">
+        <span class="item-title"> 데이터 초기화 </span>
+        <ev-button class="component" @click="dataReset"> reset </ev-button>
+      </div>
+      <div class="row-item">
+        <span class="item-title"> change range (s) </span>
+        <ev-input-number v-model="realTimeScatterRange" class="component" :min="50" :step="50" />
       </div>
     </div>
   </div>
