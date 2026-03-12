@@ -550,8 +550,8 @@ const modules = {
       }
 
       // click-legend event 발생
-      const activeSeries = Object.values(this.seriesList).filter((series) => series.show);
-      const activeSeriesIds = activeSeries.map((series) => series.sId);
+      const activeSeries = Object.values(this.seriesList).filter(series => series.show);
+      const activeSeriesIds = activeSeries.map(series => series.sId);
       const isActiveAll = activeSeriesIds.length === Object.values(this.seriesList).length;
       const args = {
         e,
@@ -775,9 +775,9 @@ const modules = {
         });
       }
 
-      //click-legend event 발생
-      const activeSeries = series.colorState.filter((colorItem) => colorItem.show);
-      const activeSerieIndices = activeSeries.map((colorItem) => +colorItem.id.split('#')[1]);
+      // click-legend event 발생
+      const activeSeries = series.colorState.filter(colorItem => colorItem.show);
+      const activeSerieIndices = activeSeries.map(colorItem => +colorItem.id.split('#')[1]);
       const isActiveAll = series.colorState.length === activeSeries.length;
       const args = {
         e,
