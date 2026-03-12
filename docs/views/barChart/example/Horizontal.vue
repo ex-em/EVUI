@@ -35,9 +35,9 @@ export default {
           },
         },
       },
-      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
+      labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'LONG_LONG_LONG_LABEL'],
       data: {
-        series1: [1500.123456, 180.123456, 30.123456, 10, 0],
+        series1: [1500.123456, 180.123456, 30.123456, 10, 0, 0],
       },
     };
 
@@ -69,6 +69,19 @@ export default {
         {
           type: 'step',
           showGrid: false,
+          labelStyle: {
+            show: true,
+            fontSize: 12,
+            color: '#25262E',
+            fontFamily: 'Roboto',
+            fontWeight: 400,
+            fitDir: 'right',
+            alignToGridLine: false,
+            padding: 0,
+            fitWidth: true,
+            // maxWidth: 300, // px
+            maxWidth: '10%',
+          }
         },
       ],
       indicator: {
