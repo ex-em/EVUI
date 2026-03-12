@@ -238,6 +238,8 @@ export default {
       return { width: 2, height: 2 };
     }
 
+    textMeasureCtx.save();
+
     textMeasureCtx.font = fontStyle;
     const metrics = textMeasureCtx.measureText(text);
 
@@ -246,6 +248,8 @@ export default {
 
     // DOM 기본 line-height 보정 (대략 1.2 ~ 1.3)
     const lineHeight = fontSize * 1.2;
+
+    textMeasureCtx.restore();
 
     return {
       width: Math.max(Math.ceil(metrics.width), 2),
