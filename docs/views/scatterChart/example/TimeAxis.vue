@@ -231,7 +231,7 @@ export default {
 
     .sub-description {
       font-size: 12px;
-      color: #666;
+      color: #666666;
       text-align: right;
     }
   }
