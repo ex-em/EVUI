@@ -87,6 +87,7 @@ export default {
     'update:realTimeScatterReset',
     'click-legend',
     'update:legendData',
+    'axes-scale-change',
   ],
   setup(props, { emit }) {
     let evChart = null;

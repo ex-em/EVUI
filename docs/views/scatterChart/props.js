@@ -12,6 +12,8 @@ import DisplayOverflow from './example/DisplayOverflow';
 import DisplayOverflowRaw from './example/DisplayOverflow?raw';
 import RealTimeScatter from './example/RealTimeScatter';
 import RealTimeScatterRaw from './example/RealTimeScatter?raw';
+import AxesScaleChange from './example/AxesScaleChange';
+import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
 
 export default {
   mdText,
@@ -45,6 +47,12 @@ export default {
       description: '실시간으로 대량의 데이터를 처리합니다.',
       component: RealTimeScatter,
       parsedData: parse(RealTimeScatterRaw).descriptor,
+    },
+    AxesScaleChange: {
+      description:
+        '차트 너비를 변경하면 axes-scale-change 이벤트로 재계산된 steps, interval, graphMin, graphMax를 확인할 수 있습니다.',
+      component: AxesScaleChange,
+      parsedData: parse(AxesScaleChangeRaw).descriptor,
     },
   },
 };

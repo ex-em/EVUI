@@ -34,6 +34,8 @@ import LargeScrollbar from './example/LargeScrollbar';
 import LargeScrollbarRaw from './example/LargeScrollbar?raw';
 import UnSelectedOpacity from './example/UnSelectedOpacity';
 import UnSelectedOpacityRaw from './example/UnSelectedOpacity?raw';
+import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
+import AxesScaleChange from './example/AxesScaleChange';
 
 export default {
   mdText,
@@ -129,6 +131,12 @@ export default {
       description: 'unSelectedOpacity 옵션으로 비선택 요소의 opacity를 설정할 수 있습니다',
       component: UnSelectedOpacity,
       parsedData: parse(UnSelectedOpacityRaw).descriptor,
+    },
+    AxesScaleChange: {
+      description:
+        '차트 너비를 변경하면 axes-scale-change 이벤트로 재계산된 steps, interval, graphMin, graphMax를 확인할 수 있습니다.',
+      component: AxesScaleChange,
+      parsedData: parse(AxesScaleChangeRaw).descriptor,
     },
   },
 };
