@@ -260,6 +260,35 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
   }
 
+  emitAxesScaleChange() {
+    if (typeof this.listeners?.['axes-scale-change'] !== 'function') {
+      return;
+    }
+
+    const prev = this._lastEmittedAxesSteps;
+    const curr = this.axesSteps;
+
+    const isSameAxis = (a, b) =>
+      a?.steps === b?.steps &&
+      a?.interval === b?.interval &&
+      a?.graphMin === b?.graphMin &&
+      a?.graphMax === b?.graphMax;
+
+    const isUnchanged =
+      prev &&
+      curr.x.length === prev.x.length &&
+      curr.y.length === prev.y.length &&
+      curr.x.every((ax, i) => isSameAxis(ax, prev.x[i])) &&
+      curr.y.every((ay, i) => isSameAxis(ay, prev.y[i]));
+
+    if (isUnchanged) {
+      return;
+    }
+
+    this._lastEmittedAxesSteps = curr;
+    this.listeners['axes-scale-change'](curr);
+  }
+
   /**
    * To draw canvas chart, it processes several sequential jobs
    * @param {any} [hitInfo=undefined]    from mousemove callback (object or object[] of undefined)
@@ -275,6 +304,8 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
 
     this.adjustXAndYAxisWidth();
+
+    this.emitAxesScaleChange();
 
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);

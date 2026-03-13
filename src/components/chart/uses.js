@@ -406,6 +406,9 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
       await nextTick();
       emit('update:legendData', legendData);
     },
+    'axes-scale-change': (result) => {
+      emit('axes-scale-change', result);
+    },
   };
 
   return {

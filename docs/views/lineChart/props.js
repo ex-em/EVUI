@@ -40,6 +40,8 @@ import LegendClickMode from './example/LegendClickMode';
 import LegendClickModeRaw from './example/LegendClickMode?raw';
 import NiceScale from './example/NiceScale';
 import NiceScaleRaw from './example/NiceScale?raw';
+import AxesScaleChange from './example/AxesScaleChange';
+import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
 import UnSelectedOpacity from './example/UnSelectedOpacity';
 import UnSelectedOpacityRaw from './example/UnSelectedOpacity?raw';
 
@@ -161,6 +163,12 @@ export default {
         '축 타입이 linear인 경우 자동으로 최적의 최대 값과 간격을 계산하여 축을 그립니다.',
       component: NiceScale,
       parsedData: parse(NiceScaleRaw).descriptor,
+    },
+    AxesScaleChange: {
+      description:
+        '차트 너비를 변경하면 axes-scale-change 이벤트로 재계산된 steps, interval, graphMin, graphMax를 확인할 수 있습니다.',
+      component: AxesScaleChange,
+      parsedData: parse(AxesScaleChangeRaw).descriptor,
     },
   },
 };
