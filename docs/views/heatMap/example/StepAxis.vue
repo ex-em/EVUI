@@ -1,15 +1,18 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="row">
-        <span>Y축 라벨 개수</span>
-        <ev-input-number v-model="yLabelCount" :min="1" :max="100" />
-      </div>
-      <div class="row">
-        <span>소수점 자릿수</span>
-        <ev-input-number v-model="decimalPoint" :min="0" :max="10" />
-      </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="row">
+      <span>Y축 눈금 개수</span>
+      <ev-input-number v-model="yLabelCount" :min="1" :max="100" />
+    </div>
+    <div class="row">
+      <span>소수점 자릿수</span>
+      <ev-input-number v-model="decimalPoint" :min="0" :max="10" />
     </div>
   </div>
 </template>
@@ -152,14 +155,6 @@ export default {
 
 <style lang="scss" scoped>
 .case {
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-
-  :deep(.ev-chart) {
-    flex: auto;
-  }
-
   .description {
     display: flex;
     flex-direction: column;

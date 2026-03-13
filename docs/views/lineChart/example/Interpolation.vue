@@ -1,43 +1,45 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
 
-    <div class="description">
-      <div class="section">
-        <div class="section-body section-body--col">
-          <div class="section-item">
-            <span class="section-title">Chart Type</span>
-            <ev-select v-model="chartType" :items="chartTypeList" @change="onChangeChartType" />
-            <span class="section-title">Interpolation</span>
-            <ev-select
-              v-model="interpolation"
-              :items="interpolationList"
-              @change="onChangeInterpolation"
-            />
-          </div>
+  <div class="description">
+    <div class="section">
+      <div class="section-body section-body--col">
+        <div class="section-item">
+          <span class="section-title">Chart Type</span>
+          <ev-select v-model="chartType" :items="chartTypeList" @change="onChangeChartType" />
+          <span class="section-title">Interpolation</span>
+          <ev-select
+            v-model="interpolation"
+            :items="interpolationList"
+            @change="onChangeInterpolation"
+          />
         </div>
+      </div>
 
-        <div
-          v-for="series in chartSeries?.filter((s) => chartData.series[s.key]?.show)?.reverse()"
-          :key="series.key"
-          class="section-body"
-        >
-          <h3 :class="`section-title--${series.key}`">Chart Data - {{ series.key }}</h3>
-          <div class="section-item">
-            <template v-for="(data, jx) in series.data" :key="`${series.key}-${jx}`">
-              <div class="column">
-                <label>{{ new Date(chartData.labels[jx]).getDate() }}</label>
-                <ev-input-number
-                  v-model="data.value"
-                  :disabled="data.isNull"
-                  :step="1"
-                  @change="changeValue"
-                />
-                <p>Null</p>
-                <ev-toggle v-model="data.isNull" />
-              </div>
-            </template>
-          </div>
+      <div
+        v-for="series in chartSeries?.filter((s) => chartData.series[s.key]?.show)?.reverse()"
+        :key="series.key"
+        class="section-body"
+      >
+        <h3 :class="`section-title--${series.key}`">Chart Data - {{ series.key }}</h3>
+        <div class="section-item">
+          <template v-for="(data, jx) in series.data" :key="`${series.key}-${jx}`">
+            <div class="column">
+              <label>{{ new Date(chartData.labels[jx]).getDate() }}</label>
+              <ev-input-number
+                v-model="data.value"
+                :disabled="data.isNull"
+                :step="1"
+                @change="changeValue"
+              />
+              <p>Null</p>
+              <ev-toggle v-model="data.isNull" />
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -131,7 +133,7 @@ export default {
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
-      height: '300px',
+      height: '100%',
       title: { text: 'Chart Title', show: true },
       legend: { show: true },
       axesX: [{ type: 'time', timeFormat: 'D', interval: 'day' }],

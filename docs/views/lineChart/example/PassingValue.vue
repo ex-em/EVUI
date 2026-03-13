@@ -1,55 +1,58 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="section">
-        <div class="section-body section-body--row">
-          <h3 class="section-title">chart Type</h3>
-          <div class="section-item">
-            <ev-select v-model="chartType" :items="chartTypeList" @change="onChangeChartType" />
-          </div>
-        </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
 
-        <div v-if="chartData?.series?.series2?.show" class="section-body">
-          <h3 class="section-title--series2">chart Data - series 2</h3>
-          <div class="section-item">
-            <template v-for="(data, jx) in chartDataForExample2" :key="`series2-${jx}`">
-              <div class="column">
-                <label>{{ new Date(chartData.labels[jx]).getDate() }}</label>
-                <ev-input-number
-                  v-model="data.value"
-                  :disabled="data.isNull || data.isPassing"
-                  :step="1"
-                  @change="changeValue"
-                />
-                <p>Null</p>
-                <ev-toggle v-model="data.isNull" />
-                <p>Passing</p>
-                <ev-toggle v-model="data.isPassing" />
-              </div>
-            </template>
-          </div>
+  <div class="description">
+    <div class="section">
+      <div class="section-body section-body--row">
+        <h3 class="section-title">chart Type</h3>
+        <div class="section-item">
+          <ev-select v-model="chartType" :items="chartTypeList" @change="onChangeChartType" />
         </div>
+      </div>
 
-        <div class="section-body">
-          <h3 class="section-title--series1">chart Data - series 1</h3>
-          <div class="section-item">
-            <template v-for="(data, ix) in chartDataForExample1" :key="`series2-${ix}`">
-              <div class="column">
-                <label>{{ new Date(chartData.labels[ix]).getDate() }}</label>
-                <ev-input-number
-                  v-model="data.value"
-                  :disabled="data.isNull || data.isPassing"
-                  :step="1"
-                  @change="changeValue"
-                />
-                <p>Null</p>
-                <ev-toggle v-model="data.isNull" />
-                <p>Passing</p>
-                <ev-toggle v-model="data.isPassing" />
-              </div>
-            </template>
-          </div>
+      <div v-if="chartData?.series?.series2?.show" class="section-body">
+        <h3 class="section-title--series2">chart Data - series 2</h3>
+        <div class="section-item">
+          <template v-for="(data, jx) in chartDataForExample2" :key="`series2-${jx}`">
+            <div class="column">
+              <label>{{ new Date(chartData.labels[jx]).getDate() }}</label>
+              <ev-input-number
+                v-model="data.value"
+                :disabled="data.isNull || data.isPassing"
+                :step="1"
+                @change="changeValue"
+              />
+              <p>Null</p>
+              <ev-toggle v-model="data.isNull" />
+              <p>Passing</p>
+              <ev-toggle v-model="data.isPassing" />
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <div class="section-body">
+        <h3 class="section-title--series1">chart Data - series 1</h3>
+        <div class="section-item">
+          <template v-for="(data, ix) in chartDataForExample1" :key="`series2-${ix}`">
+            <div class="column">
+              <label>{{ new Date(chartData.labels[ix]).getDate() }}</label>
+              <ev-input-number
+                v-model="data.value"
+                :disabled="data.isNull || data.isPassing"
+                :step="1"
+                @change="changeValue"
+              />
+              <p>Null</p>
+              <ev-toggle v-model="data.isNull" />
+              <p>Passing</p>
+              <ev-toggle v-model="data.isPassing" />
+            </div>
+          </template>
         </div>
       </div>
     </div>
@@ -168,7 +171,7 @@ export default {
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
-      height: '300px',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,

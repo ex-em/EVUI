@@ -1,30 +1,33 @@
 <template>
   <div class="case" @mouseleave="hideExternalTooltip" @wheel="onReplaceScroll">
-    <ev-chart :data="chartData" :options="chartOptions" />
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
 
-    <div
-      v-show="tooltip.items.length"
-      class="ev-chart-tooltip"
-      :style="{
-        position: 'fixed',
-        left: `${tooltip.x + 12}px`,
-        top: `${tooltip.y + 12}px`,
-      }"
-    >
-      <div class="ev-chart-tooltip-custom">
-        <div class="ev-chart-tooltip-custom__header">
-          {{
-            typeof tooltip.time === 'number' || typeof tooltip.time === 'string'
-              ? tooltip.time
-              : tooltip.time
-          }}
-        </div>
-        <div class="ev-chart-tooltip-custom__body">
-          <div v-for="s in tooltip.items" :key="s.sId + ':' + s.index" class="row">
-            <span class="color-circle" :style="{ backgroundColor: s.color }" />
-            <span class="series-name">{{ s.name }}</span>
-            <span class="value">{{ s.data?.y }}</span>
-          </div>
+  <!-- 외부에서 주입하는 툴팁 -->
+  <div
+    v-show="tooltip.items.length"
+    class="ev-chart-tooltip"
+    :style="{
+      position: 'fixed',
+      left: `${tooltip.x + 12}px`,
+      top: `${tooltip.y + 12}px`,
+    }"
+  >
+    <div class="ev-chart-tooltip-custom">
+      <div class="ev-chart-tooltip-custom__header">
+        {{
+          typeof tooltip.time === 'number' || typeof tooltip.time === 'string'
+            ? tooltip.time
+            : tooltip.time
+        }}
+      </div>
+      <div class="ev-chart-tooltip-custom__body">
+        <div v-for="s in tooltip.items" :key="s.sId + ':' + s.index" class="row">
+          <span class="color-circle" :style="{ backgroundColor: s.color }" />
+          <span class="series-name">{{ s.name }}</span>
+          <span class="value">{{ s.data?.y }}</span>
         </div>
       </div>
     </div>
@@ -58,7 +61,7 @@ export default {
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
-      height: '80%',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
@@ -79,6 +82,7 @@ export default {
           type: 'linear',
           showGrid: true,
           autoScaleRatio: 0.1,
+          startToZero: true,
         },
       ],
       tooltip: {

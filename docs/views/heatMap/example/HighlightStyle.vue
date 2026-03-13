@@ -1,5 +1,7 @@
 <template>
-  <ev-chart :data="chartData" :options="chartOptions" />
+  <resizable-wrapper>
+    <ev-chart :data="chartData" :options="chartOptions" />
+  </resizable-wrapper>
 </template>
 
 <script>

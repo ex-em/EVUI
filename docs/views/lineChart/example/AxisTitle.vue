@@ -1,72 +1,75 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div v-for="(option, idx) in titleOptions" :key="idx" class="section">
-        <h3 v-if="idx === 0" class="section-title">X Axis</h3>
-        <h3 v-else class="section-title">Y Axis</h3>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+  
+  <div class="description">
+    <div v-for="(option, idx) in titleOptions" :key="idx" class="section">
+      <h3 v-if="idx === 0" class="section-title">X Axis</h3>
+      <h3 v-else class="section-title">Y Axis</h3>
 
-        <div class="section-body">
-          <div class="section-item">
-            <label>use</label>
-            <ev-toggle v-model="option.use" />
-          </div>
-          <div class="section-item">
-            <label>text</label>
-            <ev-text-field v-model="option.text" />
-          </div>
-          <div class="section-item">
-            <label>fontWeight</label>
-            <ev-input-number v-model="option.fontWeight" :step="100" :min="100" :max="900" />
-          </div>
-          <div class="section-item">
-            <label>fontSize</label>
-            <ev-input-number v-model="option.fontSize" :step="1" :min="1" :max="30" />
-          </div>
-          <div class="section-item">
-            <label>fontFamily</label>
-            <ev-text-field v-model="option.fontFamily" />
-          </div>
-          <div class="section-item">
-            <label>textAlign</label>
-            <ev-select
-              v-model="option.textAlign"
-              :items="[
-                {
-                  name: 'right',
-                  value: 'right',
-                },
-                {
-                  name: 'center',
-                  value: 'center',
-                },
-                {
-                  name: 'left',
-                  value: 'left',
-                },
-              ]"
-            />
-          </div>
-          <div class="section-item">
-            <label>fontStyle</label>
-            <ev-select
-              v-model="option.fontStyle"
-              :items="[
-                {
-                  name: 'normal',
-                  value: 'normal',
-                },
-                {
-                  name: 'italic',
-                  value: 'italic',
-                },
-              ]"
-            />
-          </div>
-          <div class="section-item">
-            <label>color</label>
-            <ev-text-field v-model="option.color" />
-          </div>
+      <div class="section-body">
+        <div class="section-item">
+          <label>use</label>
+          <ev-toggle v-model="option.use" />
+        </div>
+        <div class="section-item">
+          <label>text</label>
+          <ev-text-field v-model="option.text" />
+        </div>
+        <div class="section-item">
+          <label>fontWeight</label>
+          <ev-input-number v-model="option.fontWeight" :step="100" :min="100" :max="900" />
+        </div>
+        <div class="section-item">
+          <label>fontSize</label>
+          <ev-input-number v-model="option.fontSize" :step="1" :min="1" :max="30" />
+        </div>
+        <div class="section-item">
+          <label>fontFamily</label>
+          <ev-text-field v-model="option.fontFamily" />
+        </div>
+        <div class="section-item">
+          <label>textAlign</label>
+          <ev-select
+            v-model="option.textAlign"
+            :items="[
+              {
+                name: 'right',
+                value: 'right',
+              },
+              {
+                name: 'center',
+                value: 'center',
+              },
+              {
+                name: 'left',
+                value: 'left',
+              },
+            ]"
+          />
+        </div>
+        <div class="section-item">
+          <label>fontStyle</label>
+          <ev-select
+            v-model="option.fontStyle"
+            :items="[
+              {
+                name: 'normal',
+                value: 'normal',
+              },
+              {
+                name: 'italic',
+                value: 'italic',
+              },
+            ]"
+          />
+        </div>
+        <div class="section-item">
+          <label>color</label>
+          <ev-text-field v-model="option.color" />
         </div>
       </div>
     </div>
@@ -96,7 +99,7 @@ export default {
       fontWeight: 400,
       fontSize: 12,
       fontFamily: 'Roboto',
-      textAlign: 'right',
+      textAlign: 'center',
       fontStyle: 'normal',
       color: '#808080',
     });

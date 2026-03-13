@@ -1,5 +1,7 @@
 <template>
-  <ev-chart :data="chartData" :options="chartOptions" />
+  <resizable-wrapper>
+    <ev-chart :data="chartData" :options="chartOptions" />
+  </resizable-wrapper>
 </template>
 
 <script>
@@ -19,11 +21,8 @@ export default {
         if (rand < 0.1) {
           // 10% 확률로 null
           data.push(null);
-        } else if (rand < 0.2) {
-          // 10% 확률로 음수
-          data.push(Math.floor(Math.random() * -200) - 10);
         } else {
-          // 80% 확률로 양수
+          // 90% 확률로 양수
           data.push(Math.floor(Math.random() * 300) + 10);
         }
       }

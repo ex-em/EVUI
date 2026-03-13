@@ -1,51 +1,59 @@
 <template>
-  <ev-chart-group :options="{ syncHover }">
-    <ev-chart
-      v-model:selectedSeries="defaultSelectSeries"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedSeries="defaultSelectSeries"
-      :data="chartData2"
-      :options="chartOptions2"
-      @click="onClick"
-    />
-    <div class="description">
-      <ev-toggle v-model="syncHover" />
-      <span>그룹 호버 동기화</span>
+  <div class="case">
+    <ev-chart-group :options="{ syncHover }">
+      <resizable-wrapper height="50%">
+        <ev-chart
+          v-model:selectedSeries="defaultSelectSeries"
+          :data="chartData1"
+          :options="chartOptions1"
+          @click="onClick"
+        />
+      </resizable-wrapper>
+      <resizable-wrapper height="50%">
+        <ev-chart
+          v-model:selectedSeries="defaultSelectSeries"
+          :data="chartData2"
+          :options="chartOptions2"
+          @click="onClick"
+        />
+      </resizable-wrapper>
+    </ev-chart-group>
+  </div>
+
+  <div class="description">
+    <ev-toggle v-model="syncHover" />
+    <span>그룹 호버 동기화</span>
+    <br />
+    <br />
+    <ev-toggle v-model="syncHoverChart1" />
+    <span>첫번째 차트 호버 동기화</span>
+    <br />
+    <br />
+    <ev-toggle v-model="syncHoverChart2" />
+    <span>두번째 차트 호버 동기화</span>
+    <br />
+    <br />
+    <ev-toggle v-model="isLive" />
+    <span> 데이터 자동 업데이트 </span>
+    <br />
+    <br />
+    <ev-button type="primary" shape="radius" @click="changeSelectedSeries('inc')"> + </ev-button>
+    <ev-button type="primary" shape="radius" @click="changeSelectedSeries('dec')"> - </ev-button>
+    <span> v-model:selectedSeries 변경 </span>
+    <br />
+    <br />
+    <div>
+      <div class="badge yellow">v-model:selectedSeries</div>
+      {{ defaultSelectSeries }}
       <br />
       <br />
-      <ev-toggle v-model="syncHoverChart1" />
-      <span>첫번째 차트 호버 동기화</span>
+      <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
+      {{ clickedSeries }}
       <br />
       <br />
-      <ev-toggle v-model="syncHoverChart2" />
-      <span>두번째 차트 호버 동기화</span>
-      <br />
-      <br />
-      <ev-toggle v-model="isLive" />
-      <span> 데이터 자동 업데이트 </span>
-      <br />
-      <br />
-      <ev-button type="primary" shape="radius" @click="changeSelectedSeries('inc')"> + </ev-button>
-      <ev-button type="primary" shape="radius" @click="changeSelectedSeries('dec')"> - </ev-button>
-      <span> v-model:selectedSeries 변경 </span>
-      <br />
-      <br />
-      <div>
-        <div class="badge yellow">v-model:selectedSeries</div>
-        {{ defaultSelectSeries }}
-        <br />
-        <br />
-        <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
-        {{ clickedSeries }}
-        <br />
-        <br />
-      </div>
     </div>
-  </ev-chart-group>
+  </div>
+
 </template>
 
 <script>
@@ -98,7 +106,7 @@ export default {
       syncHover: syncHoverChart1.value,
       type: 'line',
       width: '100%',
-      height: '80%',
+      height: '100%',
       title: {
         show: false,
       },
@@ -142,7 +150,7 @@ export default {
       syncHover: syncHoverChart2.value,
       type: 'line',
       width: '100%',
-      height: '80%',
+      height: '100%',
       title: {
         show: false,
       },

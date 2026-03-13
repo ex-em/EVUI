@@ -1,21 +1,26 @@
 <template>
   <div class="case">
-    <ev-chart
-      ref="chart"
-      v-model:selectedLabel="selectedLabel"
-      :data="chartData1"
-      :options="chartOptions1"
-    />
-    <ev-chart
-      ref="chart2"
-      v-model:selectedSeries="selectedSeries"
-      :data="chartData2"
-      :options="chartOptions2"
-    />
-    <div class="description">
-      <div class="badge yellow">unSelectedOpacity</div>
-      <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" :precision="1" />
-    </div>
+    <resizable-wrapper height="50%">
+      <ev-chart
+        ref="chart"
+        v-model:selectedLabel="selectedLabel"
+        :data="chartData1"
+        :options="chartOptions1"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper height="50%">
+      <ev-chart
+        ref="chart2"
+        v-model:selectedSeries="selectedSeries"
+        :data="chartData2"
+        :options="chartOptions2"
+      />
+    </resizable-wrapper>
+  </div>
+  
+  <div class="description">
+    <div class="badge yellow">unSelectedOpacity</div>
+    <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" :precision="1" />
   </div>
 </template>
 <script>
@@ -74,7 +79,7 @@ export default {
     const chartOptions1 = ref({
       type: 'line',
       width: '100%',
-      height: '80%',
+      height: '100%',
       unSelectedOpacity,
       title: {
         show: 'Selected Label',

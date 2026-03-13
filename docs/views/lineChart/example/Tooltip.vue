@@ -1,141 +1,144 @@
 <template>
   <div class="case">
-    <ev-chart :data="chartData" :options="chartOptions" />
-    <div class="description">
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> 값 기준 내림차순 정렬 여부 </span>
-          <ev-toggle v-model="sortByValue" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> 스크롤 생성여부 </span>
-          <ev-toggle v-model="useScrollbar" />
-        </div>
+    <resizable-wrapper>
+      <ev-chart :data="chartData" :options="chartOptions" />
+    </resizable-wrapper>
+  </div>
+
+  <div class="description">
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> 값 기준 내림차순 정렬 여부 </span>
+        <ev-toggle v-model="sortByValue" />
+      </div>
+      <div class="row-item">
+        <span class="item-title"> 스크롤 생성여부 </span>
+        <ev-toggle v-model="useScrollbar" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> 텍스트 오버플로우 처리 </span>
+        <ev-select
+          v-model="textOverflow"
+          :items="[
+            {
+              name: 'wrap',
+              value: 'wrap',
+            },
+            {
+              name: 'ellipsis',
+              value: 'ellipsis',
+            },
+          ]"
+        />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> maxWidth </span>
+        <ev-input-number v-model="maxWidth" :step="10" :min="100" :max="500" />
+      </div>
+      <div class="row-item">
+        <span class="item-title"> maxHeight </span>
+        <ev-input-number v-model="maxHeight" :step="10" :min="100" :max="500" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> 그림자 생성여부 </span>
+        <ev-toggle v-model="useShadow" />
+      </div>
+      <div class="row-item">
+        <span class="item-title"> 그림자 투명도 </span>
+        <ev-input-number v-model="shadowOpacity" :step="0.05" :precision="2" :min="0" :max="1" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> 배경 색상 </span>
+        <ev-text-field v-model="backgroundColor" />
+      </div>
+      <div class="row-item">
+        <span class="item-title"> series color 모양 </span>
+        <ev-select v-model="colorShape" :items="colorShapeList" />
+      </div>
+    </div>
+
+    <div class="row">
+      <h3>Font Color</h3>
+    </div>
+
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> Title </span>
+        <ev-text-field v-model="titleFontColor" />
       </div>
 
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> 텍스트 오버플로우 처리 </span>
-          <ev-select
-            v-model="textOverflow"
-            :items="[
-              {
-                name: 'wrap',
-                value: 'wrap',
-              },
-              {
-                name: 'ellipsis',
-                value: 'ellipsis',
-              },
-            ]"
-          />
-        </div>
+      <div class="row-item">
+        <span class="item-title"> Label </span>
+        <ev-text-field v-model="labelFontColor" />
       </div>
 
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> maxWidth </span>
-          <ev-input-number v-model="maxWidth" :step="10" :min="100" :max="500" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> maxHeight </span>
-          <ev-input-number v-model="maxHeight" :step="10" :min="100" :max="500" />
-        </div>
+      <div class="row-item">
+        <span class="item-title"> Value </span>
+        <ev-text-field v-model="valueFontColor" />
       </div>
+    </div>
 
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> 그림자 생성여부 </span>
-          <ev-toggle v-model="useShadow" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> 그림자 투명도 </span>
-          <ev-input-number v-model="shadowOpacity" :step="0.05" :precision="2" :min="0" :max="1" />
-        </div>
+    <div class="row">
+      <h3>Font Size</h3>
+    </div>
+
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> title </span>
+        <ev-input-number v-model="titleFontSize" :step="1" :min="10" :max="50" />
       </div>
-
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> 배경 색상 </span>
-          <ev-text-field v-model="backgroundColor" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> series color 모양 </span>
-          <ev-select v-model="colorShape" :items="colorShapeList" />
-        </div>
+      <div class="row-item">
+        <span class="item-title"> contents </span>
+        <ev-input-number v-model="contentsFontSize" :step="1" :min="10" :max="50" />
       </div>
+    </div>
 
-      <div class="row">
-        <h3>Font Color</h3>
+    <div class="row">
+      <h3>Row Padding</h3>
+    </div>
+
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> left </span>
+        <ev-input-number v-model="leftPadding" :step="1" :min="0" :max="50" />
       </div>
-
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> Title </span>
-          <ev-text-field v-model="titleFontColor" />
-        </div>
-
-        <div class="row-item">
-          <span class="item-title"> Label </span>
-          <ev-text-field v-model="labelFontColor" />
-        </div>
-
-        <div class="row-item">
-          <span class="item-title"> Value </span>
-          <ev-text-field v-model="valueFontColor" />
-        </div>
+      <div class="row-item">
+        <span class="item-title"> right </span>
+        <ev-input-number v-model="rightPadding" :step="1" :min="0" :max="50" />
       </div>
-
-      <div class="row">
-        <h3>Font Size</h3>
+      <div class="row-item">
+        <span class="item-title"> top </span>
+        <ev-input-number v-model="topPadding" :step="1" :min="0" :max="50" />
       </div>
-
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> title </span>
-          <ev-input-number v-model="titleFontSize" :step="1" :min="10" :max="50" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> contents </span>
-          <ev-input-number v-model="contentsFontSize" :step="1" :min="10" :max="50" />
-        </div>
+      <div class="row-item">
+        <span class="item-title"> bottom </span>
+        <ev-input-number v-model="bottomPadding" :step="1" :min="0" :max="50" />
       </div>
+    </div>
 
-      <div class="row">
-        <h3>Row Padding</h3>
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> Header 표시 여부 </span>
+        <ev-toggle v-model="showHeader" />
       </div>
+    </div>
 
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> left </span>
-          <ev-input-number v-model="leftPadding" :step="1" :min="0" :max="50" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> right </span>
-          <ev-input-number v-model="rightPadding" :step="1" :min="0" :max="50" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> top </span>
-          <ev-input-number v-model="topPadding" :step="1" :min="0" :max="50" />
-        </div>
-        <div class="row-item">
-          <span class="item-title"> bottom </span>
-          <ev-input-number v-model="bottomPadding" :step="1" :min="0" :max="50" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> Header 표시 여부 </span>
-          <ev-toggle v-model="showHeader" />
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="row-item">
-          <span class="item-title"> Use Tooltip 여부 </span>
-          <ev-toggle v-model="showTooltip" />
-        </div>
+    <div class="row">
+      <div class="row-item">
+        <span class="item-title"> Use Tooltip 여부 </span>
+        <ev-toggle v-model="showTooltip" />
       </div>
     </div>
   </div>
@@ -235,7 +238,7 @@ export default {
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
-      height: '80%',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
