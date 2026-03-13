@@ -274,14 +274,17 @@ class EvChart {
       a?.graphMin === b?.graphMin &&
       a?.graphMax === b?.graphMax;
 
-    const isUnchanged =
-      prev &&
-      curr.x.length === prev.x.length &&
-      curr.y.length === prev.y.length &&
-      curr.x.every((ax, i) => isSameAxis(ax, prev.x[i])) &&
-      curr.y.every((ay, i) => isSameAxis(ay, prev.y[i]));
+    const xSame = curr.x.every((ax, i) => {
+      const watch = this.options.axesX[i]?.scaleChange !== false;
+      return !watch || (!!prev && isSameAxis(ax, prev.x[i]));
+    });
 
-    if (isUnchanged) {
+    const ySame = curr.y.every((ay, i) => {
+      const watch = this.options.axesY[i]?.scaleChange !== false;
+      return !watch || (!!prev && isSameAxis(ay, prev.y[i]));
+    });
+
+    if (xSame && ySame) {
       return;
     }
 

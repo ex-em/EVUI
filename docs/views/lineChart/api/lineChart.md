@@ -171,6 +171,7 @@ const chartData =
 | showAxisTick   | Boolean   | true    | 보조 눈금 표시 여부                                     |                                                         |
 | fixedSteps  | Boolean  | false    | range와 interval로 설정한 값을 그대로 사용하여 step을 고정. 자동 스케일 조정을 비활성화하며, 원하는 간격으로 축을 표시할 때 사용  | |
 | niceScale   | Boolean  | false    | 축 타입이 linear 인 경우 nice scale 알고리즘을 적용하여 최적의 최대값과 간격을 계산하여 축을 그림
+| scaleChange | Boolean  | false    | scale 변경을 감지하여 emit 발생시킬때 사용, true일때 scale이 변경되면 axes-scale-range 이벤트가 발생된다. | | 
 
 ##### axesX
 
@@ -497,7 +498,7 @@ const chartOptions = {
 | mouse-move  |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환                                                                                                                                                                |
 | drag-select | data, range  | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
 | click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
-| axes-scale-change | | 차트 너비를 변경하면 axes-scale-change 이벤트로 재계산된 steps, interval, graphMin, graphMax를 정보를 반환한다. <br><br> {<br> x: { graphMin, graphMax, step, interval }, <br>   y: { graphMin, graphMax, step, interval }<br>} | |
+| axes-scale-change | | 차트 너비를 변경하면 axes-scale-change 이벤트로 재계산된 steps, interval, graphMin, graphMax를 정보를 반환한다. 단, axes옵션에 scaleRange가 true이고 scale 정보가 변경될때만 이벤트를 발생시킨다. ax<br><br> {<br> x: { graphMin, graphMax, step, interval }, <br>   y: { graphMin, graphMax, step, interval }<br>} | |
 
 - 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
 

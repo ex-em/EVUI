@@ -37,10 +37,18 @@
       </table>
     </div>
     <div class="description">
-      <span class="toggle-label">너비 ({{ chartWidth }}px)</span>
-      <ev-input-number v-model="chartWidth" :step="50" :min="300" :max="1000" />
-      <span class="toggle-label">높이 ({{ chartHeight }}px)</span>
-      <ev-input-number v-model="chartHeight" :step="20" :min="150" :max="500" />
+      <div class="description-row">
+        <span class="toggle-label">너비 ({{ chartWidth }}px)</span>
+        <ev-input-number v-model="chartWidth" :step="50" :min="300" :max="1000" />
+        <span class="toggle-label">높이 ({{ chartHeight }}px)</span>
+        <ev-input-number v-model="chartHeight" :step="20" :min="150" :max="500" />
+      </div>
+      <div class="description-row">
+        <span class="toggle-label">X 감지</span>
+        <ev-toggle v-model="chartOptions.axesX[0].scaleChange" />
+        <span class="toggle-label">Y 감지</span>
+        <ev-toggle v-model="chartOptions.axesY[0].scaleChange" />
+      </div>
     </div>
   </div>
 </template>
@@ -91,6 +99,7 @@ export default {
           type: 'time',
           timeFormat: 'HH:mm:ss',
           interval: 'second',
+          scaleChange: true,
         },
       ],
       axesY: [
@@ -99,6 +108,7 @@ export default {
           showGrid: true,
           startToZero: true,
           autoScaleRatio: 0.1,
+          scaleChange: true,
         },
       ],
     });
@@ -160,9 +170,14 @@ export default {
 }
 .description {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
   margin-top: 10px;
+}
+.description-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .toggle-label {
   vertical-align: top;
