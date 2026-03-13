@@ -1,12 +1,12 @@
 <template>
   <div class="case">
-    <div class="chart-container" :style="{ width: chartWidth + 'px', height: chartHeight + 'px' }">
+    <resizable-wrapper>
       <ev-chart
         :data="chartData"
         :options="chartOptions"
         @axes-scale-change="onStepsCalculated"
       />
-    </div>
+    </resizable-wrapper>
     <div class="info-box">
       <table v-if="axesSteps">
         <thead>
@@ -37,18 +37,10 @@
       </table>
     </div>
     <div class="description">
-      <div class="description-row">
-        <span class="toggle-label">너비 ({{ chartWidth }}px)</span>
-        <ev-input-number v-model="chartWidth" :step="50" :min="300" :max="1000" />
-        <span class="toggle-label">높이 ({{ chartHeight }}px)</span>
-        <ev-input-number v-model="chartHeight" :step="20" :min="150" :max="500" />
-      </div>
-      <div class="description-row">
-        <span class="toggle-label">X 감지</span>
-        <ev-toggle v-model="axesScaleChange.x" />
-        <span class="toggle-label">Y 감지</span>
-        <ev-toggle v-model="axesScaleChange.y" />
-      </div>
+      <span class="toggle-label">X 감지</span>
+      <ev-toggle v-model="axesScaleChange.x" />
+      <span class="toggle-label">Y 감지</span>
+      <ev-toggle v-model="axesScaleChange.y" />
     </div>
   </div>
 </template>
@@ -75,8 +67,6 @@ export default {
       },
     });
 
-    const chartWidth = ref(600);
-    const chartHeight = ref(280);
     const axesSteps = ref(null);
 
     const chartOptions = reactive({
@@ -152,8 +142,6 @@ export default {
     return {
       chartData,
       chartOptions,
-      chartWidth,
-      chartHeight,
       axesSteps,
       onStepsCalculated,
     };
@@ -164,9 +152,6 @@ export default {
 <style lang="scss" scoped>
 .case {
   height: 100%;
-}
-.chart-container {
-  transition: width 0.2s, height 0.2s;
 }
 .info-box {
   margin-top: 10px;
@@ -192,11 +177,6 @@ export default {
   flex-direction: column;
   gap: 8px;
   margin-top: 10px;
-}
-.description-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 .toggle-label {
   vertical-align: top;
