@@ -265,14 +265,14 @@ class EvChart {
       return;
     }
 
-    const prev = this._lastEmittedAxesSteps;
-    const curr = this.axesSteps;
+    const prev = this._lastEmittedAxesRange;
+    const curr = this.labelRange;
 
     const isSameAxis = (a, b) =>
-      a?.steps === b?.steps &&
-      a?.interval === b?.interval &&
-      a?.graphMin === b?.graphMin &&
-      a?.graphMax === b?.graphMax;
+      a?.min === b?.min &&
+      a?.max === b?.max;
+
+    const toPayloadAxis = ({ min, max }) => ({ minSteps: min, maxSteps: max });
 
     const xSame = curr.x.every((ax, i) => {
       const watch = this.options.axesX[i]?.scaleChange !== false;
@@ -288,8 +288,13 @@ class EvChart {
       return;
     }
 
-    this._lastEmittedAxesSteps = curr;
-    this.listeners['axes-scale-change'](curr);
+    this._lastEmittedAxesRange = curr;
+
+    const payload = {
+      x: curr.x.map(toPayloadAxis),
+      y: curr.y.map(toPayloadAxis),
+    };
+    this.listeners['axes-scale-change'](payload);
   }
 
   /**
