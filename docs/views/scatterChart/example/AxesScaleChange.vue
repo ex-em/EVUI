@@ -12,26 +12,20 @@
         <thead>
           <tr>
             <th>축</th>
-            <th>steps</th>
-            <th>interval</th>
-            <th>graphMin</th>
-            <th>graphMax</th>
+            <th>minSteps</th>
+            <th>maxSteps</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>X[0]</td>
-            <td>{{ axesSteps.x[0]?.steps }}</td>
-            <td>{{ axesSteps.x[0]?.interval }}</td>
-            <td>{{ axesSteps.x[0]?.graphMin }}</td>
-            <td>{{ axesSteps.x[0]?.graphMax }}</td>
+            <td>{{ axesSteps.x[0]?.minSteps }}</td>
+            <td>{{ axesSteps.x[0]?.maxSteps }}</td>
           </tr>
           <tr>
             <td>Y[0]</td>
-            <td>{{ axesSteps.y[0]?.steps }}</td>
-            <td>{{ axesSteps.y[0]?.interval }}</td>
-            <td>{{ axesSteps.y[0]?.graphMin }}</td>
-            <td>{{ axesSteps.y[0]?.graphMax }}</td>
+            <td>{{ axesSteps.y[0]?.minSteps }}</td>
+            <td>{{ axesSteps.y[0]?.maxSteps }}</td>
           </tr>
         </tbody>
       </table>
