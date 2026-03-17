@@ -275,12 +275,12 @@ class EvChart {
     const toPayloadAxis = ({ min, max }) => ({ minSteps: min, maxSteps: max });
 
     const xSame = curr.x.every((ax, i) => {
-      const watch = this.options.axesX[i]?.scaleChange !== false;
+      const watch = !!this.options.axesX[i]?.scaleChange;
       return !watch || (!!prev && isSameAxis(ax, prev.x[i]));
     });
 
     const ySame = curr.y.every((ay, i) => {
-      const watch = this.options.axesY[i]?.scaleChange !== false;
+      const watch = !!this.options.axesY[i]?.scaleChange;
       return !watch || (!!prev && isSameAxis(ay, prev.y[i]));
     });
 
