@@ -136,7 +136,7 @@ export default {
         seriesData.push(Math.floor(Math.random() * (range + 1)) + newMin);
       });
     };
-    
+
     watch(isLive, (newValue) => {
       if (newValue) {
         addRandomChartData();
@@ -145,7 +145,7 @@ export default {
         clearInterval(liveInterval.value);
       }
     });
-    
+
     watch(isSpeedUpMode, (newValue) => {
       if (isLive.value) {
         clearInterval(liveInterval.value);
@@ -158,7 +158,7 @@ export default {
         addRandomChartData();
       }
     });
-    
+
     onBeforeUnmount(() => {
       clearInterval(liveInterval.value);
     });

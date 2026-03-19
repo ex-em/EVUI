@@ -6,33 +6,20 @@
       </a>
       {{ title }}
     </h3>
-    <p
-      class="article-description"
-      v-html="description" />
-    <div
-        :class="['article-example', { 'vertical-mode':verticalMode }]"
-    >
+    <p class="article-description" v-html="description" />
+    <div :class="['article-example', { 'vertical-mode': verticalMode }]">
       <div
         ref="viewArea"
-        :class="['view', { 'vertical-mode-item':verticalMode }]"
+        :class="['view', { 'vertical-mode-item': verticalMode }]"
         :style="viewStyle"
       >
         <component :is="component" />
       </div>
-      <div
-        v-show="canResize"
-        ref="resizeHandle"
-        class="resize-handle"
-        @mousedown="startResize"
-      />
+      <div v-show="canResize" ref="resizeHandle" class="resize-handle" @mousedown="startResize" />
       <div
         v-show="codeVisible"
         v-highlight
-        :class="[
-          'code',
-          { 'expend': codeExpend },
-          { 'vertical-mode-item':verticalMode }
-        ]"
+        :class="['code', { expend: codeExpend }, { 'vertical-mode-item': verticalMode }]"
         :style="codeStyle"
       >
         <div ref="codeWrapper" class="code-wrapper" :style="{ height: `${viewAreaHeight}px` }">

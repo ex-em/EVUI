@@ -1,8 +1,5 @@
 <template>
-  <nav
-    class="evui-navigation"
-    :class="{ 'is-collapsed': collapsed }"
-  >
+  <nav class="evui-navigation" :class="{ 'is-collapsed': collapsed }">
     <!-- Search bar -->
     <div class="evui-nav-search">
       <i class="ev-icon-search evui-nav-search-icon" />
@@ -14,24 +11,13 @@
         placeholder="메뉴 검색..."
         @keydown.esc="searchText = ''"
       />
-      <i
-        v-if="searchText"
-        class="ev-icon-close evui-nav-search-clear"
-        @click="searchText = ''"
-      />
+      <i v-if="searchText" class="ev-icon-close evui-nav-search-clear" @click="searchText = ''" />
     </div>
 
     <!-- Menu list -->
     <div class="evui-nav-menu-list">
-      <ev-menu
-        v-model="currentMenu"
-        :items="filteredMenu"
-        @change="changeMenu"
-      />
-      <p
-        v-if="searchText && !filteredMenu.length"
-        class="evui-nav-no-results"
-      >
+      <ev-menu v-model="currentMenu" :items="filteredMenu" @change="changeMenu" />
+      <p v-if="searchText && !filteredMenu.length" class="evui-nav-no-results">
         검색 결과가 없습니다.
       </p>
     </div>
@@ -73,27 +59,30 @@ export default {
       next();
     });
 
-    const menu = router.getRoutes().filter(item => item.name !== 'PageNotFound').reduce((acc, cur) => {
-      const menuInfoObj = {
-        text: cur.name,
-        value: cur.name,
-      };
-      if (!cur.meta.category) {
-        acc.push(menuInfoObj);
-      } else {
-        const idx = acc.findIndex(v => v.text === cur.meta.category);
-        if (idx < 0) {
-          acc.push({
-            text: cur.meta.category,
-            value: cur.meta.category,
-            children: [menuInfoObj],
-          });
+    const menu = router
+      .getRoutes()
+      .filter((item) => item.name !== 'PageNotFound')
+      .reduce((acc, cur) => {
+        const menuInfoObj = {
+          text: cur.name,
+          value: cur.name,
+        };
+        if (!cur.meta.category) {
+          acc.push(menuInfoObj);
         } else {
-          acc[idx].children.push(menuInfoObj);
+          const idx = acc.findIndex((v) => v.text === cur.meta.category);
+          if (idx < 0) {
+            acc.push({
+              text: cur.meta.category,
+              value: cur.meta.category,
+              children: [menuInfoObj],
+            });
+          } else {
+            acc[idx].children.push(menuInfoObj);
+          }
         }
-      }
-      return acc;
-    }, []);
+        return acc;
+      }, []);
 
     const filteredMenu = computed(() => {
       const query = searchText.value.toLowerCase().trim();
@@ -105,8 +94,8 @@ export default {
             acc.push(item);
           } else {
             // 하위 메뉴 중 매칭되는 항목만 필터링
-            const matchingChildren = item.children.filter(
-              child => child.text.toLowerCase().includes(query),
+            const matchingChildren = item.children.filter((child) =>
+              child.text.toLowerCase().includes(query),
             );
             if (matchingChildren.length > 0) {
               acc.push({ ...item, children: matchingChildren });
@@ -124,13 +113,16 @@ export default {
     };
 
     // 펼칠 때 검색 인풋에 자동 포커스
-    watch(() => props.collapsed, (newVal) => {
-      if (!newVal) {
-        setTimeout(() => {
-          searchInputRef.value?.focus();
-        }, 350);
-      }
-    });
+    watch(
+      () => props.collapsed,
+      (newVal) => {
+        if (!newVal) {
+          setTimeout(() => {
+            searchInputRef.value?.focus();
+          }, 350);
+        }
+      },
+    );
 
     return {
       menu,
@@ -168,7 +160,8 @@ export default {
     border-right-color: transparent;
   }
 
-  ul, li {
+  ul,
+  li {
     list-style: none;
   }
 
@@ -227,7 +220,9 @@ export default {
   border-radius: 6px;
   font-size: 13px;
   outline: none;
-  transition: border-color $animate-fast, background-color $animate-fast;
+  transition:
+    border-color $animate-fast,
+    background-color $animate-fast;
 
   @include themify() {
     border: 1px solid themed('border-color-base');
@@ -298,7 +293,10 @@ export default {
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-  transition: left $animate-base, background-color $animate-fast, color $animate-fast;
+  transition:
+    left $animate-base,
+    background-color $animate-fast,
+    color $animate-fast;
   font-size: 12px;
 
   @include themify() {

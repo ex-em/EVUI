@@ -81,7 +81,7 @@ export default {
             fitWidth: true,
             // maxWidth: 300, // px
             maxWidth: '10%',
-          }
+          },
         },
       ],
       indicator: {

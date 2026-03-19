@@ -1,15 +1,7 @@
 <template>
-  <div
-    class="evui-wrapper"
-    :class="['evui-docs', docsTheme, { 'nav-collapsed': isNavCollapsed }]"
-  >
-    <MainHeader
-      v-model="docsTheme"
-    />
-    <MainNav
-      :collapsed="isNavCollapsed"
-      @toggle-collapse="toggleNav"
-    />
+  <div class="evui-wrapper" :class="['evui-docs', docsTheme, { 'nav-collapsed': isNavCollapsed }]">
+    <MainHeader v-model="docsTheme" />
+    <MainNav :collapsed="isNavCollapsed" @toggle-collapse="toggleNav" />
     <MainContent />
   </div>
 </template>

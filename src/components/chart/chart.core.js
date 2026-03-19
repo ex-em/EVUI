@@ -139,8 +139,7 @@ class EvChart {
   }
 
   _updateSeriesCount() {
-    this.seriesInfo.count = Object.values(this.seriesList)
-      .filter((s) => s.show).length;
+    this.seriesInfo.count = Object.values(this.seriesList).filter((s) => s.show).length;
   }
 
   /**
@@ -268,9 +267,7 @@ class EvChart {
     const prev = this._lastEmittedAxesRange;
     const curr = this.labelRange;
 
-    const isSameAxis = (a, b) =>
-      a?.min === b?.min &&
-      a?.max === b?.max;
+    const isSameAxis = (a, b) => a?.min === b?.min && a?.max === b?.max;
 
     const toPayloadAxis = ({ min, max }) => ({ minSteps: min, maxSteps: max });
 
@@ -1185,8 +1182,7 @@ class EvChart {
         .filter((sId) => this.seriesList[sId]?.showLegend)
         .map((sId) => [sId, this.seriesList[sId]]);
     }
-    return Object.entries(this.seriesList)
-      .filter(([, series]) => series.showLegend);
+    return Object.entries(this.seriesList).filter(([, series]) => series.showLegend);
   }
 
   /**
@@ -1196,9 +1192,8 @@ class EvChart {
    * @returns {object} legend item
    */
   _seriesToLegendItem(series) {
-    const color = typeof series.color !== 'string'
-      ? series.color[series.color.length - 1][1]
-      : series.color;
+    const color =
+      typeof series.color !== 'string' ? series.color[series.color.length - 1][1] : series.color;
     return {
       sId: series.sId,
       name: series.name,
@@ -1206,7 +1201,7 @@ class EvChart {
       type: series.type,
       show: series.show,
       fill: series.fill,
-      fillColor: series.fillColor
+      fillColor: series.fillColor,
     };
   }
 
@@ -1216,8 +1211,7 @@ class EvChart {
    * @returns {Array} legend items
    */
   buildLegendData() {
-    return this._getLegendSeries()
-      .map(([, series]) => this._seriesToLegendItem(series));
+    return this._getLegendSeries().map(([, series]) => this._seriesToLegendItem(series));
   }
 
   /**
@@ -1250,7 +1244,9 @@ class EvChart {
       const isActiveAll = legendSeries.every(([, s]) => s.show);
 
       if (isActiveAll) {
-        legendSeries.forEach(([, s]) => { s.show = false; });
+        legendSeries.forEach(([, s]) => {
+          s.show = false;
+        });
         series.show = true;
         this.seriesInfo.count = 1;
       } else if (series.show) {
@@ -1263,7 +1259,9 @@ class EvChart {
 
       const isInactiveAll = legendSeries.every(([, s]) => !s.show);
       if (isInactiveAll) {
-        legendSeries.forEach(([, s]) => { s.show = true; });
+        legendSeries.forEach(([, s]) => {
+          s.show = true;
+        });
         this.seriesInfo.count = legendSeries.length;
       }
     } else {

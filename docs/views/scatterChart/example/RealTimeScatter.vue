@@ -1,7 +1,11 @@
 <template>
   <div class="case">
     <resizable-wrapper>
-      <ev-chart v-model:realTimeScatterReset="resetFlag" :data="chartData" :options="chartOptions" />
+      <ev-chart
+        v-model:realTimeScatterReset="resetFlag"
+        :data="chartData"
+        :options="chartOptions"
+      />
     </resizable-wrapper>
   </div>
 

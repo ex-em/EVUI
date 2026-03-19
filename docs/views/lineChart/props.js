@@ -143,8 +143,7 @@ export default {
       parsedData: parse(LegendVirtualScrollRaw).descriptor,
     },
     ExternalLegend: {
-      description:
-        'External Legend를 사용하여 차트 외부에서 범례를 커스터마이징할 수 있습니다.',
+      description: 'External Legend를 사용하여 차트 외부에서 범례를 커스터마이징할 수 있습니다.',
       component: ExternalLegend,
       parsedData: parse(ExternalLegendRaw).descriptor,
     },

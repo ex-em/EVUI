@@ -22,7 +22,8 @@ class StepScale extends Scale {
 
     if (typeof this.labelStyle?.maxWidth === 'string') {
       if (this.labelStyle?.maxWidth.includes('%')) {
-        maxWidth = chartRect.chartWidth * (parseInt(this.labelStyle?.maxWidth.replace('%', '')) / 100);
+        maxWidth =
+          chartRect.chartWidth * (parseInt(this.labelStyle?.maxWidth.replace('%', '')) / 100);
       } else {
         maxWidth = parseInt(this.labelStyle?.maxWidth);
       }

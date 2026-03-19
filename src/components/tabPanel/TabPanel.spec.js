@@ -4,15 +4,16 @@ import { ref } from 'vue';
 import EvTabPanel from './TabPanel.vue';
 
 describe('EvTabPanel Component', () => {
-  const mountWithTabs = (props = {}, selectedValue = 'tab1') => mount(EvTabPanel, {
-    props: { value: 'tab1', text: '탭1', ...props },
-    slots: { default: '<div class="panel-content">패널 내용</div>' },
-    global: {
-      provide: {
-        evTabs: ref(selectedValue),
+  const mountWithTabs = (props = {}, selectedValue = 'tab1') =>
+    mount(EvTabPanel, {
+      props: { value: 'tab1', text: '탭1', ...props },
+      slots: { default: '<div class="panel-content">패널 내용</div>' },
+      global: {
+        provide: {
+          evTabs: ref(selectedValue),
+        },
       },
-    },
-  });
+    });
 
   describe('렌더링', () => {
     it('선택된 탭 패널이 렌더링된다', () => {

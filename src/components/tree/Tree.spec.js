@@ -6,10 +6,7 @@ describe('EvTree Component', () => {
   const sampleData = [
     {
       title: '루트',
-      children: [
-        { title: '자식1' },
-        { title: '자식2' },
-      ],
+      children: [{ title: '자식1' }, { title: '자식2' }],
     },
   ];
 

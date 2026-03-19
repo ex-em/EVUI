@@ -4,10 +4,7 @@
   </h2>
 
   <!-- Article Breadcrumb -->
-  <div
-    v-if="articleNames.length"
-    class="article-breadcrumb-wrapper"
-  >
+  <div v-if="articleNames.length" class="article-breadcrumb-wrapper">
     <button
       v-if="canScrollLeft"
       class="breadcrumb-scroll-btn breadcrumb-scroll-btn-left"
@@ -15,11 +12,7 @@
     >
       <i class="ev-icon-s-arrow-left" />
     </button>
-    <nav
-      ref="breadcrumbRef"
-      class="article-breadcrumb"
-      @scroll="updateScrollButtons"
-    >
+    <nav ref="breadcrumbRef" class="article-breadcrumb" @scroll="updateScrollButtons">
       <a
         v-for="name in articleNames"
         :key="name"
@@ -82,7 +75,7 @@ export default {
     const canScrollRight = ref(false);
     let ticking = false;
 
-    const toKebab = name => kebabCase(name);
+    const toKebab = (name) => kebabCase(name);
 
     // components 키 + API 항목으로 breadcrumb 생성
     const articleNames = computed(() => {

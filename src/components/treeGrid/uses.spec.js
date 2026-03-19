@@ -23,9 +23,7 @@ describe('treeGrid getUpdatedColumns', () => {
         { index: 0, field: 'name', width: 100 },
         { index: 1, field: 'value', width: 80 },
       ],
-      filteredColumns: [
-        { index: 0, width: 150 },
-      ],
+      filteredColumns: [{ index: 0, width: 150 }],
     };
     const result = getUpdatedColumns(stores);
     expect(result[0]).toEqual({ index: 0, field: 'name', width: 150 });

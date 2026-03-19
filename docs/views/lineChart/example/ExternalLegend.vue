@@ -26,14 +26,8 @@
         @mouseenter="onLegendEnter(item.sId)"
         @mouseleave="onLegendLeave"
       >
-        <span
-          class="legend-color"
-          :style="{ backgroundColor: item.show ? item.color : '#aaa' }"
-        />
-        <span
-          class="legend-name"
-          :style="{ color: item.show ? '#353740' : '#aaa' }"
-        >
+        <span class="legend-color" :style="{ backgroundColor: item.show ? item.color : '#aaa' }" />
+        <span class="legend-name" :style="{ color: item.show ? '#353740' : '#aaa' }">
           {{ item.name }}
         </span>
       </div>

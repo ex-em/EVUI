@@ -4,7 +4,7 @@
       <ev-chart :data="chartData" :options="chartOptions" />
     </resizable-wrapper>
   </div>
-  
+
   <div class="description">
     <div v-for="(option, idx) in titleOptions" :key="idx" class="section">
       <h3 v-if="idx === 0" class="section-title">X Axis</h3>

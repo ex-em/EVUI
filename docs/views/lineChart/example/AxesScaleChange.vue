@@ -1,11 +1,7 @@
 <template>
   <div class="case">
     <resizable-wrapper>
-      <ev-chart
-        :data="chartData"
-        :options="chartOptions"
-        @axes-scale-change="onStepsCalculated"
-      />
+      <ev-chart :data="chartData" :options="chartOptions" @axes-scale-change="onStepsCalculated" />
     </resizable-wrapper>
     <div class="info-box">
       <table v-if="axesSteps">
@@ -154,7 +150,8 @@ export default {
     border-collapse: collapse;
     font-size: 12px;
 
-    th, td {
+    th,
+    td {
       border: 1px solid #ddd;
       padding: 4px 10px;
       text-align: center;
