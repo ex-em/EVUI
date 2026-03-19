@@ -382,7 +382,15 @@ class Scale {
               )
               .includes(labelText);
 
-          const labelColor = this.labelStyle.color;
+          let labelColor;
+          if (ix === steps && this.lastLabelFontStyle) {
+            ctx.font = Util.getLabelStyle(this.lastLabelFontStyle);
+            labelColor = this.lastLabelFontStyle.color;
+          } else {
+            ctx.font = Util.getLabelStyle(this.labelStyle);
+            labelColor = this.labelStyle.color;
+          }
+
           let defaultOpacity = 1;
 
           if (Util.getColorStringType(labelColor) === 'RGBA') {
