@@ -4,7 +4,7 @@
       <ev-chart :data="chartData" :options="chartOptions" />
     </resizable-wrapper>
   </div>
-  
+
   <div class="description">
     <div class="row">
       <div class="row-item">

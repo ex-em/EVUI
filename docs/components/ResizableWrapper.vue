@@ -1,11 +1,10 @@
 <template>
-    <div class="resizable-wrapper">
-        <div ref="componentArea" class="component-area" :style="componentAreaStyle">
-            <slot />
-        </div>
-        <div ref="resizeHandle" class="resize-handle" @mousedown="startResize">
-        </div>
+  <div class="resizable-wrapper">
+    <div ref="componentArea" class="component-area" :style="componentAreaStyle">
+      <slot />
     </div>
+    <div ref="resizeHandle" class="resize-handle" @mousedown="startResize"></div>
+  </div>
 </template>
 
 <script>

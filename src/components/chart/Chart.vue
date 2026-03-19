@@ -188,11 +188,7 @@ export default {
           updateTooltip: isUpdateTooltip,
         });
 
-        if (
-          newOpt.legend.show &&
-          newOpt.legend.external &&
-          !prevLegendShow
-        ) {
+        if (newOpt.legend.show && newOpt.legend.external && !prevLegendShow) {
           evChart.emitLegendData();
         }
 

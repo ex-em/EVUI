@@ -23,9 +23,7 @@ describe('getUpdatedColumns', () => {
         { index: 0, field: 'name', width: 100 },
         { index: 1, field: 'age', width: 80 },
       ],
-      filteredColumns: [
-        { index: 1, width: 120, hidden: true },
-      ],
+      filteredColumns: [{ index: 1, width: 120, hidden: true }],
     };
     const result = getUpdatedColumns(stores);
     expect(result[0]).toEqual({ index: 0, field: 'name', width: 100 });

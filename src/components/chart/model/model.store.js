@@ -134,7 +134,7 @@ const modules = {
           lastTime = item.x;
         }
       }
-      
+
       lastTime = lastTime ? Math.floor(lastTime / 1000) * 1000 : 0;
 
       const dataGroupLastTime = dataGroup.at(-1)?.data?.at(-1)?.x || Date.now();

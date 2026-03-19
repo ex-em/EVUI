@@ -33,7 +33,7 @@
         @click="onClick"
       />
     </resizable-wrapper>
-  </div> 
+  </div>
   <div class="description">
     <ev-button @click="toggleSelectData"> select by v-model </ev-button>
     <span class="left">

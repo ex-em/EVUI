@@ -18,7 +18,7 @@
       />
     </resizable-wrapper>
   </div>
-  
+
   <div class="description">
     <ev-toggle v-model="isUseClick" />
     <span> 클릭 기능 enable ( false 일때는 v-model 값으로 변경 ) </span>

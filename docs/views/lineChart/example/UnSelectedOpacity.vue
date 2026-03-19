@@ -17,7 +17,7 @@
       />
     </resizable-wrapper>
   </div>
-  
+
   <div class="description">
     <div class="badge yellow">unSelectedOpacity</div>
     <ev-input-number v-model="unSelectedOpacity" :min="0" :max="1" :step="0.1" :precision="1" />

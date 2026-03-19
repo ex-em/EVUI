@@ -23,7 +23,7 @@
         :data="chartData3"
         :options="chartOptions3"
         @click="onClick"
-        />
+      />
     </resizable-wrapper>
     <resizable-wrapper height="25%">
       <ev-chart
