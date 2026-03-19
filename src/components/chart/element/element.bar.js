@@ -144,9 +144,12 @@ class Bar {
         // 너비 / 높이 계산, 스택의 경우 위치 값 재계산
         if (isHorizontal) {
           const barValue = item.b ? item.o : item.x;
-
+          const _barValue = Math.min(
+            Math.max(barValue, minmaxX.graphMin),
+            minmaxX.graphMax
+          );
           w = Canvas.calculateX(
-            barValue,
+            _barValue,
             minmaxX.graphMin,
             minmaxX.graphMax,
             xArea,
@@ -154,8 +157,13 @@ class Bar {
           );
 
           if (item.b) {
+            const _baseValue = Math.min(
+              Math.max(item.b, minmaxX.graphMin),
+              minmaxX.graphMax
+            );
+
             x = Canvas.calculateX(
-              item.b,
+              _baseValue,
               minmaxX.graphMin,
               minmaxX.graphMax,
               xArea,
@@ -167,9 +175,12 @@ class Bar {
           w = barValue && Math.abs(w) === 0 ? minimumBarWidth : w;
         } else {
           const barValue = item.b ? item.o : item.y;
-
+          const _barValue = Math.min(
+            Math.max(barValue, minmaxY.graphMin),
+            minmaxY.graphMax
+          );
           h = Canvas.calculateY(
-            barValue,
+            _barValue,
             minmaxY.graphMin,
             minmaxY.graphMax,
             yArea,
@@ -177,8 +188,12 @@ class Bar {
           );
 
           if (item.b) {
+            const _baseValue = Math.min(
+              Math.max(item.b, minmaxY.graphMin),
+              minmaxY.graphMax
+            );
             y = Canvas.calculateY(
-              item.b,
+              _baseValue,
               minmaxY.graphMin,
               minmaxY.graphMax,
               yArea,

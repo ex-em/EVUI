@@ -250,9 +250,11 @@ const modules = {
         gp -= offset;
       }
     } else if (isHorizontal) {
-      gp = Canvas.calculateX(value, graphX.graphMin, graphX.graphMax, xArea, xsp);
+      const _value = Math.min(Math.max(value, graphX.graphMin), graphX.graphMax);
+      gp = Canvas.calculateX(_value, graphX.graphMin, graphX.graphMax, xArea, xsp);
     } else {
-      gp = Canvas.calculateY(value, graphY.graphMin, graphY.graphMax, yArea, ysp);
+      const _value = Math.min(Math.max(value, graphY.graphMin), graphY.graphMax);
+      gp = Canvas.calculateY(_value, graphY.graphMin, graphY.graphMax, yArea, ysp);
       gp -= offset;
     }
 
@@ -522,11 +524,13 @@ const modules = {
         gp -= offset;
       }
     } else if (isHorizontal) {
-      gp = Canvas.calculateX(value, graphX.graphMin, graphX.graphMax, xArea, xsp);
+      const _value = Math.min(Math.max(value, graphX.graphMin), graphX.graphMax);
+      gp = Canvas.calculateX(_value, graphX.graphMin, graphX.graphMax, xArea, xsp);
       gp = value < 0 ? gp - offset : gp + offset;
     } else {
       const adjustedValue = type === 'bar' && value < 0 ? 0 : value;
-      gp = Canvas.calculateY(adjustedValue, graphY.graphMin, graphY.graphMax, yArea, ysp);
+      const _value = Math.min(Math.max(adjustedValue, graphY.graphMin), graphY.graphMax);
+      gp = Canvas.calculateY(_value, graphY.graphMin, graphY.graphMax, yArea, ysp);
       gp = adjustedValue < 0 ? gp + offset : gp - offset;
     }
 

@@ -137,8 +137,22 @@ class Line {
     const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    const getXPos = (val) => Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-    const getYPos = (val) => Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    const getXPos = (val) => {
+      const _val = Math.min(
+        Math.max(val, minmaxX.graphMin),
+        minmaxX.graphMax
+      );
+      return Canvas.calculateX(_val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    };
+
+    const getYPos = (val) => {
+      const _val = Math.min(
+        Math.max(val, minmaxY.graphMin),
+        minmaxY.graphMax
+      );
+      return Canvas.calculateY(_val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    };
+    
     const includeNegativeValue = this.data.some((data) => data.o < 0);
     const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
 
