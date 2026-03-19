@@ -119,9 +119,9 @@ export const AXIS_OPTION = {
   range: null,
   interval: null,
   decimalPoint: 'auto',
-  fixedSteps: false, // range/interval 로 steps 사용, 자동 스케일 조정 비활성화
-  niceScale: false, // nice scale 알고리즘 사용
-  scaleChange: false, // 축 스케일 변경 감지
+  fixedSteps: false,
+  niceScale: false,
+  scaleChange: false,
   labelStyle: {
     show: true,
     fontSize: 12,
