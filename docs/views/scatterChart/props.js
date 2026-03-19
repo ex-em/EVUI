@@ -48,12 +48,7 @@ export default {
     'Time Axis': {
       description: 'Time Axis를 표시합니다. range, interval 옵션을 사용하여 축의 범위와 간격을 지정할 수 있습니다.',
       component: TimeAxis,
-      parsedData: parse(TimeAxisRaw),
-    },
-    'Time Axis': {
-      description: 'Time Axis를 표시합니다. range, interval 옵션을 사용하여 축의 범위와 간격을 지정할 수 있습니다.',
-      component: TimeAxis,
-      parsedData: parse(TimeAxisRaw),
+      parsedData: parse(TimeAxisRaw).descriptor,
     },
     RealTimeScatter: {
       description: '실시간으로 대량의 데이터를 처리합니다.',

@@ -56,6 +56,15 @@
       <div class="row">
         <div class="row-item">
           <span class="item-title">
+            use Fixed Steps
+          </span>
+          <ev-toggle
+            v-model="useFixedSteps"
+            class="component"
+          />
+        </div>
+        <div class="row-item">
+          <span class="item-title">
             use Interval
           </span>
           <ev-toggle
@@ -77,7 +86,7 @@
       </div>
       <div class="row">
         <div class="sub-description">
-          range 옵션과 interval 옵션이 호환되지 않는다면, interval 옵션은 무시됩니다.
+          fixedSteps 옵션이 false일 때, range 옵션과 interval 옵션이 호환되지 않는다면 interval 옵션은 무시됩니다.
         </div>
       </div>
       <div class="row">
@@ -110,51 +119,52 @@
 import { ref, reactive, computed } from 'vue';
 import EvCheckbox from '@/components/checkbox/Checkbox';
 
-  export default {
-    components: { EvCheckbox },
-    setup() {
-      const chartData = reactive({
-        series: {
-          series1: { name: 'series#1' },
-          series2: { name: 'series#2' },
-        },
-        data: {
-          series1: [
-            { x: 134, y: 51 }, { x: 67, y: 59 }, { x: 19, y: 49 },
-            { x: 15, y: 63 }, { x: 55, y: 53 }, { x: 161, y: 51 },
-            { x: 167, y: 59 }, { x: 159, y: 49 }, { x: 157, y: 63 },
-            { x: 155, y: 53 }, { x: 170, y: 59 }, { x: 159, y: 47 },
-            { x: 166, y: 69 }, { x: 176, y: 66 }, { x: 160, y: 75 },
-            { x: 172, y: 55 }, { x: 170, y: 54 }, { x: 172, y: 62 },
-            { x: 153, y: 42 }, { x: 160, y: 50 }, { x: 147, y: 49 },
-            { x: 168, y: 49 }, { x: 175, y: 73 }, { x: 157, y: 47 },
-            { x: 167, y: 68 }, { x: 159, y: 50 }, { x: 175, y: 82 },
-            { x: 166, y: 57 }, { x: 176, y: 87 }, { x: 170, y: 72 },
-          ],
-          series2: [
-            { x: 9, y: 51 }, { x: 72, y: 59 }, { x: 0, y: 49 },
-            { x: 57, y: 63 }, { x: 15, y: 53 }, { x: 174, y: 65 },
-            { x: 175, y: 71 }, { x: 200, y: 80, color: '#FF0000' }, { x: 186, y: 72 },
-            { x: 187, y: 78 }, { x: 181, y: 74 }, { x: 184, y: 86 },
-            { x: 184, y: 78 }, { x: 175, y: 62 }, { x: 184, y: 81 },
-            { x: 180, y: 76 }, { x: 177, y: 83 }, { x: 192, y: 90, color: '#FF0000' },
-            { x: 176, y: 74 }, { x: 174, y: 71 }, { x: 184, y: 79 },
-            { x: 10, y: 4, color: '#FF0000' }, { x: 171, y: 70 }, { x: 173, y: 72 },
-            { x: 176, y: 85 }, { x: 176, y: 78 }, { x: 180, y: 77 },
-            { x: 172, y: 66 }, { x: 176, y: 86 }, { x: 173, y: 81 },
-          ],
-        },
-      });
+export default {
+  components: { EvCheckbox },
+  setup() {
+    const chartData = reactive({
+      series: {
+        series1: { name: 'series#1' },
+        series2: { name: 'series#2' },
+      },
+      data: {
+        series1: [
+          { x: 134, y: 51 }, { x: 67, y: 59 }, { x: 19, y: 49 },
+          { x: 15, y: 63 }, { x: 55, y: 53 }, { x: 161, y: 51 },
+          { x: 167, y: 59 }, { x: 159, y: 49 }, { x: 157, y: 63 },
+          { x: 155, y: 53 }, { x: 170, y: 59 }, { x: 159, y: 47 },
+          { x: 166, y: 69 }, { x: 176, y: 66 }, { x: 160, y: 75 },
+          { x: 172, y: 55 }, { x: 170, y: 54 }, { x: 172, y: 62 },
+          { x: 153, y: 42 }, { x: 160, y: 50 }, { x: 147, y: 49 },
+          { x: 168, y: 49 }, { x: 175, y: 73 }, { x: 157, y: 47 },
+          { x: 167, y: 68 }, { x: 159, y: 50 }, { x: 175, y: 82 },
+          { x: 166, y: 57 }, { x: 176, y: 87 }, { x: 170, y: 72 },
+        ],
+        series2: [
+          { x: 9, y: 51 }, { x: 72, y: 59 }, { x: 0, y: 49 },
+          { x: 57, y: 63 }, { x: 15, y: 53 }, { x: 174, y: 65 },
+          { x: 175, y: 71 }, { x: 200, y: 80, color: '#FF0000' }, { x: 186, y: 72 },
+          { x: 187, y: 78 }, { x: 181, y: 74 }, { x: 184, y: 86 },
+          { x: 184, y: 78 }, { x: 175, y: 62 }, { x: 184, y: 81 },
+          { x: 180, y: 76 }, { x: 177, y: 83 }, { x: 192, y: 90, color: '#FF0000' },
+          { x: 176, y: 74 }, { x: 174, y: 71 }, { x: 184, y: 79 },
+          { x: 10, y: 4, color: '#FF0000' }, { x: 171, y: 70 }, { x: 173, y: 72 },
+          { x: 176, y: 85 }, { x: 176, y: 78 }, { x: 180, y: 77 },
+          { x: 172, y: 66 }, { x: 176, y: 86 }, { x: 173, y: 81 },
+        ],
+      },
+    });
 
-      const maxValue = ref(10);
-      const minValue = ref(0);
-      const decimalPoint = ref(0);
-      const isAutoDecimal = ref(true);
-      const displayOverflow = ref(true);
-      const interval = ref(5);
-      const useInterval = ref(false);
-      const useRange = ref(true);
-
+    const maxValue = ref(10);
+    const minValue = ref(0);
+    const decimalPoint = ref(0);
+    const isAutoDecimal = ref(true);
+    const displayOverflow = ref(true);
+    const interval = ref(5);
+    const useInterval = ref(false);
+    const useRange = ref(true);
+    const useFixedSteps = ref(false);
+    
     const chartOptions = computed(() => ({
       type: 'scatter',
       width: '100%',
@@ -170,6 +180,12 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
           decimalPoint: isAutoDecimal.value ? 'auto' : decimalPoint.value,
           range: useRange.value ? [minValue.value, maxValue.value] : null,
           interval: useInterval.value ? interval.value : null,
+          fixedSteps: useFixedSteps.value,
+          lastLabelFontStyle: useRange.value ? {
+            color: '#FF0000',
+            fontSize: 16,
+            fontWeight: 600,
+          } : undefined,
         }],
         title: {
           text: '',
@@ -199,20 +215,21 @@ import EvCheckbox from '@/components/checkbox/Checkbox';
         displayOverflow: displayOverflow.value,
       }));
 
-      return {
-        chartData,
-        maxValue,
-        minValue,
-        decimalPoint,
-        isAutoDecimal,
-        displayOverflow,
-        chartOptions,
-        interval,
-        useInterval,
-        useRange,
-      };
-    },
-  };
+    return {
+      chartData,
+      maxValue,
+      minValue,
+      decimalPoint,
+      isAutoDecimal,
+      displayOverflow,
+      chartOptions,
+      interval,
+      useInterval,
+      useRange,
+      useFixedSteps,
+    };
+  },
+};
 </script>
 
 <style lang="scss" scoped>
