@@ -12,9 +12,8 @@ class LinearScale extends Scale {
    * @returns {string} formatted label
    */
   getTruthyValue(value) {
-    return truthyNumber(value) && !this.fixedSteps
-      ? Number(value.toFixed(this.decimalPoint))
-      : value;
+    const decimalPoint = this.adjustedDecimalPoint ?? this.decimalPoint;
+    return truthyNumber(value) ? Number(value.toFixed(decimalPoint)) : value;
   }
 
   getLabelFormat(value, data = {}) {
@@ -34,7 +33,8 @@ class LinearScale extends Scale {
       }
     }
 
-    return Util.labelSignFormat(value, this.fixedSteps ? null : this.decimalPoint);
+    const decimalPoint = this.adjustedDecimalPoint ?? this.decimalPoint;
+    return Util.labelSignFormat(value, decimalPoint);
   }
 
   /**
@@ -89,40 +89,6 @@ class LinearScale extends Scale {
   }
 
   /**
-   * Get decimal point from range
-   * @param {object} {
-   *  graphRange: number,
-   *  numberOfSteps: number,
-   *  interval: number,
-   * }
-   * @returns {number} decimal point
-   */
-  getDecimalPointFromRange({ graphRange, numberOfSteps }) {
-    if (numberOfSteps <= 0 || graphRange === 0) {
-      return 0;
-    }
-
-    const interval = graphRange / numberOfSteps;
-    if (interval === 0) {
-      return 0;
-    }
-
-    let decimals = 0;
-    let temp = interval;
-
-    while (temp < 1) {
-      temp *= 10;
-      decimals++;
-
-      if (decimals > 10) {
-        break;
-      }
-    }
-
-    return decimals;
-  }
-
-  /**
    * 주어진 값에 대한 적절한 간격을 계산합니다.
    * @param value - 계산할 값 (양수, 음수 모두 가능)
    * @returns 계산된 간격 값 (유효하지 않은 경우 0 반환)
@@ -148,45 +114,60 @@ class LinearScale extends Scale {
     return value < 0 ? -niceInterval : niceInterval;
   }
 
+  /** 
+   * user range를 사용하지 않을때 nice scale 계산
+   * graph MIN / MAX 를 조정할 수 있다.
+   * @param {number} max
+   * @param {number} min
+   * @param {number} maxSteps
+   * @returns {object}
+   */
   getStepsWithNiceScale({ max, min, maxSteps }) {
-    let bestMaxValue = Infinity;
+    let bestMaxValue = max;
     let bestMinValue = min;
     let bestInterval = 0;
     let bestSteps = 0;
     let bestOvershootAmount = Infinity;
-
-    // maxSteps - 1(최소 2개 이상인데 maxSteps가 1인 경우는 최소 1부터)부터 maxSteps + 1 범위의 세그먼트 후보를 검토
-    const minSegments = maxSteps > 1 ? Math.max(2, maxSteps - 1) : 1;
+  
+    const minSegments = Math.max(1, maxSteps - 1);
     const maxSegments = maxSteps + 1;
-    const segmentCandidates = [];
-
+  
     for (let segments = minSegments; segments <= maxSegments; segments++) {
-      segmentCandidates.push(segments);
-    }
-
-    // 최적 후보 찾기
-    for (let i = 0; i < segmentCandidates.length; i++) {
-      const segments = segmentCandidates[i];
       const rawStep = (max - min) / segments;
       const niceInterval = this.getNiceInterval(rawStep);
-
+  
       if (niceInterval > 0) {
-        const absNiceInterval = Math.abs(niceInterval);
         const niceMin = Math.floor(min / niceInterval) * niceInterval;
-        const candidateYAxisMax = niceMin + niceInterval * segments;
-        const overshootAmount = candidateYAxisMax - max; // 여유(overshoot)
-
-        // 더 나은 후보를 찾으면 업데이트
-        if (overshootAmount >= 0 && overshootAmount < bestOvershootAmount) {
-          bestMaxValue = candidateYAxisMax;
-          bestMinValue = niceMin;
-          bestInterval = absNiceInterval;
-          bestOvershootAmount = overshootAmount;
-          bestSteps = segments;
+        const candidateMax = niceMin + niceInterval * segments;
+  
+        if (candidateMax >= max) {
+          const minOvershoot = min - niceMin;
+          const maxOvershoot = candidateMax - max;
+          const totalOvershoot = minOvershoot + maxOvershoot;
+  
+          if (totalOvershoot < bestOvershootAmount) {
+            bestMaxValue = candidateMax;
+            bestMinValue = niceMin;
+            bestInterval = niceInterval;
+            bestSteps = segments;
+            bestOvershootAmount = totalOvershoot;
+          }
         }
       }
     }
-
+  
+    if (!(bestInterval > 0) || bestSteps <= 0) {
+      const fallbackSteps = Math.max(1, maxSteps);
+      const fallbackInterval = (max - min) / fallbackSteps || 1;
+  
+      return {
+        max,
+        min,
+        interval: fallbackInterval,
+        steps: fallbackSteps,
+      };
+    }
+  
     return {
       max: bestMaxValue,
       min: bestMinValue,
@@ -196,124 +177,239 @@ class LinearScale extends Scale {
   }
 
   /**
+   * graphRange와 step 수를 기반으로 필요한 소수점 자릿수를 계산
+   * @param {object} params
+   * @param {number} params.graphRange
+   * @param {number} params.numberOfSteps
+   * @returns {number} decimal places (0 이상)
+   */
+  getDecimalPointFromRange({ graphRange, numberOfSteps }) {
+    if (
+      !Number.isFinite(graphRange) ||
+      !Number.isFinite(numberOfSteps) ||
+      graphRange <= 0 ||
+      numberOfSteps <= 0
+    ) {
+      return 0;
+    }
+
+    const interval = graphRange / numberOfSteps;
+
+    if (!Number.isFinite(interval) || interval === 0) {
+      return 0;
+    }
+
+    const absInterval = Math.abs(interval);
+
+    // 1 이상이면 소수점 불필요
+    if (absInterval >= 1) {
+      return 0;
+    }
+
+    // 소수점 자리 계산 (최대 10자리 제한)
+    let decimals = 0;
+    let temp = absInterval;
+
+    while (temp < 1 && decimals < 10) {
+      temp *= 10;
+      decimals += 1;
+    }
+
+    return decimals;
+  }
+
+  /**
    * With range information, calculate how many labels in axis
    * @param {object} range    min/max information
    *
    * @returns {object} steps, interval, min/max graph value
    */
   calculateSteps(range) {
-    const { maxValue, minValue } = range;
-    let { maxSteps = 1 } = range;
-
-    let interval = this.getInterval(range);
-    let graphMin = 0;
-    let graphMax = 0;
-
-    // 그래프 최대/최소 값 계산
-    if (minValue >= 0) {
-      // 전부 양수
-      graphMin = +minValue;
-      graphMax = Math.ceil(maxValue / interval) * interval;
-    } else if (maxValue >= 0) {
-      // 양수/음수 혼합
-      graphMin = Math.floor(minValue / interval) * interval;
-      graphMax = Math.ceil(maxValue / interval) * interval;
-    } else {
-      // 전부 음수
-      graphMax = +maxValue;
-      graphMin = Math.floor(minValue / interval) * interval;
-    }
-
-    const graphRange = graphMax - graphMin;
-    let numberOfSteps = Math.round(graphRange / interval);
-
-    // 특수 케이스: 양수 최소값, 최대값이 1일 경우
-    if (minValue > 0 && maxValue === 1) {
-      if (!this.decimalPoint) {
-        interval = 1;
-        numberOfSteps = 1;
-        maxSteps = 1;
-      } else if (maxSteps > 2) {
-        interval = 0.2;
-        numberOfSteps = 5;
-        maxSteps = 5;
+    const { minValue, maxValue } = range;
+    const maxSteps = Math.max(1, range.maxSteps ?? 1);
+  
+    const hasUserRange =
+      Array.isArray(this.range) && this.range.length === 2;
+  
+    const hasUserInterval =
+      typeof this.interval === 'number' ||
+      (typeof this.interval === 'object' && this.interval !== null);
+  
+    const resolvedInterval = hasUserInterval
+      ? this.getInterval(range)
+      : null;
+  
+    const isValidInterval =
+      resolvedInterval != null &&
+      resolvedInterval > 0 &&
+      Number.isFinite(resolvedInterval);
+  
+    const userMin = hasUserRange ? +this.range[0] : null;
+    const userMax = hasUserRange ? +this.range[1] : null;
+  
+    const EPS = 1e-10;
+  
+    const setDecimal = (graphRange, steps, interval) => {
+      if (this.decimalPoint === 'auto') {
+        const decimalFromRange = this?.getDecimalPointFromRange?.({
+          graphRange,
+          numberOfSteps: steps,
+        });
+  
+        if (
+          decimalFromRange != null &&
+          !Number.isNaN(decimalFromRange)
+        ) {
+          this.adjustedDecimalPoint = decimalFromRange;
+        } else if (typeof this.getAutoDecimalPointFromInterval === 'function') {
+          this.adjustedDecimalPoint =
+            this.getAutoDecimalPointFromInterval(interval);
+        } else {
+          this.adjustedDecimalPoint = 0;
+        }
       } else {
-        interval = 0.5;
-        numberOfSteps = 2;
-        maxSteps = 2;
+        this.adjustedDecimalPoint = this.decimalPoint;
+      }
+    };
+  
+    const safeSteps = (graphRange, interval) => Math.max(1, Math.round((graphRange / interval) + EPS));
+  
+    const expandByInterval = ({ min, max, interval }) => {
+      let graphMin = 0;
+      let graphMax = 0;
+  
+      if (min >= 0) {
+        graphMin = +min;
+        graphMax = Math.ceil(max / interval) * interval;
+      } else if (max >= 0) {
+        graphMin = Math.floor(min / interval) * interval;
+        graphMax = Math.ceil(max / interval) * interval;
+      } else {
+        graphMax = +max;
+        graphMin = Math.floor(min / interval) * interval;
+      }
+  
+      return { graphMin, graphMax };
+    };
+  
+    /**
+     * 1) userRange + userInterval
+     * 호환되면 그대로 사용
+     * 아니면 userRange only 로직으로 fallback
+     */
+    if (hasUserRange && isValidInterval) {
+      const graphMin = userMin;
+      const graphMax = userMax;
+      const interval = resolvedInterval;
+      const graphRange = graphMax - graphMin;
+      const rawSteps = graphRange / interval;
+      const isCompatible =
+        Math.abs(rawSteps - Math.round(rawSteps)) < EPS;
+  
+      if (isCompatible && this.fixedSteps) {
+        const steps = Math.round(rawSteps);
+        setDecimal(graphRange, steps, interval);
+        return {
+          steps,
+          interval,
+          graphMin,
+          graphMax,
+        };
       }
     }
-
-    if (this.fixedSteps) {
-      this.decimalPoint = this?.getDecimalPointFromRange?.({
-        graphRange,
-        numberOfSteps,
-      });
-
+  
+    /**
+     * 2) userRange only
+     * niceScale 사용 안 함
+     * startToZero도 적용 안 함
+     */
+    if (hasUserRange) {
+      const graphMin = userMin;
+      const graphMax = userMax;
+      const graphRange = graphMax - graphMin;
+      const steps = maxSteps;
+      const interval = graphRange / steps;
+  
+      setDecimal(graphRange, steps, interval);
+  
       return {
-        steps: numberOfSteps,
+        steps,
         interval,
         graphMin,
         graphMax,
       };
     }
-
-    // 최대 스텝 수 조정
-    while (numberOfSteps > maxSteps) {
-      interval *= 2;
-      numberOfSteps = Math.round(graphRange / interval);
-      interval = Math.ceil(graphRange / numberOfSteps);
-    }
-
-    if (graphRange > numberOfSteps * interval) {
-      const tempInterval = graphRange / numberOfSteps;
-      interval = this.decimalPoint ? tempInterval : Math.ceil(tempInterval);
-    }
-
-    if (this.niceScale) {
-      const {
-        max: bestMax,
-        min: bestMin,
-        steps: bestStep,
-        interval: bestInterval,
-      } = this.getStepsWithNiceScale({
-        max: maxValue,
+  
+    /**
+     * 3) userInterval only
+     * interval을 힌트로 사용, 너무 촘촘하면 2배씩 증가
+     * niceScale 사용 안 함
+     * startToZero도 적용 안 함
+     */
+    if (isValidInterval) {
+      let interval = resolvedInterval;
+      let graphMin = 0;
+      let graphMax = 0;
+      let graphRange = 0;
+      let steps = 0;
+  
+      ({ graphMin, graphMax } = expandByInterval({
         min: minValue,
-        maxSteps: numberOfSteps,
-      });
-
-      // 유효한 후보를 찾은 경우
-      const isValidCandidate = Number.isFinite(bestMax) && bestStep !== 0;
-      if (isValidCandidate) {
-        const hasDecimal = bestInterval.toString().includes('.');
-
-        // interval이 0.25 인 경우 decimalPoint가 1이면 반올림 되므로 0.25의 경우 decimalPoint가 auto인 경우 2가 되도록 처리
-        this.decimalPoint =
-          hasDecimal && this.decimalPoint === 'auto'
-            ? bestInterval.toString().split('.')[1]?.length
-            : this.decimalPoint;
-
-        return {
-          steps: bestStep,
-          interval: bestInterval,
-          graphMin: bestMin,
-          graphMax: bestMax,
-        };
+        max: maxValue,
+        interval,
+      }));
+      graphRange = graphMax - graphMin;
+      steps = safeSteps(graphRange, interval);
+  
+      while (steps > maxSteps) {
+        interval *= 2;
+  
+        ({ graphMin, graphMax } = expandByInterval({
+          min: minValue,
+          max: maxValue,
+          interval,
+        }));
+        graphRange = graphMax - graphMin;
+        steps = safeSteps(graphRange, interval);
       }
+  
+      setDecimal(graphRange, steps, interval);
+  
+      return {
+        steps,
+        interval,
+        graphMin,
+        graphMax,
+      };
     }
-
-    if (this.decimalPoint === 'auto') {
-      this.decimalPoint = this?.getDecimalPointFromRange?.({
-        graphRange,
-        numberOfSteps,
-      });
-    }
-
+  
+    /**
+     * 4) auto
+     * niceScale 사용
+     */
+    const normalizedMin =
+      this.startToZero && minValue >= 0 ? 0 : minValue;
+  
+    const normalizedMax =
+      this.startToZero && maxValue <= 0 ? 0 : maxValue;
+  
+    const nice = this.getStepsWithNiceScale({
+      min: normalizedMin,
+      max: normalizedMax,
+      maxSteps,
+    });
+  
+    setDecimal(
+      nice.max - nice.min,
+      nice.steps,
+      nice.interval,
+    );
+  
     return {
-      steps: numberOfSteps,
-      interval,
-      graphMin,
-      graphMax,
+      steps: nice.steps,
+      interval: nice.interval,
+      graphMin: nice.min,
+      graphMax: nice.max,
     };
   }
 
