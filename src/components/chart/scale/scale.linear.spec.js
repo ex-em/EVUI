@@ -8,7 +8,6 @@ const createScale = (overrides = {}) => {
   scale.decimalPoint = null;
   scale.startToZero = false;
   scale.fixedSteps = false;
-  scale.niceScale = false;
   scale.formatter = null;
   Object.assign(scale, overrides);
   return scale;
