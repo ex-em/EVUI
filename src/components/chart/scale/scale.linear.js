@@ -295,6 +295,7 @@ class LinearScale extends Scale {
     /**
      * 1) userRange + userInterval
      * 호환되면 그대로 사용
+     * fixedSteps 옵션이 있으면 그대로 사용
      * 아니면 userRange only 로직으로 fallback
      */
     if (hasUserRange && isValidInterval) {
@@ -306,7 +307,7 @@ class LinearScale extends Scale {
       const isCompatible =
         Math.abs(rawSteps - Math.round(rawSteps)) < EPS;
   
-      if (isCompatible && this.fixedSteps) {
+      if (isCompatible || this.fixedSteps) {
         const steps = Math.round(rawSteps);
         setDecimal(graphRange, steps, interval);
         return {
@@ -440,7 +441,7 @@ class LinearScale extends Scale {
       maxValue = minMax.max;
       minValue = minMax.min;
     }
-    
+
     const hasUserRange = Array.isArray(this.range) && this.range.length === 2;
 
     // autoScaleRatio 적용 케이스
