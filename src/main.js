@@ -33,48 +33,28 @@ import EvTreeGrid from '@/components/treeGrid/';
 import EvPagination from '@/components/pagination/';
 import { version } from '../package.json';
 
-const components = [
-  EvTabs,
-  EvTabPanel,
-  EvButton,
-  EvButtonGroup,
-  EvCheckbox,
-  EvCheckboxGroup,
-  EvRadio,
-  EvRadioGroup,
-  EvSelect,
-  EvToggle,
-  EvTextField,
-  EvInputNumber,
-  EvSlider,
-  EvIcon,
-  EvCalendar,
-  EvDatePicker,
-  EvScheduler,
-  EvContextMenu,
-  EvWindow,
-  EvLoading,
-  EvProgress,
-  EvMenu,
-  EvTree,
-  EvTimePicker,
-  EvGrid,
-  EvChart,
-  EvChartGroup,
-  EvChartBrush,
-  EvMessage,
-  EvNotification,
-  EvMessageBox,
-  EvTreeGrid,
-  EvPagination,
-];
-
 const install = (app) => {
   if (!app) {
     return;
   }
-  components.forEach((component) => {
-    app.use(component);
+
+  const regularComponents = [
+    EvTabs, EvTabPanel, EvButton, EvButtonGroup,
+    EvCheckbox, EvCheckboxGroup, EvRadio, EvRadioGroup,
+    EvSelect, EvToggle, EvTextField, EvInputNumber,
+    EvSlider, EvIcon, EvCalendar, EvDatePicker,
+    EvScheduler, EvContextMenu, EvWindow, EvLoading,
+    EvProgress, EvMenu, EvTree, EvTimePicker,
+    EvGrid, EvChart, EvChartGroup, EvChartBrush,
+    EvTreeGrid, EvPagination,
+  ];
+
+  regularComponents.forEach((component) => {
+    app.component(component.name, component);
+  });
+
+  [EvMessage, EvNotification, EvMessageBox].forEach((plugin) => {
+    app.use(plugin);
   });
 };
 
