@@ -251,7 +251,7 @@ class LinearScale extends Scale {
   
     const setDecimal = (graphRange, steps, interval) => {
       if (this.decimalPoint === 'auto') {
-        const decimalFromRange = this?.getDecimalPointFromRange?.({
+        const decimalFromRange = this.getDecimalPointFromRange?.({
           graphRange,
           numberOfSteps: steps,
         });
