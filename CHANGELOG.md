@@ -1,3 +1,12 @@
+## [3.5.1](https://github.com/ex-em/EVUI/compare/3.5.0...3.5.1) (2026-03-20)
+
+
+### Reverts
+
+* Revert "feat(build): preserveModules를 적용하여 tree-shaking 지원" ([84fe88d](https://github.com/ex-em/EVUI/commit/84fe88ded5b46e51db1b5b77a2949e81a940351f))
+* Revert "feat(build): unplugin-vue-components용 EvuiResolver 추가" ([e7f29e6](https://github.com/ex-em/EVUI/commit/e7f29e69c1434524e6860f20e77d74f4cfe7763f))
+* Revert "test: add evui resolver tests" ([d8c03f6](https://github.com/ex-em/EVUI/commit/d8c03f69a42fcfd267dcd989a341abe4563cb9a2))
+
 # [3.5.0](https://github.com/ex-em/EVUI/compare/3.4.214...3.5.0) (2026-03-20)
 
 
