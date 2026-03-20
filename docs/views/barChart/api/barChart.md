@@ -519,14 +519,6 @@ const chartOptions = {
 | useApproximateValue | Boolean                     | false     | 가까운 label을 선택                                                        |            |
 | tipBackground       | Hex, RGB, RGBA Code(String) | '#000000' | tip 배경색상                                                               |            |
 
-#### eventBehavior
-
-이벤트별 동작을 설정하는 옵션 객체.
-
-| 이름         | 타입   | 디폴트   | 설명                                                                 | 종류(예시)           |
-| ----------- | ------ | -------- | -------------------------------------------------------------------- | -------------------- |
-| legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
-
 ### 5. resize-timeout
 
 - Default : 0
