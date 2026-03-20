@@ -124,7 +124,6 @@ const chartData =
   | title | Object | ([상세](#title)) | 라벨의 폰트 스타일을 설정 | |
   | showAxisTick   | Boolean   | true    | 보조 눈금 표시 여부                                     |                                                         |
   | fixedSteps  | Boolean  | false    | range와 interval로 설정한 값을 그대로 사용하여 step을 고정. 자동 스케일 조정을 비활성화하며, 원하는 간격으로 축을 표시할 때 사용  | |
-  | niceScale   | Boolean  | false    | 축 타입이 linear 인 경우 nice scale 알고리즘을 적용하여 최적의 최대값과 간격을 계산하여 축을 그림                     | |
   | scaleChange | Boolean  | false    | scale 변경을 감지하여 emit 발생시킬때 사용, true일때 scale이 변경되면 axes-scale-range 이벤트가 발생된다. | | 
 
 ##### axesX

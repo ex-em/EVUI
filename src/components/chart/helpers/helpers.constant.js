@@ -120,7 +120,6 @@ export const AXIS_OPTION = {
   interval: null,
   decimalPoint: 'auto',
   fixedSteps: false,
-  niceScale: false,
   scaleChange: false,
   labelStyle: {
     show: true,

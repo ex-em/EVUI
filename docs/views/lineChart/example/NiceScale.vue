@@ -83,7 +83,6 @@ export default {
           startToZero: false,
           autoScaleRatio: 0.1,
           showAxisTick: true,
-          niceScale: true,
         },
       ],
     });

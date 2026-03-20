@@ -160,7 +160,6 @@ export default {
           decimalPoint: isAutoDecimal.value ? 'auto' : decimalPoint.value,
           range: useRange.value ? [minValue.value, maxValue.value] : null,
           interval: useInterval.value ? interval.value : null,
-          useNiceScale: false,
           fixedSteps: useFixedSteps.value,
         },
       ],
