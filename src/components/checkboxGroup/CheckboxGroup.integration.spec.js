@@ -5,32 +5,8 @@ import EvCheckboxGroup from './CheckboxGroup.vue';
 import EvCheckbox from '../checkbox/Checkbox.vue';
 
 describe('EvCheckboxGroup + EvCheckbox Integration', () => {
-  // 헬퍼: 체크박스 그룹 마운트
-  const mountCheckboxGroup = (props = {}, checkboxes = []) => {
-    return mount(EvCheckboxGroup, {
-      props: {
-        modelValue: [],
-        ...props,
-      },
-      slots: {
-        default: checkboxes.map(
-          (cb) => `<EvCheckbox label="${cb.label}" ${cb.disabled ? 'disabled' : ''} />`
-        ).join(''),
-      },
-      global: {
-        components: { EvCheckbox },
-      },
-    });
-  };
-
   // 헬퍼: 실제 컴포넌트로 마운트 (slots 문자열 대신)
-  const mountWithRealCheckboxes = (groupProps = {}, checkboxConfigs = []) => {
-    const checkboxSlots = checkboxConfigs.map((config) => ({
-      component: EvCheckbox,
-      props: config,
-    }));
-
-    return mount({
+  const mountWithRealCheckboxes = (groupProps = {}, checkboxConfigs = []) => mount({
       template: `
         <EvCheckboxGroup v-model="selected" @change="onChange">
           <EvCheckbox
@@ -52,7 +28,6 @@ describe('EvCheckboxGroup + EvCheckbox Integration', () => {
         onChange: groupProps.onChange || (() => {}),
       },
     });
-  };
 
   describe('기본 연동', () => {
     it('체크박스 클릭 시 그룹의 modelValue가 업데이트된다', async () => {
