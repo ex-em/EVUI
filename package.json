@@ -34,9 +34,6 @@
     ".": {
       "import": "./dist/main.js"
     },
-    "./resolver": {
-      "import": "./dist/resolver.js"
-    },
     "./style": {
       "import": "./dist/style.css",
       "require": "./dist/style.css"
