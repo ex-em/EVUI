@@ -100,7 +100,7 @@ const chartData =
   | realTimeScatter | Object | ([상세](#realtimescatter)) | 실시간으로 데이터를 처리하는 real time scatter로 변경 여부 및 속성 | |
   | seriesReverse | Boolean | false | 시리즈 순서 반대로 표시 여부 | |
   | coordinateDedupe | Boolean | true | 좌표 중복 제거 여부 | |
-  | eventBehavior | Object | ([상세](#eventbehavior)) | 이벤트별 동작 설정 | |
+  | eventBehavior | Object | ([상세](#eventbehavior)) | 이벤트별 동작 설정 | | 
 
 #### axesX axesY
 
@@ -365,6 +365,14 @@ const chartOptions = {
 | ------ | ------ | ---- | -----| --------- |
 | tipBackground | Hex, RGB, RGBA Code(String) | '#000000' | maxTip 배경색상  | |
 | tipTextColor | Hex, RGB, RGBA Code(String) | '#FFFFFF' | maxTip 글자 색상  | |
+
+#### eventBehavior
+
+이벤트별 동작을 설정하는 옵션 객체.
+
+| 이름         | 타입   | 디폴트   | 설명                                                                 | 종류(예시)           |
+| ----------- | ------ | -------- | -------------------------------------------------------------------- | -------------------- |
+| legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
 
 - 3.4 버전부터 없어지는 옵션입니다.
 

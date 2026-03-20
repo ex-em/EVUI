@@ -787,10 +787,28 @@ const modules = {
         }
       }
 
-      this.update({
-        updateSeries: false,
-        updateSelTip: { update: true, keepDomain: true },
-      });
+      if (this.options.eventBehavior?.legendClick !== 'emitOnly') {
+        this.update({
+          updateSeries: false,
+          updateSelTip: { update: true, keepDomain: true },
+        });
+      }
+
+      // click-legend event 발생
+      const activeSeries = series.colorState.filter((colorItem) => colorItem.show);
+      const activeSerieIndices = activeSeries.map((colorItem) => +colorItem.id.split('#')[1]);
+      const isActiveAll = series.colorState.length === activeSeries.length;
+      const args = {
+        e,
+        data: {
+          seriesIndices: isActiveAll ? [] : activeSerieIndices,
+          isActiveAll,
+        },
+      };
+
+      if (typeof this.listeners['click-legend'] === 'function') {
+        this.listeners['click-legend'](args);
+      }
     };
 
     /**
