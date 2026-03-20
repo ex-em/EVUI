@@ -47,6 +47,7 @@ class TimeScale extends Scale {
 
   /**
    * With range information, calculate how many labels in axis
+   * time axis는 interval 없이 range만 사용하는 것을 지원하지 않음
    * @param {object} range    min/max information
    *
    * @returns {object} steps, interval, min/max graph value
