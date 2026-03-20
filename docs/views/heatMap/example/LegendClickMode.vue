@@ -1,7 +1,7 @@
 <template>
   <div class="case">
     <resizable-wrapper>
-      <ev-chart :data="chartData" :options="chartOptions" />
+      <ev-chart :data="chartData" :options="chartOptions" @click-legend="handleClickLegend"/>
     </resizable-wrapper>
   </div>
 
@@ -22,6 +22,10 @@
         <br />
         inactive, 처음 클릭시 해당 시리즈만 감춤, 마지막 남은 범례 클릭시 무시
       </p>
+    </div>
+    <div class="result">
+      <div class="badge yellow">클릭된 시리즈 Index 목록</div>
+      {{ clickedSeriesIndices }}
     </div>
   </div>
 </template>
@@ -88,10 +92,18 @@ export default {
       },
     }));
 
+    const clickedSeriesIndices = ref([]);
+
+    const handleClickLegend = (e) => {
+      clickedSeriesIndices.value = e.data.seriesIndices;
+    };
+
     return {
       chartData,
       chartOptions,
       legendClickMode,
+      clickedSeriesIndices,
+      handleClickLegend,
     };
   },
 };

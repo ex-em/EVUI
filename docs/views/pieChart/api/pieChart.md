@@ -99,7 +99,7 @@ const chartData =
 | doughnutHoleSize | number          | 0                                              | 내부 hole 사이즈                                                | 0 ~ 1                           |
 | pieStroke        | Object          | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션         |                                 |
 | tooltip          | Object          | ([상세](#tooltip))                             | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성                |                                 |
-| eventBehavior    | Object          | ([상세](#eventbehavior))                       | 이벤트별 동작 설정                                             |                                 |
+| eventBehavior    | Object          | ([상세](#eventbehavior))                       | 이벤트별 동작 설정 | | 
 
 #### title
 
