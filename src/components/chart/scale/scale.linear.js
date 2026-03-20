@@ -440,9 +440,11 @@ class LinearScale extends Scale {
       maxValue = minMax.max;
       minValue = minMax.min;
     }
+    
+    const hasUserRange = Array.isArray(this.range) && this.range.length === 2;
 
     // autoScaleRatio 적용 케이스
-    if (this.autoScaleRatio) {
+    if (this.autoScaleRatio && !hasUserRange) {
       const temp = maxValue;
       // 양수 방향에만 autoScaleRatio 적용
       const _maxValue = maxValue * (this.autoScaleRatio + 1);
@@ -460,7 +462,7 @@ class LinearScale extends Scale {
     }
 
     // 0 기준 축 설정 케이스
-    if (this.startToZero) {
+    if (this.startToZero && !hasUserRange) {
       if (minValue > 0) {
         minValue = 0;
       }
