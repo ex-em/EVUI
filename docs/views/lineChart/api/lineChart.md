@@ -482,13 +482,6 @@ const chartOptions = {
 | fillColor   | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상               |              |
 | opacity     | Number                      | 0.65      | 선택 영역 불투명도           | 0 ~ 1        |
 
-#### eventBehavior
-
-이벤트별 동작을 설정하는 옵션 객체.
-
-| 이름         | 타입    | 디폴트    | 설명                                                                 | 종류(예시)           |
-| ----------- | ------- | --------- | -------------------------------------------------------------------- | -------------------- |
-| legendClick | String  | 'update'  | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
 
 ### 7. resize-timeout
 
