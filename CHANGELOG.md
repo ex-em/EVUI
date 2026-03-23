@@ -1,3 +1,11 @@
+## [3.5.2](https://github.com/ex-em/EVUI/compare/3.5.1...3.5.2) (2026-03-23)
+
+
+### Bug Fixes
+
+* update decimal point calculation logic and add new tests for getDecimalPointFromRange ([2de5664](https://github.com/ex-em/EVUI/commit/2de5664628a9203d2ddcacdac8b045f26386d559))
+* 부동소수점 오차 제거 및 테스트 코드 작성 ([8c9a933](https://github.com/ex-em/EVUI/commit/8c9a93364fd1f2f29e13bbcc9170408370707f90))
+
 ## [3.5.1](https://github.com/ex-em/EVUI/compare/3.5.0...3.5.1) (2026-03-20)
 
 
