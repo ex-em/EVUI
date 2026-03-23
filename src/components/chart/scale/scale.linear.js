@@ -210,7 +210,7 @@ class LinearScale extends Scale {
     let decimals = 0;
     let temp = absInterval;
 
-    while (temp < 1 && decimals < 10) {
+    while (temp % 1 !== 0 && decimals < 10) {
       temp *= 10;
       decimals += 1;
     }
