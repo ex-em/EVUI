@@ -1,0 +1,40 @@
+name: Relay GitHub Events To Message Server
+
+on:
+  pull_request:
+    types: [opened, reopened, ready_for_review, closed]
+  issue_comment:
+    types: [created]
+  pull_request_review:
+    types: [submitted]
+  pull_request_review_comment:
+    types: [created]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+  issues: read
+
+jobs:
+  relay:
+    runs-on: [self-hosted, linux, x64]
+    timeout-minutes: 3
+    steps:
+      - name: Relay raw event payload to internal github endpoint
+        shell: bash
+        env:
+          RELAY_URL: ${{ secrets.INTERNAL_MESSAGE_SERVER_GITHUB_WEBHOOK_URL }}
+          EVENT_ACTION: ${{ github.event.action || '' }}
+          DELIVERY_ID: ${{ github.run_id }}-${{ github.run_attempt }}-${{ github.job }}
+        run: |
+          set -euo pipefail
+
+          curl --fail --show-error --silent \
+            --retry 3 --retry-delay 2 --retry-connrefused \
+            -X POST "$RELAY_URL" \
+            -H "Content-Type: application/json" \
+            -H "X-GitHub-Event: ${GITHUB_EVENT_NAME}" \
+            -H "X-GitHub-Action: ${EVENT_ACTION}" \
+            -H "X-GitHub-Delivery: ${DELIVERY_ID}" \
+            --data-binary @"${GITHUB_EVENT_PATH}"
