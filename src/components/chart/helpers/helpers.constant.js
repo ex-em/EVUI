@@ -133,12 +133,7 @@ export const AXIS_OPTION = {
     padding: 0,
     fixWidth: undefined,
   },
-  lastLabelFontStyle: {
-    fontSize: 12,
-    color: '#808080',
-    fontFamily: 'Roboto',
-    fontWeight: 400,
-  },
+  lastLabelFontStyle: null,
   title: {
     use: false,
     text: null,
