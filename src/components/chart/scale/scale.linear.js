@@ -177,45 +177,49 @@ class LinearScale extends Scale {
   }
 
   /**
-   * graphRange와 step 수를 기반으로 필요한 소수점 자릿수를 계산
-   * @param {object} params
-   * @param {number} params.graphRange
-   * @param {number} params.numberOfSteps
-   * @returns {number} decimal places (0 이상)
+   * 주어진 축 interval을 정확히 표현하기 위해 필요한 최소 소수점 자릿수를 반환한다.
+   *
+   * decimalPoint: 'auto' 모드에서 사용되며,
+   * 반올림으로 값이 왜곡되지 않도록 JS 부동소수점 오차를 고려해 계산한다.
+   *
+   * 예: 0.25 → 2, 0.125 → 3, 2.5 → 1
+   *
+   * @param {number} interval - 축 눈금 간격
+   * @returns {number} 필요한 소수점 자릿수 (0 이상)
    */
-  getDecimalPointFromRange({ graphRange, numberOfSteps }) {
-    if (
-      !Number.isFinite(graphRange) ||
-      !Number.isFinite(numberOfSteps) ||
-      graphRange <= 0 ||
-      numberOfSteps <= 0
-    ) {
-      return 0;
-    }
-
-    const interval = graphRange / numberOfSteps;
-
+  getDecimalPointFromInterval(interval) {
     if (!Number.isFinite(interval) || interval === 0) {
       return 0;
     }
-
+  
     const absInterval = Math.abs(interval);
-
-    // 1 이상이면 소수점 불필요
-    if (absInterval >= 1) {
+    const MAX_DECIMALS = 10;
+    const EPSILON = 1e-10;
+  
+    const roundTo = (value, decimals = 0) => {
+      const factor = 10 ** decimals;
+      return Math.round((value + Number.EPSILON) * factor) / factor;
+    };
+  
+    const isRepresentableAtDecimals = (value, decimals) => {
+      const rounded = roundTo(value, decimals);
+      return Math.abs(value - rounded) < EPSILON;
+    };
+  
+    if (absInterval >= 1 && isRepresentableAtDecimals(absInterval, 0)) {
       return 0;
     }
-
-    // 소수점 자리 계산 (최대 10자리 제한)
-    let decimals = 0;
-    let temp = absInterval;
-
-    while (temp % 1 !== 0 && decimals < 10) {
-      temp *= 10;
-      decimals += 1;
+  
+    const rough =
+      absInterval >= 1 ? 0 : Math.max(0, Math.ceil(-Math.log10(absInterval)));
+  
+    for (let decimals = rough; decimals <= MAX_DECIMALS; decimals += 1) {
+      if (isRepresentableAtDecimals(absInterval, decimals)) {
+        return decimals;
+      }
     }
-
-    return decimals;
+  
+    return MAX_DECIMALS;
   }
 
   /**
@@ -251,10 +255,7 @@ class LinearScale extends Scale {
   
     const setDecimal = (graphRange, steps, interval) => {
       if (this.decimalPoint === 'auto') {
-        const decimalFromRange = this.getDecimalPointFromRange?.({
-          graphRange,
-          numberOfSteps: steps,
-        });
+        const decimalFromRange = this.getDecimalPointFromInterval(interval);
   
         if (
           decimalFromRange != null &&

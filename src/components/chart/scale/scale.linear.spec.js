@@ -53,68 +53,6 @@ describe('LinearScale', () => {
     });
   });
 
-  describe('getDecimalPointFromRange', () => {
-    it('정수 범위는 0을 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getDecimalPointFromRange({ graphRange: 100, numberOfSteps: 5 })).toBe(0);
-    });
-
-    it('소수점 범위의 자릿수를 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getDecimalPointFromRange({ graphRange: 1, numberOfSteps: 10 })).toBe(1);
-    });
-
-    it('매우 작은 범위의 자릿수를 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getDecimalPointFromRange({ graphRange: 0.01, numberOfSteps: 10 })).toBe(3);
-    });
-
-    it('numberOfSteps가 0이면 0을 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getDecimalPointFromRange({ graphRange: 100, numberOfSteps: 0 })).toBe(0);
-    });
-
-    it('graphRange가 0이면 0을 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getDecimalPointFromRange({ graphRange: 0, numberOfSteps: 5 })).toBe(0);
-    });
-
-    it('유효하지 않은 값(Infinity/NaN)이면 0을 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getDecimalPointFromRange({ graphRange: Infinity, numberOfSteps: 5 })).toBe(0);
-      expect(scale.getDecimalPointFromRange({ graphRange: 1, numberOfSteps: NaN })).toBe(0);
-    });
-
-    it('소수점 계산은 최대 10자리까지만 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getDecimalPointFromRange({ graphRange: 1e-15, numberOfSteps: 1 })).toBe(10);
-    });
-
-    // 버그 재현: graphRange=0.5, numberOfSteps=2 → interval=0.25 → 소수점 2자리여야 함
-    it('graphRange=0.5, numberOfSteps=2이면 2를 반환한다 (interval=0.25)', () => {
-      const scale = createScale();
-      expect(scale.getDecimalPointFromRange({ graphRange: 0.5, numberOfSteps: 2 })).toBe(2);
-    });
-
-    it('interval이 0.5이면 1을 반환한다', () => {
-      const scale = createScale();
-      // graphRange=1, numberOfSteps=2 → interval=0.5
-      expect(scale.getDecimalPointFromRange({ graphRange: 1, numberOfSteps: 2 })).toBe(1);
-    });
-
-    it('interval이 0.125이면 3을 반환한다', () => {
-      const scale = createScale();
-      // graphRange=0.5, numberOfSteps=4 → interval=0.125
-      expect(scale.getDecimalPointFromRange({ graphRange: 0.5, numberOfSteps: 4 })).toBe(3);
-    });
-
-    it('interval이 정확히 1이면 0을 반환한다', () => {
-      const scale = createScale();
-      // graphRange=5, numberOfSteps=5 → interval=1
-      expect(scale.getDecimalPointFromRange({ graphRange: 5, numberOfSteps: 5 })).toBe(0);
-    });
-  });
-
   describe('calculateSteps', () => {
     it('userRange + userInterval이 호환되면 그대로 사용한다', () => {
       const scale = createScale({
@@ -339,6 +277,159 @@ describe('LinearScale', () => {
       const scale = createScale();
       // 15 → exponent=1, normalized=1.5 → fraction=2 → 20
       expect(scale.getNiceInterval(15)).toBe(20);
+    });
+  });
+
+  describe('getDecimalFromInterval', () => {
+    describe('정수 interval', () => {
+      it('정수는 decimal 0을 반환한다', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+
+        expect(scale.getDecimalPointFromInterval(1)).toBe(0);
+        expect(scale.getDecimalPointFromInterval(10)).toBe(0);
+        expect(scale.getDecimalPointFromInterval(100)).toBe(0);
+      });
+    });
+  
+    describe('정확히 표현 가능한 소수 (2ⁿ 분모)', () => {
+      it('0.5 → 1', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.5)).toBe(1);
+      });
+  
+      it('0.25 → 2', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.25)).toBe(2);
+      });
+  
+      it('0.125 → 3', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.125)).toBe(3);
+      });
+  
+      it('2.5 → 1', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(2.5)).toBe(1);
+      });
+    });
+  
+    describe('부동소수점 표현 불가능 값', () => {
+      it('0.1 → 1', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.1)).toBe(1);
+      });
+  
+      it('0.2 → 1', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.2)).toBe(1);
+      });
+  
+      it('0.05 → 2', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.05)).toBe(2);
+      });
+  
+      it('0.01 → 2', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.01)).toBe(2);
+      });
+
+      it('0.25 interval은 2자리 decimal이 필요하다 (0.3 방지)', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.25)).toBe(2);
+      });
+
+      it('0.1 + 0.2 문제를 유발하는 interval', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.1)).toBe(1);
+      });
+    });
+  
+    describe('작은 값', () => {
+      it('0.001 → 3', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.001)).toBe(3);
+      });
+  
+      it('0.0001 → 4', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0.0001)).toBe(4);
+      });
+    });
+  
+    describe('큰 값 + 소수 간격', () => {
+      it('100.5 → 1', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(100.5)).toBe(1);
+      });
+  
+      it('100.25 → 2', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(100.25)).toBe(2);
+      });
+    });
+  
+    describe('음수 interval', () => {
+      it('부호는 무시하고 절댓값 기준으로 계산한다', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(-0.25)).toBe(2);
+        expect(scale.getDecimalPointFromInterval(-2.5)).toBe(1);
+      });
+    });
+  
+    describe('경계값 / 예외', () => {
+      it('0 → 0', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(0)).toBe(0);
+      });
+  
+      it('NaN → 0', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(NaN)).toBe(0);
+      });
+  
+      it('Infinity → 0', () => {
+        const scale = createScale({
+          decimalPoint: 'auto',
+        });
+        expect(scale.getDecimalPointFromInterval(Infinity)).toBe(0);
+      });
     });
   });
 });
