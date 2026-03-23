@@ -89,6 +89,30 @@ describe('LinearScale', () => {
       const scale = createScale();
       expect(scale.getDecimalPointFromRange({ graphRange: 1e-15, numberOfSteps: 1 })).toBe(10);
     });
+
+    // 버그 재현: graphRange=0.5, numberOfSteps=2 → interval=0.25 → 소수점 2자리여야 함
+    it('graphRange=0.5, numberOfSteps=2이면 2를 반환한다 (interval=0.25)', () => {
+      const scale = createScale();
+      expect(scale.getDecimalPointFromRange({ graphRange: 0.5, numberOfSteps: 2 })).toBe(2);
+    });
+
+    it('interval이 0.5이면 1을 반환한다', () => {
+      const scale = createScale();
+      // graphRange=1, numberOfSteps=2 → interval=0.5
+      expect(scale.getDecimalPointFromRange({ graphRange: 1, numberOfSteps: 2 })).toBe(1);
+    });
+
+    it('interval이 0.125이면 3을 반환한다', () => {
+      const scale = createScale();
+      // graphRange=0.5, numberOfSteps=4 → interval=0.125
+      expect(scale.getDecimalPointFromRange({ graphRange: 0.5, numberOfSteps: 4 })).toBe(3);
+    });
+
+    it('interval이 정확히 1이면 0을 반환한다', () => {
+      const scale = createScale();
+      // graphRange=5, numberOfSteps=5 → interval=1
+      expect(scale.getDecimalPointFromRange({ graphRange: 5, numberOfSteps: 5 })).toBe(0);
+    });
   });
 
   describe('calculateSteps', () => {
