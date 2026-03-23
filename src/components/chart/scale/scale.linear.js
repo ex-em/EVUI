@@ -253,15 +253,15 @@ class LinearScale extends Scale {
   
     const EPS = 1e-10;
   
-    const setDecimal = (graphRange, steps, interval) => {
+    const setDecimal = (interval) => {
       if (this.decimalPoint === 'auto') {
-        const decimalFromRange = this.getDecimalPointFromInterval(interval);
+        const decimalFromInterval = this.getDecimalPointFromInterval(interval);
   
         if (
-          decimalFromRange != null &&
-          !Number.isNaN(decimalFromRange)
+          decimalFromInterval != null &&
+          !Number.isNaN(decimalFromInterval)
         ) {
-          this.adjustedDecimalPoint = decimalFromRange;
+          this.adjustedDecimalPoint = decimalFromInterval;
         } else if (typeof this.getAutoDecimalPointFromInterval === 'function') {
           this.adjustedDecimalPoint =
             this.getAutoDecimalPointFromInterval(interval);
@@ -310,7 +310,7 @@ class LinearScale extends Scale {
   
       if (isCompatible || this.fixedSteps) {
         const steps = Math.round(rawSteps);
-        setDecimal(graphRange, steps, interval);
+        setDecimal(interval);
         return {
           steps,
           interval,
@@ -332,7 +332,7 @@ class LinearScale extends Scale {
       const steps = maxSteps;
       const interval = graphRange / steps;
   
-      setDecimal(graphRange, steps, interval);
+      setDecimal(interval);
   
       return {
         steps,
@@ -375,7 +375,7 @@ class LinearScale extends Scale {
         steps = safeSteps(graphRange, interval);
       }
   
-      setDecimal(graphRange, steps, interval);
+      setDecimal(interval);
   
       return {
         steps,
@@ -401,11 +401,7 @@ class LinearScale extends Scale {
       maxSteps,
     });
   
-    setDecimal(
-      nice.max - nice.min,
-      nice.steps,
-      nice.interval,
-    );
+    setDecimal(nice.interval);
   
     return {
       steps: nice.steps,
