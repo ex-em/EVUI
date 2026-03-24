@@ -1019,7 +1019,10 @@ const modules = {
     const mousePos = isHorizontal ? yp : xp;
 
     // 첫 번째 표시 중인 시리즈를 기준으로 라벨 위치 확인
-    const referenceSeries = sIds.find((sId) => this.seriesList[sId]?.show);
+    const referenceSeries = sIds.find((sId) => {
+      const series = this.seriesList[sId];
+      return series?.show && series?.data?.length > 0;
+    });
     if (!referenceSeries || !this.seriesList[referenceSeries]?.data) {
       return -1;
     }
