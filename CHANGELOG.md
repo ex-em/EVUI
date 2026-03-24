@@ -1,3 +1,14 @@
+## [3.5.3](https://github.com/ex-em/EVUI/compare/3.5.2...3.5.3) (2026-03-24)
+
+
+### Bug Fixes
+
+* **chart:** realTimeScatter autoScale 시 유효 시간 범위 밖 데이터 min/max 반영 문제 수정 ([d3bd463](https://github.com/ex-em/EVUI/commit/d3bd4631a3d65159b6477157823ee31df4c08928))
+* **chart:** realTimeScatter 데이터 초기화 시 Y축 NaN 표시 문제 수정 ([1a227ab](https://github.com/ex-em/EVUI/commit/1a227abc0429b2459c9d2dc0b02e55f79d0c6e32))
+* lastLabelStyle 기본값 제거. 사용자가 부여했을때만 적용되도록 함 ([9a4b13f](https://github.com/ex-em/EVUI/commit/9a4b13fef5db12b5f1e4451b698bb82da46e3716))
+* 데이터 있는 시리즈 찾도록 로직 수정 ([850b000](https://github.com/ex-em/EVUI/commit/850b000e66ecd7a342ec583c921fb5a6775597cd))
+* 주석 수정 ([94205cf](https://github.com/ex-em/EVUI/commit/94205cf75af47f814d3560e70df8caa63b0e4227))
+
 ## [3.5.2](https://github.com/ex-em/EVUI/compare/3.5.1...3.5.2) (2026-03-23)
 
 
