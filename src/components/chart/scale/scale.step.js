@@ -1,6 +1,5 @@
 import { defaultsDeep } from 'lodash-es';
 import { PLOT_BAND_OPTION, PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
-import { bnMinus, bnPlus } from '@/common/utils.bignumber';
 import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
@@ -295,37 +294,6 @@ class StepScale extends Scale {
             ctx.lineTo(offsetCounterPoint, linePosition);
             ctx.stroke();
             ctx.closePath();
-          }
-        }
-        ctx.stroke();
-      }
-
-      if (alignToGridLine && index >= this.labels.length) {
-        const cellInterval = bnMinus(+labels[1], +labels[0]);
-        const lastLabelValue = bnPlus(+labels[labels.length - 1], cellInterval);
-        if (
-          isNaN(lastLabelValue) ||
-          (indexInterval !== 1 &&
-            bnMinus(lastLabelValue, drawnLabels[drawnLabels.length - 1]) <= cellInterval)
-        ) {
-          return;
-        }
-
-        labelCenter = Math.round(startPoint + labelGap * labels.length);
-        linePosition = labelCenter + aliasPixel;
-
-        const lastLabelText = this.getLabelFormat(`${lastLabelValue}`, maxWidth);
-        if (this.type === 'x') {
-          ctx.fillText(this.checkFixWidth(lastLabelText), labelCenter, labelPoint);
-          if (this.showGrid) {
-            ctx.moveTo(linePosition, offsetPoint);
-            ctx.lineTo(linePosition, offsetCounterPoint);
-          }
-        } else {
-          ctx.fillText(this.checkFixWidth(lastLabelText), labelPoint, labelCenter);
-          if (this.showGrid) {
-            ctx.moveTo(offsetPoint, linePosition);
-            ctx.lineTo(offsetCounterPoint, linePosition);
           }
         }
         ctx.stroke();
