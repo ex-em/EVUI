@@ -1,6 +1,6 @@
 <template>
   <div class="case">
-    <div class="chart-wrapper">
+    <resizable-wrapper>
       <ev-chart
         ref="chart"
         v-model:selectedLabel="defaultSelectLabel"
@@ -8,15 +8,15 @@
         :options="chartOptions1"
         @click="onClick"
       />
-    </div>
-    <div class="chart-wrapper">
+    </resizable-wrapper>
+    <resizable-wrapper>
       <ev-chart
         v-model:selectedLabel="defaultSelectLabel"
-        :data="chartData2"
-        :options="chartOptions2"
-        @click="onClick"
-      />
-    </div>
+      :data="chartData2"
+      :options="chartOptions2"
+      @click="onClick"
+    />
+  </resizable-wrapper>
     <div class="description">
       <div class="options">
         <ev-toggle v-model="isShowScrollbar" />
@@ -371,6 +371,7 @@ export default {
       type: 'bar',
       thickness: 0.8,
       width: '100%',
+      height: '100%',
       horizontal: true,
       title: {
         show: false,
@@ -614,11 +615,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.chart-wrapper {
-  overflow: hidden;
-  resize: both;
-  border: 1px dashed #CCCCCC;
-}
 .options {
   display: grid;
   grid-template-columns: 1fr 2fr;
