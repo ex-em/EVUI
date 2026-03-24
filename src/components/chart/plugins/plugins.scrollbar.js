@@ -29,6 +29,8 @@ const module = {
       scrollbarOpt[key] = merged[key];
     });
 
+    delete scrollbarOpt.savedPosition;
+
     if (!scrollbarOpt.isInit) {
       scrollbarOpt.type = axisOpt?.[0]?.type;
       scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
@@ -81,14 +83,6 @@ const module = {
         }
       }
     }
-  },
-
-  /**
-   * update scrollbar information
-   */
-  updateScrollbar(updateData) {
-    this.updateScrollbarInfo('x', updateData);
-    this.updateScrollbarInfo('y', updateData);
   },
 
   /**
@@ -449,7 +443,6 @@ const module = {
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
-        updateByScrollbar: true,
         lightUpdate: minValue > 1,
       });
     }

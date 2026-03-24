@@ -1,10 +1,15 @@
 <template>
   <div class="case">
-    <ev-chart
-      v-model:selectedLabel="selectedLabel"
-      :data="chartData"
-      :options="chartOptions"
-    />
+    <div
+      class="chart-wrapper"
+      :style="{ width: chartWidth, height: chartHeight }"
+    >
+      <ev-chart
+        v-model:selectedLabel="selectedLabel"
+        :data="chartData"
+        :options="chartOptions"
+      />
+    </div>
     <div class="description">
       <div class="option">
         <span>scrollbar 사용</span>
@@ -49,6 +54,14 @@
           :min="yMin + 1"
           :max="LABEL_Y_COUNT - 1"
         />
+      </div>
+      <div class="option">
+        <span>차트 크기 조절 (resize 테스트)</span>
+      </div>
+      <div class="option">
+        <ev-button @click="setChartSize('100%', '300px')">작게</ev-button>
+        <ev-button @click="setChartSize('100%', '500px')">기본</ev-button>
+        <ev-button @click="setChartSize('60%', '400px')">좁게</ev-button>
       </div>
       <label class="badge yellow"> v-model:selectedLabel</label>
       <span>{{ selectedLabel }}</span>
@@ -230,6 +243,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.chart-wrapper {
+  overflow: hidden;
+  resize: both;
+  border: 1px dashed #CCCCCC;
+}
 .description {
   position: relative;
 
