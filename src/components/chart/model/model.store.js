@@ -240,13 +240,23 @@ const modules = {
         }
       }
 
-      // 12) series min/max 계산
+      // 12) series min/max 계산 (fromTime ~ toTime 범위 내 데이터만 포함)
+      const MS_PER_SECOND = 1000;
       const tempMinMax = { maxY: 0, minY: Infinity };
 
       for (let i = 0; i < length; i++) {
         const g = dataGroup[i];
-        if (g.max > tempMinMax.maxY) tempMinMax.maxY = g.max;
-        if (g.min < tempMinMax.minY) tempMinMax.minY = g.min;
+        for (let j = 0; j < g.data.length; j++) {
+          const point = g.data[j];
+          // point.x(ms)를 초 단위로 내림하여 슬롯 기준 시간(fromTime/toTime)과 비교 가능하게 맞춤
+          const pointTimeInSeconds = Math.floor(point.x / MS_PER_SECOND) * MS_PER_SECOND;
+          const isInTimeRange = pointTimeInSeconds >= dataset.fromTime
+            && pointTimeInSeconds <= dataset.toTime;
+          if (isInTimeRange && Number.isFinite(point.y)) {
+            if (point.y > tempMinMax.maxY) tempMinMax.maxY = point.y;
+            if (point.y < tempMinMax.minY) tempMinMax.minY = point.y;
+          }
+        }
       }
 
       minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
