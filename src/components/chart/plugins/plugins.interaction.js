@@ -1018,7 +1018,7 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const mousePos = isHorizontal ? yp : xp;
 
-    // 첫 번째 표시 중인 시리즈를 기준으로 라벨 위치 확인
+    // 데이터 있는 시리즈를 기준으로 라벨 위치 확인
     const referenceSeries = sIds.find((sId) => {
       const series = this.seriesList[sId];
       return series?.show && series?.data?.length > 0;
