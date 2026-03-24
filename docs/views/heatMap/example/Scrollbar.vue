@@ -1,9 +1,6 @@
 <template>
   <div class="case">
-    <div
-      class="chart-wrapper"
-      :style="{ width: chartWidth, height: chartHeight }"
-    >
+    <div class="chart-wrapper">
       <ev-chart
         v-model:selectedLabel="selectedLabel"
         :data="chartData"
