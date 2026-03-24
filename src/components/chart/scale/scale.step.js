@@ -12,24 +12,34 @@ class StepScale extends Scale {
   }
 
   /**
-   * get max width from labelStyle
-   * maxWidth : number | string
+   * Resolve maxWidth from labelStyle.
+   * When not explicitly configured, keep using the per-label available width.
    * @param {object} chartRect chart size information
+   * @param {number} defaultMaxWidth fallback max width
    * @returns {number} max width
    */
-  getMaxWidth(chartRect) {
-    let maxWidth = this.labelStyle?.maxWidth ?? chartRect.chartWidth * 0.5;
+  getMaxWidth(chartRect, defaultMaxWidth) {
+    const configuredMaxWidth = this.labelStyle?.maxWidth;
 
-    if (typeof this.labelStyle?.maxWidth === 'string') {
-      if (this.labelStyle?.maxWidth.includes('%')) {
-        maxWidth =
-          chartRect.chartWidth * (parseInt(this.labelStyle?.maxWidth.replace('%', '')) / 100);
-      } else {
-        maxWidth = parseInt(this.labelStyle?.maxWidth);
-      }
+    if (configuredMaxWidth == null) {
+      return defaultMaxWidth;
     }
 
-    return maxWidth;
+    if (typeof configuredMaxWidth === 'string') {
+      const trimmedMaxWidth = configuredMaxWidth.trim();
+
+      if (trimmedMaxWidth.includes('%')) {
+        const percent = Number.parseFloat(trimmedMaxWidth.replace('%', ''));
+        return Number.isNaN(percent)
+          ? defaultMaxWidth
+          : chartRect.chartWidth * (percent / 100);
+      }
+
+      const parsedMaxWidth = Number.parseFloat(trimmedMaxWidth);
+      return Number.isNaN(parsedMaxWidth) ? defaultMaxWidth : parsedMaxWidth;
+    }
+
+    return configuredMaxWidth;
   }
 
   /**
@@ -47,6 +57,7 @@ class StepScale extends Scale {
 
     let minIndex = 0;
     let maxIndex = this.labels.length - 1;
+    let labelCount = this.labels.length;
 
     const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
     if (Array.isArray(range) && range?.length) {
@@ -56,6 +67,7 @@ class StepScale extends Scale {
         maxIndex = max > maxIndex ? maxIndex : max;
         maxValue = this.labels[maxIndex];
         minValue = this.labels[minIndex];
+        labelCount = maxIndex - minIndex + 1;
       }
     } else if (typeof range === 'function') {
       const [min, max] = range(minValue, maxValue);
@@ -63,9 +75,10 @@ class StepScale extends Scale {
       maxIndex = max > maxIndex ? maxIndex : max;
       maxValue = this.labels[maxIndex];
       minValue = this.labels[minIndex];
+      labelCount = maxIndex - minIndex + 1;
     }
 
-    const maxWidth = this.getMaxWidth(chartRect);
+    const maxWidth = this.getMaxWidth(chartRect, chartRect.chartWidth / (labelCount + 2));
 
     return {
       min: minValue,
@@ -147,7 +160,7 @@ class StepScale extends Scale {
     const endPoint = aPos[this.units.rectEnd];
     const offsetPoint = aPos[this.units.rectOffset(this.position)];
     const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
-    const maxWidth = this.getMaxWidth(chartRect);
+    const maxWidth = this.getMaxWidth(chartRect, chartRect.chartWidth / (steps + 2));
 
     const AXIS_TICK_LENGTH = 5;
 
@@ -432,10 +445,7 @@ class StepScale extends Scale {
     ctx.font = Util.getLabelStyle(this.labelStyle);
     const dir = this.labelStyle.fitDir;
 
-    const result = Util.truncateLabelWithEllipsis(value, maxWidth, ctx, dir);
-    ctx.restore();
-
-    return result;
+    return Util.truncateLabelWithEllipsis(value, maxWidth, ctx, dir);
   }
 
   /**
@@ -448,7 +458,8 @@ class StepScale extends Scale {
   getLabelWidthHasMaxLength(notFormattedLabels, chartRect) {
     // fontSize를 포함한 labelStyle 가져오기
     const labelStyle = Util.getLabelStyle(this.labelStyle);
-    const maxWidth = this.getMaxWidth(chartRect);
+    const labelCount = notFormattedLabels?.length ?? 0;
+    const maxWidth = this.getMaxWidth(chartRect, chartRect?.chartWidth / (labelCount + 2));
 
     return (notFormattedLabels ?? []).reduce((max, label) => {
       // ellipsis가 적용된 label의 width를 계산
