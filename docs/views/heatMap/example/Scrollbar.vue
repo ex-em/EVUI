@@ -52,14 +52,6 @@
           :max="LABEL_Y_COUNT - 1"
         />
       </div>
-      <div class="option">
-        <span>차트 크기 조절 (resize 테스트)</span>
-      </div>
-      <div class="option">
-        <ev-button @click="setChartSize('100%', '300px')">작게</ev-button>
-        <ev-button @click="setChartSize('100%', '500px')">기본</ev-button>
-        <ev-button @click="setChartSize('60%', '400px')">좁게</ev-button>
-      </div>
       <label class="badge yellow"> v-model:selectedLabel</label>
       <span>{{ selectedLabel }}</span>
     </div>
