@@ -259,10 +259,18 @@ const modules = {
         }
       }
 
-      minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
-      minMaxValues.minY = Math.min(minMaxValues.minY, tempMinMax.minY);
+      const hasValidData = Number.isFinite(tempMinMax.minY);
+      if (hasValidData) {
+        minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
+        minMaxValues.minY = Math.min(minMaxValues.minY, tempMinMax.minY);
+      }
       minMaxValues.fromTime = dataset.fromTime;
       minMaxValues.toTime = dataset.toTime;
+    }
+
+    if (!Number.isFinite(minMaxValues.minY)) {
+      minMaxValues.minY = 0;
+      minMaxValues.maxY = 1;
     }
 
     this.seriesInfo.charts.scatter.forEach((seriesID) => {
