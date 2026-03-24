@@ -1,9 +1,6 @@
 <template>
   <div class="case">
-    <div
-      class="chart-wrapper"
-      :style="{ width: chartWidth, height: chartHeight }"
-    >
+    <div class="chart-wrapper">
       <ev-chart
         ref="chart"
         v-model:selectedLabel="defaultSelectLabel"
@@ -12,10 +9,7 @@
         @click="onClick"
       />
     </div>
-    <div
-      class="chart-wrapper"
-      :style="{ width: chartWidth, height: chartHeight }"
-    >
+    <div class="chart-wrapper">
       <ev-chart
         v-model:selectedLabel="defaultSelectLabel"
         :data="chartData2"
