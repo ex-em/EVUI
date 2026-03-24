@@ -1,12 +1,12 @@
 <template>
   <div class="case">
-    <div class="chart-wrapper">
+    <resizable-wrapper>
       <ev-chart
         v-model:selectedLabel="selectedLabel"
         :data="chartData"
         :options="chartOptions"
       />
-    </div>
+    </resizable-wrapper>
     <div class="description">
       <div class="option">
         <span>scrollbar 사용</span>
@@ -107,7 +107,7 @@ export default {
     const chartOptions = reactive({
       type: 'heatMap',
       width: '100%',
-      height: '300px',
+      height: '100%',
       title: {
         text: 'Chart Title',
         show: true,
@@ -240,11 +240,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.chart-wrapper {
-  overflow: hidden;
-  resize: both;
-  border: 1px dashed #CCCCCC;
-}
 .description {
   position: relative;
 
