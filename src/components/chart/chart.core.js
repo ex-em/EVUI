@@ -892,6 +892,8 @@ class EvChart {
       return;
     }
 
+    this.updateScrollbar(updateData);
+
     this.resetProps();
 
     this.updateSeries = updateSeries;
@@ -1000,8 +1002,6 @@ class EvChart {
     this.axesY = this.createAxes('y', options.axesY);
 
     this.initDefaultSelectInfo();
-
-    this.updateScrollbar(updateData);
 
     let renderHitInfo = updateInfo?.hitInfo;
     if (!renderHitInfo?.legend && this.legendHover?.sId) {
