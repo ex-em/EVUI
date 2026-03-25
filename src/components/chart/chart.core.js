@@ -862,11 +862,11 @@ class EvChart {
     const xUse = this.options.axesX?.[0]?.scrollbar?.use;
     const yUse = this.options.axesY?.[0]?.scrollbar?.use;
 
-    if (xUse !== this.scrollbar?.x?.use || xUse || isForceUpdate) {
+    if (xUse !== this.scrollbar?.x?.use || xUse || (isForceUpdate && xUse)) {
       this.updateScrollbarInfo('x', updateData);
     }
 
-    if (yUse !== this.scrollbar?.y?.use || yUse || isForceUpdate) {
+    if (yUse !== this.scrollbar?.y?.use || yUse || (isForceUpdate && yUse)) {
       this.updateScrollbarInfo('y', updateData);
     }
   }

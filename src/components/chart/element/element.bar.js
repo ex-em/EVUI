@@ -289,13 +289,18 @@ class Bar {
    */
   findGraphData(offset, isHorizontal, dataIndex, useIndicatorOnLabel) {
     if (typeof dataIndex === 'number' && this.show && useIndicatorOnLabel) {
-      const gdata = this.data;
+      const barData = this.data;
       const item = { data: null, hit: false, color: this.color };
 
-      if (gdata[dataIndex]) {
-        item.data = gdata[dataIndex];
-        item.index = dataIndex;
-        item.hit = this.isPointInBar(offset, gdata[dataIndex]);
+      // dataIndex를 현재 화면에 보이는 범위로 clamp하여 stale xp/yp 참조 방지
+      const visStart = this.visibleStartIndex ?? 0;
+      const visEnd = visStart + (this.filteredCount ?? barData.length) - 1;
+      const clampedIndex = Math.max(visStart, Math.min(dataIndex, visEnd));
+
+      if (barData[clampedIndex]) {
+        item.data = barData[clampedIndex];
+        item.index = clampedIndex;
+        item.hit = this.isPointInBar(offset, barData[clampedIndex]);
       }
 
       return item;

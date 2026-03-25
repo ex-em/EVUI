@@ -30,6 +30,7 @@ const module = {
     });
 
     if (scrollbarOpt.resetPosition) {
+      scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
       delete scrollbarOpt.savedPositionRatio;
       delete scrollbarOpt.savedAtStart;
       delete scrollbarOpt.savedAtEnd;
@@ -115,11 +116,13 @@ const module = {
       if (isUpdateAxesRange) {
         this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
       }
-      if (isResetPosition) {
+
+      if (isResetPosition || updateData) {
         delete this.scrollbar[dir].savedPositionRatio;
         delete this.scrollbar[dir].savedAtStart;
         delete this.scrollbar[dir].savedAtEnd;
       }
+
       this.initScrollbarRange(dir);
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
@@ -343,7 +346,6 @@ const module = {
    * get scrollbar thumb size
    * @param dir axis direction ('x' | 'y')
    * @param trackSize scrollbar track size
-   * @param savedThumbPosition 기존 위치를 보존해야 하는 경우 저장된 위치
    */
   getScrollbarThumbSize(dir, trackSize) {
     const scrollbarOpt = this.scrollbar[dir];
