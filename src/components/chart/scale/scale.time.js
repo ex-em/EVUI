@@ -91,7 +91,7 @@ class TimeScale extends Scale {
       const isCompatible =
         Math.abs(rawSteps - Math.round(rawSteps)) < EPS;
   
-      if (isCompatible && this.fixedSteps) {
+      if ((isCompatible && rawSteps <= maxSteps) || this.fixedSteps) {
         const steps = Math.round(rawSteps);
         return {
           steps,
@@ -108,7 +108,7 @@ class TimeScale extends Scale {
      * interval을 시작값으로 사용하고,
      * steps가 maxSteps를 넘으면 interval을 배수로 증가
      */
-    if (isValidInterval) {
+    if (!hasUserRange && isValidInterval) {
       const graphRange = graphMax - graphMin;
       let interval = resolvedInterval;
       let steps = Math.ceil(graphRange / interval);
@@ -118,6 +118,7 @@ class TimeScale extends Scale {
         steps = Math.ceil(graphRange / interval);
       }
   
+      // interval을 유지하기 위해 graphMax 확장
       graphMax = graphMin + (interval * steps);
   
       return {
