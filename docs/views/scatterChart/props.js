@@ -12,8 +12,6 @@ import DisplayOverflow from './example/DisplayOverflow';
 import DisplayOverflowRaw from '!!raw-loader!./example/DisplayOverflow';
 import RealTimeScatter from './example/RealTimeScatter';
 import RealTimeScatterRaw from '!!raw-loader!./example/RealTimeScatter';
-import TimeAxis from './example/TimeAxis';
-import TimeAxisRaw from '!!raw-loader!./example/TimeAxis';
 
 export default {
   mdText,
@@ -42,11 +40,6 @@ export default {
       description: '축의 max값보다 큰 값을 표시할지의 여부를 결정합니다.',
       component: DisplayOverflow,
       parsedData: parseComponent(DisplayOverflowRaw),
-    },
-    'Time Axis': {
-      description: 'Time Axis를 표시합니다. range, interval 옵션을 사용하여 축의 범위와 간격을 지정할 수 있습니다.',
-      component: TimeAxis,
-      parsedData: parseComponent(TimeAxisRaw),
     },
     RealTimeScatter: {
       description: '실시간으로 대량의 데이터를 처리합니다.',
