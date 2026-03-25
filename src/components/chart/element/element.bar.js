@@ -115,13 +115,12 @@ class Bar {
     const startIndex = truthyNumber(minIndex) ? minIndex : 0;
     const endIndex = truthyNumber(maxIndex) ? maxIndex : this.data.length - 1;
 
-    // 스크롤 범위 내에서만 루프 돌림
-    for (let i = startIndex; i <= endIndex; i++) {
-      const screenIndex = i - startIndex; // 현재 화면상의 위치 인덱스
-      const item = this.data[i]; // 실제 데이터 인덱스에 해당하는 항목
-      if (item) {
-        // 스크롤 offset(minIndex)만큼 보정해서 그리기
+    this.visibleStartIndex = startIndex;
 
+    for (let i = startIndex; i <= endIndex; i++) {
+      const screenIndex = i - startIndex;
+      const item = this.data[i];
+      if (item) {
         const categoryPoint = isHorizontal
           ? ysp - (cArea * screenIndex) - cPad
           : xsp + (cArea * screenIndex) + cPad;
@@ -214,11 +213,7 @@ class Bar {
         item.yp = y; // eslint-disable-line
         item.w = w; // eslint-disable-line
         item.h = isHorizontal ? -h : h; // eslint-disable-line
-        item.index = i; // 실제 데이터 인덱스 (스크롤 offset 포함)
-
-        // 검색(hitInfo) 로직은 this.data[0..filteredCount-1] 범위만 검사하므로,
-        // 현재 화면에 그린 항목을 배열 앞쪽으로 매핑해준다.
-        this.data[screenIndex] = item;
+        item.index = i;
       }
     }
   }
@@ -326,10 +321,11 @@ class Bar {
     const [xp, yp] = offset;
     const item = { data: null, hit: false, color: this.color };
     const gdata = this.data;
+    const startIdx = this.visibleStartIndex ?? 0;
     const totalCount = this.filteredCount ?? gdata.length;
 
-    let s = 0;
-    let e = totalCount - 1;
+    let s = startIdx;
+    let e = startIdx + totalCount - 1;
 
     while (s <= e) {
       const m = Math.floor((s + e) / 2);
