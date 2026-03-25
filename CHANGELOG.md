@@ -1,3 +1,10 @@
+## [3.5.4](https://github.com/ex-em/EVUI/compare/3.5.3...3.5.4) (2026-03-25)
+
+
+### Bug Fixes
+
+* maxWidth 값이 없을 경우, 라벨끼리 겹치는 현상 수정 ([e85a304](https://github.com/ex-em/EVUI/commit/e85a304202e4817e71f85a0d2937cc2da72573b1))
+
 ## [3.5.3](https://github.com/ex-em/EVUI/compare/3.5.2...3.5.3) (2026-03-24)
 
 
