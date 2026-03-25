@@ -1,36 +1,68 @@
 <template>
   <div class="case">
     <resizable-wrapper>
-      <ev-chart v-model:selectedLabel="selectedLabel" :data="chartData" :options="chartOptions" />
+      <ev-chart
+        v-model:selectedLabel="selectedLabel"
+        :data="chartData"
+        :options="chartOptions"
+      />
     </resizable-wrapper>
-  </div>
-  <div class="description">
-    <div class="option">
-      <span>scrollbar 사용</span>
-      <ev-toggle v-model="useScrollbar" />
+    <div class="description">
+      <div class="option">
+        <span>scrollbar 사용</span>
+        <ev-toggle v-model="useScrollbar" />
+      </div>
+      <div class="option">
+        <span>x축 range 설정</span>
+        <ev-toggle v-model="useRangeX" />
+      </div>
+      <div class="option">
+        <span>min</span>
+        <ev-input-number
+          v-model="xMin"
+          :step="xInterval"
+          :min="minDate"
+          :max="xMax - xInterval"
+        />
+        <span>max</span>
+        <ev-input-number
+          v-model="xMax"
+          :step="xInterval"
+          :min="xMin + xInterval"
+          :max="maxDate"
+        />
+      </div>
+      <div class="option">
+        <span>y축 range 설정</span>
+        <ev-toggle v-model="useRangeY" />
+      </div>
+      <div class="option">
+        <span>min</span>
+        <ev-input-number
+          v-model="yMin"
+          :step="1"
+          :min="0"
+          :max="yMax - 1"
+        />
+        <span>max</span>
+        <ev-input-number
+          v-model="yMax"
+          :step="1"
+          :min="yMin + 1"
+          :max="LABEL_Y_COUNT - 1"
+        />
+      </div>
+      <div class="option">
+        <span>차트 크기 조절 (resize 테스트)</span>
+      </div>
+      <div class="option">
+        <ev-button @click="setChartSize('100%', '300px')">작게</ev-button>
+        <ev-button @click="setChartSize('100%', '500px')">기본</ev-button>
+        <ev-button @click="setChartSize('60%', '400px')">좁게</ev-button>
+      </div>
+      <label class="badge yellow"> v-model:selectedLabel</label>
+      <span>{{ selectedLabel }}</span>
     </div>
-    <div class="option">
-      <span>x축 range 설정</span>
-      <ev-toggle v-model="useRangeX" />
-    </div>
-    <div class="option">
-      <span>min</span>
-      <ev-input-number v-model="xMin" :step="xInterval" :min="minDate" :max="xMax - xInterval" />
-      <span>max</span>
-      <ev-input-number v-model="xMax" :step="xInterval" :min="xMin + xInterval" :max="maxDate" />
-    </div>
-    <div class="option">
-      <span>y축 range 설정</span>
-      <ev-toggle v-model="useRangeY" />
-    </div>
-    <div class="option">
-      <span>min</span>
-      <ev-input-number v-model="yMin" :step="1" :min="0" :max="yMax - 1" />
-      <span>max</span>
-      <ev-input-number v-model="yMax" :step="1" :min="yMin + 1" :max="LABEL_Y_COUNT - 1" />
-    </div>
-    <label class="badge yellow"> v-model:selectedLabel</label>
-    <span>{{ selectedLabel }}</span>
   </div>
 </template>
 
@@ -75,7 +107,7 @@ export default {
     const chartOptions = reactive({
       type: 'heatMap',
       width: '100%',
-      height: '100%',
+      height: '300px',
       title: {
         text: 'Chart Title',
         show: true,
@@ -83,41 +115,37 @@ export default {
       indicator: {
         use: true,
       },
-      axesX: [
-        {
-          type: 'time',
-          showGrid: false,
-          categoryMode: true,
-          range: xRange,
-          scrollbar: {
-            use: useScrollbar,
-            showButton: true,
-            background: '#E0E1DD',
-            thumbStyle: {
-              background: '#415A77',
-              radius: 2,
-            },
-          },
-          timeFormat: 'MMM.DD',
-          interval: 'day',
-        },
-      ],
-      axesY: [
-        {
-          type: 'step',
-          showGrid: false,
-          range: yRange,
-          scrollbar: {
-            use: useScrollbar,
-            showButton: false,
-            background: '#E0E1DD',
-            thumbStyle: {
-              background: '#415A77',
-              radius: 2,
-            },
+      axesX: [{
+        type: 'time',
+        showGrid: false,
+        categoryMode: true,
+        range: xRange,
+        scrollbar: {
+          use: useScrollbar,
+          showButton: true,
+          background: '#E0E1DD',
+          thumbStyle: {
+            background: '#415A77',
+            radius: 2,
           },
         },
-      ],
+        timeFormat: 'MMM.DD',
+        interval: 'day',
+      }],
+      axesY: [{
+        type: 'step',
+        showGrid: false,
+        range: yRange,
+        scrollbar: {
+          use: useScrollbar,
+          showButton: false,
+          background: '#E0E1DD',
+          thumbStyle: {
+            background: '#415A77',
+            radius: 2,
+          },
+        },
+      }],
       heatMapColor: {
         colorsByRange: [
           { color: '#D9ED92', label: '-30 ℃' },
@@ -185,8 +213,8 @@ export default {
       dataIndex: [],
     });
 
-    onMounted(async () => {
-      await nextTick();
+    onMounted(() => {
+      nextTick();
       createChartLegend();
       createChartData();
     });
@@ -213,6 +241,8 @@ export default {
 
 <style lang="scss" scoped>
 .description {
+  position: relative;
+
   .option {
     display: flex;
     gap: 10px;
