@@ -179,6 +179,14 @@ export default {
         const isUpdateTooltip =
           newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
 
+        const prevAxesX = evChart.options?.axesX;
+        const prevAxesY = evChart.options?.axesY;
+        const isUpdateScrollbar =
+          !isEqual(newOpt.axesX?.[0]?.range, prevAxesX?.[0]?.range) ||
+          !isEqual(newOpt.axesX?.[0]?.scrollbar, prevAxesX?.[0]?.scrollbar) ||
+          !isEqual(newOpt.axesY?.[0]?.range, prevAxesY?.[0]?.range) ||
+          !isEqual(newOpt.axesY?.[0]?.scrollbar, prevAxesY?.[0]?.scrollbar);
+
         evChart.options = cloneDeep(newOpt);
 
         evChart.update({
@@ -186,6 +194,7 @@ export default {
           updateSelTip: { update: false, keepDomain: false },
           updateLegend: isUpdateLegendType,
           updateTooltip: isUpdateTooltip,
+          updateByScrollbar: isUpdateScrollbar,
         });
 
         if (newOpt.legend.show && newOpt.legend.external && !prevLegendShow) {
