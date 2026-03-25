@@ -308,7 +308,7 @@ class LinearScale extends Scale {
       const isCompatible =
         Math.abs(rawSteps - Math.round(rawSteps)) < EPS;
   
-      if (isCompatible || this.fixedSteps) {
+      if ((isCompatible && rawSteps <= maxSteps) || this.fixedSteps) {
         const steps = Math.round(rawSteps);
         setDecimal(interval);
         return {
