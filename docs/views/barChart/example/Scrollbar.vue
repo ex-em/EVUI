@@ -1,83 +1,92 @@
 <template>
   <div class="case">
-    <ev-chart
-      ref="chart"
-      v-model:selectedLabel="defaultSelectLabel"
-      :data="chartData1"
-      :options="chartOptions1"
-      @click="onClick"
-    />
-    <ev-chart
-      v-model:selectedLabel="defaultSelectLabel"
+    <resizable-wrapper>
+      <ev-chart
+        ref="chart"
+        v-model:selectedLabel="defaultSelectLabel"
+        :data="chartData1"
+        :options="chartOptions1"
+        @click="onClick"
+      />
+    </resizable-wrapper>
+    <resizable-wrapper>
+      <ev-chart
+        v-model:selectedLabel="defaultSelectLabel"
       :data="chartData2"
       :options="chartOptions2"
       @click="onClick"
     />
-    <div class="options description">
-      <ev-toggle v-model="isResetPosition" />
-      <span>
-        스크롤위치 초기화여부
-      </span>
+  </resizable-wrapper>
+    <div class="description">
+      <div class="options">
+        <ev-toggle v-model="isShowScrollbar" />
+        <span>
+          스크롤바 표시 여부
+        </span>
 
-      <ev-toggle v-model="isFixedPosTop" />
-      <span class="left">
-        tip 위치를 최상단에 고정
-      </span>
+        <ev-toggle v-model="isResetPosition" />
+        <span>
+          스크롤위치 초기화여부
+        </span>
 
-      <ev-button @click="toggleSelectData">
-        <span>select by v-model</span>
-      </ev-button>
-      <span class="left">
-        차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을
-        변경해서 라벨 선택
-      </span>
-      <ev-button @click="updateData">
-        Update Data
-      </ev-button>
-      <span>
-        데이터 업데이트
-      </span>
+        <ev-toggle v-model="isFixedPosTop" />
+        <span class="left">
+          tip 위치를 최상단에 고정
+        </span>
 
-      <ev-button @click="updateDataWithDynamicRange">
-        Update Data With Dynamic Range
-      </ev-button>
-      <span>
-        데이터 업데이트
-      </span>
+        <ev-button @click="toggleSelectData">
+          <span>select by v-model</span>
+        </ev-button>
+        <span class="left">
+          차트 클릭이 아닌 v-model:selectedLabel 에 바인딩한 dataIndex 배열을
+          변경해서 라벨 선택
+        </span>
+        <ev-button @click="updateData">
+          Update Data
+        </ev-button>
+        <span>
+          데이터 업데이트
+        </span>
 
-      <!-- options의 range를 직접 바꿔서 스크롤/데이터 동기화 테스트용 버튼 -->
-      <ev-button @click="setRangeToFirstHalf">
-        <span>range: 앞 절반</span>
-      </ev-button>
-      <span>
-        데이터 업데이트
-      </span>
-      <ev-button @click="setRangeToLastHalf">
-        <span>range: 뒤 절반</span>
-      </ev-button>
-      <span>
-        데이터 업데이트
-      </span>
-      <span class="left">
+        <ev-button @click="updateDataWithDynamicRange">
+          Update Data With Dynamic Range
+        </ev-button>
+        <span>
+          데이터 업데이트
+        </span>
+
+        <!-- options의 range를 직접 바꿔서 스크롤/데이터 동기화 테스트용 버튼 -->
+        <ev-button @click="setRangeToFirstHalf">
+          <span>range: 앞 절반</span>
+        </ev-button>
+        <span>
+          데이터 업데이트
+        </span>
+        <ev-button @click="setRangeToLastHalf">
+          <span>range: 뒤 절반</span>
+        </ev-button>
+        <span>
+          데이터 업데이트
+        </span>
+      </div>
+      <h3>
         options의 range를 직접 바꿔서 스크롤/데이터 동기화 테스트
-      </span>
-
+      </h3>
+      <div class="options">
       <!-- 10개 → 7개 테스트 버튼들 -->
-      <ev-button @click="setDataToTen">
-        <span>데이터 10개로 설정</span>
-      </ev-button>
-      <span>
-        테스트용 데이터 10개 생성
-      </span>
-      <ev-button @click="setDataToSeven">
-        <span>데이터 7개로 줄이기</span>
-      </ev-button>
-      <span>
-        데이터를 7개로 줄여서 스크롤바 나가는 문제 재현
-      </span>
-
-      <div />
-
+        <ev-button @click="setDataToTen">
+          <span>데이터 10개로 설정</span>
+        </ev-button>
+        <span>
+          테스트용 데이터 10개 생성
+        </span>
+        <ev-button @click="setDataToSeven">
+          <span>데이터 7개로 줄이기</span>
+        </ev-button>
+        <span>
+          데이터를 7개로 줄여서 스크롤바 나가는 문제 재현
+        </span>
+      </div>
       <div class="badge yellow">
         v-model:selectedLabel
       </div>
@@ -123,6 +132,8 @@ export default {
     const isFixedPosTop = ref(false);
 
     const isResetPosition = ref(false);
+
+    const isShowScrollbar = ref(true);
 
     const chartData1 = shallowRef({
       series: {
@@ -296,6 +307,7 @@ export default {
       type: 'bar',
       thickness: 0.8,
       width: '100%',
+      height: '100%',
       horizontal: false,
       title: {
         show: false,
@@ -315,7 +327,7 @@ export default {
           },
           range: RANGE,
           scrollbar: {
-            use: true,
+            use: isShowScrollbar,
             showButton: true,
             resetPosition: isResetPosition,
           },
@@ -359,6 +371,7 @@ export default {
       type: 'bar',
       thickness: 0.8,
       width: '100%',
+      height: '100%',
       horizontal: true,
       title: {
         show: false,
@@ -378,7 +391,7 @@ export default {
           },
           range: RANGE,
           scrollbar: {
-            use: true,
+            use: isShowScrollbar,
             showButton: true,
             resetPosition: isResetPosition,
           },
@@ -579,6 +592,7 @@ export default {
       chart,
       chartData1,
       chartData2,
+      isShowScrollbar,
       isFixedPosTop,
       isResetPosition,
       chartOptions1,
@@ -605,5 +619,8 @@ export default {
   display: grid;
   grid-template-columns: 1fr 2fr;
   gap: 10px;
+}
+h3 {
+  margin-top: 20px;
 }
 </style>

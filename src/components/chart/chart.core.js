@@ -127,6 +127,10 @@ class EvChart {
     this.axesX = this.createAxes('x', axesX);
     this.axesY = this.createAxes('y', axesY);
 
+    if (axesX?.[0]?.scrollbar?.use || axesY?.[0]?.scrollbar?.use) {
+      this.initScrollbar();
+    }
+
     this.initDefaultSelectInfo();
 
     this.drawChart();
@@ -160,10 +164,6 @@ class EvChart {
       }
 
       this.setLegendPosition();
-    }
-
-    if (opt.axesX?.[0]?.scrollbar?.use || opt.axesY?.[0]?.scrollbar?.use) {
-      this.initScrollbar();
     }
 
     this.chartRect = this.getChartRect();
@@ -277,7 +277,6 @@ class EvChart {
     this.drawSeries(hitInfo);
 
     if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
-      this.initScrollbar();
       this.updateScrollbarPosition();
     }
 
@@ -853,6 +852,21 @@ class EvChart {
   }
 
   /**
+   * Update scrollbar information
+   * @param {boolean} updateData is update data
+   * @returns {undefined}
+   */
+  updateScrollbar(updateData) {
+    if (this.scrollbar?.x?.isInit || this.options.axesX?.[0]?.scrollbar?.use) {
+      this.updateScrollbarInfo('x', updateData);
+    }
+
+    if (this.scrollbar?.y?.isInit || this.options.axesY?.[0]?.scrollbar?.use) {
+      this.updateScrollbarInfo('y', updateData);
+    }
+  }
+
+  /**
    * To re-render chart, reset properties, canvas and then render chart.
    * @param {object} updateInfo   information for each components are needed to update
    *
@@ -871,7 +885,6 @@ class EvChart {
       updateLegend,
       updateData,
       updateTooltip,
-      updateByScrollbar,
       lightUpdate,
     } = updateInfo;
 
@@ -879,9 +892,7 @@ class EvChart {
       return;
     }
 
-    if (updateByScrollbar) {
-      this.updateScrollbar?.(updateData);
-    }
+    this.updateScrollbar(updateData);
 
     this.resetProps();
 
@@ -992,7 +1003,6 @@ class EvChart {
 
     this.initDefaultSelectInfo();
 
-
     let renderHitInfo = updateInfo?.hitInfo;
     if (!renderHitInfo?.legend && this.legendHover?.sId) {
       renderHitInfo = { ...(renderHitInfo || {}), legend: this.legendHover };
@@ -1065,20 +1075,16 @@ class EvChart {
    * @returns {undefined}
    */
   resize(promiseRes) {
-    // 차트 크기가 변경될 때 저장된 스크롤 픽셀 위치를 초기화하여
-    // 새로운 크기에 맞춰 스크롤바 크기/위치를 재계산하도록 함
-    if (this.scrollbar?.x) {
-      delete this.scrollbar.x.savedPosition;
-    }
-    if (this.scrollbar?.y) {
-      delete this.scrollbar.y.savedPosition;
-    }
-
     this.clear();
     this.bufferCtx.restore();
     this.bufferCtx.save();
 
     this.initRect();
+
+    if (this.options.axesX?.[0]?.scrollbar?.use || this.options.axesY?.[0]?.scrollbar?.use) {
+      this.initScrollbar();
+    }
+
     this.initScale();
     this.chartRect = this.getChartRect();
     this.drawChart();
