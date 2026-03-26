@@ -688,7 +688,7 @@ const module = {
     this.update({
       updateSeries: false,
       updateSelTip: { update: false, keepDomain: false },
-      lightUpdate: range[0] > 1,
+      lightUpdate: movedMin > 1,
       updateByScrollbar: true,
     });
   },
