@@ -270,8 +270,11 @@ const module = {
     // 위치를 비율 및 처음/끝 고정 여부로 저장
     const currentMaxPosition = Math.max(0, trackSize - thumbSize.size);
     scrollbarOpt.savedPositionRatio = trackSize > 0 ? thumbSize.position / trackSize : 0;
-    scrollbarOpt.savedAtStart = thumbSize.position <= 0;
-    scrollbarOpt.savedAtEnd = thumbSize.position >= currentMaxPosition;
+
+    if (!preservePosition || scrollbarOpt.savedPositionRatio === undefined) {
+      scrollbarOpt.savedAtStart = thumbSize.position <= 0;
+      scrollbarOpt.savedAtEnd = thumbSize.position >= currentMaxPosition;
+    }
 
     let scrollbarStyle = 'display: block;';
     let scrollbarTrackStyle;
