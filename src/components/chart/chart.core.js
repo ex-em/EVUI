@@ -269,11 +269,12 @@ class EvChart {
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
 
+    this.labelRange = this.getAxesLabelRange();
+
     if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
       this.updateScrollbarPosition();
     }
 
-    this.labelRange = this.getAxesLabelRange();
     this.axesSteps = this.calculateSteps();
 
     this.adjustXAndYAxisWidth();
