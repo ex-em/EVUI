@@ -268,10 +268,11 @@ const module = {
     }
 
     // 위치를 비율 및 처음/끝 고정 여부로 저장
+    // currentMaxPosition === 0 (thumbSize >= trackSize) 인 경우 저장하지 않음
+    // → trackSize가 다시 커졌을 때 이전 savedAtEnd/savedAtStart/savedPositionRatio 상태를 유지
     const currentMaxPosition = Math.max(0, trackSize - thumbSize.size);
-    scrollbarOpt.savedPositionRatio = trackSize > 0 ? thumbSize.position / trackSize : 0;
-
-    if (!preservePosition || scrollbarOpt.savedPositionRatio === undefined) {
+    if (currentMaxPosition > 0) {
+      scrollbarOpt.savedPositionRatio = thumbSize.position / trackSize;
       scrollbarOpt.savedAtStart = thumbSize.position <= 0;
       scrollbarOpt.savedAtEnd = thumbSize.position >= currentMaxPosition;
     }
