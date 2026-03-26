@@ -1,3 +1,15 @@
+## [3.5.5](https://github.com/ex-em/EVUI/compare/3.5.4...3.5.5) (2026-03-26)
+
+
+### Bug Fixes
+
+* bar chart scrollbar 렌더링 버그 수정 ([9e31932](https://github.com/ex-em/EVUI/commit/9e31932a90349d6ada5ca7ee8d4171f6930e890e))
+* chart > scrollbar 옵션 변경할때 차트에 반영되지 않음 (3.4) ([52a8c88](https://github.com/ex-em/EVUI/commit/52a8c8800931847cad05512242326045d5ec73bc))
+* ensure chart legend and data creation wait for DOM updates in Scrollbar component ([ac0da41](https://github.com/ex-em/EVUI/commit/ac0da413e3f8f07cd2f3ababae39a6cee563f2e6))
+* range[0] -> movedMin 으로 변경 ([f92e08a](https://github.com/ex-em/EVUI/commit/f92e08adad0a2ba11f5d772803ae2c4550293bcd))
+* savedPosition 초기화 로직 함수로 분리 ([101eb27](https://github.com/ex-em/EVUI/commit/101eb27d2a2cf0a5a17534d6153669aea499be0d))
+* updateScrollbar의 조건 강화 , maxium 줄 수정, scrolling updateByScrollbar 추가 ([a63814f](https://github.com/ex-em/EVUI/commit/a63814f32009ce35893db863689cbec2504d50d9))
+
 ## [3.5.4](https://github.com/ex-em/EVUI/compare/3.5.3...3.5.4) (2026-03-25)
 
 
