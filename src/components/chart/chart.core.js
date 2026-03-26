@@ -305,7 +305,13 @@ class EvChart {
 
     this.axesRange = this.getAxesRange();
     this.labelOffset = this.getLabelOffset();
+
     this.labelRange = this.getAxesLabelRange();
+
+    if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
+      this.updateScrollbarPosition();
+    }
+
     this.axesSteps = this.calculateSteps();
 
     this.adjustXAndYAxisWidth();
@@ -314,10 +320,6 @@ class EvChart {
 
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
-
-    if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
-      this.updateScrollbarPosition();
-    }
 
     this.drawTip();
 
@@ -902,12 +904,16 @@ class EvChart {
    * @param {boolean} updateData is update data
    * @returns {undefined}
    */
-  updateScrollbar(updateData) {
-    if (this.scrollbar?.x?.isInit || this.options.axesX?.[0]?.scrollbar?.use) {
+  updateScrollbar(updateData, updateByScrollbar) {
+    const isForceUpdate = updateByScrollbar || updateData;
+    const xUse = this.options.axesX?.[0]?.scrollbar?.use;
+    const yUse = this.options.axesY?.[0]?.scrollbar?.use;
+
+    if (xUse !== this.scrollbar?.x?.use || xUse || (isForceUpdate && xUse)) {
       this.updateScrollbarInfo('x', updateData);
     }
 
-    if (this.scrollbar?.y?.isInit || this.options.axesY?.[0]?.scrollbar?.use) {
+    if (yUse !== this.scrollbar?.y?.use || yUse || (isForceUpdate && yUse)) {
       this.updateScrollbarInfo('y', updateData);
     }
   }
@@ -932,13 +938,14 @@ class EvChart {
       updateData,
       updateTooltip,
       lightUpdate,
+      updateByScrollbar,
     } = updateInfo;
 
     if (!this.isInit) {
       return;
     }
 
-    this.updateScrollbar(updateData);
+    this.updateScrollbar(updateData, updateByScrollbar);
 
     this.resetProps();
 

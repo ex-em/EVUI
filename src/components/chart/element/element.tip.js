@@ -340,7 +340,7 @@ const modules = {
         let labelCount = labelAxes.labels.length;
         if (scrollbarOpt?.use) {
           const { range, interval, type } = scrollbarOpt;
-          const [min, max] = range;
+          const [min, max] = range ?? [];
           if (truthyNumber(min) && truthyNumber(max)) {
             labelCount = Math.floor((+max - +min) / interval) + 1;
             startIndex = type === 'step' ? min : labelAxes.labels.findIndex((v) => v === +min);
