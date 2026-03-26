@@ -860,14 +860,16 @@ class EvChart {
    */
   updateScrollbar(updateData, updateByScrollbar) {
     const isForceUpdate = updateByScrollbar || updateData;
-    const xUse = this.options.axesX?.[0]?.scrollbar?.use;
-    const yUse = this.options.axesY?.[0]?.scrollbar?.use;
+    const xUse = this.options.axesX?.[0]?.scrollbar?.use ?? false;
+    const yUse = this.options.axesY?.[0]?.scrollbar?.use ?? false;
+    const prevXUse = this.scrollbar?.x?.use ?? false;
+    const prevYUse = this.scrollbar?.y?.use ?? false;
 
-    if (xUse !== this.scrollbar?.x?.use || xUse || (isForceUpdate && xUse)) {
+    if (xUse !== prevXUse || xUse || (isForceUpdate && xUse)) {
       this.updateScrollbarInfo('x', updateData);
     }
 
-    if (yUse !== this.scrollbar?.y?.use || yUse || (isForceUpdate && yUse)) {
+    if (yUse !== prevYUse || yUse || (isForceUpdate && yUse)) {
       this.updateScrollbarInfo('y', updateData);
     }
   }
