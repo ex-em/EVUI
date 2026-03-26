@@ -112,7 +112,9 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      const isResetPosition = dir === 'x' ? this.options.axesX?.[0]?.scrollbar?.resetPosition : this.options.axesY?.[0]?.scrollbar?.resetPosition;
+      const isResetPosition = dir === 'x'
+        ? this.options.axesX?.[0]?.scrollbar?.resetPosition
+        : this.options.axesY?.[0]?.scrollbar?.resetPosition;
       if (isUpdateAxesRange) {
         this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt[0].range] : null;
       }
@@ -686,6 +688,8 @@ const module = {
     this.update({
       updateSeries: false,
       updateSelTip: { update: false, keepDomain: false },
+      lightUpdate: range[0] > 1,
+      updateByScrollbar: true,
     });
   },
 
