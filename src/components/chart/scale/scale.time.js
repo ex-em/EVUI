@@ -106,7 +106,7 @@ class TimeScale extends Scale {
      * 2) userInterval only
      * Object(time, unit) interval에만 해당
      * interval을 시작값으로 사용하고,
-     * steps가 maxSteps를 넘으면 interval을 2배씩 증가
+     * steps가 maxSteps를 넘으면 interval을 배수로 증가
      */
     if (isValidInterval) {
       const graphRange = graphMax - graphMin;
