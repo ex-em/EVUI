@@ -56,11 +56,11 @@ class TimeScale extends Scale {
     const { maxValue, minValue } = range;
     const maxSteps = Math.max(1, range.maxSteps ?? 1);
   
+    const hasUserRange =
+    Array.isArray(this.range) && this.range.length === 2;
+    
     // 사용자 interval 옵션이 있는 경우, 사용자 interval 옵션을 우선 적용
     // 문자열('hour', 'second' 등)은 4)auto 분기로 처리
-    const hasUserRange =
-      Array.isArray(this.range) && this.range.length === 2;
-  
     const hasUserInterval =
       typeof this.interval === 'number' ||
       (typeof this.interval === 'object' && this.interval !== null);
@@ -114,7 +114,7 @@ class TimeScale extends Scale {
       let steps = Math.ceil(graphRange / interval);
   
       while (steps > maxSteps) {
-        interval *= 2;
+        interval += resolvedInterval;
         steps = Math.ceil(graphRange / interval);
       }
   
