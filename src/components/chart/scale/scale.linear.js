@@ -364,13 +364,14 @@ class LinearScale extends Scale {
       steps = safeSteps(graphRange, interval);
   
       while (steps > maxSteps) {
-        interval *= 2;
+        interval += resolvedInterval;
   
         ({ graphMin, graphMax } = expandByInterval({
           min: minValue,
           max: maxValue,
           interval,
         }));
+        
         graphRange = graphMax - graphMin;
         steps = safeSteps(graphRange, interval);
       }
