@@ -226,6 +226,12 @@ describe('LinearScale', () => {
       expect(scale.adjustedDecimalPoint).toBeTypeOf('number');
       expect(scale.adjustedDecimalPoint).toBeGreaterThanOrEqual(0);
     });
+
+    it('userInterval only에서 interval이 배수 단위로 증가한다', () => {
+      const scale = createScale({ interval: 10 });
+      const result = scale.calculateSteps({ minValue: 0, maxValue: 100, maxSteps: 3 });
+      expect(result.interval % 10).toBe(0); // 10의 배수
+    });
   });
 
   describe('getNiceInterval', () => {
