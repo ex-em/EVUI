@@ -29,11 +29,15 @@ const module = {
       scrollbarOpt[key] = merged[key];
     });
 
-    delete scrollbarOpt.savedPosition;
+    if (scrollbarOpt.resetPosition) {
+      scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
+      this.resetScrollbarSavedPositions(dir);
+    }
 
     if (!scrollbarOpt.isInit) {
       scrollbarOpt.type = axisOpt?.[0]?.type;
       scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
+      this.resetScrollbarSavedPositions(dir);
 
       this.initScrollbarRange(dir);
       this.createScrollbarLayout(dir);
@@ -104,16 +108,18 @@ const module = {
     const axisOpt = dir === 'x' ? this.axesX : this.axesY;
     const isUpdateAxesRange = !isEqual(newOpt?.[0]?.range, axisOpt?.[0]?.range);
     if (isUpdateAxesRange || updateData) {
-      const isResetPosition = dir === 'x' ? this.options.axesX?.[0]?.scrollbar?.resetPosition : this.options.axesY?.[0]?.scrollbar?.resetPosition;
-      if (isUpdateAxesRange || isResetPosition) {
+      const isResetPosition = dir === 'x'
+        ? this.options.axesX?.[0]?.scrollbar?.resetPosition
+        : this.options.axesY?.[0]?.scrollbar?.resetPosition;
+
+      if (isUpdateAxesRange) {
         this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt?.[0]?.range] : null;
-        // range가 업데이트되면 저장된 스크롤 위치를 초기화
-        delete this.scrollbar[dir].savedPosition;
-      } else if (updateData) {
-        // 데이터가 업데이트되면 저장된 픽셀 위치는 더 이상 유효하지 않으므로 삭제하여
-        // 논리적 범위에 따라 다시 계산하도록 합니다.
-        delete this.scrollbar[dir].savedPosition;
       }
+
+      if (isResetPosition || updateData) {
+        this.resetScrollbarSavedPositions(dir);
+      }
+
       this.initScrollbarRange(dir);
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
@@ -244,16 +250,29 @@ const module = {
     const buttonSize = scrollbarOpt.showButton ? scrollHeight : 0;
     const trackSize = fullSize - (buttonSize * 2);
 
-    // 현재 위치를 보존해야 하는 경우 기존 위치를 저장
-    let savedThumbPosition = null;
-    if (preservePosition && scrollbarOpt.savedPosition !== undefined) {
-      savedThumbPosition = scrollbarOpt.savedPosition;
+    const thumbSize = this.getScrollbarThumbSize(dir, trackSize);
+
+    // 비율로 저장된 위치가 있으면 새 track 크기에 맞게 복원
+    if (preservePosition && scrollbarOpt.savedPositionRatio !== undefined) {
+      const maxPosition = Math.max(0, trackSize - thumbSize.size);
+      if (scrollbarOpt.savedAtStart) {
+        thumbSize.position = 0;
+      } else if (scrollbarOpt.savedAtEnd) {
+        thumbSize.position = maxPosition;
+      } else {
+        thumbSize.position = Math.min(scrollbarOpt.savedPositionRatio * trackSize, maxPosition);
+      }
     }
 
-    const thumbSize = this.getScrollbarThumbSize(dir, trackSize, savedThumbPosition);
-
-    // 새로 계산된 위치를 저장
-    scrollbarOpt.savedPosition = thumbSize.position;
+    // 위치를 비율 및 처음/끝 고정 여부로 저장
+    // currentMaxPosition === 0 (thumbSize >= trackSize) 인 경우 저장하지 않음
+    // → trackSize가 다시 커졌을 때 이전 savedAtEnd/savedAtStart/savedPositionRatio 상태를 유지
+    const currentMaxPosition = Math.max(0, trackSize - thumbSize.size);
+    if (currentMaxPosition > 0) {
+      scrollbarOpt.savedPositionRatio = thumbSize.position / trackSize;
+      scrollbarOpt.savedAtStart = thumbSize.position <= 0;
+      scrollbarOpt.savedAtEnd = thumbSize.position >= currentMaxPosition;
+    }
 
     let scrollbarStyle = 'display: block;';
     let scrollbarTrackStyle;
@@ -328,9 +347,8 @@ const module = {
    * get scrollbar thumb size
    * @param dir axis direction ('x' | 'y')
    * @param trackSize scrollbar track size
-   * @param savedThumbPosition 기존 위치를 보존해야 하는 경우 저장된 위치
    */
-  getScrollbarThumbSize(dir, trackSize, savedThumbPosition) {
+  getScrollbarThumbSize(dir, trackSize) {
     const scrollbarOpt = this.scrollbar[dir];
     const [min, max] = scrollbarOpt.range;
     const axesType = scrollbarOpt.type;
@@ -373,11 +391,6 @@ const module = {
     scrollbarOpt.startValue = startValue;
     scrollbarOpt.steps = steps;
     scrollbarOpt.interval = interval;
-
-    // 기존 위치를 보존해야 하는 경우 저장된 위치를 사용
-    if (savedThumbPosition !== null) {
-      thumbPosition = savedThumbPosition;
-    }
 
     return {
       size: thumbSize,
@@ -438,14 +451,30 @@ const module = {
       scrollbarOpt.range = [minValue, maxValue];
 
       // 사용자가 스크롤할 때는 저장된 위치를 초기화
-      delete scrollbarOpt.savedPosition;
+      this.resetScrollbarSavedPositions(dir);
 
       this.update({
         updateSeries: false,
         updateSelTip: { update: false, keepDomain: false },
         lightUpdate: minValue > 1,
+        updateByScrollbar: true,
       });
     }
+  },
+
+  /**
+   * reset scrollbar saved positions
+   * @param dir axis direction ('x' | 'y')
+   */
+  resetScrollbarSavedPositions(dir) {
+    const scrollbarOpt = this.scrollbar[dir];
+    if (!scrollbarOpt) {
+      return;
+    }
+
+    delete scrollbarOpt.savedPositionRatio;
+    delete scrollbarOpt.savedAtStart;
+    delete scrollbarOpt.savedAtEnd;
   },
 
   /**
@@ -662,11 +691,13 @@ const module = {
     this.scrollbar[dir].range = [movedMin, movedMax];
 
     // 사용자가 드래그로 스크롤할 때는 저장된 위치를 초기화
-    delete this.scrollbar[dir].savedPosition;
+    this.resetScrollbarSavedPositions(dir);
 
     this.update({
       updateSeries: false,
       updateSelTip: { update: false, keepDomain: false },
+      lightUpdate: movedMin > 1,
+      updateByScrollbar: true,
     });
   },
 
