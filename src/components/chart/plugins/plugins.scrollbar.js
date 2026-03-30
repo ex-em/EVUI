@@ -31,17 +31,13 @@ const module = {
 
     if (scrollbarOpt.resetPosition) {
       scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
-      delete scrollbarOpt.savedPositionRatio;
-      delete scrollbarOpt.savedAtStart;
-      delete scrollbarOpt.savedAtEnd;
+      this.resetScrollbarSavedPositions(dir);
     }
 
     if (!scrollbarOpt.isInit) {
       scrollbarOpt.type = axisOpt?.[0]?.type;
       scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt?.[0]?.range] : null;
-      delete scrollbarOpt.savedPositionRatio;
-      delete scrollbarOpt.savedAtStart;
-      delete scrollbarOpt.savedAtEnd;
+      this.resetScrollbarSavedPositions(dir);
 
       this.initScrollbarRange(dir);
       this.createScrollbarLayout(dir);
@@ -121,9 +117,7 @@ const module = {
       }
 
       if (isResetPosition || updateData) {
-        delete this.scrollbar[dir].savedPositionRatio;
-        delete this.scrollbar[dir].savedAtStart;
-        delete this.scrollbar[dir].savedAtEnd;
+        this.resetScrollbarSavedPositions(dir);
       }
 
       this.initScrollbarRange(dir);
@@ -457,9 +451,7 @@ const module = {
       scrollbarOpt.range = [minValue, maxValue];
 
       // 사용자가 스크롤할 때는 저장된 위치를 초기화
-      delete scrollbarOpt.savedPositionRatio;
-      delete scrollbarOpt.savedAtStart;
-      delete scrollbarOpt.savedAtEnd;
+      this.resetScrollbarSavedPositions(dir);
 
       this.update({
         updateSeries: false,
@@ -468,6 +460,21 @@ const module = {
         updateByScrollbar: true,
       });
     }
+  },
+
+  /**
+   * reset scrollbar saved positions
+   * @param dir axis direction ('x' | 'y')
+   */
+  resetScrollbarSavedPositions(dir) {
+    const scrollbarOpt = this.scrollbar[dir];
+    if (!scrollbarOpt) {
+      return;
+    }
+
+    delete scrollbarOpt.savedPositionRatio;
+    delete scrollbarOpt.savedAtStart;
+    delete scrollbarOpt.savedAtEnd;
   },
 
   /**
@@ -684,9 +691,7 @@ const module = {
     this.scrollbar[dir].range = [movedMin, movedMax];
 
     // 사용자가 드래그로 스크롤할 때는 저장된 위치를 초기화
-    delete this.scrollbar[dir].savedPositionRatio;
-    delete this.scrollbar[dir].savedAtStart;
-    delete this.scrollbar[dir].savedAtEnd;
+    this.resetScrollbarSavedPositions(dir);
 
     this.update({
       updateSeries: false,
