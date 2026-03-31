@@ -14,6 +14,10 @@
       <span>소수점 자릿수</span>
       <ev-input-number v-model="decimalPoint" :min="0" :max="10" />
     </div>
+    <div class="row">
+      <span>마지막 눈금 표시</span>
+      <ev-toggle v-model="showLastLabel" />
+    </div>
   </div>
 </template>
 
@@ -23,7 +27,8 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const chartOptions = {
+    const showLastLabel = ref(false);
+    const chartOptions = reactive({
       type: 'heatMap',
       width: '100%',
       height: '100%',
@@ -59,6 +64,7 @@ export default {
           },
           showAxisTick: true,
           axisLineColor: '#25262E',
+          showLastLabel,
         },
       ],
       heatMapColor: {
@@ -74,7 +80,7 @@ export default {
       tooltip: {
         use: true,
       },
-    };
+    });
 
     const yLabelCount = ref(20);
     const decimalPoint = ref(0);
@@ -148,6 +154,7 @@ export default {
       chartOptions,
       yLabelCount,
       decimalPoint,
+      showLastLabel,
     };
   },
 };
