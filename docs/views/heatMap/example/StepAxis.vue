@@ -15,7 +15,7 @@
       <ev-input-number v-model="decimalPoint" :min="0" :max="10" />
     </div>
     <div class="row">
-      <span>마지막 눈금 표시</span>
+      <span>마지막 라벨 표시</span>
       <ev-toggle v-model="showLastLabel" />
     </div>
   </div>
@@ -65,6 +65,11 @@ export default {
           showAxisTick: true,
           axisLineColor: '#25262E',
           showLastLabel,
+          lastLabelFontStyle: {
+            color: '#FF0000',
+            fontSize: 16,
+            fontWeight: 600,
+          },
         },
       ],
       heatMapColor: {
