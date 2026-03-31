@@ -22,12 +22,17 @@
 </template>
 
 <script>
-import { reactive, ref, watch } from 'vue';
+import { reactive, ref, watch, computed } from 'vue';
 import dayjs from 'dayjs';
 
 export default {
   setup() {
     const showLastLabel = ref(false);
+    const lastLabelFontStyle = computed(() => showLastLabel.value ? {
+      color: '#FF0000',
+      fontSize: 16,
+      fontWeight: 600,
+    }: null);
     const chartOptions = reactive({
       type: 'heatMap',
       width: '100%',
@@ -65,11 +70,7 @@ export default {
           showAxisTick: true,
           axisLineColor: '#25262E',
           showLastLabel,
-          lastLabelFontStyle: {
-            color: '#FF0000',
-            fontSize: 16,
-            fontWeight: 600,
-          },
+          lastLabelFontStyle,
         },
       ],
       heatMapColor: {

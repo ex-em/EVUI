@@ -233,11 +233,17 @@ class StepScale extends Scale {
           selectedLabelInfo?.dataIndex?.length &&
           !selectedLabelInfo?.dataIndex?.includes(labelIndex);
 
-        const labelColor = this.labelStyle.color;
+        let labelColor = this.labelStyle.color;
         let defaultOpacity = 1;
 
         if (Util.getColorStringType(labelColor) === 'RGBA') {
           defaultOpacity = Util.getOpacity(labelColor);
+        }
+
+        const isLastDrawnLabel = index === steps - 1;
+        if (isLastDrawnLabel && this.lastLabelFontStyle) {
+          ctx.font = Util.getLabelStyle(this.lastLabelFontStyle);
+          labelColor = this.lastLabelFontStyle.color;
         }
 
         ctx.fillStyle = Util.colorStringToRgba(
@@ -351,7 +357,7 @@ class StepScale extends Scale {
         const cellInterval = bnMinus(+labels[1], +labels[0]);
         const maxValue = bnPlus(+labels[labels.length - 1], cellInterval);
 
-        if (isNaN(maxValue) || (indexInterval !== 1 && bnMinus(maxValue, drawnLabels[drawnLabels.length - 1]) <= cellInterval)) {
+        if (isNaN(maxValue)) {
           return;
         }
 
