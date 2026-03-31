@@ -322,7 +322,8 @@ class StepScale extends Scale {
           const lastLabelPoint = alignToGridLine ? lastLabelCenter : lastLabelCenter + labelGap / 2;
           const lastLabelText = this.getLabelFormat(labels[lastLabelIndex], maxWidth);
 
-          ctx.fillStyle = this.labelStyle.color;
+          ctx.font = this.lastLabelFontStyle ? Util.getLabelStyle(this.lastLabelFontStyle) : Util.getLabelStyle(this.labelStyle);
+          ctx.fillStyle = this.lastLabelFontStyle ? this.lastLabelFontStyle.color : this.labelStyle.color;
 
           if (this.type === 'x') {
             ctx.fillText(this.checkFixWidth(lastLabelText), lastLabelPoint, labelPoint);
@@ -359,6 +360,9 @@ class StepScale extends Scale {
 
         const maxLabelText = this.getLabelFormat(`${maxValue}`, maxWidth);
         const tickPoint = labelCenter + labelGap / 2;
+
+        ctx.font = Util.getLabelStyle(this.labelStyle);
+        ctx.fillStyle = this.labelStyle.color;
 
         if (this.type === 'x') {
           ctx.fillText(this.checkFixWidth(maxLabelText), labelCenter, labelPoint);
