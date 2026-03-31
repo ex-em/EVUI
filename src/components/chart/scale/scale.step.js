@@ -1,5 +1,6 @@
 import { defaultsDeep } from 'lodash-es';
 import { PLOT_BAND_OPTION, PLOT_LINE_OPTION } from '@/components/chart/helpers/helpers.constant';
+import { bnMinus, bnPlus } from '@/common/utils.bignumber';
 import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
@@ -310,6 +311,74 @@ class StepScale extends Scale {
           }
         }
         ctx.stroke();
+      }
+
+      if (this.showLastLabel) {
+        const lastLabelIndex = startIndex + steps - 1;
+        const lastDrawnIndex = startIndex + Math.floor((steps - 1) / indexInterval) * indexInterval;
+
+        if (lastDrawnIndex !== lastLabelIndex) {
+          const lastLabelCenter = Math.round(startPoint + labelGap * (steps - 1));
+          const lastLabelPoint = alignToGridLine ? lastLabelCenter : lastLabelCenter + labelGap / 2;
+          const lastLabelText = this.getLabelFormat(labels[lastLabelIndex], maxWidth);
+
+          ctx.fillStyle = this.labelStyle.color;
+
+          if (this.type === 'x') {
+            ctx.fillText(this.checkFixWidth(lastLabelText), lastLabelPoint, labelPoint);
+          } else {
+            ctx.fillText(this.checkFixWidth(lastLabelText), labelPoint, lastLabelPoint);
+          }
+
+          if (this.showAxisTick) {
+            ctx.beginPath();
+            ctx.strokeStyle = this.axisLineColor;
+            if (this.type === 'x') {
+              ctx.moveTo(lastLabelPoint, offsetPoint);
+              ctx.lineTo(lastLabelPoint, offsetPoint + AXIS_TICK_LENGTH);
+            } else {
+              ctx.moveTo(offsetPoint + (this.axisLineWidth ?? 1), lastLabelPoint);
+              ctx.lineTo(offsetPoint - AXIS_TICK_LENGTH, lastLabelPoint);
+            }
+            ctx.stroke();
+            ctx.closePath();
+          }
+        }
+      }
+
+      if (alignToGridLine && !this.showLastLabel) {
+        const cellInterval = bnMinus(+labels[1], +labels[0]);
+        const maxValue = bnPlus(+labels[labels.length - 1], cellInterval);
+
+        if (isNaN(maxValue) || (indexInterval !== 1 && bnMinus(maxValue, drawnLabels[drawnLabels.length - 1]) <= cellInterval)) {
+          return;
+        }
+
+        labelCenter = Math.round(startPoint + labelGap * this.labels.length);
+        linePosition = labelCenter + aliasPixel;
+
+        const maxLabelText = this.getLabelFormat(`${maxValue}`, maxWidth);
+        const tickPoint = labelCenter + labelGap / 2;
+
+        if (this.type === 'x') {
+          ctx.fillText(this.checkFixWidth(maxLabelText), labelCenter, labelPoint);
+        } else {
+          ctx.fillText(this.checkFixWidth(maxLabelText), labelPoint, labelCenter);
+        }
+
+        if (this.showAxisTick) {
+          ctx.beginPath();
+          ctx.strokeStyle = this.axisLineColor;
+          if (this.type === 'x') {
+            ctx.moveTo(tickPoint, offsetPoint);
+            ctx.lineTo(tickPoint, offsetPoint + AXIS_TICK_LENGTH);
+          } else {
+            ctx.moveTo(offsetPoint + (this.axisLineWidth ?? 1), linePosition);
+            ctx.lineTo(offsetPoint - AXIS_TICK_LENGTH, linePosition);
+          }
+          ctx.stroke();
+          ctx.closePath();
+        }
       }
 
       ctx.closePath();

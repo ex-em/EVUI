@@ -133,6 +133,7 @@ export const AXIS_OPTION = {
     padding: 0,
     fixWidth: undefined,
   },
+  showLastLabel: false,
   lastLabelFontStyle: null,
   title: {
     use: false,
