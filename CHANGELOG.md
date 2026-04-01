@@ -1,3 +1,12 @@
+## [3.5.6](https://github.com/ex-em/EVUI/compare/3.5.5...3.5.6) (2026-04-01)
+
+
+### Bug Fixes
+
+* lastLabelFontStyle 적용 ([608e958](https://github.com/ex-em/EVUI/commit/608e958ee684e0dc4d18e3754aa46c0f214311bc))
+* lastLabelStyle 적용 ([9266d76](https://github.com/ex-em/EVUI/commit/9266d76f872927e70148de2b8ce1437577a4ee27))
+* showLastLabel이 true일때만 lastLabelFontStyle이 적용되게 하고 마지막 라벨도 적용되게 수정 ([c1bcb1f](https://github.com/ex-em/EVUI/commit/c1bcb1f66f0bfc85ed71196c2ded889eb4be7986))
+
 ## [3.5.5](https://github.com/ex-em/EVUI/compare/3.5.4...3.5.5) (2026-03-26)
 
 
