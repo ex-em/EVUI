@@ -396,7 +396,7 @@ class Bar {
     const totalCount = this.filteredCount ?? gdata.length;
 
     let s = startIdx;
-    let e = startIdx + totalCount - 1;
+    let e = Math.min(startIdx + totalCount - 1, gdata.length - 1);
 
     while (s <= e) {
       const m = Math.floor((s + e) / 2);
