@@ -399,12 +399,10 @@ class Bar {
     let e = Math.min(startIdx + totalCount - 1, gdata.length - 1);
 
     while (s <= e) {
-      if (!barData) {
-        console.warn(`[EVUI][Bar] binarySearchBar: gdata[${m}] is falsy`);
-        break;
-      }
+      const m = Math.floor((s + e) / 2);
       const barData = gdata[m];
       if (!barData) {
+        console.warn(`[EVUI][Bar] binarySearchBar: gdata[${m}] is falsy`);
         break;
       }
       const { xp: sx, yp: sy, w, h } = barData;
