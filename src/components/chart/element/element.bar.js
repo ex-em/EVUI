@@ -414,7 +414,6 @@ class Bar {
         item.data = barData;
         item.index = barData.index;
         item.hit = this.isPointInBar(offset, barData);
-        // bar 박스 내부 클릭은 "직접 박스 히트"로 표시 (findHitItem 우선순위용).
         item.directHit = item.hit;
         return item;
       }
