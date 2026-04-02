@@ -152,6 +152,8 @@ describe('EvChart Visual Regression', () => {
           options: {
             ...barChartOptions,
             horizontal: true,
+            axesX: [{ type: 'linear', startToZero: true, showAxis: true, showAxisTick: true }],
+            axesY: [{ type: 'step', showAxis: true, showAxisTick: true }],
           },
         },
       });
