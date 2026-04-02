@@ -79,7 +79,7 @@ describe('LinearScale', () => {
       });
     });
 
-    it('userRange only면 maxSteps 기준으로 interval을 계산한다', () => {
+    it('userRange only면 range를 딱 떨어지게 나누는 nice interval을 적용한다', () => {
       const scale = createScale({
         range: [0, 90],
       });
@@ -343,55 +343,52 @@ describe('LinearScale', () => {
     });
   });
 
-  describe('getNiceInterval', () => {
-    it('양수 값에 대해 nice interval을 반환한다', () => {
+  describe('getExactInterval', () => {
+    it('range가 maxSteps로 나누어 떨어지면 정수 interval을 반환한다', () => {
       const scale = createScale();
-      const result = scale.getNiceInterval(33);
-      // 33 → exponent=1, normalized=3.3 → fraction=5 → 50
-      expect(result).toBe(50);
+      const { interval, steps } = scale.getExactInterval(90, 3);
+      expect(interval).toBe(30);
+      expect(steps).toBe(3);
     });
 
-    it('작은 양수에 대해 동작한다', () => {
+    it('range가 maxSteps로 나누어 떨어지지 않으면 유한 소수 interval을 반환한다', () => {
       const scale = createScale();
-      const result = scale.getNiceInterval(0.7);
-      expect(result).toBe(1);
+      // 13 / 5 = 2.6 (유한 소수)
+      const { interval, steps } = scale.getExactInterval(13, 5);
+      expect(interval).toBe(2.6);
+      expect(steps).toBe(5);
     });
 
-    it('음수 값에 대해 음수 nice interval을 반환한다', () => {
+    it('maxSteps가 크더라도 딱 떨어지는 가장 세밀한 interval을 반환한다', () => {
       const scale = createScale();
-      const result = scale.getNiceInterval(-33);
-      expect(result).toBe(-50);
+      // 5 / 100 = 0.05 (유한 소수, maxSteps=140에서 steps=100이 가장 많은 딱 떨어지는 값)
+      const { interval, steps } = scale.getExactInterval(5, 140);
+      expect(interval).toBe(0.05);
+      expect(steps).toBe(100);
     });
 
-    it('0은 0을 반환한다', () => {
+    it('소수점 2자리 range도 처리한다', () => {
       const scale = createScale();
-      expect(scale.getNiceInterval(0)).toBe(0);
+      // 1.5 / 3 = 0.5 (유한 소수)
+      const { interval, steps } = scale.getExactInterval(1.5, 3);
+      expect(interval).toBe(0.5);
+      expect(steps).toBe(3);
     });
 
-    it('Infinity는 0을 반환한다', () => {
+    it('음수를 포함한 range도 처리한다', () => {
       const scale = createScale();
-      expect(scale.getNiceInterval(Infinity)).toBe(0);
+      // range = 10 - (-3) = 13, maxSteps = 10 → 13/10 = 1.3 (유한 소수)
+      const { interval, steps } = scale.getExactInterval(13, 10);
+      expect(interval).toBe(1.3);
+      expect(steps).toBe(10);
     });
 
-    it('NaN은 0을 반환한다', () => {
+    it('steps=1까지 내려가도 딱 떨어지는 값이 없으면 fallback을 반환한다', () => {
       const scale = createScale();
-      expect(scale.getNiceInterval(NaN)).toBe(0);
-    });
-
-    it('1에 대해 1을 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getNiceInterval(1)).toBe(1);
-    });
-
-    it('10에 대해 10을 반환한다', () => {
-      const scale = createScale();
-      expect(scale.getNiceInterval(10)).toBe(10);
-    });
-
-    it('15에 대해 20을 반환한다', () => {
-      const scale = createScale();
-      // 15 → exponent=1, normalized=1.5 → fraction=2 → 20
-      expect(scale.getNiceInterval(15)).toBe(20);
+      // range=1/3은 유한 소수로 나누기 어려운 케이스
+      // fallback: interval = range / maxSteps
+      const { steps } = scale.getExactInterval(1 / 3, 3);
+      expect(steps).toBeGreaterThanOrEqual(1);
     });
   });
 

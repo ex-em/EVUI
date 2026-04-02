@@ -89,32 +89,34 @@ class LinearScale extends Scale {
   }
 
   /**
-   * 주어진 값에 대한 적절한 간격을 계산합니다.
-   * @param value - 계산할 값 (양수, 음수 모두 가능)
-   * @returns 계산된 간격 값 (유효하지 않은 경우 0 반환)
+   * range를 maxSteps 이하의 steps로 나눌 수 있는 interval 중
+   * 유한 소수(딱 떨어지는 값)가 되는 가장 세밀한 interval을 반환한다.
+   * graphMin/graphMax를 고정한 채 interval을 구할 때 사용한다.
+   * @param {number} range - graphMax - graphMin
+   * @param {number} maxSteps
+   * @returns {{ interval: number, steps: number }}
    */
-  getNiceInterval(value) {
-    if (!Number.isFinite(value) || value === 0) return 0;
-
-    // 절댓값을 사용하여 nice step 계산
-    const absValue = Math.abs(value);
-    const exponent = Math.floor(Math.log10(absValue));
-    const normalized = absValue / 10 ** exponent;
-
-    let fraction = 10;
-    for (let i = 0; i < NICE_FRACTIONS.length; i++) {
-      if (NICE_FRACTIONS[i] >= normalized) {
-        fraction = NICE_FRACTIONS[i];
-        break;
+  getExactInterval(range, maxSteps) {
+    for (let steps = maxSteps; steps >= 1; steps--) {
+      const interval = range / steps;
+      let pow = 1;
+      for (let decimals = 0; decimals <= 12; decimals++, pow *= 10) {
+        const scaled = interval * pow;
+        if (Math.abs(scaled - Math.round(scaled)) < 1e-6) {
+          return {
+            interval: Math.round(scaled) / pow,
+            steps,
+          };
+        }
       }
     }
 
-    const niceInterval = fraction * 10 ** exponent;
-    // 원래 값의 부호 유지 (음수면 음수, 양수면 양수)
-    return value < 0 ? -niceInterval : niceInterval;
+    const safeSteps = Math.max(1, maxSteps);
+    // 부동 소수점 제거를 위해 toFixed 사용
+    return { interval: parseFloat((range / safeSteps).toFixed(12)), steps: safeSteps };
   }
 
-  /** 
+  /**
    * user range를 사용하지 않을때 nice scale 계산
    * graph MIN / MAX 를 조정할 수 있다.
    * @param {number} max
@@ -123,43 +125,56 @@ class LinearScale extends Scale {
    * @returns {object}
    */
   getStepsWithNiceScale({ max, min, maxSteps }) {
+    const range = max - min;
+
+    if (!Number.isFinite(range) || range <= 0) {
+      const fallbackInterval = 1;
+      return { max: min + fallbackInterval, min, interval: fallbackInterval, steps: 1 };
+    }
+
+    // maxSteps 이하로 커버 가능한 최소 interval 크기
+    const minInterval = range / maxSteps;
+
+    // nice interval 후보 열거: exponent 범위를 minInterval ~ range로 제한
+    const minExp = Math.floor(Math.log10(minInterval));
+    const maxExp = Math.ceil(Math.log10(range));
+
     let bestMaxValue = max;
     let bestMinValue = min;
     let bestInterval = 0;
     let bestSteps = 0;
     let bestOvershootAmount = Infinity;
-  
-    const minSegments = Math.max(1, maxSteps - 1);
-    const maxSegments = maxSteps + 1;
-  
-    for (let segments = minSegments; segments <= maxSegments; segments++) {
-      const rawStep = (max - min) / segments;
-      const niceInterval = this.getNiceInterval(rawStep);
-  
-      if (niceInterval > 0) {
-        const niceMin = Math.floor(min / niceInterval) * niceInterval;
-        const candidateMax = niceMin + niceInterval * segments;
-  
-        if (candidateMax >= max) {
-          const minOvershoot = min - niceMin;
-          const maxOvershoot = candidateMax - max;
-          const totalOvershoot = minOvershoot + maxOvershoot;
-  
-          if (totalOvershoot < bestOvershootAmount) {
-            bestMaxValue = candidateMax;
-            bestMinValue = niceMin;
-            bestInterval = niceInterval;
-            bestSteps = segments;
-            bestOvershootAmount = totalOvershoot;
+
+    for (let exp = minExp; exp <= maxExp; exp++) {
+      const pow = 10 ** exp;
+      for (const fraction of NICE_FRACTIONS) {
+        const interval = fraction * pow;
+        if (interval >= minInterval) {
+          // floating-point 오차 보정을 위해 epsilon 적용
+          const EPS = interval * 1e-10;
+          const niceMin = Math.floor((min + EPS) / interval) * interval;
+          const steps = Math.ceil((max - niceMin - EPS) / interval);
+          const candidateMax = niceMin + interval * steps;
+
+          if (steps <= maxSteps && candidateMax >= max - EPS) {
+            const totalOvershoot = (min - niceMin) + (candidateMax - max);
+
+            if (totalOvershoot < bestOvershootAmount) {
+              bestMaxValue = candidateMax;
+              bestMinValue = niceMin;
+              bestInterval = interval;
+              bestSteps = steps;
+              bestOvershootAmount = totalOvershoot;
+            }
           }
         }
       }
     }
-  
+
     if (!(bestInterval > 0) || bestSteps <= 0) {
       const fallbackSteps = Math.max(1, maxSteps);
-      const fallbackInterval = (max - min) / fallbackSteps || 1;
-  
+      const fallbackInterval = range / fallbackSteps || 1;
+
       return {
         max,
         min,
@@ -167,7 +182,7 @@ class LinearScale extends Scale {
         steps: fallbackSteps,
       };
     }
-  
+
     return {
       max: bestMaxValue,
       min: bestMinValue,
@@ -348,18 +363,18 @@ class LinearScale extends Scale {
   
     /**
      * 2) userRange only
-     * niceScale 사용 안 함
-     * startToZero도 적용 안 함
+     * range를 딱 떨어지게 나누는 nice interval 적용
+     * graphMin/graphMax는 userMin/userMax로 고정
      */
     if (hasUserRange) {
       const graphMin = userMin;
       const graphMax = userMax;
       const graphRange = graphMax - graphMin;
-      const steps = maxSteps;
-      const interval = graphRange / steps;
-  
+
+      const { interval, steps } = this.getExactInterval(graphRange, maxSteps);
+
       setDecimal(interval);
-  
+
       return {
         steps,
         interval,

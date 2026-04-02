@@ -401,6 +401,9 @@ class Bar {
     while (s <= e) {
       const m = Math.floor((s + e) / 2);
       const barData = gdata[m];
+      if (!barData) {
+        break;
+      }
       const { xp: sx, yp: sy, w, h } = barData;
       const ex = sx + w;
       const ey = sy + h;
