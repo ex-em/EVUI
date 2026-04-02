@@ -97,23 +97,41 @@ class LinearScale extends Scale {
    * @returns {{ interval: number, steps: number }}
    */
   getExactInterval(range, maxSteps) {
-    for (let steps = maxSteps; steps >= 1; steps--) {
+    if (!Number.isFinite(range) || range <= 0) {
+      return { interval: 1, steps: 1 };
+    }
+
+    const safeMaxSteps = Math.max(1, maxSteps);
+    let bestInterval = null;
+    let bestSteps = 0;
+    let bestDecimals = Infinity;
+
+    for (let steps = safeMaxSteps; steps >= 1; steps--) {
       const interval = range / steps;
       let pow = 1;
       for (let decimals = 0; decimals <= 12; decimals++, pow *= 10) {
         const scaled = interval * pow;
         if (Math.abs(scaled - Math.round(scaled)) < 1e-6) {
-          return {
-            interval: Math.round(scaled) / pow,
-            steps,
-          };
+          if (decimals < bestDecimals && interval < range) {
+            bestDecimals = decimals;
+            bestInterval = Math.round(scaled) / pow;
+            bestSteps = steps;
+          }
+          break;
         }
+      }
+
+      if (bestDecimals === 0) {
+        break;
       }
     }
 
-    const safeSteps = Math.max(1, maxSteps);
-    // 부동 소수점 제거를 위해 toFixed 사용
-    return { interval: parseFloat((range / safeSteps).toFixed(12)), steps: safeSteps };
+    if (bestSteps > 0) {
+      return { interval: bestInterval, steps: bestSteps };
+    }
+
+    // 유한 소수를 찾지 못한 경우 fallback: 부동 소수점 제거를 위해 toFixed 사용
+    return { interval: parseFloat((range / safeMaxSteps).toFixed(12)), steps: safeMaxSteps };
   }
 
   /**

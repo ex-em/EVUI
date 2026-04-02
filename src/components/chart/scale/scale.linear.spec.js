@@ -359,25 +359,27 @@ describe('LinearScale', () => {
       expect(steps).toBe(5);
     });
 
-    it('maxSteps가 크더라도 딱 떨어지는 가장 세밀한 interval을 반환한다', () => {
+    it('소수점 자리수가 더 적은 interval을 우선 반환한다', () => {
       const scale = createScale();
-      // 5 / 100 = 0.05 (유한 소수, maxSteps=140에서 steps=100이 가장 많은 딱 떨어지는 값)
+      // 후보: steps=100→0.05(2자리), steps=50→0.1(1자리), steps=5→1.0(0자리)
+      // 소수점 0자리인 steps=5, interval=1을 반환
       const { interval, steps } = scale.getExactInterval(5, 140);
-      expect(interval).toBe(0.05);
-      expect(steps).toBe(100);
+      expect(interval).toBe(1);
+      expect(steps).toBe(5);
     });
 
-    it('소수점 2자리 range도 처리한다', () => {
+    it('소수점 자리수가 같으면 steps가 많은 쪽을 반환한다', () => {
       const scale = createScale();
-      // 1.5 / 3 = 0.5 (유한 소수)
+      // 1.5 / 3 = 0.5 (1자리), 1.5 / 1 = 1.5 (1자리) → steps=3이 더 많음
       const { interval, steps } = scale.getExactInterval(1.5, 3);
       expect(interval).toBe(0.5);
       expect(steps).toBe(3);
     });
 
-    it('음수를 포함한 range도 처리한다', () => {
+    it('정수 interval이 없으면 소수점 자리수가 가장 적은 유한 소수를 반환한다', () => {
       const scale = createScale();
-      // range = 10 - (-3) = 13, maxSteps = 10 → 13/10 = 1.3 (유한 소수)
+      // 13은 소수라 maxSteps=10 이하에서 정수 divisor 없음 (steps=1은 interval===range라 제외)
+      // steps=10 → 1.3(1자리), steps=5 → 2.6(1자리) → steps=10 우선
       const { interval, steps } = scale.getExactInterval(13, 10);
       expect(interval).toBe(1.3);
       expect(steps).toBe(10);
