@@ -1,4 +1,4 @@
-import type { App, Plugin } from 'vue';
+import type { App } from 'vue';
 import EvTabs from '@/components/tabs/';
 import EvTabPanel from '@/components/tabPanel/';
 import EvButton from '@/components/button/';
@@ -78,7 +78,8 @@ const install = (app: App) => {
   });
 };
 
-const EVUI: Plugin = {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const EVUI: { install: (app: any) => void } = {
   install,
 };
 
