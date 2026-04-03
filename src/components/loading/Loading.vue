@@ -31,10 +31,10 @@
   </template>
 </template>
 
-<script>
-import { computed } from 'vue';
+<script lang="ts">
+import { computed, defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'EvLoading',
   props: {
     modelValue: {
@@ -55,11 +55,11 @@ export default {
     },
     iconStyle: {
       type: Object,
-      default: () => {},
+      default: () => ({}),
     },
   },
   emits: {
-    'update:modelValue': [Boolean],
+    'update:modelValue': (val: boolean) => typeof val === 'boolean',
   },
   setup(props, { emit }) {
     const clickEventName = computed(() => (props.clickOutside ? 'click' : null));
@@ -71,7 +71,7 @@ export default {
       closeLoading,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">

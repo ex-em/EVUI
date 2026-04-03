@@ -17,10 +17,10 @@
   </button>
 </template>
 
-<script>
-import { onMounted, ref } from 'vue';
+<script lang="ts">
+import { defineComponent, onMounted, PropType, ref } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'EvButton',
   props: {
     disabled: {
@@ -36,9 +36,9 @@ export default {
       default: 'default',
     },
     htmlType: {
-      type: String,
+      type: String as PropType<'button' | 'submit' | 'reset'>,
       default: 'button',
-      validator: (val) => ['button', 'submit', 'reset'].includes(val),
+      validator: (val: string) => ['button', 'submit', 'reset'].includes(val),
     },
     shape: {
       type: String,
@@ -53,11 +53,11 @@ export default {
     click: null,
   },
   setup(props) {
-    const buttonRef = ref(null);
+    const buttonRef = ref<HTMLButtonElement | null>(null);
 
     onMounted(() => {
       if (props.autoFocus) {
-        buttonRef.value.focus();
+        buttonRef.value?.focus();
       }
     });
 
@@ -65,7 +65,7 @@ export default {
       buttonRef,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">

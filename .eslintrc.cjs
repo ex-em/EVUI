@@ -6,6 +6,10 @@ module.exports = {
   },
   parserOptions: {
     ecmaVersion: 2022,
+    parser: {
+      ts: '@typescript-eslint/parser',
+      '<template>': 'espree',
+    },
   },
   extends: [
     'plugin:vue/vue3-essential',
@@ -428,9 +432,47 @@ module.exports = {
     'vue/v-on-style': 'warn',
     'vue/v-slot-style': 'off',
   },
+  settings: {
+    'import/parsers': {
+      'vue-eslint-parser': ['.vue'],
+    },
+  },
   overrides: [
     {
       files: ['**/__tests__/*.{j,t}s?(x)', '**/tests/unit/**/*.spec.{j,t}s?(x)'],
+    },
+    {
+      files: ['**/*.ts', '**/*.tsx'],
+      parser: '@typescript-eslint/parser',
+      parserOptions: {
+        ecmaVersion: 2022,
+        sourceType: 'module',
+      },
+      plugins: ['@typescript-eslint'],
+      rules: {
+        'no-undef': 'off',
+        'no-unused-vars': 'off',
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          { vars: 'all', args: 'after-used', ignoreRestSiblings: true },
+        ],
+        'no-use-before-define': 'off',
+        '@typescript-eslint/no-use-before-define': [
+          'error',
+          { functions: true, classes: true, variables: true },
+        ],
+        'no-shadow': 'off',
+        '@typescript-eslint/no-shadow': 'error',
+        'no-redeclare': 'off',
+        '@typescript-eslint/no-redeclare': 'error',
+        '@typescript-eslint/no-explicit-any': 'warn',
+      },
+    },
+    {
+      files: ['**/*.vue'],
+      parserOptions: {
+        parser: '@typescript-eslint/parser',
+      },
     },
   ],
 };

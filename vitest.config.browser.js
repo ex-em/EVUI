@@ -6,7 +6,7 @@ import { playwright } from '@vitest/browser-playwright';
 export default defineConfig({
   plugins: [vue()],
   test: {
-    include: ['src/**/*.visual.spec.js'],
+    include: ['src/**/*.visual.spec.{js,ts}'],
     browser: {
       enabled: true,
       provider: playwright(),

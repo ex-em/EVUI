@@ -1,9 +1,11 @@
+import type { Quantity, SizeInput } from '@/types/common';
+
 export default {
-  quantity(input) {
-    let output;
+  quantity(input: SizeInput): Quantity | undefined {
+    let output: Quantity | undefined;
 
     if (typeof input === 'string' || typeof input === 'number') {
-      const match = /^(normal|(\d+(?:\.\d+)?)(px|%)?)$/.exec(input);
+      const match = /^(normal|(\d+(?:\.\d+)?)(px|%)?)$/.exec(String(input));
       output = match ? { value: +match[2], unit: match[3] || undefined } : undefined;
     } else {
       output = undefined;
@@ -13,15 +15,13 @@ export default {
 
   /**
    * % 는 퍼센트로 숫자 및 문자 숫자는  px로 이상한값은 0px로 반환
-   * @param input
-   * @returns px | % | undefiend
    */
-  numberToPixel(input) {
-    let output;
-    let result;
+  numberToPixel(input: SizeInput): string | undefined {
+    let output: Quantity | undefined;
+    let result: string | undefined;
 
     if (typeof input === 'string' || typeof input === 'number') {
-      const match = /^(normal|(\d+(?:\.\d+)?)(px|%)?)$/.exec(input);
+      const match = /^(normal|(\d+(?:\.\d+)?)(px|%)?)$/.exec(String(input));
       output = match ? { value: +match[2], unit: match[3] || undefined } : undefined;
     } else {
       output = undefined;
@@ -39,11 +39,9 @@ export default {
 
   /**
    * % 값인지 확인 하기
-   * @param val
-   * @returns true | false
    */
-  isPercentValue(val) {
-    let result;
+  isPercentValue(val: unknown): boolean {
+    let result: boolean;
     if (typeof val !== 'string') {
       result = false;
     } else if (val.indexOf('%') === val.length - 1) {
@@ -57,13 +55,9 @@ export default {
 
   /**
    * 컬럼 min max 체크하기
-   * @param val
-   * @param min
-   * @param max
-   * @returns {*}
    */
-  checkColSize(val, min, max) {
-    let result;
+  checkColSize(val: number, min: number | undefined, max: number | undefined): number {
+    let result: number;
 
     if (min && val < min) {
       result = min;

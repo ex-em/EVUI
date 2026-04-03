@@ -7,8 +7,16 @@
  *
  * onResize({ width, height }) { ... }
  */
-const resize = {
-  mounted(el, binding) {
+import type { Directive, DirectiveBinding } from 'vue';
+
+interface ResizeHTMLElement extends HTMLElement {
+  __resizeObserver__: ResizeObserver | null;
+}
+
+type ResizeHandler = (size: { width: number; height: number }) => void;
+
+const resize: Directive<ResizeHTMLElement, ResizeHandler> = {
+  mounted(el: ResizeHTMLElement, binding: DirectiveBinding<ResizeHandler>) {
     if (typeof ResizeObserver === 'undefined') {
       return;
     }
@@ -33,7 +41,7 @@ const resize = {
     resizeObserver.observe(el);
     el.__resizeObserver__ = resizeObserver;
   },
-  unmounted(el) {
+  unmounted(el: ResizeHTMLElement) {
     const resizeObserver = el.__resizeObserver__;
     if (resizeObserver) {
       resizeObserver.disconnect();

@@ -13,19 +13,24 @@
   </div>
 </template>
 
-<script>
-import { computed } from 'vue';
+<script lang="ts">
+import { computed, defineComponent, PropType } from 'vue';
 
-export default {
+interface ColorStop {
+  value: number;
+  color: string;
+}
+
+export default defineComponent({
   name: 'EvProgress',
   props: {
     modelValue: {
       type: Number,
       default: 0,
-      validator: (val) => val >= 0 && val <= 100,
+      validator: (val: number) => val >= 0 && val <= 100,
     },
     color: {
-      type: [String, Array],
+      type: [String, Array] as PropType<string | ColorStop[]>,
       default: '#409EFF',
     },
     strokeWidth: {
@@ -76,7 +81,7 @@ export default {
       innerStyle,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">

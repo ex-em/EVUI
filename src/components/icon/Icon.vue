@@ -8,8 +8,10 @@
   />
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+export default defineComponent({
   name: 'EvIcon',
   props: {
     icon: {
@@ -31,13 +33,13 @@ export default {
     'context-menu': null,
   },
   setup(props, { emit }) {
-    const onClick = (e) => {
+    const onClick = (e: MouseEvent) => {
       emit('click', e);
     };
-    const onDblClick = (e) => {
+    const onDblClick = (e: MouseEvent) => {
       emit('dbl-click', e);
     };
-    const onContextMenu = (e) => {
+    const onContextMenu = (e: MouseEvent) => {
       emit('context-menu', e);
     };
     return {
@@ -46,5 +48,5 @@ export default {
       onContextMenu,
     };
   },
-};
+});
 </script>

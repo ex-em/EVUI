@@ -1,3 +1,4 @@
+import type { App, Plugin } from 'vue';
 import EvTabs from '@/components/tabs/';
 import EvTabPanel from '@/components/tabPanel/';
 import EvButton from '@/components/button/';
@@ -31,7 +32,6 @@ import EvChartGroup from '@/components/chartGroup/';
 import EvChartBrush from '@/components/chartBrush/';
 import EvTreeGrid from '@/components/treeGrid/';
 import EvPagination from '@/components/pagination/';
-import { version } from '../package.json';
 
 const components = [
   EvTabs,
@@ -69,7 +69,7 @@ const components = [
   EvPagination,
 ];
 
-const install = (app) => {
+const install = (app: App) => {
   if (!app) {
     return;
   }
@@ -78,8 +78,7 @@ const install = (app) => {
   });
 };
 
-const EVUI = {
-  version,
+const EVUI: Plugin = {
   install,
 };
 
