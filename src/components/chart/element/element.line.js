@@ -361,6 +361,19 @@ class Line {
     const gdata = this.data.filter((data) => !Util.isNullOrUndefined(data.x));
     const isLinearInterpolation = this.useLinearInterpolation();
 
+    // line 포인트 "정확 히트" 판정용 반경.
+    // combo 차트에서 line 포인트 중심을 직격한 경우, 같은 좌표의 bar(directHit)보다
+    // line이 우선되도록 item.directHit = true로 표시한다. 그 외(단순 Y축 근접)는 기존처럼 hit만.
+    const directHitRadius = Math.max((this.pointSize ?? 3) + 3, 6);
+    const isLinePointDirectHit = (point) => {
+      if (!point || point.xp === undefined || point.yp === undefined) {
+        return false;
+      }
+      const dx = xp - point.xp;
+      const dy = yp - point.yp;
+      return dx * dx + dy * dy <= directHitRadius * directHitRadius;
+    };
+
     if (gdata?.length) {
       if (typeof dataIndex === 'number' && this.show) {
         item.data = gdata[dataIndex];
@@ -372,6 +385,10 @@ class Line {
 
           if (yDist <= directHitThreshold) {
             item.hit = true;
+          }
+          if (isLinePointDirectHit(point)) {
+            item.hit = true;
+            item.directHit = true;
           }
         }
       } else if (
@@ -511,6 +528,10 @@ class Line {
 
             if (yDist <= directHitThreshold) {
               item.hit = true;
+            }
+            if (isLinePointDirectHit(point)) {
+              item.hit = true;
+              item.directHit = true;
             }
           }
         }

@@ -84,4 +84,38 @@ describe('Chart Interpolation', () => {
       expect(line.useLinearInterpolation()).toBe(true);
     });
   });
+
+  describe('findGraphData directHit 판정', () => {
+    // 라인 포인트를 "직격"한 경우(포인트 중심 근처)에는 item.directHit=true로 표시되어,
+    // 같은 좌표에 겹친 bar의 directHit보다 우선되어야 한다 (DSP-37527 line 회귀 대응).
+    const makeLine = () => {
+      const line = new Line('s1', { interpolation: 'none' }, 0);
+      line.show = true;
+      line.pointSize = 3;
+      line.data = [{ x: 0, y: 100, xp: 50, yp: 100, o: 100 }];
+      return line;
+    };
+
+    it('라인 포인트 중심을 정확히 클릭하면 hit=true, directHit=true', () => {
+      const line = makeLine();
+      const item = line.findGraphData([50, 100], false, 0, false);
+      expect(item.hit).toBe(true);
+      expect(item.directHit).toBe(true);
+    });
+
+    it('포인트에서 먼 Y(15px 이내)는 기존처럼 hit=true, directHit=false', () => {
+      const line = makeLine();
+      // y만 10px 떨어진 위치: yDist < 15이지만 유클리드 거리가 directHitRadius(= 6) 초과
+      const item = line.findGraphData([50, 110], false, 0, false);
+      expect(item.hit).toBe(true);
+      expect(item.directHit).toBeFalsy();
+    });
+
+    it('포인트에서 Y/X 모두 크게 떨어지면 hit=false, directHit=false', () => {
+      const line = makeLine();
+      const item = line.findGraphData([50, 200], false, 0, false);
+      expect(item.hit).toBeFalsy();
+      expect(item.directHit).toBeFalsy();
+    });
+  });
 });

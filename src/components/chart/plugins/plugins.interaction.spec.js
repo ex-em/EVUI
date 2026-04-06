@@ -83,6 +83,26 @@ describe('plugins.interaction findHitItem', () => {
       const result = chart.findHitItem([50, 50]);
       expect(result.hitId).toBe('near');
     });
+
+    it('같은 좌표에서 line 포인트 directHit는 bar 박스 directHit를 거리로 이긴다', () => {
+      // combo 차트에서 line 포인트가 bar 박스 내부에 있어 둘 다 directHit인 경우.
+      // line 포인트 중심이 클릭 좌표에 더 가까우므로 line이 선택되어야 한다.
+      const chart = createChart({
+        bar: mockSeries({
+          data: { x: 0, y: 10, xp: 30, yp: 20, o: 10 },
+          hit: true,
+          directHit: true,
+        }),
+        line: mockSeries({
+          data: { x: 0, y: 50, xp: 50, yp: 50, o: 50 },
+          hit: true,
+          directHit: true,
+        }),
+      });
+
+      const result = chart.findHitItem([50, 50]);
+      expect(result.hitId).toBe('line');
+    });
   });
 
   describe('일반 line 차트 회귀 방지', () => {
