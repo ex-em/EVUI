@@ -809,12 +809,9 @@ const modules = {
         return null;
       }
 
-      itemPosition = [this.getItemByPosition(
-        [dataInfo.xp, dataInfo.yp],
-        useApproximate,
-        dataIndex,
-        true,
-      )];
+      itemPosition = [
+        this.getHitItemByPosition([dataInfo.xp, dataInfo.yp], useApproximate, dataIndex, true),
+      ];
     } else {
       const seriesList = Object.entries(this.seriesList);
       let firShowSeriesID;
@@ -835,7 +832,7 @@ const modules = {
           return null;
         }
 
-        return this.getItemByPosition(
+        return this.getHitItemByPosition(
           [dataInfo?.xp ?? 0, dataInfo?.yp ?? 0],
           useApproximate,
           idx,
@@ -863,31 +860,48 @@ const modules = {
   },
 
   /**
-   * Find graph item by position x and y
+   * Find the hit item at the given position (x, y).
+   *
+   * 선택 우선순위:
+   *   1. directHit (bar 박스 내부 클릭) — 가장 가까운 것
+   *   2. hit (line 포인트 근접 등) — 가장 가까운 것
+   *   3. hit이 전혀 없으면 데이터가 있는 첫 시리즈로 fallback (기존 동작 호환)
+   *
+   * 과거에는 "같은 라벨 위에서 값이 가장 큰 시리즈"를 돌려주는 max-value 덮어쓰기 방식이었으나,
+   * bar + line combo 차트에서 작은 bar를 클릭해도 큰 값의 line이 선택되는 버그의 원인이었다.
+   * 이번 수정으로 사용자가 실제로 가리킨 시리즈(hit)가 선택되도록 바뀐다.
+   *
    * @param {array}   offset          position x and y
    * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
    * @param {number} dataIndex        selected data index
    * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
    *
-   * @returns {object} clicked item information
+   * @returns {object} hit item information
    */
-  getItemByPosition(
-    offset,
-    useApproximate = false,
-    dataIndex,
-    useSelectLabelOrItem = false,
-  ) {
+  getHitItemByPosition(offset, useApproximate = false, dataIndex, useSelectLabelOrItem = false) {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
-    let maxType = null;
-    let maxLabel = null;
-    let maxValuePos = null;
-    let maxValue = null;
-    let maxSeriesID = '';
+    // hit 기반 결과 (최우선)
+    let hitType = null;
+    let hitLabel = null;
+    let hitValuePos = null;
+    let hitValue = null;
+    let hitSeriesID = '';
+    let hitDataIndex = null;
+    let hitDistance = Infinity;
+    let hasDirectHit = false;
+
+    // fallback: hit이 전혀 없을 때 사용할 "데이터 있는 첫 시리즈" 정보
+    let fallbackType = null;
+    let fallbackLabel = null;
+    let fallbackValuePos = null;
+    let fallbackValue = null;
+    let fallbackSeriesID = '';
+    let fallbackDataIndex = null;
+
     let acc = 0;
     let useStack = false;
-    let maxIndex = null;
 
     for (let ix = 0; ix < seriesIDs.length; ix++) {
       const seriesID = seriesIDs[ix];
@@ -907,12 +921,13 @@ const modules = {
 
         if (data) {
           if (Util.isPieType(item.type)) {
-            maxLabel = seriesID;
-            maxSeriesID = seriesID;
-            maxValuePos = (data.ea - data.sa) / 2;
-            maxValue = data.o;
-            maxIndex = data.index;
-            maxType = item.type;
+            // pie 차트는 hit detection 체계가 달라 기존 동작 유지 (단일 pie 시리즈가 일반적)
+            hitType = item.type;
+            hitLabel = seriesID;
+            hitSeriesID = seriesID;
+            hitValuePos = (data.ea - data.sa) / 2;
+            hitValue = data.o;
+            hitDataIndex = data.index;
           } else {
             const ldata = isHorizontal ? data.y : data.x;
             const lp = isHorizontal ? data.yp : data.xp;
@@ -927,23 +942,45 @@ const modules = {
                 acc += data.y;
               }
 
+              // fallback 기록: 데이터가 있는 첫 시리즈를 저장
+              if (fallbackSeriesID === '') {
+                fallbackType = series.type;
+                fallbackLabel = ldata;
+                fallbackValuePos = lp;
+                fallbackValue = g;
+                fallbackSeriesID = seriesID;
+                fallbackDataIndex = index;
+              }
 
-              if (maxType === 'bar' && useStack) {
-                if (item.hit) {
-                  maxValue = g;
-                  maxSeriesID = seriesID;
-                  maxIndex = index;
-                  maxLabel = ldata;
-                  maxValuePos = lp;
-                  maxType = series.type;
+              // hit 기반 선택: item.hit이 true이고 유효한 좌표가 있을 때만 고려
+              if (item.hit && data.xp !== undefined && data.yp !== undefined) {
+                const distance = (data.xp - offset[0]) ** 2 + (data.yp - offset[1]) ** 2;
+
+                if (item.directHit) {
+                  // 직접 박스 히트는 최우선. 여러 개이면 가장 가까운 것.
+                  if (!hasDirectHit || distance < hitDistance) {
+                    hitDistance = distance;
+                    hitType = series.type;
+                    hitLabel = ldata;
+                    hitValuePos = lp;
+                    hitValue = g;
+                    hitSeriesID = seriesID;
+                    hitDataIndex = index;
+                  }
+                  hasDirectHit = true;
+                } else if (!hasDirectHit) {
+                  // directHit가 없을 때만 일반 hit 거리 비교 참여
+                  // (라인 근접 히트가 박스 직접 히트를 이기지 못하도록)
+                  if (distance < hitDistance) {
+                    hitDistance = distance;
+                    hitType = series.type;
+                    hitLabel = ldata;
+                    hitValuePos = lp;
+                    hitValue = g;
+                    hitSeriesID = seriesID;
+                    hitDataIndex = index;
+                  }
                 }
-              } else if (maxValue === null || maxValue <= g) {
-                maxValue = g;
-                maxSeriesID = seriesID;
-                maxLabel = ldata;
-                maxValuePos = lp;
-                maxIndex = index;
-                maxType = series.type;
               }
             }
           }
@@ -951,22 +988,24 @@ const modules = {
       }
     }
 
+    const hasHit = hitSeriesID !== '';
+
     return {
-      type: maxType,
-      label: maxLabel,
-      pos: maxValuePos,
-      value: maxValue ?? 0,
-      sId: maxSeriesID,
+      type: hasHit ? hitType : fallbackType,
+      label: hasHit ? hitLabel : fallbackLabel,
+      pos: hasHit ? hitValuePos : fallbackValuePos,
+      value: (hasHit ? hitValue : fallbackValue) ?? 0,
+      sId: hasHit ? hitSeriesID : fallbackSeriesID,
       acc,
       useStack,
-      maxIndex,
+      dataIndex: hasHit ? hitDataIndex : fallbackDataIndex,
     };
   },
 
   /**
    * @typedef {Object} LabelInfoResult
    * @property {number} labelIndex - 선택된 라벨의 인덱스
-   * @property {object} hitInfo - 해당 위치에서의 히트 정보 (getItemByPosition 반환값)
+   * @property {object} hitInfo - 해당 위치에서의 히트 정보 (getHitItemByPosition 반환값)
    */
   /**
    * Find label info by position x and y
@@ -1040,13 +1079,13 @@ const modules = {
         offsetX = x;
       }
 
-      hitInfo = this.getItemByPosition(
+      hitInfo = this.getHitItemByPosition(
         [offsetX, y],
         selectLabel?.useApproximateValue,
         dataIndex,
         true,
       );
-      labelIndex = hitInfo.maxIndex ?? -1;
+      labelIndex = hitInfo.dataIndex ?? -1;
     }
 
     return {
