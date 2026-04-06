@@ -72,6 +72,29 @@ describe('model.store getHitItemByPosition', () => {
 
       expect(result.sId).toBe('near');
     });
+
+    it('같은 좌표에서 line 포인트 directHit는 bar 박스 directHit를 거리로 이긴다', () => {
+      // combo 차트에서 line 포인트가 bar 박스 내부에 있어 둘 다 directHit인 경우.
+      // bar.(xp,yp)는 박스 꼭짓점이라 클릭 좌표와 거리가 크고,
+      // line.(xp,yp)는 포인트 중심이라 거의 0. 따라서 line이 이겨야 한다.
+      const bar = mockSeries({
+        type: 'bar',
+        data: { x: 0, y: 10, xp: 30, yp: 20, o: 10, index: 0 },
+        hit: true,
+        directHit: true,
+      });
+      const line = mockSeries({
+        type: 'line',
+        data: { x: 0, y: 50, xp: 50, yp: 50, o: 50, index: 0 },
+        hit: true,
+        directHit: true,
+      });
+
+      const store = createStore({ bar, line });
+      const result = store.getHitItemByPosition([50, 50]);
+
+      expect(result.sId).toBe('line');
+    });
   });
 
   describe('hit 없음 + directHit 없음', () => {
