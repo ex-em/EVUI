@@ -12,6 +12,8 @@ import TableTypeLegend from './example/TableTypeLegend';
 import TableTypeLegendRaw from '!!raw-loader!./example/TableTypeLegend';
 import LineBarSelectLabel from './example/LineBarSelectLabel';
 import LineBarSelectLabelRaw from '!!raw-loader!./example/LineBarSelectLabel';
+import AreaLine from './example/AreaLine';
+import AreaLineRaw from '!!raw-loader!./example/AreaLine';
 
 export default {
   mdText,
@@ -20,6 +22,12 @@ export default {
       description: 'Line과 Bar를 조합하여 2가지 계열을 나타냅니다. Bar 차트가 들어가므로 Step Axis의 TimeMode를 사용하여 구현합니다.',
       component: LineBar,
       parsedData: parseComponent(LineBarRaw),
+    },
+    'Area & Line': {
+      description:
+        'Area(fill 옵션을 준 line)와 일반 Line을 조합합니다. 두 시리즈 모두 포인트 기반이므로 hit detection은 line 포인트 directHit 규칙을 따릅니다.',
+      component: AreaLine,
+      parsedData: parseComponent(AreaLineRaw),
     },
     'Line & StackBar': {
       description: 'Line과 StackBar를 조합하여 2가지 계열을 나타냅니다.',
