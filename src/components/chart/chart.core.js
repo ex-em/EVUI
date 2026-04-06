@@ -454,10 +454,10 @@ class EvChart {
               const lastHitInfo = this.lastHitInfo;
               const defaultSelectInfo = this.defaultSelectItemInfo;
 
-              if (lastHitInfo?.maxIndex || lastHitInfo?.maxIndex === 0) {
+              if (lastHitInfo?.dataIndex || lastHitInfo?.dataIndex === 0) {
                 selectInfo = {
                   seriesID: lastHitInfo.sId,
-                  dataIndex: lastHitInfo.maxIndex,
+                  dataIndex: lastHitInfo.dataIndex,
                 };
               } else if (defaultSelectInfo?.dataIndex || defaultSelectInfo?.dataIndex === 0) {
                 selectInfo = { ...defaultSelectInfo };
