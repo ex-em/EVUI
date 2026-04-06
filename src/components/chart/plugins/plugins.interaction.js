@@ -301,13 +301,13 @@ const modules = {
       const useSelectSeries = selectSeriesOpt?.use && selectSeriesOpt?.useClick;
 
       const setSelectedItemInfo = () => {
-        const hitInfo = this.getItemByPosition(offset, false);
+        const hitInfo = this.getHitItemByPosition(offset, false);
 
         ({
           label: args.label,
           value: args.value,
           sId: args.seriesId,
-          maxIndex: args.dataIndex,
+          dataIndex: args.dataIndex,
           acc: args.acc,
         } = hitInfo);
 
@@ -315,7 +315,7 @@ const modules = {
           args.selected = {
             eventTarget: 'item',
             seriesId: this.isDeselectItem(hitInfo) ? null : hitInfo.sId,
-            dataIndex: this.isDeselectItem(hitInfo) ? null : hitInfo.maxIndex,
+            dataIndex: this.isDeselectItem(hitInfo) ? null : hitInfo.dataIndex,
           };
         }
       };
@@ -1631,9 +1631,9 @@ const modules = {
   isDeselectItem(hitInfo) {
     return (
       this.options.selectItem.useDeselectItem &&
-      hitInfo?.maxIndex === this.defaultSelectItemInfo?.dataIndex &&
+      hitInfo?.dataIndex === this.defaultSelectItemInfo?.dataIndex &&
       hitInfo?.sId === this.defaultSelectItemInfo?.seriesID &&
-      !isNaN(hitInfo?.maxIndex)
+      !isNaN(hitInfo?.dataIndex)
     );
   },
 
