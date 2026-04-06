@@ -158,7 +158,7 @@ const modules = {
 
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
-        lastTip.pos = type === 'bar' ? hitInfo.maxIndex : hitInfo.label;
+        lastTip.pos = type === 'bar' ? hitInfo.dataIndex : hitInfo.label;
         ldata = lastTip.pos;
       } else if (lastTip.pos !== null) {
         ldata = lastTip.pos;
