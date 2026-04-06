@@ -364,7 +364,12 @@ class Line {
     // line 포인트 "정확 히트" 판정용 반경.
     // combo 차트에서 line 포인트 중심을 직격한 경우, 같은 좌표의 bar(directHit)보다
     // line이 우선되도록 item.directHit = true로 표시한다. 그 외(단순 Y축 근접)는 기존처럼 hit만.
-    const directHitRadius = Math.max((this.pointSize ?? 3) + 3, 6);
+    // 포인트 반지름에 기본 포인트 크기(LINE_OPTION.pointSize)만큼의 클릭 여유 마진을 더하고,
+    // 시각적으로 하이라이트되는 포인트 반경(highlight.maxSize)을 최소 보장값으로 사용한다.
+    const directHitRadius = Math.max(
+      (this.pointSize ?? LINE_OPTION.pointSize) + LINE_OPTION.pointSize,
+      LINE_OPTION.highlight.maxSize,
+    );
     const isLinePointDirectHit = (point) => {
       if (!point || point.xp === undefined || point.yp === undefined) {
         return false;
