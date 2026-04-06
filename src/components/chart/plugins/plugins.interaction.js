@@ -917,6 +917,9 @@ const modules = {
     let maxg = null;
     let maxSID = null;
     let minDistance = Infinity;
+    // directHit(bar 박스 내부 클릭/hover) 시리즈가 발견되었는지 추적.
+    // 한 번이라도 directHit가 있으면 line의 근접 포인트 히트는 hitId 후보에서 배제된다.
+    let hasDirectHit = false;
 
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
     const targetDataIndex = this.findClosestDataIndex(offset, sIds);
@@ -986,12 +989,23 @@ const modules = {
               maxSID = sId;
             }
 
-            // 마우스 위치와의 거리 계산하여 가장 가까운 시리즈 선택
+            // 마우스 위치와의 거리 계산하여 가장 가까운 시리즈 선택.
+            // directHit(bar 박스 내부)가 하나라도 있으면 그중에서만 선택하고,
+            // 라인의 근접 포인트 히트(item.hit=true, directHit=false)는 hitId 후보에서 배제한다.
+            // bar + line combo 차트에서 작은 bar 클릭 시 큰 값의 line이 잡히던 버그 방지.
             if (item.hit && item.data.xp !== undefined && item.data.yp !== undefined) {
               const distance = (item.data.xp - offset[0]) ** 2
                 + (item.data.yp - offset[1]) ** 2;
 
-              if (distance < minDistance) {
+              if (item.directHit) {
+                // directHit는 최우선. 여러 directHit 중에서는 가장 가까운 것 선택.
+                if (!hasDirectHit || distance < minDistance) {
+                  minDistance = distance;
+                  hitId = sId;
+                }
+                hasDirectHit = true;
+              } else if (!hasDirectHit && distance < minDistance) {
+                // directHit가 없을 때만 일반 hit 거리 비교
                 minDistance = distance;
                 hitId = sId;
               }
