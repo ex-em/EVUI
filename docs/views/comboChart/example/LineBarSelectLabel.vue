@@ -30,12 +30,12 @@
       const chartData = reactive({
         series: {
           series1: { name: 'series#1', show: true, type: 'bar', showValue: { use: true } },
-          series3: { name: 'series#2', show: true, type: 'line', combo: true },
+          series2: { name: 'series#2', show: true, type: 'line', combo: true },
         },
         labels: [],
         data: {
           series1: [],
-          series3: [],
+          series2: [],
         },
       });
 
