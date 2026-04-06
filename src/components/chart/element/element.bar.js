@@ -301,6 +301,9 @@ class Bar {
         item.data = barData[clampedIndex];
         item.index = clampedIndex;
         item.hit = this.isPointInBar(offset, barData[clampedIndex]);
+        // bar 박스 내부 클릭은 "직접 박스 히트"로 표시.
+        // findHitItem에서 line 포인트 근접 히트보다 우선 선택되도록 하기 위함.
+        item.directHit = item.hit;
       }
 
       return item;
@@ -347,6 +350,8 @@ class Bar {
         item.data = barData;
         item.index = barData.index;
         item.hit = this.isPointInBar(offset, barData);
+        // bar 박스 내부 클릭은 "직접 박스 히트"로 표시 (findHitItem 우선순위용).
+        item.directHit = item.hit;
         return item;
       }
 
