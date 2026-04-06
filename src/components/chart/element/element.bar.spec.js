@@ -57,4 +57,49 @@ describe('Bar Element', () => {
       expect(bar.isPointInBar([35, 40], barData)).toBe(false);
     });
   });
+
+  describe('findGraphData directHit 플래그', () => {
+    // bar: x 10~30, y 20~50
+    const barData = { xp: 10, yp: 50, w: 20, h: -30, index: 0 };
+
+    const createBarWithData = () =>
+      createBar({
+        data: [barData],
+        show: true,
+        color: '#000',
+        visibleStartIndex: 0,
+        filteredCount: 1,
+      });
+
+    it('bar 박스 내부 클릭은 hit=true, directHit=true를 반환한다', () => {
+      const bar = createBarWithData();
+      const item = bar.findGraphData([15, 40], false, 0, true);
+      expect(item.hit).toBe(true);
+      expect(item.directHit).toBe(true);
+    });
+
+    it('bar 박스 밖 클릭은 hit=false, directHit=false를 반환한다', () => {
+      const bar = createBarWithData();
+      const item = bar.findGraphData([5, 40], false, 0, true);
+      expect(item.hit).toBe(false);
+      expect(item.directHit).toBe(false);
+    });
+
+    it('binarySearchBar 경로(findGraphRange)에서도 directHit를 세팅한다', () => {
+      // useIndicatorOnLabel=false로 두면 findGraphRange → binarySearchBar 경로 진입
+      const bar = createBarWithData();
+      const item = bar.findGraphData([15, 40], false, undefined, false);
+      expect(item.hit).toBe(true);
+      expect(item.directHit).toBe(true);
+    });
+
+    it('binarySearchBar에서 x범위 밖 클릭은 directHit가 세팅되지 않는다', () => {
+      // binarySearchBar는 inRange 조건을 만족해야 item이 세팅됨.
+      // 범위 밖이면 초기값 { hit: false } 유지 (directHit 없음 = falsy).
+      const bar = createBarWithData();
+      const item = bar.findGraphData([50, 40], false, undefined, false);
+      expect(item.hit).toBe(false);
+      expect(item.directHit).toBeFalsy();
+    });
+  });
 });
