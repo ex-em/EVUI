@@ -68,7 +68,7 @@
       const chartOptions = {
         type: 'line',
         width: '100%',
-        height: '80%',
+        height: '320px',
         title: {
           text: 'Area + Line Combo',
           show: true,
@@ -137,7 +137,7 @@
   }
   .hint {
     display: inline-block;
-    color: #666;
+    color: #666666;
     font-size: 12px;
     line-height: 1.5;
     max-width: 640px;
@@ -151,7 +151,7 @@
     margin-bottom: 4px;
 
     &.yellow {
-      background-color: #fff3cd;
+      background-color: #FFF3CD;
       color: #856404;
     }
   }
@@ -159,8 +159,8 @@
     display: block;
     padding: 8px 12px;
     margin: 0 0 12px;
-    background-color: #f5f5f5;
-    border: 1px solid #e0e0e0;
+    background-color: #F5F5F5;
+    border: 1px solid #E0E0E0;
     border-radius: 4px;
     font-family: monospace;
     font-size: 12px;
