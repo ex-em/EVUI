@@ -1,4 +1,5 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import Util from '../helpers/helpers.util';
 import LinearScale from './scale.linear';
 
 // LinearScale의 순수 계산 메서드를 테스트하기 위해 최소 mock 생성
@@ -9,9 +10,18 @@ const createScale = (overrides = {}) => {
   scale.startToZero = false;
   scale.fixedSteps = false;
   scale.formatter = null;
+  scale.options = { type: 'line' };
   Object.assign(scale, overrides);
   return scale;
 };
+
+beforeEach(() => {
+  vi.spyOn(Util, 'calcTextSizeCanvas').mockReturnValue({ width: 2, height: 2 });
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('LinearScale', () => {
   describe('getInterval', () => {
@@ -227,10 +237,109 @@ describe('LinearScale', () => {
       expect(scale.adjustedDecimalPoint).toBeGreaterThanOrEqual(0);
     });
 
+    it('auto 모드에서 0~1 범위는 기존 특례를 복원한다', () => {
+      const scale = createScale();
+
+      const result = scale.calculateSteps({ minValue: 0, maxValue: 1, maxSteps: 4 });
+
+      expect(result).toEqual({
+        steps: 1,
+        interval: 1,
+        graphMin: 0,
+        graphMax: 1,
+      });
+    });
+
+    it('auto 모드에서 소수 축의 0~1 범위는 0.2 간격 특례를 사용한다', () => {
+      const scale = createScale({
+        decimalPoint: 2,
+      });
+
+      const result = scale.calculateSteps({ minValue: 0, maxValue: 1, maxSteps: 4 });
+
+      expect(result).toEqual({
+        steps: 5,
+        interval: 0.2,
+        graphMin: 0,
+        graphMax: 1,
+      });
+    });
+
     it('userInterval only에서 interval이 배수 단위로 증가한다', () => {
       const scale = createScale({ interval: 10 });
       const result = scale.calculateSteps({ minValue: 0, maxValue: 100, maxSteps: 3 });
       expect(result.interval % 10).toBe(0); // 10의 배수
+    });
+  });
+
+  describe('getLegacyOneMaxScale', () => {
+    it('정수 축이면 1 간격 1 step을 반환한다', () => {
+      const scale = createScale();
+
+      expect(scale.getLegacyOneMaxScale(4)).toEqual({
+        interval: 1,
+        steps: 1,
+      });
+    });
+
+    it('소수 축이고 maxSteps가 충분하면 0.2 간격 5 step을 반환한다', () => {
+      const scale = createScale({
+        decimalPoint: 2,
+      });
+
+      expect(scale.getLegacyOneMaxScale(4)).toEqual({
+        interval: 0.2,
+        steps: 5,
+      });
+    });
+
+    it('소수 축이고 maxSteps가 작으면 0.5 간격 2 step을 반환한다', () => {
+      const scale = createScale({
+        decimalPoint: 2,
+      });
+
+      expect(scale.getLegacyOneMaxScale(2)).toEqual({
+        interval: 0.5,
+        steps: 2,
+      });
+    });
+  });
+
+  describe('calculateScaleRange', () => {
+    it('데이터 범위가 없고 사용자 range도 없으면 0~1 기본 축 범위를 반환한다', () => {
+      const scale = createScale({
+        labelStyle: {},
+      });
+
+      const result = scale.calculateScaleRange({ min: null, max: null });
+
+      expect(result.min).toBe(0);
+      expect(result.max).toBe(1);
+      expect(result.minLabel).toBe('0');
+      expect(result.maxLabel).toBe('1');
+    });
+
+    it('사용자 range가 있으면 빈 데이터여도 사용자 range를 유지한다', () => {
+      const scale = createScale({
+        labelStyle: {},
+        range: [10, 20],
+      });
+
+      const result = scale.calculateScaleRange({ min: null, max: null });
+
+      expect(result.min).toBe(10);
+      expect(result.max).toBe(20);
+    });
+
+    it('min과 max가 같으면 max를 1 증가시킨다', () => {
+      const scale = createScale({
+        labelStyle: {},
+      });
+
+      const result = scale.calculateScaleRange({ min: 3, max: 3 });
+
+      expect(result.min).toBe(3);
+      expect(result.max).toBe(4);
     });
   });
 
