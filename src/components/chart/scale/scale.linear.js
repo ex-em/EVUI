@@ -223,6 +223,32 @@ class LinearScale extends Scale {
   }
 
   /**
+   * maxValue가 1일 때, 특수 처리 (기존 로직)
+   * @param {number} maxSteps 
+   * @returns {object} interval, steps
+   */
+  getLegacyOneMaxScale(maxSteps) {
+    if (!this.decimalPoint) {
+      return {
+        interval: 1,
+        steps: 1,
+      };
+    }
+
+    if (maxSteps > 2) {
+      return {
+        interval: 0.2,
+        steps: 5,
+      };
+    }
+
+    return {
+      interval: 0.5,
+      steps: 2,
+    };
+  }
+
+  /**
    * With range information, calculate how many labels in axis
    * @param {object} range    min/max information
    *
@@ -395,6 +421,18 @@ class LinearScale extends Scale {
   
     const normalizedMax =
       this.startToZero && maxValue <= 0 ? 0 : maxValue;
+
+    if (normalizedMin === 0 && normalizedMax === 1) {
+      const legacy = this.getLegacyOneMaxScale(maxSteps);
+      setDecimal(legacy.interval);
+
+      return {
+        steps: legacy.steps,
+        interval: legacy.interval,
+        graphMin: normalizedMin,
+        graphMax: normalizedMax,
+      };
+    }
   
     const nice = this.getStepsWithNiceScale({
       min: normalizedMin,
@@ -425,6 +463,23 @@ class LinearScale extends Scale {
     let isDefaultMaxSameAsMin = false;
 
     const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
+    const hasRangeOverride = Array.isArray(range) || typeof range === 'function';
+
+    if (!hasRangeOverride && (minMax?.min == null || minMax?.max == null)) {
+      const minLabel = this.getLabelFormat(0);
+      const maxLabel = this.getLabelFormat(1, {
+        isMaxValueSameAsMin: true,
+      });
+
+      return {
+        min: 0,
+        max: 1,
+        minLabel,
+        maxLabel,
+        size: Util.calcTextSizeCanvas(maxLabel, Util.getLabelStyle(this.labelStyle)),
+      };
+    }
+
     if (Array.isArray(range) && range?.length === 2) {
       if (this.options.type === 'heatMap') {
         maxValue = range[1] > +minMax.max ? +minMax.max : range[1];
