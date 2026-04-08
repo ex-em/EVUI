@@ -1,3 +1,23 @@
+# [3.6.0](https://github.com/ex-em/EVUI/compare/3.5.6...3.6.0) (2026-04-08)
+
+
+### Bug Fixes
+
+* [linearScale] chartData > data, label 이 빈배열일 경우, 이전 버전 스펙과 동일하게 보이도록 함 ([865c371](https://github.com/ex-em/EVUI/commit/865c3715e7b9058c7738f92783f86ceb066be673))
+* chartData > data, label 이 빈배열일 경우, 이전 버전 스펙과 동일하게 보이도록 함 ([02363db](https://github.com/ex-em/EVUI/commit/02363db09ad38f481fe11c7232b2944329a671ea))
+* findHitItem에 directHit 우선 선택 로직 추가 -- plugins.interaction ([4164484](https://github.com/ex-em/EVUI/commit/4164484fb48fe7e2f915d4fdab07950a79ef40bd))
+* interval을 증가시키는 방식을 2배에서, interval 배수로 변경하여 조금씩 증가하며 관찰하도록 함 ([cc62d9a](https://github.com/ex-em/EVUI/commit/cc62d9aef69cdb3b1f878082a8c7e4627f68cbc2))
+* line 포인트 직격 케이스를 directHit로 표시 -- element.line ([95b064d](https://github.com/ex-em/EVUI/commit/95b064d6d03f2308d826cccb74a89cf2abb990b6))
+* range, interval 옵션을 같이쓰고 fixedStep을 사용하지 않을 경우, maxStep을 넘을 수 없도록 함 ([870a415](https://github.com/ex-em/EVUI/commit/870a4152dae85b1bbf76503c7962299e461f3452))
+* range, interval 옵션을 같이쓰고 fixedStep을 사용하지 않을 경우, maxStep을 넘을 수 없도록 함 -- time.scale ([594b22c](https://github.com/ex-em/EVUI/commit/594b22cfabf78f5ce9a1368288d4d46f957ffb61))
+* scrollbarOpt.range를 직접 수정 후 복원하는 패턴 제거 ([547b5f6](https://github.com/ex-em/EVUI/commit/547b5f6ed277e8335fe3f46a0f4579cfe5fec953))
+* 잘못된 jsDoc 수정 ([f719964](https://github.com/ex-em/EVUI/commit/f7199642bd1330485faed7736e099052325d033c))
+
+
+### Features
+
+* bar element에 directHit 플래그 추가 -- element.bar ([443ff34](https://github.com/ex-em/EVUI/commit/443ff34b771b51d4a71e05d9bc13927b59d81180))
+
 ## [3.5.6](https://github.com/ex-em/EVUI/compare/3.5.5...3.5.6) (2026-04-01)
 
 
