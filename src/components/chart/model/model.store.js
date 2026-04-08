@@ -903,17 +903,34 @@ const modules = {
       return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
     };
 
-    // dataIndex 미지정 시 공통 라벨 인덱스를 먼저 계산해 모든 시리즈가 같은 라벨로 조회.
-    // (line binary-search 경로가 각 시리즈별로 null 을 걸러내고 이웃 포인트를 반환하는 걸 방지)
+    // dataIndex 미지정 시 클릭에 가장 가까운 라벨 인덱스를 직접 계산해 모든 시리즈에 전달.
+    // findClosestDataIndex 는 "모든 시리즈가 null 인 라벨" 을 건너뛰기 때문에
+    // 해당 라벨 클릭 시 이웃 라벨의 값이 잘못 선택되는 문제가 있어 여기선 쓰지 않는다.
     let resolvedDataIndex = dataIndex;
-    if (
-      resolvedDataIndex === undefined
-      && !useApproximate
-      && typeof this.findClosestDataIndex === 'function'
-    ) {
-      const closestIndex = this.findClosestDataIndex(offset, seriesIDs);
-      if (closestIndex !== -1) {
-        resolvedDataIndex = closestIndex;
+    if (resolvedDataIndex === undefined && !useApproximate) {
+      const refSeriesID = seriesIDs.find((sId) => {
+        const s = this.seriesList[sId];
+        return s?.show && s?.data?.length > 0;
+      });
+      if (refSeriesID) {
+        const refData = this.seriesList[refSeriesID].data;
+        const clickPos = isHorizontal ? offset[1] : offset[0];
+        let nearestDistance = Infinity;
+        let nearestIndex = -1;
+        for (let i = 0; i < refData.length; i++) {
+          const p = refData[i];
+          if (!p) continue;
+          const labelPos = isHorizontal
+            ? (p.h ? p.yp + (p.h / 2) : p.yp)
+            : (p.w ? p.xp + (p.w / 2) : p.xp);
+          if (labelPos === null || labelPos === undefined) continue;
+          const d = Math.abs(clickPos - labelPos);
+          if (d < nearestDistance) {
+            nearestDistance = d;
+            nearestIndex = i;
+          }
+        }
+        if (nearestIndex !== -1) resolvedDataIndex = nearestIndex;
       }
     }
 

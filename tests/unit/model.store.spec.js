@@ -34,6 +34,8 @@ const mockSeries = ({ type, data, hit = false, directHit = false, stackIndex = n
  */
 const mockLineWithIndexedData = ({ points, hitIndex = null, directHitIndex = null }) => ({
   type: 'line',
+  show: true,
+  data: points, // 로컬 nearest label 계산에 사용됨
   stackIndex: null,
   findGraphData: (offset, isHorizontal, dataIndex) => {
     if (typeof dataIndex === 'number') {
@@ -127,20 +129,11 @@ describe('model.store getHitItemByPosition', () => {
     });
   });
 
-  describe('dataIndex 미지정 시 공통 라벨 인덱스 사용', () => {
-    it('클릭 라벨에서 값이 null인 시리즈는, 가까운 다른 라벨의 값으로 fallback되지 않는다', () => {
-      // 재현 시나리오:
-      //   series1: [20, null, 80]   — index 1이 null, 주변은 값 존재
-      //   series2: [10, 30, 50]     — index 1에 값 존재
-      // 사용자가 index 1 라벨의 빈 영역을 클릭 (hit 아님).
-      //
-      // 이전 버그: series1의 findGraphData가 binary-search로 null을 걸러내고
-      //            "가장 가까운 non-null" (index 0 또는 2) 포인트를 반환 →
-      //            값이 존재하므로 fallback 가드를 통과 → series1이 잘못 선택됨.
-      //
-      // 기대: getHitItemByPosition이 공통 dataIndex=1을 먼저 계산해서 두 시리즈 모두에
-      //       전달 → series1은 index 1의 null 포인트를 그대로 받아 가드에 걸려 제외 →
-      //       series2가 fallback으로 선택됨.
+  describe('dataIndex 미지정 시 로컬 nearest 라벨 계산', () => {
+    it('클릭 라벨에서 값이 null인 시리즈는 이웃 라벨의 값으로 잘못 선택되지 않는다', () => {
+      // series1 의 index 1 만 null, series2 는 index 1 에 값 있음.
+      // 클릭 좌표는 index 1 근처 (xp=50 부근).
+      // 기대: 로컬 nearest 가 index 1 을 리턴 → series1 은 null 로 제외 → series2 선택.
       const series1Points = [
         { x: 'L0', y: 20, o: 20, xp: 10, yp: 180, index: 0 },
         { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
@@ -152,20 +145,10 @@ describe('model.store getHitItemByPosition', () => {
         { x: 'L2', y: 50, o: 50, xp: 90, yp: 150, index: 2 },
       ];
 
-      const store = createStore(
-        {
-          series1: mockLineWithIndexedData({ points: series1Points }),
-          series2: mockLineWithIndexedData({ points: series2Points }),
-        },
-        {},
-        {
-          // model.store는 차트 인스턴스의 this에 바인딩되므로,
-          // 같은 인스턴스의 plugins.interaction 메서드인 findClosestDataIndex도
-          // 같은 this에 주입된다. 테스트에서는 결정론적으로 mock한다.
-          findClosestDataIndex: () => 1,
-        },
-      );
-      // 클릭 좌표는 index 1 라벨 주변의 "아래 빈 영역"
+      const store = createStore({
+        series1: mockLineWithIndexedData({ points: series1Points }),
+        series2: mockLineWithIndexedData({ points: series2Points }),
+      });
       const result = store.getHitItemByPosition([50, 300]);
 
       expect(result.sId).toBe('series2');
@@ -173,24 +156,30 @@ describe('model.store getHitItemByPosition', () => {
       expect(result.dataIndex).toBe(1);
     });
 
-    it('findClosestDataIndex가 -1을 반환하면 기존 경로(dataIndex 미지정)로 동작한다', () => {
-      // 클릭이 어떤 라벨에도 가깝지 않은 경우, findClosestDataIndex가 -1을 반환.
-      // 이때는 공통 인덱스를 쓰지 않고 원래 findGraphData 경로로 떨어진다.
-      // 값이 있는 첫 시리즈가 fallback으로 잡힌다.
-      const s1 = mockSeries({
-        type: 'line',
-        data: { x: 'L0', y: 10, o: 10, xp: 10, yp: 50, index: 0 },
-        hit: false,
+    it('두 시리즈 모두 null 인 라벨 클릭 시 이웃 라벨의 값이 잘못 선택되지 않는다', () => {
+      // index 1 에서 두 시리즈 모두 null, 이웃 라벨 (0, 2) 에는 값 존재.
+      // findClosestDataIndex 는 hasValidData 필터로 index 1 을 건너뛰지만,
+      // 로컬 nearest 는 필터 없이 index 1 을 리턴 → 두 시리즈 모두 null 값 가드에
+      // 걸려 제외 → sId='' 리턴 (미선택).
+      const points1 = [
+        { x: 'L0', y: 20, o: 20, xp: 10, yp: 180, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
+        { x: 'L2', y: 80, o: 80, xp: 90, yp: 120, index: 2 },
+      ];
+      const points2 = [
+        { x: 'L0', y: 30, o: 30, xp: 10, yp: 170, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
+        { x: 'L2', y: 70, o: 70, xp: 90, yp: 130, index: 2 },
+      ];
+
+      const store = createStore({
+        series1: mockLineWithIndexedData({ points: points1 }),
+        series2: mockLineWithIndexedData({ points: points2 }),
       });
+      const result = store.getHitItemByPosition([50, 250]);
 
-      const store = createStore(
-        { s1 },
-        {},
-        { findClosestDataIndex: () => -1 },
-      );
-      const result = store.getHitItemByPosition([1000, 1000]);
-
-      expect(result.sId).toBe('s1');
+      expect(result.sId).toBe('');
+      expect(result.dataIndex).toBe(null);
     });
   });
 
