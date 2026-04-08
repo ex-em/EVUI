@@ -910,6 +910,27 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.tooltipCtx;
 
+    // w/h 가 있으면 박스까지 거리(내부면 0), 아니면 포인트까지 거리.
+    // bar.xp/yp 는 bottom-left 모서리라 단순 유클리드 거리로 재면
+    // 바 상단 빈 영역에서 line 포인트가 이기는 문제가 생긴다.
+    const calcFallbackDistance = (data) => {
+      const [cx, cy] = offset;
+      if (data.w !== null && data.w !== undefined && data.h !== null && data.h !== undefined) {
+        const sx = data.xp;
+        const sy = data.yp;
+        const ex = sx + data.w;
+        const ey = sy + data.h;
+        const xMin = Math.min(sx, ex);
+        const xMax = Math.max(sx, ex);
+        const yMin = Math.min(sy, ey);
+        const yMax = Math.max(sy, ey);
+        const dx = cx < xMin ? xMin - cx : (cx > xMax ? cx - xMax : 0);
+        const dy = cy < yMin ? yMin - cy : (cy > yMax ? cy - yMax : 0);
+        return dx * dx + dy * dy;
+      }
+      return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
+    };
+
     let hitId = null;
     let maxs = '';
     let maxsw = 0;
@@ -917,9 +938,11 @@ const modules = {
     let maxg = null;
     let maxSID = null;
     let minDistance = Infinity;
-    // directHit(bar 박스 내부 클릭/hover) 시리즈가 발견되었는지 추적.
-    // 한 번이라도 directHit가 있으면 line의 근접 포인트 히트는 hitId 후보에서 배제된다.
+    // directHit 가 하나라도 있으면 일반 hit 는 hitId 후보에서 배제.
     let hasDirectHit = false;
+    // hit 이 없을 때 거리 기반으로 선택할 fallback (기존 "첫 시리즈 고정" 대체).
+    let fallbackId = null;
+    let fallbackDistance = Infinity;
 
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
     const targetDataIndex = this.findClosestDataIndex(offset, sIds);
@@ -989,25 +1012,30 @@ const modules = {
               maxSID = sId;
             }
 
-            // 마우스 위치와의 거리 계산하여 가장 가까운 시리즈 선택.
-            // directHit(bar 박스 내부)가 하나라도 있으면 그중에서만 선택하고,
-            // 라인의 근접 포인트 히트(item.hit=true, directHit=false)는 hitId 후보에서 배제한다.
-            // bar + line combo 차트에서 작은 bar 클릭 시 큰 값의 line이 잡히던 버그 방지.
+            // hit 기반 선택: directHit 최우선, 그 외 일반 hit 는 directHit 없을 때만.
             if (item.hit && item.data.xp !== undefined && item.data.yp !== undefined) {
               const distance = (item.data.xp - offset[0]) ** 2
                 + (item.data.yp - offset[1]) ** 2;
 
               if (item.directHit) {
-                // directHit는 최우선. 여러 directHit 중에서는 가장 가까운 것 선택.
                 if (!hasDirectHit || distance < minDistance) {
                   minDistance = distance;
                   hitId = sId;
                 }
                 hasDirectHit = true;
               } else if (!hasDirectHit && distance < minDistance) {
-                // directHit가 없을 때만 일반 hit 거리 비교
                 minDistance = distance;
                 hitId = sId;
+              }
+            }
+
+            // fallback 후보: hit 여부와 무관하게 거리가 가장 가까운 시리즈.
+            if (item.data.xp !== undefined && item.data.yp !== undefined
+                && item.data.xp !== null && item.data.yp !== null) {
+              const fbDistance = calcFallbackDistance(item.data);
+              if (fbDistance < fallbackDistance) {
+                fallbackDistance = fbDistance;
+                fallbackId = sId;
               }
             }
           }
@@ -1015,7 +1043,10 @@ const modules = {
       }
     }
 
-    hitId = hitId === null ? Object.keys(items)[0] : hitId;
+    // hit 없으면 거리 기반 fallback, 그것도 없으면 items 첫 키(항상 비어있을 가능성 방어).
+    if (hitId === null) {
+      hitId = fallbackId !== null ? fallbackId : Object.keys(items)[0];
+    }
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
