@@ -62,13 +62,9 @@ class TimeScale extends Scale {
     }
 
     const originalRange = this.range;
-    const originalScrollbarRange = scrollbarOpt?.range;
-
-    if (scrollbarOpt?.use) {
-      scrollbarOpt.range = normalizedRange;
-    } else {
-      this.range = normalizedRange;
-    }
+    const safeScrollbarOpt = scrollbarOpt?.use
+      ? { ...scrollbarOpt, range: normalizedRange }
+      : scrollbarOpt;
 
     const normalizedMinMax = {
       ...minMax,
@@ -76,11 +72,14 @@ class TimeScale extends Scale {
       max: this.normalizeTimeValue(minMax?.max),
     };
 
-    const result = super.calculateScaleRange(normalizedMinMax, scrollbarOpt);
-
-    this.range = originalRange;
-    if (scrollbarOpt?.use) {
-      scrollbarOpt.range = originalScrollbarRange;
+    let result;
+    try {
+      if (!scrollbarOpt?.use) {
+        this.range = normalizedRange;
+      }
+      result = super.calculateScaleRange(normalizedMinMax, safeScrollbarOpt);
+    } finally {
+      this.range = originalRange;
     }
 
     return {
