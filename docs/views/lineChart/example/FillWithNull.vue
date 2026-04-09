@@ -26,8 +26,10 @@
         <b>series2</b> 가 선택되어야 합니다. (기존 버그: series1 이 고정으로 리턴)
       </li>
       <li>
-        <b>두 시리즈 모두 null</b> 인 라벨(01/04)의 어느 영역을 클릭하든 →
-        <b>아무것도 선택되지 않아야</b> 합니다. (이벤트 selected 미발생)
+        <b>두 시리즈 모두 null</b> 인 라벨(01/04)을 클릭/더블클릭 →
+        <code>seriesId=""</code>, <code>value=0</code> 또는 <code>undefined</code>,
+        <code>label/dataIndex</code> 는 <b>01/04</b> 가 그대로 반환되어야 합니다.
+        (hover 는 여전히 nearest valid 라벨로 snap 되어 tooltip 이 표시됩니다.)
       </li>
       <li>series#2 포인트 중심을 정확히 클릭 → <b>series2</b> (directHit).</li>
       <li>
@@ -71,7 +73,7 @@ export default {
       },
       labels,
       // - index 2, 6: series1 만 null → series2 선택되어야 함
-      // - index 3: 두 시리즈 모두 null → 아무것도 선택되지 않아야 함
+      // - index 3: 두 시리즈 모두 null → seriesId='', label/dataIndex 그대로 반환
       // - 나머지: 두 시리즈 모두 값 → 클릭 좌표에 가까운 쪽이 선택
       data: {
         series1: [20, 45, null, null, 80, 55, null, 50],
