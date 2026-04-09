@@ -904,7 +904,7 @@ const modules = {
    *   maxHighlight: [string, number] | null,
    * }} hit item information
    */
-  findHitItem(offset) {
+  findHitItem(offset, disableNullLabelSnap = false) {
     const sIds = Object.keys(this.seriesList);
     const items = {};
     const isHorizontal = !!this.options.horizontal;
@@ -945,7 +945,7 @@ const modules = {
     let fallbackDistance = Infinity;
 
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
-    const targetDataIndex = this.findClosestDataIndex(offset, sIds);
+    const targetDataIndex = this.findClosestDataIndex(offset, sIds, disableNullLabelSnap);
 
     if (targetDataIndex === -1 && !this.isNotUseIndicator()) {
       return { items, hitId, maxTip: [maxs, maxv], maxHighlight: null };
@@ -1051,6 +1051,33 @@ const modules = {
     }
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
+    // disableNullLabelSnap=true 인데 어떤 시리즈도 items 후보가 되지 못한 경우
+    // (= targetDataIndex 의 모든 시리즈 값이 null), click/dblclick 콜백이
+    // 그 라벨의 label/dataIndex 를 받을 수 있도록 synthetic items[''] 를 만든다.
+    // sId 빈 문자열 / value undefined 는 사용자 요청 사양.
+    if (disableNullLabelSnap
+        && Object.keys(items).length === 0
+        && targetDataIndex !== -1) {
+      const refSeriesID = sIds.find((sId) => {
+        const s = this.seriesList[sId];
+        return s?.show && s?.data?.length > 0;
+      });
+      const refPoint = refSeriesID
+        ? this.seriesList[refSeriesID].data?.[targetDataIndex]
+        : null;
+      if (refPoint) {
+        items[''] = {
+          id: '',
+          name: '',
+          label: isHorizontal ? refPoint.y : refPoint.x,
+          index: targetDataIndex,
+          axis: { x: 0, y: 0 },
+          data: { o: undefined, x: refPoint.x, y: refPoint.y },
+        };
+        hitId = '';
+      }
+    }
+
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
   },
 
@@ -1060,7 +1087,7 @@ const modules = {
    * @param {array} sIds series IDs
    * @returns {number} closest data index
    */
-  findClosestDataIndex(offset, sIds) {
+  findClosestDataIndex(offset, sIds, disableNullLabelSnap = false) {
     const [xp, yp] = offset;
     const isHorizontal = !!this.options.horizontal;
     const mousePos = isHorizontal ? yp : xp;
@@ -1110,8 +1137,10 @@ const modules = {
 
     // 각 라벨에서 가장 가까운 것 찾기
     for (let i = 0; i < referenceData.length; i++) {
-      // 이 라벨에 유효한 데이터가 있는 시리즈가 하나 이상 있는지 확인
-      const hasValidData = sIds.some((sId) => {
+      // 이 라벨에 유효한 데이터가 있는 시리즈가 하나 이상 있는지 확인.
+      // disableNullLabelSnap=true 면 all-null 라벨도 후보로 인정해
+      // click/dblclick 콜백이 그 위치를 그대로 받을 수 있게 한다.
+      const hasValidData = disableNullLabelSnap || sIds.some((sId) => {
         const series = this.seriesList[sId];
         return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
       });
