@@ -98,10 +98,11 @@ describe('model.store getHitItemByPosition', () => {
   });
 
   describe('hit 없음 + directHit 없음', () => {
-    it('bar/line 모두 hit=false면 데이터 있는 첫 시리즈로 fallback 한다', () => {
+    it('값이 있는 hit=false 시리즈는 거리 기반 fallback 으로 선택된다', () => {
+      // 클릭에 더 가까운 s1이 fallback 으로 잡히는지 확인.
       const s1 = mockSeries({
         type: 'bar',
-        data: { x: 0, y: 10, xp: 10, yp: 20, o: 10, index: 0 },
+        data: { x: 0, y: 10, xp: 990, yp: 990, o: 10, index: 0 },
         hit: false,
         directHit: false,
       });
@@ -154,6 +155,133 @@ describe('model.store getHitItemByPosition', () => {
 
       expect(result.dataIndex).toBe(3);
       expect(result.maxIndex).toBeUndefined();
+    });
+  });
+
+  describe('fallback 등록 조건 — null 값 제외', () => {
+    it('값(data.o)이 null인 첫 시리즈는 fallback 후보가 아니다', () => {
+      // 같은 라벨에서 A는 값 없고 B만 값 있음. 어느 시리즈도 hit=false 인 빈 영역 클릭.
+      // 기대: fallback 은 값이 존재하는 B.
+      const noValueSeries = mockSeries({
+        type: 'line',
+        data: { x: '2026-01-01', y: null, o: null, xp: 100, yp: null, index: 2 },
+        hit: false,
+      });
+      const valueSeries = mockSeries({
+        type: 'line',
+        data: { x: '2026-01-01', y: 50, o: 50, xp: 100, yp: 80, index: 2 },
+        hit: false,
+      });
+
+      const store = createStore({ A: noValueSeries, B: valueSeries });
+      const result = store.getHitItemByPosition([100, 200]);
+
+      expect(result.sId).toBe('B');
+      expect(result.value).toBe(50);
+      expect(result.dataIndex).toBe(2);
+    });
+
+    it('두 시리즈 모두 값이 null이면 sId는 빈 문자열로 fallback도 없다', () => {
+      const a = mockSeries({
+        type: 'line',
+        data: { x: '2026-01-01', y: null, o: null, xp: 100, yp: null, index: 1 },
+        hit: false,
+      });
+      const b = mockSeries({
+        type: 'line',
+        data: { x: '2026-01-01', y: null, o: null, xp: 100, yp: null, index: 1 },
+        hit: false,
+      });
+
+      const store = createStore({ A: a, B: b });
+      const result = store.getHitItemByPosition([100, 200]);
+
+      expect(result.sId).toBe('');
+      expect(result.dataIndex).toBe(null);
+    });
+
+    it('값이 0인 시리즈도 fallback 후보에 포함된다 (0은 의미 있는 값)', () => {
+      const zeroSeries = mockSeries({
+        type: 'line',
+        data: { x: '2026-01-01', y: 0, o: 0, xp: 100, yp: 250, index: 0 },
+        hit: false,
+      });
+      const nullSeries = mockSeries({
+        type: 'line',
+        data: { x: '2026-01-01', y: null, o: null, xp: 100, yp: null, index: 0 },
+        hit: false,
+      });
+
+      // nullSeries 가 먼저이지만 값이 없으니 fallback 은 zeroSeries.
+      const store = createStore({ null1: nullSeries, zero1: zeroSeries });
+      const result = store.getHitItemByPosition([100, 200]);
+
+      expect(result.sId).toBe('zero1');
+      expect(result.value).toBe(0);
+    });
+  });
+
+  describe('fallback 거리 기반 선택', () => {
+    it('두 시리즈 모두 값이 있고 hit=false일 때, 클릭 좌표에 더 가까운 시리즈가 선택된다', () => {
+      const farSeries = mockSeries({
+        type: 'line',
+        data: { x: 'L1', y: 10, o: 10, xp: 50, yp: 100, index: 1 },
+        hit: false,
+      });
+      const nearSeries = mockSeries({
+        type: 'line',
+        data: { x: 'L1', y: 50, o: 50, xp: 50, yp: 200, index: 1 },
+        hit: false,
+      });
+
+      // 클릭 (50, 210) — near(거리 10) vs far(거리 110). 정의 순서상 far 가 먼저지만
+      // 거리 기반이라 near 가 선택되어야 한다.
+      const store = createStore({ far: farSeries, near: nearSeries });
+      const result = store.getHitItemByPosition([50, 210]);
+
+      expect(result.sId).toBe('near');
+      expect(result.value).toBe(50);
+    });
+
+    it('bar+line combo: bar 위쪽 빈 영역 클릭 시, 박스 거리 기준으로 bar가 선택된다', () => {
+      // line 포인트 yp=200, bar 박스 xp=40, yp=300, w=20, h=-200 → 박스 y [100, 300].
+      // 클릭 (50, 50) — 바 상단 위쪽 빈 영역. 어느 쪽도 hit 아님.
+      // 단순 (xp,yp) 거리로 재면 line 이 이김 (line 22500, bar 62600).
+      // 박스 거리로 재면 bar 가 이김 (bar 2500, line 22500).
+      const lineSeries = mockSeries({
+        type: 'line',
+        data: { x: 'L1', y: 30, o: 30, xp: 50, yp: 200, w: null, h: null, index: 1 },
+        hit: false,
+      });
+      const barSeries = mockSeries({
+        type: 'bar',
+        data: { x: 'L1', y: 50, o: 50, xp: 40, yp: 300, w: 20, h: -200, index: 1 },
+        hit: false,
+      });
+
+      const store = createStore({ series1: lineSeries, series2: barSeries });
+      const result = store.getHitItemByPosition([50, 50]);
+
+      expect(result.sId).toBe('series2');
+      expect(result.type).toBe('bar');
+    });
+
+    it('null인 시리즈는 더 가까워도 fallback에서 제외된다 (값 가드 우선)', () => {
+      const nullSeries = mockSeries({
+        type: 'line',
+        data: { x: 'L1', y: null, o: null, xp: 50, yp: 205, index: 1 },
+        hit: false,
+      });
+      const valueSeries = mockSeries({
+        type: 'line',
+        data: { x: 'L1', y: 50, o: 50, xp: 50, yp: 100, index: 1 },
+        hit: false,
+      });
+
+      const store = createStore({ nullOne: nullSeries, valueOne: valueSeries });
+      const result = store.getHitItemByPosition([50, 210]);
+
+      expect(result.sId).toBe('valueOne');
     });
   });
 });
