@@ -885,26 +885,7 @@ const modules = {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
-    // w/h 가 있으면 박스까지 거리(내부면 0), 아니면 포인트까지 거리.
-    // bar.xp/yp 는 bottom-left 모서리라 단순 유클리드 거리로 재면
-    // 바 상단 빈 영역에서 line 포인트가 이기는 문제가 생긴다.
-    const calcFallbackDistance = (data) => {
-      const [cx, cy] = offset;
-      if (data.w !== null && data.w !== undefined && data.h !== null && data.h !== undefined) {
-        const sx = data.xp;
-        const sy = data.yp;
-        const ex = sx + data.w;
-        const ey = sy + data.h;
-        const xMin = Math.min(sx, ex);
-        const xMax = Math.max(sx, ex);
-        const yMin = Math.min(sy, ey);
-        const yMax = Math.max(sy, ey);
-        const dx = Math.max(xMin - cx, 0, cx - xMax);
-        const dy = Math.max(yMin - cy, 0, cy - yMax);
-        return dx * dx + dy * dy;
-      }
-      return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
-    };
+    const [cx, cy] = offset;
 
     // dataIndex 미지정 시 클릭 좌표에 가장 가까운 valid 라벨 인덱스 결정.
     // disableNullLabelSnap=true 이면 all-null 라벨도 후보로 인정.
@@ -1013,7 +994,7 @@ const modules = {
               const hasCoords = data.xp !== null && data.xp !== undefined
                 && data.yp !== null && data.yp !== undefined;
               if (hasMeaningfulValue && hasCoords) {
-                const distance = calcFallbackDistance(data);
+                const distance = Util.calcBoxDistance(data, cx, cy);
                 if (fallbackSeriesID === '' || distance < fallbackDistance) {
                   fallbackDistance = distance;
                   fallbackType = series.type;

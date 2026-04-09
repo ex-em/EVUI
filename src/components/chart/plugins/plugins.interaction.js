@@ -2,6 +2,7 @@ import { numberWithComma } from '@/common/utils';
 import throttle from '@/common/utils.throttle';
 import { cloneDeep, defaultsDeep, inRange, isEqual } from 'lodash-es';
 import dayjs from 'dayjs';
+import Util from '../helpers/helpers.util';
 
 const modules = {
   /**
@@ -910,26 +911,7 @@ const modules = {
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.tooltipCtx;
 
-    // w/h 가 있으면 박스까지 거리(내부면 0), 아니면 포인트까지 거리.
-    // bar.xp/yp 는 bottom-left 모서리라 단순 유클리드 거리로 재면
-    // 바 상단 빈 영역에서 line 포인트가 이기는 문제가 생긴다.
-    const calcFallbackDistance = (data) => {
-      const [cx, cy] = offset;
-      if (data.w !== null && data.w !== undefined && data.h !== null && data.h !== undefined) {
-        const sx = data.xp;
-        const sy = data.yp;
-        const ex = sx + data.w;
-        const ey = sy + data.h;
-        const xMin = Math.min(sx, ex);
-        const xMax = Math.max(sx, ex);
-        const yMin = Math.min(sy, ey);
-        const yMax = Math.max(sy, ey);
-        const dx = Math.max(xMin - cx, 0, cx - xMax);
-        const dy = Math.max(yMin - cy, 0, cy - yMax);
-        return dx * dx + dy * dy;
-      }
-      return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
-    };
+    const [cx, cy] = offset;
 
     let hitId = null;
     let maxs = '';
@@ -1034,7 +1016,7 @@ const modules = {
             // 값이 null 인 시리즈는 items 수집 단계에서 이미 걸러진 상태. 별도 null 값 가드 불필요.
             if (item.data.xp !== undefined && item.data.yp !== undefined
                 && item.data.xp !== null && item.data.yp !== null) {
-              const fbDistance = calcFallbackDistance(item.data);
+              const fbDistance = Util.calcBoxDistance(item.data, cx, cy);
               if (fbDistance < fallbackDistance) {
                 fallbackDistance = fbDistance;
                 fallbackId = sId;
