@@ -112,7 +112,15 @@ const module = {
         ? this.options.axesX?.[0]?.scrollbar?.resetPosition
         : this.options.axesY?.[0]?.scrollbar?.resetPosition;
       if (isUpdateAxesRange) {
-        this.scrollbar[dir].range = newOpt?.[0]?.range?.length ? [...newOpt[0].range] : null;
+        const newOptRange = newOpt?.[0]?.range;
+        const currentRange = this.scrollbar[dir].range;
+        if (!isResetPosition && newOptRange?.length && currentRange?.length) {
+          // 리사이즈 등으로 range 크기만 변경된 경우, 현재 스크롤 위치(min)를 유지하고 크기만 조정
+          const newSize = newOptRange[1] - newOptRange[0];
+          this.scrollbar[dir].range = [currentRange[0], currentRange[0] + newSize];
+        } else {
+          this.scrollbar[dir].range = newOptRange?.length ? [...newOptRange] : null;
+        }
       }
 
       if (isResetPosition || updateData) {
