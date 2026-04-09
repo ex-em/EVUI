@@ -865,11 +865,7 @@ const modules = {
    * 선택 우선순위:
    *   1. directHit (bar 박스 내부 클릭) — 가장 가까운 것
    *   2. hit (line 포인트 근접 등) — 가장 가까운 것
-   *   3. hit이 전혀 없으면 데이터가 있는 첫 시리즈로 fallback (기존 동작 호환)
-   *
-   * 과거에는 "같은 라벨 위에서 값이 가장 큰 시리즈"를 돌려주는 max-value 덮어쓰기 방식이었으나,
-   * bar + line combo 차트에서 작은 bar를 클릭해도 큰 값의 line이 선택되는 버그의 원인이었다.
-   * 이번 수정으로 사용자가 실제로 가리킨 시리즈(hit)가 선택되도록 바뀐다.
+   *   3. hit 없으면 클릭 좌표에 가장 가까운 시리즈로 fallback (distance 기반)
    *
    * @param {array}   offset          position x and y
    * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
