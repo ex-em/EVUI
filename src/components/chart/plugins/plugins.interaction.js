@@ -1030,6 +1030,8 @@ const modules = {
             }
 
             // fallback 후보: hit 여부와 무관하게 거리가 가장 가까운 시리즈.
+            // 참고: 이 블록은 outer `if (gdata !== null && gdata !== undefined)` 안에 있어서
+            // 값이 null 인 시리즈는 items 수집 단계에서 이미 걸러진 상태. 별도 null 값 가드 불필요.
             if (
               item.data.xp !== undefined &&
               item.data.yp !== undefined &&
