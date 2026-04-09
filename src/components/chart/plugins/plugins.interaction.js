@@ -1051,10 +1051,7 @@ const modules = {
     }
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
-    // disableNullLabelSnap=true 인데 어떤 시리즈도 items 후보가 되지 못한 경우
-    // (= targetDataIndex 의 모든 시리즈 값이 null), click/dblclick 콜백이
-    // 그 라벨의 label/dataIndex 를 받을 수 있도록 synthetic items[''] 를 만든다.
-    // sId 빈 문자열 / value undefined 는 사용자 요청 사양.
+    // all-null 라벨인 경우 synthetic items[''] 로 label/index 만 채워 전달.
     if (disableNullLabelSnap
         && Object.keys(items).length === 0
         && targetDataIndex !== -1) {
@@ -1135,11 +1132,8 @@ const modules = {
     let closestDistance = Infinity;
     let closestIndex = -1;
 
-    // 각 라벨에서 가장 가까운 것 찾기
+    // 각 라벨에서 가장 가까운 것 찾기 (disableNullLabelSnap=true 면 all-null 라벨도 후보)
     for (let i = 0; i < referenceData.length; i++) {
-      // 이 라벨에 유효한 데이터가 있는 시리즈가 하나 이상 있는지 확인.
-      // disableNullLabelSnap=true 면 all-null 라벨도 후보로 인정해
-      // click/dblclick 콜백이 그 위치를 그대로 받을 수 있게 한다.
       const hasValidData = disableNullLabelSnap || sIds.some((sId) => {
         const series = this.seriesList[sId];
         return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
