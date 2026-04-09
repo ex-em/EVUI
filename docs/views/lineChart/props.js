@@ -4,6 +4,8 @@ import Default from './example/Default';
 import DefaultRaw from './example/Default?raw';
 import Fill from './example/Fill';
 import FillRaw from './example/Fill?raw';
+import FillWithNull from './example/FillWithNull';
+import FillWithNullRaw from './example/FillWithNull?raw';
 import Stack from './example/Stack';
 import StackRaw from './example/Stack?raw';
 import Event from './example/Event';
@@ -59,6 +61,12 @@ export default {
         'Line Chart의 Fill 옵션을 이용하여 각 계열 데이터의 양을 좀 더 쉽게 인지할 수 있도록 합니다.',
       component: Fill,
       parsedData: parse(FillRaw).descriptor,
+    },
+    'Fill (with null)': {
+      description:
+        'Area(fill) 시리즈 2개 중 한쪽에 null 값이 섞여 있을 때, 해당 라벨의 빈 영역을 클릭하면 null 시리즈가 아닌 값이 존재하는 시리즈가 선택되는지 검증하는 예제입니다.',
+      component: FillWithNull,
+      parsedData: parse(FillWithNullRaw).descriptor,
     },
     Stack: {
       description:
