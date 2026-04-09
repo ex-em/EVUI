@@ -875,10 +875,20 @@ const modules = {
    * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
    * @param {number} dataIndex        selected data index
    * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
+   * @param {boolean}  disableNullLabelSnap   true 이면 모든 시리즈가 null 인 라벨도
+   *                                          후보로 인정한다 (click/dblclick 경로용).
+   *                                          이 경우 hit/fallback 모두 비면 해당 라벨의
+   *                                          label/dataIndex 만 채워서 반환한다 (sId='').
    *
    * @returns {object} hit item information
    */
-  getHitItemByPosition(offset, useApproximate = false, dataIndex, useSelectLabelOrItem = false) {
+  getHitItemByPosition(
+    offset,
+    useApproximate = false,
+    dataIndex,
+    useSelectLabelOrItem = false,
+    disableNullLabelSnap = false,
+  ) {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
 
@@ -903,8 +913,10 @@ const modules = {
       return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
     };
 
-    // dataIndex 미지정 시 클릭 좌표에 가장 가까운 valid 라벨 인덱스를 결정한다.
-    // 모든 시리즈가 null 인 라벨은 제외한다.
+    // dataIndex 미지정 시 클릭 좌표에 가장 가까운 라벨 인덱스를 결정한다.
+    // 기본은 "모든 시리즈가 null 인 라벨" 을 건너뛰지만, disableNullLabelSnap=true
+    // 이면 all-null 라벨도 후보로 인정해 click/dblclick 콜백이 그 위치를 그대로
+    // 받을 수 있게 한다.
     let resolvedDataIndex = dataIndex;
     if (resolvedDataIndex === undefined && !useApproximate) {
       const refSeriesID = seriesIDs.find((sId) => {
@@ -917,7 +929,7 @@ const modules = {
         let nearestDistance = Infinity;
         let nearestIndex = -1;
         for (let i = 0; i < refData.length; i++) {
-          const hasValidData = seriesIDs.some((sId) => {
+          const hasValidData = disableNullLabelSnap || seriesIDs.some((sId) => {
             const s = this.seriesList[sId];
             return s?.show && s.data?.[i]?.o !== null && s.data?.[i]?.o !== undefined;
           });
@@ -1063,6 +1075,29 @@ const modules = {
             }
           }
         }
+      }
+    }
+
+    // disableNullLabelSnap=true 이고 어떤 시리즈도 hit/fallback 후보가 되지 못한 경우
+    // (= 모든 시리즈가 해당 라벨에서 null), 라벨/인덱스만 채워 반환한다.
+    // sId 는 빈 문자열, value 는 ?? 0 으로 0 이 반환된다.
+    if (
+      disableNullLabelSnap
+      && hitSeriesID === ''
+      && fallbackSeriesID === ''
+      && resolvedDataIndex !== undefined
+      && resolvedDataIndex >= 0
+    ) {
+      const refSeriesID = seriesIDs.find((sId) => {
+        const s = this.seriesList[sId];
+        return s?.show && s?.data?.length > 0;
+      });
+      const refPoint = refSeriesID
+        ? this.seriesList[refSeriesID].data?.[resolvedDataIndex]
+        : null;
+      if (refPoint) {
+        fallbackLabel = isHorizontal ? refPoint.y : refPoint.x;
+        fallbackDataIndex = resolvedDataIndex;
       }
     }
 
