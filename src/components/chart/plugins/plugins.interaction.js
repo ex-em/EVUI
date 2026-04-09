@@ -2,6 +2,7 @@ import { numberWithComma } from '@/common/utils';
 import throttle from '@/common/utils.throttle';
 import { cloneDeep, defaultsDeep, inRange, isEqual } from 'lodash-es';
 import dayjs from 'dayjs';
+import Util from '../helpers/helpers.util';
 
 const modules = {
   /**
@@ -180,10 +181,10 @@ const modules = {
       }
 
       const setSelectedItemInfo = () => {
-        const hitInfo = this.findHitItem(offset);
+        const hitInfo = this.findHitItem(offset, true);
 
         // 실제 클릭된 아이템의 정보 추출 (hitId가 있으면 해당 아이템, 없으면 첫 번째 아이템)
-        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItemId = hitInfo.hitId ?? Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
         if (hitItem) {
@@ -196,8 +197,8 @@ const modules = {
       };
 
       const setSelectedLabelInfo = (targetAxis) => {
-        const hitInfo = this.findHitItem(offset);
-        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitInfo = this.findHitItem(offset, true);
+        const hitItemId = hitInfo.hitId ?? Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
         const {
@@ -220,8 +221,8 @@ const modules = {
       };
 
       const setSelectedSeriesInfo = () => {
-        const hitInfo = this.findHitItem(offset);
-        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitInfo = this.findHitItem(offset, true);
+        const hitItemId = hitInfo.hitId ?? Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
         if (hitItemId !== null) {
@@ -294,7 +295,7 @@ const modules = {
       const useSelectSeries = selectSeriesOpt?.use && selectSeriesOpt?.useClick;
 
       const setSelectedItemInfo = () => {
-        const hitInfo = this.getHitItemByPosition(offset, false);
+        const hitInfo = this.getHitItemByPosition(offset, false, undefined, false, true);
 
         ({
           label: args.label,
@@ -337,8 +338,8 @@ const modules = {
       };
 
       const setSelectedSeriesInfo = () => {
-        const hitInfo = this.findHitItem(offset);
-        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitInfo = this.findHitItem(offset, true);
+        const hitItemId = hitInfo.hitId ?? Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
         if (hitItemId !== null) {
@@ -904,11 +905,13 @@ const modules = {
    *   maxHighlight: [string, number] | null,
    * }} hit item information
    */
-  findHitItem(offset) {
+  findHitItem(offset, disableNullLabelSnap = false) {
     const sIds = Object.keys(this.seriesList);
     const items = {};
     const isHorizontal = !!this.options.horizontal;
     const ctx = this.tooltipCtx;
+
+    const [cx, cy] = offset;
 
     let hitId = null;
     let maxs = '';
@@ -917,12 +920,14 @@ const modules = {
     let maxg = null;
     let maxSID = null;
     let minDistance = Infinity;
-    // directHit(bar 박스 내부 클릭/hover) 시리즈가 발견되었는지 추적.
-    // 한 번이라도 directHit가 있으면 line의 근접 포인트 히트는 hitId 후보에서 배제된다.
+    // directHit 가 하나라도 있으면 일반 hit 는 hitId 후보에서 배제.
     let hasDirectHit = false;
+    // hit 이 없을 때 거리 기반으로 선택할 fallback (기존 "첫 시리즈 고정" 대체).
+    let fallbackId = null;
+    let fallbackDistance = Infinity;
 
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
-    const targetDataIndex = this.findClosestDataIndex(offset, sIds);
+    const targetDataIndex = this.findClosestDataIndex(offset, sIds, disableNullLabelSnap);
 
     if (targetDataIndex === -1 && !this.isNotUseIndicator()) {
       return { items, hitId, maxTip: [maxs, maxv], maxHighlight: null };
@@ -989,25 +994,32 @@ const modules = {
               maxSID = sId;
             }
 
-            // 마우스 위치와의 거리 계산하여 가장 가까운 시리즈 선택.
-            // directHit(bar 박스 내부)가 하나라도 있으면 그중에서만 선택하고,
-            // 라인의 근접 포인트 히트(item.hit=true, directHit=false)는 hitId 후보에서 배제한다.
-            // bar + line combo 차트에서 작은 bar 클릭 시 큰 값의 line이 잡히던 버그 방지.
+            // hit 기반 선택: directHit 최우선, 그 외 일반 hit 는 directHit 없을 때만.
             if (item.hit && item.data.xp !== undefined && item.data.yp !== undefined) {
               const distance = (item.data.xp - offset[0]) ** 2
                 + (item.data.yp - offset[1]) ** 2;
 
               if (item.directHit) {
-                // directHit는 최우선. 여러 directHit 중에서는 가장 가까운 것 선택.
                 if (!hasDirectHit || distance < minDistance) {
                   minDistance = distance;
                   hitId = sId;
                 }
                 hasDirectHit = true;
               } else if (!hasDirectHit && distance < minDistance) {
-                // directHit가 없을 때만 일반 hit 거리 비교
                 minDistance = distance;
                 hitId = sId;
+              }
+            }
+
+            // fallback 후보: hit 여부와 무관하게 거리가 가장 가까운 시리즈.
+            // 참고: 이 블록은 outer `if (gdata !== null && gdata !== undefined)` 안에 있어서
+            // 값이 null 인 시리즈는 items 수집 단계에서 이미 걸러진 상태. 별도 null 값 가드 불필요.
+            if (item.data.xp !== undefined && item.data.yp !== undefined
+                && item.data.xp !== null && item.data.yp !== null) {
+              const fbDistance = Util.calcBoxDistance(item.data, cx, cy);
+              if (fbDistance < fallbackDistance) {
+                fallbackDistance = fbDistance;
+                fallbackId = sId;
               }
             }
           }
@@ -1015,8 +1027,35 @@ const modules = {
       }
     }
 
-    hitId = hitId === null ? Object.keys(items)[0] : hitId;
+    // hit 없으면 거리 기반 fallback, 그것도 없으면 items 첫 키(항상 비어있을 가능성 방어).
+    if (hitId === null) {
+      hitId = fallbackId !== null ? fallbackId : Object.keys(items)[0];
+    }
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
+
+    // all-null 라벨인 경우 synthetic items[''] 로 label/index 만 채워 전달.
+    if (disableNullLabelSnap
+        && Object.keys(items).length === 0
+        && targetDataIndex !== -1) {
+      const refSeriesID = sIds.find((sId) => {
+        const s = this.seriesList[sId];
+        return s?.show && s?.data?.length > 0;
+      });
+      const refPoint = refSeriesID
+        ? this.seriesList[refSeriesID].data?.[targetDataIndex]
+        : null;
+      if (refPoint) {
+        items[''] = {
+          id: '',
+          name: '',
+          label: isHorizontal ? refPoint.y : refPoint.x,
+          index: targetDataIndex,
+          axis: { x: 0, y: 0 },
+          data: { o: undefined, x: refPoint.x, y: refPoint.y },
+        };
+        hitId = '';
+      }
+    }
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
   },
@@ -1027,7 +1066,7 @@ const modules = {
    * @param {array} sIds series IDs
    * @returns {number} closest data index
    */
-  findClosestDataIndex(offset, sIds) {
+  findClosestDataIndex(offset, sIds, disableNullLabelSnap = false) {
     const [xp, yp] = offset;
     const isHorizontal = !!this.options.horizontal;
     const mousePos = isHorizontal ? yp : xp;
@@ -1075,10 +1114,9 @@ const modules = {
     let closestDistance = Infinity;
     let closestIndex = -1;
 
-    // 각 라벨에서 가장 가까운 것 찾기
+    // 각 라벨에서 가장 가까운 것 찾기 (disableNullLabelSnap=true 면 all-null 라벨도 후보)
     for (let i = 0; i < referenceData.length; i++) {
-      // 이 라벨에 유효한 데이터가 있는 시리즈가 하나 이상 있는지 확인
-      const hasValidData = sIds.some((sId) => {
+      const hasValidData = disableNullLabelSnap || sIds.some((sId) => {
         const series = this.seriesList[sId];
         return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
       });

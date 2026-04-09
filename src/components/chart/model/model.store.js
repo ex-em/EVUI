@@ -865,22 +865,67 @@ const modules = {
    * 선택 우선순위:
    *   1. directHit (bar 박스 내부 클릭) — 가장 가까운 것
    *   2. hit (line 포인트 근접 등) — 가장 가까운 것
-   *   3. hit이 전혀 없으면 데이터가 있는 첫 시리즈로 fallback (기존 동작 호환)
-   *
-   * 과거에는 "같은 라벨 위에서 값이 가장 큰 시리즈"를 돌려주는 max-value 덮어쓰기 방식이었으나,
-   * bar + line combo 차트에서 작은 bar를 클릭해도 큰 값의 line이 선택되는 버그의 원인이었다.
-   * 이번 수정으로 사용자가 실제로 가리킨 시리즈(hit)가 선택되도록 바뀐다.
+   *   3. hit 없으면 클릭 좌표에 가장 가까운 시리즈로 fallback (distance 기반)
    *
    * @param {array}   offset          position x and y
    * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
    * @param {number} dataIndex        selected data index
    * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
+   * @param {boolean}  disableNullLabelSnap   true 이면 all-null 라벨도 그대로 반환 (click/dblclick 용)
    *
    * @returns {object} hit item information
    */
-  getHitItemByPosition(offset, useApproximate = false, dataIndex, useSelectLabelOrItem = false) {
+  getHitItemByPosition(
+    offset,
+    useApproximate = false,
+    dataIndex,
+    useSelectLabelOrItem = false,
+    disableNullLabelSnap = false,
+  ) {
     const seriesIDs = Object.keys(this.seriesList);
     const isHorizontal = !!this.options.horizontal;
+
+    const [cx, cy] = offset;
+
+    // dataIndex 미지정 시 클릭 좌표에 가장 가까운 valid 라벨 인덱스 결정.
+    // disableNullLabelSnap=true 이면 all-null 라벨도 후보로 인정.
+    let resolvedDataIndex = dataIndex;
+    if (resolvedDataIndex === undefined && !useApproximate) {
+      const refSeriesID = seriesIDs.find((sId) => {
+        const s = this.seriesList[sId];
+        return s?.show && s?.data?.length > 0;
+      });
+      if (refSeriesID) {
+        const refData = this.seriesList[refSeriesID].data;
+        const clickPos = isHorizontal ? offset[1] : offset[0];
+        let nearestDistance = Infinity;
+        let nearestIndex = -1;
+        for (let i = 0; i < refData.length; i++) {
+          const hasValidData = disableNullLabelSnap || seriesIDs.some((sId) => {
+            const s = this.seriesList[sId];
+            return s?.show && s.data?.[i]?.o !== null && s.data?.[i]?.o !== undefined;
+          });
+
+          const p = refData[i];
+          if (hasValidData && p) {
+            let labelPos;
+            if (isHorizontal) {
+              labelPos = p.h ? p.yp + (p.h / 2) : p.yp;
+            } else {
+              labelPos = p.w ? p.xp + (p.w / 2) : p.xp;
+            }
+            if (labelPos !== null && labelPos !== undefined) {
+              const d = Math.abs(clickPos - labelPos);
+              if (d < nearestDistance) {
+                nearestDistance = d;
+                nearestIndex = i;
+              }
+            }
+          }
+        }
+        if (nearestIndex !== -1) resolvedDataIndex = nearestIndex;
+      }
+    }
 
     // hit 기반 결과 (최우선)
     let hitType = null;
@@ -892,13 +937,14 @@ const modules = {
     let hitDistance = Infinity;
     let hasDirectHit = false;
 
-    // fallback: hit이 전혀 없을 때 사용할 "데이터 있는 첫 시리즈" 정보
+    // hit 없을 때 쓸 fallback — 값이 있는 시리즈 중 클릭 좌표에 가장 가까운 것.
     let fallbackType = null;
     let fallbackLabel = null;
     let fallbackValuePos = null;
     let fallbackValue = null;
     let fallbackSeriesID = '';
     let fallbackDataIndex = null;
+    let fallbackDistance = Infinity;
 
     let acc = 0;
     let useStack = false;
@@ -913,7 +959,7 @@ const modules = {
           series,
           offset,
           isHorizontal,
-          dataIndex,
+          resolvedDataIndex,
           useSelectLabelOrItem,
         );
         const data = item.data;
@@ -942,8 +988,24 @@ const modules = {
                 acc += data.y;
               }
 
-              // fallback 기록: 데이터가 있는 첫 시리즈를 저장
-              if (fallbackSeriesID === '') {
+              // fallback 후보: 값이 있는 시리즈 중 거리가 가장 가까운 쪽.
+              // 값이 null 인 시리즈는 제외.
+              const hasMeaningfulValue = g !== null && g !== undefined && !Number.isNaN(g);
+              const hasCoords = data.xp !== null && data.xp !== undefined
+                && data.yp !== null && data.yp !== undefined;
+              if (hasMeaningfulValue && hasCoords) {
+                const distance = Util.calcBoxDistance(data, cx, cy);
+                if (fallbackSeriesID === '' || distance < fallbackDistance) {
+                  fallbackDistance = distance;
+                  fallbackType = series.type;
+                  fallbackLabel = ldata;
+                  fallbackValuePos = lp;
+                  fallbackValue = g;
+                  fallbackSeriesID = seriesID;
+                  fallbackDataIndex = index;
+                }
+              } else if (hasMeaningfulValue && fallbackSeriesID === '') {
+                // 좌표 없는 예외 케이스 — 첫 후보로만 등록
                 fallbackType = series.type;
                 fallbackLabel = ldata;
                 fallbackValuePos = lp;
@@ -985,6 +1047,27 @@ const modules = {
             }
           }
         }
+      }
+    }
+
+    // all-null 라벨인 경우 label/dataIndex 만 채워 반환 (sId='', value=0).
+    if (
+      disableNullLabelSnap
+      && hitSeriesID === ''
+      && fallbackSeriesID === ''
+      && resolvedDataIndex !== undefined
+      && resolvedDataIndex >= 0
+    ) {
+      const refSeriesID = seriesIDs.find((sId) => {
+        const s = this.seriesList[sId];
+        return s?.show && s?.data?.length > 0;
+      });
+      const refPoint = refSeriesID
+        ? this.seriesList[refSeriesID].data?.[resolvedDataIndex]
+        : null;
+      if (refPoint) {
+        fallbackLabel = isHorizontal ? refPoint.y : refPoint.x;
+        fallbackDataIndex = resolvedDataIndex;
       }
     }
 

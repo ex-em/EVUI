@@ -136,6 +136,7 @@ export default {
       }],
       selectSeries: {
         use: true,
+        useClick: true,
         limit: 1,
         useDeselectOverflow: true,
       },
@@ -164,6 +165,7 @@ export default {
       }],
       selectSeries: {
         use: true,
+        useClick: true,
         limit: 1,
         useDeselectOverflow: true,
       },
@@ -171,13 +173,21 @@ export default {
 
     const clickedSeries = ref();
     const onClick = (e) => {
-      clickedSeries.value = e;
+      // 'series' 모드 click 은 setSelectedSeriesInfo → findHitItem 경로.
+      // 두 라인 사이 빈 영역 클릭 시 fallback 으로 선택된 seriesId 를 여기서 확인.
+      clickedSeries.value = {
+        'selected.seriesId': e?.selected?.seriesId,
+        'selected.eventTarget': e?.selected?.eventTarget,
+        label: e?.label,
+        dataIndex: e?.dataIndex,
+      };
     };
 
     const dblclickedSeries = ref();
     const dblclickedValue = ref();
     const onDblClick = (e) => {
-      dblclickedSeries.value = e.seriesId;
+      // 'series' 모드에서는 선택된 seriesId 가 e.selected.seriesId 에 배열로 담김
+      dblclickedSeries.value = e.selected?.seriesId ?? e.seriesId;
       dblclickedValue.value = e.value;
     };
 

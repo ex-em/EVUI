@@ -25,7 +25,7 @@ export default {
     },
     'Area & Line': {
       description:
-        'Area(fill 옵션을 준 line)와 일반 Line을 조합합니다. 두 시리즈 모두 포인트 기반이므로 hit detection은 line 포인트 directHit 규칙을 따릅니다.',
+        'Area(fill 옵션을 준 line)와 일반 Line을 조합합니다. 일부 라벨에 null 값이 섞여 있을 때, null 라벨의 빈 영역을 클릭하면 값이 없는 시리즈가 아니라 실제로 값이 있는 시리즈가 선택되어야 합니다.',
       component: AreaLine,
       parsedData: parseComponent(AreaLineRaw),
     },
