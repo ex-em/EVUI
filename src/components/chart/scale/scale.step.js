@@ -5,6 +5,11 @@ import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
 import Util from '../helpers/helpers.util';
 
+/**
+ * scrollbar 사용 시 스크롤마다 labels 전체를 재순회하지 않도록 결과를 캐시
+ */
+const stringMinMaxByLabels = new WeakMap();
+
 class StepScale extends Scale {
   constructor(type, axisOpt, ctx, labels, options) {
     super(type, axisOpt, ctx, options);
@@ -43,6 +48,26 @@ class StepScale extends Scale {
   }
 
   /**
+   * labels 배열의 문자열 min/max를 반환
+   * - alignToGridLine: 전달받은 minMax 그대로 사용
+   * - scrollbar 사용: WeakMap 캐시를 통해 O(n) → O(1)로 단축
+   * - 일반: 매번 getStringMinMax 계산
+   * @param {object} minMax       축 min/max 정보 (alignToGridLine 시 사용)
+   * @param {object} scrollbarOpt 스크롤바 옵션
+   * @returns {{ min: string, max: string }}
+   */
+  getStepMinMax(minMax, scrollbarOpt) {
+    if (this.labelStyle.alignToGridLine) return minMax;
+
+    if (!scrollbarOpt?.use) return Util.getStringMinMax(this.labels);
+
+    if (!stringMinMaxByLabels.has(this.labels)) {
+      stringMinMaxByLabels.set(this.labels, Util.getStringMinMax(this.labels));
+    }
+    return stringMinMaxByLabels.get(this.labels);
+  }
+
+  /**
    * Calculate min/max value, label and size information for step scale
    * @param {object} minMax       min/max information (unused on step scale)
    * @param {object} scrollbarOpt    scroll bar option
@@ -51,7 +76,7 @@ class StepScale extends Scale {
    * @returns {object} min/max value and label
    */
   calculateScaleRange(minMax, scrollbarOpt, chartRect) {
-    const stepMinMax = this.labelStyle.alignToGridLine ? minMax : Util.getStringMinMax(this.labels);
+    const stepMinMax = this.getStepMinMax(minMax, scrollbarOpt);
     let maxValue = stepMinMax.max;
     let minValue = stepMinMax.min;
 
