@@ -1,3 +1,26 @@
+## [3.6.1](https://github.com/ex-em/EVUI/compare/3.6.0...3.6.1) (2026-04-09)
+
+
+### Bug Fixes
+
+* bar chart scrollbar 렌더링 버그 수정 ([ea19a79](https://github.com/ex-em/EVUI/commit/ea19a7957455bfe82ca5c704aba29a787596aee7))
+* barData가 있을때만 아래 로직을 타도록 수정 ([ec50878](https://github.com/ex-em/EVUI/commit/ec508788a0bf8f0ce52b89ad7c2a8c7855de1413))
+* **chart:** click/dblclick 핸들러가 all-null label 정보를 그대로 반환 ([9306e65](https://github.com/ex-em/EVUI/commit/9306e65bac5dc2cf935e74dfeafe36338f298844))
+* **chart:** findHitItem/findClosestDataIndex에 disableNullLabelSnap 옵션 추가 ([2195ccf](https://github.com/ex-em/EVUI/commit/2195ccf99298719c133ee7c768d88e2fffc48e71))
+* **chart:** getHitItemByPosition에 disableNullLabelSnap 옵션 추가 ([f2e0007](https://github.com/ex-em/EVUI/commit/f2e0007ed0138ce7d04fada68c9f872240801186))
+* **chart:** hitId falsy sentinel, JSDoc, FillWithNull.vue 명세 정합성 수정 ([ab4f8bd](https://github.com/ex-em/EVUI/commit/ab4f8bd2704e14fe8f8bee65c42a2f2db13f363a))
+* endIndex가 gData의 개수를 넘지 않도록 처리 ([7edaa8d](https://github.com/ex-em/EVUI/commit/7edaa8d494f70963687411c086273204678b049d))
+* findHitItem fallback이 "첫 시리즈" 고정으로 선택되는 문제 수정 ([45c91c4](https://github.com/ex-em/EVUI/commit/45c91c44c36a7505a9ee1efc8e2f4e131891eba8)), closes [#2199](https://github.com/ex-em/EVUI/issues/2199)
+* getHitItemByPosition fallback이 잘못된 시리즈를 선택하는 문제 수정 ([a8db4dc](https://github.com/ex-em/EVUI/commit/a8db4dc8a82c4454f8610fde769575a84cc12610)), closes [ex-em/EVUI#2199](https://github.com/ex-em/EVUI/issues/2199)
+* linear 축일때 데이터 max 값과 축의 max 값이 크게 차이나는 현상 및 사용자 range가 있을때 interval을 딱 떨어지는 interval로 구하도록 수정 ([7b35174](https://github.com/ex-em/EVUI/commit/7b351740d45a704d95da27e352798245c59d0715))
+* null-only 라벨 click 결과가 hover/dblclick 과 다른 문제 수정 ([1e4f883](https://github.com/ex-em/EVUI/commit/1e4f88307760df199836b9a0cdd2f83d4c724e21))
+* null-only 라벨 클릭 시 이웃 라벨 값이 잘못 선택되는 문제 수정 ([3827bdc](https://github.com/ex-em/EVUI/commit/3827bdc2d65cd971baa8964a90b2a5770fc31852))
+* range가 0보다 작거나 유효하지 않은 경우 eary return, 유한소수중에서도 소수점 자리수가 작은 게 우선이 되도록 개선 ([751004e](https://github.com/ex-em/EVUI/commit/751004e64da2ec0845945abc912da530eb626444))
+* range가 업데이트될때 크기만 조정하고 스크롤 위치는 유지하도록 수정 ([aa0c63c](https://github.com/ex-em/EVUI/commit/aa0c63c0df480bbefb2d3d3cf179f6e302d6bbd5))
+* update test:visual ([c4eb865](https://github.com/ex-em/EVUI/commit/c4eb8658ed653143ed13c07d49dfc9bc273d69ce))
+* 경고 로그 추가 다시 수정 ([3bcc092](https://github.com/ex-em/EVUI/commit/3bcc092ab621e7c5fafe20d48b8c24685c1bef7f))
+* 라벨이 많을 경우 스크롤 시 버벅이는 현상 개선 ([ada7b0f](https://github.com/ex-em/EVUI/commit/ada7b0f3075e7223718a16a2538ce8293211641c))
+
 # [3.6.0](https://github.com/ex-em/EVUI/compare/3.5.6...3.6.0) (2026-04-08)
 
 
