@@ -11,9 +11,10 @@
   </div>
 
   <div class="description">
-    <b>Area(fill=true)와 일반 Line을 combo로 구성한 예제 — null 섞임</b>
+    <b>null 값이 섞인 Area(Fill) 2개 시리즈 — fallback 선택 버그 재현 예제</b>
     <br />
     <span class="hint">
+      두 area 시리즈 모두 fill 옵션을 사용합니다.
       01/03, 01/07: series#1 만 null / 01/04: 두 시리즈 모두 null.
     </span>
     <br /><br />
@@ -28,11 +29,11 @@
         <b>두 시리즈 모두 null</b> 인 라벨(01/04)의 어느 영역을 클릭하든 →
         <b>아무것도 선택되지 않아야</b> 합니다. (이벤트 selected 미발생)
       </li>
+      <li>series#2 포인트 중심을 정확히 클릭 → <b>series2</b> (directHit).</li>
       <li>
         두 시리즈 모두 값이 있는 라벨에서 포인트가 아닌 중간 영역을 클릭 →
         <b>클릭 좌표에 가까운</b> 시리즈가 선택되어야 합니다.
       </li>
-      <li>각 시리즈 포인트 중심을 정확히 클릭 → 해당 시리즈 (directHit).</li>
     </ol>
     <br />
     <div class="badge yellow">클릭 이벤트 결과 (single click)</div>
@@ -54,23 +55,23 @@ export default {
     const chartData = {
       series: {
         series1: {
-          name: 'series#1 (area)',
+          name: 'series#1 (area, null 포함)',
           show: true,
-          type: 'line',
           fill: { gradient: true },
           fillColor: '#6AA9F2',
           color: '#6AA9F2',
         },
         series2: {
-          name: 'series#2 (line)',
+          name: 'series#2 (area)',
           show: true,
-          type: 'line',
+          fill: { gradient: true },
+          fillColor: '#FF6B6B',
           color: '#FF6B6B',
         },
       },
       labels,
-      // - index 2, 6 (01/03, 01/07): series1 만 null → series2 선택되어야 함
-      // - index 3 (01/04): 두 시리즈 모두 null → 아무것도 선택되지 않아야 함
+      // - index 2, 6: series1 만 null → series2 선택되어야 함
+      // - index 3: 두 시리즈 모두 null → 아무것도 선택되지 않아야 함
       // - 나머지: 두 시리즈 모두 값 → 클릭 좌표에 가까운 쪽이 선택
       data: {
         series1: [20, 45, null, null, 80, 55, null, 50],
@@ -83,7 +84,7 @@ export default {
       width: '100%',
       height: '100%',
       title: {
-        text: 'Area + Line Combo',
+        text: 'Area Fill x 2 (series#1 에 null 포함)',
         show: true,
       },
       legend: {
