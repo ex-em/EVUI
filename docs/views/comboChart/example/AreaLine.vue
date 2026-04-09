@@ -21,8 +21,10 @@
           <b>series2</b> 가 선택되어야 합니다. (기존 버그: series1 이 고정으로 리턴)
         </li>
         <li>
-          <b>두 시리즈 모두 null</b> 인 라벨(01/04)의 어느 영역을 클릭하든 →
-          hover/dblclick 과 동일하게 <b>nearest valid 라벨(01/03 또는 01/05)</b>이 선택되어야 합니다.
+          <b>두 시리즈 모두 null</b> 인 라벨(01/04)을 클릭/더블클릭 →
+          <code>seriesId=""</code>, <code>value=0</code> 또는 <code>undefined</code>,
+          <code>label/dataIndex</code> 는 <b>01/04</b> 가 그대로 반환되어야 합니다.
+          (hover 는 여전히 nearest valid 라벨로 snap 되어 tooltip 이 표시됩니다.)
         </li>
         <li>
           두 시리즈 모두 값이 있는 라벨에서 포인트가 아닌 중간 영역을 클릭 →
