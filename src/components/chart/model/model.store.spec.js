@@ -26,6 +26,40 @@ const mockSeries = ({ type, data, hit = false, directHit = false, stackIndex = n
   }),
 });
 
+/**
+ * dataIndex 인자에 반응하는 findGraphData mock.
+ * 인덱스별 데이터 포인트 배열을 받아, dataIndex 가 주어지면 그 인덱스 포인트를,
+ * 주어지지 않으면 "가장 가까운 non-null 포인트" (line binary-search 경로 근사) 를 반환한다.
+ * show/data 속성을 포함해 로컬 nearest label 계산에 참여할 수 있다.
+ */
+const mockLineWithIndexedData = ({ points, hitIndex = null, directHitIndex = null }) => ({
+  type: 'line',
+  show: true,
+  data: points,
+  stackIndex: null,
+  findGraphData: (offset, isHorizontal, dataIndex) => {
+    if (typeof dataIndex === 'number') {
+      const data = points[dataIndex] ?? null;
+      return {
+        data,
+        hit: data && dataIndex === hitIndex,
+        directHit: data && dataIndex === directHitIndex,
+        index: dataIndex,
+      };
+    }
+    const firstNonNullIdx = points.findIndex((p) => p && p.o !== null);
+    if (firstNonNullIdx === -1) {
+      return { data: null, hit: false, directHit: false, index: 0 };
+    }
+    return {
+      data: points[firstNonNullIdx],
+      hit: firstNonNullIdx === hitIndex,
+      directHit: firstNonNullIdx === directHitIndex,
+      index: firstNonNullIdx,
+    };
+  },
+});
+
 describe('model.store getHitItemByPosition', () => {
   describe('directHit 우선순위', () => {
     it('bar 박스 내부 클릭(directHit=true)은 좌표가 더 가까운 line(hit=true)보다 우선 선택된다', () => {
@@ -282,6 +316,58 @@ describe('model.store getHitItemByPosition', () => {
       const result = store.getHitItemByPosition([50, 210]);
 
       expect(result.sId).toBe('valueOne');
+    });
+  });
+
+  describe('dataIndex 미지정 시 로컬 nearest 라벨 계산', () => {
+    it('클릭 라벨에서 값이 null인 시리즈는 이웃 라벨의 값으로 잘못 선택되지 않는다', () => {
+      // series1 의 index 1 만 null, series2 는 index 1 에 값 있음.
+      // 클릭 좌표가 index 1 근처. 로컬 nearest 가 index 1 을 리턴 →
+      // series1 은 null 로 제외 → series2 선택.
+      const series1Points = [
+        { x: 'L0', y: 20, o: 20, xp: 10, yp: 180, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
+        { x: 'L2', y: 80, o: 80, xp: 90, yp: 120, index: 2 },
+      ];
+      const series2Points = [
+        { x: 'L0', y: 10, o: 10, xp: 10, yp: 190, index: 0 },
+        { x: 'L1', y: 30, o: 30, xp: 50, yp: 170, index: 1 },
+        { x: 'L2', y: 50, o: 50, xp: 90, yp: 150, index: 2 },
+      ];
+
+      const store = createStore({
+        series1: mockLineWithIndexedData({ points: series1Points }),
+        series2: mockLineWithIndexedData({ points: series2Points }),
+      });
+      const result = store.getHitItemByPosition([50, 300]);
+
+      expect(result.sId).toBe('series2');
+      expect(result.value).toBe(30);
+      expect(result.dataIndex).toBe(1);
+    });
+
+    it('두 시리즈 모두 null 인 라벨 클릭 시 이웃 라벨의 값이 잘못 선택되지 않는다', () => {
+      // index 1 에서 두 시리즈 모두 null. 로컬 nearest 는 필터 없이 index 1 을 리턴 →
+      // 두 시리즈 모두 값 가드에 걸려 제외 → sId='' (미선택).
+      const points1 = [
+        { x: 'L0', y: 20, o: 20, xp: 10, yp: 180, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
+        { x: 'L2', y: 80, o: 80, xp: 90, yp: 120, index: 2 },
+      ];
+      const points2 = [
+        { x: 'L0', y: 30, o: 30, xp: 10, yp: 170, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
+        { x: 'L2', y: 70, o: 70, xp: 90, yp: 130, index: 2 },
+      ];
+
+      const store = createStore({
+        series1: mockLineWithIndexedData({ points: points1 }),
+        series2: mockLineWithIndexedData({ points: points2 }),
+      });
+      const result = store.getHitItemByPosition([50, 250]);
+
+      expect(result.sId).toBe('');
+      expect(result.dataIndex).toBe(null);
     });
   });
 });
