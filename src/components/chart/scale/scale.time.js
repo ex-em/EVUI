@@ -182,26 +182,30 @@ class TimeScale extends Scale {
     /**
      * 1) userRange + userInterval
      * 호환되면 그대로 사용
+     * 단, maxSteps를 넘을경우 interval을 증가시켜서 맞춤
      * 호환되지 않으면 userRange only 로직으로 fallback
      */
     if (hasUserRange && isValidInterval) {
-      const interval = resolvedInterval;
       const graphRange = graphMax - graphMin;
-      const rawSteps = graphRange / interval;
+      const rawSteps = graphRange / resolvedInterval;
       const isCompatible =
         Math.abs(rawSteps - Math.round(rawSteps)) < EPS;
 
-      if ((isCompatible && rawSteps <= maxSteps) || this.fixedSteps) {
-        const steps = Math.round(rawSteps);
-        return {
-          steps,
-          interval,
-          graphMin,
-          graphMax,
-        };
+      if (this.fixedSteps || isCompatible) {
+        let interval = resolvedInterval;
+        let steps = Math.round(rawSteps);
+
+        if (!this.fixedSteps) {
+          while (steps > maxSteps) {
+            interval += resolvedInterval;
+            steps = Math.ceil(graphRange / interval);
+          }
+        }
+
+        return { steps, interval, graphMin, graphMax };
       }
     }
-  
+
     /**
      * 2) userInterval only
      * Object(time, unit) interval에만 해당

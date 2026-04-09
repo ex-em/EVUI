@@ -139,11 +139,17 @@ export default {
       },
     });
 
-    const rangeDateTimes = ref([threeHoursAgo.format('YYYY-MM-DD HH:mm:ss'), now.format('YYYY-MM-DD HH:mm:ss')]);
-    const intervalValue = ref(10);
-    const intervalUnit = ref('minute');
+    const todayStart = now.startOf('day');
+    const todayEnd = todayStart.add(23, 'hour');
+    const rangeDateTimes = ref([
+      todayStart.format('YYYY-MM-DD HH:mm:ss'),
+      todayEnd.format('YYYY-MM-DD HH:mm:ss'),
+    ]);
+
+    const intervalValue = ref(1);
+    const intervalUnit = ref('hour');
     const useInterval = ref(true);
-    const useRange = ref(false);
+    const useRange = ref(true);
 
     const chartOptions = computed(() => ({
       type: 'scatter',
