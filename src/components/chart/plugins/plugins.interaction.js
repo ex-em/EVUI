@@ -183,7 +183,7 @@ const modules = {
         const hitInfo = this.findHitItem(offset, true);
 
         // 실제 클릭된 아이템의 정보 추출 (hitId가 있으면 해당 아이템, 없으면 첫 번째 아이템)
-        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItemId = hitInfo.hitId ?? Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
         if (hitItem) {
@@ -197,7 +197,7 @@ const modules = {
 
       const setSelectedLabelInfo = (targetAxis) => {
         const hitInfo = this.findHitItem(offset, true);
-        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItemId = hitInfo.hitId ?? Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
         const {
@@ -221,7 +221,7 @@ const modules = {
 
       const setSelectedSeriesInfo = () => {
         const hitInfo = this.findHitItem(offset, true);
-        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItemId = hitInfo.hitId ?? Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
         if (hitItemId !== null) {
@@ -338,7 +338,7 @@ const modules = {
 
       const setSelectedSeriesInfo = () => {
         const hitInfo = this.findHitItem(offset, true);
-        const hitItemId = hitInfo.hitId || Object.keys(hitInfo.items)[0];
+        const hitItemId = hitInfo.hitId ?? Object.keys(hitInfo.items)[0];
         const hitItem = hitInfo.items[hitItemId];
 
         if (hitItemId !== null) {
