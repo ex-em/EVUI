@@ -903,9 +903,8 @@ const modules = {
       return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
     };
 
-    // dataIndex 미지정 시 클릭에 가장 가까운 라벨 인덱스를 직접 계산해 모든 시리즈에 전달.
-    // findClosestDataIndex 는 "모든 시리즈가 null 인 라벨" 을 건너뛰기 때문에
-    // 해당 라벨 클릭 시 이웃 라벨의 값이 잘못 선택되는 문제가 있어 여기선 쓰지 않는다.
+    // dataIndex 미지정 시 클릭 좌표에 가장 가까운 valid 라벨 인덱스를 결정한다.
+    // 모든 시리즈가 null 인 라벨은 제외한다.
     let resolvedDataIndex = dataIndex;
     if (resolvedDataIndex === undefined && !useApproximate) {
       const refSeriesID = seriesIDs.find((sId) => {
@@ -918,8 +917,13 @@ const modules = {
         let nearestDistance = Infinity;
         let nearestIndex = -1;
         for (let i = 0; i < refData.length; i++) {
+          const hasValidData = seriesIDs.some((sId) => {
+            const s = this.seriesList[sId];
+            return s?.show && s.data?.[i]?.o !== null && s.data?.[i]?.o !== undefined;
+          });
+
           const p = refData[i];
-          if (p) {
+          if (hasValidData && p) {
             let labelPos;
             if (isHorizontal) {
               labelPos = p.h ? p.yp + p.h / 2 : p.yp;
