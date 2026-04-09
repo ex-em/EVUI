@@ -430,4 +430,27 @@ export default {
 
     return `${color}80`;
   },
+
+  /**
+   * 클릭 좌표(cx, cy)에서 데이터 포인트까지의 거리²를 반환한다.
+   * w/h 가 있으면 박스 외벽까지의 거리(내부면 0), 없으면 포인트까지의 유클리드 거리².
+   * @param {object} data - 데이터 포인트 (xp, yp, w?, h?)
+   * @param {number} cx - 클릭 x 좌표
+   * @param {number} cy - 클릭 y 좌표
+   * @returns {number}
+   */
+  calcBoxDistance(data, cx, cy) {
+    if (data.w !== null && data.w !== undefined && data.h !== null && data.h !== undefined) {
+      const sx = data.xp;
+      const sy = data.yp;
+      const xMin = Math.min(sx, sx + data.w);
+      const xMax = Math.max(sx, sx + data.w);
+      const yMin = Math.min(sy, sy + data.h);
+      const yMax = Math.max(sy, sy + data.h);
+      const dx = Math.max(0, xMin - cx, cx - xMax);
+      const dy = Math.max(0, yMin - cy, cy - yMax);
+      return dx * dx + dy * dy;
+    }
+    return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
+  },
 };
