@@ -373,6 +373,33 @@ describe('model.store getHitItemByPosition', () => {
       expect(result.dataIndex).not.toBe(null);
     });
 
+    it('disableNullLabelSnap=true 면 모든 시리즈가 null 인 라벨도 그대로 반환한다', () => {
+      // index 1 에서 두 시리즈 모두 null. 클릭 좌표는 xp=50 → index 1 이 가장 가깝다.
+      // 기본 동작이라면 index 1 을 건너뛰고 nearest valid 로 snap 하지만,
+      // disableNullLabelSnap=true 이면 index 1 그대로 반환 (sId='', value=0).
+      const points1 = [
+        { x: 'L0', y: 20, o: 20, xp: 10, yp: 180, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
+        { x: 'L2', y: 80, o: 80, xp: 90, yp: 120, index: 2 },
+      ];
+      const points2 = [
+        { x: 'L0', y: 30, o: 30, xp: 10, yp: 170, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
+        { x: 'L2', y: 70, o: 70, xp: 90, yp: 130, index: 2 },
+      ];
+
+      const store = createStore({
+        series1: mockLineWithIndexedData({ points: points1 }),
+        series2: mockLineWithIndexedData({ points: points2 }),
+      });
+      const result = store.getHitItemByPosition([50, 250], false, undefined, false, true);
+
+      expect(result.sId).toBe('');
+      expect(result.value).toBe(0);
+      expect(result.label).toBe('L1');
+      expect(result.dataIndex).toBe(1);
+    });
+
     it('차트 전체 데이터가 null 이면 empty 를 반환한다', () => {
       // 모든 라벨에서 모든 시리즈가 null → hasValidData 항상 false → resolvedDataIndex 미정 → empty.
       const points1 = [
