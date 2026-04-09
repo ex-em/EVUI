@@ -875,10 +875,7 @@ const modules = {
    * @param {boolean} useApproximate  if it's true. it'll look for closed item on mouse position
    * @param {number} dataIndex        selected data index
    * @param {boolean}  useSelectLabelOrItem   used to display select label/item at tooltip location
-   * @param {boolean}  disableNullLabelSnap   true 이면 모든 시리즈가 null 인 라벨도
-   *                                          후보로 인정한다 (click/dblclick 경로용).
-   *                                          이 경우 hit/fallback 모두 비면 해당 라벨의
-   *                                          label/dataIndex 만 채워서 반환한다 (sId='').
+   * @param {boolean}  disableNullLabelSnap   true 이면 all-null 라벨도 그대로 반환 (click/dblclick 용)
    *
    * @returns {object} hit item information
    */
@@ -913,10 +910,8 @@ const modules = {
       return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
     };
 
-    // dataIndex 미지정 시 클릭 좌표에 가장 가까운 라벨 인덱스를 결정한다.
-    // 기본은 "모든 시리즈가 null 인 라벨" 을 건너뛰지만, disableNullLabelSnap=true
-    // 이면 all-null 라벨도 후보로 인정해 click/dblclick 콜백이 그 위치를 그대로
-    // 받을 수 있게 한다.
+    // dataIndex 미지정 시 클릭 좌표에 가장 가까운 valid 라벨 인덱스 결정.
+    // disableNullLabelSnap=true 이면 all-null 라벨도 후보로 인정.
     let resolvedDataIndex = dataIndex;
     if (resolvedDataIndex === undefined && !useApproximate) {
       const refSeriesID = seriesIDs.find((sId) => {
@@ -1081,9 +1076,7 @@ const modules = {
       }
     }
 
-    // disableNullLabelSnap=true 이고 어떤 시리즈도 hit/fallback 후보가 되지 못한 경우
-    // (= 모든 시리즈가 해당 라벨에서 null), 라벨/인덱스만 채워 반환한다.
-    // sId 는 빈 문자열, value 는 ?? 0 으로 0 이 반환된다.
+    // all-null 라벨인 경우 label/dataIndex 만 채워 반환 (sId='', value=0).
     if (
       disableNullLabelSnap
       && hitSeriesID === ''
