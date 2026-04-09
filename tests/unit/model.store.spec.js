@@ -156,11 +156,10 @@ describe('model.store getHitItemByPosition', () => {
       expect(result.dataIndex).toBe(1);
     });
 
-    it('두 시리즈 모두 null 인 라벨 클릭 시 이웃 라벨의 값이 잘못 선택되지 않는다', () => {
+    it('두 시리즈 모두 null 인 라벨 클릭 시 nearest valid 라벨(이웃)을 반환한다 (hover/dblclick 일관성)', () => {
       // index 1 에서 두 시리즈 모두 null, 이웃 라벨 (0, 2) 에는 값 존재.
-      // findClosestDataIndex 는 hasValidData 필터로 index 1 을 건너뛰지만,
-      // 로컬 nearest 는 필터 없이 index 1 을 리턴 → 두 시리즈 모두 null 값 가드에
-      // 걸려 제외 → sId='' 리턴 (미선택).
+      // hasValidData 필터로 index 1 을 건너뛰고 nearest valid(index 0 또는 2)를 resolvedDataIndex 로 사용.
+      // hover/dblclick 이 findClosestDataIndex 로 이웃 라벨을 반환하는 것과 동일한 동작.
       const points1 = [
         { x: 'L0', y: 20, o: 20, xp: 10, yp: 180, index: 0 },
         { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
@@ -170,6 +169,29 @@ describe('model.store getHitItemByPosition', () => {
         { x: 'L0', y: 30, o: 30, xp: 10, yp: 170, index: 0 },
         { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
         { x: 'L2', y: 70, o: 70, xp: 90, yp: 130, index: 2 },
+      ];
+
+      const store = createStore({
+        series1: mockLineWithIndexedData({ points: points1 }),
+        series2: mockLineWithIndexedData({ points: points2 }),
+      });
+      // 클릭 xp=50 → index 0(xp=10, dist=40)과 index 2(xp=90, dist=40) 동거리 → index 0 선택.
+      // index 0 에서 series1(yp=180, dist²=6500)이 series2(yp=170, dist²=8000)보다 가까움.
+      const result = store.getHitItemByPosition([50, 250]);
+
+      expect(result.sId).not.toBe('');
+      expect(result.dataIndex).not.toBe(null);
+    });
+
+    it('차트 전체 데이터가 null 이면 empty 를 반환한다', () => {
+      // 모든 라벨에서 모든 시리즈가 null → hasValidData 항상 false → resolvedDataIndex 미정 → empty.
+      const points1 = [
+        { x: 'L0', y: null, o: null, xp: 10, yp: null, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
+      ];
+      const points2 = [
+        { x: 'L0', y: null, o: null, xp: 10, yp: null, index: 0 },
+        { x: 'L1', y: null, o: null, xp: 50, yp: null, index: 1 },
       ];
 
       const store = createStore({
