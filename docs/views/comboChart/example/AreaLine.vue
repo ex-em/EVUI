@@ -26,7 +26,7 @@
       </li>
       <li>
         <b>두 시리즈 모두 null</b> 인 라벨(01/04)의 어느 영역을 클릭하든 →
-        <b>아무것도 선택되지 않아야</b> 합니다. (이벤트 selected 미발생)
+        hover/dblclick 과 동일하게 <b>nearest valid 라벨(01/03 또는 01/05)</b>이 선택되어야 합니다.
       </li>
       <li>
         두 시리즈 모두 값이 있는 라벨에서 포인트가 아닌 중간 영역을 클릭 →
@@ -70,7 +70,7 @@ export default {
       },
       labels,
       // - index 2, 6 (01/03, 01/07): series1 만 null → series2 선택되어야 함
-      // - index 3 (01/04): 두 시리즈 모두 null → 아무것도 선택되지 않아야 함
+      // - index 3 (01/04): 두 시리즈 모두 null → nearest valid 라벨(01/03 또는 01/05) 선택
       // - 나머지: 두 시리즈 모두 값 → 클릭 좌표에 가까운 쪽이 선택
       data: {
         series1: [20, 45, null, null, 80, 55, null, 50],
