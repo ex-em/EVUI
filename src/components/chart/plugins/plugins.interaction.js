@@ -924,8 +924,8 @@ const modules = {
         const xMax = Math.max(sx, ex);
         const yMin = Math.min(sy, ey);
         const yMax = Math.max(sy, ey);
-        const dx = cx < xMin ? xMin - cx : (cx > xMax ? cx - xMax : 0);
-        const dy = cy < yMin ? yMin - cy : (cy > yMax ? cy - yMax : 0);
+        const dx = Math.max(xMin - cx, 0, cx - xMax);
+        const dy = Math.max(yMin - cy, 0, cy - yMax);
         return dx * dx + dy * dy;
       }
       return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;

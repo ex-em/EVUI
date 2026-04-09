@@ -896,8 +896,8 @@ const modules = {
         const xMax = Math.max(sx, ex);
         const yMin = Math.min(sy, ey);
         const yMax = Math.max(sy, ey);
-        const dx = cx < xMin ? xMin - cx : (cx > xMax ? cx - xMax : 0);
-        const dy = cy < yMin ? yMin - cy : (cy > yMax ? cy - yMax : 0);
+        const dx = Math.max(xMin - cx, 0, cx - xMax);
+        const dy = Math.max(yMin - cy, 0, cy - yMax);
         return dx * dx + dy * dy;
       }
       return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
@@ -919,15 +919,20 @@ const modules = {
         let nearestIndex = -1;
         for (let i = 0; i < refData.length; i++) {
           const p = refData[i];
-          if (!p) continue;
-          const labelPos = isHorizontal
-            ? (p.h ? p.yp + (p.h / 2) : p.yp)
-            : (p.w ? p.xp + (p.w / 2) : p.xp);
-          if (labelPos === null || labelPos === undefined) continue;
-          const d = Math.abs(clickPos - labelPos);
-          if (d < nearestDistance) {
-            nearestDistance = d;
-            nearestIndex = i;
+          if (p) {
+            let labelPos;
+            if (isHorizontal) {
+              labelPos = p.h ? p.yp + (p.h / 2) : p.yp;
+            } else {
+              labelPos = p.w ? p.xp + (p.w / 2) : p.xp;
+            }
+            if (labelPos !== null && labelPos !== undefined) {
+              const d = Math.abs(clickPos - labelPos);
+              if (d < nearestDistance) {
+                nearestDistance = d;
+                nearestIndex = i;
+              }
+            }
           }
         }
         if (nearestIndex !== -1) resolvedDataIndex = nearestIndex;
