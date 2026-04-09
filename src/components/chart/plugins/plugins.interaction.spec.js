@@ -124,10 +124,11 @@ describe('plugins.interaction findHitItem', () => {
   });
 
   describe('hit 없을 때 fallback', () => {
-    it('모든 시리즈가 hit=false면 items의 첫 번째 키로 fallback 한다', () => {
+    it('모든 시리즈가 hit=false면 거리가 가장 가까운 시리즈로 fallback 한다', () => {
+      // 클릭 (1000, 1000) 에 s1 이 훨씬 가까운 좌표.
       const chart = createChart({
         s1: mockSeries({
-          data: { x: 0, y: 10, xp: 10, yp: 20, o: 10 },
+          data: { x: 0, y: 10, xp: 990, yp: 990, o: 10 },
           hit: false,
         }),
         s2: mockSeries({
