@@ -120,12 +120,17 @@ class TimeScale extends Scale {
     const step = range.maxSteps;
 
     if (this.interval) {
+      let userInterval;
       if (typeof this.interval === 'string') {
-        return TIME_INTERVALS[this.interval].size;
+        userInterval = TIME_INTERVALS[this.interval].size;
       } else if (typeof this.interval === 'object') {
-        return this.interval.time * TIME_INTERVALS[this.interval.unit].size;
+        userInterval = this.interval.time * TIME_INTERVALS[this.interval.unit].size;
       } else if (typeof this.interval === 'number') {
-        return this.interval;
+        userInterval = this.interval;
+      }
+
+      if (userInterval > 0 && Number.isFinite(userInterval)) {
+        return userInterval;
       }
     }
     return Math.ceil((max - min) / step);
