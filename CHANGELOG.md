@@ -1,3 +1,12 @@
+## [3.6.2](https://github.com/ex-em/EVUI/compare/3.6.1...3.6.2) (2026-04-14)
+
+
+### Bug Fixes
+
+* min값 비교할때 현재 min값이 null이 아닐 경우 그 다음 min값이 null이 아닐때만 비교하도록 변경 ([ec43b9e](https://github.com/ex-em/EVUI/commit/ec43b9e77451c0514500c15988d93e7d53ccf20c))
+* time > scale > interval : 0 입력 시 브라우저 프리징 현상 수정 ([223ae3b](https://github.com/ex-em/EVUI/commit/223ae3b1f3b36ca1e35c2ee63ac4200c314f120e))
+* 표시 가능한 label개수를 넘을 경우 range, interval 조합이 complete함에도 무시되는 현상 수정 ([a178787](https://github.com/ex-em/EVUI/commit/a178787b25931a6a7066c2cc5687cf0b49fef1e2))
+
 ## [3.6.1](https://github.com/ex-em/EVUI/compare/3.6.0...3.6.1) (2026-04-09)
 
 
