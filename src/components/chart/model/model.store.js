@@ -1300,20 +1300,20 @@ const modules = {
             if (!isHorizontal) {
               if (
                 smm.minX !== null &&
-                (minmax.x[axisX].min === null || smm.minX < minmax.x[axisX].min)
+                (minmax.x[axisX].min === null || (smm.minX !== null && smm.minX < minmax.x[axisX].min))
               ) {
                 minmax.x[axisX].min = smm.minX;
               }
-              if (minmax.y[axisY].min === null || smm.minY < minmax.y[axisY].min) {
+              if (minmax.y[axisY].min === null || (smm.minY !== null && smm.minY < minmax.y[axisY].min)) {
                 minmax.y[axisY].min = smm.minY;
               }
             } else {
-              if (minmax.x[axisX].min === null || smm.minX < minmax.x[axisX].min) {
+              if (minmax.x[axisX].min === null || (smm.minX !== null && smm.minX < minmax.x[axisX].min)) {
                 minmax.x[axisX].min = smm.minX;
               }
               if (
                 smm.minY !== null &&
-                (minmax.y[axisY].min === null || smm.minY < minmax.y[axisY].min)
+                (minmax.y[axisY].min === null || (smm.minY !== null && smm.minY < minmax.y[axisY].min))
               ) {
                 minmax.y[axisY].min = smm.minY;
               }
