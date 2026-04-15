@@ -184,6 +184,18 @@ export default class EvChartBrush {
         break;
     }
 
+    const maxBrushCanvasWidth = brushCanvasWidth * pixelRatio;
+
+    if (this.brushRectX < 0) {
+      this.brushRectX = 0;
+    } else if (this.brushRectX + this.brushRectWidth > maxBrushCanvasWidth) {
+      this.brushRectX = maxBrushCanvasWidth - this.brushRectWidth;
+    }
+
+    if (this.brushRectWidth > maxBrushCanvasWidth) {
+      this.brushRectWidth = maxBrushCanvasWidth;
+    }
+
     return {
       brushRectX: this.brushRectX,
       brushRectWidth: this.brushRectWidth,
@@ -238,25 +250,49 @@ export default class EvChartBrush {
     };
   }
 
+  getCanvasOffsetX(e) {
+    const rect = this.brushCanvas.getBoundingClientRect();
+
+    return e.clientX - rect.left;
+  }
+
   addEvent() {
     let mousePosition;
+
+    const onDocumentMouseMove = (e) => {
+      if (this.isDragMode) {
+        const offsetX = this.getCanvasOffsetX(e);
+        this.mouseDownAndMove({ offsetX });
+      }
+    };
+    this.onDocumentMouseMove = throttle(onDocumentMouseMove, 5);
+
+    this.onDocumentMouseUp = () => {
+      document.removeEventListener('mousemove', this.onDocumentMouseMove);
+      document.removeEventListener('mouseup', this.onDocumentMouseUp);
+      this.initEventState();
+    };
 
     this.onMouseDown = (e) => {
       e.preventDefault();
 
       if (mousePosition.isInsideButton) {
-        this.clickBrushInsideX = -1;
+        this.isDragMode = 'button';
       } else if (mousePosition.isInsideBrush) {
         this.clickBrushInsideX = e.offsetX;
+        this.isDragMode = 'grab';
       } else if (mousePosition.isOutsideBrush) {
         this.teleportBrush(e);
+      }
+
+      if (this.isDragMode) {
+        document.addEventListener('mousemove', this.onDocumentMouseMove);
+        document.addEventListener('mouseup', this.onDocumentMouseUp);
       }
     };
 
     const onMouseMove = (e) => {
-      if (this.clickBrushInsideX) {
-        this.mouseDownAndMove(e);
-      } else {
+      if (!this.isDragMode) {
         mousePosition = this.getMousePosition(e);
 
         this.changeCursor(mousePosition);
@@ -284,12 +320,6 @@ export default class EvChartBrush {
 
     this.onMouseUp = () => {
       this.initEventState();
-    };
-
-    this.onMouseLeave = () => {
-      if (this.clickBrushInsideX) {
-        this.initEventState();
-      }
     };
 
     const onWheelDebounce = () => {
@@ -330,6 +360,9 @@ export default class EvChartBrush {
     if (this.brushCanvas) {
       this.setEventListener('removeEventListener');
 
+      document.removeEventListener('mousemove', this.onDocumentMouseMove);
+      document.removeEventListener('mouseup', this.onDocumentMouseUp);
+
       this.brushCanvas = null;
     }
 
@@ -351,7 +384,6 @@ export default class EvChartBrush {
     this.brushCanvas[type]('mousemove', this.onMouseMove);
     this.brushCanvas[type]('mousedown', this.onMouseDown);
     this.brushCanvas[type]('mouseup', this.onMouseUp);
-    this.brushCanvas[type]('mouseleave', this.onMouseLeave);
 
     if (this.evChartBrushOptions.value.useWheelMove) {
       this.brushCanvas[type]('wheel', this.onWheel);
@@ -451,7 +483,7 @@ export default class EvChartBrush {
 
     if (e.offsetX > this.beforeMouseXPos) {
       // 오른쪽 이동
-      if (this.clickBrushInsideX > 0) {
+      if (this.isDragMode === 'grab') {
         if (this.clickBrushInsideX < e.offsetX - moveSensitive) {
           mode = BRUSH_UPDATE_MODE.GRAB.UP;
 
@@ -473,7 +505,7 @@ export default class EvChartBrush {
       }
     } else if (e.offsetX < this.beforeMouseXPos) {
       // 왼쪽 이동
-      if (this.clickBrushInsideX > 0) {
+      if (this.isDragMode === 'grab') {
         if (this.clickBrushInsideX > e.offsetX + moveSensitive) {
           mode = BRUSH_UPDATE_MODE.GRAB.DOWN;
 
@@ -643,6 +675,11 @@ export default class EvChartBrush {
    * @returns {undefined}
    */
   initEventState() {
+    if (this.isCleaningUp) {
+      return;
+    }
+    this.isCleaningUp = true;
+
     const promise = new Promise((resolve) => {
       this.updateBrushIdxUseXPos();
 
@@ -652,6 +689,7 @@ export default class EvChartBrush {
     promise.then((isUpdateBrushIdx) => {
       if (isUpdateBrushIdx) {
         this.clickBrushInsideX = null;
+        this.isDragMode = null;
         this.beforeMouseXPos = null;
         this.curBrushButtonType = null;
 
@@ -660,6 +698,7 @@ export default class EvChartBrush {
         this.brushIdx.isUseButton = false;
         this.brushIdx.isUseScroll = false;
       }
+      this.isCleaningUp = false;
     });
   }
 }
