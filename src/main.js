@@ -9,6 +9,11 @@ import EvRadioGroup from '@/components/radioGroup/';
 import EvSelect from '@/components/select/';
 import EvToggle from '@/components/toggle/';
 import EvTextField from '@/components/textField/';
+import EvInputRoot from '@/components/input/InputRoot.vue';
+import EvInput from '@/components/input/Input.vue';
+import EvInputLabel from '@/components/input/InputLabel.vue';
+import EvInputDescription from '@/components/input/InputDescription.vue';
+import EvInputErrorMessage from '@/components/input/InputErrorMessage.vue';
 import EvInputNumber from '@/components/inputNumber/';
 import EvSlider from '@/components/slider/';
 import EvIcon from '@/components/icon/';
@@ -69,12 +74,23 @@ const components = [
   EvPagination,
 ];
 
+const inputComponents = {
+  EvInputRoot,
+  EvInput,
+  EvInputLabel,
+  EvInputDescription,
+  EvInputErrorMessage,
+};
+
 const install = (app) => {
   if (!app) {
     return;
   }
   components.forEach((component) => {
     app.use(component);
+  });
+  Object.entries(inputComponents).forEach(([name, component]) => {
+    app.component(name, component);
   });
 };
 
@@ -95,6 +111,11 @@ export {
   EvSelect,
   EvToggle,
   EvTextField,
+  EvInputRoot,
+  EvInput,
+  EvInputLabel,
+  EvInputDescription,
+  EvInputErrorMessage,
   EvInputNumber,
   EvSlider,
   EvIcon,

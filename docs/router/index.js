@@ -8,6 +8,7 @@ import selectProps from 'docs/views/select/props';
 import toggleProps from 'docs/views/toggle/props';
 import radioProps from 'docs/views/radio/props';
 import textFieldProps from 'docs/views/textField/props';
+import inputProps from 'docs/views/input/props';
 import inputNumberProps from 'docs/views/inputNumber/props';
 import sliderProps from 'docs/views/slider/props';
 import iconProps from 'docs/views/icon/props';
@@ -137,6 +138,15 @@ const routes = [
     name: 'TextField',
     component: PageView,
     props: textFieldProps,
+    meta: {
+      category: 'Form',
+    },
+  },
+  {
+    path: '/input',
+    name: 'Input',
+    component: PageView,
+    props: inputProps,
     meta: {
       category: 'Form',
     },

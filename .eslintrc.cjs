@@ -3,6 +3,7 @@ module.exports = {
   env: {
     node: true,
     es2022: true,
+    'vue/setup-compiler-macros': true,
   },
   parserOptions: {
     ecmaVersion: 2022,
@@ -431,6 +432,15 @@ module.exports = {
   overrides: [
     {
       files: ['**/__tests__/*.{j,t}s?(x)', '**/tests/unit/**/*.spec.{j,t}s?(x)'],
+    },
+    {
+      files: ['src/components/input/*.vue'],
+      rules: {
+        'vue/multi-word-component-names': 'off',
+      },
+      globals: {
+        defineOptions: 'readonly',
+      },
     },
   ],
 };
