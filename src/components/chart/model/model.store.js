@@ -270,7 +270,7 @@ const modules = {
 
     if (!Number.isFinite(minMaxValues.minY)) {
       minMaxValues.minY = 0;
-      minMaxValues.maxY = 1;
+      minMaxValues.maxY = 0;
     }
 
     this.seriesInfo.charts.scatter.forEach((seriesID) => {
