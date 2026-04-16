@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import Util from './helpers.util';
+import Util, { calcExtraWidthLabel } from './helpers.util';
 
 describe('helpers.util', () => {
   describe('hexToRgb', () => {
@@ -262,6 +262,28 @@ describe('helpers.util', () => {
       expect(Util.isNullOrUndefined(0)).toBe(false);
       expect(Util.isNullOrUndefined('')).toBe(false);
       expect(Util.isNullOrUndefined(false)).toBe(false);
+    });
+  });
+
+  describe('calcExtraWidthLabel', () => {
+    it('정수는 소수 1자리로 포맷한다', () => {
+      expect(calcExtraWidthLabel(100)).toBe('100.0');
+    });
+
+    it('소수 1자리는 소수 2자리로 포맷한다', () => {
+      expect(calcExtraWidthLabel(10.5)).toBe('10.50');
+    });
+
+    it('소수 2자리는 소수 3자리로 포맷한다', () => {
+      expect(calcExtraWidthLabel(1.23)).toBe('1.230');
+    });
+
+    it('음수 정수도 소수 1자리로 포맷한다', () => {
+      expect(calcExtraWidthLabel(-100)).toBe('-100.0');
+    });
+
+    it('음수 소수 1자리도 소수 2자리로 포맷한다', () => {
+      expect(calcExtraWidthLabel(-10.5)).toBe('-10.50');
     });
   });
 

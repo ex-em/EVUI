@@ -454,3 +454,13 @@ export default {
     return (data.xp - cx) ** 2 + (data.yp - cy) ** 2;
   },
 };
+
+/**
+ * 주어진 숫자의 현재 소수점 자리수보다 1자리 더 많은 소수로 포맷한 문자열을 반환한다.
+ * @param {number} value
+ * @returns {string} 소수점 자리수+1로 포맷된 문자열
+ */
+export function calcExtraWidthLabel(value) {
+  const decimalPlaces = (String(value).split('.')[1] ?? '').length;
+  return value.toFixed(decimalPlaces + 1);
+}
