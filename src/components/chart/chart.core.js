@@ -227,8 +227,7 @@ class EvChart {
         const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth) ? axis.labelStyle.fixWidth : 0;
 
         // 정수 라벨이 소수로 바뀔 때의 너비 팽창을 사전에 반영한다.
-        // 가장 큰 절댓값의 숫자에 소수점 자리수+1로 직접 포맷한 문자열을 extraFormattedLabels로 전달해
-        // adjustedDecimalPoint와 무관하게 실제 렌더 너비를 측정한다.
+        // 가장 큰 절댓값의 숫자에 소수점 자리수+1로 직접 포맷한 문자열을 extraFormattedLabels로 전달해 렌더 너비를 측정한다.
         let extraFormattedLabels = [];
         let widestNumeric = null;
         for (const v of notFormattedLabels) {
