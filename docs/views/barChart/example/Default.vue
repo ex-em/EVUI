@@ -16,9 +16,18 @@
           class="component"
         />
       </div>
+      <div class="row-item">
+        <span class="item-title">
+          Horizontal
+        </span>
+        <ev-toggle
+          v-model="isHorizontal"
+          class="component"
+        />
+      </div>
     </div>
     <div class="row">
-      <h3> YAxis Options</h3>
+      <h3> Axes Options</h3>
     </div>
     <div class="row">
       <div class="row-item">
@@ -118,6 +127,7 @@ import { ref, computed } from 'vue';
 
 export default {
   setup() {
+    const isHorizontal = ref(false);
     const chartData = {
       series: {
         series1: { name: '시리즈 이름' },
@@ -138,31 +148,34 @@ export default {
     const useFixedSteps = ref(false);
     const showMaxTip = ref(false);
 
-    const chartOptions = computed(() => ({
-      type: 'bar',
-      cPadRatio: 0.1,
-      thickness: 1,
-      axesX: [
+    const stepAxes = computed(() => [
         {
           type: 'step',
           showAxisTick: true,
           axisLineColor: '#25262E',
         },
-      ],
-      axesY: [
-        {
-          showAxis: true,
-          type: 'linear',
-          autoScaleRatio: 0.1,
-          showAxisTick: true,
-          startToZero: true,
-          axisLineColor: '#25262E',
-          decimalPoint: isAutoDecimal.value ? 'auto' : decimalPoint.value,
-          range: useRange.value ? [minValue.value, maxValue.value] : null,
-          interval: useInterval.value ? interval.value : null,
-          fixedSteps: useFixedSteps.value,
-        },
-      ],
+      ]);
+
+    const linearAxes = computed(() => [{
+        showAxis: true,
+        type: 'linear',
+        autoScaleRatio: 0.1,
+        showAxisTick: true,
+        startToZero: true,
+        axisLineColor: '#25262E',
+        decimalPoint: isAutoDecimal.value ? 'auto' : decimalPoint.value,
+        range: useRange.value ? [minValue.value, maxValue.value] : null,
+        interval: useInterval.value ? interval.value : null,
+        fixedSteps: useFixedSteps.value,
+    }]);
+
+    const chartOptions = computed(() => ({
+      type: 'bar',
+      cPadRatio: 0.1,
+      thickness: 1,
+      horizontal: isHorizontal.value,
+      axesX: isHorizontal.value ? linearAxes.value : stepAxes.value,
+      axesY: isHorizontal.value ? stepAxes.value : linearAxes.value,
       maxTip: {
         use: showMaxTip.value,
         showTextTip: true,
@@ -184,6 +197,7 @@ export default {
       useRange,
       useFixedSteps,
       showMaxTip,
+      isHorizontal,
     };
   },
 };
