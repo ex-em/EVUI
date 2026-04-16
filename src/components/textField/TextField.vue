@@ -140,6 +140,10 @@ export default {
       type: String,
       default: 'off',
     },
+    modelModifiers: {
+      type: Object,
+      default: () => ({}),
+    },
   },
   emits: ['update:modelValue', 'focus', 'blur', 'input', 'change', 'search'],
   setup(props, { emit }) {
@@ -193,6 +197,13 @@ export default {
       emit('focus', e);
     };
     const blurInput = (e) => {
+      if (props.modelModifiers.trim && typeof e.target.value === 'string') {
+        const trimmed = e.target.value.trim();
+        if (trimmed !== e.target.value) {
+          mv.value = trimmed;
+          e.target.value = trimmed;
+        }
+      }
       emit('blur', e);
     };
 
