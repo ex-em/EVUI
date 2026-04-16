@@ -225,7 +225,22 @@ class EvChart {
         const notFormattedLabels = getNotFormattedLabels(axesSteps, 'x', axis);
 
         const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth) ? axis.labelStyle.fixWidth : 0;
-        const maxWidth = axis?.getLabelWidthHasMaxLength?.(notFormattedLabels, this.chartRect) ?? 0;
+
+        // 정수 라벨이 소수로 바뀔 때의 너비 팽창을 사전에 반영한다.
+        // 가장 큰 절댓값의 숫자 라벨에 현재 소수점 자리수보다 1자리 더 많은 소수를 더한 값을 함께 측정해 maxSteps를 보수적으로 산출한다.
+        let widestNumeric = null;
+        for (const v of notFormattedLabels) {
+          if (typeof v === 'number' && (widestNumeric === null || Math.abs(v) > Math.abs(widestNumeric))) {
+            widestNumeric = v;
+          }
+        }
+        let labelsForWidth = notFormattedLabels;
+        if (widestNumeric != null) {
+          const decimalPlaces = (String(widestNumeric).split('.')[1] ?? '').length;
+          const increment = 10 ** -(decimalPlaces + 1);
+          labelsForWidth = [...notFormattedLabels, widestNumeric + increment];
+        }
+        const maxWidth = axis?.getLabelWidthHasMaxLength?.(labelsForWidth, this.chartRect) ?? 0;
 
         return {
           ...value,
@@ -395,6 +410,7 @@ class EvChart {
       isBrush: !!brush,
       displayOverflow,
       unSelectedOpacity,
+      isHorizontal: this.options.horizontal,
     };
 
     let showIndex = 0;
