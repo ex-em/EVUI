@@ -70,6 +70,20 @@
   </div>
 
   <div class="case">
+    <p class="case-title">v-model.trim</p>
+    <ev-text-field
+      v-model.trim="modelValue8"
+      placeholder="Please enter the content"
+      type="text"
+    />
+    <div class="description">
+      <span class="badge yellow"> v-model.trim </span>
+      <span class="badge"> Text Field Value </span>
+      [{{ modelValue8 }}]
+    </div>
+  </div>
+
+  <div class="case">
     <p class="case-title">Error Message</p>
     <ev-text-field
       v-model="modelValue7"
@@ -93,6 +107,7 @@ export default {
     const modelValue5 = ref();
     const modelValue6 = ref();
     const modelValue7 = ref('1234가나다');
+    const modelValue8 = ref();
     const errMsg = ref();
     const checkValid = () => {
       const regexp = /^[0-9]*$/;
@@ -111,6 +126,7 @@ export default {
       modelValue5,
       modelValue6,
       modelValue7,
+      modelValue8,
       checkValid,
       errMsg,
     };
