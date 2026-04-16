@@ -124,15 +124,17 @@ class Scale {
    * return width what has max length
    * @param {string[]} notFormattedLabels
    * @param {object} chartRect - unused in base class, used in StepScale override
+   * @param {string[]} extraFormattedLabels - 정수 라벨이 소수로 바뀔 때의 너비 팽창을 사전에 반영한다.
    * @reutrn number maxWidth
    */
   // eslint-disable-next-line no-unused-vars
-  getLabelWidthHasMaxLength(notFormattedLabels, chartRect) {
-    return (notFormattedLabels ?? []).reduce((max, label) => {
-      const formattedLabel = this.getLabelFormat(label);
-      const width =
-        Util.calcTextSizeCanvas(formattedLabel, Util.getLabelStyle(this.labelStyle))?.width ?? 0;
+  getLabelWidthHasMaxLength(notFormattedLabels, chartRect, extraFormattedLabels = []) {
+    const labelStyle = Util.getLabelStyle(this.labelStyle);
+    const formatted = (notFormattedLabels ?? []).map(label => this.getLabelFormat(label));
+    const allLabels = [...formatted, ...extraFormattedLabels];
 
+    return allLabels.reduce((max, formattedLabel) => {
+      const width = Util.calcTextSizeCanvas(formattedLabel, labelStyle)?.width ?? 0;
       return Math.max(max, width);
     }, 0);
   }

@@ -525,19 +525,20 @@ class StepScale extends Scale {
    * ellipsis가 적용된 label의 width를 계산 (fontSize 적용)
    * @param {string[]} notFormattedLabels
    * @param {object} chartRect
+   * @param {string[]} extraFormattedLabels - 정수 라벨이 소수로 바뀔 때의 너비 팽창을 사전에 반영한다.
    * @returns {number} maxWidth
    */
-  getLabelWidthHasMaxLength(notFormattedLabels, chartRect) {
+  getLabelWidthHasMaxLength(notFormattedLabels, chartRect, extraFormattedLabels = []) {
     // fontSize를 포함한 labelStyle 가져오기
     const labelStyle = Util.getLabelStyle(this.labelStyle);
     const labelCount = notFormattedLabels?.length ?? 0;
     const maxWidth = this.getMaxWidth(chartRect, chartRect?.chartWidth / (labelCount + 2));
 
-    return (notFormattedLabels ?? []).reduce((max, label) => {
-      // ellipsis가 적용된 label의 width를 계산
-      const formattedLabel = this.getLabelFormat(label, maxWidth);
-      const width = Util.calcTextSizeCanvas(formattedLabel, labelStyle)?.width ?? 0;
+    const formatted = (notFormattedLabels ?? []).map(label => this.getLabelFormat(label, maxWidth));
+    const allLabels = [...formatted, ...extraFormattedLabels];
 
+    return allLabels.reduce((max, formattedLabel) => {
+      const width = Util.calcTextSizeCanvas(formattedLabel, labelStyle)?.width ?? 0;
       return Math.max(max, width);
     }, 0);
   }
