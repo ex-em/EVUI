@@ -1,4 +1,5 @@
 import { mobileCheck, truthyNumber } from '@/common/utils';
+import { calcExtraWidthLabel } from './helpers/helpers.util';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
@@ -226,18 +227,17 @@ class EvChart {
 
         const fixWidth = truthyNumber(axis?.labelStyle?.fixWidth) ? axis.labelStyle.fixWidth : 0;
 
-        // 정수 라벨이 소수로 바뀔 때의 너비 팽창을 사전에 반영한다.
-        // 가장 큰 절댓값의 숫자에 소수점 자리수+1로 직접 포맷한 문자열을 extraFormattedLabels로 전달해 렌더 너비를 측정한다.
+        // 숫자 라벨(linear)일 때만 적용하며, graphMin/graphMax 중 절댓값이 큰 쪽을 소수점 자리수+1로 포맷해
+        // extraFormattedLabels로 전달해 렌더 너비를 측정한다.
+        // 라벨의 소수점이 변경될때 너비 팽창을 사전에 반영한다.
         let extraFormattedLabels = [];
-        let widestNumeric = null;
-        for (const v of notFormattedLabels) {
-          if (typeof v === 'number' && (widestNumeric === null || Math.abs(v) > Math.abs(widestNumeric))) {
-            widestNumeric = v;
+        const axesStepsX = this.axesSteps?.x[index];
+        if (axis?.type !== 'step' && axesStepsX != null) {
+          const { graphMin, graphMax } = axesStepsX;
+          if (typeof graphMin === 'number' && typeof graphMax === 'number') {
+            const widestNumeric = Math.abs(graphMin) >= Math.abs(graphMax) ? graphMin : graphMax;
+            extraFormattedLabels = [calcExtraWidthLabel(widestNumeric)];
           }
-        }
-        if (widestNumeric != null) {
-          const decimalPlaces = (String(widestNumeric).split('.')[1] ?? '').length;
-          extraFormattedLabels = [widestNumeric.toFixed(decimalPlaces + 1)];
         }
         const maxWidth = axis?.getLabelWidthHasMaxLength?.(notFormattedLabels, this.chartRect, extraFormattedLabels) ?? 0;
 
