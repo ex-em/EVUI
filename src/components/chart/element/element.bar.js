@@ -53,9 +53,7 @@ class Bar {
     const thickness = param.thickness;
     const showSeriesCount = param.showSeriesCount;
 
-    if (this.isHorizontal !== param.isHorizontal) {
-      this.isHorizontal = param.isHorizontal;
-    }
+    this.isHorizontal = param.isHorizontal;
 
     const { isHorizontal, showValue } = this;
 
