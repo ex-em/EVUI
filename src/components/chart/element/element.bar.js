@@ -45,7 +45,6 @@ class Bar {
       return;
     }
 
-    const { isHorizontal, showValue } = this;
     const ctx = param.ctx;
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
@@ -53,6 +52,12 @@ class Bar {
     const showIndex = param.showIndex;
     const thickness = param.thickness;
     const showSeriesCount = param.showSeriesCount;
+
+    if (this.isHorizontal !== param.isHorizontal) {
+      this.isHorizontal = param.isHorizontal;
+    }
+
+    const { isHorizontal, showValue } = this;
 
     let x;
     let y;
