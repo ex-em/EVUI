@@ -546,4 +546,63 @@ describe('LinearScale', () => {
       });
     });
   });
+
+  describe('NICE_FRACTIONS 2.5 제거 후 회귀', () => {
+    it('0~25 범위에서 2.5 간격 대신 5 간격을 선택한다', () => {
+      const scale = createScale({ startToZero: true });
+      const result = scale.getStepsWithNiceScale({ min: 0, max: 25, maxSteps: 10 });
+      expect(result.interval).not.toBe(2.5);
+      expect(result.interval).toBe(5);
+      expect(result.steps).toBeLessThanOrEqual(10);
+    });
+
+    it('0~50 범위에서 interval이 2.5의 배수이면서 5의 배수가 아닌 값을 선택하지 않는다', () => {
+      const scale = createScale({ startToZero: true });
+      const result = scale.getStepsWithNiceScale({ min: 0, max: 50, maxSteps: 10 });
+      expect(result.interval % 2.5 === 0 && result.interval % 5 !== 0).toBe(false);
+    });
+  });
+
+  describe('interval < range 조건 엣지 케이스', () => {
+    it('모든 값이 동일할 때(range=0) fallback으로 유효한 결과를 반환한다', () => {
+      const scale = createScale();
+      const result = scale.getStepsWithNiceScale({ min: 10, max: 10, maxSteps: 5 });
+      expect(result.steps).toBeGreaterThanOrEqual(1);
+      expect(result.interval).toBeGreaterThan(0);
+      expect(result.max).toBeGreaterThanOrEqual(result.min);
+    });
+
+    it('range가 매우 작을 때(0.001) 유효한 interval을 선택한다', () => {
+      const scale = createScale();
+      const result = scale.getStepsWithNiceScale({ min: 10, max: 10.001, maxSteps: 5 });
+      expect(result.interval).toBeGreaterThan(0);
+      expect(result.interval).toBeLessThan(0.001);
+      expect(result.steps).toBeLessThanOrEqual(5);
+    });
+  });
+
+  describe('getLabelWidthHasMaxLength', () => {
+    it('extraFormattedLabels가 더 넓으면 그 너비를 반환한다', () => {
+      const scale = createScale({ labelStyle: {} });
+      vi.spyOn(Util, 'calcTextSizeCanvas').mockImplementation((text) => ({
+        width: String(text).length * 8,
+        height: 12,
+      }));
+
+      const labels = [10, 20, 100];
+      const extra = ['100.0'];
+      const withoutExtra = scale.getLabelWidthHasMaxLength(labels, {});
+      const withExtra = scale.getLabelWidthHasMaxLength(labels, {}, extra);
+
+      expect(withExtra).toBeGreaterThanOrEqual(withoutExtra);
+    });
+
+    it('extraFormattedLabels가 비어있으면 기존 동작과 동일하다', () => {
+      const scale = createScale({ labelStyle: {} });
+      const labels = [10, 20, 100];
+      const result1 = scale.getLabelWidthHasMaxLength(labels, {});
+      const result2 = scale.getLabelWidthHasMaxLength(labels, {}, []);
+      expect(result1).toBe(result2);
+    });
+  });
 });
