@@ -259,4 +259,4 @@ export const TIME_INTERVALS = {
   },
 };
 
-export const NICE_FRACTIONS = Object.freeze([1, 2, 2.5, 5]);
+export const NICE_FRACTIONS = Object.freeze([1, 2, 5]);
