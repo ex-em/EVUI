@@ -57,10 +57,10 @@ class EvChart {
 
     this.displayCanvas = document.createElement('canvas');
     this.displayCanvas.setAttribute('style', 'display: block;');
-    this.displayCtx = this.displayCanvas.getContext('2d');
+    this.displayCtx = this.displayCanvas.getContext('2d', { willReadFrequently: true });
     this.bufferCanvas = document.createElement('canvas');
     this.bufferCanvas.setAttribute('style', 'display: block;');
-    this.bufferCtx = this.bufferCanvas.getContext('2d');
+    this.bufferCtx = this.bufferCanvas.getContext('2d', { willReadFrequently: true });
 
     this.pixelRatio = window.devicePixelRatio || 1;
     this.oldPixelRatio = this.pixelRatio;
