@@ -1,3 +1,12 @@
+## [3.6.4](https://github.com/ex-em/EVUI/compare/3.6.3...3.6.4) (2026-04-17)
+
+
+### Bug Fixes
+
+* chart selectLabel 빠른 연속 클릭 시 click 이벤트 소실 수정 ([#2221](https://github.com/ex-em/EVUI/issues/2221)) ([68f0346](https://github.com/ex-em/EVUI/commit/68f03461c1bb276741b3d332c6bdafc62cb055c8))
+* step: 1일때 nice scale 적용되지 않음 ([86ce60a](https://github.com/ex-em/EVUI/commit/86ce60a0c4afbb7a51d92c04e71b2e5351168de1))
+* 불필요한 스크린샷 파일 삭제 ([2c005d8](https://github.com/ex-em/EVUI/commit/2c005d8c8829d4cab70ab3454f7fe18dc172bbc2))
+
 ## [3.6.3](https://github.com/ex-em/EVUI/compare/3.6.2...3.6.3) (2026-04-17)
 
 
