@@ -167,7 +167,7 @@ class LinearScale extends Scale {
       const pow = 10 ** exp;
       for (const fraction of NICE_FRACTIONS) {
         const interval = fraction * pow;
-        if (interval >= minInterval && interval < range) {
+        if (interval >= minInterval) {
           // floating-point 오차 보정을 위해 epsilon 적용
           const EPS = interval * 1e-10;
           const niceMin = Math.floor((min + EPS) / interval) * interval;
