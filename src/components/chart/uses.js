@@ -256,20 +256,17 @@ const DEFAULT_DATA = {
 
 const useWidgetClickEvent = () => {
   let timer = null;
-  let clickCount = 0;
   const Delay = 200;
 
   const clickEventCallback = (callback) => {
-    clickCount++;
-
-    if (clickCount === 1) {
-      timer = setTimeout(() => {
-        if (clickCount === 1) {
-          callback();
-        }
-        clickCount = 0;
-      }, Delay);
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
     }
+    timer = setTimeout(() => {
+      callback();
+      timer = null;
+    }, Delay);
   };
 
   const dblClickEventCallback = (callback) => {
@@ -278,7 +275,6 @@ const useWidgetClickEvent = () => {
       timer = null;
     }
     callback();
-    clickCount = 0;
   };
 
   return {
