@@ -1,3 +1,21 @@
+## [3.6.3](https://github.com/ex-em/EVUI/compare/3.6.2...3.6.3) (2026-04-17)
+
+
+### Bug Fixes
+
+* axesX일 경우 넓이에 소수점 한자리를 더하여 계산하도록 변경 ([800e1d4](https://github.com/ex-em/EVUI/commit/800e1d4f117c90315fc9c9aac26b0fb838ee1245))
+* extraLabel 계산을 util로 만들고 test 코드를 helpers.util.spec.js로 옮김 ([f927fcb](https://github.com/ex-em/EVUI/commit/f927fcb0ee96220d2936d2538192171ecc15dde0))
+* interval이 range를 벗어나는 경우 로직 타지 않게 수정 ([992458b](https://github.com/ex-em/EVUI/commit/992458b4954aeb4b8b54abc4ba5988f87a49a3a0))
+* nice fractions 2.5 제거, extraFormattedLabels를 배열로 넘겨 예외로 계산하도록 수정 ([92ba8e3](https://github.com/ex-em/EVUI/commit/92ba8e381bbeda6d909ef63183daf76b561755e7))
+* realTimeScatter > 데이터가 없을 경우, Y축에 0~1 범위가 아닌 0~1.1 범위가 표시되는 현상 수정 ([9a6e7bd](https://github.com/ex-em/EVUI/commit/9a6e7bdc7f44582f0833f362cdc9907d83c53315))
+* v-model.trim 사용 시 내부/외부 값 동기화 안되는 현상 수정 ([49ab849](https://github.com/ex-em/EVUI/commit/49ab849b41af011b27dc5cd5d6d92111b844b985)), closes [#2214](https://github.com/ex-em/EVUI/issues/2214)
+* visual update ([56ada81](https://github.com/ex-em/EVUI/commit/56ada81708e6e7fbb6a14e4ccb4e268df453c497))
+* widestNumeric 계산을 notFormattedLabels를 순회하지않고 graphMin,graphMax 중에서 큰 값으로 수정 ([2312dc8](https://github.com/ex-em/EVUI/commit/2312dc82d7f0fc72e557a1b3a53eacf6af597611))
+* 브러쉬 차트 드래그 시 캔버스 영역 밖에서도 정상 동작하도록 개선 ([35c8ffe](https://github.com/ex-em/EVUI/commit/35c8ffeada57c893b2f9488623689415a9b744b0))
+* 예제 Deafult에 isHorizontal 토글 추가, isHorizontal만 변경했을때 차트가 그려지지 않는 현상 수정 ([0242fe7](https://github.com/ex-em/EVUI/commit/0242fe76bdf0b89a3f025c9e7df5139afb3cddd8))
+* 주석 삭제 ([044f050](https://github.com/ex-em/EVUI/commit/044f050d7aac6614d4da425c9146c7100d9a95db))
+* 코드 리뷰 반영 ([65e0280](https://github.com/ex-em/EVUI/commit/65e0280766cca306d13b18abc292b7e36131b6e0))
+
 ## [3.6.2](https://github.com/ex-em/EVUI/compare/3.6.1...3.6.2) (2026-04-14)
 
 
