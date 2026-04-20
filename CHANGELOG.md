@@ -1,3 +1,13 @@
+## [3.6.5](https://github.com/ex-em/EVUI/compare/3.6.4...3.6.5) (2026-04-20)
+
+
+### Bug Fixes
+
+* horizontal: true이고 라벨이 2개일때 마지막 라벨이 나오지 않는 이슈 ([bd5be24](https://github.com/ex-em/EVUI/commit/bd5be24605017e3a0a4f2887859c51d785319e18))
+* linear 일때만 x축에 소수점을 더하여 계산하는 로직을 타도록 수정 ([c088895](https://github.com/ex-em/EVUI/commit/c088895658badf57a39085f6388cfc64e989a407))
+* time 축 category 모드일때 라벨 겹침 현상 ([7b9861e](https://github.com/ex-em/EVUI/commit/7b9861e3889f407fb381135ec9637ed438f500a1))
+* 테스트 코드 추가 ([15a47c7](https://github.com/ex-em/EVUI/commit/15a47c7de2ecc25b135a07f95c2900dcbe4a8ec2))
+
 ## [3.6.4](https://github.com/ex-em/EVUI/compare/3.6.3...3.6.4) (2026-04-17)
 
 
