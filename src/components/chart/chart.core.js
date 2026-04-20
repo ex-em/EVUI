@@ -232,7 +232,7 @@ class EvChart {
         // 라벨의 소수점이 변경될때 너비 팽창을 사전에 반영한다.
         let extraFormattedLabels = [];
         const axesStepsX = this.axesSteps?.x[index];
-        if (axis?.type !== 'step' && axesStepsX != null) {
+        if (axis?.type === 'linear' && axesStepsX != null) {
           const { graphMin, graphMax } = axesStepsX;
           if (typeof graphMin === 'number' && typeof graphMax === 'number') {
             const widestNumeric = Math.abs(graphMin) >= Math.abs(graphMax) ? graphMin : graphMax;
