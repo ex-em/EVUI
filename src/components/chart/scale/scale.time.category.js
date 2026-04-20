@@ -184,14 +184,7 @@ class TimeCategoryScale extends Scale {
     let ix;
 
     // 2개 이하일 경우, 첫번째와 마지막 라벨만 표시
-    let count = steps <= 2 ? oriSteps : Math.round(oriSteps / steps);
-
-    // 첫번째 라벨이 축 시작점보다 오른쪽에 있을 경우, count를 1로 설정
-    // 추후 개선 필요: 근본적 문제는 라벨이 2개인 경우 oriSteps가 1로 와야하는데 2로 옴. horizontal일 때 예외처리 필요.
-    const isStartPointRightOfRectStart = startPoint > Math.ceil(aPos[this.units.rectStart]);
-    if (this.type === 'x' && isStartPointRightOfRectStart && count === oriSteps && oriSteps <= 2) {
-      count = 1;
-    }
+    const count = steps <= 2 ? Math.max(1, oriSteps - 1) : Math.round(oriSteps / steps);
 
     const maxIndex = count === oriSteps ? oriSteps : oriSteps - 1;
 
@@ -273,11 +266,7 @@ class TimeCategoryScale extends Scale {
           ctx.closePath();
         }
 
-        if (
-          ix < oriSteps &&
-          this.showGrid &&
-          (isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0))
-        ) {
+        if (ix < oriSteps && this.showGrid) {
           ctx.beginPath();
           ctx.strokeStyle = this.gridLineColor;
           ctx.moveTo(linePosition, offsetPoint);
@@ -298,11 +287,7 @@ class TimeCategoryScale extends Scale {
           ctx.closePath();
         }
 
-        if (
-          ix < oriSteps &&
-          this.showGrid &&
-          (isStartPointRightOfRectStart || (!isStartPointRightOfRectStart && ix !== 0))
-        ) {
+        if (ix < oriSteps && this.showGrid) {
           ctx.beginPath();
           ctx.strokeStyle = this.gridLineColor;
           ctx.moveTo(offsetPoint, linePosition);
