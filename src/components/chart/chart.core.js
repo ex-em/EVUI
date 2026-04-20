@@ -55,12 +55,13 @@ class EvChart {
     this.wrapperDOM.appendChild(this.chartDOM);
     this.target.appendChild(this.wrapperDOM);
 
+    const isPie = options.type === 'pie';
     this.displayCanvas = document.createElement('canvas');
     this.displayCanvas.setAttribute('style', 'display: block;');
-    this.displayCtx = this.displayCanvas.getContext('2d', { willReadFrequently: true });
+    this.displayCtx = this.displayCanvas.getContext('2d', { willReadFrequently: isPie });
     this.bufferCanvas = document.createElement('canvas');
     this.bufferCanvas.setAttribute('style', 'display: block;');
-    this.bufferCtx = this.bufferCanvas.getContext('2d', { willReadFrequently: true });
+    this.bufferCtx = this.bufferCanvas.getContext('2d', { willReadFrequently: isPie });
 
     this.pixelRatio = window.devicePixelRatio || 1;
     this.oldPixelRatio = this.pixelRatio;
@@ -71,7 +72,7 @@ class EvChart {
       this.overlayCanvas = document.createElement('canvas');
       this.overlayCanvas.setAttribute('style', 'display: block; z-index: 2;');
       this.overlayCanvas.setAttribute('class', 'overlay-canvas');
-      this.overlayCtx = this.overlayCanvas.getContext('2d', { willReadFrequently: true });
+      this.overlayCtx = this.overlayCanvas.getContext('2d', { willReadFrequently: isPie });
 
       this.chartDOM.appendChild(this.overlayCanvas);
 
