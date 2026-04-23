@@ -1166,7 +1166,7 @@ const modules = {
           const passingValue = series.passingValue;
           const interpolation = series.interpolation;
           const hasPassingValueInData = series.hasPassingValueInData;
-    
+
           return (
             interpolation === 'linear' ||
             (interpolation === 'none' && !!passingValue && hasPassingValueInData)
