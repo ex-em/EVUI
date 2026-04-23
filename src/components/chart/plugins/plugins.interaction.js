@@ -1150,27 +1150,32 @@ const modules = {
       return -1;
     }
     
-    const useLinearInterpolation = sIds.some((sId) => {
-      const series = this.seriesList[sId];
-    
-      if (series?.show) {
-        const passingValue = series.passingValue;
-        const interpolation = series.interpolation;
-        const hasPassingValueInData = series.hasPassingValueInData;
-    
-        return (
-          interpolation === 'linear' ||
-          (interpolation === 'none' && !!passingValue && hasPassingValueInData)
-        );
-      }
-    
-      return false;
-    });
-    
-    // 데이터가 매우 촘촘할 때 avgInterval이 1px 이하로 작아질 수 있으므로 최소 snap 범위를 보정
-    const snapThreshold = Math.max(avgInterval, 6);
+    // 최소 hover snap 반경 (px)
+    // - 데이터 밀도가 높을 때 avgInterval이 1px 이하로 감소하는 문제 보정
+    // - 마우스 포인터의 실제 조작 정밀도(≈1px 이하)보다 충분히 넓은 범위를 확보하여 안정적인 hover 보장
+    // - 주요 차트 라이브러리 기준: tooltip.snap 기본값 10px (touch 25px)
+    // → 6px은 과도하게 넓지 않으면서도 안정적인 선택이 가능한 절충값
+    const MIN_SNAP_THRESHOLD_PX = 6;
+    const snapThreshold = Math.max(avgInterval, MIN_SNAP_THRESHOLD_PX);
     
     if (closestDistance >= snapThreshold) {
+      const useLinearInterpolation = sIds.some((sId) => {
+        const series = this.seriesList[sId];
+    
+        if (series?.show) {
+          const passingValue = series.passingValue;
+          const interpolation = series.interpolation;
+          const hasPassingValueInData = series.hasPassingValueInData;
+    
+          return (
+            interpolation === 'linear' ||
+            (interpolation === 'none' && !!passingValue && hasPassingValueInData)
+          );
+        }
+    
+        return false;
+      });
+    
       return useLinearInterpolation ? closestIndex : -1;
     }
     
