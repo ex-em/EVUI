@@ -17,6 +17,12 @@ const createChart = (seriesList, opts = {}) =>
     isNotUseIndicator: () => false,
   });
 
+const createChartForClosestIndex = (seriesList, opts = {}) =>
+  Object.assign(Object.create(modules), {
+    seriesList,
+    options: { horizontal: false, ...opts },
+  });
+
 /**
  * findGraphData가 고정된 item을 리턴하는 mock 시리즈.
  */
@@ -41,6 +47,20 @@ const mockSeries = ({
     directHit,
     index: data?.index ?? 0,
   }),
+});
+
+const createClosestSeries = ({
+  data,
+  show = true,
+  interpolation = 'none',
+  passingValue = null,
+  hasPassingValueInData = false,
+}) => ({
+  show,
+  data,
+  interpolation,
+  passingValue,
+  hasPassingValueInData,
 });
 
 describe('plugins.interaction findHitItem', () => {
@@ -161,5 +181,72 @@ describe('plugins.interaction findHitItem', () => {
       expect(Object.keys(result.items).sort()).toEqual(['bar1', 'line1']);
       expect(result.hitId).toBe('bar1');
     });
+  });
+});
+
+describe('plugins.interaction findClosestDataIndex', () => {
+  it('avgInterval < 6 이고 closestDistance < 6 이면 closestIndex를 반환한다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({
+        data: [
+          { xp: 10, yp: 100, o: 1 },
+          { xp: 14, yp: 100, o: 2 },
+          { xp: 18, yp: 100, o: 3 },
+        ],
+      }),
+    });
+
+    const result = chart.findClosestDataIndex([16, 0], ['s1']);
+    expect(result).toBe(1);
+  });
+
+  it('avgInterval > 6 이고 closestDistance < avgInterval 이면 closestIndex를 반환한다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({
+        data: [
+          { xp: 10, yp: 100, o: 1 },
+          { xp: 30, yp: 100, o: 2 },
+          { xp: 50, yp: 100, o: 3 },
+        ],
+      }),
+    });
+
+    const result = chart.findClosestDataIndex([37, 0], ['s1']);
+    expect(result).toBe(1);
+  });
+
+  it('closestDistance가 snapThreshold보다 크고 선형보간이 꺼져 있으면 -1을 반환한다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({
+        interpolation: 'none',
+        data: [
+          { xp: 10, yp: 100, o: 1 },
+          { xp: 20, yp: 100, o: 2 },
+        ],
+      }),
+    });
+
+    const result = chart.findClosestDataIndex([100, 0], ['s1']);
+    expect(result).toBe(-1);
+  });
+
+  it('모든 데이터가 null이고 disableNullLabelSnap=false면 -1을 반환한다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({
+        data: [
+          { xp: 10, yp: null, o: null },
+          { xp: 20, yp: null, o: null },
+        ],
+      }),
+      s2: createClosestSeries({
+        data: [
+          { xp: 10, yp: null, o: null },
+          { xp: 20, yp: null, o: null },
+        ],
+      }),
+    });
+
+    const result = chart.findClosestDataIndex([12, 0], ['s1', 's2'], false);
+    expect(result).toBe(-1);
   });
 });
