@@ -1145,27 +1145,35 @@ const modules = {
         }
       }
     }
-
-    if (closestDistance >= avgInterval) {
-      const useLinearInterpolation = sIds.some((sId) => {
-        const series = this.seriesList[sId];
-
-        if (series?.show) {
-          const passingValue = series.passingValue;
-          const interpolation = series.interpolation;
-          const hasPassingValueInData = series.hasPassingValueInData;
-
-          return (
-            interpolation === 'linear' ||
-            (interpolation === 'none' && !!passingValue && hasPassingValueInData)
-          );
-        }
-
-        return false;
-      });
+    
+    if (closestIndex === -1) {
+      return -1;
+    }
+    
+    const useLinearInterpolation = sIds.some((sId) => {
+      const series = this.seriesList[sId];
+    
+      if (series?.show) {
+        const passingValue = series.passingValue;
+        const interpolation = series.interpolation;
+        const hasPassingValueInData = series.hasPassingValueInData;
+    
+        return (
+          interpolation === 'linear' ||
+          (interpolation === 'none' && !!passingValue && hasPassingValueInData)
+        );
+      }
+    
+      return false;
+    });
+    
+    // 데이터가 매우 촘촘할 때 avgInterval이 1px 이하로 작아질 수 있으므로 최소 snap 범위를 보정
+    const snapThreshold = Math.max(avgInterval, 6);
+    
+    if (closestDistance >= snapThreshold) {
       return useLinearInterpolation ? closestIndex : -1;
     }
-
+    
     return closestIndex;
   },
 
