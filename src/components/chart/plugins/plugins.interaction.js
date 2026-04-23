@@ -1161,7 +1161,7 @@ const modules = {
     if (closestDistance >= snapThreshold) {
       const useLinearInterpolation = sIds.some((sId) => {
         const series = this.seriesList[sId];
-    
+
         if (series?.show) {
           const passingValue = series.passingValue;
           const interpolation = series.interpolation;
@@ -1172,13 +1172,12 @@ const modules = {
             (interpolation === 'none' && !!passingValue && hasPassingValueInData)
           );
         }
-    
+
         return false;
       });
-    
       return useLinearInterpolation ? closestIndex : -1;
     }
-    
+
     return closestIndex;
   },
 
