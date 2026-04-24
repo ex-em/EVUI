@@ -26,7 +26,7 @@ function getIntervalMeta(interval) {
     };
   }
 
-  if (typeof interval === 'object' && interval !== null && interval.unit && interval.time) {
+  if (typeof interval === 'object' && interval !== null && interval.unit && interval.time > 0) {
     const unitInfo = TIME_INTERVALS[interval.unit];
     if (!unitInfo) {
       return null;
@@ -392,11 +392,15 @@ class TimeScale extends Scale {
     }
 
     // tick 생성 + maxSteps 초과 시 interval을 strict 배수로 확장
-    let multiplier = 1;
+    // 예상 tick 수에서 초기 multiplier를 추정하여 불필요한 반복을 줄인다
+    const estimatedTicks = Math.ceil((graphMax - graphMin) / baseMeta.ms);
+    let multiplier = estimatedTicks > maxSteps
+      ? Math.max(1, Math.floor(estimatedTicks / maxSteps))
+      : 1;
     let ticks;
     let currentMs;
 
-    const MAX_MULTIPLIER = 10000;
+    const MAX_MULTIPLIER = multiplier + 10000;
     while (multiplier <= MAX_MULTIPLIER) {
       const currentMeta = baseMeta.unit
         ? {
