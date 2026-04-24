@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    const time = dayjs().format('YYYY-MM-DD 00:00:00');
     const chartData = {
       series: {
         series1: { name: 'series#1', fill: true, point: true, color: 'rgba(239, 58, 58, 0.5)' },
@@ -73,6 +73,12 @@ export default {
           },
         },
       ],
+      tooltip: {
+        use: true,
+        labelFormatter: (value) => {
+          return dayjs(value).format('YYYY-MM-DD HH:mm:ss');
+        },
+      }
     };
 
     return {

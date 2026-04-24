@@ -62,17 +62,7 @@ export default {
         {
           type: 'time',
           timeFormat: 'DD HH:mm',
-          interval: 'hour',
-          formatter: (value, data) => {
-            if (data?.prev) {
-              const curr = dayjs(value).format('yy-MM-DD');
-              const prev = dayjs(data?.prev).format('yy-MM-DD');
-              if (curr === prev) {
-                return dayjs(value).format('HH:mm');
-              }
-            }
-            return dayjs(value).format('DD HH:mm');
-          },
+          interval: 'day',
           showAxisTick: true,
         },
       ],
@@ -90,7 +80,7 @@ export default {
     const liveInterval = ref();
     const isSpeedUpMode = ref(false);
 
-    let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    let timeValue = dayjs().format('YYYY-MM-DD 00:00:00');
     let maxTimeValue = dayjs(timeValue).add(2, 'day');
     let newMax = 100;
     let newMin = 0;

@@ -38,7 +38,7 @@ export default {
   name: 'LegendClickMode',
   setup() {
     const legendClickMode = ref('active');
-    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    const time = dayjs().format('YYYY-MM-DD 00:00:00');
 
     const chartData = {
       series: {
