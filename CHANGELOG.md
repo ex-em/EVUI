@@ -1,3 +1,16 @@
+# [3.7.0](https://github.com/ex-em/EVUI/compare/3.6.6...3.7.0) (2026-04-24)
+
+
+### Bug Fixes
+
+* keepDisplay:true 일때 범례 hover 시 드래그 영역 사라짐 ([456f9a3](https://github.com/ex-em/EVUI/commit/456f9a3ff378c1ed68687c64a7c1c1dbb098cf10))
+* time scale 코드 리뷰 피드백 반영 ([8b3ea5f](https://github.com/ex-em/EVUI/commit/8b3ea5fcf5d371f3e8a04719ca68315e6c8b08e2))
+
+
+### Features
+
+* 시간 축 데이터 범위는 유지하면서 interval의 절대 시간 boundary 기준으로만 표시하도록 함 ([b3bf6f0](https://github.com/ex-em/EVUI/commit/b3bf6f0482a292a209d707b860db5cc89ee55232))
+
 ## [3.6.6](https://github.com/ex-em/EVUI/compare/3.6.5...3.6.6) (2026-04-24)
 
 
