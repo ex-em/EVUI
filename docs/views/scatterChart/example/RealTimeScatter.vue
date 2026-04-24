@@ -83,7 +83,6 @@ export default {
             fontFamily: 'Roboto',
             fitDir: 'right',
           },
-          flow: true,
         },
       ],
       axesY: [
