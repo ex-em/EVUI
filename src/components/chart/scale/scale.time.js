@@ -183,28 +183,24 @@ function ceilToBoundary(timestamp, meta) {
 /**
  * graphMin 이상 graphMax 이하인 visible tick을 생성한다.
  *
- * firstTick은 boundaryMeta(원본 interval) 기준으로 boundary를 찾고,
- * 이후 stepMeta(확장된 interval) 간격으로 증가한다.
- *
- * 이렇게 분리하는 이유:
- *   사용자가 interval: 'second'를 지정하면 boundary는 "초 단위(ms=0)"이다.
- *   maxSteps 초과로 5초 간격으로 확장되더라도, 첫 tick은 원래 boundary(초 단위)에서 시작해야 한다.
- *   예: 10:27:38 → 첫 tick = 10:27:38, step = 5초 → 10:27:38, 10:27:43, 10:27:48...
+ * 첫 tick은 ceilToBoundary(graphMin, meta)로 결정되고,
+ * 이후 meta 간격으로 증가한다.
+ * maxSteps로 interval이 확장된 경우에도 확장된 interval의 boundary를 사용하여
+ * tick 위치가 안정적으로 유지된다 (실시간 데이터 시나리오에서 중요).
  *
  * @param {number} graphMin 그래프 최솟값
  * @param {number} graphMax 그래프 최댓값
- * @param {{ ms: number, unit: string|null, time: number|null }} stepMeta     stepping용 (확장된 interval)
- * @param {{ ms: number, unit: string|null, time: number|null }} [boundaryMeta] 첫 tick boundary용 (원본 interval, 생략 시 stepMeta 사용)
+ * @param {{ ms: number, unit: string|null, time: number|null }} meta interval 메타 정보
  * @returns {number[]} 생성된 tick 타임스탬프 배열
  */
-function generateVisibleTicks(graphMin, graphMax, stepMeta, boundaryMeta) {
+function generateVisibleTicks(graphMin, graphMax, meta) {
   const ticks = [];
-  let tick = ceilToBoundary(graphMin, boundaryMeta || stepMeta);
+  let tick = ceilToBoundary(graphMin, meta);
   const MAX_TICKS = 10000;
 
   while (tick <= graphMax && ticks.length < MAX_TICKS) {
     ticks.push(tick);
-    tick = addInterval(tick, stepMeta);
+    tick = addInterval(tick, meta);
   }
 
   return ticks;
@@ -415,7 +411,7 @@ class TimeScale extends Scale {
           };
 
       currentMs = currentMeta.ms;
-      ticks = generateVisibleTicks(graphMin, graphMax, currentMeta, baseMeta);
+      ticks = generateVisibleTicks(graphMin, graphMax, currentMeta);
 
       if (ticks.length <= maxSteps || this.fixedSteps) {
         break;

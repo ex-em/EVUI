@@ -389,26 +389,58 @@ describe('TimeScale', () => {
     });
 
     describe('maxSteps 확장 시 boundary 정렬', () => {
-      it('interval: "minute" + maxSteps 초과 시 첫 tick은 원본 boundary, 이후 확장 interval 간격이다', () => {
+      it('interval: "minute" + maxSteps 초과 시 첫 tick은 확장된 interval boundary에 정렬된다', () => {
+        // graphMin(12:52)은 1분 boundary에 정렬되어 있으나,
+        // maxSteps 초과로 interval이 10분으로 확장되므로
+        // 첫 tick은 확장 interval boundary인 13:00부터 시작해야 한다.
         const scale = createScale({ interval: 'minute' });
 
         const result = scale.calculateSteps({
-          minValue: ts('2026-04-23 12:56:00'),
-          maxValue: ts('2026-04-23 13:56:00'),
-          maxSteps: 4,
+          minValue: ts('2026-04-23 12:52:00'),
+          maxValue: ts('2026-04-23 13:52:00'),
+          maxSteps: 6,
         });
 
-        // tick 개수가 maxSteps 이내
-        expect(result.ticks.length).toBeLessThanOrEqual(4);
+        expect(result.ticks).toEqual([
+          ts('2026-04-23 13:00:00'),
+          ts('2026-04-23 13:10:00'),
+          ts('2026-04-23 13:20:00'),
+          ts('2026-04-23 13:30:00'),
+          ts('2026-04-23 13:40:00'),
+          ts('2026-04-23 13:50:00'),
+        ]);
+        expect(result.interval).toBe(10 * 60 * 1000);
 
-        // 첫 tick은 원본 minute boundary(12:56:00)에 정렬
-        expect(dayjs(result.ticks[0]).second()).toBe(0);
-        expect(dayjs(result.ticks[0]).millisecond()).toBe(0);
-
-        // 이후 tick은 확장된 interval 간격으로 균등 배치
+        // 모든 tick은 확장 interval 간격으로 균등 배치
         for (let i = 1; i < result.ticks.length; i++) {
           expect(result.ticks[i] - result.ticks[i - 1]).toBe(result.interval);
         }
+      });
+
+      it('graphMin은 변경되지 않고, 첫 tick만 확장 interval boundary로 정렬된다', () => {
+        // 실시간 차트 시나리오: graphMin이 소폭 변해도 tick은 절대 시간
+        // boundary에 고정되어야 시각적으로 안정적이다.
+        const scale = createScale({ interval: 'minute' });
+
+        const result = scale.calculateSteps({
+          minValue: ts('2026-04-23 12:52:00'),
+          maxValue: ts('2026-04-23 13:52:00'),
+          maxSteps: 6,
+        });
+
+        // graphMin/graphMax는 원래 값 유지
+        expect(result.graphMin).toBe(ts('2026-04-23 12:52:00'));
+        expect(result.graphMax).toBe(ts('2026-04-23 13:52:00'));
+
+        // 첫 tick은 graphMin과 달라야 함 (확장 boundary로 재정렬됨)
+        expect(result.ticks[0]).not.toBe(result.graphMin);
+        expect(result.ticks[0]).toBeGreaterThan(result.graphMin);
+
+        // 확장 interval 기준 절대 boundary(= day 시작 기준 interval 배수)에 정렬
+        const dayStart = dayjs(result.graphMin).startOf('day').valueOf();
+        result.ticks.forEach((tick) => {
+          expect((tick - dayStart) % result.interval).toBe(0);
+        });
       });
     });
 
