@@ -1088,7 +1088,11 @@ class EvChart {
     if (isDragMove) {
       this.drawSelectionArea(this.dragInfo);
     } else if (this.dragInfoBackup) {
-      this.dragInfoBackup = null;
+      if (lightUpdate) {
+        this.drawSelectionArea(this.dragInfoBackup);
+      } else {
+        this.dragInfoBackup = null;
+      }
     }
   }
 
