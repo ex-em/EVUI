@@ -1,3 +1,16 @@
+## [3.6.6](https://github.com/ex-em/EVUI/compare/3.6.5...3.6.6) (2026-04-24)
+
+
+### Bug Fixes
+
+* dense 데이터에서 hover snap threshold 보정 ([d037ea0](https://github.com/ex-em/EVUI/commit/d037ea0f2cc898549654c54da40446c76a832634))
+* selectedLabel 사용중일때 데이터가 없는 부분 선택이 되지 않는 현상 수정 ([f62d032](https://github.com/ex-em/EVUI/commit/f62d03277b47acc565dc79c0408d5a4234d77d22))
+
+
+### Reverts
+
+* 테스트 예제 삭제 ([608a87d](https://github.com/ex-em/EVUI/commit/608a87d0e1d047cbf5e075cf1fc80b84c350a867))
+
 ## [3.6.5](https://github.com/ex-em/EVUI/compare/3.6.4...3.6.5) (2026-04-20)
 
 
