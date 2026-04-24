@@ -56,7 +56,7 @@ export default {
         {
           type: 'time',
           timeFormat: 'DD HH:mm',
-          interval: { time: 12, unit: 'hour' },
+          interval: { time: 1, unit: 'hour' },
           formatter: (value, data) => {
             if (data?.prev) {
               const curr = dayjs(value).format('yy-MM-DD');
