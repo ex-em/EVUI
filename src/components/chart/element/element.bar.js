@@ -497,19 +497,21 @@ class Bar {
     const textWidth = Math.round(ctx.measureText(formattedTxt).width);
     const textHeight = fontSize; // fontSize와 textHeight는 같을 수 없지만, 정확히 구할 필요 없음
 
-    const GAP = 10;
-    const LABEL_MARGIN = 4;
-    const minXPos = isNegativeValue ? barX - GAP : barX + GAP;
-    const minYPos = isNegativeValue ? barY + GAP : barY - GAP;
+    const LABEL_MARGIN = isHorizontal && align !== 'end' ? 10 : 4; // text 끝과 bar 경계 사이의 최소 여백
+    const minXPos = isNegativeValue ? barX - LABEL_MARGIN : barX + LABEL_MARGIN;
+    const minYPos = isNegativeValue ? barY + LABEL_MARGIN : barY - LABEL_MARGIN;
 
     const centerXOnBar = barX + barWidth / 2;
-    const centerYOnBar = isHighlight ? barY + barHeight / 2 : barY - barHeight / 2;
+    const barCenterY = isHighlight ? barY + barHeight / 2 : barY - barHeight / 2;
+    // 수평바: textBaseline='middle'은 em 박스 중앙 기준이므로 실제 글자의 시각적 중앙과
+    // 차이가 발생함 (fontSize에 비례). 고정 비율로 보정
+    const centerYOnBar = isHorizontal ? barCenterY + fontSize * 0.1 : barCenterY;
 
     const absBarWidth = Math.abs(barWidth);
     const absBarHeight = Math.abs(barHeight);
     // long dim(텍스트 배치 방향)에만 GAP 적용, thin dim(중앙 정렬 방향)은 GAP 불필요
-    const drawableBarWidth = absBarWidth - GAP;
-    const drawableBarHeight = absBarHeight - GAP;
+    const drawableBarWidth = absBarWidth - LABEL_MARGIN;
+    const drawableBarHeight = absBarHeight - LABEL_MARGIN;
     // 비수평 bar의 너비(thin dim)는 중앙 정렬이므로 경계값(==)도 허용
     const fitsInVerticalBar = textWidth <= absBarWidth && absBarWidth >= textHeight;
 
@@ -555,18 +557,18 @@ class Bar {
           const maxXOnChart = this.chartRect.x2 - this.labelOffset.right;
 
           if (isNegativeValue) {
-            const xPos = barX - GAP + barWidth - textWidth;
-            if (xPos > minXOnChart) {
+            const xPos = barX - LABEL_MARGIN + barWidth - textWidth;
+            if (xPos > minXOnChart && textHeight + LABEL_MARGIN * 2 < absBarHeight) {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           } else {
-            const xPos = barX + GAP + barWidth;
-            if (xPos + textWidth < maxXOnChart) {
+            const xPos = barX + LABEL_MARGIN + barWidth;
+            if (xPos + textWidth < maxXOnChart && textHeight + LABEL_MARGIN * 2 < absBarHeight) {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           }
         } else if (fitsInVerticalBar) {
-          const yPos = isNegativeValue ? barY + barHeight + GAP : barY + barHeight - GAP;
+          const yPos = isNegativeValue ? barY + barHeight + LABEL_MARGIN : barY + barHeight - LABEL_MARGIN;
           ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
@@ -577,7 +579,7 @@ class Bar {
       case 'end': {
         if (isHorizontal) {
           if (textWidth < drawableBarWidth && textHeight < absBarHeight) {
-            const xPos = isNegativeValue ? barX + barWidth + GAP : barX + barWidth - textWidth - GAP;
+            const xPos = isNegativeValue ? barX + barWidth + LABEL_MARGIN : barX + barWidth - textWidth - LABEL_MARGIN;
             ctx.fillText(formattedTxt, xPos, centerYOnBar);
           }
         } else if (isNegativeValue) {
