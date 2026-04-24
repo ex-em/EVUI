@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const currentTime = dayjs();
+    const currentTime = dayjs().millisecond(0);
 
     const chartData = {
       series: {

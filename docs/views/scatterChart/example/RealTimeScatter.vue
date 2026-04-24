@@ -72,7 +72,7 @@ export default {
         {
           type: 'time',
           timeFormat: 'HH:mm:ss',
-          interval: 'second',
+          interval: { time: 10, unit: 'second' },
           showAxis: true,
           showGrid: false,
           axisLineColor: '#C9CFDC',

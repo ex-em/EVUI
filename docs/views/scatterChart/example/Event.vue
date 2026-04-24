@@ -56,7 +56,7 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const currentTime = dayjs();
+    const currentTime = dayjs().millisecond(0);
 
     const chartData = {
       series: {
@@ -148,7 +148,7 @@ export default {
       }
     };
 
-    const getDateString = (x) => dayjs(x).format('HH:mm:ss');
+    const getDateString = (x) => dayjs(x).format('HH:mm:ss.SSS');
 
     return {
       chartData,

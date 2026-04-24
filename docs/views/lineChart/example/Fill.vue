@@ -9,7 +9,7 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    const time = dayjs().format('YYYY-MM-DD 00:00:00');
     const chartData = {
       series: {
         series1: { name: 'series#1', fill: { gradient: true }, point: false },
