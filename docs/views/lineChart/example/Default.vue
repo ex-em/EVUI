@@ -1,12 +1,8 @@
 <template>
   <div class="case">
-    <div
-      v-for="chartIndex in chartCount"
-      :key="chartIndex"
-      class="chart-item"
-    >
+    <resizable-wrapper>
       <ev-chart :data="chartData" :options="chartOptions" />
-    </div>
+    </resizable-wrapper>
   </div>
   <div class="description">
     <span class="toggle-label">데이터 자동 업데이트</span>
@@ -20,8 +16,6 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const chartCount = 16;
-    const minutePointsInDay = 24 * 60;
     const chartData = reactive({
       series: {
         series1: { name: '정수', point: false },
@@ -55,14 +49,14 @@ export default {
         show: true,
       },
       legend: {
-        show: false,
+        show: true,
         position: 'right',
       },
       axesX: [
         {
           type: 'time',
           timeFormat: 'DD HH:mm',
-          interval: { time: 10, unit: 'minute' },
+          interval: 'hour',
           formatter: (value, data) => {
             if (data?.prev) {
               const curr = dayjs(value).format('yy-MM-DD');
@@ -94,14 +88,14 @@ export default {
 
     const isLive = ref(false);
     const liveInterval = ref();
-    let timeValue = dayjs().subtract(24, 'hour').format('YYYY-MM-DD HH:mm:ss');
+    let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
     const addRandomChartData = () => {
       if (isLive.value) {
         chartData.labels.shift();
       }
 
-      timeValue = dayjs(timeValue).add(1, 'minute');
+      timeValue = dayjs(timeValue).add(1, 'hour');
       chartData.labels.push(dayjs(timeValue));
 
       Object.values(chartData.data).forEach((seriesData, sIndex) => {
@@ -126,7 +120,7 @@ export default {
     };
 
     onMounted(() => {
-      for (let ix = 0; ix < minutePointsInDay; ix++) {
+      for (let ix = 0; ix < 60; ix++) {
         addRandomChartData();
       }
     });
@@ -147,7 +141,6 @@ export default {
     return {
       chartData,
       chartOptions,
-      chartCount,
       isLive,
     };
   },
@@ -155,16 +148,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.case {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.chart-item {
-  min-height: 220px;
-}
-
 .toggle-label {
   vertical-align: top;
   margin-right: 7px;
