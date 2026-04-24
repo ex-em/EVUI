@@ -72,9 +72,9 @@ describe('Scale', () => {
           { top: 20, bottom: 20 },
           14,
         );
-        // drawRange=360, bufferedTickSize=floor(14*1.5)=21
-        // maxSteps=floor(360/21)=17
-        expect(result.max).toBe(17);
+        // drawRange=360, bufferedTickSize=14+floor(400*0.1)=14+40=54
+        // maxSteps=floor(360/54)=6
+        expect(result.max).toBe(6);
       });
 
       it('좁은 캔버스에서도 maxSteps가 최소 1을 반환한다', () => {
@@ -85,12 +85,12 @@ describe('Scale', () => {
           { top: 10, bottom: 10 },
           30,
         );
-        // drawRange=30, bufferedTickSize=floor(30*1.5)=45
-        // floor(30/45)=0 → Math.max(0,1)=1
+        // drawRange=30, bufferedTickSize=30+floor(50*0.1)=30+5=35
+        // floor(30/35)=0 → Math.max(0,1)=1
         expect(result.max).toBe(1);
       });
 
-      it('버퍼 배율 1.5가 적용된다', () => {
+      it('차트 높이에 비례하여 버퍼가 증가한다', () => {
         const scale = createScale();
         const result = scale.calculateLabelRange(
           'y',
@@ -98,28 +98,9 @@ describe('Scale', () => {
           { top: 0, bottom: 0 },
           20,
         );
-        // drawRange=300, bufferedTickSize=floor(20*1.5)=30
-        // maxSteps=floor(300/30)=10
-        expect(result.max).toBe(10);
-      });
-
-      it('차트 높이가 달라져도 동일한 tickSize면 bufferedTickSize가 동일하다', () => {
-        const scale = createScale();
-        const result300 = scale.calculateLabelRange(
-          'y',
-          { chartHeight: 300 },
-          { top: 0, bottom: 0 },
-          14,
-        );
-        const result600 = scale.calculateLabelRange(
-          'y',
-          { chartHeight: 600 },
-          { top: 0, bottom: 0 },
-          14,
-        );
-        // bufferedTickSize = floor(14*1.5) = 21 (차트 높이와 무관)
-        // 300: floor(300/21)=14, 600: floor(600/21)=28
-        expect(result600.max).toBe(result300.max * 2);
+        // drawRange=300, bufferedTickSize=20+floor(300*0.1)=20+30=50
+        // maxSteps=floor(300/50)=6
+        expect(result.max).toBe(6);
       });
     });
   });

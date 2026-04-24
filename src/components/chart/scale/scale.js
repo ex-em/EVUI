@@ -48,7 +48,7 @@ class Scale {
     } else {
       chartSize = chartRect.chartHeight;
       axisOffset = [labelOffset.top, labelOffset.bottom];
-      bufferedTickSize = Math.floor(tickSize * 1.5);
+      bufferedTickSize = tickSize + Math.floor(chartSize * 0.1);
     }
 
     const drawRange = chartSize - (axisOffset[0] + axisOffset[1]);
