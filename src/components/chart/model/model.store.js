@@ -1170,6 +1170,7 @@ const modules = {
         selectLabel?.useApproximateValue,
         dataIndex,
         true,
+        true,
       );
       labelIndex = hitInfo.dataIndex ?? -1;
     }
