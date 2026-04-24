@@ -498,25 +498,32 @@ class Bar {
     const textHeight = fontSize; // fontSize와 textHeight는 같을 수 없지만, 정확히 구할 필요 없음
 
     const GAP = 10;
+    const LABEL_MARGIN = 4;
     const minXPos = isNegativeValue ? barX - GAP : barX + GAP;
     const minYPos = isNegativeValue ? barY + GAP : barY - GAP;
 
     const centerXOnBar = barX + barWidth / 2;
     const centerYOnBar = isHighlight ? barY + barHeight / 2 : barY - barHeight / 2;
 
-    const drawableBarWidth = Math.abs(barWidth) - GAP;
-    const drawableBarHeight = Math.abs(barHeight) - GAP;
+    const absBarWidth = Math.abs(barWidth);
+    const absBarHeight = Math.abs(barHeight);
+    // long dim(텍스트 배치 방향)에만 GAP 적용, thin dim(중앙 정렬 방향)은 GAP 불필요
+    const drawableBarWidth = absBarWidth - GAP;
+    const drawableBarHeight = absBarHeight - GAP;
+    // 비수평 bar의 너비(thin dim)는 중앙 정렬이므로 경계값(==)도 허용
+    const fitsInVerticalBar = textWidth <= absBarWidth && absBarWidth >= textHeight;
 
     switch (align) {
       case 'start': {
         if (isHorizontal) {
-          if (textWidth < drawableBarWidth && textHeight < Math.abs(barHeight)) {
+          if (textWidth < drawableBarWidth && textHeight < absBarHeight) {
             const xPos = isNegativeValue ? minXPos - textWidth : minXPos;
             ctx.fillText(formattedTxt, xPos, centerYOnBar);
           }
-        } else if (textWidth <= Math.abs(barWidth) && textHeight / 2 < drawableBarHeight
-          && Math.abs(barWidth) >= fontSize) {
-          const yPos = isNegativeValue ? barY + GAP : barY - GAP;
+        } else if (fitsInVerticalBar && textHeight + LABEL_MARGIN <= absBarHeight) {
+          const yPos = isNegativeValue
+            ? barY + textHeight / 2 + LABEL_MARGIN
+            : barY - textHeight / 2 - LABEL_MARGIN;
           ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
@@ -525,11 +532,10 @@ class Bar {
 
       case 'center': {
         if (isHorizontal) {
-          if (textWidth < drawableBarWidth && textHeight < Math.abs(barHeight)) {
+          if (textWidth < drawableBarWidth && textHeight < absBarHeight) {
             ctx.fillText(formattedTxt, centerXOnBar, centerYOnBar);
           }
-        } else if (textWidth <= Math.abs(barWidth) && textHeight < drawableBarHeight
-          && Math.abs(barWidth) >= fontSize) {
+        } else if (fitsInVerticalBar && textHeight < drawableBarHeight) {
           ctx.fillText(formattedTxt, centerXOnBar, barY + barHeight / 2);
         }
 
@@ -559,7 +565,7 @@ class Bar {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           }
-        } else if (textWidth <= Math.abs(barWidth) && Math.abs(barWidth) >= fontSize) {
+        } else if (fitsInVerticalBar) {
           const yPos = isNegativeValue ? barY + barHeight + GAP : barY + barHeight - GAP;
           ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
@@ -570,21 +576,17 @@ class Bar {
       default:
       case 'end': {
         if (isHorizontal) {
-          if (textWidth < drawableBarWidth && textHeight < Math.abs(barHeight)) {
+          if (textWidth < drawableBarWidth && textHeight < absBarHeight) {
             const xPos = isNegativeValue ? barX + barWidth + GAP : barX + barWidth - textWidth - GAP;
             ctx.fillText(formattedTxt, xPos, centerYOnBar);
           }
-        } else if (!isHorizontal) {
-          if (isNegativeValue) {
-            const yPos = barY + barHeight - GAP;
-            if (yPos > minYPos && textWidth <= Math.abs(barWidth)
-              && textHeight / 2 < drawableBarHeight && Math.abs(barWidth) >= fontSize) {
-              ctx.fillText(formattedTxt, centerXOnBar, yPos);
-            }
-          } else if (textWidth <= Math.abs(barWidth) && textHeight / 2 < drawableBarHeight
-            && Math.abs(barWidth) >= fontSize) {
-            ctx.fillText(formattedTxt, centerXOnBar, barY + barHeight + GAP);
+        } else if (isNegativeValue) {
+          const yPos = barY + barHeight - textHeight / 2 - LABEL_MARGIN;
+          if (yPos > minYPos && fitsInVerticalBar && textHeight + LABEL_MARGIN <= absBarHeight) {
+            ctx.fillText(formattedTxt, centerXOnBar, yPos);
           }
+        } else if (fitsInVerticalBar && textHeight + LABEL_MARGIN <= absBarHeight) {
+          ctx.fillText(formattedTxt, centerXOnBar, barY + barHeight + textHeight / 2 + LABEL_MARGIN);
         }
 
         break;
