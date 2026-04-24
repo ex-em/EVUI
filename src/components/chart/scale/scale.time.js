@@ -395,7 +395,7 @@ class TimeScale extends Scale {
     // 예상 tick 수에서 초기 multiplier를 추정하여 불필요한 반복을 줄인다
     // fixedSteps인 경우 interval 확장을 하지 않으므로 multiplier는 항상 1
     const estimatedTicks = Math.ceil((graphMax - graphMin) / baseMeta.ms);
-    let multiplier = !this.fixedSteps && estimatedTicks > maxSteps
+    let multiplier = (!this.fixedSteps && estimatedTicks > maxSteps)
       ? Math.max(1, Math.floor(estimatedTicks / maxSteps))
       : 1;
     let ticks;
