@@ -509,10 +509,13 @@ class Bar {
 
     switch (align) {
       case 'start': {
-        if (isHorizontal && textWidth < drawableBarWidth) {
-          const xPos = isNegativeValue ? minXPos - textWidth : minXPos;
-          ctx.fillText(formattedTxt, xPos, centerYOnBar);
-        } else if (!isHorizontal && textHeight < drawableBarHeight) {
+        if (isHorizontal) {
+          if (textWidth < drawableBarWidth && textHeight < Math.abs(barHeight)) {
+            const xPos = isNegativeValue ? minXPos - textWidth : minXPos;
+            ctx.fillText(formattedTxt, xPos, centerYOnBar);
+          }
+        } else if (textWidth <= Math.abs(barWidth) && textHeight / 2 < drawableBarHeight
+          && Math.abs(barWidth) >= fontSize) {
           const yPos = isNegativeValue ? barY + GAP : barY - GAP;
           ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
@@ -521,9 +524,12 @@ class Bar {
       }
 
       case 'center': {
-        if (isHorizontal && textWidth < drawableBarWidth) {
-          ctx.fillText(formattedTxt, centerXOnBar, centerYOnBar);
-        } else if (!isHorizontal && textHeight < drawableBarHeight) {
+        if (isHorizontal) {
+          if (textWidth < drawableBarWidth && textHeight < Math.abs(barHeight)) {
+            ctx.fillText(formattedTxt, centerXOnBar, centerYOnBar);
+          }
+        } else if (textWidth <= Math.abs(barWidth) && textHeight < drawableBarHeight
+          && Math.abs(barWidth) >= fontSize) {
           ctx.fillText(formattedTxt, centerXOnBar, barY + barHeight / 2);
         }
 
@@ -553,7 +559,7 @@ class Bar {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           }
-        } else {
+        } else if (textWidth <= Math.abs(barWidth) && Math.abs(barWidth) >= fontSize) {
           const yPos = isNegativeValue ? barY + barHeight + GAP : barY + barHeight - GAP;
           ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
@@ -563,18 +569,21 @@ class Bar {
 
       default:
       case 'end': {
-        if (isHorizontal && textWidth < drawableBarWidth) {
-          const xPos = isNegativeValue ? barX + barWidth + GAP : barX + barWidth - textWidth - GAP;
-          ctx.fillText(formattedTxt, xPos, centerYOnBar);
+        if (isHorizontal) {
+          if (textWidth < drawableBarWidth && textHeight < Math.abs(barHeight)) {
+            const xPos = isNegativeValue ? barX + barWidth + GAP : barX + barWidth - textWidth - GAP;
+            ctx.fillText(formattedTxt, xPos, centerYOnBar);
+          }
         } else if (!isHorizontal) {
           if (isNegativeValue) {
             const yPos = barY + barHeight - GAP;
-            if (yPos > minYPos) {
+            if (yPos > minYPos && textWidth <= Math.abs(barWidth)
+              && textHeight / 2 < drawableBarHeight && Math.abs(barWidth) >= fontSize) {
               ctx.fillText(formattedTxt, centerXOnBar, yPos);
             }
-          } else if (textHeight < drawableBarHeight) {
-            const yPos = barY + barHeight + GAP;
-            ctx.fillText(formattedTxt, centerXOnBar, yPos);
+          } else if (textWidth <= Math.abs(barWidth) && textHeight / 2 < drawableBarHeight
+            && Math.abs(barWidth) >= fontSize) {
+            ctx.fillText(formattedTxt, centerXOnBar, barY + barHeight + GAP);
           }
         }
 
