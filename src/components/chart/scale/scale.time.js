@@ -1,14 +1,222 @@
+import { defaultsDeep } from 'lodash-es';
 import dayjs from 'dayjs';
-import { TIME_INTERVALS } from '../helpers/helpers.constant';
+import Canvas from '@/components/chart/helpers/helpers.canvas';
+import {
+  TIME_INTERVALS,
+  PLOT_LINE_OPTION,
+  PLOT_BAND_OPTION,
+} from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Scale from './scale';
 
+/**
+ * 사용자 interval 옵션을 정규화된 meta 객체로 변환한다.
+ * string/object interval은 boundary 정렬을 수행하고,
+ * number interval은 boundary 정렬 없이 ms 기반으로 계산한다.
+ *
+ * @param {string|object|number} interval 사용자 interval 옵션
+ * @returns {{ ms: number, unit: string|null, time: number|null }|null}
+ */
+function getIntervalMeta(interval) {
+  if (typeof interval === 'string' && TIME_INTERVALS[interval]) {
+    return {
+      ms: TIME_INTERVALS[interval].size,
+      unit: interval,
+      time: 1,
+    };
+  }
+
+  if (typeof interval === 'object' && interval !== null && interval.unit && interval.time) {
+    const unitInfo = TIME_INTERVALS[interval.unit];
+    if (!unitInfo) {
+      return null;
+    }
+    return {
+      ms: interval.time * unitInfo.size,
+      unit: interval.unit,
+      time: interval.time,
+    };
+  }
+
+  if (typeof interval === 'number' && interval > 0 && Number.isFinite(interval)) {
+    return {
+      ms: interval,
+      unit: null,
+      time: null,
+    };
+  }
+
+  return null;
+}
+
+/**
+ * dayjs 객체에 interval 한 단위를 더한다.
+ * month/quarter/year는 dayjs를 사용하여 달력 기반으로 증가한다.
+ *
+ * @param {dayjs.Dayjs} d dayjs 객체
+ * @param {{ unit: string|null, time: number|null, ms: number }} meta interval 메타 정보
+ * @returns {dayjs.Dayjs} interval이 더해진 dayjs 객체
+ */
+function addIntervalDayjs(d, meta) {
+  if (!meta.unit) {
+    return dayjs(d.valueOf() + meta.ms);
+  }
+
+  const t = meta.time || 1;
+  switch (meta.unit) {
+    case 'month':
+      return d.add(t, 'month');
+    case 'quarter':
+      return d.add(t * 3, 'month');
+    case 'year':
+      return d.add(t, 'year');
+    case 'week':
+      return d.add(t * 7, 'day');
+    default:
+      return dayjs(d.valueOf() + meta.ms);
+  }
+}
+
+/**
+ * timestamp에 interval 한 단위를 더한다.
+ *
+ * @param {number} timestamp 기준 타임스탬프
+ * @param {{ unit: string|null, time: number|null, ms: number }} meta interval 메타 정보
+ * @returns {number} interval이 더해진 타임스탬프
+ */
+function addInterval(timestamp, meta) {
+  if (!meta.unit) {
+    return timestamp + meta.ms;
+  }
+  return addIntervalDayjs(dayjs(timestamp), meta).valueOf();
+}
+
+/**
+ * timestamp를 다음 interval 정렬 boundary로 올림(ceil)한다.
+ *
+ * time > 1일 때도 정확한 배수 boundary에 맞춘다.
+ * 예: { time: 10, unit: 'minute' }, 12:56 → 13:00 (10분 배수)
+ *
+ * 각 unit별 anchor(기준점):
+ *   sub-day (ms/s/m/h) → start of day
+ *   day               → start of year
+ *   week              → start of year 기준 Monday
+ *   month/quarter     → start of year (달력 기반)
+ *   year              → epoch year 2000 (달력 기반)
+ *
+ * number interval → Math.ceil(timestamp / ms) * ms (boundary 정렬 없음)
+ *
+ * @param {number} timestamp 기준 타임스탬프
+ * @param {{ ms: number, unit: string|null, time: number|null }} meta interval 메타 정보
+ * @returns {number} boundary에 정렬된 타임스탬프
+ */
+function ceilToBoundary(timestamp, meta) {
+  if (!meta.unit) {
+    return Math.ceil(timestamp / meta.ms) * meta.ms;
+  }
+
+  const time = meta.time || 1;
+  const d = dayjs(timestamp);
+
+  // --- sub-day: start of day 기준 ms 연산 ---
+  if (['millisecond', 'second', 'minute', 'hour'].includes(meta.unit)) {
+    const anchor = d.startOf('day').valueOf();
+    const intervalMs = TIME_INTERVALS[meta.unit].size * time;
+    const elapsed = timestamp - anchor;
+    return anchor + Math.ceil(elapsed / intervalMs) * intervalMs;
+  }
+
+  // --- day: start of year 기준 ms 연산 ---
+  if (meta.unit === 'day') {
+    const anchor = d.startOf('year').valueOf();
+    const intervalMs = TIME_INTERVALS.day.size * time;
+    const elapsed = timestamp - anchor;
+    return anchor + Math.ceil(elapsed / intervalMs) * intervalMs;
+  }
+
+  // --- week: start of year 기준 Monday에서 ms 연산 ---
+  if (meta.unit === 'week') {
+    let anchor = d.startOf('year');
+    const dow = anchor.day();
+    anchor = anchor.subtract((dow + 6) % 7, 'day');
+    const anchorMs = anchor.valueOf();
+    const intervalMs = TIME_INTERVALS.week.size * time;
+    const elapsed = timestamp - anchorMs;
+    return anchorMs + Math.ceil(elapsed / intervalMs) * intervalMs;
+  }
+
+  // --- month: 달력 기반 ---
+  if (meta.unit === 'month') {
+    const yearStart = d.startOf('year');
+    const monthStart = d.startOf('month');
+    const monthIndex = d.month();
+    const offset = monthStart.valueOf() >= timestamp ? monthIndex : monthIndex + 1;
+    const aligned = Math.ceil(offset / time) * time;
+    return yearStart.add(aligned, 'month').valueOf();
+  }
+
+  // --- quarter: 달력 기반 ---
+  if (meta.unit === 'quarter') {
+    const yearStart = d.startOf('year');
+    const qIndex = Math.floor(d.month() / 3);
+    const qStart = d.month(qIndex * 3).startOf('month');
+    const offset = qStart.valueOf() >= timestamp ? qIndex : qIndex + 1;
+    const aligned = Math.ceil(offset / time) * time;
+    return yearStart.add(aligned * 3, 'month').valueOf();
+  }
+
+  // --- year: 달력 기반, epoch = 2000 ---
+  if (meta.unit === 'year') {
+    const yearStart = d.startOf('year');
+    const epochYear = 2000;
+    const offset = yearStart.valueOf() >= timestamp
+      ? d.year() - epochYear
+      : d.year() + 1 - epochYear;
+    const aligned = Math.ceil(offset / time) * time;
+    return dayjs(`${epochYear + aligned}-01-01`).startOf('day').valueOf();
+  }
+
+  // fallback
+  return timestamp;
+}
+
+/**
+ * graphMin 이상 graphMax 이하인 visible tick을 생성한다.
+ *
+ * firstTick은 boundaryMeta(원본 interval) 기준으로 boundary를 찾고,
+ * 이후 stepMeta(확장된 interval) 간격으로 증가한다.
+ *
+ * 이렇게 분리하는 이유:
+ *   사용자가 interval: 'second'를 지정하면 boundary는 "초 단위(ms=0)"이다.
+ *   maxSteps 초과로 5초 간격으로 확장되더라도, 첫 tick은 원래 boundary(초 단위)에서 시작해야 한다.
+ *   예: 10:27:38 → 첫 tick = 10:27:38, step = 5초 → 10:27:38, 10:27:43, 10:27:48...
+ *
+ * @param {number} graphMin 그래프 최솟값
+ * @param {number} graphMax 그래프 최댓값
+ * @param {{ ms: number, unit: string|null, time: number|null }} stepMeta     stepping용 (확장된 interval)
+ * @param {{ ms: number, unit: string|null, time: number|null }} [boundaryMeta] 첫 tick boundary용 (원본 interval, 생략 시 stepMeta 사용)
+ * @returns {number[]} 생성된 tick 타임스탬프 배열
+ */
+function generateVisibleTicks(graphMin, graphMax, stepMeta, boundaryMeta) {
+  const ticks = [];
+  let tick = ceilToBoundary(graphMin, boundaryMeta || stepMeta);
+  const MAX_TICKS = 10000;
+
+  while (tick <= graphMax && ticks.length < MAX_TICKS) {
+    ticks.push(tick);
+    tick = addInterval(tick, stepMeta);
+  }
+
+  return ticks;
+}
+
 class TimeScale extends Scale {
   /**
-   * value를 dayjs 객체로 변환하고, 숫자로 변환
-   * 
-   * @param {*} value 
-   * @returns {number} normalized value
+   * 임의의 값을 숫자(타임스탬프)로 정규화한다.
+   * null/undefined → null, 유한한 숫자 → 그대로, 그 외 → dayjs로 파싱 후 valueOf()
+   *
+   * @param {*} value 정규화할 값
+   * @returns {number|null} 정규화된 타임스탬프 (유효하지 않으면 null)
    */
   normalizeTimeValue(value) {
     if (value == null) {
@@ -24,11 +232,11 @@ class TimeScale extends Scale {
   }
 
   /**
-   * min/max value를 정규화하고, super.calculateScaleRange를 호출
-   * @param {object} minMax    min/max information
-   * @param {object} scrollbarOpt scrollbar option
+   * min/max 값을 타임스탬프로 정규화하고, super.calculateScaleRange를 호출한다.
    *
-   * @returns {object} min/max value and label
+   * @param {object} minMax        min/max 정보
+   * @param {object} scrollbarOpt  스크롤바 옵션
+   * @returns {object} 정규화된 min/max 값과 라벨
    */
   calculateScaleRange(minMax, scrollbarOpt) {
     const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
@@ -90,11 +298,11 @@ class TimeScale extends Scale {
   }
 
   /**
-   * Transforming label by designated format
-   * @param {number} value                   label value
-   * @param {object} data                    data for formatting
+   * 지정된 포맷에 따라 라벨 텍스트를 생성한다.
    *
-   * @returns {string} formatted label
+   * @param {number} value 라벨 값 (타임스탬프)
+   * @param {object} data  포맷팅에 사용할 데이터 (prev 등)
+   * @returns {string} 포맷된 라벨 문자열
    */
   getLabelFormat(value, data = {}) {
     if (this.formatter) {
@@ -109,10 +317,10 @@ class TimeScale extends Scale {
   }
 
   /**
-   * Calculate interval
-   * @param {object} range    range information
+   * interval을 계산한다 (스크롤바 플러그인 등 외부에서 사용).
    *
-   * @returns {number} interval
+   * @param {object} range 범위 정보 (minValue, maxValue, maxSteps)
+   * @returns {number} 계산된 interval (ms)
    */
   getInterval(range) {
     const max = this.normalizeTimeValue(range.maxValue);
@@ -137,142 +345,421 @@ class TimeScale extends Scale {
   }
 
   /**
-   * With range information, calculate how many labels in axis
-   * time axis는 interval 없이 range만 사용하는 것을 지원하지 않음
-   * @param {object} range    min/max information
+   * Visible tick 기반으로 steps 정보를 계산한다.
    *
-   * @returns {object} steps, interval, min/max graph value
-  */
+   * 기존 균등분할(labelGap) 방식 대신, interval boundary에 맞는 tick만 생성하고
+   * graphMin/graphMax는 변경하지 않는다.
+   *
+   * @param {object} range min/max 정보 (minValue, maxValue, maxSteps)
+   * @returns {object} { steps, interval, baseInterval, graphMin, graphMax, ticks }
+   */
   calculateSteps(range) {
     const minValue = this.normalizeTimeValue(range.minValue);
     const maxValue = this.normalizeTimeValue(range.maxValue);
     const maxSteps = Math.max(1, range.maxSteps ?? 1);
-    const normalizedRange = {
-      ...range,
-      minValue,
-      maxValue,
-    };
 
     if (minValue == null || maxValue == null) {
       return {
         steps: 0,
         interval: 0,
+        baseInterval: 0,
         graphMin: null,
         graphMax: null,
+        ticks: [],
       };
     }
-
-    const hasUserRange = Array.isArray(this.range) && this.range.length === 2;
-
-    // 사용자 interval 옵션이 있는 경우, 사용자 interval 옵션을 우선 적용
-    // 문자열('hour', 'second' 등)은 4)auto 분기로 처리
-    const hasUserInterval =
-      typeof this.interval === 'number' ||
-      (typeof this.interval === 'object' && this.interval !== null);
-
-    const resolvedInterval = hasUserInterval
-      ? this.getInterval(normalizedRange)
-      : null;
-
-    const isValidInterval =
-      resolvedInterval != null &&
-      resolvedInterval > 0 &&
-      Number.isFinite(resolvedInterval);
-
-    const EPS = 1e-10;
 
     const graphMin = +minValue;
-    let graphMax = +maxValue;
+    const graphMax = +maxValue;
 
-    /**
-     * 1) userRange + userInterval
-     * 호환되면 그대로 사용
-     * 단, maxSteps를 넘을경우 interval을 증가시켜서 맞춤
-     * 호환되지 않으면 userRange only 로직으로 fallback
-     */
-    if (hasUserRange && isValidInterval) {
-      const graphRange = graphMax - graphMin;
-      const rawSteps = graphRange / resolvedInterval;
-      const isCompatible =
-        Math.abs(rawSteps - Math.round(rawSteps)) < EPS;
-
-      if (this.fixedSteps || isCompatible) {
-        let interval = resolvedInterval;
-        let steps = Math.round(rawSteps);
-
-        if (!this.fixedSteps) {
-          while (steps > maxSteps) {
-            interval += resolvedInterval;
-            steps = Math.ceil(graphRange / interval);
-          }
-        }
-
-        return { steps, interval, graphMin, graphMax };
-      }
-    }
-
-    /**
-     * 2) userInterval only
-     * Object(time, unit) interval에만 해당
-     * interval을 시작값으로 사용하고,
-     * steps가 maxSteps를 넘으면 interval을 배수로 증가
-     */
-    if (!hasUserRange && isValidInterval) {
-      const graphRange = graphMax - graphMin;
-      let interval = resolvedInterval;
-      let steps = Math.ceil(graphRange / interval);
-
-      while (steps > maxSteps) {
-        interval += resolvedInterval;
-        steps = Math.ceil(graphRange / interval);
-      }
-
-      // interval을 유지하기 위해 graphMax 확장
-      graphMax = graphMin + (interval * steps);
-
+    if (graphMin >= graphMax) {
       return {
-        steps,
-        interval,
+        steps: 0,
+        interval: 0,
+        baseInterval: 0,
         graphMin,
         graphMax,
+        ticks: [],
       };
     }
-  
-    /**
-     * 3) auto
-     * 문자열 interval('hour', 'second' 등)도 여기서 처리
-     */
-    let interval = this.getInterval(normalizedRange);
-    let increase = graphMin;
 
-    while (increase < maxValue) {
-      increase += interval;
+    // interval meta 결정
+    const meta = getIntervalMeta(this.interval);
+
+    let baseMeta;
+    if (meta) {
+      baseMeta = meta;
+    } else {
+      // 사용자 interval이 없으면 auto (number interval, boundary 정렬 없음)
+      const autoMs = Math.max(1, Math.ceil((graphMax - graphMin) / Math.max(1, maxSteps)));
+      baseMeta = { ms: autoMs, unit: null, time: null };
     }
 
-    graphMax = increase;
+    // tick 생성 + maxSteps 초과 시 interval을 strict 배수로 확장
+    let multiplier = 1;
+    let ticks;
+    let currentMs;
 
-    const graphRange = graphMax - graphMin;
-    let steps = Math.round(graphRange / interval);
+    const MAX_MULTIPLIER = 10000;
+    while (multiplier <= MAX_MULTIPLIER) {
+      const currentMeta = baseMeta.unit
+        ? {
+            ms: baseMeta.ms * multiplier,
+            unit: baseMeta.unit,
+            time: (baseMeta.time || 1) * multiplier,
+          }
+        : {
+            ms: baseMeta.ms * multiplier,
+            unit: null,
+            time: null,
+          };
 
-    while (steps > maxSteps) {
-      interval *= 2;
-      steps = Math.round(graphRange / interval);
+      currentMs = currentMeta.ms;
+      ticks = generateVisibleTicks(graphMin, graphMax, currentMeta, baseMeta);
 
-      const tempInterval = graphRange / steps;
-      interval = this.decimalPoint ? tempInterval : Math.ceil(tempInterval);
+      if (ticks.length <= maxSteps || this.fixedSteps) {
+        break;
+      }
+      multiplier++;
     }
 
-    if (graphRange > (steps * interval)) {
-      const tempInterval = graphRange / steps;
-      interval = this.decimalPoint ? tempInterval : Math.ceil(tempInterval);
-    }
-  
     return {
-      steps,
-      interval,
+      steps: Math.max(0, ticks.length - 1),
+      interval: currentMs,
+      baseInterval: baseMeta.ms,
       graphMin,
       graphMax,
+      ticks,
     };
+  }
+
+  /**
+   * Time axis 전용 draw.
+   * 기존 균등분할(labelGap = distance / steps) 방식이 아니라,
+   * stepInfo.ticks[]의 실제 값으로부터 Canvas.calculateX/Y를 통해
+   * 픽셀 좌표를 계산하여 label / grid / axis tick을 그린다.
+   *
+   * @param {object} chartRect      차트 크기 정보
+   * @param {object} labelOffset    라벨 오프셋 정보
+   * @param {object} stepInfo       라벨 steps 정보 (ticks[] 포함)
+   * @param {object} hitInfo        히트(클릭/호버) 정보
+   * @param {object} selectLabelInfo 선택된 라벨 정보
+   */
+  draw(chartRect, labelOffset, stepInfo, hitInfo, selectLabelInfo) {
+    const ctx = this.ctx;
+    const options = this.options;
+    const aPos = {
+      x1: chartRect.x1 + labelOffset.left,
+      x2: chartRect.x2 - labelOffset.right,
+      y1: chartRect.y1 + labelOffset.top,
+      y2: chartRect.y2 - labelOffset.bottom,
+    };
+
+    const axisMin = stepInfo.graphMin;
+    const axisMax = stepInfo.graphMax;
+    const ticks = stepInfo.ticks;
+
+    const startPoint = aPos[this.units.rectStart];
+    const endPoint = aPos[this.units.rectEnd];
+    const offsetPoint = aPos[this.units.rectOffset(this.position)];
+    const offsetCounterPoint = aPos[this.units.rectOffsetCounter(this.position)];
+
+    const AXIS_TICK_LENGTH = 5;
+
+    let aliasPixel = 0;
+
+    this.drawAxisTitle(chartRect, labelOffset);
+
+    ctx.font = Util.getLabelStyle(this.labelStyle);
+    ctx.fillStyle = this.labelStyle.color;
+
+    if (this.type === 'x') {
+      ctx.textAlign = 'center';
+      ctx.textBaseline = this.position === 'top' ? 'bottom' : 'top';
+    } else {
+      ctx.textAlign = this.position === 'left' ? 'right' : 'left';
+      ctx.textBaseline = 'middle';
+    }
+
+    if (this.showAxis) {
+      ctx.lineWidth = this.axisLineWidth;
+      aliasPixel = Util.aliasPixel(ctx.lineWidth);
+
+      ctx.beginPath();
+      ctx.strokeStyle = this.axisLineColor;
+
+      if (this.type === 'x') {
+        ctx.moveTo(startPoint, offsetPoint + aliasPixel);
+        ctx.lineTo(endPoint, offsetPoint + aliasPixel);
+      } else {
+        ctx.moveTo(offsetPoint + aliasPixel, startPoint);
+        ctx.lineTo(offsetPoint + aliasPixel, endPoint);
+      }
+      ctx.stroke();
+      ctx.closePath();
+    }
+
+    // ticks가 없으면 축 선만 그리고 종료
+    if (!ticks?.length || axisMin === null) {
+      return;
+    }
+
+    if (this.labelStyle?.show) {
+      // tick 값 기반 좌표 계산을 위한 area 정보
+      const xArea = aPos.x2 - aPos.x1;
+      const yArea = aPos.y2 - aPos.y1;
+
+      ctx.strokeStyle = this.gridLineColor;
+      ctx.lineWidth = 1;
+      aliasPixel = Util.aliasPixel(ctx.lineWidth);
+
+      let labelText;
+      for (let ix = 0; ix < ticks.length; ix++) {
+        const tick = ticks[ix];
+
+        // tick 값에서 실제 픽셀 좌표를 계산
+        let labelCenter;
+        if (this.type === 'x') {
+          labelCenter = Canvas.calculateX(tick, axisMin, axisMax, xArea, aPos.x1);
+        } else {
+          labelCenter = Canvas.calculateY(tick, axisMin, axisMax, yArea, aPos.y2);
+        }
+
+        if (labelCenter === null) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        const isZeroLine = tick === 0;
+        if (isZeroLine && this.zeroLineColor) {
+          ctx.strokeStyle = this.zeroLineColor;
+        } else {
+          ctx.strokeStyle = this.gridLineColor;
+        }
+
+        const linePosition = labelCenter + aliasPixel;
+        labelText = this.getLabelFormat(tick, {
+          prev: ticks[ix - 1] ?? '',
+        });
+
+        const isBlurredLabel =
+          this.options?.selectLabel?.use &&
+          this.options?.selectLabel?.useLabelOpacity &&
+          this.options.horizontal === (this.type === 'y') &&
+          selectLabelInfo?.dataIndex?.length &&
+          !selectLabelInfo?.label
+            .map((t) =>
+              this.getLabelFormat(t, {
+                prev: ticks[ix - 1] ?? '',
+              }),
+            )
+            .includes(labelText);
+
+        let labelColor;
+        if (ix === ticks.length - 1 && this.lastLabelFontStyle) {
+          ctx.font = Util.getLabelStyle(this.lastLabelFontStyle);
+          labelColor = this.lastLabelFontStyle.color;
+        } else {
+          ctx.font = Util.getLabelStyle(this.labelStyle);
+          labelColor = this.labelStyle.color;
+        }
+
+        let defaultOpacity = 1;
+
+        if (Util.getColorStringType(labelColor) === 'RGBA') {
+          defaultOpacity = Util.getOpacity(labelColor);
+        }
+
+        ctx.fillStyle = Util.colorStringToRgba(
+          labelColor,
+          isBlurredLabel ? this.options?.unSelectedOpacity : defaultOpacity,
+        );
+
+        let labelPoint;
+
+        if (this.type === 'x') {
+          labelPoint = this.position === 'top' ? offsetPoint - 10 : offsetPoint + 10;
+          if (options?.brush?.showLabel || !options?.brush) {
+            ctx.fillText(this.checkFixWidth(labelText), labelCenter, labelPoint);
+          }
+
+          if (
+            !isBlurredLabel &&
+            options?.selectItem?.showLabelTip &&
+            hitInfo?.label &&
+            !this.options?.horizontal
+          ) {
+            const selectedLabel = this.getLabelFormat(hitInfo.label);
+            if (selectedLabel === labelText) {
+              const height = Math.round(ctx.measureText(this.labelStyle?.fontSize).width);
+              Util.showLabelTip({
+                ctx: this.ctx,
+                width: Math.round(ctx.measureText(selectedLabel).width) + 10,
+                height,
+                x: labelCenter,
+                y: labelPoint + (height - 2),
+                borderRadius: 2,
+                arrowSize: 3,
+                text: labelText,
+                backgroundColor: options?.selectItem?.labelTipStyle?.backgroundColor,
+                textColor: options?.selectItem?.labelTipStyle?.textColor,
+              });
+            }
+          }
+
+          if (this.showAxisTick) {
+            ctx.beginPath();
+            ctx.strokeStyle = this.axisLineColor;
+            ctx.moveTo(linePosition, offsetPoint);
+            ctx.lineTo(linePosition, offsetPoint + AXIS_TICK_LENGTH);
+            ctx.stroke();
+            ctx.closePath();
+          }
+
+          // ix === 0 이라는 이유만으로 grid를 생략하지 않는다
+          if (this.showGrid) {
+            ctx.beginPath();
+            ctx.strokeStyle = this.gridLineColor;
+            ctx.moveTo(linePosition, offsetPoint);
+            ctx.lineTo(linePosition, offsetCounterPoint);
+            ctx.stroke();
+            ctx.closePath();
+          }
+        } else {
+          labelPoint = this.position === 'left' ? offsetPoint - 10 : offsetPoint + 10;
+          if (options?.brush?.showLabel || !options?.brush) {
+            ctx.fillText(this.checkFixWidth(labelText), labelPoint, labelCenter);
+          }
+
+          let adjustedLinePosition = linePosition;
+          if (ix === ticks.length - 1) {
+            adjustedLinePosition -= 1;
+          }
+
+          if (this.showAxisTick) {
+            ctx.beginPath();
+            ctx.strokeStyle = this.axisLineColor;
+            ctx.moveTo(
+              offsetPoint + (this.axisLineWidth ?? 1),
+              adjustedLinePosition,
+            );
+            ctx.lineTo(offsetPoint - AXIS_TICK_LENGTH, adjustedLinePosition);
+            ctx.stroke();
+            ctx.closePath();
+          }
+
+          // ix === 0 이라는 이유만으로 grid를 생략하지 않는다
+          if (this.showGrid) {
+            ctx.beginPath();
+            ctx.strokeStyle = this.gridLineColor;
+            ctx.moveTo(offsetPoint, adjustedLinePosition);
+            ctx.lineTo(offsetCounterPoint, adjustedLinePosition);
+            ctx.stroke();
+            ctx.closePath();
+          }
+        }
+      }
+    }
+
+    // plotBand / plotLine은 axisMin/axisMax 기준으로 위치를 계산하는 기존 구조를 유지
+    if (this.plotBands?.length || this.plotLines?.length) {
+      const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+      const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+      const padding = aliasPixel + 1;
+      const minX = aPos.x1;
+      const maxX = aPos.x2 + padding;
+      const minY = aPos.y1 - padding;
+      const maxY = aPos.y2;
+
+      this.plotBands?.forEach((plotBand) => {
+        const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
+        const {
+          from: userDefinedFrom,
+          to: userDefinedTo,
+          label: labelOpt,
+        } = mergedPlotBandOpt;
+        const from = !Util.isNullOrUndefined(userDefinedFrom)
+          ? Math.max(userDefinedFrom, axisMin)
+          : axisMin;
+        const to = !Util.isNullOrUndefined(userDefinedTo)
+          ? Math.min(userDefinedTo, axisMax)
+          : axisMax;
+
+        this.setPlotBandStyle(mergedPlotBandOpt);
+
+        let fromPos;
+        let toPos;
+        if (this.type === 'x') {
+          fromPos = Canvas.calculateX(from, axisMin, axisMax, xArea, minX);
+          toPos = Canvas.calculateX(to, axisMin, axisMax, xArea, minX);
+
+          if (fromPos === null || toPos === null) {
+            return;
+          }
+
+          this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
+        } else {
+          fromPos = Canvas.calculateY(from, axisMin, axisMax, yArea, maxY);
+          toPos = Canvas.calculateY(to, axisMin, axisMax, yArea, maxY);
+
+          if (fromPos === null || toPos === null) {
+            return;
+          }
+
+          this.drawYPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
+        }
+
+        if (labelOpt.show) {
+          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
+          const textXY = this.getPlotBandLabelPosition(
+            fromPos, toPos, labelOptions, maxX, minY,
+          );
+          this.drawPlotLabel(labelOptions, textXY);
+        }
+
+        ctx.restore();
+      });
+
+      this.plotLines?.forEach((plotLine) => {
+        if (!Number.isFinite(+plotLine.value)) {
+          return;
+        }
+
+        const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
+        const { value, label: labelOpt } = mergedPlotLineOpt;
+
+        let dataPos;
+        if (this.type === 'x') {
+          dataPos = Canvas.calculateX(value, axisMin, axisMax, xArea, minX);
+
+          if (dataPos === null) {
+            return;
+          }
+
+          this.setPlotLineStyle(mergedPlotLineOpt);
+          this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
+        } else {
+          dataPos = Canvas.calculateY(value, axisMin, axisMax, yArea, maxY);
+
+          if (dataPos === null) {
+            return;
+          }
+
+          this.setPlotLineStyle(mergedPlotLineOpt);
+          this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
+        }
+
+        if (labelOpt.show) {
+          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
+          const textXY = this.getPlotLineLabelPosition(
+            dataPos, labelOptions, maxX, minY,
+          );
+          this.drawPlotLabel(labelOptions, textXY);
+        }
+
+        ctx.restore();
+      });
+    }
   }
 }
 
