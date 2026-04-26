@@ -186,6 +186,11 @@ export default {
             fontSize: 16,
             fontWeight: 600,
           } : undefined,
+          firstLabelFontStyle: useRange.value ? {
+            color: '#FF0000',
+            fontSize: 16,
+            fontWeight: 600,
+          } : undefined,
         }],
         title: {
           text: '',
