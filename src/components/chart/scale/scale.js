@@ -388,6 +388,9 @@ class Scale {
           if (ix === steps && this.lastLabelFontStyle) {
             ctx.font = Util.getLabelStyle(this.lastLabelFontStyle);
             labelColor = this.lastLabelFontStyle.color;
+          } else if (ix === 0 && this.firstLabelFontStyle) {
+            ctx.font = Util.getLabelStyle(this.firstLabelFontStyle);
+            labelColor = this.firstLabelFontStyle.color;
           } else {
             ctx.font = Util.getLabelStyle(this.labelStyle);
             labelColor = this.labelStyle.color;

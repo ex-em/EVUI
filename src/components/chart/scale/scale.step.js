@@ -258,17 +258,22 @@ class StepScale extends Scale {
           selectedLabelInfo?.dataIndex?.length &&
           !selectedLabelInfo?.dataIndex?.includes(labelIndex);
 
-        let labelColor = this.labelStyle.color;
+        let labelColor;
+        if (index === steps - 1 && this.lastLabelFontStyle) {
+          ctx.font = Util.getLabelStyle(this.lastLabelFontStyle);
+          labelColor = this.lastLabelFontStyle.color;
+        } else if (index === 0 && this.firstLabelFontStyle) {
+          ctx.font = Util.getLabelStyle(this.firstLabelFontStyle);
+          labelColor = this.firstLabelFontStyle.color;
+        } else {
+          ctx.font = Util.getLabelStyle(this.labelStyle);
+          labelColor = this.labelStyle.color;
+        }
+
         let defaultOpacity = 1;
 
         if (Util.getColorStringType(labelColor) === 'RGBA') {
           defaultOpacity = Util.getOpacity(labelColor);
-        }
-
-        const isLastDrawnLabel = index === steps - 1;
-        if (isLastDrawnLabel && this.lastLabelFontStyle) {
-          ctx.font = Util.getLabelStyle(this.lastLabelFontStyle);
-          labelColor = this.lastLabelFontStyle.color;
         }
 
         ctx.fillStyle = Util.colorStringToRgba(
@@ -353,8 +358,12 @@ class StepScale extends Scale {
           const lastLabelPoint = alignToGridLine ? lastLabelCenter : lastLabelCenter + labelGap / 2;
           const lastLabelText = this.getLabelFormat(labels[lastLabelIndex], maxWidth);
 
-          ctx.font = this.lastLabelFontStyle ? Util.getLabelStyle(this.lastLabelFontStyle) : Util.getLabelStyle(this.labelStyle);
-          ctx.fillStyle = this.lastLabelFontStyle ? this.lastLabelFontStyle.color : this.labelStyle.color;
+          ctx.font = this.lastLabelFontStyle
+            ? Util.getLabelStyle(this.lastLabelFontStyle)
+            : Util.getLabelStyle(this.labelStyle);
+          ctx.fillStyle = this.lastLabelFontStyle
+            ? this.lastLabelFontStyle.color
+            : this.labelStyle.color;
 
           if (this.type === 'x') {
             ctx.fillText(this.checkFixWidth(lastLabelText), lastLabelPoint, labelPoint);

@@ -135,6 +135,7 @@ export const AXIS_OPTION = {
   },
   showLastLabel: false,
   lastLabelFontStyle: null,
+  firstLabelFontStyle: null,
   title: {
     use: false,
     text: null,
