@@ -187,7 +187,7 @@ export default {
             fontWeight: 600,
           } : undefined,
           firstLabelFontStyle: useRange.value ? {
-            color: '#FF0000',
+            color: '#0000FF',
             fontSize: 16,
             fontWeight: 600,
           } : undefined,
