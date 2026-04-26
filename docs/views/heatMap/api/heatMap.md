@@ -143,6 +143,8 @@ const chartData =
 | range          | Array         | null                      | 축에 표시할 값의 min, max (autoScaleRatio = null, startToZero = false 이여야 정상 표현됩니다.) | [time](#time-type), [step](#step-type)                  |
 | interval       | String/number |                           | 축에 표시되는 값의 간격 단위 ( time: string / linear: number)                                  |                                                         |
 | labelStyle     | Object        | ([상세](#label-style))    | 라벨의 폰트 스타일을 설정                                                                      |                                                         |
+| firstLabelFontStyle | Object    | null                      | 첫 번째 라벨의 폰트 스타일을 설정                                                              |                                                         |
+| lastLabelFontStyle | Object     | null                      | 마지막 라벨의 폰트 스타일을 설정                                                               |                                                         |
 | formatter      | function      | null                      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용                                        | (value, { prev, isDefaultMaxSameAsMin }) => value + '%' |
 | title          | Object        | ([상세](#axes-title))     | 라벨의 폰트 스타일을 설정                                                                      |                                                         |
 | scrollbar      | Object        | ([상세](#axes-scrollbar)) | 차트 축 스크롤 설정(range 옵션 설정되어 있어야 정상 동작합니다.)                               |                                                         |
