@@ -352,15 +352,20 @@ class Line {
         item.index = dataIndex;
         if (item.data) {
           const point = gdata[dataIndex];
-          const yDist = Math.abs(yp - point.yp);
-          const directHitThreshold = 15; // 직접 히트 임계값
+          // null 좌표는 산술에서 0 으로 강제 변환되므로 hit 판정 대상에서 제외.
+          const hasValidPoint = point.o !== null && point.o !== undefined
+            && point.yp !== null && point.yp !== undefined;
+          if (hasValidPoint) {
+            const yDist = Math.abs(yp - point.yp);
+            const directHitThreshold = 15; // 직접 히트 임계값
 
-          if (yDist <= directHitThreshold) {
-            item.hit = true;
-          }
-          if (isLinePointDirectHit(point)) {
-            item.hit = true;
-            item.directHit = true;
+            if (yDist <= directHitThreshold) {
+              item.hit = true;
+            }
+            if (isLinePointDirectHit(point)) {
+              item.hit = true;
+              item.directHit = true;
+            }
           }
         }
       } else if (typeof this.beforeFindItemIndex === 'number' && this.beforeFindItemIndex !== -1 && this.show && useSelectLabelOrItem) {
