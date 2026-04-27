@@ -1,3 +1,31 @@
+# [3.8.0](https://github.com/ex-em/EVUI/compare/3.7.0...3.8.0) (2026-04-27)
+
+
+### Bug Fixes
+
+* **chart:** fill(with null) null 데이터 처리 ([ac27472](https://github.com/ex-em/EVUI/commit/ac274720e8f3d56c9168294e6b9718f63819135c))
+* **chart:** selectLabel indicator 텍스트가 클릭 라벨로 표시되도록 보정 ([41e44e8](https://github.com/ex-em/EVUI/commit/41e44e8845f0ceea9031a87c5b09fd432f7212b8))
+* improve text positioning for bar elements to prevent overflow and clipping ([1d3df38](https://github.com/ex-em/EVUI/commit/1d3df38f1e7daadae9a60016ed861875706fd0c5))
+* out이고 수평일때 bar를 벗어나는 경우 그리지 않음 ([bab78dd](https://github.com/ex-em/EVUI/commit/bab78ddc00436b4cf6238efc2a7272d7e25fcf55))
+* text가 bar를 벗어나거나 잘림 현상 ([dc03110](https://github.com/ex-em/EVUI/commit/dc031100d9921592b76e43fc10c73d6f2bd766de))
+* 린트 에러 픽스 ([43faa57](https://github.com/ex-em/EVUI/commit/43faa5743b2b67fca973e4a9a6949b031f4b8c63))
+* 실패한 테스트 코드 수정 ([7b98327](https://github.com/ex-em/EVUI/commit/7b983271966a6ee32d661c9c01283a7bbd1d4fea))
+
+
+### Features
+
+* willReadFrequently 옵션을 pie type에만 적용 ([4b5e279](https://github.com/ex-em/EVUI/commit/4b5e279c11133192583fada02a70ba62af2264bf))
+
+
+### Performance Improvements
+
+* firstLabelFontStyle 옵션이 있을 경우에 대한 처리 ([143bac2](https://github.com/ex-em/EVUI/commit/143bac2712d251cfdfdb9d73e629412f7b76207e))
+
+
+### Reverts
+
+* y축 buffer 완화 롤백 ([8ad19b8](https://github.com/ex-em/EVUI/commit/8ad19b86c4222cf3215ace9c1262068741d0127e))
+
 # [3.7.0](https://github.com/ex-em/EVUI/compare/3.6.6...3.7.0) (2026-04-24)
 
 
