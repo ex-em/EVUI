@@ -102,4 +102,36 @@ describe('Bar Element', () => {
       expect(item.directHit).toBeFalsy();
     });
   });
+
+  describe('null 데이터 안전 fall-through (회귀 가드)', () => {
+    // bar 박스 비교는 null 좌표에서 NaN 으로 false fall-through.
+    const nullBar = { xp: null, yp: null, w: null, h: null, o: null, index: 0 };
+    const createBarWithNullData = () =>
+      createBar({
+        data: [nullBar],
+        show: true,
+        color: '#000',
+        visibleStartIndex: 0,
+        filteredCount: 1,
+      });
+
+    it('isPointInBar 는 null 박스 좌표에서 false 를 반환한다', () => {
+      const bar = createBar();
+      expect(bar.isPointInBar([40, 10], { xp: null, yp: null, w: null, h: null })).toBe(false);
+    });
+
+    it('dataIndex 분기(useIndicatorOnLabel=true) + null 데이터 → hit=false', () => {
+      const bar = createBarWithNullData();
+      const item = bar.findGraphData([40, 10], false, 0, true);
+      expect(item.hit).toBe(false);
+      expect(item.directHit).toBeFalsy();
+    });
+
+    it('binarySearchBar 경로(useIndicatorOnLabel=false) + null 데이터 → hit=false', () => {
+      const bar = createBarWithNullData();
+      const item = bar.findGraphData([40, 10], false, undefined, false);
+      expect(item.hit).toBe(false);
+      expect(item.directHit).toBeFalsy();
+    });
+  });
 });
