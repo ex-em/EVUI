@@ -165,22 +165,29 @@ const modules = {
     let value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
     let label;
     if (tipType === 'sel') {
-      if (hitInfo && hitInfo.value !== null) {
-        value = hitInfo.useStack ? hitInfo.acc : hitInfo.value;
+      if (hitInfo && hitInfo.label !== null) {
+        // value=null 라벨 클릭에서도 label 자체는 hitInfo 우선. value 만 별도 fallback.
         label = hitInfo.label;
-        lastTip.value = value;
+        if (hitInfo.value !== null) {
+          value = hitInfo.useStack ? hitInfo.acc : hitInfo.value;
+          lastTip.value = value;
+        } else if (lastTip.value !== null) {
+          value = lastTip.value;
+        }
         lastTip.label = label;
       } else if (lastTip.value !== null) {
         value = lastTip.value;
         label = lastTip.label;
       } else if (lastTip.pos !== null) {
-        const item = type === 'bar'
-          ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
-
-        value = item.useStack ? item.acc : item.value;
-        label = item.label;
-        lastTip.value = value;
-        lastTip.label = label;
+        // line/scatter 는 getItemByLabel 이 미정의(dead code) — typeof 가드.
+        const fnName = type === 'bar' ? 'getItemByLabelIndex' : 'getItemByLabel';
+        if (typeof this[fnName] === 'function') {
+          const item = this[fnName](lastTip.pos);
+          value = item.useStack ? item.acc : item.value;
+          label = item.label;
+          lastTip.value = value;
+          lastTip.label = label;
+        }
       }
     }
 

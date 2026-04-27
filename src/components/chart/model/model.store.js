@@ -832,12 +832,21 @@ const modules = {
           return null;
         }
 
-        return this.getHitItemByPosition(
+        const hitInfo = this.getHitItemByPosition(
           [dataInfo?.xp ?? 0, dataInfo?.yp ?? 0],
           useApproximate,
           idx,
           true,
         );
+
+        // 모두 null 라벨에서 sId='' 반환 → element.tip indicator 그리기 skip 회피.
+        if (hitInfo && !hitInfo.sId) {
+          hitInfo.sId = firShowSeriesID;
+          hitInfo.label = this.data?.labels?.[idx] ?? hitInfo.label;
+          hitInfo.dataIndex = idx;
+        }
+
+        return hitInfo;
       });
     }
 
@@ -1077,7 +1086,7 @@ const modules = {
       type: hasHit ? hitType : fallbackType,
       label: hasHit ? hitLabel : fallbackLabel,
       pos: hasHit ? hitValuePos : fallbackValuePos,
-      value: (hasHit ? hitValue : fallbackValue) ?? 0,
+      value: hasHit ? hitValue : fallbackValue,
       sId: hasHit ? hitSeriesID : fallbackSeriesID,
       acc,
       useStack,
