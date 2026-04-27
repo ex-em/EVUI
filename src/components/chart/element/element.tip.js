@@ -165,10 +165,15 @@ const modules = {
     let value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
     let label;
     if (tipType === 'sel') {
-      if (hitInfo && hitInfo.value !== null) {
-        value = hitInfo.useStack ? hitInfo.acc : hitInfo.value;
+      if (hitInfo && hitInfo.label !== null) {
+        // value=null 라벨 클릭에서도 label 자체는 hitInfo 우선. value 만 별도 fallback.
         label = hitInfo.label;
-        lastTip.value = value;
+        if (hitInfo.value !== null) {
+          value = hitInfo.useStack ? hitInfo.acc : hitInfo.value;
+          lastTip.value = value;
+        } else if (lastTip.value !== null) {
+          value = lastTip.value;
+        }
         lastTip.label = label;
       } else if (lastTip.value !== null) {
         value = lastTip.value;
