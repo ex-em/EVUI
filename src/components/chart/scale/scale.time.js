@@ -563,7 +563,7 @@ class TimeScale extends Scale {
         } else if (ix === 0 && this.firstLabelFontStyle) {
           ctx.font = Util.getLabelStyle(this.firstLabelFontStyle);
           labelColor = this.firstLabelFontStyle.color;
-        }else {
+        } else {
           ctx.font = Util.getLabelStyle(this.labelStyle);
           labelColor = this.labelStyle.color;
         }
