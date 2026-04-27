@@ -68,4 +68,25 @@ describe('HeatMap Element', () => {
       expect(hm.getFilteredLabel(labels, 10, 10, 20)).toEqual([]);
     });
   });
+
+  describe('findGraphData null 데이터 안전 fall-through (회귀 가드)', () => {
+    // 셀 박스 비교 `x <= xp && xp <= x+w` 는 null 좌표에서 NaN 비교로 false fall-through.
+    it('null 좌표 셀은 hit=false 로 fall-through 한다', () => {
+      const hm = createHeatMap({
+        data: [{ xp: null, yp: null, w: null, h: null, value: null }],
+      });
+      const item = hm.findGraphData([40, 10]);
+      expect(item.hit).toBe(false);
+      expect(item.data).toBe(null);
+    });
+
+    it('정상 셀 내부 클릭은 hit=true (회귀 가드)', () => {
+      const hm = createHeatMap({
+        data: [{ xp: 30, yp: 0, w: 20, h: 20, value: 5, dataColor: '#abc' }],
+      });
+      const item = hm.findGraphData([40, 10]);
+      expect(item.hit).toBe(true);
+      expect(item.index).toBe(0);
+    });
+  });
 });

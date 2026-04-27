@@ -395,7 +395,7 @@ describe('model.store getHitItemByPosition', () => {
       const result = store.getHitItemByPosition([50, 250], false, undefined, false, true);
 
       expect(result.sId).toBe('');
-      expect(result.value).toBe(0);
+      expect(result.value).toBeNull();
       expect(result.label).toBe('L1');
       expect(result.dataIndex).toBe(1);
     });
@@ -420,5 +420,138 @@ describe('model.store getHitItemByPosition', () => {
       expect(result.sId).toBe('');
       expect(result.dataIndex).toBe(null);
     });
+  });
+
+  describe('Fill(with null) 8라벨 × 2시리즈 — onClick 경로 회귀', () => {
+    // FillWithNull.vue 데이터 모사. onClick 경로 인자로 호출.
+    const buildSeries1Points = () => [
+      { x: '01/01', y: 20, o: 20, xp: 0, yp: 160, index: 0 },
+      { x: '01/02', y: 45, o: 45, xp: 20, yp: 110, index: 1 },
+      { x: '01/03', y: null, o: null, xp: 40, yp: null, index: 2 },
+      { x: '01/04', y: null, o: null, xp: 60, yp: null, index: 3 },
+      { x: '01/05', y: 80, o: 80, xp: 80, yp: 40, index: 4 },
+      { x: '01/06', y: 55, o: 55, xp: 100, yp: 90, index: 5 },
+      { x: '01/07', y: null, o: null, xp: 120, yp: null, index: 6 },
+      { x: '01/08', y: 50, o: 50, xp: 140, yp: 100, index: 7 },
+    ];
+    const buildSeries2Points = () => [
+      { x: '01/01', y: 55, o: 55, xp: 0, yp: 90, index: 0 },
+      { x: '01/02', y: 30, o: 30, xp: 20, yp: 140, index: 1 },
+      { x: '01/03', y: 40, o: 40, xp: 40, yp: 120, index: 2 },
+      { x: '01/04', y: null, o: null, xp: 60, yp: null, index: 3 },
+      { x: '01/05', y: 45, o: 45, xp: 80, yp: 110, index: 4 },
+      { x: '01/06', y: 25, o: 25, xp: 100, yp: 150, index: 5 },
+      { x: '01/07', y: 65, o: 65, xp: 120, yp: 70, index: 6 },
+      { x: '01/08', y: 40, o: 40, xp: 140, yp: 120, index: 7 },
+    ];
+
+    const createFillStore = () =>
+      createStore({
+        series1: mockLineWithIndexedData({ points: buildSeries1Points() }),
+        series2: mockLineWithIndexedData({ points: buildSeries2Points() }),
+      });
+
+    it('01/03 (series1 만 null) 위쪽 빈 영역 클릭 → series2 선택, value=40', () => {
+      const store = createFillStore();
+      const result = store.getHitItemByPosition([40, 10], false, undefined, false, true);
+
+      expect(result.sId).toBe('series2');
+      expect(result.value).toBe(40);
+      expect(result.dataIndex).toBe(2);
+    });
+
+    it('01/04 (둘 다 null) 위쪽 빈 영역 클릭 → sId="", label="01/04", dataIndex=3', () => {
+      const store = createFillStore();
+      const result = store.getHitItemByPosition([60, 10], false, undefined, false, true);
+
+      expect(result.sId).toBe('');
+      expect(result.label).toBe('01/04');
+      expect(result.dataIndex).toBe(3);
+    });
+
+    it('01/04 (둘 다 null) 클릭 시 value 는 null 로 emit 된다', () => {
+      // 0 강제 변환 시 "값이 0" 과 "값이 없음" 구분 불가.
+      const store = createFillStore();
+      const result = store.getHitItemByPosition([60, 10], false, undefined, false, true);
+
+      expect(result.value).toBeNull();
+    });
+
+    it('01/07 (series1 만 null) 위쪽 빈 영역 클릭 → series2 선택, value=65', () => {
+      const store = createFillStore();
+      const result = store.getHitItemByPosition([120, 10], false, undefined, false, true);
+
+      expect(result.sId).toBe('series2');
+      expect(result.value).toBe(65);
+      expect(result.dataIndex).toBe(6);
+    });
+
+    it('01/01 (둘 다 값) 위쪽 빈 영역 클릭 → 클릭 좌표에 가까운 쪽이 선택된다', () => {
+      const store = createFillStore();
+      const result = store.getHitItemByPosition([0, 85], false, undefined, false, true);
+
+      expect(result.sId).toBe('series2');
+      expect(result.value).toBe(55);
+      expect(result.dataIndex).toBe(0);
+    });
+  });
+});
+
+describe('model.store getItem (selectLabel indicator 용)', () => {
+  // selectLabel 시 chart.core.drawTip → getItem 결과가 element.tip 에 전달된다.
+  // 모두 null 라벨에서 sId='' 이면 indicator 그리기가 skip 되므로 sId 를 보정해야 한다.
+
+  const buildSeries = (points) => ({
+    type: 'line',
+    show: true,
+    data: points,
+    stackIndex: null,
+    findGraphData: (offset, isHorizontal, dataIndex) => {
+      if (typeof dataIndex === 'number') {
+        const data = points[dataIndex] ?? null;
+        return { data, hit: false, directHit: false, index: dataIndex };
+      }
+      return { data: null, hit: false, directHit: false, index: 0 };
+    },
+  });
+
+  const buildFillStore = () => {
+    const points1 = [
+      { x: '01/01', y: 20, o: 20, xp: 0, yp: 160, index: 0 },
+      { x: '01/02', y: 45, o: 45, xp: 20, yp: 110, index: 1 },
+      { x: '01/03', y: null, o: null, xp: 40, yp: null, index: 2 },
+      { x: '01/04', y: null, o: null, xp: 60, yp: null, index: 3 },
+    ];
+    const points2 = [
+      { x: '01/01', y: 55, o: 55, xp: 0, yp: 90, index: 0 },
+      { x: '01/02', y: 30, o: 30, xp: 20, yp: 140, index: 1 },
+      { x: '01/03', y: 40, o: 40, xp: 40, yp: 120, index: 2 },
+      { x: '01/04', y: null, o: null, xp: 60, yp: null, index: 3 },
+    ];
+    const store = createStore({
+      series1: buildSeries(points1),
+      series2: buildSeries(points2),
+    });
+    store.data = { labels: ['01/01', '01/02', '01/03', '01/04'] };
+    return store;
+  };
+
+  it('모두 null 인 라벨(01/04) selectLabel → 첫 visible series 의 sId/label/dataIndex 가 보정된다', () => {
+    const store = buildFillStore();
+    const result = store.getItem({ dataIndex: [3] });
+
+    expect(result).toHaveLength(1);
+    expect(result[0]).not.toBeNull();
+    expect(result[0].sId).toBe('series1');
+    expect(result[0].label).toBe('01/04');
+    expect(result[0].dataIndex).toBe(3);
+  });
+
+  it('일부 null 라벨(01/03) selectLabel → hit detection fallback 으로 series2 가 선택된다', () => {
+    const store = buildFillStore();
+    const result = store.getItem({ dataIndex: [2] });
+
+    expect(result[0].sId).toBe('series2');
+    expect(result[0].dataIndex).toBe(2);
   });
 });

@@ -182,6 +182,106 @@ describe('plugins.interaction findHitItem', () => {
       expect(result.hitId).toBe('bar1');
     });
   });
+
+  describe('Fill(with null) 8라벨 × 2시리즈 — onDblClick(findHitItem) 회귀', () => {
+    // mock 은 element.line null 가드 적용 후의 결과(null 포인트 → hit=false) 모방.
+
+    it('01/03 (series1 만 null) → hitId=series2, items 에 series2 만', () => {
+      const series1 = mockSeries({
+        interpolation: 'none',
+        data: { x: '01/03', y: null, o: null, xp: 40, yp: null, index: 2 },
+        hit: false,
+        directHit: false,
+      });
+      const series2 = mockSeries({
+        interpolation: 'none',
+        data: { x: '01/03', y: 40, o: 40, xp: 40, yp: 120, index: 2 },
+        hit: false,
+        directHit: false,
+      });
+
+      const chart = createChart({ series1, series2 });
+      chart.findClosestDataIndex = () => 2;
+
+      const result = chart.findHitItem([40, 10], true);
+
+      expect(result.hitId).toBe('series2');
+      expect(Object.keys(result.items)).toEqual(['series2']);
+    });
+
+    it('01/04 (둘 다 null) → hitId="", items[""] synthetic (label/dataIndex 보존)', () => {
+      const series1 = mockSeries({
+        interpolation: 'none',
+        data: { x: '01/04', y: null, o: null, xp: 60, yp: null, index: 3 },
+        hit: false,
+      });
+      const series2 = mockSeries({
+        interpolation: 'none',
+        data: { x: '01/04', y: null, o: null, xp: 60, yp: null, index: 3 },
+        hit: false,
+      });
+
+      // synthetic items[''] 는 series.data?.[targetDataIndex] 의 x/y 를 참조하므로
+      // mock 시리즈에 series.data 배열을 명시 주입.
+      series1.data = [
+        { x: '01/01', y: 20, o: 20 },
+        { x: '01/02', y: 45, o: 45 },
+        { x: '01/03', y: null, o: null },
+        { x: '01/04', y: null, o: null },
+      ];
+
+      const chart = createChart({ series1, series2 });
+      chart.findClosestDataIndex = () => 3;
+
+      const result = chart.findHitItem([60, 10], true);
+
+      expect(result.hitId).toBe('');
+      expect(result.items[''].label).toBe('01/04');
+      expect(result.items[''].index).toBe(3);
+    });
+
+    it('01/07 (series1 만 null) → hitId=series2', () => {
+      const series1 = mockSeries({
+        interpolation: 'none',
+        data: { x: '01/07', y: null, o: null, xp: 120, yp: null, index: 6 },
+        hit: false,
+      });
+      const series2 = mockSeries({
+        interpolation: 'none',
+        data: { x: '01/07', y: 65, o: 65, xp: 120, yp: 70, index: 6 },
+        hit: false,
+      });
+
+      const chart = createChart({ series1, series2 });
+      chart.findClosestDataIndex = () => 6;
+
+      const result = chart.findHitItem([120, 10], true);
+
+      expect(result.hitId).toBe('series2');
+      expect(Object.keys(result.items)).toEqual(['series2']);
+    });
+
+    it('01/01 (둘 다 값) → 거리 가까운 시리즈가 hitId', () => {
+      // 클릭 (0, 85). series1.yp=160(거리 75), series2.yp=90(거리 5) → series2.
+      const series1 = mockSeries({
+        interpolation: 'none',
+        data: { x: '01/01', y: 20, o: 20, xp: 0, yp: 160, index: 0 },
+        hit: false,
+      });
+      const series2 = mockSeries({
+        interpolation: 'none',
+        data: { x: '01/01', y: 55, o: 55, xp: 0, yp: 90, index: 0 },
+        hit: false,
+      });
+
+      const chart = createChart({ series1, series2 });
+      chart.findClosestDataIndex = () => 0;
+
+      const result = chart.findHitItem([0, 85], true);
+
+      expect(result.hitId).toBe('series2');
+    });
+  });
 });
 
 describe('plugins.interaction findClosestDataIndex', () => {
