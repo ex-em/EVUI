@@ -177,13 +177,15 @@ const modules = {
         value = lastTip.value;
         label = lastTip.label;
       } else if (lastTip.pos !== null) {
-        const item =
-          type === 'bar' ? this.getItemByLabelIndex(lastTip.pos) : this.getItemByLabel(lastTip.pos);
-
-        value = item.useStack ? item.acc : item.value;
-        label = item.label;
-        lastTip.value = value;
-        lastTip.label = label;
+        // line/scatter 는 getItemByLabel 이 미정의(dead code) — typeof 가드.
+        const fnName = type === 'bar' ? 'getItemByLabelIndex' : 'getItemByLabel';
+        if (typeof this[fnName] === 'function') {
+          const item = this[fnName](lastTip.pos);
+          value = item.useStack ? item.acc : item.value;
+          label = item.label;
+          lastTip.value = value;
+          lastTip.label = label;
+        }
       }
     }
 
