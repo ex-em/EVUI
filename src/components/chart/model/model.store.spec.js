@@ -495,6 +495,56 @@ describe('model.store getHitItemByPosition', () => {
       expect(result.dataIndex).toBe(0);
     });
   });
+
+  describe('area 차트 — null 시리즈는 후보에서 제외', () => {
+    // area 차트(line + fill) 의 null 데이터 처리. hit detection 흐름은 동일하지만,
+    // isExistGrp + linear interpolation 시 element.line.draw 가 null 데이터의 yp 를
+    // baseline 으로 채우는 케이스가 있다. 그래도 o=null 이면 후보에서 제외되어야 한다.
+
+    it('o=null 시리즈는 yp 가 baseline 으로 채워져도 fallback 후보에서 제외된다', () => {
+      // isExistGrp + linear interpolation 모방: yp=100 (baseline) 으로 set 되었지만 o=null.
+      // hasMeaningfulValue 체크(g = data.o || data.y)가 모두 null 이라 후보 미등록.
+      const nullSeries = mockSeries({
+        type: 'line',
+        isExistGrp: true,
+        interpolation: 'linear',
+        data: { x: 'L0', y: null, o: null, xp: 50, yp: 100, index: 0 },
+        hit: false,
+      });
+      const valueSeries = mockSeries({
+        type: 'line',
+        data: { x: 'L0', y: 50, o: 50, xp: 50, yp: 80, index: 0 },
+        hit: false,
+      });
+
+      const store = createStore({ nullOne: nullSeries, valueOne: valueSeries });
+      const result = store.getHitItemByPosition([50, 100]);
+
+      expect(result.sId).toBe('valueOne');
+      expect(result.value).toBe(50);
+    });
+
+    it('o=null 시리즈가 클릭 좌표에 더 가까워도(yp 직격) 값 있는 시리즈가 선택된다', () => {
+      // 클릭 (50, 100). nullOne.yp=100 정확히 직격(거리 0), valueOne.yp=80 (거리 20).
+      // 거리만 보면 nullOne 이 이기지만 hasMeaningfulValue=false 라 후보 미등록.
+      const nullSeries = mockSeries({
+        type: 'line',
+        data: { x: 'L0', y: null, o: null, xp: 50, yp: 100, index: 0 },
+        hit: false,
+      });
+      const valueSeries = mockSeries({
+        type: 'line',
+        data: { x: 'L0', y: 50, o: 50, xp: 50, yp: 80, index: 0 },
+        hit: false,
+      });
+
+      const store = createStore({ nullOne: nullSeries, valueOne: valueSeries });
+      const result = store.getHitItemByPosition([50, 100]);
+
+      expect(result.sId).toBe('valueOne');
+      expect(result.value).toBe(50);
+    });
+  });
 });
 
 describe('model.store getItem (selectLabel indicator 용)', () => {
