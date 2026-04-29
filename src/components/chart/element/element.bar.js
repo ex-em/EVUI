@@ -558,17 +558,19 @@ class Bar {
 
           if (isNegativeValue) {
             const xPos = barX - LABEL_MARGIN + barWidth - textWidth;
-            if (xPos > minXOnChart && textHeight < absBarHeight) {
+            if (xPos > minXOnChart) {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           } else {
             const xPos = barX + LABEL_MARGIN + barWidth;
-            if (xPos + textWidth < maxXOnChart && textHeight < absBarHeight) {
+            if (xPos + textWidth < maxXOnChart) {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           }
         } else if (fitsInVerticalBar) {
-          const yPos = isNegativeValue ? barY + barHeight + LABEL_MARGIN : barY + barHeight - LABEL_MARGIN;
+          const yPos = isNegativeValue
+            ? barY + barHeight + LABEL_MARGIN + textHeight / 2
+            : barY + barHeight - LABEL_MARGIN - textHeight / 2;
           ctx.fillText(formattedTxt, centerXOnBar, yPos);
         }
 
