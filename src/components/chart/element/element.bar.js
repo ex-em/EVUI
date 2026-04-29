@@ -109,7 +109,7 @@ class Bar {
     const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
     const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
 
-    this.size.cat = cArea;
+    this.size.bar = cArea;
     this.size.bar = bArea;
     this.size.cPad = cPad;
     this.size.bPad = bPad;
@@ -556,30 +556,34 @@ class Bar {
           const minXOnChart = this.chartRect.x1 + this.labelOffset.left;
           const maxXOnChart = this.chartRect.x2 - this.labelOffset.right;
 
-          if (isNegativeValue) {
-            const xPos = barX - LABEL_MARGIN + barWidth - textWidth;
-            if (xPos > minXOnChart) {
-              ctx.fillText(formattedTxt, xPos, centerYOnBar);
-            }
-          } else {
-            const xPos = barX + LABEL_MARGIN + barWidth;
-            if (xPos + textWidth < maxXOnChart) {
-              ctx.fillText(formattedTxt, xPos, centerYOnBar);
+          if (textHeight < this.size.bar) {
+            if (isNegativeValue) {
+              const xPos = barX - LABEL_MARGIN + barWidth - textWidth;
+              if (xPos > minXOnChart) {
+                ctx.fillText(formattedTxt, xPos, centerYOnBar);
+              }
+            } else {
+              const xPos = barX + LABEL_MARGIN + barWidth;
+              if (xPos + textWidth < maxXOnChart) {
+                ctx.fillText(formattedTxt, xPos, centerYOnBar);
+              }
             }
           }
         } else {
           const minYOnChart = this.chartRect.y1 + this.labelOffset.top;
           const maxYOnChart = this.chartRect.y2 - this.labelOffset.bottom;
 
-          if (isNegativeValue) {
-            const yPos = barY + barHeight + LABEL_MARGIN + textHeight / 2;
-            if (yPos + textHeight / 2 <= maxYOnChart) {
-              ctx.fillText(formattedTxt, centerXOnBar, yPos);
-            }
-          } else {
-            const yPos = barY + barHeight - LABEL_MARGIN - textHeight / 2;
-            if (yPos - textHeight / 2 >= minYOnChart) {
-              ctx.fillText(formattedTxt, centerXOnBar, yPos);
+          if (textWidth <= this.size.bar) {
+            if (isNegativeValue) {
+              const yPos = barY + barHeight + LABEL_MARGIN + textHeight / 2;
+              if (yPos + textHeight / 2 <= maxYOnChart) {
+                ctx.fillText(formattedTxt, centerXOnBar, yPos);
+              }
+            } else {
+              const yPos = barY + barHeight - LABEL_MARGIN - textHeight / 2;
+              if (yPos - textHeight / 2 >= minYOnChart) {
+                ctx.fillText(formattedTxt, centerXOnBar, yPos);
+              }
             }
           }
         }

@@ -22,7 +22,7 @@
       </div>
       <div class="row-item">
         <span class="item-title">fontSize</span>
-        <ev-input-number v-model="fontSize" :min="8" :max="30" class="component" />
+        <ev-input-number v-model="fontSize" :min="8" :max="40" class="component" />
       </div>
       <div class="row-item">
         <span class="item-title">thickness</span>
