@@ -36,6 +36,8 @@ import UnSelectedOpacity from './example/UnSelectedOpacity';
 import UnSelectedOpacityRaw from './example/UnSelectedOpacity?raw';
 import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
 import AxesScaleChange from './example/AxesScaleChange';
+import ShowValue from './example/ShowValue';
+import ShowValueRaw from './example/ShowValue?raw';
 
 export default {
   mdText,
@@ -137,6 +139,12 @@ export default {
         '차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 확인할 수 있습니다.',
       component: AxesScaleChange,
       parsedData: parse(AxesScaleChangeRaw).descriptor,
+    },
+    ShowValue: {
+      description:
+        'showValue 옵션의 align(start/center/out/end)과 horizontal 조합을 인터랙티브하게 테스트할 수 있습니다.',
+      component: ShowValue,
+      parsedData: parse(ShowValueRaw).descriptor,
     },
   },
 };
