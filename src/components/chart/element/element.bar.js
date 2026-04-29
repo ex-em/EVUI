@@ -567,11 +567,21 @@ class Bar {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           }
-        } else if (fitsInVerticalBar) {
-          const yPos = isNegativeValue
-            ? barY + barHeight + LABEL_MARGIN + textHeight / 2
-            : barY + barHeight - LABEL_MARGIN - textHeight / 2;
-          ctx.fillText(formattedTxt, centerXOnBar, yPos);
+        } else {
+          const minYOnChart = this.chartRect.y1 + this.labelOffset.top;
+          const maxYOnChart = this.chartRect.y2 - this.labelOffset.bottom;
+
+          if (isNegativeValue) {
+            const yPos = barY + barHeight + LABEL_MARGIN + textHeight / 2;
+            if (yPos + textHeight / 2 <= maxYOnChart) {
+              ctx.fillText(formattedTxt, centerXOnBar, yPos);
+            }
+          } else {
+            const yPos = barY + barHeight - LABEL_MARGIN - textHeight / 2;
+            if (yPos - textHeight / 2 >= minYOnChart) {
+              ctx.fillText(formattedTxt, centerXOnBar, yPos);
+            }
+          }
         }
 
         break;
