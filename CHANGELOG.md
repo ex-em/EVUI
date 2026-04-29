@@ -1,3 +1,13 @@
+## [3.8.1](https://github.com/ex-em/EVUI/compare/3.8.0...3.8.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* align out일때, Bar의 크기 고려 하지 않고 표시되도록 함 + Bar랑 겹치는 부분 수정 ([6d86939](https://github.com/ex-em/EVUI/commit/6d86939b16cb55e3d46236ff55bad8740bf6e4c1))
+* horizontal + out 조합일때 막대의 두께가 32px을 초과해야만 value가 그려지는 문제 수정 ([8bdf022](https://github.com/ex-em/EVUI/commit/8bdf0221e26dfc669afbed1306e8e9ad92314354))
+* out일때, Bar 너비가 아닌 Bar 영역 너비 제한 추가 ([45a3d09](https://github.com/ex-em/EVUI/commit/45a3d0965d8f3cab56b8488894fedeade020683b))
+* showValue align 'out' 옵션에서 바 크기와 무관하게 텍스트를 표시하고, 차트 경계 이탈 시에만 숨기도록 수정 ([0414e3d](https://github.com/ex-em/EVUI/commit/0414e3dc3ce86bb0d5fa3f3e528bc20ae30650de))
+
 # [3.8.0](https://github.com/ex-em/EVUI/compare/3.7.0...3.8.0) (2026-04-27)
 
 
