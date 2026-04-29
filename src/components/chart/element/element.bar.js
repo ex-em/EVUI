@@ -558,12 +558,12 @@ class Bar {
 
           if (isNegativeValue) {
             const xPos = barX - LABEL_MARGIN + barWidth - textWidth;
-            if (xPos > minXOnChart && textHeight + LABEL_MARGIN * 2 < absBarHeight) {
+            if (xPos > minXOnChart && textHeight < absBarHeight) {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           } else {
             const xPos = barX + LABEL_MARGIN + barWidth;
-            if (xPos + textWidth < maxXOnChart && textHeight + LABEL_MARGIN * 2 < absBarHeight) {
+            if (xPos + textWidth < maxXOnChart && textHeight < absBarHeight) {
               ctx.fillText(formattedTxt, xPos, centerYOnBar);
             }
           }
