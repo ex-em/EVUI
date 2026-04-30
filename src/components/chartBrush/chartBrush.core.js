@@ -185,8 +185,18 @@ export default class EvChartBrush {
     }
 
     const maxBrushCanvasWidth = brushCanvasWidth * pixelRatio;
+    const isButtonMode =
+      mode === BRUSH_UPDATE_MODE.BUTTON.INCREASE || mode === BRUSH_UPDATE_MODE.BUTTON.DECREASE;
 
-    if (this.brushRectX < 0) {
+    if (isButtonMode) {
+      if (this.brushRectX < 0) {
+        this.brushRectWidth += this.brushRectX;
+        this.brushRectX = 0;
+      }
+      if (this.brushRectX + this.brushRectWidth > maxBrushCanvasWidth) {
+        this.brushRectWidth = maxBrushCanvasWidth - this.brushRectX;
+      }
+    } else if (this.brushRectX < 0) {
       this.brushRectX = 0;
     } else if (this.brushRectX + this.brushRectWidth > maxBrushCanvasWidth) {
       this.brushRectX = maxBrushCanvasWidth - this.brushRectWidth;
