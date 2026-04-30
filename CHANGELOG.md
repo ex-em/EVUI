@@ -1,3 +1,11 @@
+## [3.8.2](https://github.com/ex-em/EVUI/compare/3.8.1...3.8.2) (2026-04-30)
+
+
+### Bug Fixes
+
+* maxtip이 정상적인 위치에 그려지지 않는 현상 수정 ([65f91be](https://github.com/ex-em/EVUI/commit/65f91befc8d5e6710e557bc80379a49602df2567))
+* setBrushXAndWidth 로직 변경 ([ee777c2](https://github.com/ex-em/EVUI/commit/ee777c2b4cfabc0ce38f6de53d963b10934fd7df))
+
 ## [3.8.1](https://github.com/ex-em/EVUI/compare/3.8.0...3.8.1) (2026-04-29)
 
 
