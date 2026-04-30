@@ -109,7 +109,7 @@ class Bar {
     const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
     const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
 
-    this.size.bar = cArea;
+    this.size.cat = cArea;
     this.size.bar = bArea;
     this.size.cPad = cPad;
     this.size.bPad = bPad;
