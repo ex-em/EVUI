@@ -1,3 +1,10 @@
+# [3.9.0](https://github.com/ex-em/EVUI/compare/3.8.2...3.9.0) (2026-05-07)
+
+
+### Features
+
+* trim-trailing-zero 옵션 추가 ([ff0e792](https://github.com/ex-em/EVUI/commit/ff0e79236639232a099aa82f2b06c3838e437985))
+
 ## [3.8.2](https://github.com/ex-em/EVUI/compare/3.8.1...3.8.2) (2026-04-30)
 
 
