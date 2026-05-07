@@ -25,7 +25,7 @@ export default {
       ),
       labels: [],
       data: Object.fromEntries(
-        Array.from({ length: 100 }, (_, i) => {
+        Array.from({ length: 3 }, (_, i) => {
           const seriesId = `series${i + 1}`;
           return [seriesId, []];
         }),
