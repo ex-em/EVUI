@@ -60,8 +60,13 @@ export function useModel() {
   /**
    * 고정 소수점 사용 시, 해당하는 소수점 값 반환
    * */
-  const getPrecisionValue = (val) =>
-    props.precision && (val || val === 0) ? Number(val).toFixed(props.precision) : val;
+  const getPrecisionValue = (val) => {
+    if (props.precision && (val || val === 0)) {
+      const fixed = Number(val).toFixed(props.precision);
+      return props.trimTrailingZero ? String(parseFloat(fixed)) : fixed;
+    }
+    return val;
+  };
 
   /**
    * input 값 validate
