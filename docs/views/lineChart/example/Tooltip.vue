@@ -180,7 +180,7 @@ export default {
     const topPadding = ref(0);
     const bottomPadding = ref(8);
     const showHeader = ref(true);
-    const showTooltip = ref(false);
+    const showTooltip = ref(true);
 
     const chartData = reactive({
       series: {

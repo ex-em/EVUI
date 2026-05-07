@@ -18,7 +18,7 @@ export default {
   setup() {
     const chartData = reactive({
       series: Object.fromEntries(
-        Array.from({ length: 100 }, (_, i) => {
+        Array.from({ length: 3 }, (_, i) => {
           const seriesId = `series${i + 1}`;
           return [seriesId, { name: `series#${i + 1}`, point: false }];
         }),
