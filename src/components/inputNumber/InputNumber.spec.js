@@ -65,6 +65,56 @@ describe('EvInputNumber Component', () => {
     });
   });
 
+  describe('Precision', () => {
+    it('precision 설정 시 소수점 자릿수가 맞춰진다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { modelValue: 1.5, precision: 3 },
+      });
+
+      expect(wrapper.find('.ev-input').element.value).toBe('1.500');
+    });
+
+    it('precision 설정 시 값이 0이면 0.000으로 표시된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { modelValue: 0, precision: 3 },
+      });
+
+      expect(wrapper.find('.ev-input').element.value).toBe('0.000');
+    });
+
+    it('trimTrailingZero가 true이면 후행 0이 제거된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { modelValue: 1.5, precision: 3, trimTrailingZero: true },
+      });
+
+      expect(wrapper.find('.ev-input').element.value).toBe('1.5');
+    });
+
+    it('trimTrailingZero가 true이고 값이 0이면 0으로 표시된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { modelValue: 0, precision: 3, trimTrailingZero: true },
+      });
+
+      expect(wrapper.find('.ev-input').element.value).toBe('0');
+    });
+
+    it('trimTrailingZero가 false(기본값)이면 후행 0이 유지된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { modelValue: 1.5, precision: 3 },
+      });
+
+      expect(wrapper.find('.ev-input').element.value).toBe('1.500');
+    });
+
+    it('trimTrailingZero가 true이고 소수점이 정확히 맞으면 그대로 표시된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { modelValue: 1.123, precision: 3, trimTrailingZero: true },
+      });
+
+      expect(wrapper.find('.ev-input').element.value).toBe('1.123');
+    });
+  });
+
   describe('기본값', () => {
     it('컴포넌트 이름이 EvInputNumber이다', () => {
       expect(EvInputNumber.name).toBe('EvInputNumber');

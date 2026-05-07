@@ -51,6 +51,15 @@
       <span class="badge"> step="0.02" </span>
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Precision (trimTrailingZero)</p>
+    <ev-input-number v-model="inputNumber6" :precision="3" :step="0.02" trim-trailing-zero />
+    <div class="description">
+      <span class="badge yellow"> precision="3" </span>
+      <span class="badge yellow"> trim-trailing-zero </span>
+      <span class="badge"> step="0.02" </span>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -63,12 +72,14 @@ export default {
     const inputNumber3 = ref();
     const inputNumber4 = ref();
     const inputNumber5 = ref();
+    const inputNumber6 = ref();
     return {
       inputNumber1,
       inputNumber2,
       inputNumber3,
       inputNumber4,
       inputNumber5,
+      inputNumber6,
     };
   },
 };
