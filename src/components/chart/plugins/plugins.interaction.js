@@ -502,21 +502,29 @@ const modules = {
 
     this.onWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
-      const customTooltip = this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget);
+      if (!isTooltipVisible) return;
 
-      if (
-        isTooltipVisible ||
-        (customTooltip && customTooltip.scrollHeight > customTooltip.clientHeight)
-      ) {
-        e.preventDefault();
-
-        if (isTooltipVisible) {
-          this.tooltipBodyDOM.scrollTop += e.deltaY;
-        }
-        if (customTooltip) {
-          customTooltip.scrollTop += e.deltaY;
-        }
+      const scrollTarget =
+        this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget) ||
+        this.tooltipBodyDOM;
+      if (!scrollTarget || scrollTarget.scrollHeight <= scrollTarget.clientHeight) {
+        this.hideTooltipDOM();
+        return;
       }
+
+      const { scrollTop, scrollHeight, clientHeight } = scrollTarget;
+      const isAtTop = scrollTop <= 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+      const isScrollingUp = e.deltaY < 0;
+      const isScrollingDown = e.deltaY > 0;
+
+      if ((isAtTop && isScrollingUp) || (isAtBottom && isScrollingDown)) {
+        this.hideTooltipDOM();
+        return;
+      }
+
+      e.preventDefault();
+      scrollTarget.scrollTop += e.deltaY;
     };
 
     if (this.options?.tooltip?.useScrollbar) {
