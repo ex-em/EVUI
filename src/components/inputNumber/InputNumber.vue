@@ -77,6 +77,10 @@ export default {
       default: 0,
       validator: (val) => val >= 0 && val <= 100 && val === parseInt(val, 10),
     },
+    trimTrailingZero: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['update:modelValue', 'focus', 'blur', 'input', 'change'],
   setup() {
