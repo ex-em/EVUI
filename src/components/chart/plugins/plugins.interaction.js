@@ -518,13 +518,11 @@ const modules = {
       const isScrollingUp = e.deltaY < 0;
       const isScrollingDown = e.deltaY > 0;
 
-      if ((isAtTop && isScrollingUp) || (isAtBottom && isScrollingDown)) {
-        this.hideTooltipDOM();
-        return;
-      }
-
       e.preventDefault();
-      scrollTarget.scrollTop += e.deltaY;
+
+      if (!(isAtTop && isScrollingUp) && !(isAtBottom && isScrollingDown)) {
+        scrollTarget.scrollTop += e.deltaY;
+      }
     };
 
     if (this.options?.tooltip?.useScrollbar) {
