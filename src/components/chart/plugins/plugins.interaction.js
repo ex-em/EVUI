@@ -514,7 +514,7 @@ const modules = {
 
       const { scrollTop, scrollHeight, clientHeight } = scrollTarget;
       const isAtTop = scrollTop <= 0;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight;
+      const isAtBottom = Math.ceil(scrollTop) + clientHeight >= scrollHeight;
       const isScrollingUp = e.deltaY < 0;
       const isScrollingDown = e.deltaY > 0;
 
