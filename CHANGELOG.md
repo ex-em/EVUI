@@ -1,3 +1,11 @@
+## [3.9.1](https://github.com/ex-em/EVUI/compare/3.9.0...3.9.1) (2026-05-08)
+
+
+### Bug Fixes
+
+* **chart:** tooltip wheel 이벤트가 viewport 스크롤을 불필요하게 차단하는 문제 수정 ([d2ebaf3](https://github.com/ex-em/EVUI/commit/d2ebaf377b879a78804536cafb0cb04aae8a5976))
+* **chart:** tooltip 내부 스크롤 끝 도달 시 viewport로 휠 이벤트가 전파되지 않도록 변경 ([96e5991](https://github.com/ex-em/EVUI/commit/96e599100650f2e855e0cfb8137b6b51d19f62b5))
+
 # [3.9.0](https://github.com/ex-em/EVUI/compare/3.8.2...3.9.0) (2026-05-07)
 
 
