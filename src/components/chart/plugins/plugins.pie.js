@@ -1,3 +1,50 @@
+const alignToDevicePixel = (value, pixelRatio) => Math.round(value * pixelRatio) / pixelRatio;
+const ceilToDevicePixel = (value, pixelRatio) => Math.ceil(value * pixelRatio) / pixelRatio;
+
+const isTransparentColor = (color) => {
+  if (!color) {
+    return true;
+  }
+
+  const normalizedColor = color.trim().toLowerCase();
+
+  if (normalizedColor === 'transparent') {
+    return true;
+  }
+
+  const colorMatch = normalizedColor.match(
+    /rgba?\(\s*[\d.]+%?\s*(?:,|\s)\s*[\d.]+%?\s*(?:,|\s)\s*[\d.]+%?\s*(?:,|\/)\s*([\d.]+%?)\s*\)/,
+  );
+
+  if (!colorMatch) {
+    return false;
+  }
+
+  return Number.parseFloat(colorMatch[1]) === 0;
+};
+
+const resolveDoughnutHoleColor = (pieOption, rootElement) => {
+  const optionColor = pieOption?.doughnutHoleColor || pieOption?.backgroundColor;
+
+  if (!isTransparentColor(optionColor)) {
+    return optionColor;
+  }
+
+  let element = rootElement;
+
+  while (element) {
+    const backgroundColor = getComputedStyle(element)?.backgroundColor;
+
+    if (!isTransparentColor(backgroundColor)) {
+      return backgroundColor;
+    }
+
+    element = element.parentElement;
+  }
+
+  return '#fff';
+};
+
 const modules = {
   pieDataSet: [],
   /**
@@ -209,6 +256,30 @@ const modules = {
   },
 
   /**
+   * doughnutHoleColor 캐시를 무효화한다.
+   * 옵션 변경/리사이즈/리렌더 등으로 부모 DOM의 background-color 컨텍스트가
+   * 달라졌을 수 있을 때 호출한다.
+   */
+  invalidateDoughnutHoleColorCache() {
+    this.cachedDoughnutHoleColor = null;
+  },
+
+  /**
+   * 캐시된 doughnutHoleColor를 반환하거나, 없으면 한 번 계산해 캐시한다.
+   * tooltip hover 중 hole이 자주 다시 그려지므로(plugins.tooltip.js의 highlight 경로)
+   * 매 호출마다 getComputedStyle로 DOM을 거슬러 올라가지 않도록 한다.
+   */
+  getDoughnutHoleColor() {
+    if (this.cachedDoughnutHoleColor) {
+      return this.cachedDoughnutHoleColor;
+    }
+
+    const rootElement = this.chartDOM || this.wrapperDOM || this.target;
+    this.cachedDoughnutHoleColor = resolveDoughnutHoleColor(this.options, rootElement);
+    return this.cachedDoughnutHoleColor;
+  },
+
+  /**
    * Draw doughnut hole
    * @param ctx
    */
@@ -216,86 +287,43 @@ const modules = {
     const pieOption = this.options;
     const { width, height } = this.chartRect;
     const padding = this.options.padding;
-  
+
     const centerX = width / 2;
     const centerY = height / 2;
-  
+
     const chartWidth = centerX - (padding.left + padding.right);
     const chartHeight = centerY - (padding.bottom + padding.top);
-  
+
     if (
       (typeof chartWidth === 'number' && chartWidth < 0) ||
       (typeof chartHeight === 'number' && chartHeight < 0)
     ) {
       return;
     }
-  
+
     const radius = Math.min(chartWidth, chartHeight) * pieOption.doughnutHoleSize;
-  
+
     const pixelRatio = this.pixelRatio || window.devicePixelRatio || 1;
     const isFractionalPixelRatio = !Number.isInteger(pixelRatio);
-  
-    const alignToDevicePixel = (value) => Math.round(value * pixelRatio) / pixelRatio;
-    const ceilToDevicePixel = (value) => Math.ceil(value * pixelRatio) / pixelRatio;
-  
-    const adjustedCenterX = isFractionalPixelRatio ? alignToDevicePixel(centerX) : centerX;
-    const adjustedCenterY = isFractionalPixelRatio ? alignToDevicePixel(centerY) : centerY;
-  
+
+    const adjustedCenterX = isFractionalPixelRatio
+      ? alignToDevicePixel(centerX, pixelRatio)
+      : centerX;
+    const adjustedCenterY = isFractionalPixelRatio
+      ? alignToDevicePixel(centerY, pixelRatio)
+      : centerY;
+
     // fractional scale 환경에서 원 경계 잔여 픽셀이 남는 케이스를 줄이기 위해
     // hole 영역만 1 device pixel 정도 더 크게 덮는다.
     const erasePadding = isFractionalPixelRatio ? 1 / pixelRatio : 0;
     const adjustedRadius = isFractionalPixelRatio
-      ? ceilToDevicePixel(radius + erasePadding)
+      ? ceilToDevicePixel(radius + erasePadding, pixelRatio)
       : radius;
-  
-    const isTransparentColor = (color) => {
-      if (!color) {
-        return true;
-      }
-  
-      const normalizedColor = color.trim().toLowerCase();
-  
-      if (normalizedColor === 'transparent') {
-        return true;
-      }
-  
-      const colorMatch = normalizedColor.match(
-        /rgba?\(\s*[\d.]+%?\s*(?:,|\s)\s*[\d.]+%?\s*(?:,|\s)\s*[\d.]+%?\s*(?:,|\/)\s*([\d.]+%?)\s*\)/,
-      );
-  
-      if (!colorMatch) {
-        return false;
-      }
-  
-      return Number.parseFloat(colorMatch[1]) === 0;
-    };
-  
-    const getDoughnutHoleColor = () => {
-      const optionColor = pieOption?.doughnutHoleColor || pieOption?.backgroundColor;
-  
-      if (!isTransparentColor(optionColor)) {
-        return optionColor;
-      }
-  
-      let element = this.chartDOM || this.wrapperDOM || this.target;
-  
-      while (element && element !== document.documentElement) {
-        const backgroundColor = getComputedStyle(element)?.backgroundColor;
-  
-        if (!isTransparentColor(backgroundColor)) {
-          return backgroundColor;
-        }
-  
-        element = element.parentElement;
-      }
-  
-      return '#fff';
-    };
-  
-    const doughnutHoleColor = getDoughnutHoleColor();
-  
+
+    const doughnutHoleColor = this.getDoughnutHoleColor();
+
     ctx.save();
-  
+
     // 일부 GPU 가속 환경에서 destination-out 합성 경계가 깨지는 케이스가 있어,
     // hole을 투명하게 지우지 않고 실제 배경색으로 덮는다.
     ctx.globalCompositeOperation = 'source-over';
@@ -304,9 +332,9 @@ const modules = {
     ctx.arc(adjustedCenterX, adjustedCenterY, adjustedRadius, 0, Math.PI * 2);
     ctx.closePath();
     ctx.fill();
-  
+
     ctx.restore();
-  
+
     // inner stroke는 시각 보정용 adjustedRadius가 아니라 원래 논리 radius 기준으로 유지한다.
     if (pieOption?.pieStroke?.use) {
       ctx.beginPath();
@@ -316,7 +344,7 @@ const modules = {
       ctx.closePath();
       ctx.stroke();
     }
-  
+
     // adjustedRadius는 렌더링 보정값이므로 hit-test 등에 사용되는 내부 논리값은 기존 radius를 유지한다.
     this.pieDataSet[this.pieDataSet.length - 1].ir = radius;
   },
