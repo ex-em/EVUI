@@ -24,7 +24,7 @@ const isTransparentColor = (color) => {
 };
 
 const resolveDoughnutHoleColor = (pieOption, rootElement) => {
-  const optionColor = pieOption?.doughnutHoleColor || pieOption?.backgroundColor;
+  const optionColor = pieOption?.doughnutHoleColor;
 
   if (!isTransparentColor(optionColor)) {
     return optionColor;
@@ -298,12 +298,11 @@ const modules = {
 
     const rootElement = this.chartDOM || this.wrapperDOM || this.target;
     const doughnutHoleColor = resolveDoughnutHoleColor(pieOption, rootElement);
-    this.lastDoughnutHoleColor = doughnutHoleColor;
+    this._lastDoughnutHoleColor = doughnutHoleColor;
 
     ctx.save();
 
-    // 일부 GPU 가속 환경에서 destination-out 합성 경계가 깨지는 케이스가 있어,
-    // hole을 투명하게 지우지 않고 실제 배경색으로 덮는다.
+    // 일부 GPU 가속 환경에서 destination-out의 가장자리가 깨져 source-over로 칠한다.
     ctx.globalCompositeOperation = 'source-over';
     ctx.beginPath();
     ctx.fillStyle = doughnutHoleColor;
@@ -345,20 +344,20 @@ const modules = {
     if (this.options?.doughnutHoleColor) {
       return;
     }
-    if (this.doughnutHoleThemeObserver) {
+    if (this._doughnutHoleThemeObserver) {
       return;
     }
 
     // 테마 클래스가 html/body가 아니라 그 하위 wrapper div에 붙는 앱도 흔하므로
     // documentElement subtree 전체의 attribute 변화를 감시한다.
     // 다양한 무관 mutation에 대해 매번 DOM walk를 돌지 않도록 rAF로 coalesce 한다.
-    this.doughnutHoleThemeObserver = new MutationObserver(() => {
-      if (this.doughnutHoleThemeRafId != null) {
+    this._doughnutHoleThemeObserver = new MutationObserver(() => {
+      if (this._doughnutHoleThemeRafId != null) {
         return;
       }
 
-      this.doughnutHoleThemeRafId = requestAnimationFrame(() => {
-        this.doughnutHoleThemeRafId = null;
+      this._doughnutHoleThemeRafId = requestAnimationFrame(() => {
+        this._doughnutHoleThemeRafId = null;
 
         if (!this.isInit) {
           return;
@@ -370,14 +369,14 @@ const modules = {
         }
 
         const nextColor = resolveDoughnutHoleColor(this.options, rootElement);
-        if (nextColor !== this.lastDoughnutHoleColor) {
+        if (nextColor !== this._lastDoughnutHoleColor) {
           this.render();
         }
       });
     });
 
     if (document.documentElement) {
-      this.doughnutHoleThemeObserver.observe(document.documentElement, {
+      this._doughnutHoleThemeObserver.observe(document.documentElement, {
         attributes: true,
         attributeFilter: ['class', 'style', 'data-theme'],
         subtree: true,
@@ -386,13 +385,13 @@ const modules = {
   },
 
   teardownDoughnutHoleThemeObserver() {
-    if (this.doughnutHoleThemeObserver) {
-      this.doughnutHoleThemeObserver.disconnect();
-      this.doughnutHoleThemeObserver = null;
+    if (this._doughnutHoleThemeObserver) {
+      this._doughnutHoleThemeObserver.disconnect();
+      this._doughnutHoleThemeObserver = null;
     }
-    if (this.doughnutHoleThemeRafId != null) {
-      cancelAnimationFrame(this.doughnutHoleThemeRafId);
-      this.doughnutHoleThemeRafId = null;
+    if (this._doughnutHoleThemeRafId != null) {
+      cancelAnimationFrame(this._doughnutHoleThemeRafId);
+      this._doughnutHoleThemeRafId = null;
     }
   },
 };
