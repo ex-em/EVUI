@@ -67,6 +67,7 @@ const DEFAULT_OPTIONS = {
   unSelectedOpacity: 0.3,
   useSelect: false,
   doughnutHoleSize: 0,
+  doughnutHoleColor: null,
   pieStroke: {
     use: true,
     lineWidth: 2,

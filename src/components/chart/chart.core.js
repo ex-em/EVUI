@@ -141,6 +141,8 @@ class EvChart {
 
     this.createEventFunctions?.();
     this.isInit = true;
+
+    this.setupDoughnutHoleThemeObserver?.();
   }
 
   _updateSeriesCount() {
@@ -1077,9 +1079,6 @@ class EvChart {
 
     this.initDefaultSelectInfo();
 
-    // update 시점에 doughnutHoleColor 옵션이 바뀌었거나 DOM 컨텍스트가 달라졌을 수 있다.
-    this.invalidateDoughnutHoleColorCache?.();
-
     let renderHitInfo = updateInfo?.hitInfo;
     if (!renderHitInfo?.legend && this.legendHover?.sId) {
       renderHitInfo = { ...(renderHitInfo || {}), legend: this.legendHover };
@@ -1180,7 +1179,6 @@ class EvChart {
 
     this.initScale();
     this.chartRect = this.getChartRect();
-    this.invalidateDoughnutHoleColorCache?.();
     this.drawChart();
     if (this.dragInfoBackup) {
       this.drawSelectionArea?.(this.dragInfoBackup);
@@ -1394,6 +1392,8 @@ class EvChart {
     if (!this.isInit) {
       return;
     }
+
+    this.teardownDoughnutHoleThemeObserver?.();
 
     const target = this.target;
 

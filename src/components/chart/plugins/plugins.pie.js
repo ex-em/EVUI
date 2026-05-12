@@ -256,30 +256,6 @@ const modules = {
   },
 
   /**
-   * doughnutHoleColor 캐시를 무효화한다.
-   * 옵션 변경/리사이즈/리렌더 등으로 부모 DOM의 background-color 컨텍스트가
-   * 달라졌을 수 있을 때 호출한다.
-   */
-  invalidateDoughnutHoleColorCache() {
-    this.cachedDoughnutHoleColor = null;
-  },
-
-  /**
-   * 캐시된 doughnutHoleColor를 반환하거나, 없으면 한 번 계산해 캐시한다.
-   * tooltip hover 중 hole이 자주 다시 그려지므로(plugins.tooltip.js의 highlight 경로)
-   * 매 호출마다 getComputedStyle로 DOM을 거슬러 올라가지 않도록 한다.
-   */
-  getDoughnutHoleColor() {
-    if (this.cachedDoughnutHoleColor) {
-      return this.cachedDoughnutHoleColor;
-    }
-
-    const rootElement = this.chartDOM || this.wrapperDOM || this.target;
-    this.cachedDoughnutHoleColor = resolveDoughnutHoleColor(this.options, rootElement);
-    return this.cachedDoughnutHoleColor;
-  },
-
-  /**
    * Draw doughnut hole
    * @param ctx
    */
@@ -320,7 +296,9 @@ const modules = {
       ? ceilToDevicePixel(radius + erasePadding, pixelRatio)
       : radius;
 
-    const doughnutHoleColor = this.getDoughnutHoleColor();
+    const rootElement = this.chartDOM || this.wrapperDOM || this.target;
+    const doughnutHoleColor = resolveDoughnutHoleColor(pieOption, rootElement);
+    this.lastDoughnutHoleColor = doughnutHoleColor;
 
     ctx.save();
 
@@ -347,6 +325,75 @@ const modules = {
 
     // adjustedRadius는 렌더링 보정값이므로 hit-test 등에 사용되는 내부 논리값은 기존 radius를 유지한다.
     this.pieDataSet[this.pieDataSet.length - 1].ir = radius;
+  },
+
+  /**
+   * 다크↔라이트 테마 토글 등 상위 DOM의 background-color가 바뀌었을 때
+   * hole 색이 자동으로 갱신되도록 documentElement / body 의 attribute 변화를 감시한다.
+   *
+   * - doughnutHoleColor 옵션이 명시되어 있으면 사용자가 직접 색을 통제하는 것으로 보고
+   *   옵저버를 등록하지 않는다 (옵션을 reactive로 바인딩한 경우 Vue가 update를 트리거하므로 불필요).
+   * - doughnutHoleSize가 0이면 hole 자체를 그리지 않으므로 등록하지 않는다.
+   */
+  setupDoughnutHoleThemeObserver() {
+    if (typeof window === 'undefined' || typeof MutationObserver === 'undefined') {
+      return;
+    }
+    if (!(this.options?.doughnutHoleSize > 0)) {
+      return;
+    }
+    if (this.options?.doughnutHoleColor) {
+      return;
+    }
+    if (this.doughnutHoleThemeObserver) {
+      return;
+    }
+
+    // 테마 클래스가 html/body가 아니라 그 하위 wrapper div에 붙는 앱도 흔하므로
+    // documentElement subtree 전체의 attribute 변화를 감시한다.
+    // 다양한 무관 mutation에 대해 매번 DOM walk를 돌지 않도록 rAF로 coalesce 한다.
+    this.doughnutHoleThemeObserver = new MutationObserver(() => {
+      if (this.doughnutHoleThemeRafId != null) {
+        return;
+      }
+
+      this.doughnutHoleThemeRafId = requestAnimationFrame(() => {
+        this.doughnutHoleThemeRafId = null;
+
+        if (!this.isInit) {
+          return;
+        }
+
+        const rootElement = this.chartDOM || this.wrapperDOM || this.target;
+        if (!rootElement) {
+          return;
+        }
+
+        const nextColor = resolveDoughnutHoleColor(this.options, rootElement);
+        if (nextColor !== this.lastDoughnutHoleColor) {
+          this.render();
+        }
+      });
+    });
+
+    if (document.documentElement) {
+      this.doughnutHoleThemeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class', 'style', 'data-theme'],
+        subtree: true,
+      });
+    }
+  },
+
+  teardownDoughnutHoleThemeObserver() {
+    if (this.doughnutHoleThemeObserver) {
+      this.doughnutHoleThemeObserver.disconnect();
+      this.doughnutHoleThemeObserver = null;
+    }
+    if (this.doughnutHoleThemeRafId != null) {
+      cancelAnimationFrame(this.doughnutHoleThemeRafId);
+      this.doughnutHoleThemeRafId = null;
+    }
   },
 };
 
