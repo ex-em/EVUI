@@ -140,7 +140,8 @@ class Scatter {
     const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    // 시리즈 내부의 동일 (x,y) overdraw로 인한 두께 흔들림을 막기 위해 그린 좌표를 추적한다.
+    // 비-realtime 경로는 data 레이어 dedupe(addSeriesDSforScatter)가 없어
+    // 시리즈 내부 (x,y) overdraw로 인한 두께 흔들림을 여기서 막는다.
     const drawnKeys = new Set();
     const isDedupeOn = coordinateDedupe !== false;
 
@@ -155,7 +156,7 @@ class Scatter {
       } else if (isDedupeOn) {
         shouldDraw = duple.get(key) === this.sId && !drawnKeys.has(key);
       } else {
-        shouldDraw = !drawnKeys.has(key);
+        shouldDraw = true;
       }
 
       if (shouldDraw) {
@@ -192,9 +193,6 @@ class Scatter {
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
     let totalCount = 0;
 
-    // 시리즈 내부의 동일 (x,y) overdraw로 인한 두께 흔들림을 막기 위해 그린 좌표를 추적한다.
-    // totalCount는 findGraphData의 global index 계산에 필요하므로 dedupe와 별개로 모든 점을 셈한다.
-    const drawnKeys = new Set();
     const isDedupeOnRT = coordinateDedupe !== false;
 
     for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
@@ -202,14 +200,13 @@ class Scatter {
         const item = this.data[this.sId]?.dataGroup[i]?.data[j];
         totalCount++;
 
-        const key = `${item.x}${item.y}`;
         let shouldDraw;
         if (legendHitInfo) {
           shouldDraw = legendHitInfo.sId === this.sId;
         } else if (isDedupeOnRT) {
-          shouldDraw = duple.get(key) === this.sId && !drawnKeys.has(key);
+          shouldDraw = duple.get(`${item.x}${item.y}`) === this.sId;
         } else {
-          shouldDraw = !drawnKeys.has(key);
+          shouldDraw = true;
         }
 
         if (shouldDraw) {
@@ -227,7 +224,6 @@ class Scatter {
             ctx.fillStyle = this.getCachedColor(baseFillColor, fillOpacity);
 
             Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
-            drawnKeys.add(key);
           }
         }
       }
