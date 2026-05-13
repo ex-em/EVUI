@@ -605,3 +605,97 @@ describe('model.store getItem (selectLabel indicator 용)', () => {
     expect(result[0].dataIndex).toBe(2);
   });
 });
+
+/**
+ * createRealTimeScatterDataSet 의 시리즈 내부 (x,y) dedupe 회귀 테스트.
+ * 같은 dataGroup 슬롯에 동일 (x,y) 가 두 번 들어오면 한 번만 push 되어야 한다.
+ */
+describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
+  const SECOND = 1000;
+
+  const buildRealTimeStore = (range = 5) => {
+    const store = Object.create(modules);
+    Object.assign(store, {
+      isInit: false,
+      updateSeries: false,
+      dataSet: {},
+      options: { realTimeScatter: { range } },
+      seriesInfo: { charts: { scatter: ['series1'] } },
+      seriesList: {
+        series1: {},
+      },
+    });
+    return store;
+  };
+
+  it('한 배치에 동일 (x,y) 가 N개 있어도 dataGroup 에는 한 번만 push 된다', () => {
+    const store = buildRealTimeStore();
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      series1: [
+        { x: t, y: 10 },
+        { x: t, y: 10 },
+        { x: t, y: 10 },
+        { x: t, y: 20 },
+      ],
+    });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const totalPoints = groups.reduce((acc, g) => acc + g.data.length, 0);
+    expect(totalPoints).toBe(2);
+  });
+
+  it('서로 다른 (x,y) 는 모두 push 된다', () => {
+    const store = buildRealTimeStore();
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      series1: [
+        { x: t, y: 10 },
+        { x: t, y: 20 },
+        { x: t, y: 30 },
+      ],
+    });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const totalPoints = groups.reduce((acc, g) => acc + g.data.length, 0);
+    expect(totalPoints).toBe(3);
+  });
+
+  it('dataKeys Set 이 슬롯마다 생성되고 push 된 좌표를 보관한다', () => {
+    const store = buildRealTimeStore();
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      series1: [{ x: t, y: 10 }],
+    });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const slotWithData = groups.find((g) => g.data.length > 0);
+    expect(slotWithData.dataKeys).toBeInstanceOf(Set);
+    expect(slotWithData.dataKeys.has(`${t}10`)).toBe(true);
+  });
+
+  it('윈도우 밖으로 밀려난 슬롯이 reset 되면 dataKeys 도 비워져 같은 좌표를 재 push 할 수 있다', () => {
+    const store = buildRealTimeStore(3);
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    // 1차 batch: (t0, 10) push
+    store.createRealTimeScatterDataSet({ series1: [{ x: t0, y: 10 }] });
+    const firstTotal = store.dataSet.series1.dataGroup.reduce((acc, g) => acc + g.data.length, 0);
+    expect(firstTotal).toBe(1);
+
+    // 2차 batch: 같은 (x,y) 재 push → 이미 슬롯에 있으니 무시
+    store.createRealTimeScatterDataSet({ series1: [{ x: t0, y: 10 }] });
+    const secondTotal = store.dataSet.series1.dataGroup.reduce((acc, g) => acc + g.data.length, 0);
+    expect(secondTotal).toBe(1);
+
+    // 3차 batch: 시간이 length 초 이상 지나 모든 슬롯 reset → 같은 (x,y) 재 push 가능
+    const t1 = t0 + 10 * SECOND;
+    store.createRealTimeScatterDataSet({ series1: [{ x: t1, y: 10 }] });
+    const slotsAfterReset = store.dataSet.series1.dataGroup;
+    const containsKey = slotsAfterReset.some((g) => g.dataKeys?.has(`${t1}10`));
+    expect(containsKey).toBe(true);
+  });
+});
