@@ -140,7 +140,8 @@ class Scatter {
     const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    // 비-realtime 경로는 push 시점 dedupe가 없어(realtime의 createRealTimeScatterDataSet 같은 데이터 적재 단계가 없음) 시리즈 내부 (x,y) overdraw로 인한 두께 흔들림을 여기서 막는다.
+    // 비-realtime 경로는 push 시점 dedupe가 없어 시리즈 내부 (x,y) overdraw로 두께가 흔들린다.
+    // realtime은 createRealTimeScatterDataSet 적재 단계에서 dedupe 처리.
     const drawnKeys = new Set();
     const isDedupeOn = coordinateDedupe !== false;
 
@@ -172,7 +173,7 @@ class Scatter {
           ctx.fillStyle = this.getCachedColor(pointFillColor, fillOpacity);
 
           Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
-          drawnKeys.add(key);
+          if (isDedupeOn && !legendHitInfo) drawnKeys.add(key);
         }
       }
     }
