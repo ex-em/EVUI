@@ -613,13 +613,13 @@ describe('model.store getItem (selectLabel indicator 용)', () => {
 describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
   const SECOND = 1000;
 
-  const buildRealTimeStore = (range = 5) => {
+  const buildRealTimeStore = (range = 5, options = {}) => {
     const store = Object.create(modules);
     Object.assign(store, {
       isInit: false,
       updateSeries: false,
       dataSet: {},
-      options: { realTimeScatter: { range } },
+      options: { realTimeScatter: { range }, ...options },
       seriesInfo: { charts: { scatter: ['series1'] } },
       seriesList: {
         series1: {},
@@ -697,5 +697,23 @@ describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
     const slotsAfterReset = store.dataSet.series1.dataGroup;
     const containsKey = slotsAfterReset.some((g) => g.dataKeys?.has(`${t1}10`));
     expect(containsKey).toBe(true);
+  });
+
+  it('coordinateDedupe=false 일 때 동일 (x,y) 가 N개여도 모두 push 된다 (#2011 opt-out 보존)', () => {
+    const store = buildRealTimeStore(5, { coordinateDedupe: false });
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      series1: [
+        { x: t, y: 10 },
+        { x: t, y: 10 },
+        { x: t, y: 10 },
+        { x: t, y: 20 },
+      ],
+    });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const totalPoints = groups.reduce((acc, g) => acc + g.data.length, 0);
+    expect(totalPoints).toBe(4);
   });
 });

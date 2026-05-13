@@ -146,6 +146,17 @@ const modules = {
       // 5) nextToTime 결정: 새 데이터가 있으면 lastTime, 없으면 이전 유지
       const nextToTime = lastTime || prevToTime;
 
+      const resetDataGroup = (group) => {
+        group.data.length = 0;
+        if (group.dataKeys) {
+          group.dataKeys.clear();
+        } else {
+          group.dataKeys = new Set();
+        }
+        group.max = 0;
+        group.min = Infinity;
+      };
+
       // 6) endIndex/startIndex 초기화 (최초 1회) + length 변경 시 재구성
       if (dataset.endIndex == null || lengthChanged) {
         dataset.startIndex = 0;
@@ -154,20 +165,8 @@ const modules = {
         // dataGroup 크기 맞추고 모두 reset
         dataGroup.length = length;
         for (let i = 0; i < length; i++) {
-          dataGroup[i] = dataGroup[i] || {
-            data: [],
-            dataKeys: new Set(),
-            max: 0,
-            min: Infinity,
-          };
-          dataGroup[i].data.length = 0;
-          if (dataGroup[i].dataKeys) {
-            dataGroup[i].dataKeys.clear();
-          } else {
-            dataGroup[i].dataKeys = new Set();
-          }
-          dataGroup[i].max = 0;
-          dataGroup[i].min = Infinity;
+          dataGroup[i] = dataGroup[i] || { data: [], dataKeys: new Set(), max: 0, min: Infinity };
+          resetDataGroup(dataGroup[i]);
         }
 
         // toTime/fromTime도 새 기준으로 맞춤
@@ -187,17 +186,6 @@ const modules = {
       if (lastTime && (dataset.toTime - lastTime) / 1000 > length && key === '') {
         return;
       }
-
-      const resetDataGroup = (group) => {
-        group.data.length = 0;
-        if (group.dataKeys) {
-          group.dataKeys.clear();
-        } else {
-          group.dataKeys = new Set();
-        }
-        group.max = 0;
-        group.min = Infinity;
-      };
 
       // 9) dataGroup 슬롯 확보
       for (let i = 0; i < length; i++) {
@@ -235,6 +223,9 @@ const modules = {
       }
 
       // 11) 데이터 push (윈도우 안에 들어오는 것만)
+      // coordinateDedupe=false 는 #2011 에서 "모든 중복 좌표 표시" opt-out 으로 도입됐다.
+      // data 레이어에서 dedupe 가 강제되면 draw 레이어의 opt-out 도 무력화되므로 옵션을 존중한다.
+      const isDedupeOn = this.options.coordinateDedupe !== false;
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
         if (item) {
@@ -246,9 +237,12 @@ const modules = {
 
             const group = dataGroup[index];
             const dedupeKey = `${item.x}${item.y}`;
+            const isDuplicate = isDedupeOn && group.dataKeys.has(dedupeKey);
 
-            if (!group.dataKeys.has(dedupeKey)) {
-              group.dataKeys.add(dedupeKey);
+            if (!isDuplicate) {
+              if (isDedupeOn) {
+                group.dataKeys.add(dedupeKey);
+              }
               group.data.push({
                 x: item.x,
                 y: item.y,
