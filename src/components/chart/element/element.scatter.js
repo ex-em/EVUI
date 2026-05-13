@@ -140,8 +140,7 @@ class Scatter {
     const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    // 비-realtime 경로는 data 레이어 dedupe(addSeriesDSforScatter)가 없어
-    // 시리즈 내부 (x,y) overdraw로 인한 두께 흔들림을 여기서 막는다.
+    // 비-realtime 경로는 push 시점 dedupe가 없어(realtime의 createRealTimeScatterDataSet 같은 데이터 적재 단계가 없음) 시리즈 내부 (x,y) overdraw로 인한 두께 흔들림을 여기서 막는다.
     const drawnKeys = new Set();
     const isDedupeOn = coordinateDedupe !== false;
 
