@@ -130,6 +130,18 @@ export default {
   },
 
   /**
+   * scatter dedupe/duple Map의 좌표 키 포맷.
+   * 구분자 없는 단순 concat 은 (12, 34) 와 (123, 4) 가 같은 키가 되는 충돌이 있어
+   * '|' 로 분리한다. set/get 양쪽에서 반드시 이 함수를 통해 키를 생성해야 일치한다.
+   * @param {string|number} x
+   * @param {string|number} y
+   * @returns {string}
+   */
+  coordinateKey(x, y) {
+    return `${x}|${y}`;
+  },
+
+  /**
    * Create string for canvas font style
    * @param {object} style    style object by user
    *

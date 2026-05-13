@@ -127,6 +127,20 @@ describe('helpers.util', () => {
     });
   });
 
+  describe('coordinateKey', () => {
+    it('should join x and y with the | separator', () => {
+      expect(Util.coordinateKey(10, 20)).toBe('10|20');
+    });
+
+    it('should disambiguate (12, 34) and (123, 4)', () => {
+      expect(Util.coordinateKey(12, 34)).not.toBe(Util.coordinateKey(123, 4));
+    });
+
+    it('should handle string labels safely', () => {
+      expect(Util.coordinateKey('2026-05-13', 100)).toBe('2026-05-13|100');
+    });
+  });
+
   describe('getLabelStyle', () => {
     it('should create font style string with defaults', () => {
       const style = Util.getLabelStyle({});

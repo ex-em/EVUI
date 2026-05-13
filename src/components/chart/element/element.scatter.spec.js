@@ -43,8 +43,8 @@ describe('Scatter Element', () => {
       ];
       const param = createDrawParam();
       // dedupe 가 켜져 있으면 chart.core.js 가 duple 을 채워서 넘기므로 모킹한다.
-      param.duple.set('1020', 's1');
-      param.duple.set('3040', 's1');
+      param.duple.set('10|20', 's1');
+      param.duple.set('30|40', 's1');
 
       const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
       scatter.draw(param);
@@ -76,9 +76,9 @@ describe('Scatter Element', () => {
         { x: 3, y: 3 },
       ];
       const param = createDrawParam();
-      param.duple.set('11', 's1');
-      param.duple.set('22', 's1');
-      param.duple.set('33', 's1');
+      param.duple.set('1|1', 's1');
+      param.duple.set('2|2', 's1');
+      param.duple.set('3|3', 's1');
 
       const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
       scatter.draw(param);
@@ -93,8 +93,8 @@ describe('Scatter Element', () => {
         { x: 30, y: 40 },
       ];
       const param = createDrawParam();
-      param.duple.set('1020', 'otherSeries');
-      param.duple.set('3040', 's1');
+      param.duple.set('10|20', 'otherSeries');
+      param.duple.set('30|40', 's1');
 
       const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
       scatter.draw(param);
@@ -120,9 +120,9 @@ describe('Scatter Element', () => {
         },
       };
       const param = createDrawParam();
-      param.duple.set('11', 's1');
-      param.duple.set('12', 's1');
-      param.duple.set('21', 's1');
+      param.duple.set('1|1', 's1');
+      param.duple.set('1|2', 's1');
+      param.duple.set('2|1', 's1');
 
       const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
       scatter.draw(param);

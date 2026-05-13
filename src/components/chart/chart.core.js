@@ -1,5 +1,5 @@
 import { mobileCheck, truthyNumber } from '@/common/utils';
-import { calcExtraWidthLabel } from './helpers/helpers.util';
+import Util, { calcExtraWidthLabel } from './helpers/helpers.util';
 import Model from './model';
 import TimeScale from './scale/scale.time';
 import LinearScale from './scale/scale.linear';
@@ -240,7 +240,12 @@ class EvChart {
             extraFormattedLabels = [calcExtraWidthLabel(widestNumeric)];
           }
         }
-        const maxWidth = axis?.getLabelWidthHasMaxLength?.(notFormattedLabels, this.chartRect, extraFormattedLabels) ?? 0;
+        const maxWidth =
+          axis?.getLabelWidthHasMaxLength?.(
+            notFormattedLabels,
+            this.chartRect,
+            extraFormattedLabels,
+          ) ?? 0;
 
         return {
           ...value,
@@ -366,14 +371,14 @@ class EvChart {
             const dataItems = seriesDatas[i]?.data || [];
             for (let j = 0; j < dataItems.length; j++) {
               const item = dataItems[j];
-              duple.set(`${item.x}${item.y}`, series.sId);
+              duple.set(Util.coordinateKey(item.x, item.y), series.sId);
             }
           }
         } else {
           const seriesDatas = this.data.data[chartTypeSet[jx]] ?? [];
           for (let i = 0; i < seriesDatas.length; i++) {
             const item = seriesDatas[i];
-            duple.set(`${item.x}${item.y}`, series.sId);
+            duple.set(Util.coordinateKey(item.x, item.y), series.sId);
           }
         }
       }
