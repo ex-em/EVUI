@@ -236,7 +236,7 @@ const modules = {
             if (index < 0) index = length + index;
 
             const group = dataGroup[index];
-            const dedupeKey = `${item.x}${item.y}`;
+            const dedupeKey = Util.coordinateKey(item.x, item.y);
             const isDuplicate = isDedupeOn && group.dataKeys.has(dedupeKey);
 
             if (!isDuplicate) {

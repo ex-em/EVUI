@@ -148,7 +148,7 @@ class Scatter {
     for (let i = 0; i < this.data.length; i++) {
       const item = this.data[i];
       const idx = i;
-      const key = `${item.x}${item.y}`;
+      const key = Util.coordinateKey(item.x, item.y);
       let shouldDraw;
       if (legendHitInfo) {
         shouldDraw = legendHitInfo.sId === this.sId;
@@ -203,7 +203,7 @@ class Scatter {
         if (legendHitInfo) {
           shouldDraw = legendHitInfo.sId === this.sId;
         } else if (isDedupeOnRT) {
-          shouldDraw = duple.get(`${item.x}${item.y}`) === this.sId;
+          shouldDraw = duple.get(Util.coordinateKey(item.x, item.y)) === this.sId;
         } else {
           shouldDraw = true;
         }

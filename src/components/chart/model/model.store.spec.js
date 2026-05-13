@@ -674,7 +674,7 @@ describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
     const groups = store.dataSet.series1.dataGroup;
     const slotWithData = groups.find((g) => g.data.length > 0);
     expect(slotWithData.dataKeys).toBeInstanceOf(Set);
-    expect(slotWithData.dataKeys.has(`${t}10`)).toBe(true);
+    expect(slotWithData.dataKeys.has(`${t}|10`)).toBe(true);
   });
 
   it('윈도우 밖으로 밀려난 슬롯이 reset 되면 dataKeys 도 비워져 같은 좌표를 재 push 할 수 있다', () => {
@@ -695,7 +695,7 @@ describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
     const t1 = t0 + 10 * SECOND;
     store.createRealTimeScatterDataSet({ series1: [{ x: t1, y: 10 }] });
     const slotsAfterReset = store.dataSet.series1.dataGroup;
-    const containsKey = slotsAfterReset.some((g) => g.dataKeys?.has(`${t1}10`));
+    const containsKey = slotsAfterReset.some((g) => g.dataKeys?.has(`${t1}|10`));
     expect(containsKey).toBe(true);
   });
 
