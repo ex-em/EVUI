@@ -227,15 +227,19 @@ const modules = {
             if (index < 0) index = length + index;
 
             const group = dataGroup[index];
-            group.data.push({
-              x: item.x,
-              y: item.y,
-              o: item.value ?? item.y,
-              color: item.color,
-            });
+            const isExactDuplicate = group.data.some((d) => d.x === item.x && d.y === item.y);
 
-            group.max = Math.max(group.max, item.y);
-            group.min = Math.min(group.min, item.y);
+            if (!isExactDuplicate) {
+              group.data.push({
+                x: item.x,
+                y: item.y,
+                o: item.value ?? item.y,
+                color: item.color,
+              });
+
+              group.max = Math.max(group.max, item.y);
+              group.min = Math.min(group.min, item.y);
+            }
           }
         }
       }
@@ -910,10 +914,12 @@ const modules = {
         let nearestDistance = Infinity;
         let nearestIndex = -1;
         for (let i = 0; i < refData.length; i++) {
-          const hasValidData = disableNullLabelSnap || seriesIDs.some((sId) => {
-            const s = this.seriesList[sId];
-            return s?.show && s.data?.[i]?.o !== null && s.data?.[i]?.o !== undefined;
-          });
+          const hasValidData =
+            disableNullLabelSnap ||
+            seriesIDs.some((sId) => {
+              const s = this.seriesList[sId];
+              return s?.show && s.data?.[i]?.o !== null && s.data?.[i]?.o !== undefined;
+            });
 
           const p = refData[i];
           if (hasValidData && p) {
@@ -1064,19 +1070,17 @@ const modules = {
 
     // all-null 라벨인 경우 label/dataIndex 만 채워 반환 (sId='', value=0).
     if (
-      disableNullLabelSnap
-      && hitSeriesID === ''
-      && fallbackSeriesID === ''
-      && resolvedDataIndex !== undefined
-      && resolvedDataIndex >= 0
+      disableNullLabelSnap &&
+      hitSeriesID === '' &&
+      fallbackSeriesID === '' &&
+      resolvedDataIndex !== undefined &&
+      resolvedDataIndex >= 0
     ) {
       const refSeriesID = seriesIDs.find((sId) => {
         const s = this.seriesList[sId];
         return s?.show && s?.data?.length > 0;
       });
-      const refPoint = refSeriesID
-        ? this.seriesList[refSeriesID].data?.[resolvedDataIndex]
-        : null;
+      const refPoint = refSeriesID ? this.seriesList[refSeriesID].data?.[resolvedDataIndex] : null;
       if (refPoint) {
         fallbackLabel = isHorizontal ? refPoint.y : refPoint.x;
         fallbackDataIndex = resolvedDataIndex;
@@ -1239,12 +1243,13 @@ const modules = {
         y1: this.chartRect.y1 + this.labelOffset.top,
         y2: this.chartRect.y2 - this.labelOffset.bottom,
       };
-      const { steps, interval: labelValInterval, graphMin } = this.axesSteps[
-        targetAxisDirection
-      ][0];
-      const { width: labelWidth, height: labelHeight } = this.axesRange[
-        targetAxisDirection
-      ][0].size;
+      const {
+        steps,
+        interval: labelValInterval,
+        graphMin,
+      } = this.axesSteps[targetAxisDirection][0];
+      const { width: labelWidth, height: labelHeight } =
+        this.axesRange[targetAxisDirection][0].size;
       const axes = isXAxis ? this.axesX : this.axesY;
       const axisStartPoint = aPos[axes[0].units.rectStart];
       const axisEndPoint = aPos[axes[0].units.rectEnd];
@@ -1310,20 +1315,28 @@ const modules = {
             if (!isHorizontal) {
               if (
                 smm.minX !== null &&
-                (minmax.x[axisX].min === null || (smm.minX !== null && smm.minX < minmax.x[axisX].min))
+                (minmax.x[axisX].min === null ||
+                  (smm.minX !== null && smm.minX < minmax.x[axisX].min))
               ) {
                 minmax.x[axisX].min = smm.minX;
               }
-              if (minmax.y[axisY].min === null || (smm.minY !== null && smm.minY < minmax.y[axisY].min)) {
+              if (
+                minmax.y[axisY].min === null ||
+                (smm.minY !== null && smm.minY < minmax.y[axisY].min)
+              ) {
                 minmax.y[axisY].min = smm.minY;
               }
             } else {
-              if (minmax.x[axisX].min === null || (smm.minX !== null && smm.minX < minmax.x[axisX].min)) {
+              if (
+                minmax.x[axisX].min === null ||
+                (smm.minX !== null && smm.minX < minmax.x[axisX].min)
+              ) {
                 minmax.x[axisX].min = smm.minX;
               }
               if (
                 smm.minY !== null &&
-                (minmax.y[axisY].min === null || (smm.minY !== null && smm.minY < minmax.y[axisY].min))
+                (minmax.y[axisY].min === null ||
+                  (smm.minY !== null && smm.minY < minmax.y[axisY].min))
               ) {
                 minmax.y[axisY].min = smm.minY;
               }

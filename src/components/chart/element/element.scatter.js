@@ -140,18 +140,22 @@ class Scatter {
     const { ctx, axesSteps, duple, legendHitInfo, coordinateDedupe } = param;
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
+    // 시리즈 내부의 동일 (x,y) overdraw로 인한 두께 흔들림을 막기 위해 그린 좌표를 추적한다.
+    const drawnKeys = new Set();
+    const isDedupeOn = coordinateDedupe !== false;
+
     // Adjusted because Real Time Scatter is drawn from the back.
     for (let i = 0; i < this.data.length; i++) {
       const item = this.data[i];
       const idx = i;
-      const isDedupeOn = coordinateDedupe !== false;
+      const key = `${item.x}${item.y}`;
       let shouldDraw;
       if (legendHitInfo) {
         shouldDraw = legendHitInfo.sId === this.sId;
       } else if (isDedupeOn) {
-        shouldDraw = duple.get(`${item.x}${item.y}`) === this.sId;
+        shouldDraw = duple.get(key) === this.sId && !drawnKeys.has(key);
       } else {
-        shouldDraw = true;
+        shouldDraw = !drawnKeys.has(key);
       }
 
       if (shouldDraw) {
@@ -168,6 +172,7 @@ class Scatter {
           ctx.fillStyle = this.getCachedColor(pointFillColor, fillOpacity);
 
           Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
+          drawnKeys.add(key);
         }
       }
     }
@@ -187,19 +192,24 @@ class Scatter {
     const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
     let totalCount = 0;
 
+    // 시리즈 내부의 동일 (x,y) overdraw로 인한 두께 흔들림을 막기 위해 그린 좌표를 추적한다.
+    // totalCount는 findGraphData의 global index 계산에 필요하므로 dedupe와 별개로 모든 점을 셈한다.
+    const drawnKeys = new Set();
+    const isDedupeOnRT = coordinateDedupe !== false;
+
     for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
         const item = this.data[this.sId]?.dataGroup[i]?.data[j];
         totalCount++;
 
-        const isDedupeOnRT = coordinateDedupe !== false;
+        const key = `${item.x}${item.y}`;
         let shouldDraw;
         if (legendHitInfo) {
           shouldDraw = legendHitInfo.sId === this.sId;
         } else if (isDedupeOnRT) {
-          shouldDraw = duple.get(`${item.x}${item.y}`) === this.sId;
+          shouldDraw = duple.get(key) === this.sId && !drawnKeys.has(key);
         } else {
-          shouldDraw = true;
+          shouldDraw = !drawnKeys.has(key);
         }
 
         if (shouldDraw) {
@@ -217,6 +227,7 @@ class Scatter {
             ctx.fillStyle = this.getCachedColor(baseFillColor, fillOpacity);
 
             Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+            drawnKeys.add(key);
           }
         }
       }
