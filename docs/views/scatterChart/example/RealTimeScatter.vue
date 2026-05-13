@@ -201,11 +201,19 @@ export default {
 
     watch(
       () => isRealTime.value,
-      () => {
-        if (isRealTime.value) {
+      (next, prev) => {
+        if (next) {
+          chartOptions.realTimeScatter.use = true;
           timeoutId = setTimeout(tick, 3000);
         } else {
           clearTimeout(timeoutId);
+          if (prev) {
+            chartData.value = {
+              series,
+              data: generateSnapshot(realTimeScatterRange.value * 1000),
+            };
+          }
+          chartOptions.realTimeScatter.use = false;
         }
       },
       { immediate: true },
@@ -228,6 +236,31 @@ export default {
           series2: [],
         },
       };
+    };
+
+    let snapshotCache = null;
+    const generateSnapshot = (rangeMs) => {
+      dataReset();
+
+      if (snapshotCache) {
+        return snapshotCache;
+      }
+
+      const now = Date.now();
+      const floor = (n) => Math.floor(n / 1000) * 1000;
+      const snapshot1 = [];
+      const snapshot2 = [];
+
+      for (let i = 0; i < 5000; i++) {
+        const tx = floor(now + getRandomInt(-rangeMs, 0));
+        const ty = floor(getRandomInt(3000, 57000));
+        const type = getRandomInt(0, 1);
+        const point = { x: tx, y: ty / 1000 };
+        if (type === 1) snapshot1.push(point);
+        else snapshot2.push(point);
+      }
+      snapshotCache = { series1: snapshot1, series2: snapshot2 };
+      return snapshotCache;
     };
 
     onUnmounted(() => {
