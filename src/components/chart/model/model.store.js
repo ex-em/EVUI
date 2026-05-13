@@ -154,8 +154,18 @@ const modules = {
         // dataGroup 크기 맞추고 모두 reset
         dataGroup.length = length;
         for (let i = 0; i < length; i++) {
-          dataGroup[i] = dataGroup[i] || { data: [], max: 0, min: Infinity };
+          dataGroup[i] = dataGroup[i] || {
+            data: [],
+            dataKeys: new Set(),
+            max: 0,
+            min: Infinity,
+          };
           dataGroup[i].data.length = 0;
+          if (dataGroup[i].dataKeys) {
+            dataGroup[i].dataKeys.clear();
+          } else {
+            dataGroup[i].dataKeys = new Set();
+          }
           dataGroup[i].max = 0;
           dataGroup[i].min = Infinity;
         }
@@ -180,6 +190,11 @@ const modules = {
 
       const resetDataGroup = (group) => {
         group.data.length = 0;
+        if (group.dataKeys) {
+          group.dataKeys.clear();
+        } else {
+          group.dataKeys = new Set();
+        }
         group.max = 0;
         group.min = Infinity;
       };
@@ -187,11 +202,14 @@ const modules = {
       // 9) dataGroup 슬롯 확보
       for (let i = 0; i < length; i++) {
         if (!dataGroup[i]) {
-          dataGroup[i] = { data: [], max: 0, min: Infinity };
+          dataGroup[i] = { data: [], dataKeys: new Set(), max: 0, min: Infinity };
         } else if (!dataGroup[i].data) {
           dataGroup[i].data = [];
+          dataGroup[i].dataKeys = new Set();
           dataGroup[i].max = 0;
           dataGroup[i].min = Infinity;
+        } else if (!dataGroup[i].dataKeys) {
+          dataGroup[i].dataKeys = new Set();
         }
       }
 
@@ -227,9 +245,10 @@ const modules = {
             if (index < 0) index = length + index;
 
             const group = dataGroup[index];
-            const isExactDuplicate = group.data.some((d) => d.x === item.x && d.y === item.y);
+            const dedupeKey = `${item.x}${item.y}`;
 
-            if (!isExactDuplicate) {
+            if (!group.dataKeys.has(dedupeKey)) {
+              group.dataKeys.add(dedupeKey);
               group.data.push({
                 x: item.x,
                 y: item.y,
