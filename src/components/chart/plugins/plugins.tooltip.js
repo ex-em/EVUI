@@ -879,6 +879,30 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
+    const isCategoryMode = options.horizontal
+      ? options.axesY?.some((axis) => axis.categoryMode)
+      : options.axesX?.some((axis) => axis.categoryMode);
+
+    if (isCategoryMode) {
+      const labelsCount = this.data.labels.length;
+      let hoverRatio;
+
+      if (options.horizontal) {
+        const chartHeight = graphPos.y2 - graphPos.y1;
+        hoverRatio = (offsetY - graphPos.y1) / chartHeight;
+      } else {
+        const chartWidth = graphPos.x2 - graphPos.x1;
+        hoverRatio = (offsetX - graphPos.x1) / chartWidth;
+      }
+
+      const index = Math.min(
+        Math.max(Math.floor(hoverRatio * labelsCount), 0),
+        labelsCount - 1,
+      );
+      
+      return +this.data.labels[index];
+    }
+
     if (options.horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
       const hoverYAxis = offsetY - graphPos.y1;
