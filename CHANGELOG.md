@@ -1,3 +1,22 @@
+## [3.9.2](https://github.com/ex-em/EVUI/compare/3.9.1...3.9.2) (2026-05-14)
+
+
+### Bug Fixes
+
+* **chart:** realtime scatter coordinateDedupe opt-out 복원 + dedupe 주석·헬퍼 정리 ([42b7b00](https://github.com/ex-em/EVUI/commit/42b7b0014c08079b335923b8e6efa9035e30626f))
+* **chart:** realtime scatter 동일 좌표 overdraw로 점 굵기가 흔들리는 현상 수정 ([b5c5339](https://github.com/ex-em/EVUI/commit/b5c5339743b7f8000bb16d6634d1abb7e9b65934))
+* **chart:** scatter dedupe coordinateDedupe opt-out 복원·중복 dedupe 제거·O(1) Set 마이그레이션 ([4a6fe66](https://github.com/ex-em/EVUI/commit/4a6fe663f5c0330d0dbd8f066335256273b4cc2e))
+
+
+### Performance Improvements
+
+* **chart:** scatter draw에서 불필요한 drawnKeys.add 호출 제거 ([ad65f35](https://github.com/ex-em/EVUI/commit/ad65f359cb69c20257b0513788fedcb511479eaf))
+
+
+### Reverts
+
+* **docs:** realtime scatter 예제 테스트 코드 제거 및 3.4 원본 복원 ([f971275](https://github.com/ex-em/EVUI/commit/f971275e3fc02697543e71c6bb512db4e49038d8))
+
 ## [3.9.1](https://github.com/ex-em/EVUI/compare/3.9.0...3.9.1) (2026-05-08)
 
 
