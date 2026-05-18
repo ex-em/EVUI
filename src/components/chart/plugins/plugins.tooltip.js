@@ -880,11 +880,12 @@ const modules = {
     };
 
     const isCategoryMode = options.horizontal
-      ? options.axesY?.some((axis) => axis.categoryMode)
-      : options.axesX?.some((axis) => axis.categoryMode);
+      ? options.axesY?.every((axis) => axis.categoryMode)
+      : options.axesX?.every((axis) => axis.categoryMode);
 
     if (isCategoryMode) {
       const labelsCount = this.data.labels.length;
+      if (!labelsCount) return null;
       let hoverRatio;
 
       if (options.horizontal) {
@@ -899,7 +900,6 @@ const modules = {
         Math.max(Math.floor(hoverRatio * labelsCount), 0),
         labelsCount - 1,
       );
-      
       return +this.data.labels[index];
     }
 
