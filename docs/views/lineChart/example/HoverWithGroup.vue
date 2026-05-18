@@ -47,7 +47,7 @@ export default {
 
     const getValues = (count) => {
       return Array.from({ length: count }, (_, index) => Math.floor(Math.random() * 100));
-    }
+    };
 
     const syncHover = ref(true);
 
