@@ -152,6 +152,29 @@ export const useDropdown = (param) => {
   };
 
   /**
+   * dropbox flip 판단에 쓰일 가장 가까운 스크롤 가능한 ancestor를 찾는다.
+   * `.ev-window-content`처럼 자체 스크롤을 가진 컨테이너 내부에서도
+   * 컨테이너 경계 기준으로 dropTop/dropDown을 정확히 결정하기 위함.
+   * 못 찾으면 viewport(document.documentElement)로 폴백.
+   * @param {HTMLElement | null | undefined} el
+   * @returns {HTMLElement}
+   */
+  const findScrollableAncestor = (el) => {
+    let parent = el?.parentElement;
+    while (parent && parent !== document.documentElement) {
+      const cs = window.getComputedStyle(parent);
+      const verticallyScrollable =
+        /(auto|scroll|overlay)/.test(cs.overflowY) ||
+        (/(auto|scroll|overlay)/.test(cs.overflow) && parent.scrollHeight > parent.clientHeight);
+      if (verticallyScrollable) {
+        return parent;
+      }
+      parent = parent.parentElement;
+    }
+    return document.documentElement;
+  };
+
+  /**
    * dropdown box 위치 변경하는 메소드
    */
   const changeDropboxPosition = async () => {
@@ -159,8 +182,25 @@ export const useDropdown = (param) => {
     const selectHeight = selectWrapper.value?.getBoundingClientRect().height;
     const selectY = selectWrapper.value?.getBoundingClientRect().y;
     const dropboxHeight = dropbox.value?.getBoundingClientRect().height;
-    const docHeight = document.documentElement.clientHeight;
-    if (docHeight < selectY + selectHeight + dropboxHeight) {
+
+    const container = findScrollableAncestor(selectWrapper.value);
+    const isViewport = container === document.documentElement;
+    const containerRect = container.getBoundingClientRect();
+    const viewportHeight = document.documentElement.clientHeight;
+    // ev-window를 viewport 밖으로 드래그한 경우처럼 컨테이너가 viewport를 벗어날 수 있으므로
+    // 컨테이너 경계와 viewport 경계의 교집합을 실제 가시 영역으로 사용한다.
+    const bottomBoundary = isViewport
+      ? viewportHeight
+      : Math.min(containerRect.bottom, viewportHeight);
+    const topBoundary = isViewport ? 0 : Math.max(containerRect.top, 0);
+
+    const spaceAbove = selectY - topBoundary;
+    const spaceBelow = bottomBoundary - (selectY + selectHeight);
+    const overflowsBottom = dropboxHeight > spaceBelow;
+
+    // 위쪽에 dropbox가 fully fit 하지 않더라도, 아래쪽이 더 좁으면 위로 펼친다.
+    // (ev-window 내부 스크롤처럼 양쪽 모두 부족한 경우 더 많은 항목이 보이는 쪽 선택)
+    if (overflowsBottom && spaceAbove > spaceBelow) {
       dropboxPosition.top = `-${dropboxHeight}px`; // dropTop
     } else {
       dropboxPosition.top = `${selectHeight}px`; // dropDown
