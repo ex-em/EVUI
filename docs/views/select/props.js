@@ -4,6 +4,8 @@ import Default from './example/Default';
 import DefaultRaw from './example/Default?raw';
 import Multiple from './example/Multiple';
 import MultipleRaw from './example/Multiple?raw';
+import InWindow from './example/InWindow';
+import InWindowRaw from './example/InWindow?raw';
 
 export default {
   mdText,
@@ -17,6 +19,11 @@ export default {
       description: '다중 선택가능한 멀티 체크박스입니다.',
       component: Multiple,
       parsedData: parse(MultipleRaw).descriptor,
+    },
+    InWindow: {
+      description: 'ev-window 안에서 사용하는 경우의 예시입니다.',
+      component: InWindow,
+      parsedData: parse(InWindowRaw).descriptor,
     },
   },
 };
