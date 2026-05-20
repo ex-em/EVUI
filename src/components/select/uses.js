@@ -427,9 +427,9 @@ export const useDropdown = (param) => {
     },
   );
 
-  // teleport 모드에서는 viewport resize / select 자체 resize 모두 dropbox를 닫는다
-  // (native select와 동일 UX). non-teleport 모드는 dropbox가 wrapper 내부에 있어
-  // 자연스럽게 따라가므로 기존 너비/위치 재계산을 유지.
+  // teleport 모드에서는 viewport resize 시 dropbox를 닫는다 (native select와 동일 UX).
+  // non-teleport 모드는 dropbox가 wrapper 내부에 있어 자연스럽게 따라가므로 기존
+  // 너비/위치 재계산을 유지.
   const handleResize = () => {
     if (!isDropbox.value) {
       return;
@@ -467,10 +467,9 @@ export const useDropdown = (param) => {
     window.removeEventListener('resize', handleResize);
   });
 
-  // teleport 모드 + dropbox open일 때만 listener/observer를 활성화한다.
+  // teleport 모드 + dropbox open일 때만 scroll listener를 활성화한다.
   // dropbox가 닫혀있는 동안 capture-phase scroll 핸들러가 페이지 전체 스크롤마다 호출되는
-  // 비용을 피하고, ResizeObserver도 의미 있는 시점에만 동작시킨다.
-  // flush:'post'로 dropbox DOM이 마운트된 뒤 selectWrapper.value 기준으로 observe한다.
+  // 비용을 피한다.
   watch(
     () => !!props.teleport && isDropbox.value,
     (active, _prev, onCleanup) => {
@@ -479,29 +478,10 @@ export const useDropdown = (param) => {
       }
       window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
 
-      // teleport 모드 + open 상태일 때만 select 자체 size 변화도 닫기로 처리.
-      // (위치 재계산은 dropbox가 body에 fixed로 떠있는 동안 어색한 추적이 되기 쉬움)
-      // ResizeObserver는 observe() 직후 초기 size로 콜백을 1회 발화하는 spec이므로
-      // 첫 콜백은 무시해야 dropbox가 열리자마자 즉시 닫히지 않는다.
-      let observer = null;
-      if (typeof ResizeObserver !== 'undefined' && selectWrapper.value) {
-        let isInitialCallback = true;
-        observer = new ResizeObserver(() => {
-          if (isInitialCallback) {
-            isInitialCallback = false;
-            return;
-          }
-          clickOutsideDropbox();
-        });
-        observer.observe(selectWrapper.value);
-      }
-
       onCleanup(() => {
         window.removeEventListener('scroll', handleScroll, { capture: true });
-        observer?.disconnect();
       });
     },
-    { flush: 'post' },
   );
 
   return {

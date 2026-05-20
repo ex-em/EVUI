@@ -454,7 +454,7 @@ describe('EvSelect Component', () => {
     });
 
     /**
-     * scroll/ResizeObserver 회귀 가드용 mock — selectWrapperRect를 ref-like 객체로 받아
+     * scroll 회귀 가드용 mock — selectWrapperRect를 ref-like 객체로 받아
      * 테스트 도중 갱신하면 다음 getBoundingClientRect 호출에서 새 값을 돌려준다.
      */
     const mockMutableTeleportBounds = ({ wrapperRectRef, dropboxRect, docClientHeight = 1000 }) => {
@@ -525,58 +525,6 @@ describe('EvSelect Component', () => {
       await nextTick();
 
       expect(document.querySelector('body > .ev-select-dropbox')).not.toBeNull();
-      wrapper.unmount();
-    });
-
-    it('teleport 모드에서 ResizeObserver 콜백 시 dropbox가 닫힌다 (첫 콜백은 무시)', async () => {
-      let observerCb = null;
-      class MockResizeObserver {
-        constructor(cb) {
-          observerCb = cb;
-        }
-
-        observe() {}
-
-        disconnect() {}
-
-        unobserve() {}
-      }
-      vi.stubGlobal('ResizeObserver', MockResizeObserver);
-
-      const wrapperRectRef = {
-        current: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
-      };
-      mockMutableTeleportBounds({
-        wrapperRectRef,
-        dropboxRect: { height: 175 },
-      });
-
-      const wrapper = mount(EvSelect, {
-        props: { ...defaultProps, teleport: 'body' },
-        attachTo: document.body,
-        ...globalConfig,
-      });
-
-      await wrapper.find('.ev-input').trigger('click');
-      await nextTick();
-      await nextTick();
-
-      expect(document.querySelector('body > .ev-select-dropbox')).not.toBeNull();
-      expect(observerCb).not.toBeNull();
-
-      // 첫 콜백(observe() 직후 spec상 1회)은 무시되어 dropbox가 열린 채 유지되어야 한다
-      observerCb([{ target: wrapper.find('.ev-select__wrapper').element }]);
-      await nextTick();
-      await nextTick();
-      expect(document.querySelector('body > .ev-select-dropbox')).not.toBeNull();
-
-      // 두 번째 콜백(실제 size 변화)에서는 닫힘
-      observerCb([{ target: wrapper.find('.ev-select__wrapper').element }]);
-      await nextTick();
-      await nextTick();
-      expect(document.querySelector('body > .ev-select-dropbox')).toBeNull();
-
-      vi.unstubAllGlobals();
       wrapper.unmount();
     });
 

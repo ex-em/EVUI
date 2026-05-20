@@ -110,6 +110,39 @@
       <button class="btn" @click="clickButton3">click to open window!</button>
     </div>
   </div>
+
+  <div class="case">
+    <p class="case-title">Multiple + Teleport (회귀 가드: tag wrap 시 dropbox 유지)</p>
+    <ev-window
+      v-model:visible="isVisible4"
+      title="Multiple select inside window"
+      width="500px"
+      height="360px"
+    >
+      <div class="window-row">
+        <div class="window-cell">
+          <label>Multi+Teleport</label>
+          <ev-select
+            v-model="multiTeleportVal"
+            :items="manyItems"
+            multiple
+            checkable
+            placeholder="Please select values."
+            teleport="body"
+          />
+        </div>
+      </div>
+      <div class="filler" />
+      <div class="description">
+        <strong>multiple + teleport</strong> 조합. dropbox를 열고 항목을 4~5개 이상 차례로
+        선택해서 tag가 두 번째 줄로 <strong>wrap</strong>되는 순간에도 dropbox가 그대로 유지되어
+        다중 선택 흐름이 끊기지 않는지 확인.
+      </div>
+    </ev-window>
+    <div class="description">
+      <button class="btn" @click="clickButton4">click to open window!</button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -127,6 +160,7 @@ export default {
     const isVisible1 = ref(false);
     const isVisible2 = ref(false);
     const isVisible3 = ref(false);
+    const isVisible4 = ref(false);
 
     const clickButton1 = () => {
       isVisible1.value = true;
@@ -136,6 +170,9 @@ export default {
     };
     const clickButton3 = () => {
       isVisible3.value = true;
+    };
+    const clickButton4 = () => {
+      isVisible4.value = true;
     };
     const closeWindow3 = () => {
       isVisible3.value = false;
@@ -147,15 +184,18 @@ export default {
     const selectVal1Teleport = ref('');
     const selectVal2Teleport = ref('');
     const selectVal3Teleport = ref('');
+    const multiTeleportVal = ref([]);
 
     return {
       manyItems,
       isVisible1,
       isVisible2,
       isVisible3,
+      isVisible4,
       clickButton1,
       clickButton2,
       clickButton3,
+      clickButton4,
       closeWindow3,
       selectVal1,
       selectVal2,
@@ -163,6 +203,7 @@ export default {
       selectVal1Teleport,
       selectVal2Teleport,
       selectVal3Teleport,
+      multiTeleportVal,
     };
   },
 };
