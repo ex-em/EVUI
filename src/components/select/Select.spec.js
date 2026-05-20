@@ -519,7 +519,7 @@ describe('EvSelect Component', () => {
       expect(dropboxEl).not.toBeNull();
 
       // dropbox 내부 element에서 발생한 scroll은 capture phase에서도 무시되어야 한다
-      const innerScrollTarget = dropboxEl.querySelector('.ev-select-dropbox-items') || dropboxEl;
+      const innerScrollTarget = dropboxEl.querySelector('.ev-select-dropbox-list') || dropboxEl;
       innerScrollTarget.dispatchEvent(new Event('scroll', { bubbles: true }));
       await nextTick();
       await nextTick();
