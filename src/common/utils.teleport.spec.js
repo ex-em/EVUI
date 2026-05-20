@@ -1,11 +1,12 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { resolveTeleportTarget } from './utils.teleport';
+import { resolveTeleportTarget, __resetTeleportWarnCache } from './utils.teleport';
 
 describe('utils.teleport', () => {
   let warnSpy;
 
   beforeEach(() => {
     warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    __resetTeleportWarnCache();
   });
 
   afterEach(() => {
@@ -85,6 +86,28 @@ describe('utils.teleport', () => {
       resolveTeleportTarget('.missing', 'EvSelect');
       const msg = warnSpy.mock.calls[0][0];
       expect(msg).toContain('[EvSelect]');
+    });
+  });
+
+  describe('warn 캐시 (selector별 1회)', () => {
+    it('같은 mismatch selector를 반복 호출해도 console.warn은 1회만 출력된다', () => {
+      resolveTeleportTarget('.does-not-exist');
+      resolveTeleportTarget('.does-not-exist');
+      resolveTeleportTarget('.does-not-exist');
+      expect(warnSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('서로 다른 mismatch selector는 각각 1회씩 warn한다', () => {
+      resolveTeleportTarget('.miss-a');
+      resolveTeleportTarget('.miss-b');
+      resolveTeleportTarget('.miss-a');
+      expect(warnSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('같은 selector라도 componentName이 다르면 각각 1회씩 warn한다', () => {
+      resolveTeleportTarget('.miss', 'EvSelect');
+      resolveTeleportTarget('.miss', 'EvDatePicker');
+      expect(warnSpy).toHaveBeenCalledTimes(2);
     });
   });
 

@@ -455,23 +455,21 @@ export const useDropdown = (param) => {
     window.removeEventListener('resize', handleResize);
   });
 
-  // props.teleport가 동적으로 변경되어도 listener/observer가 정확히 add/remove 되도록
-  // watch + onCleanup으로 일원화한다. flush:'post' + immediate로 마운트 직후 selectWrapper.value 보장.
+  // teleport 모드 + dropbox open일 때만 listener/observer를 활성화한다.
+  // dropbox가 닫혀있는 동안 capture-phase scroll 핸들러가 페이지 전체 스크롤마다 호출되는
+  // 비용을 피하고, ResizeObserver도 의미 있는 시점에만 동작시킨다.
+  // flush:'post'로 dropbox DOM이 마운트된 뒤 selectWrapper.value 기준으로 observe한다.
   watch(
-    () => props.teleport,
-    (teleport, _prev, onCleanup) => {
-      if (!teleport) {
+    () => !!props.teleport && isDropbox.value,
+    (active, _prev, onCleanup) => {
+      if (!active) {
         return;
       }
       window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
 
       let observer = null;
       if (typeof ResizeObserver !== 'undefined' && selectWrapper.value) {
-        observer = new ResizeObserver(() => {
-          if (isDropbox.value) {
-            changeDropboxPosition();
-          }
-        });
+        observer = new ResizeObserver(() => changeDropboxPosition());
         observer.observe(selectWrapper.value);
       }
 
@@ -480,7 +478,7 @@ export const useDropdown = (param) => {
         observer?.disconnect();
       });
     },
-    { immediate: true, flush: 'post' },
+    { flush: 'post' },
   );
 
   return {
