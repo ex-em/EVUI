@@ -362,6 +362,98 @@ describe('EvSelect Component', () => {
     });
   });
 
+  describe('Teleport 모드 dropbox flip 동작', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+      document
+        .querySelectorAll('body > .ev-select-dropbox')
+        .forEach((el) => el.parentElement.removeChild(el));
+    });
+
+    const mockTeleportBounds = ({ selectWrapperRect, dropboxRect, docClientHeight = 1000 }) => {
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(docClientHeight);
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rect() {
+        if (this.classList?.contains('ev-select__wrapper')) return selectWrapperRect;
+        if (this.classList?.contains('ev-select-dropbox')) return dropboxRect;
+        return { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0 };
+      });
+    };
+
+    it('teleport="body" + 화면 상단 select 는 viewport bottom 좌표로 dropDown 한다', async () => {
+      mockTeleportBounds({
+        selectWrapperRect: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
+        dropboxRect: { height: 175 },
+        docClientHeight: 1000,
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: { ...defaultProps, teleport: 'body' },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl = document.querySelector('body > .ev-select-dropbox');
+      expect(dropboxEl).not.toBeNull();
+      // teleport 분기: dropDown 시 top = selectRect.bottom (viewport 절대 좌표, px)
+      expect(dropboxEl.style.top).toBe('130px');
+      expect(dropboxEl.style.left).toBe('50px');
+      wrapper.unmount();
+    });
+
+    it('teleport="body" + 화면 하단 select 는 viewport top 기준으로 위로 펼친다', async () => {
+      mockTeleportBounds({
+        selectWrapperRect: { top: 900, bottom: 930, left: 50, width: 200, height: 30, y: 900 },
+        dropboxRect: { height: 175 },
+        docClientHeight: 1000,
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: { ...defaultProps, teleport: 'body' },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl = document.querySelector('body > .ev-select-dropbox');
+      expect(dropboxEl).not.toBeNull();
+      // teleport 분기 dropTop: top = selectRect.top - dropboxHeight = 900 - 175 = 725
+      expect(dropboxEl.style.top).toBe('725px');
+      expect(dropboxEl.style.left).toBe('50px');
+      wrapper.unmount();
+    });
+
+    it('teleport="body" 활성 시 dropbox에 teleported 클래스가 적용되고 body 직속으로 옮겨진다', async () => {
+      mockTeleportBounds({
+        selectWrapperRect: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
+        dropboxRect: { height: 175 },
+        docClientHeight: 1000,
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: { ...defaultProps, teleport: 'body' },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl = document.querySelector('body > .ev-select-dropbox');
+      expect(dropboxEl).not.toBeNull();
+      expect(dropboxEl.classList.contains('teleported')).toBe(true);
+      expect(dropboxEl.style.width).toBe('200px');
+      wrapper.unmount();
+    });
+  });
+
   describe('기본값', () => {
     it('컴포넌트 이름이 EvSelect이다', () => {
       expect(EvSelect.name).toBe('EvSelect');
