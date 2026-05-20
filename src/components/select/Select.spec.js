@@ -452,6 +452,134 @@ describe('EvSelect Component', () => {
       expect(dropboxEl.style.width).toBe('200px');
       wrapper.unmount();
     });
+
+    /**
+     * scroll/ResizeObserver 회귀 가드용 mock — selectWrapperRect를 ref-like 객체로 받아
+     * 테스트 도중 갱신하면 다음 getBoundingClientRect 호출에서 새 값을 돌려준다.
+     */
+    const mockMutableTeleportBounds = ({ wrapperRectRef, dropboxRect, docClientHeight = 1000 }) => {
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(docClientHeight);
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rect() {
+        if (this.classList?.contains('ev-select__wrapper')) return wrapperRectRef.current;
+        if (this.classList?.contains('ev-select-dropbox')) return dropboxRect;
+        return { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0 };
+      });
+    };
+
+    it('teleport 모드에서 window scroll 시 dropbox 위치가 재계산된다', async () => {
+      const wrapperRectRef = {
+        current: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
+      };
+      mockMutableTeleportBounds({
+        wrapperRectRef,
+        dropboxRect: { height: 175 },
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: { ...defaultProps, teleport: 'body' },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl = document.querySelector('body > .ev-select-dropbox');
+      expect(dropboxEl.style.top).toBe('130px');
+
+      // 페이지가 위로 50px 스크롤된 상황: selectWrapperRect도 위로 이동
+      wrapperRectRef.current = { top: 50, bottom: 80, left: 50, width: 200, height: 30, y: 50 };
+      window.dispatchEvent(new Event('scroll'));
+      await nextTick();
+      await nextTick();
+
+      // changeDropboxPosition이 다시 호출되어 새 selectRect.bottom을 사용해야 한다
+      expect(dropboxEl.style.top).toBe('80px');
+      wrapper.unmount();
+    });
+
+    it('teleport 모드에서 ResizeObserver 콜백 시 dropbox 위치가 재계산된다', async () => {
+      let observerCb = null;
+      class MockResizeObserver {
+        constructor(cb) {
+          observerCb = cb;
+        }
+
+        observe() {}
+
+        disconnect() {}
+
+        unobserve() {}
+      }
+      vi.stubGlobal('ResizeObserver', MockResizeObserver);
+
+      const wrapperRectRef = {
+        current: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
+      };
+      mockMutableTeleportBounds({
+        wrapperRectRef,
+        dropboxRect: { height: 175 },
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: { ...defaultProps, teleport: 'body' },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl = document.querySelector('body > .ev-select-dropbox');
+      expect(dropboxEl.style.top).toBe('130px');
+      expect(observerCb).not.toBeNull();
+
+      // select 자체 크기/위치 변화로 ResizeObserver 콜백 발화
+      wrapperRectRef.current = { top: 200, bottom: 240, left: 50, width: 200, height: 40, y: 200 };
+      observerCb([{ target: wrapper.find('.ev-select__wrapper').element }]);
+      await nextTick();
+      await nextTick();
+
+      expect(dropboxEl.style.top).toBe('240px');
+
+      vi.unstubAllGlobals();
+      wrapper.unmount();
+    });
+
+    it('teleport 모드에서 dropbox close 시 scroll listener가 해제된다', async () => {
+      const addSpy = vi.spyOn(window, 'addEventListener');
+      const removeSpy = vi.spyOn(window, 'removeEventListener');
+
+      mockTeleportBounds({
+        selectWrapperRect: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
+        dropboxRect: { height: 175 },
+        docClientHeight: 1000,
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: { ...defaultProps, teleport: 'body' },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      // open → scroll listener 등록
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+      const scrollAdds = addSpy.mock.calls.filter(([type]) => type === 'scroll');
+      expect(scrollAdds.length).toBeGreaterThan(0);
+
+      // close → scroll listener 해제
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+      const scrollRemoves = removeSpy.mock.calls.filter(([type]) => type === 'scroll');
+      expect(scrollRemoves.length).toBeGreaterThan(0);
+
+      wrapper.unmount();
+    });
   });
 
   describe('기본값', () => {

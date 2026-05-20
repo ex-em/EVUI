@@ -41,6 +41,7 @@
 
 - <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫혀야한다.
 - `teleport` 옵션 사용 시 <드랍박스>는 viewport 기준(position: fixed)으로 위치가 계산되며, ev-window 등 부모 컨테이너 경계에 잘리지 않는다.
+- `teleport` target 또는 그 ancestor에 `transform`/`filter`/`perspective`/`will-change` 등이 적용돼 있으면 `position: fixed`의 containing block이 해당 ancestor로 바뀌어 <드랍박스> 위치가 어긋날 수 있다. 기본값인 `"body"` 또는 body 직속 element를 권장한다.
 
 2) 멀티 셀렉트 사용 시
 
