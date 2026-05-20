@@ -9,6 +9,7 @@ import {
   onUnmounted,
 } from 'vue';
 import { getRegExp, engToKor, korToEng } from 'korean-regexp';
+import { resolveTeleportTarget } from '@/common/utils.teleport';
 
 export const useModel = () => {
   const { props, emit } = getCurrentInstance();
@@ -121,7 +122,12 @@ export const useDropdown = (param) => {
   const initialDropboxWidth = ref(null);
   const dropboxPosition = reactive({
     top: 0,
+    left: 'auto',
   });
+
+  // teleport target은 dropbox가 열리는 시점에 clickSelectInput에서 동기적으로 resolve한다.
+  // (Select보다 늦게 마운트되는 target도 잡히도록 매 open 시 재평가)
+  const teleportTarget = ref('body');
 
   /**
    * filterable 모드 시 인풋박스에 입력된 텍스트가 포함된 목록 가져오기
@@ -179,9 +185,31 @@ export const useDropdown = (param) => {
    */
   const changeDropboxPosition = async () => {
     await nextTick();
-    const selectHeight = selectWrapper.value?.getBoundingClientRect().height;
-    const selectY = selectWrapper.value?.getBoundingClientRect().y;
-    const dropboxHeight = dropbox.value?.getBoundingClientRect().height;
+    if (!selectWrapper.value || !dropbox.value) {
+      return;
+    }
+    const selectRect = selectWrapper.value.getBoundingClientRect();
+    const selectHeight = selectRect.height;
+    const selectY = selectRect.y;
+    const dropboxHeight = dropbox.value.getBoundingClientRect().height;
+
+    // teleport 모드는 dropbox가 body로 옮겨져 부모(예: ev-window) 컨테이너 경계의
+    // overflow:hidden 영향을 받지 않으므로 viewport만 기준으로 flip 계산하고
+    // position:fixed + viewport 절대 좌표를 사용한다.
+    if (props.teleport) {
+      const viewportHeight = document.documentElement.clientHeight;
+      const spaceAbove = selectRect.top;
+      const spaceBelow = viewportHeight - selectRect.bottom;
+      const overflowsBottom = dropboxHeight > spaceBelow;
+
+      if (overflowsBottom && spaceAbove > spaceBelow) {
+        dropboxPosition.top = `${selectRect.top - dropboxHeight}px`; // dropTop
+      } else {
+        dropboxPosition.top = `${selectRect.bottom}px`; // dropDown
+      }
+      dropboxPosition.left = `${selectRect.left}px`;
+      return;
+    }
 
     const container = findScrollableAncestor(selectWrapper.value);
     const isViewport = container === document.documentElement;
@@ -205,6 +233,7 @@ export const useDropdown = (param) => {
     } else {
       dropboxPosition.top = `${selectHeight}px`; // dropDown
     }
+    dropboxPosition.left = 'auto';
   };
 
   /**
@@ -303,6 +332,17 @@ export const useDropdown = (param) => {
     if (props.items.length && !props.disabled) {
       isDropbox.value = !isDropbox.value;
       if (isDropbox.value) {
+        // teleport 모드는 body에 옮겨지므로 target/초기 너비/위치를 동기적으로 잡아
+        // 첫 렌더 프레임에서 body 전체 너비로 펼쳐졌다가 줄어드는 깜빡임을 막는다.
+        if (props.teleport) {
+          teleportTarget.value = resolveTeleportTarget(props.teleport, 'EvSelect');
+          if (selectWrapper.value) {
+            const rect = selectWrapper.value.getBoundingClientRect();
+            dropboxWidth.value = `${rect.width}px`;
+            dropboxPosition.top = `${rect.bottom}px`;
+            dropboxPosition.left = `${rect.left}px`;
+          }
+        }
         await changeDropboxPosition();
       }
     }
@@ -394,6 +434,19 @@ export const useDropdown = (param) => {
     }
   };
 
+  // teleport 모드에서는 dropbox가 body에 고정(position:fixed)되므로
+  // ev-window content 등 스크롤 가능한 ancestor가 스크롤되거나 select 자체가 리사이즈되면
+  // select와 dropbox 위치가 어긋난다.
+  // - scroll: capture phase로 어떤 ancestor의 scroll이라도 잡아 재배치
+  // - ResizeObserver: select 자체의 size 변화(레이아웃 변화로 위치가 바뀌는 경우 포함)를 감지.
+  //   ev-window 단순 드래그처럼 select size가 불변인 위치-only 이동은 잡지 못한다 — 그 경우
+  //   드래그 시작 시 dropbox를 닫는 UX가 권장된다.
+  const handleScroll = () => {
+    if (isDropbox.value) {
+      changeDropboxPosition();
+    }
+  };
+
   onMounted(() => {
     window.addEventListener('resize', handleResize);
   });
@@ -401,6 +454,34 @@ export const useDropdown = (param) => {
   onUnmounted(() => {
     window.removeEventListener('resize', handleResize);
   });
+
+  // props.teleport가 동적으로 변경되어도 listener/observer가 정확히 add/remove 되도록
+  // watch + onCleanup으로 일원화한다. flush:'post' + immediate로 마운트 직후 selectWrapper.value 보장.
+  watch(
+    () => props.teleport,
+    (teleport, _prev, onCleanup) => {
+      if (!teleport) {
+        return;
+      }
+      window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
+
+      let observer = null;
+      if (typeof ResizeObserver !== 'undefined' && selectWrapper.value) {
+        observer = new ResizeObserver(() => {
+          if (isDropbox.value) {
+            changeDropboxPosition();
+          }
+        });
+        observer.observe(selectWrapper.value);
+      }
+
+      onCleanup(() => {
+        window.removeEventListener('scroll', handleScroll, { capture: true });
+        observer?.disconnect();
+      });
+    },
+    { immediate: true, flush: 'post' },
+  );
 
   return {
     select,
@@ -420,5 +501,6 @@ export const useDropdown = (param) => {
     allCheck,
     changeAllCheck,
     dropboxWidth,
+    teleportTarget,
   };
 };

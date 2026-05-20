@@ -1,6 +1,6 @@
 <template>
   <div class="case">
-    <p class="case-title">Dropbox flip (window 상단 근처) - 기본값</p>
+    <p class="case-title">Dropbox flip (window 상단 근처) - 기본값 + teleport 비교</p>
     <ev-window
       v-model:visible="isVisible2"
       title="Select near window top"
@@ -8,13 +8,24 @@
       height="320px"
     >
       <div class="window-row">
-        <label>Top Select</label>
-        <ev-select v-model="selectVal2" :items="manyItems" placeholder="Please select value." />
+        <div class="window-cell">
+          <label>Default</label>
+          <ev-select v-model="selectVal2" :items="manyItems" placeholder="Please select value." />
+        </div>
+        <div class="window-cell">
+          <label>Teleport</label>
+          <ev-select
+            v-model="selectVal2Teleport"
+            :items="manyItems"
+            placeholder="Please select value."
+            teleport="body"
+          />
+        </div>
       </div>
       <div class="filler" />
       <div class="description">
-        window content 상단에 가까운 select. 위로 펼칠 공간이 부족하므로
-        <strong>아래쪽으로 펼쳐져야</strong> 한다.
+        window content 상단에 가까운 select. 기본은 wrapper 내부에서 펼쳐지고,
+        <strong>teleport</strong>는 body로 옮겨져 펼쳐진다.
       </div>
     </ev-window>
     <div class="description">
@@ -23,7 +34,7 @@
   </div>
 
   <div class="case">
-    <p class="case-title">Dropbox flip (window 하단 근처)</p>
+    <p class="case-title">Dropbox flip (window 하단 근처) - 기본값 + teleport 비교</p>
     <ev-window
       v-model:visible="isVisible1"
       title="Select near window bottom"
@@ -32,12 +43,23 @@
     >
       <div class="filler" />
       <div class="window-row">
-        <label>Bottom Select</label>
-        <ev-select v-model="selectVal1" :items="manyItems" placeholder="Please select value." />
+        <div class="window-cell">
+          <label>Default</label>
+          <ev-select v-model="selectVal1" :items="manyItems" placeholder="Please select value." />
+        </div>
+        <div class="window-cell">
+          <label>Teleport</label>
+          <ev-select
+            v-model="selectVal1Teleport"
+            :items="manyItems"
+            placeholder="Please select value."
+            teleport="body"
+          />
+        </div>
       </div>
       <div class="description">
-        window content 하단에 가까운 select. 옵션 레이어가 viewport에는 들어가도 window 컨테이너
-        하단을 넘기면 <strong>위쪽으로 펼쳐져야</strong> 한다.
+        window content 하단에 가까운 select. 기본은 window 컨테이너 경계 기준으로 flip 되고,
+        <strong>teleport</strong>는 viewport 경계 기준으로 flip 되어 window 밖으로도 펼쳐진다.
       </div>
     </ev-window>
     <div class="description">
@@ -46,7 +68,7 @@
   </div>
 
   <div class="case">
-    <p class="case-title">Draggable / Resizable window + Footer + Select</p>
+    <p class="case-title">Draggable / Resizable window + Footer + 기본값 + teleport 비교</p>
     <ev-window
       v-model:visible="isVisible3"
       title="Window with footer (non-scrollable)"
@@ -58,13 +80,23 @@
     >
       <div class="filler" />
       <div class="window-row">
-        <label>Select</label>
-        <ev-select v-model="selectVal3" :items="manyItems" placeholder="Please select value." />
+        <div class="window-cell">
+          <label>Default</label>
+          <ev-select v-model="selectVal3" :items="manyItems" placeholder="Please select value." />
+        </div>
+        <div class="window-cell">
+          <label>Teleport</label>
+          <ev-select
+            v-model="selectVal3Teleport"
+            :items="manyItems"
+            placeholder="Please select value."
+            teleport="body"
+          />
+        </div>
       </div>
       <div class="description">
-        window를 화면 하단까지 드래그해서 옮긴 후 select를 열어보세요. viewport 하단과 window 하단
-        모두에 의해 flip 이 결정되어야 한다.
-        <br />
+        window를 화면 하단까지 드래그해서 옮긴 후 두 select를 각각 열어보세요. 기본은 window 경계에
+        맞춰 flip 되고, teleport는 viewport 기준으로 flip 된다.
         <br />
         <br />
       </div>
@@ -112,6 +144,9 @@ export default {
     const selectVal1 = ref('');
     const selectVal2 = ref('');
     const selectVal3 = ref('');
+    const selectVal1Teleport = ref('');
+    const selectVal2Teleport = ref('');
+    const selectVal3Teleport = ref('');
 
     return {
       manyItems,
@@ -125,6 +160,9 @@ export default {
       selectVal1,
       selectVal2,
       selectVal3,
+      selectVal1Teleport,
+      selectVal2Teleport,
+      selectVal3Teleport,
     };
   },
 };
@@ -134,21 +172,24 @@ export default {
 .window-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 16px;
   margin: 8px 0;
+}
+.window-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
 
   label {
-    min-width: 100px;
+    min-width: 60px;
   }
 }
 .filler {
   height: 140px;
   background-color: #f5f5f5;
   border: 1px dashed #ccc;
-
-  &.tall {
-    height: 600px;
-  }
 }
 .window-footer-buttons {
   display: flex;

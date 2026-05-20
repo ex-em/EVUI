@@ -37,8 +37,10 @@
   | searchPlaceholder | String | '' | <셀렉트> 필터링의 표기문구 |  |
   | noMatchingText | String | '' | <셀렉트> 필터링 결과가 없을 시 표기문구 |  |
   | checkable      | Boolean | false | <셀렉트> 체크박스 여부 |  |
+  | teleport | String | '' | <드랍박스>를 옮길 target CSS selector (예: `"body"`, `".my-class"`, `"#some-id"`). 빈 문자열이면 teleport 비활성. 매칭되는 element가 없거나 selector가 유효하지 않으면 `document.body`로 fallback하고 console.warn. | `"body"`, `".class"`, `"#id"` |
 
 - <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫혀야한다.
+- `teleport` 옵션 사용 시 <드랍박스>는 viewport 기준(position: fixed)으로 위치가 계산되며, ev-window 등 부모 컨테이너 경계에 잘리지 않는다.
 
 2) 멀티 셀렉트 사용 시
 
@@ -55,6 +57,7 @@
   | searchPlaceholder | String | '' | <셀렉트> 필터링의 표기문구 |  |
   | noMatchingText | String | '' | <셀렉트> 필터링 결과가 없을 시 표기문구 |  |
   | checkable         | Boolean | false | <셀렉트> 체크박스 여부 |  |
+  | teleport | String | '' | <드랍박스>를 옮길 target CSS selector (예: `"body"`, `".my-class"`, `"#some-id"`). 빈 문자열이면 teleport 비활성. 매칭되는 element가 없거나 selector가 유효하지 않으면 `document.body`로 fallback하고 console.warn. | `"body"`, `".class"`, `"#id"` |
 
 - <셀렉트> 클릭 시 <드랍다운 박스>가 나타나며, 목록 선택 시 <드랍다운 박스>가 닫히지 말아야 한다.
 
