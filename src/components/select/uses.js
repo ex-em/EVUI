@@ -427,24 +427,36 @@ export const useDropdown = (param) => {
     },
   );
 
+  // teleport 모드에서는 viewport resize / select 자체 resize 모두 dropbox를 닫는다
+  // (native select와 동일 UX). non-teleport 모드는 dropbox가 wrapper 내부에 있어
+  // 자연스럽게 따라가므로 기존 너비/위치 재계산을 유지.
   const handleResize = () => {
-    if (isDropbox.value) {
-      calculateDropboxWidth();
-      changeDropboxPosition();
+    if (!isDropbox.value) {
+      return;
     }
+    if (props.teleport) {
+      clickOutsideDropbox();
+      return;
+    }
+    calculateDropboxWidth();
+    changeDropboxPosition();
   };
 
   // teleport 모드에서는 dropbox가 body에 고정(position:fixed)되므로
-  // ev-window content 등 스크롤 가능한 ancestor가 스크롤되거나 select 자체가 리사이즈되면
-  // select와 dropbox 위치가 어긋난다.
-  // - scroll: capture phase로 어떤 ancestor의 scroll이라도 잡아 재배치
-  // - ResizeObserver: select 자체의 size 변화(레이아웃 변화로 위치가 바뀌는 경우 포함)를 감지.
-  //   ev-window 단순 드래그처럼 select size가 불변인 위치-only 이동은 잡지 못한다 — 그 경우
-  //   드래그 시작 시 dropbox를 닫는 UX가 권장된다.
-  const handleScroll = () => {
-    if (isDropbox.value) {
-      changeDropboxPosition();
+  // ev-window content 등 스크롤 가능한 ancestor가 스크롤되면 select와 dropbox 위치가 어긋난다.
+  // 위치 재계산 대신 닫는다(native select와 동일한 UX). 단 dropbox 내부 스크롤
+  // (필터 input 포커싱, item 리스트 스크롤)은 닫기 트리거에서 제외한다.
+  const handleScroll = (event) => {
+    if (!isDropbox.value) {
+      return;
     }
+    // event.target이 window/document인 페이지-레벨 scroll은 외부 스크롤로 간주해 닫는다.
+    // Element이면서 dropbox 내부에서 발생한 scroll(필터 input 포커싱, item 리스트 scroll)만 무시.
+    const target = event.target;
+    if (target instanceof Element && dropbox.value?.contains(target)) {
+      return;
+    }
+    clickOutsideDropbox();
   };
 
   onMounted(() => {
@@ -467,9 +479,20 @@ export const useDropdown = (param) => {
       }
       window.addEventListener('scroll', handleScroll, { capture: true, passive: true });
 
+      // teleport 모드 + open 상태일 때만 select 자체 size 변화도 닫기로 처리.
+      // (위치 재계산은 dropbox가 body에 fixed로 떠있는 동안 어색한 추적이 되기 쉬움)
+      // ResizeObserver는 observe() 직후 초기 size로 콜백을 1회 발화하는 spec이므로
+      // 첫 콜백은 무시해야 dropbox가 열리자마자 즉시 닫히지 않는다.
       let observer = null;
       if (typeof ResizeObserver !== 'undefined' && selectWrapper.value) {
-        observer = new ResizeObserver(() => changeDropboxPosition());
+        let isInitialCallback = true;
+        observer = new ResizeObserver(() => {
+          if (isInitialCallback) {
+            isInitialCallback = false;
+            return;
+          }
+          clickOutsideDropbox();
+        });
         observer.observe(selectWrapper.value);
       }
 

@@ -466,7 +466,37 @@ describe('EvSelect Component', () => {
       });
     };
 
-    it('teleport 모드에서 window scroll 시 dropbox 위치가 재계산된다', async () => {
+    it('teleport 모드에서 ancestor/viewport scroll 시 dropbox가 닫힌다', async () => {
+      const wrapperRectRef = {
+        current: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
+      };
+      mockMutableTeleportBounds({
+        wrapperRectRef,
+        dropboxRect: { height: 175 },
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: { ...defaultProps, teleport: 'body' },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      expect(document.querySelector('body > .ev-select-dropbox')).not.toBeNull();
+
+      // ancestor가 스크롤되면 dropbox는 위치 재계산이 아니라 닫혀야 한다 (native select UX)
+      window.dispatchEvent(new Event('scroll'));
+      await nextTick();
+      await nextTick();
+
+      expect(document.querySelector('body > .ev-select-dropbox')).toBeNull();
+      wrapper.unmount();
+    });
+
+    it('teleport 모드에서 dropbox 내부 scroll(필터 input, item list)은 닫지 않는다', async () => {
       const wrapperRectRef = {
         current: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
       };
@@ -486,20 +516,19 @@ describe('EvSelect Component', () => {
       await nextTick();
 
       const dropboxEl = document.querySelector('body > .ev-select-dropbox');
-      expect(dropboxEl.style.top).toBe('130px');
+      expect(dropboxEl).not.toBeNull();
 
-      // 페이지가 위로 50px 스크롤된 상황: selectWrapperRect도 위로 이동
-      wrapperRectRef.current = { top: 50, bottom: 80, left: 50, width: 200, height: 30, y: 50 };
-      window.dispatchEvent(new Event('scroll'));
+      // dropbox 내부 element에서 발생한 scroll은 capture phase에서도 무시되어야 한다
+      const innerScrollTarget = dropboxEl.querySelector('.ev-select-dropbox-items') || dropboxEl;
+      innerScrollTarget.dispatchEvent(new Event('scroll', { bubbles: true }));
       await nextTick();
       await nextTick();
 
-      // changeDropboxPosition이 다시 호출되어 새 selectRect.bottom을 사용해야 한다
-      expect(dropboxEl.style.top).toBe('80px');
+      expect(document.querySelector('body > .ev-select-dropbox')).not.toBeNull();
       wrapper.unmount();
     });
 
-    it('teleport 모드에서 ResizeObserver 콜백 시 dropbox 위치가 재계산된다', async () => {
+    it('teleport 모드에서 ResizeObserver 콜백 시 dropbox가 닫힌다 (첫 콜백은 무시)', async () => {
       let observerCb = null;
       class MockResizeObserver {
         constructor(cb) {
@@ -532,19 +561,51 @@ describe('EvSelect Component', () => {
       await nextTick();
       await nextTick();
 
-      const dropboxEl = document.querySelector('body > .ev-select-dropbox');
-      expect(dropboxEl.style.top).toBe('130px');
+      expect(document.querySelector('body > .ev-select-dropbox')).not.toBeNull();
       expect(observerCb).not.toBeNull();
 
-      // select 자체 크기/위치 변화로 ResizeObserver 콜백 발화
-      wrapperRectRef.current = { top: 200, bottom: 240, left: 50, width: 200, height: 40, y: 200 };
+      // 첫 콜백(observe() 직후 spec상 1회)은 무시되어 dropbox가 열린 채 유지되어야 한다
       observerCb([{ target: wrapper.find('.ev-select__wrapper').element }]);
       await nextTick();
       await nextTick();
+      expect(document.querySelector('body > .ev-select-dropbox')).not.toBeNull();
 
-      expect(dropboxEl.style.top).toBe('240px');
+      // 두 번째 콜백(실제 size 변화)에서는 닫힘
+      observerCb([{ target: wrapper.find('.ev-select__wrapper').element }]);
+      await nextTick();
+      await nextTick();
+      expect(document.querySelector('body > .ev-select-dropbox')).toBeNull();
 
       vi.unstubAllGlobals();
+      wrapper.unmount();
+    });
+
+    it('teleport 모드에서 window resize 시 dropbox가 닫힌다', async () => {
+      const wrapperRectRef = {
+        current: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
+      };
+      mockMutableTeleportBounds({
+        wrapperRectRef,
+        dropboxRect: { height: 175 },
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: { ...defaultProps, teleport: 'body' },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      expect(document.querySelector('body > .ev-select-dropbox')).not.toBeNull();
+
+      window.dispatchEvent(new Event('resize'));
+      await nextTick();
+      await nextTick();
+
+      expect(document.querySelector('body > .ev-select-dropbox')).toBeNull();
       wrapper.unmount();
     });
 
