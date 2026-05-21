@@ -783,6 +783,109 @@ describe('EvSelect Component', () => {
       wrapper.unmount();
     });
 
+    it('teleport+multiple+checkable: 항목 선택으로 wrapper height가 늘어나도 dropbox top이 새 selectRect.bottom을 추종한다 (회귀 가드)', async () => {
+      // multiple+checkable에서 modelValue가 바뀔 때 mv.value watch가 changeDropboxPosition()을
+      // recomputeDirection: false 로 호출 — teleport branch는 viewport 절대 좌표를 쓰므로
+      // 변경된 wrapper bottom에 dropbox.top이 그대로 따라붙어야 한다.
+      // cf8d3911 fix(multi+teleport tag wrap close)가 silent하게 회귀하면 여기서 잡힌다.
+      const wrapperRectRef = {
+        current: { top: 100, bottom: 130, left: 50, width: 200, height: 30, y: 100 },
+      };
+      mockMutableTeleportBounds({
+        wrapperRectRef,
+        dropboxRect: { height: 175 },
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: {
+          ...defaultProps,
+          teleport: 'body',
+          multiple: true,
+          checkable: true,
+          modelValue: [],
+        },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl = document.querySelector('body > .ev-select-dropbox');
+      expect(dropboxEl).not.toBeNull();
+      expect(dropboxEl.style.top).toBe('130px');
+
+      // tag wrap으로 wrapper height 30 → 110 시뮬레이트
+      wrapperRectRef.current = {
+        top: 100,
+        bottom: 210,
+        left: 50,
+        width: 200,
+        height: 110,
+        y: 100,
+      };
+      await wrapper.setProps({ modelValue: ['opt1', 'opt2'] });
+      await nextTick();
+      await nextTick();
+
+      expect(dropboxEl.style.top).toBe('210px');
+      wrapper.unmount();
+    });
+
+    it('teleport+multiple+checkable: open 시점에 dropTop으로 결정되면 wrapper height 변화 후에도 방향이 유지된다 (회귀 가드)', async () => {
+      // open 시점에 한 번 결정한 flip 방향(isDropTop)이 wrapper height 변화로
+      // 재판정되면 위/아래 점프가 발생한다. mv.value watch는 recomputeDirection: false 로
+      // 호출되어야 하며, top 좌표만 새 selectRect.top - dropboxHeight 로 갱신되어야 한다.
+      const wrapperRectRef = {
+        current: { top: 900, bottom: 930, left: 50, width: 200, height: 30, y: 900 },
+      };
+      mockMutableTeleportBounds({
+        wrapperRectRef,
+        dropboxRect: { height: 175 },
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: {
+          ...defaultProps,
+          teleport: 'body',
+          multiple: true,
+          checkable: true,
+          modelValue: [],
+        },
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl = document.querySelector('body > .ev-select-dropbox');
+      expect(dropboxEl).not.toBeNull();
+      // open 시점 dropTop: top = selectRect.top - dropboxHeight = 900 - 175 = 725
+      expect(dropboxEl.style.top).toBe('725px');
+
+      // 항목 선택으로 wrapper top이 위로 밀려나는 상황 (height 30 → 110, top 900 → 820)
+      wrapperRectRef.current = {
+        top: 820,
+        bottom: 930,
+        left: 50,
+        width: 200,
+        height: 110,
+        y: 820,
+      };
+      await wrapper.setProps({ modelValue: ['opt1', 'opt2'] });
+      await nextTick();
+      await nextTick();
+
+      // dropTop 유지 + top만 갱신: 820 - 175 = 645
+      // (recomputeDirection 누설 회귀 시 spaceAbove 820 / spaceBelow 70 으로 여전히 dropTop이지만
+      //  dropDown으로 점프하는 다른 회귀가 들어와도 이 expect로 잡힌다)
+      expect(dropboxEl.style.top).toBe('645px');
+      wrapper.unmount();
+    });
+
     it('teleport 모드에서 dropbox close 시 scroll listener가 해제된다', async () => {
       const addSpy = vi.spyOn(window, 'addEventListener');
       const removeSpy = vi.spyOn(window, 'removeEventListener');
