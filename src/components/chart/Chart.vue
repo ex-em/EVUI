@@ -133,6 +133,33 @@ export default {
           injectEvChartPropsInGroup,
         );
 
+    let pendingUpdate = null;
+    let pendingTimer = null;
+
+    const scheduleUpdate = (params) => {
+      if (!pendingUpdate) {
+        pendingUpdate = { ...params };
+      } else {
+        if (params.updateSeries) pendingUpdate.updateSeries = true;
+        if (params.updateData) pendingUpdate.updateData = true;
+        if (params.updateLegend) pendingUpdate.updateLegend = true;
+        if (params.updateTooltip) pendingUpdate.updateTooltip = true;
+        if (params.updateSelTip?.update) {
+          pendingUpdate.updateSelTip ??= {};
+          pendingUpdate.updateSelTip.update = true;
+        }
+      }
+
+      clearTimeout(pendingTimer);
+      pendingTimer = setTimeout(() => {
+        if (pendingUpdate && evChart) {
+          evChart.update(pendingUpdate);
+        }
+        pendingUpdate = null;
+        pendingTimer = null;
+      }, 0);
+    };
+
     const createChart = () => {
       let selected;
       if (normalizedOptions.selectLabel.use) {
@@ -181,7 +208,7 @@ export default {
 
         evChart.options = cloneDeep(newOpt);
 
-        evChart.update({
+        scheduleUpdate({
           updateSeries: false,
           updateSelTip: { update: false, keepDomain: false },
           updateLegend: isUpdateLegendType,
@@ -214,7 +241,7 @@ export default {
 
         evChart.data = props.options.realTimeScatter?.use ? newData : cloneDeep(newData);
 
-        evChart.update({
+        scheduleUpdate({
           updateSeries: isUpdateSeries,
           updateSelTip: { update: true, keepDomain: false },
           updateData: isUpdateData,
@@ -347,6 +374,10 @@ export default {
     });
 
     onBeforeUnmount(() => {
+      clearTimeout(pendingTimer);
+      pendingUpdate = null;
+      pendingTimer = null;
+
       if (evChart && 'destroy' in evChart) {
         evChart.destroy();
       }
