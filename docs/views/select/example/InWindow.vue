@@ -124,9 +124,11 @@
           <label>Default Multi</label>
           <ev-select
             v-model="multiDefaultVal"
+            :tag-max-rows="3"
             :items="manyItems"
             multiple
             checkable
+            filterable
             placeholder="Please select values."
           />
         </div>
@@ -134,9 +136,11 @@
           <label>Multi Teleport</label>
           <ev-select
             v-model="multiTeleportVal"
+            :tag-max-rows="3"
             :items="manyItems"
             multiple
             checkable
+            filterable
             placeholder="Please select values."
             teleport="body"
           />
@@ -144,9 +148,9 @@
       </div>
       <div class="filler" />
       <div class="description">
-        <strong>multiple + teleport</strong> 조합. dropbox를 열고 항목을 4~5개 이상 차례로
-        선택해서 tag가 두 번째 줄로 <strong>wrap</strong>되는 순간에도 dropbox가 그대로 유지되어
-        다중 선택 흐름이 끊기지 않는지 확인 (Default Multi 와 동일하게 유지되어야 함).
+        <strong>multiple + teleport</strong> 조합. dropbox를 열고 항목을 4~5개 이상 차례로 선택해서
+        tag가 두 번째 줄로 <strong>wrap</strong>되는 순간에도 dropbox가 그대로 유지되어 다중 선택
+        흐름이 끊기지 않는지 확인 (Default Multi 와 동일하게 유지되어야 함).
       </div>
     </ev-window>
     <div class="description">

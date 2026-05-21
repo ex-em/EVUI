@@ -33,11 +33,16 @@
         />
       </template>
       <template v-else>
-        <div class="ev-select-tag-wrapper">
+        <div
+          class="ev-select-tag-wrapper"
+          :class="{ 'has-max-rows': hasMaxRows }"
+          :style="hasMaxRows ? { '--ev-select-tag-max-rows': tagMaxRows } : null"
+          @click="clickSelectInput"
+        >
           <span
             v-if="!clearable || !isClearableIcon"
             class="ev-input-suffix"
-            @click="clickSelectInput"
+            @click.stop="clickSelectInput"
           >
             <i
               class="ev-input-suffix-arrow ev-icon-s-arrow-down"
@@ -50,12 +55,13 @@
             type="text"
             class="ev-input multiple"
             readonly
+            :tabindex="hasMaxRows ? -1 : null"
             :placeholder="computedPlaceholder"
             :disabled="disabled"
-            @click="clickSelectInput"
+            @click.stop="clickSelectInput"
           />
           <template v-if="!collapseTags">
-            <div v-for="item in selectedModel" :key="item" class="ev-select-tag">
+            <div v-for="item in selectedModel" :key="item" class="ev-select-tag" @click.stop>
               <span class="ev-tag-name">
                 {{ item.name }}
               </span>
@@ -68,7 +74,7 @@
             </div>
           </template>
           <template v-else>
-            <div v-if="selectedModel.length" class="ev-select-tag">
+            <div v-if="selectedModel.length" class="ev-select-tag" @click.stop>
               <span class="ev-tag-name">
                 {{ selectedModel[0].name }}
               </span>
@@ -79,7 +85,7 @@
                 <i class="ev-tag-suffix-close ev-icon-error" />
               </span>
             </div>
-            <div v-if="selectedModel.length > 1" class="ev-select-tag num">
+            <div v-if="selectedModel.length > 1" class="ev-select-tag num" @click.stop>
               <span class="ev-tag-name"> + {{ selectedModel.length - 1 }} </span>
             </div>
           </template>
@@ -226,6 +232,7 @@
 </template>
 
 <script>
+import { computed } from 'vue';
 import { selectClickoutside as clickoutside } from '@/directives/clickoutside';
 import EvCheckboxGroup from '@/components/checkboxGroup/CheckboxGroup';
 import EvCheckbox from '@/components/checkbox/Checkbox';
@@ -297,12 +304,24 @@ export default {
       type: String,
       default: '',
     },
+    // multiple 모드에서 tag wrapper가 몇 줄까지 노출될지 결정.
+    // 0(기본) 이면 무제한 wrap, 양수면 그 줄 수까지 표시하고 그 이상은 내부 scroll.
+    // 항목이 많이 선택되어 wrapper 가 폭발적으로 커질 때
+    // ① teleport 모드에서 dropbox 가 window/viewport 밖으로 밀려나는 문제와
+    // ② non-teleport 모드에서 wrapper height 변화로 flip 이 점프하는 문제를 막을 수 있다.
+    tagMaxRows: {
+      type: Number,
+      default: 0,
+      validator: (v) => Number.isInteger(v) && v >= 0,
+    },
   },
   emits: {
     'update:modelValue': null,
     change: null,
   },
-  setup() {
+  setup(props) {
+    const hasMaxRows = computed(() => props.tagMaxRows > 0);
+
     const {
       mv,
       selectedModel,
@@ -335,6 +354,8 @@ export default {
     } = useDropdown({ mv, changeMv });
 
     return {
+      hasMaxRows,
+
       mv,
       selectedModel,
       computedPlaceholder,
@@ -392,6 +413,24 @@ export default {
     }
   }
 
+  // tagMaxRows > 0 (has-max-rows) 일 때만 wrapper에 overflow-y: auto가 적용된다.
+  // 이때 absolute로 깔린 input.multiple이 wrapper의 wheel/touch scroll 영역을 가려
+  // 마우스가 input 위에 있을 때 내부 스크롤이 동작하지 않는 회귀가 있어,
+  // 해당 모드에서만 pointer-events를 통과시키고 클릭은 tag-wrapper @click 으로 위임한다.
+  // 기본(tagMaxRows=0) 모드는 기존 input 클릭 동작을 그대로 유지해 사이드 이펙트를 최소화한다.
+  .ev-select-tag-wrapper.has-max-rows .ev-input.multiple {
+    pointer-events: none;
+  }
+
+  // has-max-rows 모드에서 input.multiple은 pointer-events:none 이라 :hover가 발화하지 않는다.
+  // multi 모드에서도 select hover 시 border 색이 primary로 바뀌는 시각 피드백이 사라지지 않도록
+  // 부모 hover로 cascade 시켜 유지한다.
+  &:not(.disabled):hover .ev-select-tag-wrapper.has-max-rows .ev-input.multiple {
+    @include evThemify() {
+      border-color: evThemed('primary');
+    }
+  }
+
   .ev-input-suffix {
     display: flex;
     position: absolute;
@@ -423,6 +462,14 @@ export default {
     flex-wrap: wrap;
     align-items: center;
     z-index: 100;
+
+    // tagMaxRows prop이 설정된 경우에만 적용.
+    // wrapper가 무제한으로 늘어나서 teleport dropbox가 window 밖에 펼쳐지거나
+    // non-teleport에서 wrapper height 변화로 flip이 점프하는 문제를 옵트인 방식으로 막는다.
+    &.has-max-rows {
+      max-height: calc(#{$select-height} * var(--ev-select-tag-max-rows));
+      overflow-y: auto;
+    }
   }
 }
 
