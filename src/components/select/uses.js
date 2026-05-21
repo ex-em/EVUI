@@ -124,6 +124,10 @@ export const useDropdown = (param) => {
     top: 0,
     left: 'auto',
   });
+  // open 시점에 결정한 flip 방향. dropbox가 열려있는 동안 multiple+checkable 등에서
+  // wrapper height가 변할 때마다 flip 재판정으로 위/아래 점프해 컨테이너 경계 밖으로
+  // dropbox가 잘리는 문제를 막기 위해 유지한다 (native select와 동일 UX).
+  const isDropTop = ref(false);
 
   // teleport target은 dropbox가 열리는 시점에 clickSelectInput에서 동기적으로 resolve한다.
   // (Select보다 늦게 마운트되는 target도 잡히도록 매 open 시 재평가)
@@ -182,8 +186,14 @@ export const useDropdown = (param) => {
 
   /**
    * dropdown box 위치 변경하는 메소드
+   * @param {{ recomputeDirection?: boolean }} [options]
+   *  - recomputeDirection: true 면 spaceAbove/spaceBelow 기준으로 flip 방향을 새로 결정한다.
+   *    open / window resize 처럼 컨텍스트 자체가 바뀌는 트리거에서만 true.
+   *    false 면 isDropTop.value(open 시점 결정값)를 유지하고 position만 갱신한다.
+   *    (multiple+checkable에서 tag wrap으로 wrapper가 늘어나거나, filterable에서 검색어
+   *     입력/삭제로 dropbox 크기가 바뀌어도 open 시점의 방향이 유지되어 점프하지 않도록)
    */
-  const changeDropboxPosition = async () => {
+  const changeDropboxPosition = async ({ recomputeDirection = false } = {}) => {
     await nextTick();
     if (!selectWrapper.value || !dropbox.value) {
       return;
@@ -198,37 +208,46 @@ export const useDropdown = (param) => {
     // position:fixed + viewport 절대 좌표를 사용한다.
     if (props.teleport) {
       const viewportHeight = document.documentElement.clientHeight;
-      const spaceAbove = selectRect.top;
-      const spaceBelow = viewportHeight - selectRect.bottom;
-      const overflowsBottom = dropboxHeight > spaceBelow;
-
-      if (overflowsBottom && spaceAbove > spaceBelow) {
-        dropboxPosition.top = `${selectRect.top - dropboxHeight}px`; // dropTop
-      } else {
-        dropboxPosition.top = `${selectRect.bottom}px`; // dropDown
+      if (recomputeDirection) {
+        const spaceAbove = selectRect.top;
+        const spaceBelow = viewportHeight - selectRect.bottom;
+        const overflowsBottom = dropboxHeight > spaceBelow;
+        // 위로 펼쳐도 충분히 들어갈 때에 한해서만 위로. 양쪽 모두 부족하면 아래로 —
+        // teleport는 viewport에 position:fixed 라 위로 빠져나가면 페이지 스크롤로
+        // 도달 불가능한 반면, 아래는 페이지 스크롤로 도달 가능하기 때문.
+        // (non-teleport는 컨테이너 자체가 viewport에 고정될 수 있어 다른 룰을 쓴다)
+        isDropTop.value = overflowsBottom && spaceAbove > spaceBelow && spaceAbove >= dropboxHeight;
       }
+      dropboxPosition.top = isDropTop.value
+        ? `${selectRect.top - dropboxHeight}px` // dropTop
+        : `${selectRect.bottom}px`; // dropDown
       dropboxPosition.left = `${selectRect.left}px`;
       return;
     }
 
-    const container = findScrollableAncestor(selectWrapper.value);
-    const isViewport = container === document.documentElement;
-    const containerRect = container.getBoundingClientRect();
-    const viewportHeight = document.documentElement.clientHeight;
-    // ev-window를 viewport 밖으로 드래그한 경우처럼 컨테이너가 viewport를 벗어날 수 있으므로
-    // 컨테이너 경계와 viewport 경계의 교집합을 실제 가시 영역으로 사용한다.
-    const bottomBoundary = isViewport
-      ? viewportHeight
-      : Math.min(containerRect.bottom, viewportHeight);
-    const topBoundary = isViewport ? 0 : Math.max(containerRect.top, 0);
+    if (recomputeDirection) {
+      const container = findScrollableAncestor(selectWrapper.value);
+      const isViewport = container === document.documentElement;
+      const containerRect = container.getBoundingClientRect();
+      const viewportHeight = document.documentElement.clientHeight;
+      // ev-window를 viewport 밖으로 드래그한 경우처럼 컨테이너가 viewport를 벗어날 수 있으므로
+      // 컨테이너 경계와 viewport 경계의 교집합을 실제 가시 영역으로 사용한다.
+      const bottomBoundary = isViewport
+        ? viewportHeight
+        : Math.min(containerRect.bottom, viewportHeight);
+      const topBoundary = isViewport ? 0 : Math.max(containerRect.top, 0);
 
-    const spaceAbove = selectY - topBoundary;
-    const spaceBelow = bottomBoundary - (selectY + selectHeight);
-    const overflowsBottom = dropboxHeight > spaceBelow;
+      const spaceAbove = selectY - topBoundary;
+      const spaceBelow = bottomBoundary - (selectY + selectHeight);
+      const overflowsBottom = dropboxHeight > spaceBelow;
 
-    // 위쪽에 dropbox가 fully fit 하지 않더라도, 아래쪽이 더 좁으면 위로 펼친다.
-    // (ev-window 내부 스크롤처럼 양쪽 모두 부족한 경우 더 많은 항목이 보이는 쪽 선택)
-    if (overflowsBottom && spaceAbove > spaceBelow) {
+      // 아래가 부족하면 더 넓은 쪽으로 펼친다 (native select와 동일한 UX).
+      // 양쪽 모두 dropbox 전체를 담지 못하더라도 위쪽이 더 넓으면 위로 — 더 많은 항목을
+      // 노출하는 게 컨테이너 안에서 잘려 가려지는 것보다 낫다.
+      isDropTop.value = overflowsBottom && spaceAbove > spaceBelow;
+    }
+
+    if (isDropTop.value) {
       dropboxPosition.top = `-${dropboxHeight}px`; // dropTop
     } else {
       dropboxPosition.top = `${selectHeight}px`; // dropDown
@@ -312,16 +331,12 @@ export const useDropdown = (param) => {
   watch(
     () => filteredItems.value,
     async () => {
+      // filter 결과 변경으로 dropbox 크기가 바뀌면 dropTop 모드의 좌표(top)가 달라지므로
+      // position만 재계산한다. 방향(isDropTop)은 open 시점 값을 유지해 검색어 입력/삭제로
+      // dropDown ↔ dropTop 점프가 발생하지 않도록 한다.
       await changeDropboxPosition();
     },
   );
-
-  if (props.filterable) {
-    watch(
-      () => filteredItems.value,
-      () => changeDropboxPosition(),
-    );
-  }
 
   /**
    * 인풋박스 클릭 이벤트
@@ -343,7 +358,8 @@ export const useDropdown = (param) => {
             dropboxPosition.left = `${rect.left}px`;
           }
         }
-        await changeDropboxPosition();
+        // open 시점에 flip 방향을 결정. 이후 wrapper height 변화에도 방향은 유지된다.
+        await changeDropboxPosition({ recomputeDirection: true });
       }
     }
   };
@@ -439,21 +455,26 @@ export const useDropdown = (param) => {
       return;
     }
     calculateDropboxWidth();
-    changeDropboxPosition();
+    // viewport 변화는 ancestor 가시 영역도 같이 바뀌므로 flip 재판정.
+    changeDropboxPosition({ recomputeDirection: true });
   };
 
   // teleport 모드에서는 dropbox가 body에 고정(position:fixed)되므로
   // ev-window content 등 스크롤 가능한 ancestor가 스크롤되면 select와 dropbox 위치가 어긋난다.
   // 위치 재계산 대신 닫는다(native select와 동일한 UX). 단 dropbox 내부 스크롤
-  // (필터 input 포커싱, item 리스트 스크롤)은 닫기 트리거에서 제외한다.
+  // (필터 input 포커싱, item 리스트 스크롤)이나 select root 내부 스크롤
+  // (tagMaxRows로 인한 tag wrapper 내부 scroll 등)은 닫기 트리거에서 제외한다.
   const handleScroll = (event) => {
     if (!isDropbox.value) {
       return;
     }
     // event.target이 window/document인 페이지-레벨 scroll은 외부 스크롤로 간주해 닫는다.
-    // Element이면서 dropbox 내부에서 발생한 scroll(필터 input 포커싱, item 리스트 scroll)만 무시.
+    // Element이면서 dropbox 내부 또는 select root 내부에서 발생한 scroll은 무시.
     const target = event.target;
-    if (target instanceof Element && dropbox.value?.contains(target)) {
+    const isInternal =
+      target instanceof Element &&
+      (dropbox.value?.contains(target) || select.value?.contains(target));
+    if (isInternal) {
       return;
     }
     clickOutsideDropbox();
