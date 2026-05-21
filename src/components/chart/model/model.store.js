@@ -48,22 +48,34 @@ const modules = {
         } else {
           seriesIDs.forEach((seriesID) => {
             const series = this.seriesList[seriesID];
+            const rawData = data?.[seriesID];
+            const { passingValue, interpolation } = series;
+            const needsTransform = interpolation === 'zero'
+              || (passingValue != null && passingValue !== undefined);
 
-            const hasPassingValueInData = data?.[seriesID]?.some(
-              (item) => item === series.passingValue,
-            );
+            let hasPassingValueInData = false;
+            let sData;
+
+            if (!rawData) {
+              sData = rawData;
+            } else if (!needsTransform) {
+              sData = rawData;
+            } else {
+              sData = new Array(rawData.length);
+              for (let i = 0; i < rawData.length; i++) {
+                const item = rawData[i];
+                if (item === passingValue) {
+                  hasPassingValueInData = true;
+                  sData[i] = null;
+                } else if (interpolation === 'zero' && !item) {
+                  sData[i] = 0;
+                } else {
+                  sData[i] = item;
+                }
+              }
+            }
 
             series.hasPassingValueInData = hasPassingValueInData;
-
-            const sData = data?.[seriesID]?.map((item) => {
-              if (series.interpolation === 'zero' && !item) {
-                return 0;
-              }
-              if (item === series.passingValue) {
-                return null;
-              }
-              return item;
-            });
 
             if (series && sData) {
               if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
@@ -527,23 +539,27 @@ const modules = {
   addSeriesDS(data, label, isBase) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
-    const passingValue = this.seriesList[Object.keys(this.seriesList)[0]]?.passingValue;
+    const firstSeriesId = Object.keys(this.seriesList)[0];
+    const passingValue = this.seriesList[firstSeriesId]?.passingValue;
+    const usePassingValue = isBase && !Util.isNullOrUndefined(passingValue);
 
-    data.forEach((curr, index) => {
-      let gdata = curr;
-      let ldata = label[index];
+    for (let i = 0; i < data.length; i++) {
+      let gdata = data[i];
+      let ldata = label[i];
 
-      if (gdata && typeof gdata === 'object' && (curr.x || curr.y)) {
-        gdata = isHorizontal ? curr.x : curr.y;
-        ldata = isHorizontal ? curr.y : curr.x;
+      if (gdata && typeof gdata === 'object' && (gdata.x || gdata.y)) {
+        gdata = isHorizontal ? gdata.x : gdata.y;
+        ldata = isHorizontal ? data[i].y : data[i].x;
       }
 
       if (ldata !== null) {
-        const isPassingValueWithStack =
-          isBase && !Util.isNullOrUndefined(passingValue) && gdata === passingValue;
-        sdata.push(this.addData(isPassingValueWithStack ? 0 : gdata, ldata, gdata));
+        sdata.push(this.addData(
+          usePassingValue && gdata === passingValue ? 0 : gdata,
+          ldata,
+          gdata,
+        ));
       }
-    });
+    }
 
     return sdata;
   },
@@ -647,51 +663,51 @@ const modules = {
 
     if (data.length) {
       const usePassingValue = !Util.isNullOrUndefined(passingValue);
+      const minmax = {
+        minX: data[0].x,
+        minY: data[0].y,
+        maxX: data[0].x,
+        maxY: data[0].y,
+        maxDomain: isHorizontal ? data[0].y : data[0].x,
+        maxDomainIndex: 0,
+      };
 
-      return data.reduce(
-        (acc, p, index) => {
-          const minmax = acc;
-          const px = p.x?.value || p.x;
-          const py = p.y?.value || p.y;
-          const po = p.o?.value || p.o;
+      for (let i = 0; i < data.length; i++) {
+        const p = data[i];
+        const px = p.x?.value || p.x;
+        const py = p.y?.value || p.y;
+        const po = p.o?.value || p.o;
 
-          if (usePassingValue ? po !== passingValue && px <= minmax.minX : px <= minmax.minX) {
+        if (!usePassingValue || po !== passingValue) {
+          if (px <= minmax.minX) {
             minmax.minX = px === null ? 0 : px;
           }
 
-          if (usePassingValue ? po !== passingValue && py <= minmax.minY : py <= minmax.minY) {
+          if (py <= minmax.minY) {
             minmax.minY = py === null ? 0 : py;
           }
 
-          if (usePassingValue ? po !== passingValue && px >= minmax.maxX : px >= minmax.maxX) {
+          if (px >= minmax.maxX) {
             minmax.maxX = px === null ? 0 : px;
 
             if (isHorizontal && px !== null) {
               minmax.maxDomain = py;
-              minmax.maxDomainIndex = index;
+              minmax.maxDomainIndex = i;
             }
           }
 
-          if (usePassingValue ? po !== passingValue && py >= minmax.maxY : py >= minmax.maxY) {
+          if (py >= minmax.maxY) {
             minmax.maxY = py === null ? 0 : py;
 
             if (!isHorizontal && py !== null) {
               minmax.maxDomain = px;
-              minmax.maxDomainIndex = index;
+              minmax.maxDomainIndex = i;
             }
           }
+        }
+      }
 
-          return minmax;
-        },
-        {
-          minX: data[0].x,
-          minY: data[0].y,
-          maxX: data[0].x,
-          maxY: data[0].y,
-          maxDomain: isHorizontal ? data[0].y : data[0].x,
-          maxDomainIndex: 0,
-        },
-      );
+      return minmax;
     }
 
     return def;
