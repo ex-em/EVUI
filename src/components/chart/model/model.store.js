@@ -69,11 +69,11 @@ const modules = {
               sData = new Array(rawData.length);
               for (let i = 0; i < rawData.length; i++) {
                 const item = rawData[i];
-                if (item === passingValue) {
+                if (interpolation === 'zero' && !item) {
+                  sData[i] = 0;
+                } else if (item === passingValue) {
                   hasPassingValueInData = true;
                   sData[i] = null;
-                } else if (interpolation === 'zero' && !item) {
-                  sData[i] = 0;
                 } else {
                   sData[i] = item;
                 }
