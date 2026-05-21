@@ -548,6 +548,107 @@ describe('EvSelect Component', () => {
     });
   });
 
+  describe('Dropbox width 재계산', () => {
+    afterEach(() => {
+      vi.restoreAllMocks();
+    });
+
+    /**
+     * 비-teleport 모드에서 dropbox width 측정에 필요한 layout 속성들을 mock한다.
+     * jsdom은 layout을 계산하지 않으므로 offsetWidth/clientWidth/scrollWidth를 직접 흉내낸다.
+     *
+     * 회귀 가드 핵심: .ev-select-dropbox-item.scrollWidth가 "item이 dropbox content 폭으로
+     * stretch된 결과"를 반환하도록 모의한다. 실제 브라우저에서 block-level item이 부모 폭에
+     * 맞춰 stretch되어 scrollWidth가 그 폭을 반환하는 동작을 재현. 이 동작이 들어와야
+     * "이전 open에서 stretch된 폭이 다음 open의 측정에 누설되는" 버그가 재현된다.
+     */
+    const mockWidthLayout = ({ wrapperOffsetWidthRef }) => {
+      vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockImplementation(function offset() {
+        if (this.classList?.contains('ev-select__wrapper')) {
+          return wrapperOffsetWidthRef.current;
+        }
+        if (this.classList?.contains('ev-select-dropbox-list')) {
+          const dropbox = this.closest('.ev-select-dropbox');
+          return dropbox ? parseFloat(dropbox.style.width || '0') : 0;
+        }
+        return 0;
+      });
+      // clientWidth는 Element.prototype에 정의되어 있다 (HTMLElement가 아님).
+      vi.spyOn(Element.prototype, 'clientWidth', 'get').mockImplementation(function client() {
+        if (this.classList?.contains('ev-select-dropbox-list')) {
+          const dropbox = this.closest('.ev-select-dropbox');
+          return dropbox ? parseFloat(dropbox.style.width || '0') : 0;
+        }
+        return 0;
+      });
+      vi.spyOn(Element.prototype, 'scrollWidth', 'get').mockImplementation(function scroll() {
+        if (this.classList?.contains('ev-select-dropbox-item')) {
+          // 실제 브라우저 동작 모사: item은 dropbox content 폭으로 stretch되어
+          // 콘텐츠가 짧으면 scrollWidth = clientWidth = 부모 폭이 된다.
+          const dropbox = this.closest('.ev-select-dropbox');
+          return dropbox ? parseFloat(dropbox.style.width || '0') : 0;
+        }
+        return 0;
+      });
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rect() {
+        if (this.classList?.contains('ev-select-dropbox')) {
+          return { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0 };
+        }
+        return { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0 };
+      });
+      vi.spyOn(window, 'innerWidth', 'get').mockReturnValue(1000);
+    };
+
+    it('wrapper 너비가 줄어든 뒤 재오픈 시 dropbox width가 새 wrapper 너비에 맞게 줄어든다 (회귀 가드)', async () => {
+      // 이전 open에서 늘어난 dropboxWidth가 남아있으면 다음 open에서 item이 그 폭으로
+      // stretch되어 item.scrollWidth가 stretch된 폭을 반환 → finalWidth가 이전 폭에 갇혀
+      // 너비가 줄어들지 않는다. calculateDropboxWidth 진입 시 base 폭으로 리셋한 뒤
+      // 측정하는지 검증.
+      const wrapperOffsetWidthRef = { current: 400 };
+      mockWidthLayout({ wrapperOffsetWidthRef });
+
+      const wrapper = mount(EvSelect, {
+        props: defaultProps,
+        attachTo: document.body,
+        ...globalConfig,
+      });
+
+      // 1차 open (wrapper 400px)
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl1 = wrapper.find('.ev-select-dropbox').element;
+      const initialWidth = parseFloat(dropboxEl1.style.width);
+      expect(initialWidth).toBeGreaterThanOrEqual(400);
+
+      // close
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      expect(wrapper.find('.ev-select-dropbox').exists()).toBe(false);
+
+      // wrapper 너비 축소 (ev-window 리사이즈 시뮬레이션)
+      wrapperOffsetWidthRef.current = 200;
+
+      // 2차 open — dropbox는 새 wrapper 폭(200)에 맞게 줄어야 함
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+      await nextTick();
+
+      const dropboxEl2 = wrapper.find('.ev-select-dropbox').element;
+      const newWidth = parseFloat(dropboxEl2.style.width);
+
+      // 가드: 새 wrapper 폭에 가까운 값이어야 한다. 스크롤바/border 가산을 고려해
+      // 정확한 수치 대신 directional inequality로 검증.
+      expect(newWidth).toBeLessThan(initialWidth);
+      expect(newWidth).toBeLessThanOrEqual(220);
+
+      wrapper.unmount();
+    });
+  });
+
   describe('Teleport 모드 dropbox flip 동작', () => {
     afterEach(() => {
       vi.restoreAllMocks();
