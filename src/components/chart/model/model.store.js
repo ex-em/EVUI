@@ -46,7 +46,12 @@ const modules = {
             }
           });
         } else {
-          seriesIDs.forEach((seriesID) => {
+          // 시리즈마다 동일한 값이므로 루프 밖에서 1회만 계산 (O(N²) → O(N))
+          const firstSeriesId = seriesIDs[0];
+          const basePassingValue = this.seriesList[firstSeriesId]?.passingValue;
+
+          for (let s = 0; s < seriesIDs.length; s++) {
+            const seriesID = seriesIDs[s];
             const series = this.seriesList[seriesID];
             const rawData = data?.[seriesID];
             const { passingValue, interpolation } = series;
@@ -81,11 +86,16 @@ const modules = {
               if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
                 series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
               } else {
-                series.data = this.addSeriesDS(sData, label, series.isExistGrp);
+                series.data = this.addSeriesDS(
+                  sData,
+                  label,
+                  series.isExistGrp,
+                  basePassingValue,
+                );
               }
               series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
             }
-          });
+          }
         }
       }
     });
@@ -536,11 +546,9 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesDS(data, label, isBase) {
+  addSeriesDS(data, label, isBase, passingValue) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
-    const firstSeriesId = Object.keys(this.seriesList)[0];
-    const passingValue = this.seriesList[firstSeriesId]?.passingValue;
     const usePassingValue = isBase && !Util.isNullOrUndefined(passingValue);
 
     for (let i = 0; i < data.length; i++) {
@@ -684,9 +692,11 @@ const modules = {
 
       for (let i = 0; i < data.length; i++) {
         const p = data[i];
-        const px = p.x?.value || p.x;
-        const py = p.y?.value || p.y;
-        const po = p.o?.value || p.o;
+        // addData/addSeriesDS/addSeriesDSforScatter/addSeriesDSForHeatMap 결과 객체의
+        // x/y/o는 항상 primitive(또는 null) — 옵셔널 체이닝 불필요
+        const px = p.x;
+        const py = p.y;
+        const po = p.o;
 
         if (!usePassingValue || po !== passingValue) {
           if (px <= minmax.minX) {
