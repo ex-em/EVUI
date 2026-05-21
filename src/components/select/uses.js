@@ -289,6 +289,18 @@ export const useDropdown = (param) => {
         initialDropboxWidth.value = selectWrapper.value.offsetWidth;
       }
 
+      // 비-teleport에서 이전 측정에서 늘어난 dropboxWidth가 남아있으면
+      // .ev-select-dropbox-item이 그 폭으로 stretch되어 item.scrollWidth가 실제 content
+      // 너비가 아닌 stretch된 폭으로 측정된다 → 너비가 줄어드는 방향으로 재계산되지 않음.
+      // wrapper 폭(=base)으로 리셋한 뒤 한 프레임 기다리고 측정해, ev-window 축소 후
+      // 재오픈/리사이즈 시 dropbox가 새 wrapper 폭에 맞게 줄어들도록 한다.
+      // teleport 모드는 매 open마다 clickSelectInput이 rect.width로 동기화하므로 이 리셋이
+      // 필요 없다.
+      if (!props.teleport) {
+        dropboxWidth.value = `${initialDropboxWidth.value}px`;
+        await nextTick();
+      }
+
       const items = itemWrapper.value.querySelectorAll('.ev-select-dropbox-item');
       let maxWidth = 0;
 
