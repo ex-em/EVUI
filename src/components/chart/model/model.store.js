@@ -553,11 +553,21 @@ const modules = {
       }
 
       if (ldata !== null) {
-        sdata.push(this.addData(
-          usePassingValue && gdata === passingValue ? 0 : gdata,
-          ldata,
-          gdata,
-        ));
+        const value = usePassingValue && gdata === passingValue ? 0 : gdata;
+
+        if ((value !== null && typeof value === 'object')
+          || (gdata !== null && typeof gdata === 'object')) {
+          sdata.push(this.addData(value, ldata, gdata));
+        } else {
+          const v = value ?? null;
+          const o = gdata ?? null;
+          sdata.push(isHorizontal
+            ? { x: v, y: ldata, o, b: null, xp: null, yp: null,
+                w: null, h: null, dataColor: null, dataTextColor: null }
+            : { x: ldata, y: v, o, b: null, xp: null, yp: null,
+                w: null, h: null, dataColor: null, dataTextColor: null },
+          );
+        }
       }
     }
 
