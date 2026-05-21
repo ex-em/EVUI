@@ -24,3 +24,6 @@ pnpm-debug.log*
 
 # Vitest test attachments
 .vitest-attachments
+
+# Claude Code local settings (personal, do not share)
+.claude/settings.local.json
