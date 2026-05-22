@@ -317,10 +317,10 @@ describe('EvSelect Component', () => {
       document.body.removeChild(scrollContainer);
     });
 
-    it('스크롤 ancestor 안에서 양쪽 모두 부족하지만 위가 더 넓으면 위로 펼친다 (native select 일관성)', async () => {
+    it('스크롤 ancestor 안에서 양쪽 모두 dropbox를 못 담으면 아래로 펼친다', async () => {
       // ev-window 내부에서 select 위/아래 모두 dropbox 전체를 담을 공간이 없는 상황.
-      // 양쪽 다 부족하더라도 더 넓은 쪽(위)으로 펼쳐서 더 많은 항목을 노출한다 —
-      // 컨테이너 안에서 가려지는 것보다 native select와 동일하게 더 큰 쪽으로 펼친다.
+      // 위로 빠져나간 영역은 스크롤로 도달이 어려운 반면 아래로 잘린 영역은 컨테이너
+      // 스크롤로 접근 가능하므로, 양쪽 모두 부족하면 아래로 펼친다 (teleport와 동일 룰).
       const scrollContainer = document.createElement('div');
       document.body.appendChild(scrollContainer);
 
@@ -345,9 +345,10 @@ describe('EvSelect Component', () => {
       await nextTick();
       await nextTick();
 
-      // spaceAbove=135, spaceBelow=65, overflowsBottom=true, spaceAbove > spaceBelow → dropTop
+      // spaceAbove=135, spaceBelow=65, overflowsBottom=true, spaceAbove(135) < dropboxHeight(175)
+      // → dropTop 조건 불충족이므로 dropDown 유지
       const dropboxEl = wrapper.find('.ev-select-dropbox').element;
-      expect(dropboxEl.style.top).toBe('-175px');
+      expect(dropboxEl.style.top).toBe('30px');
 
       wrapper.unmount();
       document.body.removeChild(scrollContainer);
@@ -384,6 +385,59 @@ describe('EvSelect Component', () => {
 
       wrapper.unmount();
       document.body.removeChild(scrollContainer);
+    });
+
+    it('overflow:hidden 중간 ancestor가 overflow:auto 바깥 ancestor보다 먼저 잡혀 flip 기준이 된다 (회귀 가드)', async () => {
+      // 실제 소비처(splitpanes__pane[overflow:auto] > host-view__chart[overflow:hidden] > select)
+      // 케이스 재현. 가까운 hidden 을 무시하고 바깥 auto 만 잡으면 spaceAbove 가 과장되어
+      // 위로 펼쳐지는 버그가 있었다. 가까운 clip 경계(hidden)를 잡아야 정확한 dropDown 이 나온다.
+      const outerPane = document.createElement('div');
+      document.body.appendChild(outerPane);
+      const innerCard = document.createElement('div');
+      outerPane.appendChild(innerCard);
+      const selectMount = document.createElement('div');
+      innerCard.appendChild(selectMount);
+
+      const outerPaneRect = { top: 0, bottom: 288, height: 288, y: 0 };
+      const innerCardRect = { top: 169, bottom: 288, height: 119, y: 169 };
+
+      vi.spyOn(document.documentElement, 'clientHeight', 'get').mockReturnValue(1000);
+      vi.spyOn(Element.prototype, 'getBoundingClientRect').mockImplementation(function rect() {
+        if (this.classList?.contains('ev-select__wrapper')) {
+          return { top: 195, bottom: 225, height: 30, y: 195 };
+        }
+        if (this.classList?.contains('ev-select-dropbox')) return { height: 175 };
+        if (this === outerPane) return outerPaneRect;
+        if (this === innerCard) return innerCardRect;
+        return { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0 };
+      });
+
+      const original = window.getComputedStyle.bind(window);
+      vi.spyOn(window, 'getComputedStyle').mockImplementation((el) => {
+        if (el === outerPane) return { overflow: 'auto', overflowY: 'auto' };
+        if (el === innerCard) return { overflow: 'hidden', overflowY: 'hidden' };
+        return original(el);
+      });
+
+      const wrapper = mount(EvSelect, {
+        props: defaultProps,
+        attachTo: selectMount,
+        ...globalConfig,
+      });
+
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+      await nextTick();
+
+      // 가까운 hidden(innerCard) 기준: spaceAbove=195-169=26, spaceBelow=288-225=63
+      // → spaceAbove(26) < spaceBelow(63) 이므로 dropDown.
+      // 만약 hidden 을 건너뛰고 바깥 auto(outerPane)을 잡으면 spaceAbove=195, spaceBelow=63
+      // 이 되어 dropTop 으로 잘못 펼쳐진다.
+      const dropboxEl = wrapper.find('.ev-select-dropbox').element;
+      expect(dropboxEl.style.top).toBe('30px');
+
+      wrapper.unmount();
+      document.body.removeChild(outerPane);
     });
 
     /**

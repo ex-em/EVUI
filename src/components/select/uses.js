@@ -162,21 +162,21 @@ export const useDropdown = (param) => {
   };
 
   /**
-   * dropbox flip 판단에 쓰일 가장 가까운 스크롤 가능한 ancestor를 찾는다.
-   * `.ev-window-content`처럼 자체 스크롤을 가진 컨테이너 내부에서도
-   * 컨테이너 경계 기준으로 dropTop/dropDown을 정확히 결정하기 위함.
+   * dropbox flip 판단에 쓰일 가장 가까운 clip 경계 ancestor를 찾는다.
+   * overflow-y가 visible이 아닌 ancestor(auto/scroll/overlay/hidden/clip)는 모두
+   * 세로 방향으로 dropbox를 잘라낸다 — 스크롤 가능 여부와 무관하게 그렇다.
+   * 가장 가까운 clip 경계를 잡아야 dropTop/dropDown을 정확히 결정할 수 있다.
+   * (예: overflow:auto 패널 안에 overflow:hidden 카드가 중첩된 레이아웃에서,
+   *  바깥 auto 만 잡으면 select가 카드 안에서 flip 방향이 카드 경계와 어긋난다.)
    * 못 찾으면 viewport(document.documentElement)로 폴백.
    * @param {HTMLElement | null | undefined} el
    * @returns {HTMLElement}
    */
-  const findScrollableAncestor = (el) => {
+  const findClipBoundary = (el) => {
     let parent = el?.parentElement;
     while (parent && parent !== document.documentElement) {
       const cs = window.getComputedStyle(parent);
-      const verticallyScrollable =
-        /(auto|scroll|overlay)/.test(cs.overflowY) ||
-        (/(auto|scroll|overlay)/.test(cs.overflow) && parent.scrollHeight > parent.clientHeight);
-      if (verticallyScrollable) {
+      if (/(auto|scroll|overlay|hidden|clip)/.test(cs.overflowY)) {
         return parent;
       }
       parent = parent.parentElement;
@@ -215,7 +215,6 @@ export const useDropdown = (param) => {
         // 위로 펼쳐도 충분히 들어갈 때에 한해서만 위로. 양쪽 모두 부족하면 아래로 —
         // teleport는 viewport에 position:fixed 라 위로 빠져나가면 페이지 스크롤로
         // 도달 불가능한 반면, 아래는 페이지 스크롤로 도달 가능하기 때문.
-        // (non-teleport는 컨테이너 자체가 viewport에 고정될 수 있어 다른 룰을 쓴다)
         isDropTop.value = overflowsBottom && spaceAbove > spaceBelow && spaceAbove >= dropboxHeight;
       }
       dropboxPosition.top = isDropTop.value
@@ -226,7 +225,7 @@ export const useDropdown = (param) => {
     }
 
     if (recomputeDirection) {
-      const container = findScrollableAncestor(selectWrapper.value);
+      const container = findClipBoundary(selectWrapper.value);
       const isViewport = container === document.documentElement;
       const containerRect = container.getBoundingClientRect();
       const viewportHeight = document.documentElement.clientHeight;
@@ -241,10 +240,10 @@ export const useDropdown = (param) => {
       const spaceBelow = bottomBoundary - (selectY + selectHeight);
       const overflowsBottom = dropboxHeight > spaceBelow;
 
-      // 아래가 부족하면 더 넓은 쪽으로 펼친다 (native select와 동일한 UX).
-      // 양쪽 모두 dropbox 전체를 담지 못하더라도 위쪽이 더 넓으면 위로 — 더 많은 항목을
-      // 노출하는 게 컨테이너 안에서 잘려 가려지는 것보다 낫다.
-      isDropTop.value = overflowsBottom && spaceAbove > spaceBelow;
+      // 아래가 부족하고 위쪽이 dropbox 전체를 담을 수 있을 때에 한해 위로 펼친다.
+      // 양쪽 모두 부족하면 아래로 — 위로 빠져나간 영역은 스크롤로 도달하기 어려운 반면
+      // 아래로 잘린 영역은 페이지/컨테이너 스크롤로 접근 가능하기 때문 (teleport와 동일 룰).
+      isDropTop.value = overflowsBottom && spaceAbove > spaceBelow && spaceAbove >= dropboxHeight;
     }
 
     if (isDropTop.value) {
