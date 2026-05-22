@@ -1,3 +1,17 @@
+## [3.9.3](https://github.com/ex-em/EVUI/compare/3.9.2...3.9.3) (2026-05-22)
+
+
+### Bug Fixes
+
+* **chart:** interpolation 'zero' 분기 순서 복원하여 회귀 해소 ([82592d3](https://github.com/ex-em/EVUI/commit/82592d339bc1b856f8118e12b3ea9f19baf6acd6))
+
+
+### Performance Improvements
+
+* **chart:** addSeriesDS에서 primitive 데이터의 addData 호출을 인라인 객체 생성으로 대체 ([21a144c](https://github.com/ex-em/EVUI/commit/21a144c603c1d5fbef21c92f3da4d284287596f0))
+* **chart:** addSeriesDS의 Object.keys 호출을 제거하여 O(N²) 패턴 해소 ([c8f3c2e](https://github.com/ex-em/EVUI/commit/c8f3c2ee02964a1e7c9123da3ae117f8f6712bbe))
+* **chart:** createDataSet 내 불필요한 순회 제거 및 루프 최적화 ([3b758bb](https://github.com/ex-em/EVUI/commit/3b758bbc1605c9b4e537087240014193d5adc919))
+
 ## [3.9.2](https://github.com/ex-em/EVUI/compare/3.9.1...3.9.2) (2026-05-14)
 
 
