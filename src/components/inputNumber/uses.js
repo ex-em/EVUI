@@ -178,7 +178,16 @@ export function useStep(params) {
         squaredValue;
     }
 
-    if (result >= props.min && result <= props.max) {
+    if (props.clampOnStep) {
+      if (result < props.min) {
+        result = props.min;
+      } else if (result > props.max) {
+        result = props.max;
+      }
+      if (result !== +currentValue.value) {
+        validateValue(result);
+      }
+    } else if (result >= props.min && result <= props.max) {
       validateValue(result);
     }
   };

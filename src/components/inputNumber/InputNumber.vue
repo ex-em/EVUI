@@ -85,6 +85,10 @@ export default {
       type: Boolean,
       default: false,
     },
+    clampOnStep: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: ['update:modelValue', 'focus', 'blur', 'input', 'change'],
   setup() {
