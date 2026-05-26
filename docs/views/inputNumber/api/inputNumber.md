@@ -27,6 +27,7 @@ height: 35px;
 | step | Number | 1 | 우측 화살표 클릭 및 키보드 ArrowUp / ArrowDown 입력 이벤트를 통한 변화 값 | |
 | step-strictly | Boolean | false | 설정한 step에 맞는 수만 허용. `modelValue`가 없을 경우 `props.min`을 기준으로 세팅됨(`props.min`을 따로 설정하지 않았을 경우, 0으로 세팅됨) | |
 | disable-empty | Boolean | false | 값을 비우는 것을 허용하지 않음. true로 설정하면 빈 값 입력 시 `null` 대신 `0`을 기준값으로 세팅하고 `min`/`max` 범위로 보정함. `step-strictly`와 함께 사용하면 기준값 0을 가장 가까운 step 값으로 스냅함(예: `min=-3, step=2` → `-1`) | true, false |
+| clamp-on-step | Boolean | false | step으로 인해 `min`/`max`를 초과할 경우 값 변경을 막는 대신 `min` 또는 `max` 값으로 변경됨.| true, false |
 | precision | Number |  | 고정 소수점 값. 0~100 사이의 정수 | |
 | trim-trailing-zero | Boolean | false | precision 사용 시 후행 0 제거 여부. true로 설정하면 `1.500` → `1.5`, `0.000` → `0`으로 표시 | true, false |
 

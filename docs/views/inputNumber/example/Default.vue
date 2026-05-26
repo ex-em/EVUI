@@ -33,19 +33,29 @@
       {{ inputNumber3 }}
     </div>
   </div>
-  <div class="case">
-    <p class="case-title">Step Strictly</p>
-    <ev-input-number v-model="inputNumber4" :step="3" :min="2" :max="10" step-strictly />
+    <div class="case">
+    <p class="case-title">Clamp On Step</p>
+    <ev-input-number v-model="inputNumber4" :step="4" :min="1" :max="10" clamp-on-step />
     <div class="description">
-      <span class="badge yellow"> step="3" </span>
-      <span class="badge yellow"> min="2" </span>
+      <span class="badge yellow"> step="4" </span>
       <span class="badge"> max="10" </span>
+      <span class="badge"> min="1" </span>
       {{ inputNumber4 }}
     </div>
   </div>
   <div class="case">
+    <p class="case-title">Step Strictly</p>
+    <ev-input-number v-model="inputNumber5" :step="3" :min="2" :max="10" step-strictly />
+    <div class="description">
+      <span class="badge yellow"> step="3" </span>
+      <span class="badge yellow"> min="2" </span>
+      <span class="badge"> max="10" </span>
+      {{ inputNumber5 }}
+    </div>
+  </div>
+  <div class="case">
     <p class="case-title">Precision</p>
-    <ev-input-number v-model="inputNumber5" :precision="3" :step="0.02" />
+    <ev-input-number v-model="inputNumber6" :precision="3" :step="0.02" />
     <div class="description">
       <span class="badge yellow"> precision="3" </span>
       <span class="badge"> step="0.02" </span>
@@ -53,7 +63,7 @@
   </div>
   <div class="case">
     <p class="case-title">Precision (trimTrailingZero)</p>
-    <ev-input-number v-model="inputNumber6" :precision="3" :step="0.02" trim-trailing-zero />
+    <ev-input-number v-model="inputNumber7" :precision="3" :step="0.02" trim-trailing-zero />
     <div class="description">
       <span class="badge yellow"> precision="3" </span>
       <span class="badge yellow"> trim-trailing-zero </span>
@@ -73,6 +83,7 @@ export default {
     const inputNumber4 = ref();
     const inputNumber5 = ref();
     const inputNumber6 = ref();
+    const inputNumber7 = ref();
     return {
       inputNumber1,
       inputNumber2,
@@ -80,6 +91,7 @@ export default {
       inputNumber4,
       inputNumber5,
       inputNumber6,
+      inputNumber7,
     };
   },
 };
