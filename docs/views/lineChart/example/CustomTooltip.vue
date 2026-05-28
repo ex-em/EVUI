@@ -16,16 +16,18 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
+    const SERIES_COUNT = 100;
+    
     const chartData = reactive({
       series: Object.fromEntries(
-        Array.from({ length: 3 }, (_, i) => {
+        Array.from({ length: SERIES_COUNT }, (_, i) => {
           const seriesId = `series${i + 1}`;
           return [seriesId, { name: `series#${i + 1}`, point: false }];
         }),
       ),
       labels: [],
       data: Object.fromEntries(
-        Array.from({ length: 3 }, (_, i) => {
+        Array.from({ length: SERIES_COUNT }, (_, i) => {
           const seriesId = `series${i + 1}`;
           return [seriesId, []];
         }),
