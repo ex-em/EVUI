@@ -215,10 +215,10 @@ const modules = {
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
     const reversedPosY = mouseY - tooltipDOMHeight - distanceMouseAndTooltip;
-    this.tooltipDOM.style.left =
-      expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
-    this.tooltipDOM.style.top =
-      expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
+    const posX = expectedPosX > maximumPosX ? reversedPosX : expectedPosX;
+    const posY = expectedPosY > maximumPosY ? reversedPosY : expectedPosY;
+    // left/top 대신 transform을 사용해 합성(compositor) 레이어에서 이동시켜 레이아웃/리페인트를 회피한다.
+    this.tooltipDOM.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
   },
 
   /**
@@ -315,6 +315,9 @@ const modules = {
 
     this.setTooltipDOMStyle(opt);
 
+    // 루프 내에서 offsetWidth를 반복 읽으면 강제 동기 레이아웃이 발생하므로 한 번만 읽는다.
+    const tooltipWidth = this.tooltipDOM.offsetWidth;
+
     let textLineCnt = 1;
     for (let ix = 0; ix < seriesList.length; ix++) {
       const gdata = seriesList[ix].data;
@@ -402,7 +405,7 @@ const modules = {
           ? opt.fontColor.value(curTooltipInfo)
           : (opt.fontColor.value ?? opt.fontColor);
       ctx.textAlign = 'right';
-      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(valueText, tooltipWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
 
@@ -463,6 +466,8 @@ const modules = {
 
     this.setTooltipDOMStyle(opt);
 
+    const tooltipWidth = this.tooltipDOM.offsetWidth;
+
     // draw tooltip contents (series, value combination)
     ctx.save();
     ctx.scale(this.pixelRatio, this.pixelRatio);
@@ -519,7 +524,7 @@ const modules = {
       typeof opt.fontColor.value === 'function'
         ? opt.fontColor.value(curTooltipInfo)
         : (opt.fontColor.value ?? opt.fontColor);
-    ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+    ctx.fillText(valueText, tooltipWidth - boxPadding.r, itemY);
     ctx.closePath();
   },
 
@@ -590,6 +595,9 @@ const modules = {
     }
 
     this.setTooltipDOMStyle(opt);
+
+    // 루프 내에서 offsetWidth를 반복 읽으면 강제 동기 레이아웃이 발생하므로 한 번만 읽는다.
+    const tooltipWidth = this.tooltipDOM.offsetWidth;
 
     let textLineCnt = 1;
     for (let ix = 0; ix < seriesList.length; ix++) {
@@ -678,7 +686,7 @@ const modules = {
         typeof opt.fontColor.value === 'function'
           ? opt.fontColor.value(curTooltipInfo)
           : (opt.fontColor.value ?? opt.fontColor);
-      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(valueText, tooltipWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
 
@@ -716,10 +724,9 @@ const modules = {
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
     const reversedPosY = mouseY - tooltipDOMSize?.height - distanceMouseAndTooltip;
-    this.tooltipDOM.style.left =
-      expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
-    this.tooltipDOM.style.top =
-      expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
+    const posX = expectedPosX > maximumPosX ? reversedPosX : expectedPosX;
+    const posY = expectedPosY > maximumPosY ? reversedPosY : expectedPosY;
+    this.tooltipDOM.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
   },
 
   /**
@@ -909,7 +916,7 @@ const modules = {
     const fromTime = +this.data.labels?.[0];
     const toTime = +this.data.labels?.[this.data.labels.length - 1];
     const [clientX, clientY] = mousePosition;
-    const { top, bottom, left, right } = this.chartDOM.getBoundingClientRect();
+    const { top, bottom, left, right } = this.getChartDOMClientRect();
 
     const isHoveredChart = inRange(clientX, left, right) && inRange(clientY, bottom, top);
     if (isHoveredChart) {
@@ -981,7 +988,7 @@ const modules = {
     }
 
     const { horizontal } = this.options;
-    const rect = this.chartDOM.getBoundingClientRect();
+    const rect = this.getChartDOMClientRect();
     const [mouseX, mouseY] = mousePosition;
     const isHoveredChart =
       inRange(mouseX, rect.left, rect.right) && inRange(mouseY, rect.bottom, rect.top);
