@@ -736,31 +736,42 @@ const modules = {
    */
   drawCustomTooltip(hitInfoItems) {
     const opt = this.options?.tooltip;
-    if (opt.formatter?.html) {
-      this.tooltipDOM.innerHTML = '';
+    if (!opt?.formatter?.html) return;
 
-      const seriesList = [];
-      Object.keys(hitInfoItems).forEach((sId) => {
-        seriesList.push({
-          sId,
-          data: hitInfoItems[sId].data,
-          color: hitInfoItems[sId].color,
-          name: hitInfoItems[sId].name,
-          dataId: hitInfoItems[sId].id,
-          index: hitInfoItems[sId].index,
-        });
-      });
+    const itemsCount = Object.keys(hitInfoItems).length;
 
-      const userCustomTooltipBody = Util.htmlToElement(opt?.formatter?.html(seriesList));
-      if (userCustomTooltipBody) {
-        this.tooltipDOM.appendChild(userCustomTooltipBody);
-      }
-
-      this.tooltipDOM.style.overflowY = 'hidden';
-      this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
-      this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
-      this.tooltipDOM.style.color = opt.fontColor?.title ?? opt.fontColor;
+    // 가상 스크롤 경로 (자동/명시 활성 + 휴리스틱 성공 시)
+    if (this._shouldVirtualizeCustomTooltip?.(itemsCount)) {
+      const ok = this.drawCustomTooltipVirtual(hitInfoItems);
+      if (ok) return;
+      // 휴리스틱 실패 시 기존 경로로 fallback
     }
+
+    // 기존 경로 (전체 부착)
+    this._teardownCustomTooltipVirtualScroll?.();
+    this.tooltipDOM.innerHTML = '';
+
+    const seriesList = [];
+    Object.keys(hitInfoItems).forEach((sId) => {
+      seriesList.push({
+        sId,
+        data: hitInfoItems[sId].data,
+        color: hitInfoItems[sId].color,
+        name: hitInfoItems[sId].name,
+        dataId: hitInfoItems[sId].id,
+        index: hitInfoItems[sId].index,
+      });
+    });
+
+    const userCustomTooltipBody = Util.htmlToElement(opt.formatter.html(seriesList));
+    if (userCustomTooltipBody) {
+      this.tooltipDOM.appendChild(userCustomTooltipBody);
+    }
+
+    this.tooltipDOM.style.overflowY = 'hidden';
+    this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
+    this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
+    this.tooltipDOM.style.color = opt.fontColor?.title ?? opt.fontColor;
   },
 
   /**
@@ -1103,6 +1114,7 @@ const modules = {
   },
 
   tooltipDestroy() {
+    this._teardownCustomTooltipVirtualScroll?.();
     if (this.tooltipDOM) {
       this.tooltipDOM.remove();
       this.tooltipDOM = null;

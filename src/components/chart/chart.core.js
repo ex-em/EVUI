@@ -12,6 +12,7 @@ import GradientLegend from './plugins/plugins.legend.gradient';
 import Scrollbar from './plugins/plugins.scrollbar';
 import Interaction from './plugins/plugins.interaction';
 import Tooltip from './plugins/plugins.tooltip';
+import TooltipVirtualScroll from './plugins/plugins.tooltip.virtualScroll';
 import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 
@@ -29,6 +30,7 @@ class EvChart {
 
     if (!options.brush) {
       Object.assign(this, Tooltip);
+      Object.assign(this, TooltipVirtualScroll);
       Object.assign(this, Interaction);
       Object.assign(this, Tip);
       Object.assign(this, Legend);

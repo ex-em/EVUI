@@ -111,6 +111,14 @@ const DEFAULT_OPTIONS = {
       left: 16,
     },
     showHeader: true,
+    // 시리즈가 많을 때(html formatter 한정) 가상 스크롤로 보이는 행만 라이브 DOM에 부착하여
+    // 레이아웃/페인트 비용을 O(N) → O(viewport)로 줄인다.
+    virtualScroll: {
+      use: 'auto', // 'auto' | true | false. 'auto'면 시리즈 수 >= threshold일 때 자동 활성
+      threshold: 50,
+      estimatedRowHeight: 28,
+      overscan: 5,
+    },
   },
   indicator: {
     use: true,
