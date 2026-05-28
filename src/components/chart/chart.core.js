@@ -743,6 +743,42 @@ class EvChart {
   }
 
   /**
+   * Viewport 기준 overlayCanvas 위치/크기를 캐시해 반환한다.
+   * mousemove마다 getBoundingClientRect를 호출하면 강제 동기 레이아웃이 발생하므로
+   * resize/render/scroll/mouseleave 시점에만 무효화한다.
+   *
+   * @returns {DOMRect|undefined} cached overlay client rect
+   */
+  getOverlayClientRect() {
+    if (!this.cachedOverlayRect && this.overlayCanvas) {
+      this.cachedOverlayRect = this.overlayCanvas.getBoundingClientRect();
+    }
+    return this.cachedOverlayRect;
+  }
+
+  /**
+   * Viewport 기준 chartDOM 위치/크기를 캐시해 반환한다. (indicator sync 경로용)
+   *
+   * @returns {DOMRect|undefined} cached chartDOM client rect
+   */
+  getChartDOMClientRect() {
+    if (!this.cachedChartDOMRect && this.chartDOM) {
+      this.cachedChartDOMRect = this.chartDOM.getBoundingClientRect();
+    }
+    return this.cachedChartDOMRect;
+  }
+
+  /**
+   * 캐시된 client rect를 무효화한다.
+   *
+   * @returns {undefined}
+   */
+  invalidateClientRectCache() {
+    this.cachedOverlayRect = null;
+    this.cachedChartDOMRect = null;
+  }
+
+  /**
    * Calculate chart size
    * @typedef {import('./model/index').ChartRect} ChartRect
    *
@@ -1175,6 +1211,7 @@ class EvChart {
    * @returns {undefined}
    */
   resize(promiseRes) {
+    this.invalidateClientRectCache();
     this.clear();
     this.bufferCtx.restore();
     this.bufferCtx.save();
@@ -1205,6 +1242,7 @@ class EvChart {
    */
   render(hitInfo) {
     if (this.isInit) {
+      this.invalidateClientRectCache();
       this.clear();
       this.chartRect = this.getChartRect();
       this.drawChart(hitInfo);
@@ -1430,6 +1468,9 @@ class EvChart {
       this.overlayCanvas.removeEventListener('mousedown', this.onMouseDown);
       this.overlayCanvas.removeEventListener('wheel', this.onWheel);
       window.removeEventListener('click', this.dragTouchSelectionEvent);
+      if (this.invalidateRectOnScroll) {
+        window.removeEventListener('scroll', this.invalidateRectOnScroll, { capture: true });
+      }
     }
 
     if (this.isInitTooltip) {

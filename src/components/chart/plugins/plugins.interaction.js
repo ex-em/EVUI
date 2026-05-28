@@ -157,6 +157,9 @@ const modules = {
 
         this.tooltipClear();
       }
+
+      // 다음 hover 시작 시 레이아웃 변화를 반영하도록 캐시를 무효화한다.
+      this.invalidateClientRectCache();
       this.listeners['mouse-leave']();
     };
 
@@ -540,6 +543,14 @@ const modules = {
 
     this.dragTouchSelectionEvent = (e) => this.dragTouchSelectionDestroy(e);
     window.addEventListener('click', this.dragTouchSelectionEvent);
+
+    // 스크롤 시 viewport 기준 위치가 바뀌므로 캐시된 client rect를 무효화한다.
+    // scroll 이벤트는 버블링하지 않으므로 capture 단계로 모든 스크롤 컨테이너를 감지한다.
+    this.invalidateRectOnScroll = () => this.invalidateClientRectCache();
+    window.addEventListener('scroll', this.invalidateRectOnScroll, {
+      capture: true,
+      passive: true,
+    });
   },
 
   /**
@@ -745,7 +756,7 @@ const modules = {
    */
   getMousePosition(evt) {
     const e = evt.originalEvent || evt;
-    const rect = this.overlayCanvas.getBoundingClientRect();
+    const rect = this.getOverlayClientRect();
     return [e.clientX - rect.left, e.clientY - rect.top, rect.width, rect.height];
   },
 

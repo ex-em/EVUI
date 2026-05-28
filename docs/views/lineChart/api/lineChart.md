@@ -302,7 +302,7 @@ const chartData =
 | borderColor         | Hex, RGB, RGBA Code(String) | '#666666'                                  | tooltip 테두리 색상                                     |                                                                     |
 | useShadow           | Boolean                     | false                                      | 그림자 사용 여부                                        |                                                                     |
 | shadowOpacity       | Number                      | 0.25                                       | 그림자 투명도                                           |                                                                     |
-| throttledMove       | Boolean                     | false                                      | 데이터 조회 Throttling 처리 유무                        |                                                                     |
+| throttledMove       | Boolean                     | true                                       | 데이터 조회 Throttling 처리 유무                        |                                                                     |
 | debouncedHide       | Boolean                     | false                                      | 좌표 이동 시 tooltip hide 여부                          |                                                                     |
 | sortByValue         | Boolean                     | true                                       | 값을 기준으로 정렬할지의 여부                           |                                                                     |
 | useScrollbar        | Boolean                     | false                                      | 스크롤바 사용 여부                                      |                                                                     |
