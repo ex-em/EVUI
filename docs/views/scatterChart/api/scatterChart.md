@@ -277,6 +277,7 @@ const chartData =
 | showAllValueInRange | Boolean                     | false     | 동일한 axes값을 가진 전체 series를 Tooltip에 표시 |
 | formatter           | function / Object           | null      | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용      | (아래 코드 참고)                                                          |
 | returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
+| virtualScroll       | Object                      | { use: 'auto', threshold: 50, estimatedRowHeight: 28, overscan: 5 } | `formatter.html` 사용 시 가상 스크롤로 보이는 행만 라이브 DOM에 부착. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 부여하면 안정적으로 활성화됨 | use: 'auto' \| true \| false |
 
 ```ts
 const chartOptions = {

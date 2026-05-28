@@ -41,6 +41,8 @@ export default {
         result += `<div class="ev-chart-tooltip-custom__header"> ${dayjs(seriesList?.[0]?.data?.x).format('mm:ss')}</div>`;
         result += '<div class="ev-chart-tooltip-custom__body">';
         seriesList.forEach((series) => {
+          // 가상 스크롤(자동 활성)을 위해 시리즈당 wrapper에 data-evui-tooltip-row 마커를 부여한다.
+          result += '<div data-evui-tooltip-row>';
           result += '<br/>';
           result += '<div class="row">';
           result += `<div class="color-circle" style="background-color: ${series.color}"></div>`;
@@ -51,6 +53,7 @@ export default {
           result += `<div class="color-circle" style="background-color: ${series.color}"></div>`;
           result += '<div class="series-name">전체 합계 </div>';
           result += `<div class="value">${chartData.data[series?.sId].reduce((a, b) => a + b, 0)}</div>`;
+          result += '</div>';
           result += '</div>';
         });
 
