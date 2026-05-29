@@ -3,6 +3,21 @@ import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
 
+// Canvas.drawPoint 의 switch 에서 default 분기 (원/circle) 로 떨어지는 스타일은
+// 모든 점을 단일 path 에 합쳐 fill/stroke 1회로 그릴 수 있다.
+// 그 외 스타일은 도형별 closePath 처리가 달라 batching 대상에서 제외한다.
+const NON_CIRCLE_POINT_STYLES = new Set([
+  'triangle',
+  'rect',
+  'rectRounded',
+  'rectRot',
+  'cross',
+  'crossRot',
+  'star',
+  'line',
+]);
+const TWO_PI = Math.PI * 2;
+
 class Line {
   constructor(sId, opt, sIdx) {
     const merged = defaultsDeep({}, opt, LINE_OPTION);
@@ -305,25 +320,112 @@ class Line {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
-      const isLinearSingle =
-        this.interpolation === 'linear' && this.data.filter((item) => item.o !== null).length === 1;
 
-      this.data.forEach((curr, ix) => {
-        if (curr.xp === null || curr.yp === null || curr.o === null) {
-          return;
+      // isLinearSingle: 전체 filter 대신 2개 발견 시점에 즉시 종료.
+      let isLinearSingle = false;
+      if (this.interpolation === 'linear') {
+        let nonNullCount = 0;
+        for (let i = 0; i < this.data.length; i++) {
+          if (this.data[i].o !== null) {
+            nonNullCount++;
+            if (nonNullCount > 1) break;
+          }
         }
+        isLinearSingle = nonNullCount === 1;
+      }
 
-        const prevData = this.data[ix - 1]?.o;
-        const nextData = this.data[ix + 1]?.o;
+      // includes(O(n)) → Set(O(1))
+      const selectedLabelIndexSet = selectedLabelIndexList.length
+        ? new Set(selectedLabelIndexList)
+        : null;
 
-        const isSingle =
-          (!isLinearInterpolation && isNil(prevData) && isNil(nextData)) || isLinearSingle;
-        const isSelectedLabel = selectedLabelIndexList.includes(ix);
-        if (this.point || isSingle || isSelectedLabel) {
-          ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
-          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
+      const pointSize = this.pointSize;
+      const pointStyle = this.pointStyle;
+      const data = this.data;
+      const dataLen = data.length;
+      // 다수 series × 다수 point 환경에서 점마다 beginPath/fill/stroke 를 호출하면
+      // 캔버스 rasterizer flush 가 수만 회 발생한다. circle 스타일(default)일 때는
+      // 모든 점을 단일 path 에 모아 fill/stroke 를 1회만 호출하도록 batching 한다.
+      const canBatch = !NON_CIRCLE_POINT_STYLES.has(pointStyle);
+
+      if (canBatch) {
+        let blurPathOpen = false;
+        let focusPoints = null;
+
+        for (let ix = 0; ix < dataLen; ix++) {
+          const curr = data[ix];
+          if (curr.xp !== null && curr.yp !== null && curr.o !== null) {
+            let isSingle;
+            if (isLinearSingle) {
+              isSingle = true;
+            } else if (!isLinearInterpolation) {
+              const prevO = ix > 0 ? data[ix - 1].o : null;
+              const nextO = ix + 1 < dataLen ? data[ix + 1].o : null;
+              isSingle = prevO == null && nextO == null;
+            } else {
+              isSingle = false;
+            }
+
+            const isSelectedLabel = selectedLabelIndexSet
+              ? selectedLabelIndexSet.has(ix)
+              : false;
+            if (this.point || isSingle || isSelectedLabel) {
+              if (isSelectedLabel && !legendHitInfo) {
+                if (focusPoints === null) focusPoints = [];
+                focusPoints.push(curr);
+              } else {
+                if (!blurPathOpen) {
+                  ctx.beginPath();
+                  blurPathOpen = true;
+                }
+                // arc 직전 moveTo 로 sub-path 를 분리해 점 사이 line 연결을 막는다.
+                ctx.moveTo(curr.xp + pointSize, curr.yp);
+                ctx.arc(curr.xp, curr.yp, pointSize, 0, TWO_PI);
+              }
+            }
+          }
         }
-      });
+        if (blurPathOpen) {
+          ctx.fillStyle = blurStyle;
+          ctx.fill();
+          ctx.stroke();
+        }
+        if (focusPoints !== null) {
+          ctx.beginPath();
+          for (let i = 0; i < focusPoints.length; i++) {
+            const p = focusPoints[i];
+            ctx.moveTo(p.xp + pointSize, p.yp);
+            ctx.arc(p.xp, p.yp, pointSize, 0, TWO_PI);
+          }
+          ctx.fillStyle = focusStyle;
+          ctx.fill();
+          ctx.stroke();
+        }
+      } else {
+        for (let ix = 0; ix < dataLen; ix++) {
+          const curr = data[ix];
+          if (curr.xp !== null && curr.yp !== null && curr.o !== null) {
+            let isSingle;
+            if (isLinearSingle) {
+              isSingle = true;
+            } else if (!isLinearInterpolation) {
+              const prevO = ix > 0 ? data[ix - 1].o : null;
+              const nextO = ix + 1 < dataLen ? data[ix + 1].o : null;
+              isSingle = prevO == null && nextO == null;
+            } else {
+              isSingle = false;
+            }
+
+            const isSelectedLabel = selectedLabelIndexSet
+              ? selectedLabelIndexSet.has(ix)
+              : false;
+            if (this.point || isSingle || isSelectedLabel) {
+              ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
+              Canvas.drawPoint(ctx, pointStyle, pointSize, curr.xp, curr.yp);
+            }
+          }
+        }
+      }
     }
 
     ctx.restore();
