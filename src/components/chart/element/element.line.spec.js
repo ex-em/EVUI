@@ -119,6 +119,108 @@ describe('Chart Interpolation', () => {
     });
   });
 
+  describe('axis range 밖 데이터 — clamp 회귀 방지', () => {
+    // commit 2a1c2d0c 가 도입한 getXPos/getYPos 의 Math.min/max clamp 가 다시 들어오면
+    // range 밖 포인트가 차트 edge 에 그려지고 hover/maxTip 에 잡혀 회귀가 발생한다.
+    // axis range 밖 데이터는 xp/yp = null 이 되어 시각 표시·hit 판정에서 모두 제외돼야 한다.
+    const makeStubCtx = () => ({
+      calls: [],
+      beginPath() { this.calls.push(['beginPath']); },
+      save() {},
+      restore() {},
+      stroke() {},
+      fill() {},
+      closePath() {},
+      setLineDash() {},
+      moveTo(x, y) { this.calls.push(['moveTo', x, y]); },
+      lineTo(x, y) { this.calls.push(['lineTo', x, y]); },
+      arc() {},
+      arcTo() {},
+      fillRect() {},
+      strokeRect() {},
+      rect() {},
+      clip() {},
+      createLinearGradient: () => ({ addColorStop() {} }),
+      measureText: () => ({ width: 0 }),
+      strokeStyle: '',
+      fillStyle: '',
+      lineJoin: '',
+      lineWidth: 1,
+    });
+
+    const drawWithRange = (data, { xMin = 0, xMax = 100, yMin = 0, yMax = 100 } = {}) => {
+      const line = new Line('series', { interpolation: 'none' }, 0);
+      line.show = true;
+      line.pointSize = 3;
+      line.data = data.map((d) => ({ ...d, o: d.o ?? d.y }));
+      const ctx = makeStubCtx();
+      line.draw({
+        ctx,
+        chartRect: { x1: 0, x2: 200, y1: 0, y2: 200, chartWidth: 200, chartHeight: 200 },
+        labelOffset: { top: 0, bottom: 0, left: 0, right: 0 },
+        axesSteps: {
+          x: [{ graphMin: xMin, graphMax: xMax }],
+          y: [{ graphMin: yMin, graphMax: yMax }],
+        },
+      });
+      return { line, ctx };
+    };
+
+    it('X 가 graphMax 를 초과하는 데이터는 xp=null 로 세팅되어 hit 후보에서 제외된다', () => {
+      const { line } = drawWithRange([
+        { x: 10, y: 50 },
+        { x: 50, y: 50 },
+        { x: 200, y: 50 }, // graphMax(100) 초과
+      ]);
+      expect(line.data[0].xp).not.toBe(null);
+      expect(line.data[1].xp).not.toBe(null);
+      // X 가 range 밖이면 xp 가 null 이어야 함 — 이 한 값만 null 이어도 draw/hit 가드(`xp === null`)에 걸려 제외된다.
+      expect(line.data[2].xp).toBe(null);
+    });
+
+    it('X 가 graphMin 미만인 데이터는 xp=null 로 세팅된다', () => {
+      const { line } = drawWithRange([
+        { x: -10, y: 50 }, // graphMin(0) 미만
+        { x: 50, y: 50 },
+      ]);
+      expect(line.data[0].xp).toBe(null);
+      expect(line.data[1].xp).not.toBe(null);
+    });
+
+    it('Y 가 graphMax 를 초과하는 데이터는 yp=null 로 세팅된다 (clamp 미적용)', () => {
+      const { line } = drawWithRange([
+        { x: 10, y: 50 },
+        { x: 50, y: 500 }, // graphMax(100) 초과
+      ]);
+      expect(line.data[1].yp).toBe(null);
+    });
+
+    it('range 밖 포인트에서 ctx.moveTo/lineTo 가 null 좌표로 호출되지 않는다', () => {
+      const { ctx } = drawWithRange([
+        { x: 10, y: 50 },
+        { x: 200, y: 50 }, // out of range
+        { x: 90, y: 50 },
+      ]);
+      const pathCalls = ctx.calls.filter(([op]) => op === 'moveTo' || op === 'lineTo');
+      for (const [, x, y] of pathCalls) {
+        expect(x).not.toBe(null);
+        expect(y).not.toBe(null);
+      }
+    });
+
+    it('range 밖에서 라인이 끊기고 in-range 재진입 시 moveTo 로 다시 시작한다', () => {
+      const { ctx } = drawWithRange([
+        { x: 10, y: 50 },
+        { x: 200, y: 50 }, // out of range — 라인 끊김
+        { x: 90, y: 50 },
+      ]);
+      const moveLineOps = ctx.calls.filter(([op]) => op === 'moveTo' || op === 'lineTo');
+      // 첫 in-range 포인트 → moveTo, range 밖 skip, 그 다음 in-range 포인트는 prevValid=undefined 라 다시 moveTo.
+      expect(moveLineOps[0][0]).toBe('moveTo');
+      expect(moveLineOps[1][0]).toBe('moveTo');
+    });
+  });
+
   describe('findGraphData — null 데이터 위 dataIndex 호출 (onClick 경로)', () => {
     // FillWithNull.vue 데이터 모사. onClick 은 useSelectLabelOrItem=false 로 호출.
     const makeSeries1 = () => {
