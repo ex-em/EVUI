@@ -4,6 +4,29 @@ import debounce from '@/common/utils.debounce';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
+const clampRatio = r => (Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : 1);
+
+/**
+ * 스케일 범위(step) 대비 데이터 범위(range)의 픽셀 경계를 계산한다.
+ * @param {object} step   axesSteps 항목 ({ graphMin, graphMax })
+ * @param {object} range  axesRange 항목 ({ min, max })
+ * @param {number} start  축 시작 픽셀 (X: graphPos.x1 / Y(반전): graphPos.y2)
+ * @param {number} size   축 픽셀 크기 (graphPos.x2 - x1 또는 y2 - y1)
+ * @param {boolean} inverted Y축처럼 값이 커질수록 픽셀이 감소하는 경우 true
+ * @returns {[number, number] | null} [boundMin, boundMax] 또는 계산 불가 시 null
+ */
+const calcDomainBounds = (step, range, start, size, inverted) => {
+  const span = step?.graphMax - step?.graphMin;
+  if (!range || !Number.isFinite(span) || span <= 0) return null;
+  const r0 = clampRatio((range.min - step.graphMin) / span);
+  const r1 = clampRatio((range.max - step.graphMin) / span);
+  const minRatio = Math.min(r0, r1);
+  const maxRatio = Math.max(r0, r1);
+  return inverted
+    ? [Math.floor(start - size * maxRatio), Math.ceil(start - size * minRatio)]
+    : [Math.ceil(start + size * minRatio), Math.ceil(start + size * maxRatio)];
+};
+
 const LINE_SPACING = 8;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
@@ -816,16 +839,42 @@ const modules = {
       y1: this.chartRect.y1 + this.labelOffset.top,
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
-    const mouseXIp = 15; // mouseInterpolation - 더 넓은 범위에서 감지
-    const mouseYIp = 15; // Y축도 동일하게 증가
+    
+    const EDGE_TOLERANCE = 15; // mouse interpolation 더 넓은 범위에서 감지
     const options = this.options;
 
-    if (
-      offsetX >= graphPos.x1 - mouseXIp &&
-      offsetX <= graphPos.x2 + mouseXIp &&
-      offsetY >= graphPos.y1 - mouseYIp &&
-      offsetY <= graphPos.y2 + mouseYIp
-    ) {
+    // 스케일 확장 영역(데이터 없는 구간)에 인디케이터가 그려지지 않도록
+    // 도메인 축은 실제 데이터 범위로 좁힌다.
+    let xMin = graphPos.x1;
+    let xMax = graphPos.x2;
+    let yMin = graphPos.y1;
+    let yMax = graphPos.y2;
+
+    if (options.horizontal) {
+      const bounds = calcDomainBounds(
+        this.axesSteps?.y?.[0], this.axesRange?.y?.[0],
+        graphPos.y2, graphPos.y2 - graphPos.y1, true,
+      );
+      if (bounds) {
+        [yMin, yMax] = bounds;
+      }
+    } else {
+      const bounds = calcDomainBounds(
+        this.axesSteps?.x?.[0], this.axesRange?.x?.[0],
+        graphPos.x1, graphPos.x2 - graphPos.x1, false,
+      );
+      if (bounds) {
+        [xMin, xMax] = bounds;
+      }
+    }
+
+    // 도메인 축: 정확한 데이터 범위 / 비도메인 축: 차트 경계 ± tolerance
+    const hitXMin = options.horizontal ? graphPos.x1 - EDGE_TOLERANCE : xMin;
+    const hitXMax = options.horizontal ? graphPos.x2 + EDGE_TOLERANCE : xMax;
+    const hitYMin = options.horizontal ? yMin : graphPos.y1 - EDGE_TOLERANCE;
+    const hitYMax = options.horizontal ? yMax : graphPos.y2 + EDGE_TOLERANCE;
+
+    if (offsetX >= hitXMin && offsetX <= hitXMax && offsetY >= hitYMin && offsetY <= hitYMax) {
       ctx.beginPath();
       ctx.save();
       ctx.strokeStyle = color;
@@ -1104,4 +1153,5 @@ const modules = {
   },
 };
 
+export { calcDomainBounds };
 export default modules;
