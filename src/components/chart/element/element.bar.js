@@ -146,12 +146,8 @@ class Bar {
         // 너비 / 높이 계산, 스택의 경우 위치 값 재계산
         if (isHorizontal) {
           const barValue = item.b ? item.o : item.x;
-          const _barValue = Math.min(
-            Math.max(barValue, minmaxX.graphMin),
-            minmaxX.graphMax
-          );
           w = Canvas.calculateX(
-            _barValue,
+            barValue,
             minmaxX.graphMin,
             minmaxX.graphMax,
             xArea,
@@ -159,13 +155,8 @@ class Bar {
           );
 
           if (item.b) {
-            const _baseValue = Math.min(
-              Math.max(item.b, minmaxX.graphMin),
-              minmaxX.graphMax
-            );
-
             x = Canvas.calculateX(
-              _baseValue,
+              item.b,
               minmaxX.graphMin,
               minmaxX.graphMax,
               xArea,
@@ -174,15 +165,12 @@ class Bar {
           }
 
           const minimumBarWidth = barValue > 0 ? -1 : 1;
-          w = barValue && Math.abs(w) === 0 ? minimumBarWidth : w;
+          // w === null 은 axis range 밖이라는 신호이므로 minimumBarWidth 보정에서 제외한다.
+          w = barValue && w !== null && Math.abs(w) === 0 ? minimumBarWidth : w;
         } else {
           const barValue = item.b ? item.o : item.y;
-          const _barValue = Math.min(
-            Math.max(barValue, minmaxY.graphMin),
-            minmaxY.graphMax
-          );
           h = Canvas.calculateY(
-            _barValue,
+            barValue,
             minmaxY.graphMin,
             minmaxY.graphMax,
             yArea,
@@ -190,12 +178,8 @@ class Bar {
           );
 
           if (item.b) {
-            const _baseValue = Math.min(
-              Math.max(item.b, minmaxY.graphMin),
-              minmaxY.graphMax
-            );
             y = Canvas.calculateY(
-              _baseValue,
+              item.b,
               minmaxY.graphMin,
               minmaxY.graphMax,
               yArea,
@@ -204,7 +188,8 @@ class Bar {
           }
 
           const minimumBarHeight = barValue > 0 ? -1 : 1;
-          h = barValue && Math.abs(h) === 0 ? minimumBarHeight : h;
+          // h === null 은 axis range 밖이라는 신호이므로 minimumBarHeight 보정에서 제외한다.
+          h = barValue && h !== null && Math.abs(h) === 0 ? minimumBarHeight : h;
         }
 
         const barColor = item.dataColor || this.color;

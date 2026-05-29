@@ -89,3 +89,30 @@ describe('element.tip calculateTipInfo — sel 분기 label 우선 동작', () =
     expect(result.value).toBe(50);
   });
 });
+
+describe('element.tip calculateTipInfo — axis range 밖 maxDomain', () => {
+  // maxDomain 이 graphMax 를 초과하면 Canvas.calculateX 가 null 을 반환 → dp=null.
+  // drawTips 의 호출부 가드(dp !== null) 가 빠지면 drawTextTip 이 null 을 0 으로 강제 변환해
+  // maxTip 이 좌상단에 찍히는 회귀가 발생한다.
+  it('maxDomain 이 graphMax 초과 → dp 는 null 로 반환된다', () => {
+    const ctx = createCtx();
+    const series = buildSeries({ minMax: { maxDomain: 9999, maxDomainIndex: 0, maxX: 10, maxY: 100 } });
+    const result = ctx.calculateTipInfo(series, 'max', null);
+    expect(result.dp).toBe(null);
+  });
+
+  it('maxDomain 이 graphMin 미만 → dp 는 null 로 반환된다', () => {
+    const ctx = createCtx();
+    const series = buildSeries({ minMax: { maxDomain: -1, maxDomainIndex: 0, maxX: 10, maxY: 100 } });
+    const result = ctx.calculateTipInfo(series, 'max', null);
+    expect(result.dp).toBe(null);
+  });
+
+  it('range 안 maxDomain 은 dp 가 valid 한 수치로 반환된다', () => {
+    const ctx = createCtx();
+    const series = buildSeries({ minMax: { maxDomain: 5, maxDomainIndex: 0, maxX: 10, maxY: 100 } });
+    const result = ctx.calculateTipInfo(series, 'max', null);
+    expect(typeof result.dp).toBe('number');
+    expect(result.dp).not.toBe(null);
+  });
+});
