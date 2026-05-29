@@ -24,13 +24,14 @@ const calcDomainBounds = (step, range, start, size, inverted) => {
   const maxRatio = Math.max(r0, r1);
   return inverted
     ? [Math.floor(start - size * maxRatio), Math.ceil(start - size * minRatio)]
-    : [Math.ceil(start + size * minRatio), Math.ceil(start + size * maxRatio)];
+    : [Math.floor(start + size * minRatio), Math.ceil(start + size * maxRatio)];
 };
 
 const LINE_SPACING = 8;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
 const BODY_PADDING = 8;
+const EDGE_TOLERANCE = 15; // mouse interpolation 더 넓은 범위에서 감지
 
 const modules = {
   /**
@@ -823,6 +824,63 @@ const modules = {
     });
   },
 
+  updateIndicatorHitBounds() {
+    const options = this.options;
+    const x1 = this.chartRect.x1 + this.labelOffset.left;
+    const x2 = this.chartRect.x2 - this.labelOffset.right;
+    const y1 = this.chartRect.y1 + this.labelOffset.top;
+    const y2 = this.chartRect.y2 - this.labelOffset.bottom;
+
+    let xMin = x1;
+    let xMax = x2;
+    let yMin = y1;
+    let yMax = y2;
+
+    if (options.horizontal) {
+      const ySteps = this.axesSteps?.y || [];
+      for (let i = 0; i < ySteps.length; i += 1) {
+        const bounds = calcDomainBounds(
+          ySteps[i],
+          this.axesRange?.y?.[i],
+          y2,
+          y2 - y1,
+          true,
+        );
+        if (bounds) {
+          yMin = Math.min(yMin, bounds[0]);
+          yMax = Math.max(yMax, bounds[1]);
+        }
+      }
+    } else {
+      const xSteps = this.axesSteps?.x || [];
+      for (let i = 0; i < xSteps.length; i += 1) {
+        const bounds = calcDomainBounds(
+          xSteps[i],
+          this.axesRange?.x?.[i],
+          x1,
+          x2 - x1,
+          false,
+        );
+        if (bounds) {
+          xMin = Math.min(xMin, bounds[0]);
+          xMax = Math.max(xMax, bounds[1]);
+        }
+      }
+    }
+
+    this._indicatorHitBounds = {
+      horizontal: !!options.horizontal,
+      x1,
+      x2,
+      y1,
+      y2,
+      hitXMin: options.horizontal ? x1 - EDGE_TOLERANCE : xMin,
+      hitXMax: options.horizontal ? x2 + EDGE_TOLERANCE : xMax,
+      hitYMin: options.horizontal ? yMin : y1 - EDGE_TOLERANCE,
+      hitYMax: options.horizontal ? yMax : y2 + EDGE_TOLERANCE,
+    };
+  },
+
   /**
    * Draw chart indicator with mousemove
    * @param {object} offset    mousemove callback
@@ -833,48 +891,20 @@ const modules = {
   drawIndicator(offset, color) {
     const ctx = this.overlayCtx;
     const [offsetX, offsetY] = offset;
-    const graphPos = {
-      x1: this.chartRect.x1 + this.labelOffset.left,
-      x2: this.chartRect.x2 - this.labelOffset.right,
-      y1: this.chartRect.y1 + this.labelOffset.top,
-      y2: this.chartRect.y2 - this.labelOffset.bottom,
-    };
-    
-    const EDGE_TOLERANCE = 15; // mouse interpolation 더 넓은 범위에서 감지
     const options = this.options;
+    let bounds = this._indicatorHitBounds;
 
-    // 스케일 확장 영역(데이터 없는 구간)에 인디케이터가 그려지지 않도록
-    // 도메인 축은 실제 데이터 범위로 좁힌다.
-    let xMin = graphPos.x1;
-    let xMax = graphPos.x2;
-    let yMin = graphPos.y1;
-    let yMax = graphPos.y2;
-
-    if (options.horizontal) {
-      const bounds = calcDomainBounds(
-        this.axesSteps?.y?.[0], this.axesRange?.y?.[0],
-        graphPos.y2, graphPos.y2 - graphPos.y1, true,
-      );
-      if (bounds) {
-        [yMin, yMax] = bounds;
-      }
-    } else {
-      const bounds = calcDomainBounds(
-        this.axesSteps?.x?.[0], this.axesRange?.x?.[0],
-        graphPos.x1, graphPos.x2 - graphPos.x1, false,
-      );
-      if (bounds) {
-        [xMin, xMax] = bounds;
-      }
+    if (!bounds || bounds.horizontal !== !!options.horizontal) {
+      this.updateIndicatorHitBounds();
+      bounds = this._indicatorHitBounds;
     }
 
-    // 도메인 축: 정확한 데이터 범위 / 비도메인 축: 차트 경계 ± tolerance
-    const hitXMin = options.horizontal ? graphPos.x1 - EDGE_TOLERANCE : xMin;
-    const hitXMax = options.horizontal ? graphPos.x2 + EDGE_TOLERANCE : xMax;
-    const hitYMin = options.horizontal ? yMin : graphPos.y1 - EDGE_TOLERANCE;
-    const hitYMax = options.horizontal ? yMax : graphPos.y2 + EDGE_TOLERANCE;
-
-    if (offsetX >= hitXMin && offsetX <= hitXMax && offsetY >= hitYMin && offsetY <= hitYMax) {
+    if (
+      offsetX >= bounds.hitXMin &&
+      offsetX <= bounds.hitXMax &&
+      offsetY >= bounds.hitYMin &&
+      offsetY <= bounds.hitYMax
+    ) {
       ctx.beginPath();
       ctx.save();
       ctx.strokeStyle = color;
@@ -885,11 +915,11 @@ const modules = {
       }
 
       if (options.horizontal) {
-        ctx.moveTo(graphPos.x1, offsetY + 0.5);
-        ctx.lineTo(graphPos.x2, offsetY + 0.5);
+        ctx.moveTo(bounds.x1, offsetY + 0.5);
+        ctx.lineTo(bounds.x2, offsetY + 0.5);
       } else {
-        ctx.moveTo(offsetX + 0.5, graphPos.y1);
-        ctx.lineTo(offsetX + 0.5, graphPos.y2);
+        ctx.moveTo(offsetX + 0.5, bounds.y1);
+        ctx.lineTo(offsetX + 0.5, bounds.y2);
       }
 
       ctx.stroke();
@@ -1150,6 +1180,7 @@ const modules = {
       this.tooltipDOM = null;
     }
     this.isInitTooltip = false;
+    this._indicatorHitBounds = null;
   },
 };
 

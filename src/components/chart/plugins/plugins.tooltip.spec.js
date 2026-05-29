@@ -22,11 +22,27 @@ describe('calcDomainBounds', () => {
 
     it('비율을 정확히 계산한다', () => {
       // graphMin=0, graphMax=100, range=25~75, start=0, size=100
-      // minRatio=0.25 → ceil(0+100*0.25)=25
+      // minRatio=0.25 → floor(0+100*0.25)=25
       // maxRatio=0.75 → ceil(0+100*0.75)=75
       const [min, max] = calcDomainBounds(step(0, 100), range(25, 75), 0, 100, false);
       expect(min).toBe(25);
       expect(max).toBe(75);
+    });
+
+    it('소수점 start 값일 때 하한은 floor로 반내림된다', () => {
+      // start=0.3이면 하한: floor(0.3+0)=0, 상한: ceil(0.3+99.7)=100
+      // ceil이었다면 하한이 1이 되어 leftmost 픽셀이 히트 영역에서 제외됨
+      const [min, max] = calcDomainBounds(step(0, 100), range(0, 100), 0.3, 99.7, false);
+      expect(min).toBe(0);
+      expect(max).toBe(100);
+    });
+
+    it('range.min === range.max(단일 값)이면 동일한 픽셀 경계를 반환한다', () => {
+      // 모든 데이터가 x=50 → ratio=0.5, 결과는 [50, 50]
+      // 호출부에서 EDGE_TOLERANCE를 더해 실제 히트 영역을 확보한다
+      const [min, max] = calcDomainBounds(step(0, 100), range(50, 50), 0, 100, false);
+      expect(min).toBe(50);
+      expect(max).toBe(50);
     });
   });
 
@@ -41,6 +57,9 @@ describe('calcDomainBounds', () => {
     });
 
     it('non-inverted과 대칭 구조다', () => {
+      // inverted: [floor(start - size*maxRatio), ceil(start - size*minRatio)]
+      // non-inverted: [floor(start + size*minRatio), ceil(start + size*maxRatio)]
+      // → yMax = ceil(start - size*minRatio) = start - floor(size*minRatio) = start - xMin (start_x=0)
       const size = 200;
       const start = size; // y2 = size (y1=0 기준)
       const [yMin, yMax] = calcDomainBounds(step(0, 100), range(10, 90), start, size, true);

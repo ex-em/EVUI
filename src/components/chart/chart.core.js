@@ -337,6 +337,9 @@ class EvChart {
     this.adjustXAndYAxisWidth();
 
     this.emitAxesScaleChange();
+    if (!this.isNotUseIndicator?.() && this.options?.indicator?.use !== false) {
+      this.updateIndicatorHitBounds?.();
+    }
 
     this.drawAxis(hitInfo);
     this.drawSeries(hitInfo);
