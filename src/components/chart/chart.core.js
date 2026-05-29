@@ -418,8 +418,14 @@ class EvChart {
 
     this.adjustXAndYAxisWidth();
 
+    const scaleChange = this.computeAxesScaleChange();
+
+    if (!this.isNotUseIndicator?.() && this.options?.indicator?.use !== false) {
+      this.updateIndicatorHitBounds?.();
+    }
+
     return {
-      scaleChange: this.computeAxesScaleChange(),
+      scaleChange,
       scrollbarLabelOffset,
     };
   }
