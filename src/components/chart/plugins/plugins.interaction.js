@@ -1544,11 +1544,25 @@ const modules = {
 
     if (horizontal) {
       // 수평 차트에서는 Y축 라벨 위치에 수평선
-      const yPosition = firstItem.data.yp + (firstItem.data.h ? firstItem.data.h / 2 : 0);
+      let yPosition = firstItem.data.yp + (firstItem.data.h ? firstItem.data.h / 2 : 0);
+      if (yPosition < graphPos.y1) {
+        yPosition = graphPos.y1;
+      }
+
+      if (yPosition > graphPos.y2) {
+        yPosition = graphPos.y2;
+      }
       indicatorPosition = [graphPos.x1, yPosition];
     } else {
       // 수직 차트에서는 X축 라벨 위치에 수직선
-      const xPosition = firstItem.data.xp + (firstItem.data.w ? firstItem.data.w / 2 : 0);
+      let xPosition = firstItem.data.xp + (firstItem.data.w ? firstItem.data.w / 2 : 0);
+      if (xPosition < graphPos.x1) {
+        xPosition = graphPos.x1;
+      }
+
+      if (xPosition > graphPos.x2) {
+        xPosition = graphPos.x2;
+      }
       indicatorPosition = [xPosition, graphPos.y1];
     }
 

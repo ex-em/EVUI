@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import modules from './plugins.interaction';
 
 /**
@@ -22,6 +22,38 @@ const createChartForClosestIndex = (seriesList, opts = {}) =>
     seriesList,
     options: { horizontal: false, ...opts },
   });
+
+const createOverlayCtx = () => ({
+  beginPath: vi.fn(),
+  save: vi.fn(),
+  restore: vi.fn(),
+  closePath: vi.fn(),
+  stroke: vi.fn(),
+  setLineDash: vi.fn(),
+  moveTo: vi.fn(),
+  lineTo: vi.fn(),
+});
+
+const createIndicatorChart = (horizontal = false) => {
+  const chartRect = { x1: 0, x2: 300, y1: 0, y2: 200 };
+  const labelOffset = { left: 20, right: 20, top: 15, bottom: 20 };
+  const graphPos = {
+    x1: chartRect.x1 + labelOffset.left,
+    x2: chartRect.x2 - labelOffset.right,
+    y1: chartRect.y1 + labelOffset.top,
+    y2: chartRect.y2 - labelOffset.bottom,
+  };
+
+  return {
+    graphPos,
+    chart: Object.assign(Object.create(modules), {
+      chartRect,
+      labelOffset,
+      options: { horizontal },
+      overlayCtx: createOverlayCtx(),
+    }),
+  };
+};
 
 /**
  * findGraphData가 고정된 item을 리턴하는 mock 시리즈.
@@ -61,6 +93,52 @@ const createClosestSeries = ({
   interpolation,
   passingValue,
   hasPassingValueInData,
+});
+
+describe('plugins.interaction drawIndicatorForTooltip', () => {
+  it('수직 차트 indicator X 위치를 graph 영역 안으로 제한한다', () => {
+    const { chart, graphPos } = createIndicatorChart();
+    const hitInfo = {
+      items: {
+        series1: {
+          data: { x: 'A', xp: graphPos.x2 + 50, w: 20 },
+        },
+      },
+    };
+    const rawXPosition = hitInfo.items.series1.data.xp + hitInfo.items.series1.data.w / 2;
+
+    const result = chart.drawIndicatorForTooltip(hitInfo, '#000');
+    const drawnX = chart.overlayCtx.moveTo.mock.calls[0][0];
+    const drawnLineX = chart.overlayCtx.lineTo.mock.calls[0][0];
+
+    expect(result.position[0]).toBe(graphPos.x2);
+    expect(drawnX - 0.5).toBeLessThanOrEqual(graphPos.x2);
+    expect(drawnX).toBe(graphPos.x2 + 0.5);
+    expect(drawnLineX).toBe(graphPos.x2 + 0.5);
+    expect(drawnX).not.toBe(rawXPosition + 0.5);
+  });
+
+  it('수평 차트 indicator Y 위치를 graph 영역 안으로 제한한다', () => {
+    const { chart, graphPos } = createIndicatorChart(true);
+    const hitInfo = {
+      items: {
+        series1: {
+          data: { y: 'A', yp: graphPos.y2 + 50, h: 20 },
+        },
+      },
+    };
+    const rawYPosition = hitInfo.items.series1.data.yp + hitInfo.items.series1.data.h / 2;
+
+    const result = chart.drawIndicatorForTooltip(hitInfo, '#000');
+    const drawnY = chart.overlayCtx.moveTo.mock.calls[0][1];
+    const drawnLineY = chart.overlayCtx.lineTo.mock.calls[0][1];
+
+    expect(result.position[1]).toBe(graphPos.y2);
+    expect(drawnY - 0.5).toBeLessThanOrEqual(graphPos.y2);
+    expect(drawnY).toBe(graphPos.y2 + 0.5);
+    expect(drawnLineY).toBe(graphPos.y2 + 0.5);
+    expect(drawnY).not.toBe(rawYPosition + 0.5);
+  });
 });
 
 describe('plugins.interaction findHitItem', () => {
