@@ -30,6 +30,55 @@ class TimeCategoryScale extends Scale {
   }
 
   /**
+   * Calculate min/max value and index range for time category scale.
+   * Extends base result with minIndex/maxIndex so bar chart can restrict
+   * the rendered data range to the visible timestamp window.
+   *
+   * Empty-range sentinel: { minIndex: 0, maxIndex: -1 }
+   *   Callers must check maxIndex >= minIndex before treating minIndex as a
+   *   valid start index — minIndex: 0 with maxIndex: -1 means "no visible labels",
+   *   not "start from first label".
+   *
+   * @param {object} minMax       min/max information
+   * @param {object} scrollbarOpt scrollbar option
+   * @param {object} chartRect    chart size information
+   *
+   * @returns {object} min/max value, label, and index range
+   */
+  calculateScaleRange(minMax, scrollbarOpt, chartRect) {
+    const baseRange = super.calculateScaleRange(minMax, scrollbarOpt, chartRect);
+
+    const labels = this.labels;
+    if (!labels?.length) {
+      return { ...baseRange, minIndex: 0, maxIndex: -1 };
+    }
+
+    let minIndex = 0;
+    let maxIndex = labels.length - 1;
+
+    const { min: rangeMin, max: rangeMax } = baseRange;
+    if (Number.isFinite(rangeMin) && Number.isFinite(rangeMax)) {
+      const startIdx = labels.findIndex(ts => ts >= rangeMin);
+      let endIdx = -1;
+      for (let i = labels.length - 1; i >= 0; i -= 1) {
+        if (labels[i] <= rangeMax) {
+          endIdx = i;
+          break;
+        }
+      }
+      if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
+        minIndex = 0;
+        maxIndex = -1;
+      } else {
+        minIndex = startIdx;
+        maxIndex = endIdx;
+      }
+    }
+
+    return { ...baseRange, minIndex, maxIndex };
+  }
+
+  /**
    * Calculate interval
    * @param {object} range    range information
    *
@@ -59,7 +108,7 @@ class TimeCategoryScale extends Scale {
    * @returns {object} steps, interval, min/max graph value
    */
   calculateSteps(range) {
-    const { maxValue, minValue, maxSteps } = range;
+    const { maxValue, minValue, maxSteps, minIndex, maxIndex } = range;
     const rawInterval = this.getInterval(range);
 
     let interval = rawInterval;
@@ -99,6 +148,8 @@ class TimeCategoryScale extends Scale {
       rawInterval,
       graphMin,
       graphMax,
+      minIndex,
+      maxIndex,
     };
   }
 

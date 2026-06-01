@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AXIS_UNITS } from '../helpers/helpers.constant';
+import Scale from './scale';
 import TimeCategoryScale from './scale.time.category';
 
 const HOUR = 3600_000;
@@ -107,6 +108,105 @@ describe('TimeCategoryScale', () => {
   });
 
   // ─────────────────────────────────────────────────
+  describe('calculateScaleRange', () => {
+    const T0 = dayjs('2026-01-01 00:00:00').valueOf();
+    const labels = Array.from({ length: 10 }, (_, i) => T0 + i * HOUR);
+
+    const makeScale = () => {
+      const scale = Object.create(TimeCategoryScale.prototype);
+      scale.labels = labels;
+      scale.timeFormat = 'HH:mm';
+      scale.formatter = null;
+      scale.labelStyle = { color: '#000', fontSize: 11 };
+      return scale;
+    };
+
+    // Scale.prototype.calculateScaleRange이 실제 canvas를 사용하므로
+    // jsdom에서 실행하기 위해 spy로 minMax.min/max를 그대로 반환하는 구현으로 대체한다.
+    // TimeCategoryScale의 인덱스 계산 로직은 baseRange.min/max 기준으로 동작하므로
+    // minMax에 원하는 min/max를 직접 전달해 super 반환값을 제어한다.
+    let superSpy;
+    beforeEach(() => {
+      superSpy = vi.spyOn(Scale.prototype, 'calculateScaleRange')
+        .mockImplementation(minMax => ({
+          min: minMax?.min,
+          max: minMax?.max,
+          minLabel: '',
+          maxLabel: '',
+          size: { width: 0, height: 0 },
+        }));
+    });
+    afterEach(() => { superSpy.mockRestore(); });
+
+    it('배열 range: 해당 구간의 minIndex/maxIndex를 반환한다', () => {
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0 + 3 * HOUR, max: T0 + 7 * HOUR });
+      expect(result.minIndex).toBe(3);
+      expect(result.maxIndex).toBe(7);
+    });
+
+    it('함수형 range 등 super가 계산한 min/max 기준으로 인덱스를 찾는다', () => {
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0 + 2 * HOUR, max: T0 + 8 * HOUR });
+      expect(result.minIndex).toBe(2);
+      expect(result.maxIndex).toBe(8);
+    });
+
+    it('range가 라벨 이후 구간: maxIndex = -1 (빈 범위)', () => {
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0 + 20 * HOUR, max: T0 + 30 * HOUR });
+      expect(result.maxIndex).toBe(-1);
+    });
+
+    it('range가 라벨 이전 구간: maxIndex = -1 (빈 범위)', () => {
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0 - 10 * HOUR, max: T0 - HOUR });
+      expect(result.maxIndex).toBe(-1);
+    });
+
+    it('range가 두 라벨 사이에 끼어 교집합 없음: maxIndex = -1 (빈 범위)', () => {
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0 + 0.3 * HOUR, max: T0 + 0.7 * HOUR });
+      expect(result.maxIndex).toBe(-1);
+    });
+
+    it('라벨 경계와 정확히 일치하는 range: 전체 라벨 범위(0 ~ last)를 반환한다', () => {
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0, max: T0 + 9 * HOUR });
+      expect(result.minIndex).toBe(0);
+      expect(result.maxIndex).toBe(labels.length - 1);
+    });
+
+    it('super가 non-numeric min/max를 반환하면 전체 라벨 범위(0 ~ last) 폴백을 사용한다', () => {
+      // baseRange.min/max가 undefined인 경우(데이터 없이 초기 렌더링 등)
+      // typeof undefined !== 'number' → Number.isFinite 가드가 false → 폴백 반환
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({});
+      expect(result.minIndex).toBe(0);
+      expect(result.maxIndex).toBe(labels.length - 1);
+    });
+
+    it('super가 NaN min/max를 반환하면 전체 라벨 범위(0 ~ last) 폴백을 사용한다', () => {
+      // typeof NaN === 'number'이지만 Number.isFinite(NaN) === false이므로 가드가 막아야 한다
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: NaN, max: NaN });
+      expect(result.minIndex).toBe(0);
+      expect(result.maxIndex).toBe(labels.length - 1);
+    });
+
+    it('labels가 비어있으면 maxIndex = -1 (빈 범위)를 반환한다', () => {
+      const scale = Object.create(TimeCategoryScale.prototype);
+      scale.labels = [];
+      scale.timeFormat = 'HH:mm';
+      scale.formatter = null;
+      scale.labelStyle = { color: '#000', fontSize: 11 };
+      const result = scale.calculateScaleRange({ min: T0, max: T0 + 9 * HOUR });
+      expect(result.minIndex).toBe(0);
+      expect(result.maxIndex).toBe(-1);
+    });
+  });
+
+  // ─────────────────────────────────────────────────
   describe('calculateSteps', () => {
     it('데이터 2개 → oriSteps=2, steps=2를 반환한다', () => {
       const t0 = dayjs('2026-01-01 00:00:00').valueOf();
@@ -166,6 +266,34 @@ describe('TimeCategoryScale', () => {
 
       expect(result.graphMin).toBe(t0);
       expect(result.graphMax).toBe(t1);
+    });
+
+    it('minIndex/maxIndex 없이 호출하면 결과에도 undefined로 포함된다', () => {
+      const t0 = dayjs('2026-01-01 00:00:00').valueOf();
+      const t1 = dayjs('2026-01-01 01:00:00').valueOf();
+      const scale = createScale({ interval: 'hour' });
+
+      const result = scale.calculateSteps({ minValue: t0, maxValue: t1, maxSteps: 10 });
+
+      expect(result.minIndex).toBeUndefined();
+      expect(result.maxIndex).toBeUndefined();
+    });
+
+    it('range의 minIndex/maxIndex를 결과에 그대로 포함한다', () => {
+      const t0 = dayjs('2026-01-01 00:00:00').valueOf();
+      const t4 = dayjs('2026-01-01 04:00:00').valueOf();
+      const scale = createScale({ interval: 'hour' });
+
+      const result = scale.calculateSteps({
+        minValue: t0,
+        maxValue: t4,
+        maxSteps: 10,
+        minIndex: 2,
+        maxIndex: 6,
+      });
+
+      expect(result.minIndex).toBe(2);
+      expect(result.maxIndex).toBe(6);
     });
   });
 
