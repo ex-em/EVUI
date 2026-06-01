@@ -31,30 +31,56 @@ const modules = {
       }
 
       const ctx = this.overlayCtx;
+      const itemKeys = Object.keys(hitInfo.items);
+      const hasItems = itemKeys.length > 0;
+
+      // hover 시그니처: hitId + 시리즈/dataIndex 집합이 동일하면 같은 데이터 포인트 위.
+      // formatter.html 경로에서 비용 가장 큰 drawCustomTooltip(고객 formatter + htmlToElement +
+      // virtualScroll teardown→reinit) 만 스킵하고, 나머지(overlay/indicator/listener/hoveredLabel)
+      // 흐름은 그대로 유지한다. fast path 를 더 넓히면 부수 효과가 생길 수 있어 보수적으로 둔다.
+      let hoverSig = '';
+      if (hasItems) {
+        hoverSig = `h=${hitInfo.hitId}`;
+        const sortedKeys = itemKeys.slice().sort();
+        for (let i = 0; i < sortedKeys.length; i++) {
+          const k = sortedKeys[i];
+          hoverSig += `|${k}:${hitInfo.items[k].index}`;
+        }
+      }
+
+      const skipCustomTooltipRedraw =
+        hoverSig !== '' &&
+        hoverSig === this._lastHoverSig &&
+        this.tooltipDOM &&
+        this.tooltipDOM.style.display !== 'none';
 
       this.overlayClear();
 
-      if (Object.keys(hitInfo.items).length) {
+      if (hasItems) {
         if (tooltip.use && this.isInitTooltip) {
           this.drawItemsHighlight(hitInfo, ctx);
 
           if (typeof tooltip?.returnValue === 'function') {
             const seriesList = [];
-            Object.keys(hitInfo.items).forEach((sId) => {
+            for (let i = 0; i < itemKeys.length; i++) {
+              const sId = itemKeys[i];
+              const it = hitInfo.items[sId];
               seriesList.push({
                 sId,
-                data: hitInfo.items[sId].data,
-                color: hitInfo.items[sId].color,
-                name: hitInfo.items[sId].name,
-                dataId: hitInfo.items[sId].id,
-                index: hitInfo.items[sId].index,
+                data: it.data,
+                color: it.color,
+                name: it.name,
+                dataId: it.id,
+                index: it.index,
               });
-            });
+            }
 
             this.hideTooltipDOM();
             tooltip.returnValue(seriesList, e);
           } else if (tooltip?.formatter?.html) {
-            this.drawCustomTooltip(hitInfo?.items);
+            if (!skipCustomTooltipRedraw) {
+              this.drawCustomTooltip(hitInfo?.items);
+            }
             this.setCustomTooltipLayoutPosition(hitInfo, e);
           } else {
             this.setTooltipLayoutPosition(hitInfo, e);
@@ -94,6 +120,8 @@ const modules = {
 
         this.hideTooltipDOM();
       }
+
+      this._lastHoverSig = hoverSig;
 
       if (this.dragInfoBackup) {
         this.drawSelectionArea(this.dragInfoBackup);
@@ -157,6 +185,9 @@ const modules = {
 
         this.tooltipClear();
       }
+
+      // 다음 hover 진입 시 fast path 가 stale 시그니처로 잘못 매치되지 않도록 초기화한다.
+      this._lastHoverSig = '';
 
       // 다음 hover 시작 시 레이아웃 변화를 반영하도록 캐시를 무효화한다.
       this.invalidateClientRectCache();
@@ -1255,6 +1286,24 @@ const modules = {
         ? tooltipOpt?.formatter
         : tooltipOpt?.formatter?.value;
 
+    // 동일 itemData 객체에 대한 포맷 결과를 캐시한다.
+    // 데이터가 새 배열/새 객체로 갱신되면 WeakMap 키가 사라져 자동 GC되므로 무효화도 자동.
+    // 같은 mousemove 윈도우 안에서 hover 중 큰 비용(고객 value formatter; big.js 등)을 1회만 부담.
+    const useCache =
+      itemData !== null && typeof itemData === 'object' && tooltipValueFormatter;
+    if (useCache) {
+      if (!this._tooltipValueCache) {
+        this._tooltipValueCache = new WeakMap();
+      }
+      const bucket = this._tooltipValueCache.get(itemData);
+      if (bucket !== undefined) {
+        const cached = bucket[seriesId];
+        if (cached !== undefined) {
+          return cached;
+        }
+      }
+    }
+
     let formattedTxt = value;
     if (tooltipValueFormatter) {
       if (opt.type === 'pie') {
@@ -1291,6 +1340,15 @@ const modules = {
       } else {
         formattedTxt = numberWithComma(value);
       }
+    }
+
+    if (useCache) {
+      let bucket = this._tooltipValueCache.get(itemData);
+      if (!bucket) {
+        bucket = Object.create(null);
+        this._tooltipValueCache.set(itemData, bucket);
+      }
+      bucket[seriesId] = formattedTxt;
     }
 
     return formattedTxt;
