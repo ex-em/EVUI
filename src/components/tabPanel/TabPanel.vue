@@ -1,11 +1,11 @@
 <template>
-  <article v-show="isSelected" class="ev-tab-panel">
+  <article v-if="!lazy || hasBeenSelected" v-show="isSelected" class="ev-tab-panel">
     <slot />
   </article>
 </template>
 
 <script>
-import { computed, inject } from 'vue';
+import { computed, inject, ref, watch } from 'vue';
 
 export default {
   name: 'EvTabPanel',
@@ -23,14 +23,28 @@ export default {
       type: Boolean,
       default: false,
     },
+    // true면 한 번이라도 선택된 적 있는 탭만 mount하고 이후 유지(방문 캐시).
+    // 기본 false는 기존 동작(모든 패널 mount + v-show 토글)과 동일.
+    lazy: {
+      type: Boolean,
+      default: false,
+    },
   },
   emits: {},
   setup(props) {
     const evTabs = inject('evTabs', null);
     const isSelected = computed(() => props.value === evTabs.value);
+    // lazy 모드에서 한 번 선택되면 true로 고정되어 비선택 후에도 unmount되지 않는다.
+    const hasBeenSelected = ref(isSelected.value);
+    watch(isSelected, (selected) => {
+      if (selected) {
+        hasBeenSelected.value = true;
+      }
+    });
 
     return {
       isSelected,
+      hasBeenSelected,
     };
   },
 };
