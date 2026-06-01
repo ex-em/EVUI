@@ -1006,6 +1006,11 @@ class EvChart {
       return;
     }
 
+    // 데이터 갱신 시 hover fast-path 시그니처를 무효화한다.
+    if (updateData || updateSeries) {
+      this._lastHoverSig = '';
+    }
+
     this.updateScrollbar(updateData, updateByScrollbar);
 
     this.resetProps();

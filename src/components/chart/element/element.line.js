@@ -59,6 +59,24 @@ class Line {
   }
 
   /**
+   * x가 null/undefined가 아닌 데이터만 필터링한 배열을 반환한다.
+   * mousemove마다 호출되는 findGraphData가 매번 새 배열을 만들지 않도록
+   * this.data 참조(+ length)로 메모이즈한다. 새 배열로 교체되거나 길이가 바뀌면
+   * 자동으로 재계산된다. (in-place push에 의한 stale도 length 비교로 감지)
+   */
+  _getValidGData() {
+    const src = this.data;
+    const cache = this._validGDataCache;
+    if (cache && cache.src === src && cache.length === src.length) {
+      return cache.value;
+    }
+
+    const value = src.filter((data) => !Util.isNullOrUndefined(data.x));
+    this._validGDataCache = { src, length: src.length, value };
+    return value;
+  }
+
+  /**
    * @typedef {Object} LineDrawParam
    * @property {CanvasRenderingContext2D} ctx - 캔버스 렌더링 컨텍스트
    * @property {object} chartRect - 차트 영역 정보
@@ -472,7 +490,7 @@ class Line {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data.filter((data) => !Util.isNullOrUndefined(data.x));
+    const gdata = this._getValidGData();
     const isLinearInterpolation = this.useLinearInterpolation();
 
     // line 포인트 "정확 히트" 판정용 반경.
