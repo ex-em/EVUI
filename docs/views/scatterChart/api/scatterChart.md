@@ -251,8 +251,10 @@ const chartData =
 | size | number | 50 | 모바일에서 선택 영역 크기 | only mobile |
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
+| startArea | String (CSS Selector) | '' | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. | '.chart-wrapper' |
 
 - PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
+- `startArea`를 지정하면 캔버스 바깥(지정한 영역 내부)에서 드래그를 시작해도 포인터가 캔버스에 진입하는 순간 선택이 시작됩니다.
 
 #### tooltip
 

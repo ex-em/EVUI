@@ -214,6 +214,7 @@ const DEFAULT_OPTIONS = {
     size: 50,
     fillColor: '#38ACEC',
     opacity: 0.65,
+    startArea: '',
   },
   zoom: {
     bufferMemoryCnt: 100,

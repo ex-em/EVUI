@@ -2132,7 +2132,7 @@ class EvChart {
       this.overlayCanvas.removeEventListener('mouseleave', this.onMouseLeave);
       this.overlayCanvas.removeEventListener('dblclick', this.onDblClick);
       this.overlayCanvas.removeEventListener('click', this.onClick);
-      this.overlayCanvas.removeEventListener('mousedown', this.onMouseDown);
+      this.dragStartTarget?.removeEventListener('mousedown', this.onMouseDown);
       this.overlayCanvas.removeEventListener('wheel', this.onWheel);
       window.removeEventListener('click', this.dragTouchSelectionEvent);
       if (this.invalidateRectOnScroll) {
