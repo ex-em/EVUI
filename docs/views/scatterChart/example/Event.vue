@@ -100,6 +100,7 @@ export default {
       dragSelection: {
         use: true,
         keepDisplay: true,
+        startArea: '.case',
       },
       axesX: [
         {

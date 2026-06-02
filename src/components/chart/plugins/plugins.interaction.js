@@ -583,7 +583,13 @@ const modules = {
     this.overlayCanvas.addEventListener('mouseleave', this.onMouseLeave);
     this.overlayCanvas.addEventListener('dblclick', this.onDblClick);
     this.overlayCanvas.addEventListener('click', this.onClick);
-    this.overlayCanvas.addEventListener('mousedown', this.onMouseDown);
+
+    // dragSelection.startArea(CSS 셀렉터)가 지정되면 해당 영역에서 시작한 드래그도 인식한다.
+    // 기본값은 overlayCanvas이므로 캔버스 안에서 시작해야만 동작한다(기존 동작).
+    // 셀렉터는 차트 자신의 조상에서 탐색하므로 멀티 차트에서도 각자 자신의 영역만 바라본다.
+    const { startArea } = this.options.dragSelection;
+    this.dragStartTarget = (startArea && this.target.closest(startArea)) || this.overlayCanvas;
+    this.dragStartTarget.addEventListener('mousedown', this.onMouseDown);
 
     this.dragTouchSelectionEvent = (e) => this.dragTouchSelectionDestroy(e);
     window.addEventListener('click', this.dragTouchSelectionEvent);
@@ -603,7 +609,9 @@ const modules = {
    * @returns {undefined}
    */
   dragStart(evt, type) {
-    let [offsetX, offsetY] = this.getMousePosition(evt);
+    const [rawOffsetX, rawOffsetY, canvasWidth, canvasHeight] = this.getMousePosition(evt);
+    let offsetX = rawOffsetX;
+    let offsetY = rawOffsetY;
     const chartRect = this.chartRect;
     const labelOffset = this.labelOffset;
     const range = {
@@ -635,14 +643,43 @@ const modules = {
       range,
     };
 
+    // 포인터가 캔버스(차트 영역) 안에 있는지 판별
+    const isInsideCanvas = (x, y) => x >= 0 && x <= canvasWidth && y >= 0 && y <= canvasHeight;
+
+    // 드래그 활성화 여부. 캔버스 바깥에서 시작한 경우 포인터가 캔버스에 진입할 때 활성화된다.
+    let isActivated = false;
+    const activate = () => {
+      if (isActivated) {
+        return;
+      }
+      isActivated = true;
+      this.removeSelectionArea();
+    };
+
+    // 캔버스 안에서 드래그를 시작했다면 기존 동작과 동일하게 즉시 활성화
+    if (isInsideCanvas(rawOffsetX, rawOffsetY)) {
+      activate();
+    }
+
     /**
      * Calculate drag-section position and size, and drawing drag-section
      *
      * @returns {undefined}
      */
     const dragMove = (e) => {
-      e.preventDefault();
       const [aOffsetX, aOffsetY] = this.getMousePosition(e);
+
+      // 캔버스 바깥에서 시작한 드래그는 포인터가 캔버스에 진입한 순간 활성화한다.
+      // 진입 전에는 preventDefault를 호출하지 않아 페이지의 다른 인터랙션을 방해하지 않는다.
+      if (!isActivated) {
+        if (isInsideCanvas(aOffsetX, aOffsetY)) {
+          activate();
+        } else {
+          return;
+        }
+      }
+
+      e.preventDefault();
       const dragInfo = this.dragInfo;
       const { xcp, ycp, range: aRange } = dragInfo;
 
@@ -695,7 +732,7 @@ const modules = {
     const dragEnd = (e) => {
       const dragInfo = this.dragInfo;
 
-      if (dragInfo?.isMove && dragInfo?.width > 1 && dragInfo?.height > 1) {
+      if (isActivated && dragInfo?.isMove && dragInfo?.width > 1 && dragInfo?.height > 1) {
         const args = {
           e,
           data: this.findSelectedItems(dragInfo),

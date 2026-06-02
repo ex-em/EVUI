@@ -515,6 +515,7 @@ chartData.value = {
 | keepDisplay | Boolean                     | true      | 드래그 후 선택영역 유지 여부 | true / false |
 | fillColor   | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상               |              |
 | opacity     | Number                      | 0.65      | 선택 영역 불투명도           | 0 ~ 1        |
+| startArea   | String (CSS Selector)       | ''        | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. | '.chart-wrapper' |
 
 
 ### 7. resize-timeout
