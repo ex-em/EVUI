@@ -52,6 +52,7 @@ class Bar {
     const showIndex = param.showIndex;
     const thickness = param.thickness;
     const showSeriesCount = param.showSeriesCount;
+    const displayOverflow = param.displayOverflow;
 
     this.isHorizontal = param.isHorizontal;
 
@@ -144,10 +145,14 @@ class Bar {
         }
 
         // 너비 / 높이 계산, 스택의 경우 위치 값 재계산
+        // displayOverflow 가 켜졌을 때만 값 축(horizontal: X, vertical: Y) graphMax 초과 값을
+        // 경계로 clamp 해 막대를 경계까지 그린다. 꺼져 있으면 raw → calculateX/Y 가 null 반환 → 숨김.
         if (isHorizontal) {
           const barValue = item.b ? item.o : item.x;
+          const drawValue =
+            displayOverflow && barValue > minmaxX.graphMax ? minmaxX.graphMax : barValue;
           w = Canvas.calculateX(
-            barValue,
+            drawValue,
             minmaxX.graphMin,
             minmaxX.graphMax,
             xArea,
@@ -155,6 +160,7 @@ class Bar {
           );
 
           if (item.b) {
+            // stack-base 위치는 raw 유지 (세그먼트 값만 clamp).
             x = Canvas.calculateX(
               item.b,
               minmaxX.graphMin,
@@ -169,8 +175,10 @@ class Bar {
           w = barValue && w !== null && Math.abs(w) === 0 ? minimumBarWidth : w;
         } else {
           const barValue = item.b ? item.o : item.y;
+          const drawValue =
+            displayOverflow && barValue > minmaxY.graphMax ? minmaxY.graphMax : barValue;
           h = Canvas.calculateY(
-            barValue,
+            drawValue,
             minmaxY.graphMin,
             minmaxY.graphMax,
             yArea,
@@ -178,6 +186,7 @@ class Bar {
           );
 
           if (item.b) {
+            // stack-base 위치는 raw 유지 (세그먼트 값만 clamp).
             y = Canvas.calculateY(
               item.b,
               minmaxY.graphMin,

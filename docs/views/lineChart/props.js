@@ -42,6 +42,8 @@ import LegendClickMode from './example/LegendClickMode';
 import LegendClickModeRaw from './example/LegendClickMode?raw';
 import AxesScaleChange from './example/AxesScaleChange';
 import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
+import DisplayOverflow from './example/DisplayOverflow';
+import DisplayOverflowRaw from './example/DisplayOverflow?raw';
 import UnSelectedOpacity from './example/UnSelectedOpacity';
 import UnSelectedOpacityRaw from './example/UnSelectedOpacity?raw';
 
@@ -168,6 +170,12 @@ export default {
         '차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 확인할 수 있습니다.',
       component: AxesScaleChange,
       parsedData: parse(AxesScaleChangeRaw).descriptor,
+    },
+    DisplayOverflow: {
+      description:
+        'displayOverflow 옵션으로 값 축(Y) range를 초과한 데이터를 상단 경계에 기본 시리즈 색으로 모아 표시할 수 있습니다. false(기본값)면 range 밖 데이터는 숨겨집니다.',
+      component: DisplayOverflow,
+      parsedData: parse(DisplayOverflowRaw).descriptor,
     },
   },
 };
