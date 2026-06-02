@@ -548,7 +548,7 @@ chartOptions.value = {
 | keepDisplay | Boolean                     | true      | 드래그 후 선택영역 유지 여부 | true / false |
 | fillColor   | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상               |              |
 | opacity     | Number                      | 0.65      | 선택 영역 불투명도           | 0 ~ 1        |
-| startArea   | String (CSS Selector)       | ''        | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. | '.chart-wrapper' |
+| startArea   | String (CSS Selector)       | ''        | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. 여러 차트를 사용할 때는 차트마다 고유한 셀렉터를 지정하세요(공통 조상을 지정하면 한 번의 드래그가 모든 차트의 selection을 트리거합니다). | '.chart-wrapper' |
 
 
 ### 7. resize-timeout
