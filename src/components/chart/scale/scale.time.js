@@ -8,6 +8,7 @@ import {
 } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Scale from './scale';
+import { createNormalizedLabelsResolver, createVisibleIndexResolver } from './scale.utils';
 
 /**
  * 사용자 interval 옵션을 정규화된 meta 객체로 변환한다.
@@ -207,6 +208,23 @@ function generateVisibleTicks(graphMin, graphMax, meta) {
 }
 
 class TimeScale extends Scale {
+  constructor(type, axisOpt, ctx, labels, options) {
+    super(type, axisOpt, ctx, options);
+    this.labels = labels;
+  }
+
+  /**
+   * this.labels을 타임스탬프 배열로 정규화하고 캐시한다.
+   * 캐시 키: ref + length + head + tail (shift+push 등 길이 보존 in-place 변형까지 검출).
+   */
+  _getNormalizedLabels() {
+    if (!this._normalizedLabelsResolver) {
+      this._normalizedLabelsResolver =
+        createNormalizedLabelsResolver(v => this.normalizeTimeValue(v));
+    }
+    return this._normalizedLabelsResolver(this.labels);
+  }
+
   /**
    * 임의의 값을 숫자(타임스탬프)로 정규화한다.
    * null/undefined → null, 유한한 숫자 → 그대로, 그 외 → dayjs로 파싱 후 valueOf()
@@ -286,10 +304,29 @@ class TimeScale extends Scale {
       this.range = originalRange;
     }
 
+    const normalizedMin = this.normalizeTimeValue(result.min);
+    const normalizedMax = this.normalizeTimeValue(result.max);
+
+    // axis range 또는 scrollbar.range가 활성일 때 bar element가 사용할 가시 인덱스를 계산한다.
+    // calculateScaleRange는 drawChart마다 호출되지만(resize/hover/brush 등), 라벨과 range가
+    // 동일하면 리졸버가 캐시 hit으로 O(n) 스캔을 1회로 줄여준다.
+    let indexRange;
+    if (hasRangeOverride && this.labels?.length) {
+      if (!this._visibleIndexResolver) {
+        this._visibleIndexResolver = createVisibleIndexResolver();
+      }
+      indexRange = this._visibleIndexResolver(
+        this._getNormalizedLabels(),
+        normalizedMin,
+        normalizedMax,
+      );
+    }
+
     return {
       ...result,
-      min: this.normalizeTimeValue(result.min),
-      max: this.normalizeTimeValue(result.max),
+      min: normalizedMin,
+      max: normalizedMax,
+      ...(indexRange ?? {}),
     };
   }
 
@@ -353,6 +390,7 @@ class TimeScale extends Scale {
     const minValue = this.normalizeTimeValue(range.minValue);
     const maxValue = this.normalizeTimeValue(range.maxValue);
     const maxSteps = Math.max(1, range.maxSteps ?? 1);
+    const { minIndex, maxIndex } = range;
 
     if (minValue == null || maxValue == null) {
       return {
@@ -362,6 +400,8 @@ class TimeScale extends Scale {
         graphMin: null,
         graphMax: null,
         ticks: [],
+        minIndex,
+        maxIndex,
       };
     }
 
@@ -376,6 +416,8 @@ class TimeScale extends Scale {
         graphMin,
         graphMax,
         ticks: [],
+        minIndex,
+        maxIndex,
       };
     }
 
@@ -431,6 +473,8 @@ class TimeScale extends Scale {
       graphMin,
       graphMax,
       ticks,
+      minIndex,
+      maxIndex,
     };
   }
 

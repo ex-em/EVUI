@@ -1,9 +1,15 @@
 import { truthyNumber } from '@/common/utils';
 import Scale from './scale';
+import { createVisibleIndexResolver } from './scale.utils';
 import Util from '../helpers/helpers.util';
 import { NICE_FRACTIONS } from '../helpers/helpers.constant';
 
 class LinearScale extends Scale {
+  constructor(type, axisOpt, ctx, labels, options) {
+    super(type, axisOpt, ctx, options);
+    this.labels = labels;
+  }
+
   /**
    * Transforming label by designated format
    * @param {number} value                   label value
@@ -288,7 +294,7 @@ class LinearScale extends Scale {
    * @returns {object} steps, interval, min/max graph value
    */
   calculateSteps(range) {
-    const { minValue, maxValue } = range;
+    const { minValue, maxValue, minIndex, maxIndex } = range;
     const maxSteps = Math.max(1, range.maxSteps ?? 1);
   
     const hasUserRange =
@@ -375,6 +381,8 @@ class LinearScale extends Scale {
           interval,
           graphMin,
           graphMax,
+          minIndex,
+          maxIndex,
         };
       }
     }
@@ -398,6 +406,8 @@ class LinearScale extends Scale {
         interval,
         graphMin,
         graphMax,
+        minIndex,
+        maxIndex,
       };
     }
   
@@ -436,15 +446,17 @@ class LinearScale extends Scale {
       }
   
       setDecimal(interval);
-  
+
       return {
         steps,
         interval,
         graphMin,
         graphMax,
+        minIndex,
+        maxIndex,
       };
     }
-  
+
     /**
      * 4) auto
      * niceScale 사용
@@ -464,6 +476,8 @@ class LinearScale extends Scale {
         interval: legacy.interval,
         graphMin: normalizedMin,
         graphMax: normalizedMax,
+        minIndex,
+        maxIndex,
       };
     }
   
@@ -480,6 +494,8 @@ class LinearScale extends Scale {
       interval: nice.interval,
       graphMin: nice.min,
       graphMax: nice.max,
+      minIndex,
+      maxIndex,
     };
   }
 
@@ -569,6 +585,16 @@ class LinearScale extends Scale {
       isMaxValueSameAsMin: isDefaultMaxSameAsMin,
     });
 
+    // axis range 또는 scrollbar.range가 활성일 때 bar element가 사용할 가시 인덱스를 계산한다.
+    // drawChart마다 호출되지만(resize/hover/brush 등), 라벨과 range가 동일하면 캐시 hit.
+    let indexRange;
+    if (hasRangeOverride && this.labels?.length) {
+      if (!this._visibleIndexResolver) {
+        this._visibleIndexResolver = createVisibleIndexResolver();
+      }
+      indexRange = this._visibleIndexResolver(this.labels, minValue, maxValue);
+    }
+
     return {
       min: minValue,
       max: maxValue,
@@ -579,6 +605,7 @@ class LinearScale extends Scale {
         Util.getLabelStyle(this.labelStyle),
         this.labelStyle?.padding,
       ),
+      ...(indexRange ?? {}),
     };
   }
 }

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { TIME_INTERVALS } from '../helpers/helpers.constant';
 import Scale from './scale';
+import { createNormalizedLabelsResolver, createVisibleIndexResolver } from './scale.utils';
 import Util from '../helpers/helpers.util';
 
 class TimeCategoryScale extends Scale {
@@ -8,6 +9,38 @@ class TimeCategoryScale extends Scale {
     super(type, axisOpt, ctx);
     this.labels = labels;
     this.options = options;
+  }
+
+  /**
+   * 임의의 값을 숫자(타임스탬프)로 정규화한다.
+   * null/undefined → null, 유한한 숫자 → 그대로, 그 외(dayjs/Date/문자열 등) → dayjs 파싱 후 valueOf()
+   *
+   * @param {*} value 정규화할 값
+   * @returns {number|null} 정규화된 타임스탬프 (유효하지 않으면 null)
+   */
+  normalizeTimeValue(value) {
+    if (value == null) {
+      return null;
+    }
+
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null;
+    }
+
+    const normalized = dayjs(value).valueOf();
+    return Number.isFinite(normalized) ? normalized : null;
+  }
+
+  /**
+   * this.labels을 타임스탬프 배열로 정규화하고 캐시한다.
+   * 캐시 키: ref + length + head + tail (shift+push 등 길이 보존 in-place 변형까지 검출).
+   */
+  _getNormalizedLabels() {
+    if (!this._normalizedLabelsResolver) {
+      this._normalizedLabelsResolver =
+        createNormalizedLabelsResolver(v => this.normalizeTimeValue(v));
+    }
+    return this._normalizedLabelsResolver(this.labels);
   }
 
   /**
@@ -31,8 +64,10 @@ class TimeCategoryScale extends Scale {
 
   /**
    * Calculate min/max value and index range for time category scale.
-   * Extends base result with minIndex/maxIndex so bar chart can restrict
-   * the rendered data range to the visible timestamp window.
+   *
+   * axis range / scrollbar range가 활성일 때만 minIndex/maxIndex를 함께 반환한다.
+   * (LinearScale/TimeScale과 동일한 contract — range가 없으면 bar element는
+   *  this.data 전체를 그리는 기존 경로로 동작한다.)
    *
    * Empty-range sentinel: { minIndex: 0, maxIndex: -1 }
    *   Callers must check maxIndex >= minIndex before treating minIndex as a
@@ -43,38 +78,26 @@ class TimeCategoryScale extends Scale {
    * @param {object} scrollbarOpt scrollbar option
    * @param {object} chartRect    chart size information
    *
-   * @returns {object} min/max value, label, and index range
+   * @returns {object} min/max value, label, and (optional) index range
    */
   calculateScaleRange(minMax, scrollbarOpt, chartRect) {
     const baseRange = super.calculateScaleRange(minMax, scrollbarOpt, chartRect);
 
-    const labels = this.labels;
-    if (!labels?.length) {
-      return { ...baseRange, minIndex: 0, maxIndex: -1 };
+    const range = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
+    const hasRangeOverride = Array.isArray(range) || typeof range === 'function';
+
+    if (!hasRangeOverride || !this.labels?.length) {
+      return baseRange;
     }
 
-    let minIndex = 0;
-    let maxIndex = labels.length - 1;
-
-    const { min: rangeMin, max: rangeMax } = baseRange;
-    if (Number.isFinite(rangeMin) && Number.isFinite(rangeMax)) {
-      const startIdx = labels.findIndex(ts => ts >= rangeMin);
-      let endIdx = -1;
-      for (let i = labels.length - 1; i >= 0; i -= 1) {
-        if (labels[i] <= rangeMax) {
-          endIdx = i;
-          break;
-        }
-      }
-      if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
-        minIndex = 0;
-        maxIndex = -1;
-      } else {
-        minIndex = startIdx;
-        maxIndex = endIdx;
-      }
+    if (!this._visibleIndexResolver) {
+      this._visibleIndexResolver = createVisibleIndexResolver();
     }
-
+    const { minIndex, maxIndex } = this._visibleIndexResolver(
+      this._getNormalizedLabels(),
+      this.normalizeTimeValue(baseRange.min),
+      this.normalizeTimeValue(baseRange.max),
+    );
     return { ...baseRange, minIndex, maxIndex };
   }
 

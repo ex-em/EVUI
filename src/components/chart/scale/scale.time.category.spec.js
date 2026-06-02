@@ -112,9 +112,12 @@ describe('TimeCategoryScale', () => {
     const T0 = dayjs('2026-01-01 00:00:00').valueOf();
     const labels = Array.from({ length: 10 }, (_, i) => T0 + i * HOUR);
 
+    // hasRangeOverride 가드를 통과시키려면 scale.range가 array 또는 function이어야 한다.
+    // super.calculateScaleRange는 spy로 mock되어 range 값 자체는 사용되지 않으므로 빈 배열로 충분.
     const makeScale = () => {
       const scale = Object.create(TimeCategoryScale.prototype);
       scale.labels = labels;
+      scale.range = [];
       scale.timeFormat = 'HH:mm';
       scale.formatter = null;
       scale.labelStyle = { color: '#000', fontSize: 11 };
@@ -194,15 +197,95 @@ describe('TimeCategoryScale', () => {
       expect(result.maxIndex).toBe(labels.length - 1);
     });
 
-    it('labels가 비어있으면 maxIndex = -1 (빈 범위)를 반환한다', () => {
+    it('labels가 비어있으면 indexRange를 반환하지 않는다 (baseRange만)', () => {
       const scale = Object.create(TimeCategoryScale.prototype);
       scale.labels = [];
+      scale.range = [];
       scale.timeFormat = 'HH:mm';
       scale.formatter = null;
       scale.labelStyle = { color: '#000', fontSize: 11 };
       const result = scale.calculateScaleRange({ min: T0, max: T0 + 9 * HOUR });
-      expect(result.minIndex).toBe(0);
-      expect(result.maxIndex).toBe(-1);
+      expect(result.minIndex).toBeUndefined();
+      expect(result.maxIndex).toBeUndefined();
+    });
+
+    it('range가 미설정이면 indexRange를 반환하지 않는다 (LinearScale/TimeScale과 일관)', () => {
+      const scale = Object.create(TimeCategoryScale.prototype);
+      scale.labels = labels;
+      // scale.range 미설정 → hasRangeOverride = false
+      scale.timeFormat = 'HH:mm';
+      scale.formatter = null;
+      scale.labelStyle = { color: '#000', fontSize: 11 };
+      const result = scale.calculateScaleRange({ min: T0 + 3 * HOUR, max: T0 + 7 * HOUR });
+      expect(result.minIndex).toBeUndefined();
+      expect(result.maxIndex).toBeUndefined();
+    });
+
+    // 라벨이 dayjs/Date/ISO 문자열로 들어와도 정규화 후 인덱스를 찾아야 한다.
+    // (정규화 누락 회귀 가드 — sentinel {0,-1} 폴백으로 막대가 사라지는 버그를 막는다)
+    it('dayjs 객체 라벨: 정규화 후 정상 인덱스 반환', () => {
+      const dayjsLabels = Array.from({ length: 10 }, (_, i) => dayjs(T0 + i * HOUR));
+      const scale = Object.create(TimeCategoryScale.prototype);
+      scale.labels = dayjsLabels;
+      scale.range = [];
+      scale.timeFormat = 'HH:mm';
+      scale.formatter = null;
+      scale.labelStyle = { color: '#000', fontSize: 11 };
+      const result = scale.calculateScaleRange({ min: T0 + 3 * HOUR, max: T0 + 7 * HOUR });
+      expect(result.minIndex).toBe(3);
+      expect(result.maxIndex).toBe(7);
+    });
+
+    it('Date 객체 라벨: 정규화 후 정상 인덱스 반환', () => {
+      const dateLabels = Array.from({ length: 10 }, (_, i) => new Date(T0 + i * HOUR));
+      const scale = Object.create(TimeCategoryScale.prototype);
+      scale.labels = dateLabels;
+      scale.range = [];
+      scale.timeFormat = 'HH:mm';
+      scale.formatter = null;
+      scale.labelStyle = { color: '#000', fontSize: 11 };
+      const result = scale.calculateScaleRange({ min: T0 + 2 * HOUR, max: T0 + 8 * HOUR });
+      expect(result.minIndex).toBe(2);
+      expect(result.maxIndex).toBe(8);
+    });
+
+    it('ISO 문자열 라벨: 정규화 후 정상 인덱스 반환', () => {
+      const strLabels = Array.from({ length: 10 }, (_, i) => dayjs(T0 + i * HOUR).toISOString());
+      const scale = Object.create(TimeCategoryScale.prototype);
+      scale.labels = strLabels;
+      scale.range = [];
+      scale.timeFormat = 'HH:mm';
+      scale.formatter = null;
+      scale.labelStyle = { color: '#000', fontSize: 11 };
+      const result = scale.calculateScaleRange({ min: T0 + 1 * HOUR, max: T0 + 5 * HOUR });
+      expect(result.minIndex).toBe(1);
+      expect(result.maxIndex).toBe(5);
+    });
+
+    // shift+push 캐시 무효화 회귀 가드 (#1):
+    // labels.shift() + labels.push()로 길이는 보존되지만 내용이 바뀌는 streaming 패턴에서
+    // 정규화 캐시가 stale해지면 안 된다.
+    it('shift+push: 길이 보존 in-place 변형 시 정규화/인덱스 캐시가 stale하지 않다', () => {
+      const liveLabels = Array.from({ length: 10 }, (_, i) => T0 + i * HOUR);
+      const scale = Object.create(TimeCategoryScale.prototype);
+      scale.labels = liveLabels;
+      scale.range = [];
+      scale.timeFormat = 'HH:mm';
+      scale.formatter = null;
+      scale.labelStyle = { color: '#000', fontSize: 11 };
+
+      const r1 = scale.calculateScaleRange({ min: T0, max: T0 + 9 * HOUR });
+      expect(r1.minIndex).toBe(0);
+      expect(r1.maxIndex).toBe(9);
+
+      // streaming tick: 첫 원소 제거 + 새 시간대 push (길이 동일)
+      liveLabels.shift();
+      liveLabels.push(T0 + 10 * HOUR);
+
+      const r2 = scale.calculateScaleRange({ min: T0 + 1 * HOUR, max: T0 + 10 * HOUR });
+      // 캐시가 head/tail 변화를 감지해 정규화/인덱스 모두 갱신되어야 한다.
+      expect(r2.minIndex).toBe(0);
+      expect(r2.maxIndex).toBe(9);
     });
   });
 
