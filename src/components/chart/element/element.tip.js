@@ -223,6 +223,18 @@ const modules = {
         } else {
           return false;
         }
+      } else {
+        // axis range가 가시 인덱스 window를 지정한 경우(time/linear scale 등).
+        // bar는 size.cat이 visibleCount 기준이라 ldata도 가시 시작 인덱스를 기준으로 보정해야 한다.
+        const dirSteps = isHorizontal ? graphY : graphX;
+        const { minIndex, maxIndex } = dirSteps ?? {};
+        if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
+          if (ldata >= minIndex && ldata <= maxIndex) {
+            ldata -= minIndex;
+          } else {
+            return false;
+          }
+        }
       }
 
       if (isHorizontal) {
