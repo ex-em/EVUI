@@ -1,5 +1,5 @@
 import { defaultsDeep } from 'lodash-es';
-import { truthy, truthyNumber } from '@/common/utils';
+import { truthy } from '@/common/utils';
 import { COLOR, BAR_OPTION } from '../helpers/helpers.constant';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
@@ -64,12 +64,20 @@ class Bar {
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
     let totalCount = this.data.length;
-    const [minIndex, maxIndex] = isHorizontal
+    let [minIndex, maxIndex] = isHorizontal
       ? [minmaxY.minIndex, minmaxY.maxIndex]
       : [minmaxX.minIndex, minmaxX.maxIndex];
 
+    // invariant: minIndex/maxIndex는 둘 다 유효하거나 둘 다 비정상이어야 한다.
+    // 부분 상태(한쪽만 유효)는 scale 구현 규약 위반이므로 fail-safe로 빈 구간 sentinel을
+    // 설정해 아무것도 그리지 않는다(전체 그리기로 silent fallback 되어 버그를 숨기지 않도록).
+    if (Number.isFinite(minIndex) !== Number.isFinite(maxIndex)) {
+      minIndex = 0;
+      maxIndex = -1;
+    }
+
     // minIndex, maxIndex가 유효하면 실제 그릴 데이터 개수로 보정
-    if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
+    if (Number.isFinite(minIndex) && Number.isFinite(maxIndex)) {
       totalCount = maxIndex - minIndex + 1;
     }
 
@@ -121,8 +129,8 @@ class Bar {
     this.borderRadius = param.borderRadius;
     this.filteredCount = totalCount;
 
-    const startIndex = truthyNumber(minIndex) ? minIndex : 0;
-    const endIndex = truthyNumber(maxIndex) ? maxIndex : this.data.length - 1;
+    const startIndex = Number.isFinite(minIndex) ? minIndex : 0;
+    const endIndex = Number.isFinite(maxIndex) ? maxIndex : this.data.length - 1;
 
     this.visibleStartIndex = startIndex;
 

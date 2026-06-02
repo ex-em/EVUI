@@ -1179,19 +1179,24 @@ const modules = {
 
     let scale;
     let scrollbarOpt;
+    let useY;
     if (targetAxis === 'xAxis') {
       scale = this.axesX[0];
       scrollbarOpt = this.scrollbar.x;
+      useY = false;
     } else if (targetAxis === 'yAxis') {
       scale = this.axesY[0];
       scrollbarOpt = this.scrollbar.y;
+      useY = true;
     } else {
-      scale = horizontal ? this.axesY[0] : this.axesX[0];
-      scrollbarOpt = horizontal ? this.scrollbar.y : this.scrollbar.x;
+      useY = horizontal;
+      scale = useY ? this.axesY[0] : this.axesX[0];
+      scrollbarOpt = useY ? this.scrollbar.y : this.scrollbar.x;
     }
 
     const startPoint = aPos[scale.units.rectStart];
     const endPoint = aPos[scale.units.rectEnd];
+    const isYAxis = targetAxis === 'yAxis';
 
     let labelIndex;
     let hitInfo;
@@ -1201,8 +1206,7 @@ const modules = {
       const labelCount = Math.floor((+max - +min) / interval) + 1;
       const labelGap = (endPoint - startPoint) / labelCount;
 
-      const isYAxis = targetAxis === 'yAxis' || horizontal;
-      const index = Math.floor(((isYAxis ? y : x) - startPoint) / labelGap);
+      const index = Math.floor((((isYAxis || horizontal) ? y : x) - startPoint) / labelGap);
       if (type === 'step') {
         labelIndex = min + index;
       } else {
@@ -1210,10 +1214,31 @@ const modules = {
         labelIndex = minIndex + index;
       }
     } else if (scale?.labels?.length) {
-      const labelGap = (endPoint - startPoint) / scale.labels.length;
-      const isYAxis = targetAxis === 'yAxis';
-      const index = Math.floor(((isYAxis ? y : x) - startPoint) / labelGap);
-      labelIndex = scale.labels.length > index ? index : -1;
+      // stepInfo는 이 분기에서만 사용 (scrollbar 미사용 + labels 있을 때 axis range 보정).
+      const stepInfo = useY ? this.axesSteps?.y?.[0] : this.axesSteps?.x?.[0];
+      const minIdx = stepInfo?.minIndex;
+      const maxIdx = stepInfo?.maxIndex;
+
+      // axis range로 가시 인덱스 window가 좁혀진 경우(time/linear scale + range 등):
+      // labelGap을 가시 카운트 기준으로 계산하고, 화면 인덱스를 minIdx 만큼 offset해서
+      // 실제 full-data 인덱스로 복원한다. scrollbar 분기와 동일한 패턴.
+      if (Number.isFinite(minIdx) && Number.isFinite(maxIdx)) {
+        if (maxIdx < minIdx) {
+          // 빈 구간 sentinel — 가시 데이터 없음
+          labelIndex = -1;
+        } else {
+          const labelCount = maxIdx - minIdx + 1;
+          const labelGap = (endPoint - startPoint) / labelCount;
+          const screenIndex = Math.floor(
+            (((isYAxis || horizontal) ? y : x) - startPoint) / labelGap,
+          );
+          labelIndex = screenIndex >= 0 && screenIndex < labelCount ? minIdx + screenIndex : -1;
+        }
+      } else {
+        const labelGap = (endPoint - startPoint) / scale.labels.length;
+        const index = Math.floor((((isYAxis || horizontal) ? y : x) - startPoint) / labelGap);
+        labelIndex = scale.labels.length > index ? index : -1;
+      }
     } else {
       let offsetX;
       let dataIndex;
