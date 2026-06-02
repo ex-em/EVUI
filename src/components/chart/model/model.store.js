@@ -733,6 +733,49 @@ const modules = {
     return def;
   },
 
+  /**
+   * 가시 인덱스 윈도우 [minIndex, maxIndex] 안에서 모든 visible bar 시리즈를 스캔해
+   * 최댓값을 가진 (sId, value, index)를 반환한다.
+   *
+   * axis range로 막대가 일부만 표시될 때 maxTip이 윈도우 밖의 전역 max를 가리키지 않도록
+   * 윈도우 안에서 max를 재산출하기 위한 헬퍼. 전역 series.minMax 캐시는 건드리지 않는다.
+   *
+   * @param {number} minIndex 윈도우 시작 인덱스
+   * @param {number} maxIndex 윈도우 끝 인덱스 (inclusive)
+   * @returns {{sId: string, value: number, index: number}|null}
+   *   가시 윈도우 안에 유효한 값이 하나도 없으면 null.
+   */
+  getVisibleWindowMaxSeries(minIndex, maxIndex) {
+    if (
+      !Number.isFinite(minIndex)
+      || !Number.isFinite(maxIndex)
+      || maxIndex < minIndex
+    ) {
+      return null;
+    }
+
+    const isHorizontal = this.options.horizontal;
+    let best = null;
+
+    const sIds = Object.keys(this.seriesList);
+    for (let s = 0; s < sIds.length; s += 1) {
+      const series = this.seriesList[sIds[s]];
+      if (series?.show && series.type === 'bar' && series.data?.length) {
+        const lo = Math.max(0, minIndex);
+        const hi = Math.min(series.data.length - 1, maxIndex);
+        for (let i = lo; i <= hi; i += 1) {
+          const p = series.data[i];
+          const v = isHorizontal ? p?.x : p?.y;
+          if (v != null && (!best || v > best.value)) {
+            best = { sId: series.sId, value: v, index: i };
+          }
+        }
+      }
+    }
+
+    return best;
+  },
+
   getSeriesValueOptForHeatMap(series) {
     const { data, colorState, isGradient } = series;
     const colorOpt = this.options.heatMapColor;

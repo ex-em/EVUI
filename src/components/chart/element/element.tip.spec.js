@@ -89,3 +89,51 @@ describe('element.tip calculateTipInfo — sel 분기 label 우선 동작', () =
     expect(result.value).toBe(50);
   });
 });
+
+// ────────────────────────────────────────────────
+// calculateTipInfo — max 분기 + 가시 윈도우 override
+//
+// axis range로 가시 인덱스 윈도우가 좁혀지면 drawTips가 미리 계산한
+// { sId, value, index }를 hitInfo로 넘긴다. calculateTipInfo는 이 override를
+// series.minMax(전역 캐시) 대신 사용해 윈도우 안의 max로 maxTip을 표시한다.
+// ────────────────────────────────────────────────
+describe('element.tip calculateTipInfo — max 분기 가시 윈도우 override', () => {
+  const buildBarSeries = () => ({
+    type: 'bar',
+    size: { w: 10, h: 0, cat: 20, cPad: 0, bar: 10, ix: 0, bPad: 0 },
+    xAxisIndex: 0,
+    yAxisIndex: 0,
+    minMax: { maxDomain: 9, maxDomainIndex: 9, maxX: 10, maxY: 999 },
+  });
+
+  it('hitInfo가 valid한 override면 value/ldata가 그 값으로 적용된다', () => {
+    const ctx = createCtx();
+    const result = ctx.calculateTipInfo(buildBarSeries(), 'max', {
+      sId: 'b', value: 60, index: 3,
+    });
+    // ldata=3 → 윈도우 보정 없으므로 그대로 사용. value는 override의 60.
+    expect(result.value).toBe(60);
+  });
+
+  it('hitInfo가 null이면 series.minMax(전역 캐시)를 그대로 쓴다', () => {
+    const ctx = createCtx();
+    const result = ctx.calculateTipInfo(buildBarSeries(), 'max', null);
+    expect(result.value).toBe(999); // series.minMax.maxY
+  });
+
+  it('hitInfo.index가 비유한이면 override를 무시하고 전역 캐시 폴백', () => {
+    const ctx = createCtx();
+    const result = ctx.calculateTipInfo(buildBarSeries(), 'max', {
+      sId: 'b', value: 60, index: NaN,
+    });
+    expect(result.value).toBe(999);
+  });
+
+  it('hitInfo.value가 비유한이면 override를 무시하고 전역 캐시 폴백', () => {
+    const ctx = createCtx();
+    const result = ctx.calculateTipInfo(buildBarSeries(), 'max', {
+      sId: 'b', value: null, index: 3,
+    });
+    expect(result.value).toBe(999);
+  });
+});

@@ -717,3 +717,118 @@ describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
     expect(totalPoints).toBe(4);
   });
 });
+
+// ────────────────────────────────────────────────
+// getVisibleWindowMaxSeries
+// axis range로 가시 인덱스 윈도우가 좁혀졌을 때, 윈도우 안의 max를 (sId, value, index)로 반환.
+// maxTip이 윈도우 밖 전역 max를 가리키지 않도록 보정하는 헬퍼.
+// ────────────────────────────────────────────────
+describe('getVisibleWindowMaxSeries', () => {
+  const buildStore = (seriesList, options = {}) =>
+    Object.assign(Object.create(modules), {
+      seriesList,
+      options: { horizontal: false, ...options },
+    });
+
+  const barSeries = (sId, ys) => ({
+    sId,
+    type: 'bar',
+    show: true,
+    data: ys.map((y, i) => ({ x: i, y })),
+  });
+
+  it('윈도우 안의 최댓값 시리즈/인덱스/값을 반환한다', () => {
+    const store = buildStore({
+      a: barSeries('a', [10, 20, 100, 30, 40]),  // 전역 max 100 at idx=2
+      b: barSeries('b', [5, 50, 25, 60, 15]),    // 전역 max 60 at idx=3
+    });
+    // window [3, 4]: a는 30,40 / b는 60,15 → b의 idx=3, value=60이 윈도우 max
+    expect(store.getVisibleWindowMaxSeries(3, 4))
+      .toEqual({ sId: 'b', value: 60, index: 3 });
+  });
+
+  it('전역 max가 윈도우 안이면 그대로 그 시리즈를 반환한다', () => {
+    const store = buildStore({
+      a: barSeries('a', [10, 20, 100, 30, 40]),
+    });
+    expect(store.getVisibleWindowMaxSeries(1, 3))
+      .toEqual({ sId: 'a', value: 100, index: 2 });
+  });
+
+  it('horizontal 차트는 p.x를 비교한다', () => {
+    const store = Object.assign(Object.create(modules), {
+      seriesList: {
+        a: {
+          sId: 'a',
+          type: 'bar',
+          show: true,
+          data: [{ x: 5, y: 0 }, { x: 99, y: 1 }, { x: 7, y: 2 }],
+        },
+      },
+      options: { horizontal: true },
+    });
+    expect(store.getVisibleWindowMaxSeries(0, 2))
+      .toEqual({ sId: 'a', value: 99, index: 1 });
+  });
+
+  it('show=false 시리즈는 무시한다', () => {
+    const store = buildStore({
+      a: { ...barSeries('a', [10, 20, 30]), show: false },
+      b: barSeries('b', [5, 50, 15]),
+    });
+    expect(store.getVisibleWindowMaxSeries(0, 2))
+      .toEqual({ sId: 'b', value: 50, index: 1 });
+  });
+
+  it('bar 외 타입 시리즈는 무시한다', () => {
+    const store = buildStore({
+      a: { ...barSeries('a', [10, 20, 30]), type: 'line' },
+      b: barSeries('b', [5, 50, 15]),
+    });
+    expect(store.getVisibleWindowMaxSeries(0, 2))
+      .toEqual({ sId: 'b', value: 50, index: 1 });
+  });
+
+  it('윈도우가 data 길이 밖으로 넘어가도 안전하게 clamp 한다', () => {
+    const store = buildStore({
+      a: barSeries('a', [10, 20, 30]),
+    });
+    expect(store.getVisibleWindowMaxSeries(0, 100))
+      .toEqual({ sId: 'a', value: 30, index: 2 });
+  });
+
+  it('윈도우 안 모든 값이 null/undefined면 null을 반환한다', () => {
+    const store = buildStore({
+      a: { sId: 'a', type: 'bar', show: true, data: [{ x: 0, y: null }, { x: 1, y: null }] },
+    });
+    expect(store.getVisibleWindowMaxSeries(0, 1)).toBeNull();
+  });
+
+  it('minIndex/maxIndex가 비유한이면 null을 반환한다 (가드)', () => {
+    const store = buildStore({ a: barSeries('a', [1, 2, 3]) });
+    expect(store.getVisibleWindowMaxSeries(NaN, 2)).toBeNull();
+    expect(store.getVisibleWindowMaxSeries(0, undefined)).toBeNull();
+  });
+
+  it('maxIndex < minIndex (빈 윈도우)이면 null을 반환한다', () => {
+    const store = buildStore({ a: barSeries('a', [1, 2, 3]) });
+    expect(store.getVisibleWindowMaxSeries(2, 0)).toBeNull();
+  });
+
+  // addSeriesStackDS는 각 시리즈의 p.y에 stack 누적값을 저장하므로,
+  // index i에서 max p.y는 항상 top 시리즈의 값(=stack 총합)이 된다.
+  // 별도 분기 없이 일반 max 스캔만으로 stack 차트가 자동 지원됨을 가드한다.
+  it('stack 차트: top 시리즈가 stack 총합으로 윈도우 max를 결정한다', () => {
+    const store = buildStore({
+      base: { sId: 'base', type: 'bar', show: true,
+        data: [{ x: 0, y: 10, o: 10, b: 0 }, { x: 1, y: 20, o: 20, b: 0 }] },
+      mid:  { sId: 'mid',  type: 'bar', show: true,
+        data: [{ x: 0, y: 15, o: 5,  b: 10 }, { x: 1, y: 30, o: 10, b: 20 }] },
+      top:  { sId: 'top',  type: 'bar', show: true,
+        data: [{ x: 0, y: 18, o: 3,  b: 15 }, { x: 1, y: 35, o: 5,  b: 30 }] },
+    });
+    // 윈도우 [0, 1]: idx=1 stack 총합 35가 max, top 시리즈가 그 값을 보유.
+    expect(store.getVisibleWindowMaxSeries(0, 1))
+      .toEqual({ sId: 'top', value: 35, index: 1 });
+  });
+});

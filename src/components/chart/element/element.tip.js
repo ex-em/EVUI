@@ -89,24 +89,42 @@ const modules = {
     }
 
     if (maxTipOpt.use && !isExistSelectedLabel) {
-      const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
-      const seriesInfo = this.seriesList[maxSID];
-      maxArgs = this.calculateTipInfo(seriesInfo, 'max', null);
+      // axis range가 활성이면 가시 윈도우 안에서 max를 재계산한다.
+      // 전역 max가 윈도우 밖일 수 있고, 다른 시리즈가 윈도우 안의 max일 수도 있다.
+      const axesSteps = isHorizontal ? this.axesSteps.y[0] : this.axesSteps.x[0];
+      const minIndex = axesSteps?.minIndex;
+      const maxIndex = axesSteps?.maxIndex;
+      const hasWindow =
+        Number.isFinite(minIndex) && Number.isFinite(maxIndex) && maxIndex >= minIndex;
 
-      if (maxTipOpt.use && maxArgs) {
-        if (tooltipValueFormatter) {
-          maxArgs.text = tooltipValueFormatter({
-            seriesId: seriesInfo.sId,
-            x: isHorizontal ? maxArgs.value : undefined,
-            y: !isHorizontal ? maxArgs.value : undefined,
-          });
-        } else {
-          maxArgs.text = numberWithComma(maxArgs.value);
-        }
-        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
+      let maxSID;
+      let windowMax = null;
+      if (hasWindow) {
+        windowMax = this.getVisibleWindowMaxSeries(minIndex, maxIndex);
+        maxSID = windowMax?.sId;
+      } else {
+        maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
+      }
 
-        if (maxTipOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ...maxArgs });
+      const seriesInfo = maxSID ? this.seriesList[maxSID] : null;
+      if (seriesInfo) {
+        maxArgs = this.calculateTipInfo(seriesInfo, 'max', windowMax);
+
+        if (maxArgs) {
+          if (tooltipValueFormatter) {
+            maxArgs.text = tooltipValueFormatter({
+              seriesId: seriesInfo.sId,
+              x: isHorizontal ? maxArgs.value : undefined,
+              y: !isHorizontal ? maxArgs.value : undefined,
+            });
+          } else {
+            maxArgs.text = numberWithComma(maxArgs.value);
+          }
+          this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
+
+          if (maxTipOpt.showIndicator) {
+            this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ...maxArgs });
+          }
         }
       }
     }
@@ -154,7 +172,17 @@ const modules = {
       return false;
     }
 
-    let ldata = type === 'bar' ? maxDomainIndex : maxDomain;
+    // tipType === 'max' + hitInfo: drawTips에서 미리 산출한 가시 윈도우 max override.
+    // 일반 'max' 경로는 series.minMax(전역 캐시)를 그대로 사용.
+    const hasMaxOverride = tipType === 'max' && hitInfo
+      && Number.isFinite(hitInfo.index) && Number.isFinite(hitInfo.value);
+
+    let ldata;
+    if (hasMaxOverride) {
+      ldata = hitInfo.index;
+    } else {
+      ldata = type === 'bar' ? maxDomainIndex : maxDomain;
+    }
 
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
@@ -165,7 +193,12 @@ const modules = {
       }
     }
 
-    let value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
+    let value;
+    if (hasMaxOverride) {
+      value = hitInfo.value;
+    } else {
+      value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
+    }
     let label;
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
