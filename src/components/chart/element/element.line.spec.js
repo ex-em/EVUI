@@ -148,10 +148,14 @@ describe('Chart Interpolation', () => {
       lineWidth: 1,
     });
 
-    const drawWithRange = (data, { xMin = 0, xMax = 100, yMin = 0, yMax = 100 } = {}) => {
+    const drawWithRange = (
+      data,
+      { xMin = 0, xMax = 100, yMin = 0, yMax = 100, displayOverflow = false, point = false } = {},
+    ) => {
       const line = new Line('series', { interpolation: 'none' }, 0);
       line.show = true;
       line.pointSize = 3;
+      line.point = point;
       line.data = data.map((d) => ({ ...d, o: d.o ?? d.y }));
       const ctx = makeStubCtx();
       line.draw({
@@ -162,6 +166,7 @@ describe('Chart Interpolation', () => {
           x: [{ graphMin: xMin, graphMax: xMax }],
           y: [{ graphMin: yMin, graphMax: yMax }],
         },
+        displayOverflow,
       });
       return { line, ctx };
     };
@@ -218,6 +223,40 @@ describe('Chart Interpolation', () => {
       // 첫 in-range 포인트 → moveTo, range 밖 skip, 그 다음 in-range 포인트는 prevValid=undefined 라 다시 moveTo.
       expect(moveLineOps[0][0]).toBe('moveTo');
       expect(moveLineOps[1][0]).toBe('moveTo');
+    });
+
+    describe('displayOverflow — 값 축(Y) 초과 경계 표시', () => {
+      it('displayOverflow=true 면 Y>graphMax 데이터가 경계로 clamp 되어 yp 가 non-null', () => {
+        const { line } = drawWithRange(
+          [{ x: 10, y: 50 }, { x: 50, y: 500 }],
+          { displayOverflow: true },
+        );
+        expect(line.data[1].yp).not.toBe(null);
+        // 경계(graphMax=100) 위치 = getYPos(100)
+        expect(line.data[1].yp).toBe(line.data[0].yp - ((100 - 50) / 100) * 200);
+      });
+
+      it('displayOverflow=true 라도 X>graphMax 는 여전히 xp=null (X 는 clamp 안 함)', () => {
+        const { line } = drawWithRange(
+          [{ x: 10, y: 50 }, { x: 200, y: 50 }],
+          { displayOverflow: true },
+        );
+        expect(line.data[1].xp).toBe(null);
+      });
+
+      it('displayOverflow=false(기본)면 Y>graphMax 는 yp=null (숨김 유지)', () => {
+        const { line } = drawWithRange([{ x: 10, y: 50 }, { x: 50, y: 500 }]);
+        expect(line.data[1].yp).toBe(null);
+      });
+
+      it('displayOverflow=true + 중간 X range 밖 포인트에서 크래시하지 않는다', () => {
+        expect(() =>
+          drawWithRange(
+            [{ x: 10, y: 500 }, { x: 200, y: 500 }, { x: 90, y: 500 }],
+            { displayOverflow: true },
+          ),
+        ).not.toThrow();
+      });
     });
   });
 

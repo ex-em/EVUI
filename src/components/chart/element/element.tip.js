@@ -198,6 +198,18 @@ const modules = {
       }
     }
 
+    // 값 축(horizontal: X, vertical: Y) max 를 초과하는데 displayOverflow 가 꺼져 있으면
+    // 해당 데이터(포인트/막대)는 숨겨지므로 maxTip/sel tip 도 그리지 않는다.
+    // displayOverflow 가 켜져 있으면 fall-through → 기존 gp clamp 로 경계 위치에 tip 표시.
+    const valueAxisMax = isHorizontal ? graphX.graphMax : graphY.graphMax;
+    if (
+      (tipType === 'max' || tipType === 'sel') &&
+      value > valueAxisMax &&
+      !this.options.displayOverflow
+    ) {
+      return false;
+    }
+
     let cp;
     let halfBarSize;
     let dp;

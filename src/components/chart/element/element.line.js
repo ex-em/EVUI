@@ -76,6 +76,7 @@ class Line {
       legendHitInfo,
       isBrush,
       unSelectedOpacity,
+      displayOverflow,
     } = param;
 
     // about selectLabel
@@ -139,8 +140,18 @@ class Line {
 
     const getXPos = (val) =>
       Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    // 값 축(현재 line 은 세로 전용 → 값 축 = Y)이 graphMax 를 초과하면, displayOverflow 가
+    // 켜졌을 때만 graphMax 로 clamp 해 상단 경계에 표시한다(scatter 와 동일). 꺼져 있으면 raw →
+    // calculateY 가 null 반환 → 숨김. horizontal line 지원 시 값 축이 X 로 바뀌므로
+    // getXPos 에도 동일 clamp 를 적용해야 한다.
     const getYPos = (val) =>
-      Canvas.calculateY(val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+      Canvas.calculateY(
+        displayOverflow && val > minmaxY.graphMax ? minmaxY.graphMax : val,
+        minmaxY.graphMin,
+        minmaxY.graphMax,
+        yArea,
+        ysp,
+      );
 
     const includeNegativeValue = this.data.some((data) => data.o < 0);
     const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;

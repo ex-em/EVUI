@@ -154,4 +154,44 @@ describe('Scatter Element', () => {
       expect(spy).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe('displayOverflow — 값 축(Y) 초과 처리 (기본값 false 회귀 방지)', () => {
+    // displayOverflow 가 DEFAULT_OPTIONS 에 추가되면서 기본값이 true 로 들어가면,
+    // 옵션을 지정하지 않은 기존 scatter 의 range 초과 포인트가 숨김 → 경계 표시로 뒤집힌다.
+    // 기본값은 false(=숨김) 여야 하고, calcItem 은 그 동작을 그대로 반영해야 한다.
+    const calcParam = ({ displayOverflow }) => ({
+      chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+      labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      axesSteps: { x: [{ graphMin: 0, graphMax: 100 }], y: [{ graphMin: 0, graphMax: 100 }] },
+      displayOverflow,
+    });
+
+    // 실제 calcItem 구현을 써야 displayOverflow clamp 를 검증할 수 있다(항등 매핑 모킹 X).
+    const realScatter = () => {
+      const scatter = new Scatter('s1', { color: '#000000', pointFill: '#000000' }, 0, false);
+      scatter.show = true;
+      return scatter;
+    };
+
+    it('displayOverflow=false(기본)면 Y>graphMax 데이터는 yp=null 로 숨겨진다', () => {
+      const scatter = realScatter();
+      const item = { x: 50, y: 500 }; // graphMax(100) 초과
+      scatter.calcItem(item, calcParam({ displayOverflow: false }));
+      expect(item.yp).toBe(null);
+    });
+
+    it('displayOverflow=true 면 Y>graphMax 데이터가 경계로 clamp 되어 yp 가 non-null', () => {
+      const scatter = realScatter();
+      const item = { x: 50, y: 500 };
+      scatter.calcItem(item, calcParam({ displayOverflow: true }));
+      expect(item.yp).not.toBe(null);
+    });
+
+    it('range 안 데이터는 displayOverflow 와 무관하게 항상 그려진다', () => {
+      const scatter = realScatter();
+      const item = { x: 50, y: 50 };
+      scatter.calcItem(item, calcParam({ displayOverflow: false }));
+      expect(item.yp).not.toBe(null);
+    });
+  });
 });
