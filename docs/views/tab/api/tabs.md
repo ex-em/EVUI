@@ -42,5 +42,6 @@
 |------|--------|------|------|------|
 | text | String, Number | null | <탭 패널>의 텍스트(라벨) | |
 | value | String, Number | null | <탭 패널>의 value | required |
+| lazy | Boolean | false | true면 한 번이라도 선택된 적 있는 <탭 패널>만 mount하고 이후 유지(방문 캐시). false는 모든 패널을 mount하고 v-show로 토글 | |
 
 
