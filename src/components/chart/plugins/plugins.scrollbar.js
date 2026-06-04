@@ -31,15 +31,14 @@ const module = {
 
     if (scrollbarOpt.resetPosition) {
       scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt[0].range] : null;
-      this.resetScrollbarSavedPositions(dir);
     }
 
     if (!scrollbarOpt.isInit) {
       scrollbarOpt.type = axisOpt?.[0]?.type;
       scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt[0].range] : null;
-      this.resetScrollbarSavedPositions(dir);
 
       this.initScrollbarRange(dir);
+      this.updateScrollbarAnchorEdge(dir);
       this.createScrollbarLayout(dir);
       this.createScrollbar(dir);
       this.createScrollEvent(dir);
@@ -115,19 +114,27 @@ const module = {
         const newOptRange = newOpt?.[0]?.range;
         const currentRange = this.scrollbar[dir].range;
         if (!isResetPosition && newOptRange?.length && currentRange?.length) {
-          // 리사이즈 등으로 range 크기만 변경된 경우, 현재 스크롤 위치(min)를 유지하고 크기만 조정
+          // 리사이즈 등으로 size 만 바뀌었을 때: anchorEdge 가 있으면 그 가장자리에 붙여
+          // 새 range 를 계산하고, 없으면 현재 시작점을 유지한다.
           const newSize = newOptRange[1] - newOptRange[0];
-          this.scrollbar[dir].range = [currentRange[0], currentRange[0] + newSize];
+          const anchorEdge = this.scrollbar[dir].anchorEdge;
+          const limits = anchorEdge ? this.getScrollbarLimits(dir) : null;
+          if (anchorEdge === 'start' && limits) {
+            this.scrollbar[dir].range = [limits.limitMin, limits.limitMin + newSize];
+          } else if (anchorEdge === 'end' && limits) {
+            this.scrollbar[dir].range = [limits.limitMax - newSize, limits.limitMax];
+          } else {
+            this.scrollbar[dir].range = [currentRange[0], currentRange[0] + newSize];
+          }
         } else {
           this.scrollbar[dir].range = newOptRange?.length ? [...newOptRange] : null;
         }
       }
 
-      if (isResetPosition || updateData) {
-        this.resetScrollbarSavedPositions(dir);
-      }
-
       this.initScrollbarRange(dir);
+      // range 가 갱신/clip 된 후 anchorEdge 재계산. 데이터만 업데이트 시 range 는 그대로
+      // 지만 limit 이 바뀌었을 수 있어 항상 호출한다.
+      this.updateScrollbarAnchorEdge(dir);
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
   },
@@ -137,15 +144,11 @@ const module = {
    */
   updateScrollbarPosition() {
     if (this.scrollbar.x?.use && this.scrollbar.x?.isInit) {
-      // resetPosition 옵션에 따라 preservePosition 결정
-      const preservePosition = !this.options.axesX?.[0]?.scrollbar?.resetPosition;
-      this.setScrollbarPosition('x', preservePosition);
+      this.setScrollbarPosition('x');
     }
 
     if (this.scrollbar.y?.use && this.scrollbar.y?.isInit) {
-      // resetPosition 옵션에 따라 preservePosition 결정
-      const preservePosition = !this.options.axesY?.[0]?.scrollbar?.resetPosition;
-      this.setScrollbarPosition('y', preservePosition);
+      this.setScrollbarPosition('y');
     }
   },
 
@@ -230,11 +233,11 @@ const module = {
   },
 
   /**
-   * set scrollbar position
+   * set scrollbar position. thumb 위치는 scrollbar.range 에서 파생되며,
+   * 부동소수점 누적 오차가 가장자리를 살짝 넘지 않도록 [0, maxPosition] 으로 보정한다.
    * @param dir axis direction ('x' | 'y')
-   * @param preservePosition 기존 위치를 유지할지 여부
    */
-  setScrollbarPosition(dir, preservePosition = false) {
+  setScrollbarPosition(dir) {
     const scrollbarOpt = this.scrollbar[dir];
     if (!scrollbarOpt.use || !scrollbarOpt.range) {
       return;
@@ -258,28 +261,8 @@ const module = {
     const trackSize = fullSize - (buttonSize * 2);
 
     const thumbSize = this.getScrollbarThumbSize(dir, trackSize);
-
-    // 비율로 저장된 위치가 있으면 새 track 크기에 맞게 복원
-    if (preservePosition && scrollbarOpt.savedPositionRatio !== undefined) {
-      const maxPosition = Math.max(0, trackSize - thumbSize.size);
-      if (scrollbarOpt.savedAtStart) {
-        thumbSize.position = 0;
-      } else if (scrollbarOpt.savedAtEnd) {
-        thumbSize.position = maxPosition;
-      } else {
-        thumbSize.position = Math.min(scrollbarOpt.savedPositionRatio * trackSize, maxPosition);
-      }
-    }
-
-    // 위치를 비율 및 처음/끝 고정 여부로 저장
-    // currentMaxPosition === 0 (thumbSize >= trackSize) 인 경우 저장하지 않음
-    // → trackSize가 다시 커졌을 때 이전 savedAtEnd/savedAtStart/savedPositionRatio 상태를 유지
-    const currentMaxPosition = Math.max(0, trackSize - thumbSize.size);
-    if (currentMaxPosition > 0) {
-      scrollbarOpt.savedPositionRatio = thumbSize.position / trackSize;
-      scrollbarOpt.savedAtStart = thumbSize.position <= 0;
-      scrollbarOpt.savedAtEnd = thumbSize.position >= currentMaxPosition;
-    }
+    const maxPosition = Math.max(0, trackSize - thumbSize.size);
+    thumbSize.position = Math.min(Math.max(thumbSize.position, 0), maxPosition);
 
     let scrollbarStyle = 'display: block;';
     let scrollbarTrackStyle;
@@ -456,9 +439,7 @@ const module = {
 
     if (!isOutOfRange) {
       scrollbarOpt.range = [minValue, maxValue];
-
-      // 사용자가 스크롤할 때는 저장된 위치를 초기화
-      this.resetScrollbarSavedPositions(dir);
+      this.updateScrollbarAnchorEdge(dir);
 
       this.update({
         updateSeries: false,
@@ -470,18 +451,44 @@ const module = {
   },
 
   /**
-   * reset scrollbar saved positions
+   * 축의 인덱스/값 한계 반환. step 은 labels 길이 기준, 그 외는 minMax 기준.
+   * @param dir axis direction ('x' | 'y')
+   * @returns {{limitMin: number, limitMax: number} | null}
+   */
+  getScrollbarLimits(dir) {
+    const scrollbarOpt = this.scrollbar[dir];
+    if (scrollbarOpt?.type === 'step') {
+      const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
+      if (!labels?.length) return null;
+      return { limitMin: 0, limitMax: labels.length - 1 };
+    }
+    const minMax = this.minMax?.[dir]?.[0];
+    if (!minMax) return null;
+    return { limitMin: +minMax.min, limitMax: +minMax.max };
+  },
+
+  /**
+   * 현재 scrollbar.range 가 축 한계의 어느 쪽에 닿아있는지로 anchorEdge 를 갱신.
+   * 사용자의 "끝/시작에 붙여둔 상태" 의도를 보존해 사이즈 변경 시 재계산에 사용.
    * @param dir axis direction ('x' | 'y')
    */
-  resetScrollbarSavedPositions(dir) {
+  updateScrollbarAnchorEdge(dir) {
     const scrollbarOpt = this.scrollbar[dir];
-    if (!scrollbarOpt) {
+    if (!scrollbarOpt) return;
+
+    const range = scrollbarOpt.range;
+    const limits = this.getScrollbarLimits(dir);
+    if (!Array.isArray(range) || range.length !== 2 || !limits) {
+      scrollbarOpt.anchorEdge = null;
       return;
     }
-
-    delete scrollbarOpt.savedPositionRatio;
-    delete scrollbarOpt.savedAtStart;
-    delete scrollbarOpt.savedAtEnd;
+    if (range[0] <= limits.limitMin) {
+      scrollbarOpt.anchorEdge = 'start';
+    } else if (range[1] >= limits.limitMax) {
+      scrollbarOpt.anchorEdge = 'end';
+    } else {
+      scrollbarOpt.anchorEdge = null;
+    }
   },
 
   /**
@@ -694,9 +701,7 @@ const module = {
     }
 
     this.scrollbar[dir].range = [movedMin, movedMax];
-
-    // 사용자가 드래그로 스크롤할 때는 저장된 위치를 초기화
-    this.resetScrollbarSavedPositions(dir);
+    this.updateScrollbarAnchorEdge(dir);
 
     this.update({
       updateSeries: false,
