@@ -252,9 +252,11 @@ const chartData =
 | fillColor | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상 | |
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
 | startArea | String (CSS Selector) | '' | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. 여러 차트를 사용할 때는 차트마다 고유한 셀렉터를 지정하세요(공통 조상을 지정하면 한 번의 드래그가 모든 차트의 selection을 트리거합니다). | '.chart-wrapper' |
+| displayFromStartArea | Boolean | false | (scatter, PC 전용) 드래그 선택 영역을 캔버스 가장자리가 아니라 `startArea`에서 드래그를 시작한 지점부터 표시합니다. `startArea`가 지정되어야 동작합니다. 선택되는 데이터·`drag-select` range 페이로드는 영향받지 않고 화면 표시만 달라집니다. | true / false |
 
 - PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
 - `startArea`를 지정하면 캔버스 바깥(지정한 영역 내부)에서 드래그를 시작해도 포인터가 캔버스에 진입하는 순간 선택이 시작됩니다.
+- `displayFromStartArea`를 `true`로 지정하면 `startArea`를 덮는 전용 캔버스(`pointer-events: none`)에 선택 영역을 그려, 드래그를 시작한 지점부터 사각형이 표시됩니다. 이때 `startArea` 요소가 `position: static`이면 라이브러리가 자동으로 `position: relative`로 설정하고 차트 destroy 시 원복합니다.
 
 #### tooltip
 
