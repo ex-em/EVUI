@@ -1790,6 +1790,12 @@ class EvChart {
 
     this.render(renderHitInfo);
 
+    // displayFromStartArea 전용 캔버스는 render로 비워지지 않으므로, 재렌더마다 startArea 크기에
+    // 맞춰 갱신(클리어 포함)한 뒤 드래그 영역을 다시 그린다.
+    if (this.dragDisplayCanvas) {
+      this.refreshDragDisplayCanvas();
+    }
+
     const isDragMove = this.dragInfo && this.drawSelectionArea;
     if (isDragMove) {
       this.drawSelectionArea(this.dragInfo);
@@ -1889,6 +1895,9 @@ class EvChart {
     // resize 는 캔버스를 막 리사이즈해 display 가 비워진 상태 → worker 비동기 합성을 기다리면 깜빡인다.
     // 이 프레임은 main 으로 동기 렌더한다(steady-state tick 은 계속 worker 사용).
     this.drawChart(undefined, true);
+    if (this.dragDisplayCanvas) {
+      this.refreshDragDisplayCanvas();
+    }
     if (this.dragInfoBackup) {
       this.drawSelectionArea?.(this.dragInfoBackup);
     }
@@ -2137,6 +2146,18 @@ class EvChart {
       window.removeEventListener('click', this.dragTouchSelectionEvent);
       if (this.invalidateRectOnScroll) {
         window.removeEventListener('scroll', this.invalidateRectOnScroll, { capture: true });
+      }
+
+      // displayFromStartArea 전용 캔버스 제거 및 startArea position 원복
+      if (this.dragDisplayCanvas) {
+        this.dragDisplayCanvas.parentNode?.removeChild(this.dragDisplayCanvas);
+        this.dragDisplayCanvas = null;
+        this.dragDisplayCtx = null;
+        this.dragDisplayOffset = null;
+      }
+      if (this.dragStartTarget && this.dragStartAreaPrevPosition !== undefined) {
+        this.dragStartTarget.style.position = this.dragStartAreaPrevPosition;
+        this.dragStartAreaPrevPosition = undefined;
       }
     }
 

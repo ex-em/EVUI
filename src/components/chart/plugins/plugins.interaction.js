@@ -123,7 +123,10 @@ const modules = {
 
       this._lastHoverSig = hoverSig;
 
-      if (this.dragInfoBackup) {
+      // 전용 드래그 캔버스를 쓰면 keepDisplay 영역이 그 캔버스에 그대로 남아 있어(매 hover의
+      // overlayClear는 메인 overlay만 비움) 여기서 다시 그릴 필요가 없다.
+      // (clear 없이 다시 그리면 opacity가 누적되어 짙어진다.)
+      if (this.dragInfoBackup && !this.dragDisplayCanvas) {
         this.drawSelectionArea(this.dragInfoBackup);
       }
 
@@ -529,6 +532,12 @@ const modules = {
       const { dragSelection, type } = this.options;
 
       if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
+        // displayFromStartArea: 텍스트가 포함될 수 있는 startArea 위에서 드래그를 시작하면
+        // 브라우저가 텍스트를 선택하므로, mousedown 기본동작을 막아 텍스트 드래그 선택을 방지한다.
+        // (click 이벤트는 그대로 발생하므로 selectItem 등에는 영향이 없다.)
+        if (this.dragDisplayCanvas) {
+          e.preventDefault();
+        }
         this.removeSelectionArea();
         this.dragStart(e, type);
       }
@@ -587,9 +596,21 @@ const modules = {
     // dragSelection.startArea(CSS 셀렉터)가 지정되면 해당 영역에서 시작한 드래그도 인식한다.
     // 기본값은 overlayCanvas이므로 캔버스 안에서 시작해야만 동작한다(기존 동작).
     // 셀렉터는 차트 자신의 조상에서 탐색하므로 멀티 차트에서도 각자 자신의 영역만 바라본다.
-    const { startArea } = this.options.dragSelection;
+    const { startArea, displayFromStartArea } = this.options.dragSelection;
     this.dragStartTarget = (startArea && this.target.closest(startArea)) || this.overlayCanvas;
     this.dragStartTarget.addEventListener('mousedown', this.onMouseDown);
+
+    // displayFromStartArea: scatter(PC)에서 드래그 영역을 startArea 지점부터 표시하기 위한 전용 캔버스.
+    // overlayCanvas는 .ev-chart-container(overflow:hidden) 안에 있어 캔버스 밖으로 그릴 수 없으므로,
+    // startArea를 덮는 별도의 pointer-events:none 캔버스가 필요하다.
+    if (
+      displayFromStartArea &&
+      this.options.type === 'scatter' &&
+      !this.isMobile &&
+      this.dragStartTarget !== this.overlayCanvas
+    ) {
+      this.createDragDisplayCanvas();
+    }
 
     this.dragTouchSelectionEvent = (e) => this.dragTouchSelectionDestroy(e);
     window.addEventListener('click', this.dragTouchSelectionEvent);
@@ -609,6 +630,9 @@ const modules = {
    * @returns {undefined}
    */
   dragStart(evt, type) {
+    if (this.dragDisplayCanvas) {
+      this.refreshDragDisplayCanvas();
+    }
     const [rawOffsetX, rawOffsetY, canvasWidth, canvasHeight] = this.getMousePosition(evt);
     let offsetX = rawOffsetX;
     let offsetY = rawOffsetY;
@@ -656,8 +680,9 @@ const modules = {
       this.removeSelectionArea();
     };
 
-    // 캔버스 안에서 드래그를 시작했다면 기존 동작과 동일하게 즉시 활성화
-    if (isInsideCanvas(rawOffsetX, rawOffsetY)) {
+    // 캔버스 안에서 드래그를 시작했다면 기존 동작과 동일하게 즉시 활성화.
+    // displayFromStartArea(전용 캔버스)면 startArea 지점부터 그려야 하므로 시작 즉시 활성화한다.
+    if (isInsideCanvas(rawOffsetX, rawOffsetY) || this.dragDisplayCanvas) {
       activate();
     }
 
@@ -718,6 +743,19 @@ const modules = {
         dragInfo.width = Math.ceil(Math.abs(xep - xcp));
         dragInfo.height =
           type === 'scatter' ? Math.ceil(Math.abs(yep - ycp)) : aRange.y2 - aRange.y1;
+      }
+
+      // displayFromStartArea: 선택/range 계산용 clamped rect(위)와 별개로,
+      // startArea 지점부터 그리기 위한 raw(미clamp) rect를 별도로 보관한다.
+      // 선택 동작과 drag-select range 페이로드는 기존과 동일하게 유지된다.
+      if (this.dragDisplayCanvas && type === 'scatter') {
+        dragInfo.displayRect = {
+          xsp: Math.min(rawOffsetX, aOffsetX),
+          ysp: Math.min(rawOffsetY, aOffsetY),
+          width: Math.ceil(Math.abs(aOffsetX - rawOffsetX)),
+          height: Math.ceil(Math.abs(aOffsetY - rawOffsetY)),
+          range: aRange,
+        };
       }
 
       this.overlayClear();
@@ -782,9 +820,26 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSelectionArea({ xsp, ysp, width, height, range }) {
-    const ctx = this.overlayCtx;
+  drawSelectionArea(dragInfo) {
+    // displayFromStartArea가 활성화된 경우, 전용 캔버스에 raw(미clamp) displayRect를 그린다.
+    // 그 외에는 기존과 동일하게 overlayCanvas에 clamped rect를 그린다.
+    const useDedicated = !!this.dragDisplayCanvas;
+    const { xsp, ysp, width, height, range } =
+      useDedicated && dragInfo.displayRect ? dragInfo.displayRect : dragInfo;
+    const ctx = useDedicated ? this.dragDisplayCtx : this.overlayCtx;
     const { fillColor, opacity } = this.options.dragSelection;
+
+    // 전용 캔버스는 차트 영역만 덮는 overlayCanvas와 원점이 다르다(startArea를 덮음).
+    // 차트 좌표 → 전용 캔버스 좌표 변환 오프셋은 geometry가 바뀌는 시점(dragStart/render/resize)에
+    // refreshDragDisplayCanvas에서 미리 측정·캐시한 값을 쓴다. 매 프레임 getBoundingClientRect를
+    // 호출하지 않아 layout thrashing을 피한다.
+    let offsetX = 0;
+    let offsetY = 0;
+    if (useDedicated) {
+      this.dragDisplayClear();
+      offsetX = this.dragDisplayOffset?.x ?? 0;
+      offsetY = this.dragDisplayOffset?.y ?? 0;
+    }
 
     const chartRect = this.chartRect;
     const labelOffset = this.labelOffset;
@@ -799,7 +854,7 @@ const modules = {
     ctx.globalAlpha = opacity;
 
     if (isEqual(newRange, range)) {
-      ctx.fillRect(xsp, ysp, width, height);
+      ctx.fillRect(xsp + offsetX, ysp + offsetY, width, height);
     } else {
       const rectWidth = range.x2 - range.x1;
       const rectHeight = range.y2 - range.y1;
@@ -816,10 +871,108 @@ const modules = {
       const newWidth = newRectWidth * ratioWidth;
       const newHeight = newRectHeight * ratioHeight;
 
-      ctx.fillRect(newXsp, newYsp, newWidth, newHeight);
+      ctx.fillRect(newXsp + offsetX, newYsp + offsetY, newWidth, newHeight);
     }
 
     ctx.globalAlpha = 1;
+  },
+
+  /**
+   * Create a dedicated drag-display canvas mounted on the startArea element.
+   * Used only when dragSelection.displayFromStartArea is on (scatter, PC).
+   *
+   * @returns {undefined}
+   */
+  createDragDisplayCanvas() {
+    const startAreaEl = this.dragStartTarget;
+    if (!startAreaEl || startAreaEl === this.overlayCanvas) {
+      return;
+    }
+
+    // 전용 캔버스의 절대배치/크기 기준이 startArea가 되도록, static이면 relative로 승격한다.
+    // (chart destroy 시 원래 inline 값으로 복원)
+    if (window.getComputedStyle(startAreaEl).position === 'static') {
+      this.dragStartAreaPrevPosition = startAreaEl.style.position;
+      startAreaEl.style.position = 'relative';
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.className = 'ev-chart-drag-display-canvas';
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0px';
+    canvas.style.left = '0px';
+    // overlayCanvas(z-index:2)보다 위에서 그려져 선택 영역이 차트 위에 보이도록 한다.
+    canvas.style.zIndex = '3';
+    // 그리기 전용 — startArea의 다른 인터랙션을 막지 않는다(mousedown은 startArea가 처리).
+    canvas.style.pointerEvents = 'none';
+
+    startAreaEl.appendChild(canvas);
+
+    this.dragDisplayCanvas = canvas;
+    this.dragDisplayCtx = canvas.getContext('2d');
+
+    this.refreshDragDisplayCanvas();
+  },
+
+  /**
+   * Resize the dedicated drag-display canvas to cover the current startArea bounds.
+   * Called on creation and on chart render/resize.
+   *
+   * @returns {undefined}
+   */
+  refreshDragDisplayCanvas() {
+    if (!this.dragDisplayCanvas || !this.dragStartTarget) {
+      return;
+    }
+
+    const { width, height } = this.dragStartTarget.getBoundingClientRect();
+    const cssWidth = Math.max(1, Math.round(width));
+    const cssHeight = Math.max(1, Math.round(height));
+    const deviceWidth = cssWidth * this.pixelRatio;
+    const deviceHeight = cssHeight * this.pixelRatio;
+
+    if (
+      this.dragDisplayCanvas.width !== deviceWidth ||
+      this.dragDisplayCanvas.height !== deviceHeight
+    ) {
+      this.dragDisplayCanvas.width = deviceWidth;
+      this.dragDisplayCanvas.height = deviceHeight;
+      this.dragDisplayCanvas.style.width = `${cssWidth}px`;
+      this.dragDisplayCanvas.style.height = `${cssHeight}px`;
+    }
+
+    // canvas.width 변경은 transform을 초기화하므로 매번 재설정한다.
+    this.dragDisplayCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+    this.dragDisplayClear();
+
+    // 차트 좌표 → 전용 캔버스 좌표 오프셋을 여기서 한 번만 측정해 캐시한다.
+    // 주의: 차트와 startArea 사이 조상에 CSS transform이 걸리거나 드래그 도중 startArea가
+    // 차트에 대해 내부 스크롤되면 오프셋이 어긋날 수 있다(일반적 사용에선 발생하지 않음).
+    const overlayRect = this.overlayCanvas.getBoundingClientRect();
+    const canvasRect = this.dragDisplayCanvas.getBoundingClientRect();
+    this.dragDisplayOffset = {
+      x: overlayRect.left - canvasRect.left,
+      y: overlayRect.top - canvasRect.top,
+    };
+  },
+
+  /**
+   * Clear the dedicated drag-display canvas.
+   *
+   * @returns {undefined}
+   */
+  dragDisplayClear() {
+    if (!this.dragDisplayCtx || !this.dragDisplayCanvas) {
+      return;
+    }
+
+    const ratio = this.pixelRatio < 1 ? this.pixelRatio : 1;
+    this.dragDisplayCtx.clearRect(
+      0,
+      0,
+      this.dragDisplayCanvas.width / ratio,
+      this.dragDisplayCanvas.height / ratio,
+    );
   },
 
   /** Remove drag selection area
@@ -828,6 +981,9 @@ const modules = {
   removeSelectionArea() {
     this.dragInfoBackup = null;
     this.overlayClear();
+    if (this.dragDisplayCanvas) {
+      this.dragDisplayClear();
+    }
   },
 
   /**

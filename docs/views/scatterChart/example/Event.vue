@@ -101,6 +101,7 @@ export default {
         use: true,
         keepDisplay: true,
         startArea: '.case',
+        displayFromStartArea: true,
       },
       axesX: [
         {
