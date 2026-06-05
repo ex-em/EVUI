@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import modules from './plugins.interaction';
 
 /**
@@ -407,5 +407,189 @@ describe('plugins.interaction buildLabelValidMask', () => {
     });
 
     expect(Array.from(chart.buildLabelValidMask())).toEqual([1]);
+  });
+});
+
+/**
+ * displayFromStartArea(전용 드래그 캔버스) 회귀 테스트.
+ * drawSelectionArea 시그니처 변경(구조분해 → dragInfo 객체)과,
+ * 전용 캔버스에 raw rect를 그릴 때의 좌표 오프셋 가산(xsp + offsetX) 로직을 격리 검증한다.
+ */
+const makeCtx = () => ({
+  fillStyle: '',
+  globalAlpha: 1,
+  fillRect: vi.fn(),
+  clearRect: vi.fn(),
+});
+
+const createDrawChart = (overrides = {}) =>
+  Object.assign(Object.create(modules), {
+    options: { dragSelection: { fillColor: '#ff0000', opacity: 0.3 } },
+    chartRect: { x1: 0, x2: 100, y1: 0, y2: 100 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    overlayCtx: makeCtx(),
+    pixelRatio: 1,
+    ...overrides,
+  });
+
+describe('plugins.interaction drawSelectionArea 시그니처 호환 (overlay 경로)', () => {
+  it('단일 dragInfo 객체를 받아 overlayCtx에 clamped rect를 그린다', () => {
+    // 전용 캔버스가 없으면(기존 동작) overlayCtx에 오프셋 없이 그대로 그린다.
+    const chart = createDrawChart();
+    // labelOffset 0 + chartRect 0..100 → newRange === range 이므로 재스케일 없이 그대로.
+    const range = { x1: 0, x2: 100, y1: 0, y2: 100 };
+
+    chart.drawSelectionArea({ xsp: 10, ysp: 20, width: 30, height: 40, range });
+
+    expect(chart.overlayCtx.fillRect).toHaveBeenCalledTimes(1);
+    expect(chart.overlayCtx.fillRect).toHaveBeenCalledWith(10, 20, 30, 40);
+    expect(chart.overlayCtx.fillStyle).toBe('#ff0000');
+    expect(chart.overlayCtx.globalAlpha).toBe(1); // 그린 뒤 1로 복원
+  });
+});
+
+describe('plugins.interaction drawSelectionArea displayFromStartArea 좌표 오프셋', () => {
+  it('raw displayRect를 전용 캔버스에 (raw + offset) 위치로 그린다 (리사이즈 없음)', () => {
+    // startArea가 캔버스 위/왼쪽이라 raw 좌표가 음수여도 offset 가산 후 캔버스 내부 양수로 매핑된다.
+    const range = { x1: 0, x2: 100, y1: 0, y2: 100 };
+    const chart = createDrawChart({
+      dragDisplayCanvas: { width: 200, height: 150 },
+      dragDisplayCtx: makeCtx(),
+      dragDisplayOffset: { x: 20, y: 10 },
+    });
+
+    chart.drawSelectionArea({
+      // 선택/range 계산용 clamped rect (캔버스 안)
+      xsp: 0,
+      ysp: 0,
+      width: 60,
+      height: 50,
+      range,
+      // 그리기용 raw rect (startArea까지 뻗어 음수 시작)
+      displayRect: { xsp: -20, ysp: -10, width: 80, height: 60, range },
+    });
+
+    // raw.xsp + offsetX = -20 + 20 = 0, raw.ysp + offsetY = -10 + 10 = 0, 크기는 raw 그대로
+    expect(chart.dragDisplayCtx.fillRect).toHaveBeenCalledWith(0, 0, 80, 60);
+    // overlay에는 그리지 않는다
+    expect(chart.overlayCtx.fillRect).not.toHaveBeenCalled();
+    // 그리기 전 전용 캔버스를 항상 clear (opacity 누적 방지)
+    expect(chart.dragDisplayCtx.clearRect).toHaveBeenCalledWith(0, 0, 200, 150);
+  });
+
+  it('dragDisplayOffset이 없으면 오프셋 0으로 동작한다 (?? 0 fallback)', () => {
+    const range = { x1: 0, x2: 100, y1: 0, y2: 100 };
+    const chart = createDrawChart({
+      dragDisplayCanvas: { width: 200, height: 150 },
+      dragDisplayCtx: makeCtx(),
+      // dragDisplayOffset 미설정
+    });
+
+    chart.drawSelectionArea({
+      xsp: 0,
+      ysp: 0,
+      width: 60,
+      height: 50,
+      range,
+      displayRect: { xsp: -20, ysp: -10, width: 80, height: 60, range },
+    });
+
+    expect(chart.dragDisplayCtx.fillRect).toHaveBeenCalledWith(-20, -10, 80, 60);
+  });
+
+  it('keepDisplay 리사이즈 시 chart portion만 재스케일하고 startArea 꼬리는 픽셀 유지 (#3 드리프트 보정)', () => {
+    // chartRect를 2배(0..200)로 키워 리사이즈 발생. dragInfo.range는 리사이즈 전(0..100).
+    const range = { x1: 0, x2: 100, y1: 0, y2: 100 };
+    const chart = createDrawChart({
+      chartRect: { x1: 0, x2: 200, y1: 0, y2: 200 },
+      dragDisplayCanvas: { width: 400, height: 400 },
+      dragDisplayCtx: makeCtx(),
+      dragDisplayOffset: { x: 100, y: 50 },
+    });
+
+    chart.drawSelectionArea({
+      // clamped rect: 옛 chart(0..100) 안에서 x 20..70, y 20..70
+      xsp: 20,
+      ysp: 20,
+      width: 50,
+      height: 50,
+      range,
+      // raw rect: startArea로 뻗어 x -10..80, y -5..70
+      // leftExt=30, topExt=25, rightExt=10, bottomExt=0
+      displayRect: { xsp: -10, ysp: -5, width: 90, height: 75, range },
+    });
+
+    // clamped 2x 재스케일 → (40,40,100,100), 꼬리(30/25/10/0) 픽셀 유지, offset(100,50) 가산
+    // x = 40 - 30 + 100 = 110, y = 40 - 25 + 50 = 65
+    // w = 100 + 30 + 10 = 140, h = 100 + 25 + 0 = 125
+    expect(chart.dragDisplayCtx.fillRect).toHaveBeenCalledWith(110, 65, 140, 125);
+  });
+});
+
+describe('plugins.interaction 전용 드래그 캔버스 라이프사이클', () => {
+  it('refreshDragDisplayCanvas는 overlay와 전용 캔버스 rect 차이로 오프셋을 캐시한다', () => {
+    const chart = createDrawChart({
+      dragStartTarget: { getBoundingClientRect: () => ({ width: 200, height: 150 }) },
+      dragDisplayCanvas: {
+        width: 0,
+        height: 0,
+        style: {},
+        getBoundingClientRect: () => ({ left: 60, top: 20 }),
+      },
+      dragDisplayCtx: { setTransform: vi.fn(), clearRect: vi.fn() },
+      overlayCanvas: { getBoundingClientRect: () => ({ left: 100, top: 50 }) },
+    });
+
+    chart.refreshDragDisplayCanvas();
+
+    // offset = overlayRect - canvasRect = (100-60, 50-20)
+    expect(chart.dragDisplayOffset).toEqual({ x: 40, y: 30 });
+    // startArea 크기에 맞춰 device 픽셀로 리사이즈 (pixelRatio 1)
+    expect(chart.dragDisplayCanvas.width).toBe(200);
+    expect(chart.dragDisplayCanvas.height).toBe(150);
+    expect(chart.dragDisplayCtx.setTransform).toHaveBeenCalledWith(1, 0, 0, 1, 0, 0);
+  });
+
+  it('refreshDragDisplayCanvas는 전용 캔버스가 없으면 아무 일도 하지 않는다', () => {
+    const chart = createDrawChart({
+      dragStartTarget: { getBoundingClientRect: () => ({ width: 10, height: 10 }) },
+    });
+    expect(() => chart.refreshDragDisplayCanvas()).not.toThrow();
+    expect(chart.dragDisplayOffset).toBeUndefined();
+  });
+
+  it('dragDisplayClear는 ctx/canvas가 없으면 아무 일도 하지 않는다', () => {
+    const chart = createDrawChart({ dragDisplayCtx: null, dragDisplayCanvas: null });
+    expect(() => chart.dragDisplayClear()).not.toThrow();
+  });
+
+  it('removeSelectionArea는 backup을 비우고 전용 캔버스도 clear 한다', () => {
+    const dragDisplayCtx = { clearRect: vi.fn() };
+    const overlayClear = vi.fn();
+    const chart = createDrawChart({
+      dragInfoBackup: { xsp: 1 },
+      overlayClear,
+      dragDisplayCanvas: { width: 100, height: 80 },
+      dragDisplayCtx,
+    });
+
+    chart.removeSelectionArea();
+
+    expect(chart.dragInfoBackup).toBeNull();
+    expect(overlayClear).toHaveBeenCalled();
+    expect(dragDisplayCtx.clearRect).toHaveBeenCalledWith(0, 0, 100, 80);
+  });
+
+  it('createDragDisplayCanvas는 startArea가 overlayCanvas와 같으면 전용 캔버스를 만들지 않는다', () => {
+    // 가드는 overlayCanvas와의 동일성 비교뿐이라 실제 canvas가 필요 없다.
+    const overlayCanvas = {};
+    const chart = createDrawChart({
+      dragStartTarget: overlayCanvas,
+      overlayCanvas,
+    });
+
+    chart.createDragDisplayCanvas();
+
+    expect(chart.dragDisplayCanvas).toBeUndefined();
   });
 });
