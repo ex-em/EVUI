@@ -833,8 +833,6 @@ const modules = {
     // displayFromStartArea가 활성화된 경우, 전용 캔버스에 raw(미clamp) displayRect를 그린다.
     // 그 외에는 기존과 동일하게 overlayCanvas에 clamped rect를 그린다.
     const useDedicated = !!this.dragDisplayCanvas;
-    const { xsp, ysp, width, height, range } =
-      useDedicated && dragInfo.displayRect ? dragInfo.displayRect : dragInfo;
     const ctx = useDedicated ? this.dragDisplayCtx : this.overlayCtx;
     const { fillColor, opacity } = this.options.dragSelection;
 
@@ -862,25 +860,65 @@ const modules = {
     ctx.fillStyle = fillColor;
     ctx.globalAlpha = opacity;
 
-    if (isEqual(newRange, range)) {
-      ctx.fillRect(xsp + offsetX, ysp + offsetY, width, height);
+    if (useDedicated && dragInfo.displayRect) {
+      // raw displayRect는 chart 영역을 벗어나 startArea까지 뻗는 픽셀 꼬리를 포함한다.
+      // resize(keepDisplay) 시 chart 영역 portion(clamped rect)만 chart-range 비율로 재스케일하고,
+      // startArea로 뻗은 꼬리는 chart range와 무관하므로 픽셀 길이를 그대로 유지한다.
+      // resize가 없으면(newRange === range) 아래 계산은 raw displayRect를 그대로 복원한다.
+      const raw = dragInfo.displayRect;
+      const { xsp, ysp, width, height, range } = dragInfo;
+
+      let clampedXsp = xsp;
+      let clampedYsp = ysp;
+      let clampedWidth = width;
+      let clampedHeight = height;
+      if (!isEqual(newRange, range)) {
+        const rectWidth = range.x2 - range.x1;
+        const rectHeight = range.y2 - range.y1;
+        const newRectWidth = newRange.x2 - newRange.x1;
+        const newRectHeight = newRange.y2 - newRange.y1;
+
+        clampedXsp = newRange.x1 + newRectWidth * ((xsp - range.x1) / rectWidth);
+        clampedYsp = newRange.y1 + newRectHeight * ((ysp - range.y1) / rectHeight);
+        clampedWidth = newRectWidth * (width / rectWidth);
+        clampedHeight = newRectHeight * (height / rectHeight);
+      }
+
+      // clamped rect와 raw rect의 픽셀 차이(startArea로 뻗은 꼬리)를 재스케일된 clamped rect에 다시 더한다.
+      const leftExt = xsp - raw.xsp;
+      const topExt = ysp - raw.ysp;
+      const rightExt = raw.xsp + raw.width - (xsp + width);
+      const bottomExt = raw.ysp + raw.height - (ysp + height);
+
+      ctx.fillRect(
+        clampedXsp - leftExt + offsetX,
+        clampedYsp - topExt + offsetY,
+        clampedWidth + leftExt + rightExt,
+        clampedHeight + topExt + bottomExt,
+      );
     } else {
-      const rectWidth = range.x2 - range.x1;
-      const rectHeight = range.y2 - range.y1;
-      const newRectWidth = newRange.x2 - newRange.x1;
-      const newRectHeight = newRange.y2 - newRange.y1;
+      const { xsp, ysp, width, height, range } = dragInfo;
 
-      const ratioX = (xsp - range.x1) / rectWidth;
-      const ratioY = (ysp - range.y1) / rectHeight;
-      const newXsp = newRange.x1 + newRectWidth * ratioX;
-      const newYsp = newRange.y1 + newRectHeight * ratioY;
+      if (isEqual(newRange, range)) {
+        ctx.fillRect(xsp + offsetX, ysp + offsetY, width, height);
+      } else {
+        const rectWidth = range.x2 - range.x1;
+        const rectHeight = range.y2 - range.y1;
+        const newRectWidth = newRange.x2 - newRange.x1;
+        const newRectHeight = newRange.y2 - newRange.y1;
 
-      const ratioWidth = width / rectWidth;
-      const ratioHeight = height / rectHeight;
-      const newWidth = newRectWidth * ratioWidth;
-      const newHeight = newRectHeight * ratioHeight;
+        const ratioX = (xsp - range.x1) / rectWidth;
+        const ratioY = (ysp - range.y1) / rectHeight;
+        const newXsp = newRange.x1 + newRectWidth * ratioX;
+        const newYsp = newRange.y1 + newRectHeight * ratioY;
 
-      ctx.fillRect(newXsp + offsetX, newYsp + offsetY, newWidth, newHeight);
+        const ratioWidth = width / rectWidth;
+        const ratioHeight = height / rectHeight;
+        const newWidth = newRectWidth * ratioWidth;
+        const newHeight = newRectHeight * ratioHeight;
+
+        ctx.fillRect(newXsp + offsetX, newYsp + offsetY, newWidth, newHeight);
+      }
     }
 
     ctx.globalAlpha = 1;
