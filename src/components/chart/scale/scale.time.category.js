@@ -38,6 +38,8 @@ class TimeCategoryScale extends Scale {
    *   - maxIndex >= minIndex: [minIndex, maxIndex] 범위만.
    *   - sentinel { 0, -1 }: 빈 윈도우 → 아무것도 안 그림. undefined로 두지 않는
    *     이유는 undefined가 "전체 그림"을 뜻해 결과가 정반대이기 때문.
+   * 단, baseRange.min/max가 non-finite(데이터 없음 또는 range 오설정)면 빈 범위가
+   * 아니라 전체 라벨 범위 [0, last]로 폴백한다(빈 sentinel과 혼동 금지).
    * 소비자는 sentinel을 "아무것도 안 그림"으로 다뤄야 하며 minIndex를 단독
    * 시작 인덱스로 쓰려면 먼저 maxIndex >= minIndex 를 확인해야 한다.
    *
@@ -59,7 +61,9 @@ class TimeCategoryScale extends Scale {
     let maxIndex = labels.length - 1;
 
     const { min: rangeMin, max: rangeMax } = baseRange;
-    if (Number.isFinite(rangeMin) && Number.isFinite(rangeMax) && rangeMin < rangeMax) {
+    // labels는 오름차순(시간순) 정렬 가정: findIndex(ts >= rangeMin) + 역방향 루프는
+    // 정렬돼 있을 때만 올바른 [start, end] window를 준다(기존 코드베이스 전제와 동일).
+    if (Number.isFinite(rangeMin) && Number.isFinite(rangeMax)) {
       const startIdx = labels.findIndex(ts => ts >= rangeMin);
       let endIdx = -1;
       for (let i = labels.length - 1; i >= 0; i -= 1) {
@@ -74,6 +78,19 @@ class TimeCategoryScale extends Scale {
       } else {
         minIndex = startIdx;
         maxIndex = endIdx;
+      }
+    } else {
+      // min/max가 non-finite → 전체 라벨 범위(0 ~ last)로 폴백.
+      //   (a) 데이터 없는 초기 렌더링은 정상.
+      //   (b) range 옵션이 지정됐는데 non-finite로 귀결되면 오설정 가능성이 크므로
+      //       조용히 삼키지 말고 경고한다.
+      const rangeOpt = scrollbarOpt?.use ? scrollbarOpt?.range : this.range;
+      if (rangeOpt != null) {
+        console.warn(
+          '[EVUI][TimeCategoryScale] axis range가 유효한 min/max 숫자로 해석되지 ' +
+            '않아 전체 라벨 범위로 폴백합니다. range 설정을 확인하세요:',
+          rangeOpt,
+        );
       }
     }
 
