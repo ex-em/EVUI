@@ -720,10 +720,13 @@ class EvChart {
       this.oldPixelRatio = this.pixelRatio;
     }
 
-    this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
+    // 누적형 scale() 대신 절대 변환(setTransform)을 사용해 idempotent하게 만든다.
+    // 이렇게 하면 매 update마다 canvas.width 재대입(트랜스폼 리셋)에 의존하지 않아도 되어
+    // setWidth/setHeight에서 크기 변경이 없을 때 비트맵 재할당을 건너뛸 수 있다.
+    this.bufferCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
 
     if (this.overlayCtx) {
-      this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
+      this.overlayCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
     }
   }
 
@@ -853,13 +856,22 @@ class EvChart {
       return;
     }
 
-    this.displayCanvas.width = width * this.pixelRatio;
+    // canvas.width 재대입은 크기가 같아도 비트맵 재할당+clear+컨텍스트 리셋을 유발한다.
+    // 실제 device-pixel 폭이 바뀐 경우에만 재설정해 매 update마다의 재할당을 제거한다.
+    // (clear()가 매 렌더에서 캔버스를 비우므로 재할당의 암묵적 clear는 불필요하다.)
+    const deviceWidth = width * this.pixelRatio;
+    if (this._deviceWidth === deviceWidth) {
+      return;
+    }
+    this._deviceWidth = deviceWidth;
+
+    this.displayCanvas.width = deviceWidth;
     this.displayCanvas.style.width = `${width}px`;
-    this.bufferCanvas.width = width * this.pixelRatio;
+    this.bufferCanvas.width = deviceWidth;
     this.bufferCanvas.style.width = `${width}px`;
 
     if (this.overlayCanvas) {
-      this.overlayCanvas.width = width * this.pixelRatio;
+      this.overlayCanvas.width = deviceWidth;
       this.overlayCanvas.style.width = `${width}px`;
     }
   }
@@ -875,13 +887,20 @@ class EvChart {
       return;
     }
 
-    this.displayCanvas.height = height * this.pixelRatio;
+    // setWidth와 동일하게 device-pixel 높이가 바뀐 경우에만 재설정한다.
+    const deviceHeight = height * this.pixelRatio;
+    if (this._deviceHeight === deviceHeight) {
+      return;
+    }
+    this._deviceHeight = deviceHeight;
+
+    this.displayCanvas.height = deviceHeight;
     this.displayCanvas.style.height = `${height}px`;
-    this.bufferCanvas.height = height * this.pixelRatio;
+    this.bufferCanvas.height = deviceHeight;
     this.bufferCanvas.style.height = `${height}px`;
 
     if (this.overlayCanvas) {
-      this.overlayCanvas.height = height * this.pixelRatio;
+      this.overlayCanvas.height = deviceHeight;
       this.overlayCanvas.style.height = `${height}px`;
     }
   }
