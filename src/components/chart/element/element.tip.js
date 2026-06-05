@@ -386,7 +386,7 @@ const modules = {
             if (
               Number.isFinite(stepInfo?.minIndex)
               && Number.isFinite(stepInfo?.maxIndex)
-              && stepInfo.minIndex <= stepInfo.maxIndex
+              && stepInfo.minIndex < stepInfo.maxIndex
             ) {
               startIndex = stepInfo.minIndex;
               endIndex = stepInfo.maxIndex;

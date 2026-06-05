@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { AXIS_UNITS } from '../helpers/helpers.constant';
+import Util from '../helpers/helpers.util';
 import Scale from './scale';
 import TimeCategoryScale from './scale.time.category';
 
@@ -170,6 +171,14 @@ describe('TimeCategoryScale', () => {
       expect(result.maxIndex).toBe(-1);
     });
 
+    it('range가 역전된 경우(min > max): 교집합 없음 → maxIndex = -1 (빈 범위)', () => {
+      // rangeMin < rangeMax 가드를 제거했으므로, 역전 range는 기존 endIdx < startIdx
+      // 로직을 타고 빈 sentinel로 처리된다(전체 범위로 새지 않음).
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0 + 7 * HOUR, max: T0 + 3 * HOUR });
+      expect(result.maxIndex).toBe(-1);
+    });
+
     it('라벨 경계와 정확히 일치하는 range: 전체 라벨 범위(0 ~ last)를 반환한다', () => {
       const scale = makeScale();
       const result = scale.calculateScaleRange({ min: T0, max: T0 + 9 * HOUR });
@@ -203,6 +212,81 @@ describe('TimeCategoryScale', () => {
       const result = scale.calculateScaleRange({ min: T0, max: T0 + 9 * HOUR });
       expect(result.minIndex).toBe(0);
       expect(result.maxIndex).toBe(-1);
+    });
+  });
+
+  // ─────────────────────────────────────────────────
+  // 위 describe는 super를 항등 mock으로 대체하지만, 실제 base(Scale.prototype)는
+  // min === max → max += 1, startToZero, autoScaleRatio 등 보정을 수행한다.
+  // 여기서는 canvas 의존 함수(Util.calcTextSizeCanvas)만 좁게 stub 하고 나머지
+  // base 로직은 그대로 실행해, "보정된 min/max" 기준으로 인덱스가 계산되는지
+  // (특히 startToZero 같은 보정이 mock에 가려지지 않는지)를 통합으로 검증한다.
+  describe('calculateScaleRange - base 보정 통합', () => {
+    const T0 = dayjs('2026-01-01 00:00:00').valueOf();
+    const labels = Array.from({ length: 10 }, (_, i) => T0 + i * HOUR);
+
+    let sizeSpy;
+    beforeEach(() => {
+      sizeSpy = vi.spyOn(Util, 'calcTextSizeCanvas').mockReturnValue({ width: 0, height: 0 });
+    });
+    afterEach(() => { sizeSpy.mockRestore(); });
+
+    const makeScale = (overrides = {}) => {
+      const scale = Object.create(TimeCategoryScale.prototype);
+      scale.labels = labels;
+      scale.timeFormat = 'HH:mm';
+      scale.formatter = null;
+      scale.labelStyle = { color: '#000', fontSize: 11 };
+      scale.options = {};
+      scale.range = null;
+      Object.assign(scale, overrides);
+      return scale;
+    };
+
+    it('정상 다중 구간은 항등 mock 버전과 동일한 인덱스를 반환한다(통합 하니스 검증)', () => {
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0 + 3 * HOUR, max: T0 + 7 * HOUR });
+      expect(result.minIndex).toBe(3);
+      expect(result.maxIndex).toBe(7);
+    });
+
+    it('min === max(단일 시점)도 정상 동작: 해당 인덱스 단일 window(3,3)를 반환한다', () => {
+      // base가 max += 1 보정을 하지만, 보정 전이라도 startIdx === endIdx === 3 이므로
+      // 어느 쪽이든 단일 인덱스 window로 좁혀진다(crash/전체범위로 새지 않음).
+      const scale = makeScale();
+      const result = scale.calculateScaleRange({ min: T0 + 3 * HOUR, max: T0 + 3 * HOUR });
+      expect(result.minIndex).toBe(3);
+      expect(result.maxIndex).toBe(3);
+    });
+
+    it('startToZero: base가 minValue=0 보정 → minIndex가 0으로 당겨진다', () => {
+      // 항등 mock이라면 minIndex=3 이지만, 실제 base는 minValue를 0으로 바꾸므로
+      // rangeMin=0 기준으로 startIdx가 0이 된다(보정이 mock에 가려지지 않음을 확인).
+      const scale = makeScale({ startToZero: true });
+      const result = scale.calculateScaleRange({ min: T0 + 3 * HOUR, max: T0 + 7 * HOUR });
+      expect(result.minIndex).toBe(0);
+      expect(result.maxIndex).toBe(7);
+    });
+
+    it('range가 지정됐는데 non-finite로 해석되면 경고하고 전체 범위로 폴백한다', () => {
+      // range[0]이 NaN → base가 minValue=NaN으로 해석 → non-finite 폴백 경로 + 경고
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const scale = makeScale({ range: [NaN, T0 + 5 * HOUR] });
+      const result = scale.calculateScaleRange({ min: T0, max: T0 + 5 * HOUR });
+      expect(warnSpy).toHaveBeenCalledOnce();
+      expect(result.minIndex).toBe(0);
+      expect(result.maxIndex).toBe(labels.length - 1);
+      warnSpy.mockRestore();
+    });
+
+    it('range 미지정 상태의 non-finite(데이터 없는 초기 렌더링)는 경고하지 않는다', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const scale = makeScale({ range: null });
+      const result = scale.calculateScaleRange({ min: NaN, max: NaN });
+      expect(warnSpy).not.toHaveBeenCalled();
+      expect(result.minIndex).toBe(0);
+      expect(result.maxIndex).toBe(labels.length - 1);
+      warnSpy.mockRestore();
     });
   });
 
