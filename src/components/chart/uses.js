@@ -74,6 +74,9 @@ const DEFAULT_OPTIONS = {
   },
   reverse: false,
   horizontal: false,
+  // 값 축(value axis: horizontal ? X : Y)의 graphMax 를 초과하는 데이터를
+  // 경계에 모아 표시할지 여부. false 면 range 밖 데이터는 숨긴다(scatter 기존 동작 유지).
+  displayOverflow: false,
   overlapping: {
     use: false,
   },

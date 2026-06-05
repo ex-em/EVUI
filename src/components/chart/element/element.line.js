@@ -76,6 +76,7 @@ class Line {
       legendHitInfo,
       isBrush,
       unSelectedOpacity,
+      displayOverflow,
     } = param;
 
     // about selectLabel
@@ -137,22 +138,21 @@ class Line {
     const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    const getXPos = (val) => {
-      const _val = Math.min(
-        Math.max(val, minmaxX.graphMin),
-        minmaxX.graphMax
+    const getXPos = (val) =>
+      Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    // 값 축(현재 line 은 세로 전용 → 값 축 = Y)이 graphMax 를 초과하면, displayOverflow 가
+    // 켜졌을 때만 graphMax 로 clamp 해 상단 경계에 표시한다(scatter 와 동일). 꺼져 있으면 raw →
+    // calculateY 가 null 반환 → 숨김. horizontal line 지원 시 값 축이 X 로 바뀌므로
+    // getXPos 에도 동일 clamp 를 적용해야 한다.
+    const getYPos = (val) =>
+      Canvas.calculateY(
+        displayOverflow && val > minmaxY.graphMax ? minmaxY.graphMax : val,
+        minmaxY.graphMin,
+        minmaxY.graphMax,
+        yArea,
+        ysp,
       );
-      return Canvas.calculateX(_val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-    };
 
-    const getYPos = (val) => {
-      const _val = Math.min(
-        Math.max(val, minmaxY.graphMin),
-        minmaxY.graphMax
-      );
-      return Canvas.calculateY(_val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-    };
-    
     const includeNegativeValue = this.data.some((data) => data.o < 0);
     const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
 
@@ -174,6 +174,10 @@ class Line {
       curr.yp = y;
 
       if (isLinearInterpolation && curr.o === null) {
+        return;
+      } else if (x === null || y === null) {
+        // axis range 밖 데이터는 라인을 끊고 prevValid 도 리셋해 다음 valid 포인트가 moveTo 로 재시작하도록.
+        prevValid = undefined;
         return;
       } else if (
         (isNil(prevValid?.y) && !this.isExistGrp) ||
@@ -251,6 +255,10 @@ class Line {
       needFillDataIndexList.forEach(([startIndex, endIndex]) => {
         if (startIndex === endIndex) {
           const singleData = this.data[startIndex];
+          // axis range 밖이면 xp/yp 가 null. 그대로 ctx 에 전달하면 좌상단으로 fill 이 튕긴다.
+          if (singleData.xp === null || singleData.yp === null) {
+            return;
+          }
           ctx.moveTo(singleData.xp - lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, getYPos(singleData.b) ?? endPoint);
@@ -258,13 +266,19 @@ class Line {
           return;
         }
 
+        let pathStarted = false;
         for (let ix = startIndex; ix <= endIndex; ix++) {
           const currData = this.data[ix];
+          // axis range 밖 (xp/yp null) 이면 path 추가는 건너뛰고 다음 valid 포인트에서 새 path 를 시작.
+          const isInRange = currData.xp !== null && currData.yp !== null;
 
-          if (ix === startIndex) {
-            ctx.moveTo(currData.xp, currData.yp);
-          } else if (currData.o !== null) {
-            ctx.lineTo(currData.xp, currData.yp);
+          if (isInRange) {
+            if (!pathStarted) {
+              ctx.moveTo(currData.xp, currData.yp);
+              pathStarted = true;
+            } else if (currData.o !== null) {
+              ctx.lineTo(currData.xp, currData.yp);
+            }
           }
 
           if (ix === endIndex) {
@@ -272,7 +286,7 @@ class Line {
               const nextData = this.data[jx];
               const xp = getXPos(nextData.x);
 
-              if (nextData.o !== null) {
+              if (xp !== null && nextData.o !== null) {
                 const bp = getYPos(nextData.b) ?? getYPos(0);
                 ctx.lineTo(xp, bp);
               }

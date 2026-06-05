@@ -42,7 +42,9 @@ const modules = {
 
           const selArgs = this.calculateTipInfo(seriesInfo, 'sel', tipInfo);
 
-          if (selArgs) {
+          // dp 가 null 이면 그릴 위치가 axis range 밖 — drawTextTip 이 null 을 0 으로 강제 변환해
+          // 좌상단에 가짜 tip 을 그려버리는 회귀를 막는다.
+          if (selArgs && selArgs.dp !== null) {
             let isSamePos = false;
 
             if (maxTipOpt.use && maxArgs?.dp === selArgs.dp) {
@@ -93,7 +95,9 @@ const modules = {
       const seriesInfo = this.seriesList[maxSID];
       maxArgs = this.calculateTipInfo(seriesInfo, 'max', null);
 
-      if (maxTipOpt.use && maxArgs) {
+      // dp 가 null 이면 max 데이터가 axis range 밖이라는 신호. drawTextTip 이 null 을 0 으로
+      // 강제 변환해 maxTip 이 좌상단에 찍히는 회귀를 막는다.
+      if (maxTipOpt.use && maxArgs && maxArgs.dp !== null) {
         if (tooltipValueFormatter) {
           maxArgs.text = tooltipValueFormatter({
             seriesId: seriesInfo.sId,
@@ -192,6 +196,18 @@ const modules = {
           lastTip.label = label;
         }
       }
+    }
+
+    // 값 축(horizontal: X, vertical: Y) max 를 초과하는데 displayOverflow 가 꺼져 있으면
+    // 해당 데이터(포인트/막대)는 숨겨지므로 maxTip/sel tip 도 그리지 않는다.
+    // displayOverflow 가 켜져 있으면 fall-through → 기존 gp clamp 로 경계 위치에 tip 표시.
+    const valueAxisMax = isHorizontal ? graphX.graphMax : graphY.graphMax;
+    if (
+      (tipType === 'max' || tipType === 'sel') &&
+      value > valueAxisMax &&
+      !this.options.displayOverflow
+    ) {
+      return false;
     }
 
     let cp;
