@@ -50,6 +50,11 @@ const modules = {
           const firstSeriesId = seriesIDs[0];
           const basePassingValue = this.seriesList[firstSeriesId]?.passingValue;
 
+          // 스택 그룹별 부호별 누적 top(base 위치)을 유지해 base 조회를 O(1)로 만든다.
+          // (기존 addSeriesStackDS 의 bsIds 역방향 탐색 O(S) 제거 → 그룹 전체 O(L·S²)→O(L·S).
+          //  null 이 많아도 비용이 일정 — 매 포인트마다 바닥까지 훑던 최악 케이스가 사라진다.)
+          const stackTops = new Map();
+
           for (let s = 0; s < seriesIDs.length; s++) {
             const seriesID = seriesIDs[s];
             const series = this.seriesList[seriesID];
@@ -83,8 +88,18 @@ const modules = {
             series.hasPassingValueInData = hasPassingValueInData;
 
             if (series && sData) {
-              if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
-                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
+              const inStackGroup = series.isExistGrp && !series.isOverlapping;
+              let tops = null;
+              if (inStackGroup) {
+                tops = stackTops.get(series.groupIndex);
+                if (!tops) {
+                  tops = { pos: [], neg: [] };
+                  stackTops.set(series.groupIndex, tops);
+                }
+              }
+
+              if (inStackGroup && series.stackIndex) {
+                series.data = this.addSeriesStackDS(sData, label, series.stackIndex, tops);
               } else {
                 series.data = this.addSeriesDS(
                   sData,
@@ -95,6 +110,11 @@ const modules = {
                 );
               }
               series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
+
+              // 이 시리즈가 이후 스택 시리즈의 base 가 되므로 누적 top 갱신
+              if (inStackGroup) {
+                this.updateStackTops(tops, series);
+              }
             }
           }
         }
@@ -457,57 +477,23 @@ const modules = {
    * Take data and label to create stack data for each series
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
-   * @param {array}   bsIds   stacked base data ID List
    * @param {number}  sIdx    series ordered index
+   * @param {{pos: number[], neg: number[]}}  tops  스택 그룹의 부호별 누적 top(base 위치)
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesStackDS(data, label, bsIds, sIdx = 0) {
-    const seriesList = this.seriesList;
+  addSeriesStackDS(data, label, sIdx = 0, tops = null) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
-    const basePositionCache = new Map();
+    const posTop = tops?.pos;
+    const negTop = tops?.neg;
 
-    const getBaseDataPosition = (baseIndex, dataIndex, curr) => {
-      const key = `${baseIndex}-${dataIndex}-${curr >= 0 ? 'pos' : 'neg'}`;
-      if (basePositionCache.has(key)) {
-        return basePositionCache.get(key);
-      }
-
-      let result = 0;
-      let idx = baseIndex;
-
-      while (idx >= 0) {
-        const baseSeries = seriesList[bsIds[idx]];
-        if (baseSeries?.show) {
-          const baseData = baseSeries.data[dataIndex];
-          const position = isHorizontal ? baseData?.x : baseData?.y;
-          const baseValue = baseData?.o;
-
-          const isPassingValue =
-            !Util.isNullOrUndefined(baseSeries.passingValue) &&
-            baseSeries.passingValue === baseValue;
-
-          const isSameSign = (curr >= 0 && baseValue >= 0) || (curr < 0 && baseValue < 0);
-
-          if (position != null && !isPassingValue && isSameSign) {
-            result = position;
-            break;
-          }
-        }
-        idx--;
-      }
-
-      basePositionCache.set(key, result);
-      return result;
-    };
-
-    const lastBaseIndex = bsIds.length - 1;
     data.forEach((curr, index) => {
-      const baseIndex = Math.max(0, lastBaseIndex);
-      let bdata = getBaseDataPosition(baseIndex, index, curr); // base(previous) series data
+      // base(아래 스택) 위치: 부호별 누적 top 에서 O(1) 조회.
+      // 기존 bsIds 역방향 탐색과 동치 — 가장 최근에 갱신된 "보이는 동일부호 유효 base"가 곧 누적 top.
+      let bdata = (curr >= 0 ? posTop?.[index] : negTop?.[index]) ?? 0; // base(previous) series data
       let odata = curr; // current series original data
       let ldata = label[index]; // label data
       let gdata = curr; // current series data which added previous series's value
@@ -535,6 +521,46 @@ const modules = {
     });
 
     return sdata;
+  },
+
+  /**
+   * 방금 data 가 계산된 스택 시리즈로 그룹의 부호별 누적 top(base 위치)을 갱신한다.
+   * addSeriesStackDS 의 base 조회를 O(1) 로 만들기 위한 보조 상태이며,
+   * 갱신 규칙은 기존 getBaseDataPosition 의 accept 조건과 동치다:
+   *   show 시리즈만, position(null 아님) && passingValue 아님 → 해당 부호 버킷에 기록.
+   * 인덱스는 series.data(압축본) 기준으로 기록하고 조회는 라벨 인덱스로 하므로
+   * 기존 `baseSeries.data[dataIndex]` 접근과 동일한 정렬을 유지한다.
+   * @param {{pos: number[], neg: number[]}}  tops  그룹 누적 top
+   * @param {object}  series  방금 data 가 계산된 시리즈
+   *
+   * @returns {undefined}
+   */
+  updateStackTops(tops, series) {
+    if (!series.show) {
+      return;
+    }
+
+    const isHorizontal = this.options.horizontal;
+    const passingValue = series.passingValue;
+    const usePassingValue = !Util.isNullOrUndefined(passingValue);
+    const data = series.data;
+    const pos = tops.pos;
+    const neg = tops.neg;
+
+    for (let i = 0; i < data.length; i++) {
+      const p = data[i];
+      const position = isHorizontal ? p.x : p.y;
+      const baseValue = p.o;
+      const isPassingValue = usePassingValue && baseValue === passingValue;
+
+      if (position != null && !isPassingValue) {
+        if (baseValue >= 0) {
+          pos[i] = position;
+        } else {
+          neg[i] = position;
+        }
+      }
+    }
   },
 
   /**
