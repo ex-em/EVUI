@@ -91,6 +91,7 @@ const modules = {
                   label,
                   series.isExistGrp,
                   basePassingValue,
+                  series.data,
                 );
               }
               series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
@@ -546,10 +547,13 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesDS(data, label, isBase, passingValue) {
+  addSeriesDS(data, label, isBase, passingValue, prevData) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
     const usePassingValue = isBase && !Util.isNullOrUndefined(passingValue);
+    // 직전 데이터셋의 포인트 객체를 재사용해 매 update마다의 N개 객체 할당(GC 압력)을 제거한다.
+    // 모든 포인트 객체는 동일한 10필드 형태이고 아래에서 전 필드를 덮어쓰므로 stale 값 위험이 없다.
+    const pool = Array.isArray(prevData) ? prevData : null;
 
     for (let i = 0; i < data.length; i++) {
       let gdata = data[i];
@@ -569,12 +573,28 @@ const modules = {
         } else {
           const v = value ?? null;
           const o = gdata ?? null;
-          sdata.push(isHorizontal
-            ? { x: v, y: ldata, o, b: null, xp: null, yp: null,
-                w: null, h: null, dataColor: null, dataTextColor: null }
-            : { x: ldata, y: v, o, b: null, xp: null, yp: null,
-                w: null, h: null, dataColor: null, dataTextColor: null },
-          );
+          const reused = pool && pool[sdata.length];
+
+          if (reused && typeof reused === 'object') {
+            reused.x = isHorizontal ? v : ldata;
+            reused.y = isHorizontal ? ldata : v;
+            reused.o = o;
+            reused.b = null;
+            reused.xp = null;
+            reused.yp = null;
+            reused.w = null;
+            reused.h = null;
+            reused.dataColor = null;
+            reused.dataTextColor = null;
+            sdata.push(reused);
+          } else {
+            sdata.push(isHorizontal
+              ? { x: v, y: ldata, o, b: null, xp: null, yp: null,
+                  w: null, h: null, dataColor: null, dataTextColor: null }
+              : { x: ldata, y: v, o, b: null, xp: null, yp: null,
+                  w: null, h: null, dataColor: null, dataTextColor: null },
+            );
+          }
         }
       }
     }
