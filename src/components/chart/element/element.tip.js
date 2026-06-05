@@ -224,7 +224,7 @@ const modules = {
           return false;
         }
       } else {
-        // axis range가 가시 인덱스 window를 지정한 경우(time/linear scale 등).
+        // axis range가 가시 인덱스 window를 지정한 경우(step/timeCategory scale 등).
         // bar는 size.cat이 visibleCount 기준이라 ldata도 가시 시작 인덱스를 기준으로 보정해야 한다.
         const dirSteps = isHorizontal ? graphY : graphX;
         const { minIndex, maxIndex } = dirSteps ?? {};
@@ -383,7 +383,11 @@ const modules = {
           } else {
             // axis range가 가시 인덱스 window를 지정한 경우 동일하게 화면 인덱스로 보정.
             const stepInfo = isHorizontal ? this.axesSteps.y[0] : this.axesSteps.x[0];
-            if (Number.isFinite(stepInfo?.minIndex) && Number.isFinite(stepInfo?.maxIndex)) {
+            if (
+              Number.isFinite(stepInfo?.minIndex)
+              && Number.isFinite(stepInfo?.maxIndex)
+              && stepInfo.minIndex <= stepInfo.maxIndex
+            ) {
               startIndex = stepInfo.minIndex;
               endIndex = stepInfo.maxIndex;
               labelCount = endIndex - startIndex + 1;

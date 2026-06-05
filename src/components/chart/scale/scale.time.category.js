@@ -31,13 +31,15 @@ class TimeCategoryScale extends Scale {
 
   /**
    * Calculate min/max value and index range for time category scale.
-   * Extends base result with minIndex/maxIndex so bar chart can restrict
-   * the rendered data range to the visible timestamp window.
+   * Adds minIndex/maxIndex so bar/tooltip can clip to the visible window.
    *
-   * Empty-range sentinel: { minIndex: 0, maxIndex: -1 }
-   *   Callers must check maxIndex >= minIndex before treating minIndex as a
-   *   valid start index — minIndex: 0 with maxIndex: -1 means "no visible labels",
-   *   not "start from first label".
+   * minIndex/maxIndex 세 가지 상태:
+   *   - undefined: 윈도우 없음 → 전체 범위 (여기선 반환하지 않음).
+   *   - maxIndex >= minIndex: [minIndex, maxIndex] 범위만.
+   *   - sentinel { 0, -1 }: 빈 윈도우 → 아무것도 안 그림. undefined로 두지 않는
+   *     이유는 undefined가 "전체 그림"을 뜻해 결과가 정반대이기 때문.
+   * 소비자는 sentinel을 "아무것도 안 그림"으로 다뤄야 하며 minIndex를 단독
+   * 시작 인덱스로 쓰려면 먼저 maxIndex >= minIndex 를 확인해야 한다.
    *
    * @param {object} minMax       min/max information
    * @param {object} scrollbarOpt scrollbar option
@@ -57,7 +59,7 @@ class TimeCategoryScale extends Scale {
     let maxIndex = labels.length - 1;
 
     const { min: rangeMin, max: rangeMax } = baseRange;
-    if (Number.isFinite(rangeMin) && Number.isFinite(rangeMax)) {
+    if (Number.isFinite(rangeMin) && Number.isFinite(rangeMax) && rangeMin < rangeMax) {
       const startIdx = labels.findIndex(ts => ts >= rangeMin);
       let endIdx = -1;
       for (let i = labels.length - 1; i >= 0; i -= 1) {
