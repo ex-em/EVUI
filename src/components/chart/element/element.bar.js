@@ -64,15 +64,19 @@ class Bar {
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    let totalCount = this.data.length;
     const [minIndex, maxIndex] = isHorizontal
       ? [minmaxY.minIndex, minmaxY.maxIndex]
       : [minmaxX.minIndex, minmaxX.maxIndex];
 
-    // minIndex, maxIndex가 유효하면 실제 그릴 데이터 개수로 보정
-    if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
-      totalCount = maxIndex - minIndex + 1;
-    }
+    // 가시 인덱스 윈도우를 한 곳에서 일관되게 해석한다(start/end/count 동시 산출).
+    //   - min/maxIndex가 number가 아님(undefined): 윈도우 미지정 → 전체 데이터 범위.
+    //   - 유효 윈도우(maxIndex >= minIndex): [minIndex, maxIndex] 범위만.
+    //   - 빈 윈도우(sentinel { minIndex: 0, maxIndex: -1 }): start > end 이므로
+    //     totalCount === 0 이고 아래 for 루프도 0회 → 아무것도 그리지 않는다.
+    const hasWindow = truthyNumber(minIndex) && truthyNumber(maxIndex);
+    const startIndex = hasWindow ? minIndex : 0;
+    const endIndex = hasWindow ? maxIndex : this.data.length - 1;
+    const totalCount = endIndex - startIndex + 1;
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
@@ -121,9 +125,6 @@ class Bar {
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
     this.filteredCount = totalCount;
-
-    const startIndex = truthyNumber(minIndex) ? minIndex : 0;
-    const endIndex = truthyNumber(maxIndex) ? maxIndex : this.data.length - 1;
 
     this.visibleStartIndex = startIndex;
 
