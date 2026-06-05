@@ -1,5 +1,5 @@
 import { ref, reactive, computed, watch, getCurrentInstance, nextTick, onUpdated } from 'vue';
-import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
+import { cloneDeep, cloneDeepWith, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
 
@@ -261,6 +261,21 @@ const DEFAULT_DATA = {
   labels: [],
   data: {},
 };
+
+/**
+ * dayjs/Date 등 불변(immutable) 날짜 값은 깊은 복제 대상에서 제외하고 참조만 공유한다.
+ * 메서드가 새 인스턴스를 반환하는 불변 객체라 제자리 변형이 없으므로 스냅샷 격리가 깨지지 않으며,
+ * time-axis 차트에서 labels의 dayjs 인스턴스를 통째로 깊은 복제하던 비용(수천 개)을 제거한다.
+ */
+const isImmutableDateLike = (value) =>
+  value instanceof Date ||
+  (value !== null &&
+    typeof value === 'object' &&
+    typeof value.toDate === 'function' &&
+    typeof value.format === 'function');
+
+export const cloneChartData = (data) =>
+  cloneDeepWith(data, (value) => (isImmutableDateLike(value) ? value : undefined));
 
 const useWidgetClickEvent = () => {
   let timer = null;
@@ -627,7 +642,7 @@ export const useZoomModel = (
   const setDataForUseZoom = (newData) => {
     if (isUpdateDataForUseZoom.value) {
       if (!isExecuteZoom.value) {
-        evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
+        evChartClone.data = evChartGroupRef ? cloneChartData(newData) : [cloneChartData(newData)];
 
         if (evChartZoomOptions.zoom.keepZoomStatus) {
           isUpdateDataForUseZoom.value = false;
