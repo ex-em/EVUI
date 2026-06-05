@@ -532,12 +532,6 @@ const modules = {
       const { dragSelection, type } = this.options;
 
       if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
-        // displayFromStartArea: 텍스트가 포함될 수 있는 startArea 위에서 드래그를 시작하면
-        // 브라우저가 텍스트를 선택하므로, mousedown 기본동작을 막아 텍스트 드래그 선택을 방지한다.
-        // (click 이벤트는 그대로 발생하므로 selectItem 등에는 영향이 없다.)
-        if (this.dragDisplayCanvas) {
-          e.preventDefault();
-        }
         this.removeSelectionArea();
         this.dragStart(e, type);
       }
@@ -633,6 +627,17 @@ const modules = {
     if (this.dragDisplayCanvas) {
       this.refreshDragDisplayCanvas();
     }
+
+    // displayFromStartArea: startArea 텍스트가 드래그 중 선택되는 것을 막는다.
+    // mousedown의 preventDefault는 포커스 이동까지 막아 startArea 안의 button/input 등
+    // 포커스 가능한 자식이 동작하지 않으므로, 포커스에 영향이 없는 user-select만 끈다.
+    // 드래그가 끝나면(dragEnd) 원래 인라인 값으로 되돌린다.
+    let prevUserSelect;
+    if (this.dragDisplayCanvas) {
+      prevUserSelect = this.dragStartTarget.style.userSelect;
+      this.dragStartTarget.style.userSelect = 'none';
+    }
+
     const [rawOffsetX, rawOffsetY, canvasWidth, canvasHeight] = this.getMousePosition(evt);
     let offsetX = rawOffsetX;
     let offsetY = rawOffsetY;
@@ -806,6 +811,10 @@ const modules = {
       }
 
       this.dragInfo = null;
+
+      if (prevUserSelect !== undefined) {
+        this.dragStartTarget.style.userSelect = prevUserSelect;
+      }
 
       window.removeEventListener('mousemove', dragMove);
       window.removeEventListener('mouseup', dragEnd);
