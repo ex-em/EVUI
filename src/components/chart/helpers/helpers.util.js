@@ -5,6 +5,11 @@ import { billions, millions, quadrillion, trillion, truthy } from '@/common/util
 const textMeasureCanvas = document.createElement('canvas');
 const textMeasureCtx = textMeasureCanvas.getContext('2d');
 
+// colorStringToRgba 결과 캐시. 시리즈 색상은 update 간 거의 불변이고 동일 (색,opacity)
+// 조합이 반복 파싱되므로, 불변 문자열 결과를 메모이즈해 정규식 재실행을 제거한다.
+const colorRgbaCache = new Map();
+const COLOR_RGBA_CACHE_MAX = 512;
+
 export default {
   /**
    * Transforming hex to rgb code
@@ -69,6 +74,12 @@ export default {
    * @returns {string} transformed rgba
    */
   colorStringToRgba(colorStr, opacity = 1) {
+    const cacheKey = `${colorStr}|${opacity}`;
+    const cached = colorRgbaCache.get(cacheKey);
+    if (cached !== undefined) {
+      return cached;
+    }
+
     const noneWhiteSpaceColorStr = colorStr.replace(/ /g, '');
     const colorType = this.getColorStringType(noneWhiteSpaceColorStr);
     let resultRGBA = '';
@@ -80,13 +91,23 @@ export default {
       case 'RGB':
         resultRGBA = noneWhiteSpaceColorStr.replace(')', `, ${opacity})`).replace('rgb', 'rgba');
         break;
-      case 'RGBA':
-        resultRGBA = noneWhiteSpaceColorStr.replace(`${this.getOpacity(colorStr)})`, `${opacity})`);
+      case 'RGBA': {
+        // 이미 RGBA로 판정됐으므로 getOpacity(=getColorStringType 재실행, 정규식 3개)를 호출하지 않고
+        // 현재 opacity 값을 직접 추출해 교체한다.
+        const curOpacity = noneWhiteSpaceColorStr.replace(/^.*,(.+)\)/, '$1');
+        resultRGBA = noneWhiteSpaceColorStr.replace(`${curOpacity})`, `${opacity})`);
         break;
+      }
       default:
         resultRGBA = `rgba(0, 0, 0, ${opacity})`;
         break;
     }
+
+    if (colorRgbaCache.size >= COLOR_RGBA_CACHE_MAX) {
+      colorRgbaCache.delete(colorRgbaCache.keys().next().value);
+    }
+
+    colorRgbaCache.set(cacheKey, resultRGBA);
 
     return resultRGBA;
   },
