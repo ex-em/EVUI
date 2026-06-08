@@ -88,6 +88,7 @@ export default {
     'click-legend',
     'update:legendData',
     'axes-scale-change',
+    'axes-data-max-change',
   ],
   setup(props, { emit }) {
     let evChart = null;
