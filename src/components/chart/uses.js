@@ -431,6 +431,9 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
     'axes-scale-change': (result) => {
       emit('axes-scale-change', result);
     },
+    'axes-data-max-change': (maxY) => {
+      emit('axes-data-max-change', maxY);
+    },
   };
 
   return {
