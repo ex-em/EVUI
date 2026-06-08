@@ -153,6 +153,75 @@ describe('Scatter Element', () => {
 
       expect(spy).toHaveBeenCalledTimes(2);
     });
+
+    it('item.k 가 있으면 좌표 재계산 없이 캐시 키로 duple 을 조회한다', () => {
+      const scatter = createScatter({ realTimeScatter: true });
+      scatter.data = {
+        s1: {
+          dataGroup: [{ data: [{ x: 1, y: 1, k: 'K1' }] }],
+        },
+      };
+      const param = createDrawParam();
+      // 캐시 키로만 owner 매칭되고, 재계산 키('1|1')는 무시되어야 한다.
+      param.duple.set('K1', 's1');
+      param.duple.set('1|1', 'otherSeries');
+
+      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      scatter.draw(param);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('coordinateDedupe=true + 빈 duple 이면 아무 점도 그리지 않는다 (단일-series 경로가 false 를 넘겨야 하는 이유)', () => {
+      // chart.core 의 단일 series 스킵 경로가 실수로 coordinateDedupe=true 를 넘기면(=duple 미수집)
+      // 모든 점의 owner 판정(duple.get(key) === sId)이 탈락해 예외 없이 빈 차트가 된다.
+      // element 측 불변식으로 이 위험 상태를 명시 고정한다(배선 회귀는 chart.core.scatterDedupe.spec 에서 잠금).
+      const scatter = createScatter({ realTimeScatter: true });
+      scatter.data = {
+        s1: {
+          dataGroup: [
+            {
+              data: [
+                { x: 1, y: 1 },
+                { x: 2, y: 2 },
+              ],
+            },
+          ],
+        },
+      };
+      const param = createDrawParam(); // coordinateDedupe: true, duple: 빈 Map
+
+      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      scatter.draw(param);
+
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('show=false 면 dedupe 우회(coordinateDedupe=false)여도 draw() 가드로 아무것도 안 그린다', () => {
+      // 단일 series dedupe 스킵 시 duple 이 비어도 숨긴 series 가 되살아나지 않음을 보장.
+      // 숨김 억제는 duple 이 아니라 draw() 진입 가드(!this.show)가 담당한다.
+      const scatter = createScatter({ realTimeScatter: true });
+      scatter.show = false;
+      scatter.data = {
+        s1: {
+          dataGroup: [
+            {
+              data: [
+                { x: 1, y: 1 },
+                { x: 2, y: 2 },
+              ],
+            },
+          ],
+        },
+      };
+      const param = createDrawParam();
+      param.coordinateDedupe = false;
+
+      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      scatter.draw(param);
+
+      expect(spy).not.toHaveBeenCalled();
+    });
   });
 
   describe('displayOverflow — 값 축(Y) 초과 처리 (기본값 false 회귀 방지)', () => {

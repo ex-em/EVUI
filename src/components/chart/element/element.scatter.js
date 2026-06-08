@@ -204,7 +204,8 @@ class Scatter {
         if (legendHitInfo) {
           shouldDraw = legendHitInfo.sId === this.sId;
         } else if (isDedupeOnRT) {
-          shouldDraw = duple.get(Util.coordinateKey(item.x, item.y)) === this.sId;
+          // item.k 는 push 단계에서 캐시한 좌표 키. 렌더마다 재생성하지 않는다(없으면 폴백).
+          shouldDraw = duple.get(item.k ?? Util.coordinateKey(item.x, item.y)) === this.sId;
         } else {
           shouldDraw = true;
         }

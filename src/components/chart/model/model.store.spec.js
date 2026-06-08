@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import modules from './model.store';
+import Util from '../helpers/helpers.util';
 
 /**
  * model.store의 메서드들은 차트 인스턴스의 this에 바인딩되어 사용됨.
@@ -613,17 +614,15 @@ describe('model.store getItem (selectLabel indicator 용)', () => {
 describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
   const SECOND = 1000;
 
-  const buildRealTimeStore = (range = 5, options = {}) => {
+  const buildRealTimeStore = (range = 5, options = {}, scatterIds = ['series1']) => {
     const store = Object.create(modules);
     Object.assign(store, {
       isInit: false,
       updateSeries: false,
       dataSet: {},
       options: { realTimeScatter: { range }, ...options },
-      seriesInfo: { charts: { scatter: ['series1'] } },
-      seriesList: {
-        series1: {},
-      },
+      seriesInfo: { charts: { scatter: scatterIds } },
+      seriesList: Object.fromEntries(scatterIds.map((id) => [id, {}])),
     });
     return store;
   };
@@ -715,6 +714,42 @@ describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
     const groups = store.dataSet.series1.dataGroup;
     const totalPoints = groups.reduce((acc, g) => acc + g.data.length, 0);
     expect(totalPoints).toBe(4);
+  });
+
+  it('multi-series 면 push 된 point 에 좌표 키(k)를 캐시한다 (렌더 단계 재계산 제거)', () => {
+    // configured scatter series 2개 이상이어야 cross-series dedupe 가 살아 element 가 k 를 읽는다.
+    const store = buildRealTimeStore(5, {}, ['series1', 'series2']);
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({ series1: [{ x: t, y: 10 }] });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const point = groups.flatMap((g) => g.data).find((p) => p.y === 10);
+    // 캐시 키는 draw 폴백이 쓰는 Util.coordinateKey 와 동일 포맷이어야 한다(lockstep 보장).
+    expect(point.k).toBe(Util.coordinateKey(point.x, point.y));
+  });
+
+  it('단일 scatter series 면 dedupe on 이어도 k 를 저장하지 않는다 (canSkip → element 가 k 미사용)', () => {
+    const store = buildRealTimeStore(5, {}, ['series1']);
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({ series1: [{ x: t, y: 10 }] });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const point = groups.flatMap((g) => g.data).find((p) => p.y === 10);
+    expect(point.k).toBeUndefined();
+  });
+
+  it('coordinateDedupe=false 면 키를 캐시하지 않는다 (draw 가 키를 보지 않음)', () => {
+    // multi-series 라 k 저장 게이트(series>1)는 통과 — 캐시 생략 사유는 오직 dedupe off.
+    const store = buildRealTimeStore(5, { coordinateDedupe: false }, ['series1', 'series2']);
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({ series1: [{ x: t, y: 10 }] });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const point = groups.flatMap((g) => g.data).find((p) => p.y === 10);
+    expect(point.k).toBeUndefined();
   });
 });
 

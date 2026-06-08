@@ -409,7 +409,9 @@ class EvChart {
             const dataItems = seriesDatas[i]?.data || [];
             for (let j = 0; j < dataItems.length; j++) {
               const item = dataItems[j];
-              duple.set(Util.coordinateKey(item.x, item.y), series.sId);
+              // item.k 는 push 단계(model.store)에서 1회 생성·캐시한 좌표 키.
+              // 렌더마다 문자열을 재생성하지 않고 재사용한다(없으면 폴백).
+              duple.set(item.k ?? Util.coordinateKey(item.x, item.y), series.sId);
             }
           }
         } else {
@@ -421,6 +423,34 @@ class EvChart {
         }
       }
     }
+  }
+
+  /**
+   * realtime scatter에서 "보이는" series가 1개뿐이면 cross-series dedupe가 무의미하다.
+   * - push 단계(model.store)에서 series 내부 (x,y) 유일성이 이미 보장되고,
+   * - realTimeScatterDraw 에는 intra-series drawnKeys 필터가 없어 duple 은 오직 owner 판정용이다.
+   * 따라서 단일 series 면 duple 을 채우거나 조회하지 않고 전부 그려도 결과가 동일하다.
+   * 정지(non-realtime) 모드는 push-dedupe 가 없어 duple+drawnKeys 에 의존하므로 스킵 대상이 아니다
+   * (duple 이 비면 모든 점이 owner 판정에서 탈락해 아무것도 안 그려진다).
+   * coordinateDedupe 옵션 자체는 호출부(drawSeries)에서 함께 판정한다.
+   * @param {string[]} scatterSeriesIds   this.seriesInfo.charts.scatter
+   *
+   * @returns {boolean}
+   */
+  canSkipRealtimeScatterDedupe(scatterSeriesIds) {
+    if (!this.options.realTimeScatter?.use) {
+      return false;
+    }
+    let shownCount = 0;
+    for (let i = 0; i < scatterSeriesIds.length; i++) {
+      if (this.seriesList[scatterSeriesIds[i]]?.show) {
+        shownCount++;
+        if (shownCount > 1) {
+          return false;
+        }
+      }
+    }
+    return shownCount === 1;
   }
 
   /**
@@ -476,8 +506,16 @@ class EvChart {
       const chartType = chartKeys[ix];
       const chartTypeSet = this.seriesInfo.charts[chartType];
 
-      if (chartType === 'scatter' && this.options.coordinateDedupe) {
-        this.collectDuplicatePoints(duple, chartTypeSet);
+      // scatter 의 이번 렌더 유효 dedupe 여부.
+      // 단일 realtime series 면 dedupe 가 무의미하므로 수집/조회를 건너뛴다(전부 그림).
+      let scatterDedupe = false;
+      if (chartType === 'scatter') {
+        scatterDedupe =
+          this.options.coordinateDedupe !== false &&
+          !this.canSkipRealtimeScatterDedupe(chartTypeSet);
+        if (scatterDedupe) {
+          this.collectDuplicatePoints(duple, chartTypeSet);
+        }
       }
 
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
@@ -572,7 +610,7 @@ class EvChart {
               legendHitInfo,
               selectInfo,
               duple,
-              coordinateDedupe: this.options.coordinateDedupe,
+              coordinateDedupe: scatterDedupe,
               ...opt,
             });
             break;
