@@ -60,8 +60,8 @@ const modules = {
             const series = this.seriesList[seriesID];
             const rawData = data?.[seriesID];
             const { passingValue, interpolation } = series;
-            const needsTransform = interpolation === 'zero'
-              || (passingValue != null && passingValue !== undefined);
+            const needsTransform =
+              interpolation === 'zero' || (passingValue != null && passingValue !== undefined);
 
             let hasPassingValueInData = false;
             let sData;
@@ -291,6 +291,11 @@ const modules = {
                 y: item.y,
                 o: item.value ?? item.y,
                 color: item.color,
+                // 렌더 단계 dedupe 가 매 프레임 재생성하던 좌표 키를 push 시점에 1회 캐시.
+                // dedupe off 면 draw 가 키를 보지 않으므로 저장하지 않는다.
+                // 단일 scatter series 면 canSkipRealtimeScatterDedupe 가 항상 스킵 → element 가
+                // k 를 읽지 않으므로 저장 자체를 생략한다(configured count 는 legend toggle 에 안 흔들림).
+                k: isDedupeOn && this.seriesInfo.charts.scatter.length > 1 ? dedupeKey : undefined,
               });
 
               group.max = Math.max(group.max, item.y);
@@ -593,8 +598,10 @@ const modules = {
       if (ldata !== null) {
         const value = usePassingValue && gdata === passingValue ? 0 : gdata;
 
-        if ((value !== null && typeof value === 'object')
-          || (gdata !== null && typeof gdata === 'object')) {
+        if (
+          (value !== null && typeof value === 'object') ||
+          (gdata !== null && typeof gdata === 'object')
+        ) {
           sdata.push(this.addData(value, ldata, gdata));
         } else {
           const v = value ?? null;
