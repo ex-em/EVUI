@@ -345,8 +345,21 @@ class EvChart {
 
     this.drawTip();
 
-    if (this.bufferCanvas && this.bufferCanvas?.width > 1 && this.bufferCanvas?.height > 1) {
-      this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
+    this.commitToDisplay(this.displayCtx, this.bufferCanvas);
+  }
+
+  /**
+   * Commit the rendered buffer canvas to the display canvas (buffer→display blit).
+   * Render pipeline의 출력단 경계 — RenderCore 단계 호출이 canvas 핸들을 주입받아
+   * 호출할 수 있도록 별도 함수로 추출. (Worker 경로에선 ImageBitmap blit으로 치환될 자리)
+   * @param {CanvasRenderingContext2D} displayCtx   destination display context
+   * @param {HTMLCanvasElement} bufferCanvas        source buffer canvas
+   *
+   * @returns {undefined}
+   */
+  commitToDisplay(displayCtx, bufferCanvas) {
+    if (bufferCanvas && bufferCanvas?.width > 1 && bufferCanvas?.height > 1) {
+      displayCtx.drawImage(bufferCanvas, 0, 0);
     }
   }
 
