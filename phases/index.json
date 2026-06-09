@@ -7,8 +7,7 @@
     },
     {
       "dir": "chart-data-pipeline",
-      "status": "completed",
-      "completed_at": "2026-06-09T17:54:16+0900"
+      "status": "pending"
     }
   ]
 }
