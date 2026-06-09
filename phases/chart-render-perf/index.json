@@ -1,0 +1,64 @@
+{
+  "project": "EVUI",
+  "phase": "chart-render-perf",
+  "steps": [
+    {
+      "step": 0,
+      "name": "repro-examples",
+      "status": "completed",
+      "started_at": "2026-06-09T14:30:14+0900",
+      "summary": "A 프로파일 repro: docs/views/lineChart/example/PerfStressSingle.vue (라우트 /lineChart, line 만 개 시리즈 단일 차트, append/full-replace 토글). B-real 프로파일 repro: docs/views/comboChart/example/PerfStressDashboard.vue (라우트 /comboChart, 같은 timer로 동시 갱신되는 8개 combo 차트). 시리즈/포인트/차트 수 상수 노출, 초당 1회 갱신, 다운샘플링·culling 없음. lint·format:check(해당 파일) 통과, 두 예제 렌더+라이브 갱신 playwright 검증 완료.",
+      "completed_at": "2026-06-09T14:39:35+0900"
+    },
+    {
+      "step": 1,
+      "name": "perf-harness",
+      "status": "completed",
+      "started_at": "2026-06-09T14:39:37+0900",
+      "summary": "repro 전용 계측 harness를 공유 모듈 docs/views/perfHarness.js(usePerfHarness)로 작성, 두 repro(PerfStressSingle/PerfStressDashboard)에 부착(src/ 본체 무수정). 플로팅 패널+console.table로 plan과 동일 이름 지표 출력: drawChart=데이터 mutate→Vue flush 합산 근사(createDataSet+commit 포함, p50 검증값 단일 767ms·대시보드 8차트 30ms), hitTest=pointermove→mouse-move emit(hover 핸들러), interaction-latency=pointermove→tooltip paint(rAF). createDataSet·commit 단독 구간은 본체 미계측이라 docs에서 분리 불가 → 패널에 'DevTools 수동 캡처' 명시(주석으로도 한계 기재). 사용자 측정 TODO: 저사양 기준 기기에서 DevTools Performance로 (1)이 패널 수치 + (2)createDataSet/commit 단독 self-time을 캡처해 measurements.md Step 0a 표(redrawMs/createDataSetMs/hitTestMs/LongTask·TBT)를 채운다. lint 통과, 변경 3개 파일 format:check 통과(기존 30개 무관 파일 경고는 pre-existing), playwright로 두 repro 갱신+hover 시 3개 측정 지표 수치 출력 확인.",
+      "completed_at": "2026-06-09T14:52:57+0900"
+    },
+    {
+      "step": 2,
+      "name": "regression-safety-net",
+      "status": "completed",
+      "started_at": "2026-06-09T14:52:58+0900",
+      "summary": "회귀 안전망을 두 축으로 분리 구축. (A) 시각 회귀: 기존 Chart.visual.spec.js에 9개 케이스 추가 — 타입 보강 scatter-chart-basic/heatmap-chart-basic/combo-chart-basic, 변형 보강 line-chart-legend-hidden(범례 토글)/line-chart-axis-formatter/line-chart-log-scale(type:'log')/line-chart-negative/bar-chart-stacked(groups)/line-chart-dpr2(window.devicePixelRatio=2 override). golden baseline 9개 PNG를 __screenshots__/Chart.visual.spec.js/에 생성(test:visual:update)→test:visual 통과. (B) tooltip 값 정확성: 신규 src/components/chart/Chart.tooltip.spec.js(*.spec.js, test:run 포함, jsdom). plugins.interaction의 실제 findClosestDataIndex/findHitItem을 mock 차트 컨텍스트로 호출해 공유 라벨 인덱스+시리즈별 o값이 raw 원본과 일치함을 6개 테스트로 고정(per-label 유효성/음수/show=false 제외 포함) — step3(hit test)이 이 값을 바꾸면 회귀로 잡힘. 본체 로직 무수정(테스트·golden만 추가, export 추가 없음). lint(src 전체 exit 0)·test:run(833 passed)·test:visual(22 passed)·format:check(변경 2파일) 모두 통과.",
+      "completed_at": "2026-06-09T15:06:26+0900"
+    },
+    {
+      "step": 3,
+      "name": "hit-test-reduce",
+      "status": "completed",
+      "started_at": "2026-06-09T15:06:27+0900",
+      "summary": "T3 hit test dominant term 제거. ③(핵심): 신규 plugins.interaction.buildLabelValidMask(sIds)가 라벨 인덱스별 '유효(non-null) o를 가진 가시 시리즈 존재'를 Uint8Array mask로 사전계산 → findClosestDataIndex의 per-label sIds.some()(O(라벨×시리즈) dominant term)을 mask[i] O(1) 조회로 대체. 자료구조 this.labelValidMask. 사전계산 위치=model.store.createDataSet 끝(this.buildLabelValidMask?.()). 무효화 트리거: 데이터 변경·범례(show) 토글 모두 update()→createDataSet() 재호출(legend.js·toggleSeries 확인)→mask 재빌드. createDataSet 미경유 경로(단위 테스트) 대비 findClosestDataIndex에 lazy build&cache fallback. ②: findHitItem의 fallback 거리(calcBoxDistance)를 hitId===null일 때만 계산하도록 가드(hitId는 한번 정해지면 안 풀리고 fallback은 hitId===null에서만 소비 → 출력 불변, hover당 중복 계산 감소). ①(binary search)·④(avgInterval 캐시)는 의도적 미구현(단순함 우선): 타깃 프로파일이 '만 개 시리즈·소수 라벨'이라 ③가 ×시리즈 곱셈항(예 50×10000≈5e5→50)을 제거하면 잔여 O(라벨) 항은 무시 가능(50→10 수준, 나노초), ①은 monotonic 보장+prev/next-valid 점프+tie 복제 리스크, ④의 clean 무효화는 draw-time hook(step4 영역) 필요 → 비용 대비 이득 부재로 제외. raw 인덱스 계약·tooltip 값 불변 유지(pick buffer·신규 throttle 미도입). 검증: lint exit0, test:run 833 passed(Chart.tooltip.spec.js 6 포함 불변), test:visual 22 passed, 변경 2파일 추가라인 prettier-clean(파일 자체 경고는 pre-existing).",
+      "completed_at": "2026-06-09T15:18:53+0900"
+    },
+    {
+      "step": 4,
+      "name": "draw-skip-path",
+      "status": "completed",
+      "started_at": "2026-06-09T15:18:54+0900",
+      "summary": "Step 2a low-risk draw skip 2종(데이터 불변·출력 동일). (1) hidden 시리즈 변환 skip: model.store.createDataSet generic line/bar 루프를 `if (series && series.show !== false)` 로 감싸 show=false 시리즈의 변환(addSeriesDS/Stack + getSeriesMinMax)을 건너뜀. element.draw 는 이미 !this.show 가드, getStoreMinMax·step3 buildLabelValidMask 모두 show 시리즈만 집계하므로 hidden 의 stale data/minMax 가 축 범위·hit test 에 미반영 → 출력 불변. show 상태 미변경(다시 켜면 update→createDataSet 재호출로 현재 데이터 변환). (2) line 연속 동일픽셀 lineTo 생략: element.line.js draw 의 stroke 루프에서 lastDrawnX/Y 추적, lineTo 분기를 `else if (x!==lastDrawnX||y!==lastDrawnY)` 로 가드 — 직전 path 위치와 완전히 같은 float 픽셀로의 lineTo(zero-length no-op)만 생략. moveTo(null/방향전환 경계)는 비대상, fill·marker 는 별도 경로이며 xp/yp 는 매 점 항상 설정 → fill 형상·marker 위치·hit/tooltip 불변. scatter/bar/heatmap/pie·area·step-line 미확대. 추가 테스트: src/components/chart/element/element.line.spec.js 에 path 생략 describe 4개(중복 제거 데이터와 명령 시퀀스 동일=데이터 불변성, 방향 전환점 보존, null 경계 moveTo 보존, 생략점 xp/yp 설정=marker/fill 기준점 보존). 검증: lint exit0, test:run 837 passed(833+4, tooltip 6 불변), test:visual 22 passed(legend toggle/hidden 포함 golden 동일), 변경 코드라인 prettier-clean(spec 파일 clean; model.store.js·element.line.js 파일경고는 pre-existing config 불일치).",
+      "completed_at": "2026-06-09T15:33:09+0900"
+    },
+    {
+      "step": 5,
+      "name": "drawchart-inventory",
+      "status": "completed",
+      "started_at": "2026-06-09T15:33:10+0900",
+      "summary": "phases/chart-render-perf/drawchart-inventory.md 작성(코드 변경 0, git diff --stat -- src/ 비어 있음 AC 통과). drawChart(:325-351)와 직접 호출 함수(initScale/getAxesRange/getLabelOffset/getAxesLabelRange/updateScrollbarPosition/calculateSteps/adjustXAndYAxisWidth/emitAxesScaleChange/drawAxis/drawSeries/drawTip/buffer→display commit) + 전제 입력(chartRect=getChartRect→getBoundingClientRect, minMax=getStoreMinMax)을 13행 표로 목록화, DOM/canvas/model/plugin 의존 분류 + RenderCore/ChartShell 분리 가능 여부 + Step 2.5-a~d mini-step 매핑. 결론: **commit 분리 가능(2.5-a #12 단독 추출 안전)**. drawChart의 출력단(commit)·draw단(series/static)은 그대로 RenderCore로 떨어지고, 입력단(prepare)에 섞인 DOM/plugin 의존 3개만 ChartShell 주입으로 걷어내면 분리 가능 — chartRect(#0a getBoundingClientRect 유래)·pixelRatio(#1 window.devicePixelRatio 유래)·axes-scale-change emit(#8 listener)를 ChartShell 주입값으로 확정. helpers.util.js:5 top-level document.createElement('canvas') 싱글톤은 #7 adjustXAndYAxisWidth·#2 getAxesRange의 calcTextSizeCanvas 경로에서 소비 → Worker 진입 시 OffscreenCanvas/환경 분기 선결(분류로 드러냄). step6(2.5-a commitToDisplay 분리)의 근거 확보.",
+      "completed_at": "2026-06-09T15:36:08+0900"
+    },
+    {
+      "step": 6,
+      "name": "commit-to-display",
+      "status": "completed",
+      "started_at": "2026-06-09T15:36:09+0900",
+      "summary": "Step 2.5-a — buffer→display commit(chart.core.js drawChart :348-350)을 별도 메서드 commitToDisplay(displayCtx, bufferCanvas)로 추출. 시그니처: 인벤토리 #12가 의존하는 canvas 핸들 2개만 인자 주입(displayCtx=목적지, bufferCanvas=원본). DPR은 미주입 — commit이 drawImage(bufferCanvas,0,0)뿐이라 buffer가 이미 DPR-scaled, DPR 직접 소비 안 함(단순함 우선: 미사용 인자 추가 안 함). drawChart는 동일 위치에서 this.commitToDisplay(this.displayCtx, this.bufferCanvas) 호출 — 가드 조건(bufferCanvas.width/height>1)·drawImage 동작·호출 순서(drawTip 직후, 파이프라인 맨 끝) 모두 불변 → 출력 동일. buffer→display blit은 코드 전체에서 이 한 곳뿐(grep 확인). 구조 안정화 작업이라 성능 중립(단순 메서드 래핑, 게이트 아님). 이후 RenderCore 재사용 경계: commitToDisplay는 this 의존 없이 인자만 받는 얇은 출력단 함수라 RenderCore 단계가 그대로 호출 가능(Worker 경로에선 ImageBitmap blit으로 치환될 자리, 단 Worker 분기는 이번 범위 밖·미생성). plugin/event hook·formatter·EvChartGroup/Brush 미접촉. 검증: lint exit0, test:run 837 passed(tooltip 6 불변), test:visual 22 passed(전 타입 line·bar·scatter·pie·heatmap·combo 회귀 0), format:check(chart.core.js) clean.",
+      "completed_at": "2026-06-09T15:38:43+0900"
+    }
+  ],
+  "created_at": "2026-06-09T14:30:14+0900",
+  "completed_at": "2026-06-09T15:38:43+0900"
+}

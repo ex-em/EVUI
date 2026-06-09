@@ -4,6 +4,10 @@
       "dir": "chart-render-perf",
       "status": "completed",
       "completed_at": "2026-06-09T15:38:43+0900"
+    },
+    {
+      "dir": "chart-data-pipeline",
+      "status": "pending"
     }
   ]
 }
