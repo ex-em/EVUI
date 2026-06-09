@@ -11,9 +11,9 @@
       <span class="toggle-label">데이터 자동 업데이트</span>
       <ev-toggle v-model="isLive" />
     </div>
-    <div class="dashboard-grid">
+    <div class="dashboard-grid" @pointermove="perf.onPointerMove">
       <div v-for="(chart, idx) in charts" :key="idx" class="dashboard-cell">
-        <ev-chart :data="chart.data" :options="chart.options" />
+        <ev-chart :data="chart.data" :options="chart.options" @mouse-move="perf.onChartMouseMove" />
       </div>
     </div>
   </div>
@@ -22,6 +22,7 @@
 <script>
 import { watch, ref, onBeforeUnmount, reactive } from 'vue';
 import dayjs from 'dayjs';
+import { usePerfHarness } from '../../perfHarness';
 
 // 측정 규모 조절용 상수 (Q3: scheduler window 내 heavy job pile-up 규모)
 const CHART_COUNT = 8;
@@ -30,6 +31,7 @@ const POINTS_PER_SERIES = 60;
 
 export default {
   setup() {
+    const perf = usePerfHarness();
     let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
     const randomValue = () => Math.floor(Math.random() * 100);
@@ -107,7 +109,7 @@ export default {
     const liveInterval = ref();
 
     // 모든 차트를 같은 tick에 슬라이딩 윈도우로 갱신 → heavy job pile-up 재현
-    const updateAllCharts = () => {
+    const mutateAllCharts = () => {
       timeValue = dayjs(timeValue).add(1, 'second');
       const nextLabel = dayjs(timeValue);
       charts.forEach((chart) => {
@@ -119,6 +121,10 @@ export default {
         });
       });
     };
+
+    // 한 tick에 8개 차트 전체 갱신을 perf harness로 감싼다. drawChart 합산값은 같은 window에
+    // pile-up되는 전체 차트 렌더(B-real heavy job 묶음)의 벽시계 시간이다.
+    const updateAllCharts = () => perf.measureTick(mutateAllCharts);
 
     watch(isLive, (newValue) => {
       if (newValue) {
@@ -139,6 +145,7 @@ export default {
       POINTS_PER_SERIES,
       charts,
       isLive,
+      perf,
     };
   },
 };

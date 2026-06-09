@@ -1,7 +1,7 @@
 <template>
-  <div class="case">
+  <div class="case" @pointermove="perf.onPointerMove">
     <resizable-wrapper>
-      <ev-chart :data="chartData" :options="chartOptions" />
+      <ev-chart :data="chartData" :options="chartOptions" @mouse-move="perf.onChartMouseMove" />
     </resizable-wrapper>
   </div>
   <div class="description">
@@ -19,6 +19,7 @@
 
 <script>
 import { watch, ref, onBeforeUnmount, reactive } from 'vue';
+import { usePerfHarness } from '../../perfHarness';
 
 // 측정 규모 조절용 상수 (Step 0a 선결 분류 ①: 시리즈당 포인트 수 vs 화면 가로 픽셀)
 const SERIES_COUNT = 10000;
@@ -26,6 +27,7 @@ const POINTS_PER_SERIES = 50;
 
 export default {
   setup() {
+    const perf = usePerfHarness();
     let labelCounter = 0;
 
     const randomValue = () => Math.random() * 100;
@@ -98,7 +100,7 @@ export default {
 
     // 갱신 방식 토글 — append형(슬라이딩 윈도우) vs full-replace.
     // plan Q2 분류(append+fixed range vs full-replace+rescale) 측정용.
-    const updateChartData = () => {
+    const mutateChartData = () => {
       if (isAppendMode.value) {
         chartData.labels.shift();
         chartData.labels.push(String(labelCounter++));
@@ -111,6 +113,9 @@ export default {
         chartData.data = buildData();
       }
     };
+
+    // 갱신 1틱을 perf harness로 감싼다(drawChart = createDataSet+drawChart+commit 합산 근사).
+    const updateChartData = () => perf.measureTick(mutateChartData);
 
     watch(isLive, (newValue) => {
       if (newValue) {
@@ -132,6 +137,7 @@ export default {
       chartOptions,
       isLive,
       isAppendMode,
+      perf,
     };
   },
 };
