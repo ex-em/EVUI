@@ -100,6 +100,11 @@ const modules = {
         }
       }
     });
+
+    // ③ hit test 사전계산: 라벨별 "유효 데이터를 가진 가시 시리즈 존재" mask 를 여기서 1회 만든다.
+    // 데이터 변경·범례(show) 토글은 모두 update()→createDataSet() 를 거치므로 이 시점 재계산이 곧 무효화다.
+    // (interaction 모듈이 mixin 된 정상 인스턴스에서만 동작. createDataSet 단독 단위 테스트 대비 optional 호출.)
+    this.buildLabelValidMask?.();
   },
 
   /**
