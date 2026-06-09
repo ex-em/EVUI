@@ -44,6 +44,8 @@ import AxesScaleChange from './example/AxesScaleChange';
 import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
 import UnSelectedOpacity from './example/UnSelectedOpacity';
 import UnSelectedOpacityRaw from './example/UnSelectedOpacity?raw';
+import PerfStressSingle from './example/PerfStressSingle';
+import PerfStressSingleRaw from './example/PerfStressSingle?raw';
 
 export default {
   mdText,
@@ -168,6 +170,13 @@ export default {
         '차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 확인할 수 있습니다.',
       component: AxesScaleChange,
       parsedData: parse(AxesScaleChangeRaw).descriptor,
+    },
+    PerfStressSingle: {
+      description:
+        'A 프로파일 성능 stress 예제 — line 만 개 시리즈 단일 차트를 초당 1회 갱신합니다. ' +
+        '시리즈 수·포인트 수는 상수로 조절하며, append(슬라이딩 윈도우)/full-replace 갱신을 토글할 수 있습니다.',
+      component: PerfStressSingle,
+      parsedData: parse(PerfStressSingleRaw).descriptor,
     },
   },
 };
