@@ -53,48 +53,60 @@ const modules = {
           for (let s = 0; s < seriesIDs.length; s++) {
             const seriesID = seriesIDs[s];
             const series = this.seriesList[seriesID];
-            const rawData = data?.[seriesID];
-            const { passingValue, interpolation } = series;
-            const needsTransform = interpolation === 'zero'
-              || (passingValue != null && passingValue !== undefined);
 
-            let hasPassingValueInData = false;
-            let sData;
+            // show=false 시리즈는 element.draw 가 이미 그리지 않고, getStoreMinMax·
+            // buildLabelValidMask 도 show 시리즈만 집계하므로(축 범위·hit test 에 미반영)
+            // 변환 자체를 건너뛴다 — 출력 불변. show 상태는 덮어쓰지 않는다(다시 켜면
+            // update()→createDataSet 재호출로 현재 데이터로 변환됨).
+            if (series && series.show !== false) {
+              const rawData = data?.[seriesID];
+              const { passingValue, interpolation } = series;
+              const needsTransform = interpolation === 'zero'
+                || (passingValue != null && passingValue !== undefined);
 
-            if (!rawData) {
-              sData = rawData;
-            } else if (!needsTransform) {
-              sData = rawData;
-            } else {
-              sData = new Array(rawData.length);
-              for (let i = 0; i < rawData.length; i++) {
-                const item = rawData[i];
-                if (interpolation === 'zero' && !item) {
-                  sData[i] = 0;
-                } else if (item === passingValue) {
-                  hasPassingValueInData = true;
-                  sData[i] = null;
-                } else {
-                  sData[i] = item;
+              let hasPassingValueInData = false;
+              let sData;
+
+              if (!rawData) {
+                sData = rawData;
+              } else if (!needsTransform) {
+                sData = rawData;
+              } else {
+                sData = new Array(rawData.length);
+                for (let i = 0; i < rawData.length; i++) {
+                  const item = rawData[i];
+                  if (interpolation === 'zero' && !item) {
+                    sData[i] = 0;
+                  } else if (item === passingValue) {
+                    hasPassingValueInData = true;
+                    sData[i] = null;
+                  } else {
+                    sData[i] = item;
+                  }
                 }
               }
-            }
 
-            series.hasPassingValueInData = hasPassingValueInData;
+              series.hasPassingValueInData = hasPassingValueInData;
 
-            if (series && sData) {
-              if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
-                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
-              } else {
-                series.data = this.addSeriesDS(
-                  sData,
-                  label,
-                  series.isExistGrp,
-                  basePassingValue,
-                  series.data,
-                );
+              if (sData) {
+                if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
+                  series.data = this.addSeriesStackDS(
+                    sData,
+                    label,
+                    series.bsIds,
+                    series.stackIndex,
+                  );
+                } else {
+                  series.data = this.addSeriesDS(
+                    sData,
+                    label,
+                    series.isExistGrp,
+                    basePassingValue,
+                    series.data,
+                  );
+                }
+                series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
               }
-              series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
             }
           }
         }
