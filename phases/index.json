@@ -1,0 +1,8 @@
+{
+  "phases": [
+    {
+      "dir": "chart-render-perf",
+      "status": "pending"
+    }
+  ]
+}
