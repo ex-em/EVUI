@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import Line from './element.line';
+import Canvas from '../helpers/helpers.canvas';
 import { LINE_OPTION } from '../helpers/helpers.constant';
 
 describe('Chart Interpolation', () => {
@@ -316,6 +317,91 @@ describe('element.line path 생략 (연속 동일 픽셀 lineTo)', () => {
       expect(typeof p.xp).toBe('number');
       expect(typeof p.yp).toBe('number');
     });
+  });
+});
+
+/**
+ * 마커 배치 렌더링 — isSingle(양옆 null) 고립점이 point:false 에서도 마커로 그려지는데,
+ * 이를 점마다 fill/stroke(path-per-point) 하던 것을 색(blur/focus)별 배치로 모은다.
+ * 라이브 대시보드(5초 라벨 그리드 × 10초 데이터 → 50% null 교차)에서 fill/stroke 콜 폭주를 막는 핵심.
+ */
+describe('element.line 마커 배치 렌더링', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  const noop = () => {};
+  const makeCtx = () => ({
+    save: noop,
+    restore: noop,
+    beginPath: noop,
+    closePath: noop,
+    stroke: noop,
+    fill: noop,
+    setLineDash: noop,
+    arc: noop,
+    moveTo: noop,
+    lineTo: noop,
+    fillRect: noop,
+    strokeRect: noop,
+    createLinearGradient: () => ({ addColorStop: noop }),
+  });
+
+  // isBrush:false 라야 마커 블록이 실행된다(true면 마커 자체를 건너뜀).
+  const baseParam = (ctx) => ({
+    ctx,
+    chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    axesSteps: { x: [{ graphMin: 0, graphMax: 4 }], y: [{ graphMin: 0, graphMax: 100 }] },
+    isBrush: false,
+  });
+
+  const makeLine = (data) => {
+    const line = new Line('s0', {}, 0);
+    line.data = data;
+    line.xAxisIndex = 0;
+    line.yAxisIndex = 0;
+    line.interpolation = 'none';
+    line.combo = false;
+    line.isExistGrp = false;
+    line.fill = false;
+    line.point = false;
+    line.show = true;
+    return line;
+  };
+
+  it('교차 null 데이터: 모든 고립점(isSingle)을 단일 batch로 모아 그린다 (per-point drawPoint 미사용)', () => {
+    // #.#.#  — 비-null 점(idx 0,2,4)이 전부 양옆 null → isSingle, point:false 여도 마커 그려짐.
+    const data = [
+      { x: 0, y: 10, o: 10 },
+      { x: 1, y: null, o: null },
+      { x: 2, y: 20, o: 20 },
+      { x: 3, y: null, o: null },
+      { x: 4, y: 30, o: 30 },
+    ];
+    const batchSpy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
+    const pointSpy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+
+    makeLine(data).draw(baseParam(makeCtx()));
+
+    // 같은 색(blur) 한 그룹 → batch 1회, 점 3개. path-per-point drawPoint 는 호출되지 않음.
+    expect(pointSpy).not.toHaveBeenCalled();
+    expect(batchSpy).toHaveBeenCalledTimes(1);
+    expect(batchSpy.mock.calls[0][3]).toHaveLength(3);
+  });
+
+  it('마커 대상이 없으면 batch 를 호출하지 않는다', () => {
+    // 연속 데이터 + point:false → isSingle 아님, selectedLabel 없음 → 마커 없음.
+    const data = [
+      { x: 0, y: 10, o: 10 },
+      { x: 1, y: 20, o: 20 },
+      { x: 2, y: 30, o: 30 },
+    ];
+    const batchSpy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
+
+    makeLine(data).draw(baseParam(makeCtx()));
+
+    expect(batchSpy).not.toHaveBeenCalled();
   });
 });
 
