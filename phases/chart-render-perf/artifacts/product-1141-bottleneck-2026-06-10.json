@@ -1,0 +1,51 @@
+{
+  "measurement": "제품 dashboard/view/1141 실측 — F2/worker 검증 + 병목 원인 규명",
+  "date": "2026-06-10",
+  "evui_build": "evui-3.9.3.tgz (F2 shallowDataWatch + worker opt-in + kill switch 제거 포함)",
+  "env": {
+    "tool": "Playwright MCP + CDP (newCDPSession)",
+    "method": "Profiler(200µs) self-time + leaf→root 콜스택 + longtask observer, 6x CPU throttle, 12~15s window",
+    "caveat": "(program)/longtask 절대%는 윈도우·집계시간 변동으로 노이즈. self-time 콜스택과 코드경로 직결 버킷(traverse/postMessage)이 신뢰 지표. headless 렌더는 SwiftShader로 GPU 비중 부풀 수 있음."
+  },
+  "chart_scale": {
+    "charts_per_dashboard": 24,
+    "series_per_chart": "~1398~1518",
+    "points_per_series": "~119~120",
+    "canvas_px": "271x214 (소형)",
+    "total_points_approx": "~4,000,000 (24 x 1400 x 120)",
+    "note": "271px 폭에 119점 → 포인트 ~2.3px 간격(이미 픽셀밀도). 1400 시리즈 거의 완전 중첩."
+  },
+  "product_adoption": {
+    "shallowDataWatch": "true (제품이 채택)",
+    "data_isReactive": false,
+    "top_level_ref_replaced_on_update": true,
+    "charts_live_updating": true,
+    "workerRender": "원래 true였음 → 측정 중 false 권장/적용",
+    "coordinateDedupe": "기본 on",
+    "conclusion": "제품이 F2를 완전·정확히 채택(비반응성 데이터 + 참조교체 + 플래그). 그래서 반응성 비용 ~0."
+  },
+  "ab_results_6x": {
+    "wR_true_shallow_false": { "traverse_pct": 2.4, "reactivity_pct": 3.2, "render_named_pct": 15.1, "postMessage_pct": 6.1, "program_pct": 33.5, "longtask_density": "~71%" },
+    "wR_true_shallow_true_first": { "traverse_pct": 0, "reactivity_pct": 0.5, "render_named_pct": 11.6, "postMessage_pct": 4.4, "program_pct": 55.1, "longtask_density": "~48%" },
+    "wR_false_shallow_true_current": { "traverse_pct": 0.1, "reactivity_pct": "~0", "render_named_pct": 0, "postMessage_pct": 0, "program_pct": 55, "gc_pct": 5.9, "longtask_density": "~46%" }
+  },
+  "hot_callstacks_wR_true": [
+    "render@evui ← tryDrawSeriesOnWorker ← drawChart ← update : 16.1% (메인 series 드로잉, worker 켜도 메인 geometry 패스 남음)",
+    "postMessage ← tryDrawSeriesOnWorker ← drawChart : 6.2% (worker 직렬화 오버헤드)",
+    "addSeriesDS ← createDataSet ← update : 3.8% (1400 시리즈 dataset 재구성)",
+    "#onMessageHandler@WorkerManager.ts : 3.4% (제품 데이터 worker 수신/역직렬화)",
+    "bi↔Ff↔sc/Tl@evui (재귀) : 2.6% (evui 내부, scale/path 추정)",
+    "mergeMetricData@mergeChartData.ts ← Vue watcher job : 2.0% (제품 메트릭 머지)"
+  ],
+  "findings": {
+    "F2_works": "shallowDataWatch:true 인 모든 구성에서 traverse 0%·반응성 ~0. F2 정상 작동(제품 실증).",
+    "F2_marginal_on_1141": "옵션만 토글한 A/B(데이터는 둘 다 비반응성)에선 deep:false 이득=traverse ~2.4% 제거로 작음. 제품의 큰 반응성 이득은 '비반응성 데이터+참조교체' 채택에서 나왔고, 플래그는 남은 traverse 낭비를 없애는 보완재(참조교체 쓰면 deep traverse는 순수 낭비 → 공짜 절감).",
+    "worker_overhead_confirmed": "workerRender:true 는 postMessage ~6% + 더 무거운 worker 렌더 경로(render@20763 16%+ 서브트리)를 메인에 부과. off 하면 그 서브트리가 통째로 사라지고 작은 drawSeriesLayer(~2%)로 대체 + longtask density 하락. 메모리의 worker 결론(off-main 이득을 직렬화가 상쇄, 순이득 없음)이 제품에서 재현됨. → workerRender:false 권장.",
+    "real_bottleneck": "반응성 병목 아님. 지배 비용=(program) ~55%(네이티브: 1400선×119점×24차트 GPU 래스터 + 제품 데이터 worker 메시지 structured-clone 역직렬화 + layout) + gc ~6%. = '~400만 점 규모를 매 갱신 전달·역직렬화·래스터'하는 데이터 볼륨/렌더 바운드."
+  },
+  "recommendations": {
+    "evui_options": "shallowDataWatch:true + workerRender:false 유지(둘 다 적용 시 evui 옵션 최적). coordinateDedupe 기본 on.",
+    "evui_code_limited": "남은 evui JS ~10%. 후보=① 재귀 ~6% 핫스팟(bi/Ff, minify라 docs 실명 재현으로 식별 필요) ② path 배칭/stroke 호출 축소. 단 1400 distinct 시리즈엔 효과 제한적이고 시각충실도 트레이드오프.",
+    "real_lever": "데이터/시각화 설계(제품 영역): 시리즈 top-N/서버 집계/다운샘플, density·heatmap 표현 등. 1400 선을 다 그리는 것 자체가 (program) 래스터의 근원."
+  }
+}
