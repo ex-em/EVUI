@@ -379,7 +379,7 @@ class EvChart {
    *
    * @returns {undefined}
    */
-  drawChart(hitInfo) {
+  drawChart(hitInfo, forceMainSeries) {
     this.initScale();
 
     const { scaleChange, scrollbarLabelOffset } = this.prepareScale();
@@ -394,7 +394,9 @@ class EvChart {
 
     // worker 분기(Step 8, kill switch 뒤): ready 이고 in-flight 여유가 있을 때만 series 를 worker 로.
     // 기본 off(start() 미호출)면 항상 false → 아래 main 경로로 fall through(기존 동작 불변).
-    if (this.tryDrawSeriesOnWorker(hitInfo)) {
+    // forceMainSeries: resize 처럼 캔버스가 막 리사이즈(=자동 clear)된 프레임은 worker 의 비동기 합성을
+    // 기다리면 display 가 blank 로 깜빡인다 → 이 프레임은 main 으로 동기 렌더해 즉시 채운다.
+    if (!forceMainSeries && this.tryDrawSeriesOnWorker(hitInfo)) {
       return;
     }
 
@@ -1523,7 +1525,9 @@ class EvChart {
 
     this.initScale();
     this.chartRect = this.getChartRect();
-    this.drawChart();
+    // resize 는 캔버스를 막 리사이즈해 display 가 비워진 상태 → worker 비동기 합성을 기다리면 깜빡인다.
+    // 이 프레임은 main 으로 동기 렌더한다(steady-state tick 은 계속 worker 사용).
+    this.drawChart(undefined, true);
     if (this.dragInfoBackup) {
       this.drawSelectionArea?.(this.dragInfoBackup);
     }
