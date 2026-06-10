@@ -4,8 +4,6 @@ import {
   WorkerRenderGate,
   detectWorkerRenderSupport,
   canSerializeSnapshot,
-  isWorkerRenderEnabled,
-  setWorkerRenderEnabled,
 } from './render.worker.gate';
 
 /**
@@ -30,21 +28,6 @@ describe('detectWorkerRenderSupport (feature-detect)', () => {
   });
 });
 
-describe('kill switch (내부 플래그)', () => {
-  afterEach(() => setWorkerRenderEnabled(false));
-
-  it('기본은 on (플래그 없이 항상 활성)', () => {
-    expect(isWorkerRenderEnabled()).toBe(true);
-  });
-
-  it('deterministic 내부 enable 경로로 켜고 끌 수 있다', () => {
-    setWorkerRenderEnabled(true);
-    expect(isWorkerRenderEnabled()).toBe(true);
-    setWorkerRenderEnabled(false);
-    expect(isWorkerRenderEnabled()).toBe(false);
-  });
-});
-
 describe('canSerializeSnapshot', () => {
   it('plain object 는 직렬화 가능', () => {
     expect(canSerializeSnapshot({ a: 1, b: [1, 2], c: { d: 'x' } })).toBe(true);
@@ -56,7 +39,7 @@ describe('canSerializeSnapshot', () => {
 });
 
 describe('WorkerRenderGate — fallback 결정 (worker vs main)', () => {
-  it('kill switch off → worker 미생성, main 경로(IDLE) + onFallback', () => {
+  it('opt-in off → worker 미생성, main 경로(IDLE) + onFallback', () => {
     const onFallback = vi.fn();
     const createWorker = vi.fn();
     const gate = new WorkerRenderGate({
@@ -68,7 +51,7 @@ describe('WorkerRenderGate — fallback 결정 (worker vs main)', () => {
 
     expect(gate.start()).toBe(RENDER_WORKER_STATE.IDLE);
     expect(createWorker).not.toHaveBeenCalled();
-    expect(onFallback).toHaveBeenCalledWith('kill-switch-off');
+    expect(onFallback).toHaveBeenCalledWith('opt-in-off');
     expect(gate.shouldRenderOnWorker({})).toBe(false);
   });
 

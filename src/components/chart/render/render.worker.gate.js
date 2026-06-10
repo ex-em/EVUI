@@ -1,9 +1,8 @@
 /**
  * RenderCore worker 게이트 (Step 7: layer-arch-and-killswitch).
  *
- * worker 렌더(Step 8)를 붙이기 *전* 레이어 소유권·kill switch·worker 생명주기를 확정하는 스캐폴딩이다.
- * 이 step 은 **실제 worker 렌더를 연결하지 않는다** — 게이트는 항상 main 경로로 결정되며(kill switch 기본 off),
- * worker 미진입 상태에서 기존 동작이 100% 유지된다. 실제 series 래스터 연결은 Step 8.
+ * 레이어 소유권·opt-in 게이트·worker 생명주기를 담당한다. worker 진입은 차트별 `options.workerRender`
+ * (기본 off)로만 켜지며, opt-in 하지 않으면 worker 미진입 = 기존 main 경로 100% 유지.
  *
  * 레이어 경계·invalidation·B2 캔버스 소유권 전체 표는 `phases/chart-worker-offload/worker-arch.md` 참조.
  *
@@ -11,8 +10,8 @@
  *  - **B2**: worker 는 *자체* OffscreenCanvas 를 만들어 `transferToImageBitmap()` → main `drawImage`.
  *    디스플레이 캔버스를 `transferControlToOffscreen` 으로 넘기지 *않는다*(일방향 transfer = fallback 불가).
  *    따라서 worker 진입은 transfer 게이트가 아니라 **async ready 핸드셰이크**(initializing→ready→failed)다.
- *  - **kill switch**: 공개 API 에 노출하지 않는 내부 플래그. 기본 보수적(off). Step 8/9 측정을 위한
- *    deterministic 내부 enable 경로(`setWorkerRenderEnabled`)를 둔다("off or feature-detect" 모호성 제거).
+ *  - **opt-in**: worker 진입은 차트별 옵션(`options.workerRender`, 기본 off)으로만 켠다. chart.core 가
+ *    `isEnabled: () => !!options.workerRender` 를 게이트에 주입한다(전역 플래그 없음 → OSS 무회귀).
  *  - **관측성**: init 실패 / render 예외 / timeout / main fallback 전환 hook 자리(기본 no-op).
  */
 
@@ -54,26 +53,6 @@ const DEFAULT_HOOKS = {
   onRenderException: NOOP,
   onFallback: NOOP,
 };
-
-/**
- * 내부 kill switch. 공개 API 가 아니다. 기본 on(사용자 결정) — 빌드 플래그 없이 모든 빌드에서
- * worker 렌더를 활성화한다. 미지원 환경(SSR/OffscreenCanvas 부재)은 feature-detect(_isSupported)가
- * main 으로 fallback 하므로 안전하다.
- */
-let workerRenderEnabled = true;
-
-/** kill switch 조회. */
-export function isWorkerRenderEnabled() {
-  return workerRenderEnabled;
-}
-
-/**
- * kill switch 의 deterministic 내부 enable 경로(Step 8/9 측정용). 공개 API 아님.
- * "off or feature-detect" 모호성을 제거해 측정 시 확실히 켜지도록 한다.
- */
-export function setWorkerRenderEnabled(enabled) {
-  workerRenderEnabled = !!enabled;
-}
 
 /**
  * worker 렌더 환경 feature-detect.
@@ -118,8 +97,8 @@ export function createRenderWorker() {
 /**
  * async worker-ready 상태기계. ready 전·failed 면 main RenderCore 가 그린다.
  *
- * 이 step 에선 production 경로에서 `start()` 를 호출하지 않으므로 worker 가 생성되지 않고(기존 동작 유지),
- * Step 8 이 측정 시 `setWorkerRenderEnabled(true)` 후 `start()` 로 진입한다.
+ * 차트가 `options.workerRender` 로 opt-in 하지 않으면 `_isEnabled()` 가 false 라 `start()` 가
+ * worker 를 만들지 않고 main 경로로 남는다(기존 동작 100% 유지).
  */
 export class WorkerRenderGate {
   constructor(options = {}) {
@@ -137,14 +116,15 @@ export class WorkerRenderGate {
     // 미응답(in-flight) 렌더 수. 상한 초과 시 main 이 그 프레임을 그린다(stale frame pile-up 방지).
     this._inFlight = 0;
 
-    // 테스트/측정용 주입(기본 = 실제 구현). 공개 API 아님.
-    this._isEnabled = options.isEnabled || isWorkerRenderEnabled;
+    // worker 진입 여부(차트별 opt-in). chart.core 가 `() => !!options.workerRender` 를 주입한다.
+    // 주입이 없으면 보수적으로 off(기존 main 경로 유지).
+    this._isEnabled = options.isEnabled || (() => false);
     this._isSupported = options.isSupported || detectWorkerRenderSupport;
     this._createWorker = options.createWorker || createRenderWorker;
   }
 
   /**
-   * worker 초기화 + ready 핸드셰이크 시작. kill switch off / 미지원 / 생성 실패면 main 경로로 남는다.
+   * worker 초기화 + ready 핸드셰이크 시작. opt-in off / 미지원 / 생성 실패면 main 경로로 남는다.
    * @returns {string} 진입 후 상태
    */
   start() {
@@ -152,7 +132,7 @@ export class WorkerRenderGate {
       return this.state;
     }
     if (!this._isEnabled()) {
-      this.hooks.onFallback('kill-switch-off');
+      this.hooks.onFallback('opt-in-off');
       return this.state;
     }
     if (!this._isSupported()) {

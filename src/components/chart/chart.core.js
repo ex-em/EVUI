@@ -15,7 +15,7 @@ import Tooltip from './plugins/plugins.tooltip';
 import TooltipVirtualScroll from './plugins/plugins.tooltip.virtualScroll';
 import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
-import { WorkerRenderGate, isWorkerRenderEnabled } from './render/render.worker.gate';
+import { WorkerRenderGate } from './render/render.worker.gate';
 import { toRenderSnapshot, packSeries } from './render/render.snapshot';
 
 class EvChart {
@@ -104,18 +104,18 @@ class EvChart {
 
     this.legendHover = null;
 
-    // Step 7/8: worker 렌더 게이트. kill switch(VITE_EVUI_WORKER_RENDER) off 가 기본 →
-    // worker 미진입 = 기존 main 경로 100% 유지(아래 drawChart 의 worker 분기는 ready 일 때만).
-    this.renderWorkerGate = new WorkerRenderGate();
+    // worker 렌더 게이트. 차트별 opt-in(`options.workerRender`, 기본 off)으로만 진입한다 →
+    // opt-in 하지 않으면 worker 미진입 = 기존 main 경로 100% 유지(아래 drawChart 의 worker 분기는 ready 일 때만).
+    this.renderWorkerGate = new WorkerRenderGate({
+      isEnabled: () => !!this.options.workerRender,
+    });
     // display frame ↔ hit-test model 일관성 / stale frame drop 용 단조 증가 epoch(Step 8).
     this.renderEpoch = 0;
     this.renderWorkerGate.setFrameHandler((msg) => this.commitWorkerFrame(msg));
     this.renderWorkerGate.setErrorHandler(() => this.drawSeriesLayerFallback());
-    // kill switch 가 켜졌을 때만 worker 를 기동한다. 미지원/생성 실패/미준비는 gate 상태기계가
-    // 처리하고 drawChart 는 ready 일 때만 worker 분기하므로, 꺼져있거나 실패해도 main 경로(무회귀).
-    if (isWorkerRenderEnabled()) {
-      this.renderWorkerGate.start();
-    }
+    // opt-in off / 미지원 / 생성 실패 / 미준비는 gate 상태기계가 처리하고 drawChart 는 ready 일 때만
+    // worker 분기하므로, 꺼져있거나 실패해도 main 경로(무회귀).
+    this.renderWorkerGate.start();
   }
 
   /**

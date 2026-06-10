@@ -263,6 +263,9 @@ const DEFAULT_OPTIONS = {
   eventBehavior: {
     legendClick: 'update',
   },
+  // series 래스터를 worker(OffscreenCanvas)로 오프로드할지 여부(차트별 opt-in). 기본 off(무회귀).
+  // 미지원 환경(SSR/OffscreenCanvas 부재)은 게이트 feature-detect 가 main 으로 fallback 한다.
+  workerRender: false,
 };
 
 const DEFAULT_DATA = {
