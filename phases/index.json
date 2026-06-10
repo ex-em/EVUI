@@ -12,7 +12,8 @@
     },
     {
       "dir": "chart-worker-offload",
-      "status": "pending"
+      "status": "blocked",
+      "blocked_at": "2026-06-10T11:37:41+0900"
     }
   ]
 }

@@ -1,0 +1,77 @@
+[     720ms] [WARNING] `IconButton` is deprecated and will be removed in Storybook 11, use `Button` instead. @ http://localhost:6006/sb-manager/globals-runtime.js:5810
+[     720ms] [WARNING] The 'ariaLabel' prop on 'Button' will become mandatory in Storybook 11. Buttons with text content should set 'ariaLabel={false}' to indicate that they are accessible as-is. Buttons without text content must provide a meaningful 'ariaLabel' for accessibility. The button content is: [object Object],태그 검색. @ http://localhost:6006/sb-manager/globals-runtime.js:5810
+[    1541ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    1550ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    2536ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    2536ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    2626ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    2626ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    2984ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    2984ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    3026ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    3026ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    3039ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    3039ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    4041ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[    4042ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   16415ms] [LOG] %cDocumentation: %chttps://mswjs.io/docs font-weight:bold font-weight:normal @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/msw-storybook-addon.js?v=3c02e630:865
+[   16415ms] [LOG] Found an issue? https://github.com/mswjs/msw/issues @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/msw-storybook-addon.js?v=3c02e630:870
+[   16415ms] [LOG] Worker script URL: http://localhost:6006/mockServiceWorker.js @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/msw-storybook-addon.js?v=3c02e630:872
+[   16415ms] [LOG] Worker scope: http://localhost:6006/ @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/msw-storybook-addon.js?v=3c02e630:875
+[   16415ms] [LOG] Client ID: %s (%s) 1094f406-c06a-4617-907d-c78c5bda77d6 nested @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/msw-storybook-addon.js?v=3c02e630:878
+[   16482ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   16482ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   16513ms] [WARNING] The 'ariaLabel' prop on 'PopoverProvider' will become mandatory in Storybook 11. Provide a concise, accessible label describing the popover's purpose. @ http://localhost:6006/sb-manager/globals-runtime.js:5810
+[   16560ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   16560ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   16604ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   16605ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   16655ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   16656ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17243ms] [WARNING] [Vue warn]: injection "Symbol(route location)" not found. 
+  at <Anonymous> 
+  at <App> @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   17295ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17295ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17348ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17349ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17381ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17381ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17419ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17419ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17448ms] [LOG] Request {url: URL, method: GET, headers: Object, body: } @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   17448ms] [LOG] Handler: HttpHandler @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   17448ms] [LOG] Response {status: 200, statusText: OK, headers: Object, body: {"status":"success","requestTime":"2026-06-10T02:4…e,"usePWA":false,"useAI":true,"propertyMap":{}}]}} @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   17448ms] [LOG] Request {url: URL, method: GET, headers: Object, body: } @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   17449ms] [LOG] Handler: HttpHandler @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   17449ms] [LOG] Response {status: 200, statusText: OK, headers: Object, body: {"data":[{"pcategory":"application","categories":[…on","oracle","mysql","postgresql","sqlserver"]}]}} @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   17453ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   17453ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   19996ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   19996ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20177ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20177ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20308ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20309ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20350ms] [LOG] Request {url: URL, method: GET, headers: Object, body: } @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   20350ms] [LOG] Handler: HttpHandler @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   20351ms] [LOG] Response {status: 200, statusText: OK, headers: Object, body: {"status":"success","requestTime":"2026-06-10T02:4…Score":88,"weekAvgScore":90,"monthAvgScore":91}]}} @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   20354ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20354ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20593ms] [WARNING] [MSW] Warning: intercepted a request without a matching request handler:
+
+  • POST /api/v8/user-envs?global=false
+
+  • Request body: [{"key":"GRIDSETTINGS_alert_alertDetail_primaryCausesList","value":"{\"columnOrder\":[\"cause\",\"priority\",\"explanation\",\"diagnosticCriteria\"]}"}]
+
+If you still wish to intercept this unhandled request, please create a request handler for it.
+Read more: https://mswjs.io/docs/http/intercepting-requests @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   20597ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20597ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20625ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:6006/api/v8/user-envs?global=false:0
+[   20626ms] [LOG] AxiosError: Request failed with status code 404
+    at settle (http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/axios.js?v=3c02e630:1319:7)
+    at XMLHttpRequest.onloadend (http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/axios.js?v=3c02e630:1682:7)
+    at Axios.request (http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/axios.js?v=3c02e630:2328:41) @ http://localhost:6006/node_modules/.cache/storybook/10.3.3/1c3385a5d25e538d10b518b310c74d3ca2690b6aaffeadccd74da79736171f86/sb-vite/deps/storybook_internal_preview_runtime.js?v=3c02e630:23064
+[   20630ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798
+[   20630ms] [VERBOSE] Rendering was performed in a subtree hidden by content-visibility. @ http://localhost:6006/sb-manager/runtime.js:12798

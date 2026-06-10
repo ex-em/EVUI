@@ -1,0 +1,17 @@
+[   24221ms] [WARNING] [evui] tooltip.virtualScroll: formatter.html 반환 구조에서 row를 식별하지 못해 가상 스크롤을 건너뜁니다. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 추가하거나, row 컨테이너 직속 자식이 시리즈 수와 일치하도록 마크업을 정리하세요. @ http://localhost:3001/node_modules/.vite/deps/evui.js?v=5f407a18:19851
+[   24405ms] [WARNING] [evui] tooltip.virtualScroll: formatter.html 반환 구조에서 row를 식별하지 못해 가상 스크롤을 건너뜁니다. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 추가하거나, row 컨테이너 직속 자식이 시리즈 수와 일치하도록 마크업을 정리하세요. @ http://localhost:3001/node_modules/.vite/deps/evui.js?v=5f407a18:19851
+[  858849ms] [LOG] CanceledError: canceled
+    at AbortSignal.onCanceled (http://localhost:3001/node_modules/.vite/deps/axios.js?v=5ea006f5:1764:41)
+    at abortApi (http://localhost:3001/src/common/utils/apiUtils.ts:12:16)
+    at getNoticePopupInfo (http://localhost:3001/src/config/stores/notice.ts:407:5)
+    at useRepeat.isSetup (http://localhost:3001/src/config/stores/notice.ts:481:13)
+    at repeat (http://localhost:3001/src/worker/utils.ts:42:3)
+    at resume (http://localhost:3001/src/worker/composables/useRepeat.ts:55:5)
+    at resumeWithTarget (http://localhost:3001/src/worker/composables/useRepeat.ts:68:7)
+    at http://localhost:3001/src/worker/composables/useRepeat.ts:74:9
+    at callWithErrorHandling (http://localhost:3001/node_modules/.vite/deps/chunk-XT57QRP5.js?v=306392a6:2522:19)
+    at callWithAsyncErrorHandling (http://localhost:3001/node_modules/.vite/deps/chunk-XT57QRP5.js?v=306392a6:2529:17)
+    at Axios.request (http://localhost:3001/node_modules/.vite/deps/axios.js?v=5ea006f5:2328:41)
+    at async fetchLoginAfterPopupList (http://localhost:3001/src/config/stores/notice.ts:258:24)
+    at async getNoticePopupInfo (http://localhost:3001/src/config/stores/notice.ts:415:20)
+    at async useRepeat.isSetup (http://localhost:3001/src/config/stores/notice.ts:481:7) @ http://localhost:3001/src/config/stores/notice.ts:283
