@@ -230,10 +230,100 @@ class HeatMap {
     return point;
   }
 
+  /**
+   * Compute pixel geometry (xp/yp/w/h) for each cell and store it on the main model.
+   * 기하 계산만 수행한다(canvas 그리기 없음). border(stroke/selectItem) 두께에 따른 좌표 보정까지
+   * draw와 동일하게 반영해 hit-test가 동일한 item.xp/yp/w/h를 소비하도록 한다. dataColor/cId도
+   * 함께 채운다(findGraphData가 소비). 좌표 의미·반올림·null/show 처리는 draw와 동일해야 한다.
+   * @param {object} param
+   * @returns {undefined}
+   */
+  computeGeometry(param) {
+    if (!this.show) {
+      return;
+    }
+
+    const { chartRect, labelOffset, selectItem, axesSteps } = param;
+
+    const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+
+    const xsp = chartRect.x1 + labelOffset.left;
+    const ysp = chartRect.y2 - labelOffset.bottom;
+
+    const minmaxX = axesSteps.x[this.xAxisIndex];
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    this.size.w = xArea / minmaxX.oriSteps;
+    this.size.h = yArea / minmaxY.oriSteps;
+
+    this.currentLabelInfo = {
+      x: { steps: minmaxX.oriSteps, min: minmaxX.graphMin, max: minmaxX.graphMax },
+      y: { steps: minmaxY.oriSteps, min: minmaxY.graphMin, max: minmaxY.graphMax },
+    };
+
+    this.data.forEach((item, index) => {
+      const axisLineWidth = 1;
+
+      let xp = this.calculateXY('x', item.x, xsp, minmaxX);
+      let yp = this.calculateXY('y', item.y, ysp, minmaxY);
+      let w = this.size.w;
+      let h = this.size.h;
+
+      const value = item.o;
+
+      if (xp !== null && yp !== null && value !== null && value !== undefined) {
+        const { show, dataColor, id } = this.getItemInfo(value);
+
+        if (!item.dataColor) {
+          item.dataColor = dataColor;
+        }
+        item.cId = id;
+
+        if (show) {
+          let borderOpt = this.stroke;
+          const selectItemOption = selectItem?.option;
+          const useSelectItem = selectItemOption?.use && selectItemOption?.showBorder;
+          const isHit = index === selectItem?.selected?.dataIndex;
+          if (useSelectItem && isHit) {
+            borderOpt = {
+              show: selectItemOption?.showBorder,
+              ...selectItemOption?.borderStyle,
+            };
+          }
+
+          if (borderOpt.show && borderOpt.lineWidth > 0) {
+            const { lineWidth } = borderOpt;
+            const totalStrokeWidth = lineWidth * 2;
+            const isBorderDrawable =
+              totalStrokeWidth < Math.floor(w) && totalStrokeWidth < Math.floor(h);
+
+            if (isBorderDrawable) {
+              xp += lineWidth;
+              yp += lineWidth;
+              w -= totalStrokeWidth;
+              h -= totalStrokeWidth;
+            }
+          }
+
+          xp += axisLineWidth;
+
+          item.xp = xp;
+          item.yp = yp;
+          item.w = w;
+          item.h = h;
+        }
+      }
+    });
+  }
+
   draw(param) {
     if (!this.show) {
       return;
     }
+
+    // 기하(xp/yp/w/h)는 기하 패스가 채운다. 아래 래스터 패스는 mutate하지 않는다.
+    this.computeGeometry(param);
 
     const {
       ctx,
@@ -362,11 +452,7 @@ class HeatMap {
 
           xp += axisLineWidth;
 
-          item.xp = xp;
-          item.yp = yp;
-          item.w = w;
-          item.h = h;
-
+          // 기하(xp/yp/w/h)는 computeGeometry가 채운다. 래스터 패스는 로컬 좌표로 그리며 mutate하지 않는다.
           this.drawItem(ctx, xp, yp, w, h, { ...borderOpt, show: isBorderDrawable });
           ctx.restore();
 

@@ -318,3 +318,107 @@ describe('element.line path 생략 (연속 동일 픽셀 lineTo)', () => {
     });
   });
 });
+
+/**
+ * 기하/래스터 분리 회귀 가드 — computeGeometry(기하 패스, main 저장)와 draw(래스터 패스)의
+ * hit-test 기하(xp/yp) 일관성을 검증한다(Step 2 geometry-hittest-split).
+ *
+ *  1) computeGeometry 단독 호출만으로 hit-test가 읽는 xp/yp 가 채워진다(canvas 없이도).
+ *  2) 래스터 패스(draw)는 기하를 바꾸지 않는다 — computeGeometry 결과와 draw 후 결과가 동일.
+ *  3) update→hover 일관성: 데이터 갱신 후 다시 계산하면 xp/yp 가 최신 데이터로 갱신된다.
+ */
+describe('element.line 기하/래스터 분리 (computeGeometry ↔ draw)', () => {
+  const noop = () => {};
+  const makeCtx = () => ({
+    save: noop,
+    restore: noop,
+    beginPath: noop,
+    closePath: noop,
+    stroke: noop,
+    fill: noop,
+    setLineDash: noop,
+    arc: noop,
+    fillRect: noop,
+    moveTo: noop,
+    lineTo: noop,
+    createLinearGradient: () => ({ addColorStop: noop }),
+  });
+
+  const baseParam = (ctx) => ({
+    ctx,
+    chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    axesSteps: { x: [{ graphMin: 0, graphMax: 4 }], y: [{ graphMin: 0, graphMax: 100 }] },
+    isBrush: true,
+  });
+
+  const makeLine = (data) => {
+    const line = new Line('s0', {}, 0);
+    line.data = data;
+    line.xAxisIndex = 0;
+    line.yAxisIndex = 0;
+    line.interpolation = 'none';
+    line.combo = false;
+    line.isExistGrp = false;
+    line.fill = false;
+    line.point = false;
+    line.show = true;
+    return line;
+  };
+
+  it('computeGeometry 단독으로 hit-test용 xp/yp 가 채워진다 (canvas 그리기 없이)', () => {
+    const data = [
+      { x: 0, y: 0, o: 0 },
+      { x: 2, y: 50, o: 50 },
+      { x: 4, y: 100, o: 100 },
+    ];
+    const line = makeLine(data);
+    line.computeGeometry(baseParam(null)); // ctx 없이도 동작해야 함(그리기 없음)
+
+    data.forEach((p) => {
+      expect(typeof p.xp).toBe('number');
+      expect(typeof p.yp).toBe('number');
+    });
+    // x:[0..4]→픽셀[0..100] 선형, y:[0..100]→아래가 큰 값(yp 작아짐) 순증가.
+    expect(data[0].xp).toBeLessThan(data[1].xp);
+    expect(data[1].xp).toBeLessThan(data[2].xp);
+    expect(data[0].yp).toBeGreaterThan(data[2].yp);
+  });
+
+  it('래스터 패스(draw)는 기하를 바꾸지 않는다 — computeGeometry 결과와 동일', () => {
+    const data = [
+      { x: 0, y: 10, o: 10 },
+      { x: 1, y: 80, o: 80 },
+      { x: 3, y: 40, o: 40 },
+      { x: 4, y: 55, o: 55 },
+    ];
+    const geomLine = makeLine(data.map((d) => ({ ...d })));
+    geomLine.computeGeometry(baseParam(null));
+    const expected = geomLine.data.map(({ xp, yp }) => ({ xp, yp }));
+
+    const drawLine = makeLine(data.map((d) => ({ ...d })));
+    drawLine.draw(baseParam(makeCtx()));
+    const drawn = drawLine.data.map(({ xp, yp }) => ({ xp, yp }));
+
+    expect(drawn).toEqual(expected);
+  });
+
+  it('update→hover 일관성: 데이터 갱신 후 다시 계산하면 xp/yp 가 최신 데이터로 갱신된다', () => {
+    const data = [
+      { x: 0, y: 10, o: 10 },
+      { x: 2, y: 20, o: 20 },
+      { x: 4, y: 30, o: 30 },
+    ];
+    const line = makeLine(data);
+    line.computeGeometry(baseParam(null));
+    const before = data[1].yp;
+
+    // 가운데 점 값 갱신 → 다시 계산하면 yp 가 갱신되어야 한다.
+    data[1].y = 90;
+    data[1].o = 90;
+    line.computeGeometry(baseParam(null));
+
+    expect(data[1].yp).not.toBe(before);
+    expect(data[1].yp).toBeLessThan(before); // 값이 커지면 yp(위쪽) 작아짐
+  });
+});
