@@ -132,7 +132,9 @@ const modules = {
     const keys = Object.keys(datas);
 
     const minMaxValues = {
-      maxY: 0,
+      // 음수 전용 데이터에서 maxY 가 0 으로 clamp 되지 않도록 -Infinity 에서 시작한다.
+      // 유효 데이터가 하나도 없으면 아래 fallback(isFinite(minY) 검사)에서 0/0 으로 되돌린다.
+      maxY: -Infinity,
       minY: Infinity,
       fromTime: 0,
       toTime: 0,
@@ -307,7 +309,8 @@ const modules = {
 
       // 12) series min/max 계산 (fromTime ~ toTime 범위 내 데이터만 포함)
       const MS_PER_SECOND = 1000;
-      const tempMinMax = { maxY: 0, minY: Infinity };
+      // maxY 도 minY 와 대칭으로 -Infinity 에서 시작 — 음수 데이터의 실제 최대값을 잡는다.
+      const tempMinMax = { maxY: -Infinity, minY: Infinity };
 
       for (let i = 0; i < length; i++) {
         const g = dataGroup[i];

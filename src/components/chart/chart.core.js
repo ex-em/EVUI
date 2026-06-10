@@ -338,7 +338,8 @@ class EvChart {
       if (!series?.show || !series.minMax) {
         return;
       }
-      // 데이터 없는 series 의 maxY 는 0(finite)이라 포함된다. 제외되는 건 show=false·minMax 미정의·NaN 뿐.
+      // minMax.maxY 가 유한수인 series 만 포함한다(0·음수 포함). 제외: show=false·minMax 미정의·
+      // 비유한값(일반 차트의 빈 series 는 maxY=null, realtime scatter 는 전 series 무데이터 시 0 폴백).
       const m = series.minMax.maxY;
       if (Number.isFinite(m) && m > maxY) {
         maxY = m;
