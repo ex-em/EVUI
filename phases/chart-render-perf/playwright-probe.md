@@ -141,6 +141,29 @@ flat 기준 reactivity 총합(get+set+noTracking+traverse+trigger+…) ≈ **16%
 - OffscreenCanvas + Worker(pool) 적용을 **정식 plan으로 설계**(plan §Step 4/부록 A 활성화). chart.core가 buffer/display 2-canvas 구조라 `transferControlToOffscreen` 적용 경로 존재(`chart.core.js:61-66`).
 - 실기기(GPU)에서 1000×10 repro의 render 비중을 1회 재확인 후 착수(부록 A.0/A.4 오버헤드 caveat 적용).
 
+## ★★★★★ GPU(headed) 재확인 게이트 (chart-worker-offload Step 0) — **전제 붕괴, 결론 재역전**
+
+> 동기: 위 ★★★★ B-real 실규모 측정은 **headless Chromium**이라 GPU 합성이 아닌 **SwiftShader(소프트웨어 래스터)** 였을 수 있어 `drawImage` 65%가 부풀려졌을 의심이 있었다(plan caveat). worker 오프로딩 phase 전체의 전제("프로파일 B는 render-bound")를 착수 전 **실 GPU**에서 검증하는 게이트.
+> 방법: 동일 repro(`PerfStressDashboard.vue` 상수 임시 10×1000×60 + 결정적 tick 구동 훅), **`chromium.launch({ headless:false })`(실 GPU 가속)** + `newCDPSession`. 초기 마운트는 throttle 없이, 측정 구간만 6× throttle, warmup 4 + measure 10 tick. CDP `Profiler`(200µs) call-tree 카테고리 귀속. 측정 후 하니스/probe 전부 원복. **2회 실행, 결과 일관.**
+
+| 날짜 | profile | browser | **GPU status** | render % | reactivity %(flat) | **drawImage %** | deepwatch % | clone % | 아티팩트 |
+|---|---|---|---|---:|---:|---:|---:|---:|---|
+| 2026-06-10 | 1000×10×60 | Chromium 145 **headed** | **하드웨어 GPU** — ANGLE Metal Renderer (Apple M2 Pro), SwiftShader=false | **5.1** | **56.0** | **0** | 26.2 | 12.9 | `artifacts/gpu-render-confirm-2026-06-10.json` |
+| (대조) 2026-06-10 | 1000×10×60 | Chromium **headless** | **SwiftShader 의심**(소프트웨어 래스터) | **76.4** | ~16 | **65** | 6.3 | 3.2 | (위 ★★★★ 섹션) |
+
+- 개발 PC `navigator.hardwareConcurrency = 10`. **단 고객사는 2~4코어 가능성** → worker 풀은 저코어 보수 설계 전제였으나(아래 판정으로 무의미).
+
+### 판정 — **BLOCKED (render 비전제 붕괴)**
+- 실 GPU(Metal)에서 **render ≈ 5%, `drawImage` ≈ 0%**. headless의 `drawImage` 65%는 **SwiftShader 소프트웨어 래스터 아티팩트**였음이 확인됨(GPU에선 2D canvas 래스터가 GPU로 처리돼 메인스레드 CPU 비용에 잡히지 않음).
+- 메인스레드 지배항은 다시 **Vue 반응성(flat ~56%)**: `set`/`get`/`trigger` + **deep-watch `traverse` ~26%** + **cloneDeep ~13%** + 소비자 in-place 배열 mutation(~16%, PerfStressDashboard `(anonymous)`). 즉 **프로파일 A와 같은 그림** — "Worker 무효" 결론이 B-real(실 GPU)에도 적용됨.
+- **물리적 교차검증(강력)**: headless↔GPU에서 **deepwatch 절대비용 ≈13s, clone ≈6.5s로 거의 동일**하고 **오직 `drawImage` 135s→0s만 붕괴**. 반응성 비용은 실재·안정·메인스레드 고유. 붕괴분은 전적으로 software-raster.
+- **off-main(freeze 제거) 가치도 없음**: 메인 freeze(≈4.7s/tick @6×)의 ~95%가 반응성/클론/소비자 mutation(메인스레드 고유, worker로 못 옮김). render(5%)만 옮겨봐야 freeze 제거 효과 ~5%. 저코어 freeze-제거 논거도 성립 안 함.
+
+### 결론 / 다음
+- **chart-worker-offload phase는 전제가 깨져 착수 보류(blocked).** Worker/OffscreenCanvas는 이 병목에 무효.
+- 남은 레버는 **F2(deep-watch 회피, ~26%)** 인데 소비자 in-place mutation 감지(default deep watch) 계약 위반이라 범위 밖 → **opt-in 형태로 사용자와 별도 재논의** 필요. clone(~13%)은 F0/F1으로 이미 일부 축소됐고 잔여분 추가 축소 여지.
+- ⚠️ 6× throttle 근사·단일 개발기(M2 Pro) 측정. 절대 게이트선은 저사양 실기기 확정 필요하나, **방향(반응성-bound, render 비지배)** 은 headless·GPU 양쪽 self-time 비율과 절대비용 교차검증으로 견고.
+
 ## 근본 원인 (코드 위치)
 
 per-tick 경로 = `Chart.vue:231-263` `watch(() => props.data, …, { deep: true })`. 매 틱마다:

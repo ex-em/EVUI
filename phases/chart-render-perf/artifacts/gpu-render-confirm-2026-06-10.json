@@ -1,0 +1,348 @@
+{
+  "date": "2026-06-10",
+  "gate": "gpu-render-confirm (chart-worker-offload step 0)",
+  "profile": {
+    "CHART_COUNT": 10,
+    "SERIES_PER_CHART": 1000,
+    "POINTS_PER_SERIES": 60
+  },
+  "browser": "145.0.7632.6",
+  "headless": false,
+  "cpuThrottle": "6x",
+  "hardwareConcurrency": 10,
+  "gpu": {
+    "webglUnmaskedRenderer": "ANGLE (Apple, ANGLE Metal Renderer: Apple M2 Pro, Unspecified Version)",
+    "webglUnmaskedVendor": "Google Inc. (Apple)",
+    "swiftShader": false,
+    "systemInfoGpu": {
+      "err": "Error: cdpSession.send: Protocol error (SystemInfo.getInfo): SystemInfo.getInfo is only supported on the browser target"
+    }
+  },
+  "ticks": {
+    "warmup": 4,
+    "measured": 10,
+    "wallMsAt6x": 44639
+  },
+  "totals": {
+    "activeMs": 49146,
+    "idleMs": 12,
+    "samples": 67165
+  },
+  "categoriesPctOfActive": {
+    "other": {
+      "pct": 54.6,
+      "ms": 26813
+    },
+    "deepwatch": {
+      "pct": 26.2,
+      "ms": 12859
+    },
+    "clone": {
+      "pct": 12.9,
+      "ms": 6338
+    },
+    "render": {
+      "pct": 5.1,
+      "ms": 2507
+    },
+    "isEqual": {
+      "pct": 1.3,
+      "ms": 629
+    }
+  },
+  "drawImagePct": 0,
+  "reactivityFlatPct": 56,
+  "topSelfTimeFns": [
+    {
+      "fn": "(anonymous)",
+      "pct": 16.8,
+      "ms": 8278
+    },
+    {
+      "fn": "set",
+      "pct": 16.7,
+      "ms": 8212
+    },
+    {
+      "fn": "traverse",
+      "pct": 15.8,
+      "ms": 7763
+    },
+    {
+      "fn": "get",
+      "pct": 13.2,
+      "ms": 6480
+    },
+    {
+      "fn": "baseClone",
+      "pct": 9.9,
+      "ms": 4846
+    },
+    {
+      "fn": "(program)",
+      "pct": 5.6,
+      "ms": 2729
+    },
+    {
+      "fn": "trigger",
+      "pct": 4.4,
+      "ms": 2160
+    },
+    {
+      "fn": "cleanupDeps",
+      "pct": 2.3,
+      "ms": 1142
+    },
+    {
+      "fn": "getAllKeys",
+      "pct": 2.2,
+      "ms": 1067
+    },
+    {
+      "fn": "prepareDeps",
+      "pct": 2,
+      "ms": 1001
+    },
+    {
+      "fn": "ownKeys",
+      "pct": 1.6,
+      "ms": 767
+    },
+    {
+      "fn": "getSeriesMinMax",
+      "pct": 1.4,
+      "ms": 695
+    },
+    {
+      "fn": "notify",
+      "pct": 1.1,
+      "ms": 529
+    },
+    {
+      "fn": "calculateX",
+      "pct": 1.1,
+      "ms": 526
+    },
+    {
+      "fn": "getXPos",
+      "pct": 0.9,
+      "ms": 424
+    },
+    {
+      "fn": "(garbage collector)",
+      "pct": 0.8,
+      "ms": 397
+    },
+    {
+      "fn": "equalObjects",
+      "pct": 0.5,
+      "ms": 227
+    },
+    {
+      "fn": "baseIsEqualDeep",
+      "pct": 0.5,
+      "ms": 226
+    }
+  ],
+  "categoryTopFns": {
+    "other": [
+      {
+        "fn": "set",
+        "pct": 16.7
+      },
+      {
+        "fn": "(anonymous)",
+        "pct": 16.4
+      },
+      {
+        "fn": "(program)",
+        "pct": 5.6
+      },
+      {
+        "fn": "trigger",
+        "pct": 4.4
+      },
+      {
+        "fn": "get",
+        "pct": 3.8
+      },
+      {
+        "fn": "cleanupDeps",
+        "pct": 2.3
+      }
+    ],
+    "render": [
+      {
+        "fn": "getSeriesMinMax",
+        "pct": 1.4
+      },
+      {
+        "fn": "calculateX",
+        "pct": 1.1
+      },
+      {
+        "fn": "getXPos",
+        "pct": 0.9
+      },
+      {
+        "fn": "(anonymous)",
+        "pct": 0.4
+      },
+      {
+        "fn": "draw",
+        "pct": 0.3
+      },
+      {
+        "fn": "addSeriesDS",
+        "pct": 0.2
+      }
+    ],
+    "deepwatch": [
+      {
+        "fn": "traverse",
+        "pct": 15.8
+      },
+      {
+        "fn": "get",
+        "pct": 9
+      },
+      {
+        "fn": "ownKeys",
+        "pct": 1
+      },
+      {
+        "fn": "reactive",
+        "pct": 0.3
+      }
+    ],
+    "clone": [
+      {
+        "fn": "baseClone",
+        "pct": 9.9
+      },
+      {
+        "fn": "getAllKeys",
+        "pct": 2.2
+      },
+      {
+        "fn": "ownKeys",
+        "pct": 0.4
+      },
+      {
+        "fn": "cloneDeepWith",
+        "pct": 0.2
+      },
+      {
+        "fn": "stackSet",
+        "pct": 0.1
+      },
+      {
+        "fn": "get",
+        "pct": 0.1
+      }
+    ],
+    "isEqual": [
+      {
+        "fn": "equalObjects",
+        "pct": 0.5
+      },
+      {
+        "fn": "baseIsEqualDeep",
+        "pct": 0.5
+      },
+      {
+        "fn": "get",
+        "pct": 0.3
+      },
+      {
+        "fn": "reactive",
+        "pct": 0.1
+      },
+      {
+        "fn": "stackSet",
+        "pct": 0
+      },
+      {
+        "fn": "has",
+        "pct": 0
+      }
+    ]
+  },
+  "chartCodeSelfTime": [
+    {
+      "where": "(anonymous) @ /EVUI/docs/views/comboChart/example/PerfStressDashboard.vue",
+      "pct": 16,
+      "ms": 7849
+    },
+    {
+      "where": "getSeriesMinMax @ /EVUI/src/components/chart/model/model.store.js",
+      "pct": 1.4,
+      "ms": 695
+    },
+    {
+      "where": "calculateX @ /EVUI/src/components/chart/helpers/helpers.canvas.js",
+      "pct": 1.1,
+      "ms": 526
+    },
+    {
+      "where": "getXPos @ /EVUI/src/components/chart/element/element.line.js",
+      "pct": 0.9,
+      "ms": 424
+    },
+    {
+      "where": "draw @ /EVUI/src/components/chart/element/element.line.js",
+      "pct": 0.3,
+      "ms": 156
+    },
+    {
+      "where": "(anonymous) @ /EVUI/src/components/chart/element/element.line.js",
+      "pct": 0.3,
+      "ms": 133
+    },
+    {
+      "where": "addSeriesDS @ /EVUI/src/components/chart/model/model.store.js",
+      "pct": 0.2,
+      "ms": 110
+    },
+    {
+      "where": "(anonymous) @ /EVUI/src/components/chart/model/model.store.js",
+      "pct": 0.1,
+      "ms": 54
+    },
+    {
+      "where": "buildLabelValidMask @ /EVUI/src/components/chart/plugins/plugins.interaction.js",
+      "pct": 0.1,
+      "ms": 30
+    },
+    {
+      "where": "keys.reduce.x.min @ /EVUI/src/components/chart/model/model.store.js",
+      "pct": 0.1,
+      "ms": 26
+    },
+    {
+      "where": "drawSeries @ /EVUI/src/components/chart/chart.core.js",
+      "pct": 0.1,
+      "ms": 25
+    },
+    {
+      "where": "createDataSet @ /EVUI/src/components/chart/model/model.store.js",
+      "pct": 0,
+      "ms": 24
+    },
+    {
+      "where": "colorStringToRgba @ /EVUI/src/components/chart/helpers/helpers.util.js",
+      "pct": 0,
+      "ms": 22
+    },
+    {
+      "where": "getYPos @ /EVUI/src/components/chart/element/element.line.js",
+      "pct": 0,
+      "ms": 16
+    },
+    {
+      "where": "drawChart @ /EVUI/src/components/chart/chart.core.js",
+      "pct": 0,
+      "ms": 14
+    }
+  ]
+}
