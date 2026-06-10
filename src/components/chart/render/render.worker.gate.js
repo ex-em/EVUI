@@ -18,6 +18,12 @@
 
 /** worker 가 모르는 스냅샷 버전이면 main fallback. render.snapshot.js 와 동일 값. */
 import { RENDER_SNAPSHOT_VERSION } from './render.snapshot';
+/**
+ * worker 를 inline(blob)으로 번들한다. lib 빌드가 worker 를 별도 에셋(`/assets/render.worker-*.js`)으로
+ * emit 하면 소비자 앱 루트에 그 경로가 없어 404 → worker 미로드. inline 은 소비자 번들러/에셋 서빙과
+ * 무관하게 항상 로드된다(대가: 번들 크기 +worker, CSP blob 허용 필요). Step 10 소비자 패키징.
+ */
+import RenderWorkerInline from './render.worker.js?worker&inline';
 
 /** worker 생명주기 상태기계. ready 전·failed 면 main RenderCore. */
 export const RENDER_WORKER_STATE = {
@@ -110,7 +116,7 @@ export function canSerializeSnapshot(snapshot) {
  */
 export function createRenderWorker() {
   try {
-    return new Worker(new URL('./render.worker.js', import.meta.url), { type: 'module' });
+    return new RenderWorkerInline();
   } catch (e) {
     return null;
   }
