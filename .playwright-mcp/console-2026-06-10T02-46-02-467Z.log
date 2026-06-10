@@ -15,3 +15,6 @@
     at async fetchLoginAfterPopupList (http://localhost:3001/src/config/stores/notice.ts:258:24)
     at async getNoticePopupInfo (http://localhost:3001/src/config/stores/notice.ts:415:20)
     at async useRepeat.isSetup (http://localhost:3001/src/config/stores/notice.ts:481:7) @ http://localhost:3001/src/config/stores/notice.ts:283
+[ 5135810ms] [WARNING] [evui] tooltip.virtualScroll: formatter.html 반환 구조에서 row를 식별하지 못해 가상 스크롤을 건너뜁니다. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 추가하거나, row 컨테이너 직속 자식이 시리즈 수와 일치하도록 마크업을 정리하세요. @ http://localhost:3001/node_modules/.vite/deps/evui.js?v=5f407a18:19851
+[ 5135876ms] [WARNING] [evui] tooltip.virtualScroll: formatter.html 반환 구조에서 row를 식별하지 못해 가상 스크롤을 건너뜁니다. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 추가하거나, row 컨테이너 직속 자식이 시리즈 수와 일치하도록 마크업을 정리하세요. @ http://localhost:3001/node_modules/.vite/deps/evui.js?v=5f407a18:19851
+[ 5215295ms] [WARNING] [evui] tooltip.virtualScroll: formatter.html 반환 구조에서 row를 식별하지 못해 가상 스크롤을 건너뜁니다. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 추가하거나, row 컨테이너 직속 자식이 시리즈 수와 일치하도록 마크업을 정리하세요. @ http://localhost:3001/node_modules/.vite/deps/evui.js?v=5f407a18:19851
