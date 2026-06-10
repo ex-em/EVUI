@@ -1,0 +1,37 @@
+{
+  "project": "EVUI",
+  "phase": "chart-data-pipeline",
+  "steps": [
+    {
+      "step": 0,
+      "name": "contract-audit",
+      "status": "completed",
+      "started_at": "2026-06-09T17:48:35+0900",
+      "summary": "(a) getNormalizedData=defaultsDeep(data,DEFAULT_DATA)가 원본 props.data(proxy)를 in-place mutate하고 같은 참조 반환 — 누락 시 groups/labels/series/data 빈 컨테이너 주입(F0 근거). (b) zoom 사용 시 per-tick clone 재발(uses.js:645 Z2, 메인+zoom 틱당 2회, group은 N+1회) + executeZoom이 props.data 직접 mutate(Z4). (c) in-place mutation(labels.push/seriesData.shift)이 docs 예제에 광범위 실재 → deep watch 계약·F3 보수 fallback 필수. (d) F1 저위험 판정: 메인 경로는 createDataSet/addSeriesDS가 입력 비변형 확인 → 저위험, 그러나 zoom 경로는 props.data 직접 교체로 별도 정책 통일·검증 필요.",
+      "completed_at": "2026-06-09T17:54:15+0900"
+    },
+    {
+      "step": 1,
+      "name": "f0-normalize-non-mutating",
+      "status": "completed",
+      "started_at": "2026-06-09T18:03:35+0900",
+      "summary": "F0: getNormalizedData를 모듈 스코프 export normalizeData로 추출, defaultsDeep(data,DEFAULT_DATA)→defaults({...data},DEFAULT_DATA)로 전환(원본 in-place mutate 제거, 빈 shallow copy target). deep copy/clone 미도입(F1 소관). 신규 Chart.normalizeData.spec.js 5케이스(원본 불변·reactive proxy 불변·누락키 기본값·추가키 보존·참조 격리). 검증: lint exit0, test:run 842 passed(837+5), test:visual 22 passed(출력 불변), prettier clean. 수동 실행(harness 자식이 환경적 code 1로 3회 실패 → 직접 구현).",
+      "completed_at": "2026-06-09T18:25:00+0900"
+    },
+    {
+      "step": 2,
+      "name": "f1-clone-reduce-main",
+      "status": "completed",
+      "summary": "F1 메인: cloneChartData(cloneDeepWith) customizer에서 reactive proxy를 toRaw로 벗긴 뒤 동일 customizer로 재귀 복사 → per-value get/noTracking trap 제거(probe clone 서브트리 ~30%의 proxy traversal분). deep copy·immutable date 보존 불변. CLONE_RAW_UNWRAP 상수 flag(측정 A/B·회귀 대조, 기본 true). 신규 Chart.cloneChartData.spec.js 6케이스(reactive→non-reactive plain·값 동일·legacy 대조·격리·Date 보존). 검증: lint·test:run 848(842+6)·test:visual 22·prettier 통과. zoom/group 클론 미접촉(step3). 수동 구현.",
+      "completed_at": "2026-06-09T18:40:00+0900"
+    },
+    {
+      "step": 3,
+      "name": "f1-clone-reduce-zoom",
+      "status": "completed",
+      "summary": "코드 변경 0. zoom per-tick 클론(setDataForUseZoom:680)이 step2에서 고친 동일 cloneChartData를 쓰므로 toRaw 자동 적용. step2는 cloneChartData 결과(값·구조·독립 plain)를 불변 유지하고 복사 과정 trap만 제거 → Chart.cloneChartData.spec의 'legacy 대조 출력 동일' 테스트가 zoom/group/brush 전 소비자의 출력=동작 불변을 보장. deep copy(구조공유 없음) 독립성으로 executeZoom(Z4 props.data 직접교체)와 evChartClone 복원소스 stale/교차오염 없음. createEvChartZoom 셋업 cloneDeep은 per-tick 아니라 미접촉(단순함). 실 zoom 인터랙션(toolbar/drag 복원)은 자동 테스트 부재 → 사람 수동 검증 권고. 다음 차례: 사람이 재측정(D4a) → measurements.md 기록.",
+      "completed_at": "2026-06-09T18:55:00+0900"
+    }
+  ],
+  "created_at": "2026-06-09T17:48:35+0900"
+}
