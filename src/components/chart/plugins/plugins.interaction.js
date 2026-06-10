@@ -968,6 +968,8 @@ const modules = {
    * }} hit item information
    */
   findHitItem(offset, disableNullLabelSnap = false) {
+    // realtime scatter blit 틱은 strip 밖 점들의 xp/yp 갱신을 건너뛴다 — hit-test 전에 지연 복구.
+    this.ensureHitCoordsFresh?.();
     const sIds = Object.keys(this.seriesList);
     const items = {};
     const isHorizontal = !!this.options.horizontal;
@@ -1098,16 +1100,12 @@ const modules = {
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     // all-null 라벨인 경우 synthetic items[''] 로 label/index 만 채워 전달.
-    if (disableNullLabelSnap
-        && Object.keys(items).length === 0
-        && targetDataIndex !== -1) {
+    if (disableNullLabelSnap && Object.keys(items).length === 0 && targetDataIndex !== -1) {
       const refSeriesID = sIds.find((sId) => {
         const s = this.seriesList[sId];
         return s?.show && s?.data?.length > 0;
       });
-      const refPoint = refSeriesID
-        ? this.seriesList[refSeriesID].data?.[targetDataIndex]
-        : null;
+      const refPoint = refSeriesID ? this.seriesList[refSeriesID].data?.[targetDataIndex] : null;
       if (refPoint) {
         items[''] = {
           id: '',
@@ -1180,10 +1178,12 @@ const modules = {
 
     // 각 라벨에서 가장 가까운 것 찾기 (disableNullLabelSnap=true 면 all-null 라벨도 후보)
     for (let i = 0; i < referenceData.length; i++) {
-      const hasValidData = disableNullLabelSnap || sIds.some((sId) => {
-        const series = this.seriesList[sId];
-        return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
-      });
+      const hasValidData =
+        disableNullLabelSnap ||
+        sIds.some((sId) => {
+          const series = this.seriesList[sId];
+          return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
+        });
 
       if (hasValidData) {
         const point = referenceData[i];
@@ -1206,11 +1206,11 @@ const modules = {
         }
       }
     }
-    
+
     if (closestIndex === -1) {
       return -1;
     }
-    
+
     // 최소 hover snap 반경 (px)
     // - 데이터 밀도가 높을 때 avgInterval이 1px 이하로 감소하는 문제 보정
     // - 마우스 포인터의 실제 조작 정밀도(≈1px 이하)보다 충분히 넓은 범위를 확보하여 안정적인 hover 보장
@@ -1218,7 +1218,7 @@ const modules = {
     // → 6px은 과도하게 넓지 않으면서도 안정적인 선택이 가능한 절충값
     const MIN_SNAP_THRESHOLD_PX = 6;
     const snapThreshold = Math.max(avgInterval, MIN_SNAP_THRESHOLD_PX);
-    
+
     if (closestDistance >= snapThreshold) {
       const useLinearInterpolation = sIds.some((sId) => {
         const series = this.seriesList[sId];
@@ -1669,6 +1669,8 @@ const modules = {
    * @returns {object}
    */
   findSelectedItems(range) {
+    // realtime scatter blit 틱 이후의 스테일 xp/yp 를 drag select 전에 지연 복구.
+    this.ensureHitCoordsFresh?.();
     const items = [];
     const sIds = Object.keys(this.seriesList);
     for (let ix = 0; ix < sIds.length; ix++) {
