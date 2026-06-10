@@ -281,11 +281,14 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
   }
 
-  emitAxesScaleChange() {
-    if (typeof this.listeners?.['axes-scale-change'] !== 'function') {
-      return;
-    }
-
+  /**
+   * Compute the axes-scale-change payload (RenderCore — DOM/listener-free).
+   * listener 호출은 하지 않는다 — payload(또는 변경 없음 시 null)만 반환하고,
+   * ChartShell(drawChart)이 그 결과로 listener 를 호출한다.
+   *
+   * @returns {?object} axes-scale-change payload, or null when nothing watched changed
+   */
+  computeAxesScaleChange() {
     const prev = this._lastEmittedAxesRange;
     const curr = this.labelRange;
 
@@ -304,20 +307,59 @@ class EvChart {
     });
 
     if (xSame && ySame) {
-      return;
+      return null;
     }
 
     this._lastEmittedAxesRange = curr;
 
-    const payload = {
+    return {
       x: curr.x.map(toPayloadAxis),
       y: curr.y.map(toPayloadAxis),
     };
-    this.listeners['axes-scale-change'](payload);
   }
 
   /**
-   * To draw canvas chart, it processes several sequential jobs
+   * Prepare scale (RenderCore — DOM/scrollbar/listener-free).
+   * axesRange→labelOffset→labelRange→steps→adjustXAndYAxisWidth 를 계산하고,
+   * scrollbar DOM 배치(ChartShell)에 쓸 pre-adjust labelOffset 스냅샷과
+   * axes-scale-change payload 를 반환한다(직접 listener 호출/ DOM write 안 함).
+   *
+   * 주의: scrollbar 배치는 adjustXAndYAxisWidth 가 labelOffset 을 재계산하기 *전* 값으로
+   * 그려져 왔으므로(기존 동작), 그 시점 스냅샷을 따로 잡아 반환한다.
+   *
+   * @returns {{ scaleChange: ?object, scrollbarLabelOffset: object }}
+   */
+  prepareScale() {
+    this.axesRange = this.getAxesRange();
+    this.labelOffset = this.getLabelOffset();
+    this.labelRange = this.getAxesLabelRange();
+
+    // scrollbar DOM 배치는 adjust 이전 labelOffset 으로 계산돼 왔다(동작 보존).
+    const scrollbarLabelOffset = this.labelOffset;
+
+    this.axesSteps = this.calculateSteps();
+
+    this.adjustXAndYAxisWidth();
+
+    return {
+      scaleChange: this.computeAxesScaleChange(),
+      scrollbarLabelOffset,
+    };
+  }
+
+  /**
+   * To draw canvas chart, it processes several sequential jobs.
+   *
+   * Orchestration layer — ChartShell(main 전용)과 RenderCore(DOM-free, worker 후보) 단계를 엮는다:
+   *   - initScale       : ChartShell(window pixelRatio 읽기) → RenderCore prepareLayout(buffer transform)
+   *                       + main 소유 overlay transform
+   *   - prepareScale    : RenderCore(scale 계산) → scrollbar 기하·scale-change payload 반환(DOM/listener 없음)
+   *   - updateScrollbarPosition : ChartShell(scrollbar DOM 스타일 write)
+   *   - axes-scale-change       : ChartShell(payload 로 listener 호출)
+   *   - drawStaticLayer/drawSeriesLayer : RenderCore(주입형 bufferCtx 래스터)
+   *   - drawSeriesOverlay/drawTip       : ChartShell(main overlay/tip — interaction 즉답)
+   *   - commitToDisplay : RenderCore 출력단(buffer→display blit)
+   *
    * @param {any} [hitInfo=undefined]    from mousemove callback (object or object[] of undefined)
    *
    * @returns {undefined}
@@ -325,20 +367,15 @@ class EvChart {
   drawChart(hitInfo) {
     this.initScale();
 
-    this.axesRange = this.getAxesRange();
-    this.labelOffset = this.getLabelOffset();
-
-    this.labelRange = this.getAxesLabelRange();
+    const { scaleChange, scrollbarLabelOffset } = this.prepareScale();
 
     if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
-      this.updateScrollbarPosition();
+      this.updateScrollbarPosition(scrollbarLabelOffset);
     }
 
-    this.axesSteps = this.calculateSteps();
-
-    this.adjustXAndYAxisWidth();
-
-    this.emitAxesScaleChange();
+    if (scaleChange && typeof this.listeners?.['axes-scale-change'] === 'function') {
+      this.listeners['axes-scale-change'](scaleChange);
+    }
 
     this.drawStaticLayer(this.bufferCtx, hitInfo);
     this.drawSeriesLayer(this.bufferCtx, hitInfo);
@@ -764,11 +801,13 @@ class EvChart {
   }
 
   /**
-   * Reset devicePixelRatio for high DPI
+   * Compute the device pixel ratio (window.devicePixelRatio + display ctx backing store).
+   * ChartShell 경계 — window/ctx DOM-property 를 읽으므로 RenderCore(prepareLayout)에 주입할
+   * 값을 main 에서 계산한다. Worker 경로엔 window 가 없으므로 RenderCore 가 직접 읽지 않는다.
    *
-   * @returns {undefined}
+   * @returns {number} device pixel ratio
    */
-  initScale() {
+  computePixelRatio() {
     const devicePixelRatio = window.devicePixelRatio || 1;
     const backingStoreRatio =
       this.displayCtx.webkitBackingStorePixelRatio ||
@@ -778,7 +817,19 @@ class EvChart {
       this.displayCtx.backingStorePixelRatio ||
       1;
 
-    this.pixelRatio = devicePixelRatio / backingStoreRatio;
+    return devicePixelRatio / backingStoreRatio;
+  }
+
+  /**
+   * Prepare layout transform on the injected buffer ctx (RenderCore — DOM-free).
+   * pixelRatio 는 ChartShell(computePixelRatio)이 주입한다. buffer ctx 의 transform 만 소유하며
+   * overlay ctx 의 transform 은 main(ChartShell) 소유이므로 여기서 건드리지 않는다.
+   * @param {number} pixelRatio    injected device pixel ratio
+   *
+   * @returns {undefined}
+   */
+  prepareLayout(pixelRatio) {
+    this.pixelRatio = pixelRatio;
 
     if (this.oldPixelRatio !== this.pixelRatio) {
       this.oldPixelRatio = this.pixelRatio;
@@ -788,9 +839,22 @@ class EvChart {
     // 이렇게 하면 매 update마다 canvas.width 재대입(트랜스폼 리셋)에 의존하지 않아도 되어
     // setWidth/setHeight에서 크기 변경이 없을 때 비트맵 재할당을 건너뛸 수 있다.
     this.bufferCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+  }
+
+  /**
+   * Reset devicePixelRatio for high DPI (ChartShell layout entry — resize 등에서 직접 사용).
+   * device pixel ratio 를 읽어 RenderCore(prepareLayout)에 주입하고, main 소유인
+   * overlay ctx transform 을 함께 적용한다.
+   *
+   * @returns {undefined}
+   */
+  initScale() {
+    const pixelRatio = this.computePixelRatio();
+
+    this.prepareLayout(pixelRatio);
 
     if (this.overlayCtx) {
-      this.overlayCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+      this.overlayCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     }
   }
 
