@@ -271,6 +271,10 @@ const modules = {
       // coordinateDedupe=false 는 #2011 에서 "모든 중복 좌표 표시" opt-out 으로 도입됐다.
       // data 레이어에서 dedupe 가 강제되면 draw 레이어의 opt-out 도 무력화되므로 옵션을 존중한다.
       const isDedupeOn = this.options.coordinateDedupe !== false;
+      // blit fast-path 안전장치: 이번 틱 신규 점이 윈도우 우측단(toTime)에서 몇 초(=버킷) 뒤까지
+      // 들어왔는지의 최댓값. 신규 점이 우측 strip 보다 오래된 버킷에 떨어지면(지연/역순 데이터)
+      // strip-only redraw 로는 그 점이 누락되므로, draw 단계가 이 값을 보고 full redraw 로 폴백한다.
+      let maxDirtyAge = -1;
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
         if (item) {
@@ -302,10 +306,37 @@ const modules = {
 
               group.max = Math.max(group.max, item.y);
               group.min = Math.min(group.min, item.y);
+
+              // 신규 점이 우측단에서 (toTime - xAxisTime)/1000 버킷만큼 뒤. 시간 정렬돼 있어 비용 0에 가까움.
+              const age = (dataset.toTime - xAxisTime) / 1000;
+              if (age > maxDirtyAge) {
+                maxDirtyAge = age;
+              }
             }
           }
         }
       }
+
+      // 11.5) blit fast-path 용 틱 메타 기록. 모두 위에서 이미 계산된 값이라 추가 비용이 없다.
+      //  - gapCount   : 이번 틱 링 전진량(왼쪽으로 시프트될 버킷 수)
+      //  - prevToTime : 덮기 전 윈도우 우측단 시간(시프트량 dx 산출용)
+      //  - toTime     : 갱신된 우측단 시간
+      //  - length     : 윈도우 버킷 수(= range)
+      //  - start/endIndex : 링 포인터(신규 strip 버킷 매핑용)
+      //  - maxDirtyAge : 신규 점이 우측단에서 떨어진 최대 버킷 거리(-1=신규 없음). strip 범위 밖이면 full 폴백.
+      // draw 단계(chart.core.evaluateBlitGate / element.scatter.realTimeScatterDrawStrip)가 소비한다.
+      dataset.lastTick = {
+        // 데이터 틱 단조 시퀀스. toTime/endIndex 는 sub-second 틱(gapCount 0)에서 그대로라
+        // "데이터가 갱신됐는가" 판정(points layer 스탬프)에는 seq 가 필요하다.
+        seq: (dataset.lastTick?.seq ?? 0) + 1,
+        gapCount,
+        prevToTime,
+        toTime: dataset.toTime,
+        length,
+        startIndex: dataset.startIndex,
+        endIndex: dataset.endIndex,
+        maxDirtyAge,
+      };
 
       // 12) series min/max 계산 (fromTime ~ toTime 범위 내 데이터만 포함)
       const MS_PER_SECOND = 1000;
