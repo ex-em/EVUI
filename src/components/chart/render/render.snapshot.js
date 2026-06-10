@@ -40,6 +40,7 @@ const OPTION_KEYS = [
   'seriesReverse',
   'maxTip',
   'padding',
+  'heatMapColor',
 ];
 
 /** SeriesSnapshot 에 담는 시리즈 메타 원시값 화이트리스트(function/class 제외, formatter 는 toPlain 이 drop). */
@@ -188,6 +189,11 @@ export function toRenderSnapshot(core, epoch = 0) {
       ...pickPlain(s, SERIES_META_KEYS),
       data: extractSeriesData(s),
     };
+    // heatMap 래스터는 category label 배열(this.labels)을 calculateXY 에서 소비한다(Step 8 발견).
+    // 문자열 label 은 Float64 pack 불가라 별도 plain 배열로 전달(per-type pack 한계 → render-contract §5).
+    if (s.type === 'heatMap' && s.labels) {
+      series[id].labels = toPlain(s.labels) ?? {};
+    }
   });
 
   return {
@@ -200,7 +206,11 @@ export function toRenderSnapshot(core, epoch = 0) {
       x: toPlain(core.axesSteps?.x) ?? [],
       y: toPlain(core.axesSteps?.y) ?? [],
     },
-    options: pickPlain(core.options, OPTION_KEYS),
+    options: {
+      ...pickPlain(core.options, OPTION_KEYS),
+      // heatMap 재구성 입력(Step 8): legend.type 파생 plain boolean(함수/객체 아님).
+      isGradient: core.options?.legend?.type === 'gradient',
+    },
     seriesOrder,
     series,
   };
