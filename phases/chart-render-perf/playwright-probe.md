@@ -107,6 +107,40 @@ profiler total이 틱 수에 따라 달라지므로 **틱당 환산**으로 비�
 
 > 틱 redraw 143ms@6×가 메인스레드를 동기 블록 → hover 겹치면 latency p95 ≈127ms@6×.
 
+## ★★★★ B-real **실규모 재측정** (10 charts × 1000 series × 60 pts, 6×) — 결론을 뒤집음
+
+> 동기: 실제 제품 사용 패턴이 "차트당 시리즈 1000+ × 한 페이지 10+ 차트"로 확인됨(2026-06-10).
+> 기존 B-real(8×20)은 너무 작아 self-time 분해도 없었음 → 실규모로 CDP Profiler call-tree 귀속 재측정.
+> 방법: `PerfStressDashboard.vue` 상수 임시 변경 + 결정적 tick 구동 훅, `playwright` + `newCDPSession`,
+> 초기 마운트는 throttle 없이, 측정 구간만 6× throttle, warmup 4 + measure 10 tick. (측정 후 하니스 원복.)
+
+**call-tree 카테고리 귀속 (1000 series, total self-time 208s / 10 tick):**
+
+| 카테고리 | 비중 | 비고 |
+|---|---:|---|
+| **render** | **76.4%** | 그 중 **`drawImage` 단독 65%**(135s) |
+| other (스케줄러·GC·미분류) | 13.7% | |
+| **deepwatch** (`traverse`) | **6.3%** | |
+| clone | 3.2% | |
+| isEqual | 0.3% | |
+| normalize | 0.1% | |
+
+flat 기준 reactivity 총합(get+set+noTracking+traverse+trigger+…) ≈ **16%**.
+
+**`drawImage`가 왜 65%인가** — `commitToDisplay`(`chart.core.js:360`)는 차트당 `displayCtx.drawImage(bufferCanvas,0,0)` **단 1회**다. 작은 캔버스 blit이 1.35s/call일 수 없음 → **Canvas 2D 지연 래스터화**: 버퍼에 쌓인 1000개 시리즈의 `stroke` 큐가 `drawImage` 시점에 한꺼번에 래스터화되며 그 비용이 drawImage에 귀속된 것. 즉 **실제 시리즈 렌더 비용**이다.
+
+**선형성 검증 (100 series A/B):** total 208s→**22.8s**(≈9.1×), drawImage 135s→**13.8s**(≈9.8×) — 시리즈 수에 선형 비례. 고정 blit 아티팩트가 아니라 시리즈 stroke 래스터화 비용임을 확인. render 비중(66~76%)은 규모와 무관하게 안정적.
+
+### 결론 — 프로파일 A와 **정반대**, Worker/OffscreenCanvas가 이번엔 유효
+- **A-single(1만 시리즈 1차트)**: 반응성 ~70%, render <10% → Worker 무효.
+- **B-real(1000×10 다중차트)**: **render ~76%(drawImage 래스터화 지배), 반응성 ~16%** → **Worker/OffscreenCanvas가 정당한 레버**. 10개 독립 차트라 worker pool 병렬 래스터화 이득이 실재(plan §Step 4/부록 A가 가정했던 프로파일 B 병렬성). OffscreenCanvas는 병렬성 없이도 메인스레드 freeze 자체를 제거.
+- **즉 F2(deep watch)는 B-real에선 핵심이 아니다**(deepwatch 6.3%뿐). B-real의 답은 **렌더 off-main**.
+- **caveat(중요)**: headless Chromium은 GPU 합성이 아닌 SwiftShader(소프트웨어 래스터)일 수 있어 **canvas/drawImage 비용이 실기기보다 부풀려졌을 수 있다**. 다만 (a)반응성이 명백히 비지배(16%)라 A의 "Worker 무효" 결론은 B에 적용 불가, (b)drawImage가 시리즈 수에 선형이라 실제 렌더 작업임은 확실 → **방향(render-bound)은 견고**, **절대 비중은 실기기 GPU에서 재확인 필요**.
+
+### 다음
+- OffscreenCanvas + Worker(pool) 적용을 **정식 plan으로 설계**(plan §Step 4/부록 A 활성화). chart.core가 buffer/display 2-canvas 구조라 `transferControlToOffscreen` 적용 경로 존재(`chart.core.js:61-66`).
+- 실기기(GPU)에서 1000×10 repro의 render 비중을 1회 재확인 후 착수(부록 A.0/A.4 오버헤드 caveat 적용).
+
 ## 근본 원인 (코드 위치)
 
 per-tick 경로 = `Chart.vue:231-263` `watch(() => props.data, …, { deep: true })`. 매 틱마다:

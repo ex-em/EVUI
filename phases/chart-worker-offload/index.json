@@ -1,0 +1,17 @@
+{
+  "project": "EVUI",
+  "phase": "chart-worker-offload",
+  "steps": [
+    { "step": 0, "name": "gpu-render-confirm", "status": "pending" },
+    { "step": 1, "name": "dom-isolation", "status": "pending" },
+    { "step": 2, "name": "geometry-hittest-split", "status": "pending" },
+    { "step": 3, "name": "rendercore-series-raster", "status": "pending" },
+    { "step": 4, "name": "rendercore-static-layer", "status": "pending" },
+    { "step": 5, "name": "rendercore-prepare", "status": "pending" },
+    { "step": 6, "name": "render-snapshot-contract", "status": "pending" },
+    { "step": 7, "name": "layer-arch-and-killswitch", "status": "pending" },
+    { "step": 8, "name": "worker-micro-poc", "status": "pending" },
+    { "step": 9, "name": "worker-pool-integration", "status": "pending" },
+    { "step": 10, "name": "worker-fallback-hardening", "status": "pending" }
+  ]
+}
