@@ -341,7 +341,8 @@ class EvChart {
     this.emitAxesScaleChange();
 
     this.drawAxis(hitInfo);
-    this.drawSeries(hitInfo);
+    this.drawSeriesLayer(this.bufferCtx, hitInfo);
+    this.drawSeriesOverlay();
 
     this.drawTip();
 
@@ -401,12 +402,16 @@ class EvChart {
   }
 
   /**
-   * Draw each series
+   * Draw each series raster (RenderCore series 래스터 레이어).
+   * 순수 series 래스터만 bufferCtx(주입형 핸들)에 그린다 — overlay(interaction 즉답)·tip(formatter
+   * 실행/hit state mutate)은 이 경로에 포함하지 않는다(worker 후보). overlay는 drawSeriesOverlay,
+   * tip은 drawTip이 main에서 별도 처리한다.
+   * @param {CanvasRenderingContext2D} bufferCtx     destination buffer context (worker 경로에선 주입됨)
    * @param {any} [hitInfo=undefined]   legend mouseover callback (object or undefined)
    *
    * @returns {undefined}
    */
-  drawSeries(hitInfo) {
+  drawSeriesLayer(bufferCtx, hitInfo) {
     const {
       maxTip,
       selectLabel,
@@ -418,7 +423,7 @@ class EvChart {
     } = this.options;
 
     const opt = {
-      ctx: this.bufferCtx,
+      ctx: bufferCtx,
       chartRect: this.chartRect,
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
@@ -426,7 +431,6 @@ class EvChart {
       selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
       selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
       selectItem: { option: selectItem, selected: this.defaultSelectItemInfo },
-      overlayCtx: this.overlayCtx,
       isBrush: !!brush,
       displayOverflow,
       unSelectedOpacity,
@@ -503,21 +507,27 @@ class EvChart {
             const legendHitInfo = hitInfo?.legend;
 
             if (this.options.sunburst) {
-              this.drawSunburst({
-                selectInfo,
-                legendHitInfo,
-                unSelectedOpacity: opt.unSelectedOpacity,
-              });
+              this.drawSunburst(
+                {
+                  selectInfo,
+                  legendHitInfo,
+                  unSelectedOpacity: opt.unSelectedOpacity,
+                },
+                bufferCtx,
+              );
             } else {
-              this.drawPie({
-                selectInfo,
-                legendHitInfo,
-                unSelectedOpacity: opt.unSelectedOpacity,
-              });
+              this.drawPie(
+                {
+                  selectInfo,
+                  legendHitInfo,
+                  unSelectedOpacity: opt.unSelectedOpacity,
+                },
+                bufferCtx,
+              );
             }
 
             if (this.options.doughnutHoleSize > 0) {
-              this.drawDoughnutHole();
+              this.drawDoughnutHole(bufferCtx);
             }
             break;
           }
@@ -559,6 +569,34 @@ class EvChart {
           }
         }
       }
+    }
+  }
+
+  /**
+   * Draw series highlight onto the overlay layer (main 전용 interaction 즉답 레이어).
+   * 래스터(drawSeriesLayer, worker 후보)에서 분리해 main의 overlayCtx에만 그린다.
+   * 현재 series 래스터 경로에서 overlay highlight를 쓰는 타입은 heatMap뿐이다(line/bar/scatter의
+   * 선택/crosshair overlay는 interaction 플러그인이, pie highlight도 interaction 경로가 담당).
+   * brush 차트는 overlayCanvas가 없어 overlayCtx가 없다 → 각 series.drawOverlay에서 no-op.
+   *
+   * @returns {undefined}
+   */
+  drawSeriesOverlay() {
+    const overlayCtx = this.overlayCtx;
+    if (!overlayCtx) {
+      return;
+    }
+
+    const opt = {
+      overlayCtx,
+      chartRect: this.chartRect,
+      labelOffset: this.labelOffset,
+      axesSteps: this.axesSteps,
+    };
+
+    const heatMapSeries = this.seriesInfo.charts.heatMap;
+    for (let ix = 0; ix < heatMapSeries.length; ix++) {
+      this.seriesList[heatMapSeries[ix]]?.drawOverlay?.(opt);
     }
   }
 

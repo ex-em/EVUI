@@ -329,7 +329,6 @@ class HeatMap {
       ctx,
       chartRect,
       labelOffset,
-      overlayCtx,
       selectLabel,
       legendHitInfo,
       selectItem,
@@ -395,7 +394,7 @@ class HeatMap {
       const value = item.o;
 
       if (xp !== null && yp !== null && value !== null && value !== undefined) {
-        const { show, opacity, dataColor, id, isHighlight } = this.getItemInfo(value);
+        const { show, opacity, dataColor, id } = this.getItemInfo(value);
 
         let originalOpacity = opacity;
         if (opacity === 1 && Util.getColorStringType(item.dataColor) === 'RGBA') {
@@ -462,14 +461,45 @@ class HeatMap {
               data: item,
             });
           }
-          if (isHighlight) {
-            this.itemHighlight(
-              {
-                data: item,
-              },
-              overlayCtx,
-            );
-          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Draw gradient highlight to the overlay layer (래스터와 분리된 main 전용 interaction 즉답 경로).
+   * 기하(item.xp/yp/w/h/cId/dataColor)는 computeGeometry가 main 모델에 채운 값을 읽는다.
+   * draw(래스터, worker 후보)는 overlayCtx를 만지지 않는다.
+   * @param param   { overlayCtx, chartRect, labelOffset, axesSteps }
+   *
+   * @returns {undefined}
+   */
+  drawOverlay(param) {
+    if (!this.show) {
+      return;
+    }
+
+    const { overlayCtx, chartRect, labelOffset, axesSteps } = param;
+
+    if (!overlayCtx) {
+      return;
+    }
+
+    const xsp = chartRect.x1 + labelOffset.left;
+    const ysp = chartRect.y2 - labelOffset.bottom;
+
+    const minmaxX = axesSteps.x[this.xAxisIndex];
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    this.data.forEach((item) => {
+      const xp = this.calculateXY('x', item.x, xsp, minmaxX);
+      const yp = this.calculateXY('y', item.y, ysp, minmaxY);
+      const value = item.o;
+
+      if (xp !== null && yp !== null && value !== null && value !== undefined) {
+        const { show, isHighlight } = this.getItemInfo(value);
+        if (show && isHighlight) {
+          this.itemHighlight({ data: item }, overlayCtx);
         }
       }
     });
