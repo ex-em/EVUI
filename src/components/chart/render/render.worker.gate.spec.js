@@ -33,8 +33,8 @@ describe('detectWorkerRenderSupport (feature-detect)', () => {
 describe('kill switch (내부 플래그)', () => {
   afterEach(() => setWorkerRenderEnabled(false));
 
-  it('기본은 보수적으로 off', () => {
-    expect(isWorkerRenderEnabled()).toBe(false);
+  it('기본은 on (플래그 없이 항상 활성)', () => {
+    expect(isWorkerRenderEnabled()).toBe(true);
   });
 
   it('deterministic 내부 enable 경로로 켜고 끌 수 있다', () => {

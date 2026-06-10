@@ -55,19 +55,12 @@ const DEFAULT_HOOKS = {
   onFallback: NOOP,
 };
 
-function readEnvFlag() {
-  try {
-    return !!(import.meta && import.meta.env && import.meta.env.VITE_EVUI_WORKER_RENDER);
-  } catch (e) {
-    return false;
-  }
-}
-
 /**
- * 내부 kill switch. 공개 API 가 아니며 기본 off(보수적).
- * 빌드/dev 플래그(`VITE_EVUI_WORKER_RENDER`)가 있으면 그 값으로 초기화한다.
+ * 내부 kill switch. 공개 API 가 아니다. 기본 on(사용자 결정) — 빌드 플래그 없이 모든 빌드에서
+ * worker 렌더를 활성화한다. 미지원 환경(SSR/OffscreenCanvas 부재)은 feature-detect(_isSupported)가
+ * main 으로 fallback 하므로 안전하다.
  */
-let workerRenderEnabled = readEnvFlag();
+let workerRenderEnabled = true;
 
 /** kill switch 조회. */
 export function isWorkerRenderEnabled() {
