@@ -15,6 +15,7 @@ import Tooltip from './plugins/plugins.tooltip';
 import TooltipVirtualScroll from './plugins/plugins.tooltip.virtualScroll';
 import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
+import { WorkerRenderGate } from './render/render.worker.gate';
 
 class EvChart {
   constructor(
@@ -101,6 +102,10 @@ class EvChart {
     this.defaultSelectInfo = defaultSelectInfo;
 
     this.legendHover = null;
+
+    // Step 7: worker 렌더 게이트(스캐폴딩). kill switch 기본 off + start() 미호출 →
+    // worker 미진입 = 기존 main 경로 100% 유지. 실제 worker 렌더 연결은 Step 8.
+    this.renderWorkerGate = new WorkerRenderGate();
   }
 
   /**
