@@ -310,7 +310,8 @@ const useWidgetClickEvent = () => {
 };
 
 export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
-  const { props, emit } = getCurrentInstance();
+  const instance = getCurrentInstance();
+  const { props, emit } = instance;
 
   const getNormalizedOptions = (options) => {
     const normalizedOptions = defaultsDeep({}, options, DEFAULT_OPTIONS);
@@ -431,10 +432,15 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
     'axes-scale-change': (result) => {
       emit('axes-scale-change', result);
     },
-    'axes-data-max-change': (maxY) => {
-      emit('axes-data-max-change', maxY);
-    },
   };
+
+  // 소비처가 @axes-data-max-change 를 바인딩했을 때만 래퍼를 등록한다.
+  // 미등록 시 core(emitDataMaxChange)가 리스너 부재로 일찍 빠져 집계 비용이 0 이 된다.
+  if (instance.vnode.props?.onAxesDataMaxChange) {
+    eventListeners['axes-data-max-change'] = (maxY) => {
+      emit('axes-data-max-change', maxY);
+    };
+  }
 
   return {
     eventListeners,
