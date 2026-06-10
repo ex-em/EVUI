@@ -463,8 +463,8 @@ class EvChart {
       return;
     }
 
+    // commitToDisplay 가 display clear + static(buffer) blit 을 atomic 하게 수행 → series bitmap 합성.
     const ctx = this.displayCtx;
-    ctx.clearRect(0, 0, this.displayCanvas.width, this.displayCanvas.height);
     this.commitToDisplay(ctx, this.bufferCanvas);
     ctx.drawImage(bitmap, 0, 0);
     bitmap.close();
@@ -491,6 +491,16 @@ class EvChart {
    * @returns {undefined}
    */
   commitToDisplay(displayCtx, bufferCanvas) {
+    // clear+blit 를 present 시점에 atomic 하게 수행(clear() 가 더 이상 display 를 비우지 않음).
+    if (this.displayCanvas) {
+      const ratio = this.pixelRatio < 1 ? this.pixelRatio : 1;
+      displayCtx.clearRect(
+        0,
+        0,
+        this.displayCanvas.width / ratio,
+        this.displayCanvas.height / ratio,
+      );
+    }
     if (bufferCanvas && bufferCanvas?.width > 1 && bufferCanvas?.height > 1) {
       displayCtx.drawImage(bufferCanvas, 0, 0);
     }
@@ -1421,14 +1431,9 @@ class EvChart {
    */
   clear() {
     this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
-    if (this.displayCanvas) {
-      this.displayCtx.clearRect(
-        0,
-        0,
-        this.displayCanvas.width / this.clearRectRatio,
-        this.displayCanvas.height / this.clearRectRatio,
-      );
-    }
+    // display 는 여기서 비우지 않는다 — commit 시점(commitToDisplay/commitWorkerFrame)에 clear+blit 한다.
+    // worker 경로는 series 를 비동기로 합성하므로, 미리 display 를 비우면 프레임 도착 전까지 blank 가 되고
+    // (epoch drop 시 영구) "그려졌다 사라진다" 가 된다. 이전 프레임을 새 프레임 준비 시점까지 유지한다.
     if (this.bufferCanvas) {
       this.bufferCtx.clearRect(
         0,

@@ -243,8 +243,9 @@ describe('worker series 래스터 경로 (Step 8)', () => {
     expect(order).toContain('commitToDisplay');
   });
 
-  it('commitWorkerFrame: epoch 일치 → clear→buffer(axis)→bitmap 합성 + bitmap.close()', () => {
+  it('commitWorkerFrame: epoch 일치 → commitToDisplay(clear+axis)→bitmap 합성 + bitmap.close()', () => {
     const { chart, displayOps } = makeWorkerChart();
+    // commitToDisplay 가 display clear+static blit 을 atomic 하게 수행(내부에서 clearRect). 그 위에 bitmap 합성.
     chart.commitToDisplay = (ctx, canvas) => displayOps.push({ op: 'commitToDisplay', canvas });
     chart.renderEpoch = 4;
     const close = vi.fn();
@@ -252,7 +253,7 @@ describe('worker series 래스터 경로 (Step 8)', () => {
 
     chart.commitWorkerFrame({ epoch: 4, bitmap });
 
-    expect(displayOps.map((o) => o.op)).toEqual(['clearRect', 'commitToDisplay', 'drawImage']);
+    expect(displayOps.map((o) => o.op)).toEqual(['commitToDisplay', 'drawImage']);
     expect(close).toHaveBeenCalledTimes(1);
   });
 
