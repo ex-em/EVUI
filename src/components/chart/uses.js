@@ -1,5 +1,5 @@
 import { ref, reactive, computed, watch, getCurrentInstance, nextTick, onUpdated } from 'vue';
-import { cloneDeep, cloneDeepWith, defaultsDeep, isEqual } from 'lodash-es';
+import { cloneDeep, cloneDeepWith, defaults, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
 
@@ -263,6 +263,15 @@ const DEFAULT_DATA = {
 };
 
 /**
+ * F0: props.data를 정규화하되 **원본을 in-place mutate하지 않는다**.
+ * 기존 `defaultsDeep(data, DEFAULT_DATA)`는 lodash가 첫 인자(원본 reactive proxy)를 변형하고
+ * 같은 참조를 반환했다(누락 키 주입 → 원본 오염 + set/trigger trap). 빈 shallow copy를 target으로
+ * 써서 원본을 건드리지 않고, 누락된 top-level 키만 채운다(DEFAULT_DATA가 빈 컨테이너뿐이라 deep
+ * 보강은 불필요). 깊은 분리/클론은 이후 cloneChartData가 담당한다.
+ */
+export const normalizeData = (data) => defaults({ ...data }, DEFAULT_DATA);
+
+/**
  * dayjs/Date 등 불변(immutable) 날짜 값은 깊은 복제 대상에서 제외하고 참조만 공유한다.
  * 메서드가 새 인스턴스를 반환하는 불변 객체라 제자리 변형이 없으므로 스냅샷 격리가 깨지지 않으며,
  * time-axis 차트에서 labels의 dayjs 인스턴스를 통째로 깊은 복제하던 비용(수천 개)을 제거한다.
@@ -327,7 +336,7 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
 
     return normalizedOptions;
   };
-  const getNormalizedData = (data) => defaultsDeep(data, DEFAULT_DATA);
+  const getNormalizedData = normalizeData;
 
   const selectItemInfo = cloneDeep(props.selectedItem);
   const selectLabelInfo = cloneDeep(props.selectedLabel ?? injectGroupSelectedLabel?.value);
