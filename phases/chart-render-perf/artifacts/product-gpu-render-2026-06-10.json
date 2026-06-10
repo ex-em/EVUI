@@ -1,0 +1,53 @@
+{
+  "date": "2026-06-10",
+  "context": "chart-worker-offload Step 0 재판정 — docs repro(1000x10x60) 대신 실제 제품 대시보드에서 실 GPU 측정",
+  "target": {
+    "url": "http://localhost:3001/dashboard/view/1141",
+    "description": "exemONE 실시간 모니터링 대시보드. 작은 timeseries 차트 다수 동시 주기 갱신",
+    "canvasCount": 24,
+    "evChartContainers": 67,
+    "evuiBuild": "F0/F1 적용본 (feat-chart-data-pipeline: 8df60ca3 normalize-non-mutating + fc436bb9 clone toRaw unwrap)",
+    "evuiAssetHash": "evui.js?v=5f407a18"
+  },
+  "env": {
+    "browser": "Playwright MCP Chromium (headed, 실 GPU)",
+    "gpuStatus": "ANGLE Metal Renderer (Apple M2 Pro), SwiftShader=false",
+    "hardwareConcurrency": 10,
+    "samplingIntervalUs": 100,
+    "attribution": "CDP Profiler call-tree DFS 카테고리 귀속(leaf→root, 정규식 매칭). busy = idle 제외 샘플 기준 %"
+  },
+  "measurements": [
+    {
+      "label": "무throttle, 20s, call-tree 귀속",
+      "throttle": "none",
+      "durationMs": 20972,
+      "totalSamples": 135588,
+      "busySamples": 34591,
+      "idlePctOfTotal": 74.5,
+      "busyBreakdownPct": { "render": 35.2, "reactivity": 18.9, "clone": 5.1, "data": 10.7, "other": 30.2 }
+    },
+    {
+      "label": "6x throttle (저사양 근사), 20s, call-tree 귀속 + longtask",
+      "throttle": "6x",
+      "durationMs": 26994,
+      "idlePctOfTotal": 0.2,
+      "busyBreakdownPct": { "render": 28.7, "reactivity": 32.5, "clone": 8.4, "data": 11.6, "other": 18.8 },
+      "longtaskFreeze": { "count": 100, "sumMs": 19127, "maxMs": 718, "top8Ms": [718, 255, 248, 246, 240, 239, 239, 237] }
+    }
+  ],
+  "leafTopBusyPct_noThrottle": {
+    "(program)": 20.3, "(anon)@evui.js": 10.2, "Af@evui.js": 6.5, "addSeriesDS@evui.js": 5.3,
+    "mergeMetricData@mergeChartData.ts": 4.8, "(garbage collector)": 4.5, "fi@evui.js": 4.0,
+    "stroke": 3.7, "traverse@vue-chunk": 3.0, "drawImage": 3.0, "WorkerManager.onMessageHandler": 3.0,
+    "draw@evui.js": 2.5, "fill": 2.3, "calculateY@evui.js": 2.1, "moveTo": 1.7,
+    "getSeriesMinMax@evui.js": 1.4, "buildLabelValidMask@evui.js": 1.3, "getMetricChartMinMaxData@metricChartData.ts": 1.3
+  },
+  "notes": [
+    "drawImage(commit) = 3% 뿐 → headless 65%는 SwiftShader 아티팩트였음을 제품 실 GPU에서도 재확인.",
+    "render 비용은 CPU path 빌드(stroke/fill/moveTo) + evui draw 로직(draw/drawSeries/calculateY/colorStringToRgba) → worker로 off-main 가능. drawImage(3%, commit)만 main 잔류.",
+    "clone/data의 큰 부분(mergeMetricData, getMetricChartMinMaxData, WorkerManager)은 제품 코드(.ts)라 evui 밖 — 라이브러리로 못 줄임.",
+    "other 30%(무throttle)는 (program)20% + GC 4.5% + 제품 WorkerManager 3% 등 네이티브/미귀속. render/reactivity로 재분류할 분량 없음.",
+    "docs repro(1000x10x60, render 5%)와 제품(작은 차트 67개 실시간, render 29~35%)은 워크로드가 달라 병목이 다름 — plan의 '프로파일마다 병목 정반대'가 제품에서 재현."
+  ],
+  "verdict": "조건부 GO (제품 워크로드 기준). render가 docs repro와 달리 무시못할 단일 레버(무throttle 35% / 저사양 29%)지만 단독 50% 지배는 아님(저사양 reactivity 32.5%가 더 큼). 소비자 무수정 제약 하에서 render off-main(worker)이 유일한 큰 레버 → 사용자 결정으로 worker phase 진행. 단 freeze는 ~30%만 완화, reactivity/clone/data(상당부 제품 코드)는 main 잔류."
+}

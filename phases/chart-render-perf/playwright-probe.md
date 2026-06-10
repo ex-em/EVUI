@@ -164,6 +164,24 @@ flat 기준 reactivity 총합(get+set+noTracking+traverse+trigger+…) ≈ **16%
 - 남은 레버는 **F2(deep-watch 회피, ~26%)** 인데 소비자 in-place mutation 감지(default deep watch) 계약 위반이라 범위 밖 → **opt-in 형태로 사용자와 별도 재논의** 필요. clone(~13%)은 F0/F1으로 이미 일부 축소됐고 잔여분 추가 축소 여지.
 - ⚠️ 6× throttle 근사·단일 개발기(M2 Pro) 측정. 절대 게이트선은 저사양 실기기 확정 필요하나, **방향(반응성-bound, render 비지배)** 은 headless·GPU 양쪽 self-time 비율과 절대비용 교차검증으로 견고.
 
+## ★★★★★★ 제품 환경(실 GPU) 재측정 — Step 0 **재판정: 조건부 GO**
+
+> 동기: 위 ★★★★★ 게이트는 **docs repro(`PerfStressDashboard` 1000×10×60 = 거대 시리즈 1차트)** 로 쟀고 render 5%(blocked)였다. 그러나 **실제 제품 사용 패턴은 작은 timeseries 차트 다수가 동시 주기 갱신**(repro와 다른 워크로드)이다. 사용자 요청으로 **실제 제품 대시보드**(`localhost:3001/dashboard/view/1141`, **F0/F1 적용본**, 차트 24 canvas / ev-chart 컨테이너 67)에서 실 GPU 재측정.
+> 방법: Playwright MCP **headed**(실 GPU) + `newCDPSession`. 페이지 자연 주기 갱신을 20s 캡처, CDP `Profiler`(100µs) call-tree DFS 카테고리 귀속(busy = idle 제외). 무throttle + 6× throttle(저사양 근사, longtask freeze 동시 측정). src/repro 무변경(probe는 `browser_run_code_unsafe` 일회용).
+
+| 날짜 | profile | GPU status | render % | reactivity % | drawImage % | clone % | data % | other % | idle | 아티팩트 |
+|---|---|---|---:|---:|---:|---:|---:|---:|---:|---|
+| 2026-06-10 | 제품 view/1141 (무throttle) | ANGLE Metal (M2 Pro), SwiftShader=false | **35.2** | 18.9 | 3.0 | 5.1 | 10.7 | 30.2 | 74.5% | `artifacts/product-gpu-render-2026-06-10.json` |
+| 2026-06-10 | 제품 view/1141 (**6× = 저사양 근사**) | 동일 | **28.7** | **32.5** | — | 8.4 | 11.6 | 18.8 | 0.2% | 동일 |
+
+- `navigator.hardwareConcurrency = 10`(개발 PC). **freeze 체감(6×, longtask)**: 20s 중 19s가 longtask, tick당 ~240ms 블록(최대 718ms).
+
+### 판정 — **조건부 GO (제품 워크로드 기준)**
+- **docs repro(render 5%)는 제품에 안 맞았다.** 거대-시리즈-단일-차트(repro) vs 작은-차트-67개-실시간(제품)은 다른 프로파일 → plan의 "프로파일마다 병목 정반대"가 제품에서 재현. **제품 측정이 실제 타깃.**
+- **`drawImage`(commit) = 3% 뿐** → headless 65%가 SwiftShader 아티팩트였음을 제품 실 GPU에서도 재확인. render 비용은 **CPU path 빌드(stroke/fill/moveTo) + evui draw 로직** = **worker로 off-main 가능**(drawImage 3%만 main 잔류).
+- **단, render는 단독 지배 아님**: 저사양에선 reactivity(32.5%) > render(28.7%). plan의 엄격 통과선(render ≥50% & react <30%)은 미달. worker로 render off-main 해도 **freeze ~30%만 완화**, reactivity/clone/data는 main 잔류(그 중 `mergeMetricData`·`getMetricChartMinMaxData`·`WorkerManager` 등 **상당부는 제품 코드라 evui 밖**).
+- **결정(사용자)**: 사용처(소비자) 코드 변경이 필요한 F2(deep-watch opt-in)는 회피하고 싶음 → **소비자 무수정으로 가능한 worker(render off-main)부터 진행**, 그래도 부족하면 그때 deep-watch 개선 재논의. 이에 `chart-worker-offload` Step 0 = **completed(조건부 go)** 로 갱신하고 Step 1~ 착수.
+
 ## 근본 원인 (코드 위치)
 
 per-tick 경로 = `Chart.vue:231-263` `watch(() => props.data, …, { deep: true })`. 매 틱마다:

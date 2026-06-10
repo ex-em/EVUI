@@ -2,16 +2,64 @@
   "project": "EVUI",
   "phase": "chart-worker-offload",
   "steps": [
-    { "step": 0, "name": "gpu-render-confirm", "status": "pending" },
-    { "step": 1, "name": "dom-isolation", "status": "pending" },
-    { "step": 2, "name": "geometry-hittest-split", "status": "pending" },
-    { "step": 3, "name": "rendercore-series-raster", "status": "pending" },
-    { "step": 4, "name": "rendercore-static-layer", "status": "pending" },
-    { "step": 5, "name": "rendercore-prepare", "status": "pending" },
-    { "step": 6, "name": "render-snapshot-contract", "status": "pending" },
-    { "step": 7, "name": "layer-arch-and-killswitch", "status": "pending" },
-    { "step": 8, "name": "worker-micro-poc", "status": "pending" },
-    { "step": 9, "name": "worker-pool-integration", "status": "pending" },
-    { "step": 10, "name": "worker-fallback-hardening", "status": "pending" }
-  ]
+    {
+      "step": 0,
+      "name": "gpu-render-confirm",
+      "status": "completed",
+      "started_at": "2026-06-10T11:24:35+0900",
+      "completed_at": "2026-06-10T12:10:00+0900",
+      "summary": "조건부 GO. 1차 게이트(docs repro 1000×10×60, 실 GPU)는 render≈5%로 blocked였으나, 실제 제품 대시보드(localhost:3001/dashboard/view/1141, F0/F1 적용본, 작은 timeseries 차트 24 canvas/67 컨테이너 동시 주기 갱신)를 실 GPU(ANGLE Metal, M2 Pro, SwiftShader=false)에서 재측정하니 render가 docs repro와 달리 무시못할 단일 레버임: 무throttle render 35.2%/reactivity 18.9%, 6× throttle(저사양 근사) render 28.7%/reactivity 32.5%/clone 8.4%/data 11.6%. drawImage(commit)=3%뿐 → headless 65%가 SwiftShader 아티팩트였음을 제품에서도 재확인. render 비용=CPU path 빌드(stroke/fill/moveTo)+evui draw 로직 → worker off-main 가능(drawImage 3%만 main 잔류). 단 render 단독 50% 지배는 아니고(저사양 reactivity가 더 큼) worker는 freeze ~30%만 완화; reactivity/clone/data는 main 잔류이며 그 중 mergeMetricData·getMetricChartMinMaxData·WorkerManager 등 상당부는 제품 코드(evui 밖). 사용자 결정: 소비자 코드 변경이 필요한 F2(deep-watch opt-in)는 회피, 소비자 무수정으로 가능한 worker(render off-main)부터 진행하고 부족하면 deep-watch 재논의. freeze 체감(6×): tick당 ~240ms 블록(최대 718ms). 아티팩트: phases/chart-render-perf/artifacts/product-gpu-render-2026-06-10.json, 기록: playwright-probe.md '★★★★★★ 제품 환경(실 GPU) 재측정' 섹션. caveat(Step 8/9 게이트에서 재평가): render가 부분 레버(~29%)이므로 worker pool/통합 단계에서 실측 이득이 비용을 정당화하는지 다시 판정."
+    },
+    {
+      "step": 1,
+      "name": "dom-isolation",
+      "status": "pending"
+    },
+    {
+      "step": 2,
+      "name": "geometry-hittest-split",
+      "status": "pending"
+    },
+    {
+      "step": 3,
+      "name": "rendercore-series-raster",
+      "status": "pending"
+    },
+    {
+      "step": 4,
+      "name": "rendercore-static-layer",
+      "status": "pending"
+    },
+    {
+      "step": 5,
+      "name": "rendercore-prepare",
+      "status": "pending"
+    },
+    {
+      "step": 6,
+      "name": "render-snapshot-contract",
+      "status": "pending"
+    },
+    {
+      "step": 7,
+      "name": "layer-arch-and-killswitch",
+      "status": "pending"
+    },
+    {
+      "step": 8,
+      "name": "worker-micro-poc",
+      "status": "pending"
+    },
+    {
+      "step": 9,
+      "name": "worker-pool-integration",
+      "status": "pending"
+    },
+    {
+      "step": 10,
+      "name": "worker-fallback-hardening",
+      "status": "pending"
+    }
+  ],
+  "created_at": "2026-06-10T11:24:35+0900"
 }
