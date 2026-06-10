@@ -42,7 +42,7 @@ describe('drawChart 파이프라인 호출 순서 (series raster/overlay/tip 분
       calculateSteps: rec('calculateSteps', {}),
       adjustXAndYAxisWidth: rec('adjustXAndYAxisWidth'),
       emitAxesScaleChange: rec('emitAxesScaleChange'),
-      drawAxis: rec('drawAxis'),
+      drawStaticLayer: rec('drawStaticLayer'),
       drawSeriesLayer: rec('drawSeriesLayer'),
       drawSeriesOverlay: rec('drawSeriesOverlay'),
       drawTip: rec('drawTip'),
@@ -54,7 +54,7 @@ describe('drawChart 파이프라인 호출 순서 (series raster/overlay/tip 분
 
   const names = (calls) => calls.map((c) => c.name);
 
-  it('initScale→...→drawAxis→drawSeriesLayer→drawSeriesOverlay→drawTip→commitToDisplay 순서', () => {
+  it('initScale→...→drawStaticLayer→drawSeriesLayer→drawSeriesOverlay→drawTip→commitToDisplay 순서', () => {
     const { chart, calls } = makeChart();
     chart.drawChart();
 
@@ -66,7 +66,7 @@ describe('drawChart 파이프라인 호출 순서 (series raster/overlay/tip 분
       'calculateSteps',
       'adjustXAndYAxisWidth',
       'emitAxesScaleChange',
-      'drawAxis',
+      'drawStaticLayer',
       'drawSeriesLayer',
       'drawSeriesOverlay',
       'drawTip',
@@ -84,9 +84,13 @@ describe('drawChart 파이프라인 호출 순서 (series raster/overlay/tip 분
     expect(order.indexOf('drawTip')).toBeLessThan(order.indexOf('commitToDisplay'));
   });
 
-  it('drawSeriesLayer 에는 bufferCtx, overlay 에는 main overlayCtx 가 전달된다', () => {
+  it('drawStaticLayer·drawSeriesLayer 에는 bufferCtx(주입형), overlay 에는 main overlayCtx 가 전달된다', () => {
     const { chart, calls, bufferCtx, overlayCtx } = makeChart();
     chart.drawChart();
+
+    // static/series 래스터는 동일한 주입형 bufferCtx 핸들로 그린다(worker ctx 주입점).
+    const staticCall = calls.find((c) => c.name === 'drawStaticLayer');
+    expect(staticCall.args[0]).toBe(bufferCtx);
 
     const layerCall = calls.find((c) => c.name === 'drawSeriesLayer');
     expect(layerCall.args[0]).toBe(bufferCtx);

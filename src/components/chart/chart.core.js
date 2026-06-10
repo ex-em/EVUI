@@ -340,7 +340,7 @@ class EvChart {
 
     this.emitAxesScaleChange();
 
-    this.drawAxis(hitInfo);
+    this.drawStaticLayer(this.bufferCtx, hitInfo);
     this.drawSeriesLayer(this.bufferCtx, hitInfo);
     this.drawSeriesOverlay();
 
@@ -671,12 +671,24 @@ class EvChart {
   }
 
   /**
-   * Draw each axis
+   * Draw the static layer (axis/grid/base labels) into the injected buffer context
+   * (RenderCore static 레이어 경계, Step 2.5-c). drawSeriesLayer(Step 3)와 동일하게 bufferCtx를
+   * 주입받아 worker가 자체 OffscreenCanvas ctx로 축을 래스터할 수 있게 한다(main 경로에선
+   * this.bufferCtx와 동일하므로 픽셀 변화 없음).
+   *
+   * 캐시 결정: **캐시 보류**(분리만 수행). drawAxis는 완전 static이 아니라 — 상호작용 상태
+   * (hitInfo blurred label·selectItem.showLabelTip, scale.js:374-442)와 동적 rescale(scale min/max·
+   * 범례 토글 series.show — model/model.store.js:1400)·plotLines/plotBands를 같은 패스에서 소비한다.
+   * 안전한 캐시 키가 이 상태를 빠짐없이 포함해야 하는데 그 범위가 너무 넓어 stale axis 오염 위험이
+   * 크므로, 캐시는 후속 단계로 미루고 RenderCore 경계 분리(=worker ctx 주입점)만 둔다.
+   * @param {CanvasRenderingContext2D} bufferCtx   destination buffer context (worker 경로에선 주입됨)
+   * @param {any} [hitInfo=undefined]   hit/hover information for axis interaction labels
    *
    * @returns {undefined}
    */
-  drawAxis(hitInfo) {
+  drawStaticLayer(bufferCtx, hitInfo) {
     this.axesX.forEach((axis, index) => {
+      axis.ctx = bufferCtx;
       axis.draw(
         this.chartRect,
         this.labelOffset,
@@ -688,6 +700,7 @@ class EvChart {
     });
 
     this.axesY.forEach((axis, index) => {
+      axis.ctx = bufferCtx;
       axis.draw(
         this.chartRect,
         this.labelOffset,
