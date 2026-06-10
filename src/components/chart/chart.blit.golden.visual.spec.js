@@ -192,4 +192,99 @@ describe('EvChart realtime scatter blit golden equivalence', () => {
     expect(fwd, `golden→blit (18틱) ${fwd.toFixed(3)} — drift 누적 의심`).toBeGreaterThan(0.9);
     expect(rev, `blit→golden (18틱) ${rev.toFixed(3)} — drift 누적 의심`).toBeGreaterThan(0.85);
   });
+
+  it('Test C: blit 합성이 plot 좌단(xsp) 점의 좌측 절반을 자르지 않는다(full 과 동일)', async () => {
+    // 회귀 배경: compositePointsLayer 가 좌측만 pointSize 마진 없이 xsp 에서 hard-clip 하면
+    // 윈도우 좌단(=xsp)에 놓인 점의 좌측 절반이 잘린다. full(직접 drawSeries)은 clip 이 없어
+    // 점이 온전하다. Test A/B 의 occupancy 는 PLOT_REGION.x0=0.16 으로 좌단을 제외해 이 회귀를
+    // 못 본다. 여기서는 최종 윈도우의 fromTime 버킷(=xsp)에 앵커 점을 고정하고, y축 라벨을 꺼
+    // [xsp-pointSize, xsp) 밴드에 점 픽셀만 남긴 뒤 full(golden) 과 blit 의 좌단 점유를 비교한다.
+    const POINT = 5;
+    const TICKS = 6;
+    const finalToTime = BASE + TICKS * 3000; // 최종 틱 max x → toTime (model.store: floor(maxX/1000)*1000)
+    const anchorX = finalToTime - RANGE * 1000 + 1; // 최종 fromTime 버킷(=xsp) 안의 점
+
+    const genC = (baseMs, n, spanMs) => {
+      const series1 = [{ x: anchorX, y: 50 }]; // 좌단 앵커: 최종 프레임에 xsp 로 매핑
+      for (let i = 0; i < n; i++) {
+        series1.push({
+          x: baseMs - Math.floor((i / Math.max(1, n)) * spanMs),
+          y: 5 + ((i * 37) % 90),
+        });
+      }
+      return {
+        series: {
+          series1: { name: 's1', pointSize: POINT, color: '#E0322F', pointFill: '#E0322F' },
+        },
+        data: { series1 },
+      };
+    };
+
+    // y축 라벨 off → [xsp-pointSize, xsp) 밴드에 라벨 텍스트 없이 점 스필만 남는다.
+    const optC = {
+      ...options,
+      axesY: [{ ...options.axesY[0], labelStyle: { show: false } }],
+    };
+
+    const runC = async (forceOff) => {
+      window.__EVUI_BLIT_FORCE_OFF__ = forceOff;
+      window.__EVUI_BLIT_DEBUG__ = true;
+      const { container, rerender } = render(EvChart, {
+        props: { data: genC(BASE, 200, FULL_SPAN), options: optC },
+      });
+      await settle();
+      for (let t = 1; t <= TICKS; t++) {
+        // eslint-disable-next-line no-await-in-loop
+        await rerender({ data: genC(BASE + t * 3000, 50, TICK_SPAN), options: optC });
+        // eslint-disable-next-line no-await-in-loop
+        await settle();
+      }
+      return { img: getDisplayImageData(container), ec: window.__EVUI_BLIT_CHART__ };
+    };
+
+    const golden = await runC(true);
+    window.__EVUI_BLIT_DIAG__ = undefined;
+    const blit = await runC(false);
+    window.__EVUI_BLIT_DEBUG__ = false;
+
+    // blit 이 실제로 실행됐는지 확인 — 폴백만 하면 full-vs-full 비교라 회귀를 못 잡는다.
+    const diag = window.__EVUI_BLIT_DIAG__;
+    expect(diag?.blitted ?? 0, `blit 미실행: diag=${JSON.stringify(diag)}`).toBeGreaterThan(2);
+
+    const ec = blit.ec;
+    const pr = ec.pixelRatio;
+    const cr = ec.chartRect;
+    const lo = ec.labelOffset;
+    const xsp = cr.x1 + lo.left;
+    const plotBottom = cr.y2 - lo.bottom;
+    const plotTop = plotBottom - (cr.chartHeight - (lo.top + lo.bottom));
+
+    const xspDev = Math.round(xsp * pr);
+    const bandL = Math.max(0, Math.round((xsp - POINT) * pr));
+    const bandR = xspDev - 2; // 축선/AA(@xsp) 제외 → 순수 점 스필만
+    const yTop = Math.max(0, Math.round(plotTop * pr));
+    const yBot = Math.round(plotBottom * pr);
+
+    const countBand = ({ data, w }) => {
+      let c = 0;
+      const d = data.data;
+      for (let y = yTop; y < yBot; y++) {
+        for (let x = bandL; x < bandR; x++) {
+          if (d[(y * w + x) * 4 + 3] > 16) {
+            c++;
+          }
+        }
+      }
+      return c;
+    };
+
+    const g = countBand(golden.img);
+    const b = countBand(blit.img);
+    const ctx = `band ${bandL}..${bandR} (xspDev ${xspDev}) rows ${yTop}..${yBot} / golden=${g} blit=${b}`;
+
+    // 시나리오 유효성: full 은 좌단 점의 좌측 절반을 그린다 → g>0.
+    expect(g, `시나리오 무효: golden 좌단 밴드 점유 0 — ${ctx}`).toBeGreaterThan(0);
+    // 회귀: blit 도 동등하게 좌단 점이 온전해야 한다(좌측 clip 비대칭이면 b≈0).
+    expect(b, `blit 좌단 점 잘림 — ${ctx}`).toBeGreaterThan(g * 0.6);
+  });
 });

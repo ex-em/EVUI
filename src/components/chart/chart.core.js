@@ -1136,7 +1136,12 @@ class EvChart {
 
   /**
    * 현재 점 레이어를 bufferCtx 의 plot 영역에 합성한다.
-   * 좌측은 xsp 에서 hard-clip(이탈 점 픽셀 제거), 우/상/하는 pointSize 만큼 확장(full redraw 마커 스필 일치).
+   * clip 은 plot 사각형을 네 변 모두 pointSize 만큼 확장한다 — 마커는 중심이 plot 안에 있어도
+   * 반경(pointSize)만큼 경계 밖으로 스필하므로, full redraw(직접 drawSeries, clip 없음)와 동일하게
+   * 좌단 점(중심이 xsp)도 좌측 절반까지 온전히 보여야 한다. 좌측만 xsp 로 hard-clip 하면 좌단 점이
+   * 잘린다(#blit 좌단 회귀). 윈도우를 벗어나 좌측으로 흐른 이탈 점 픽셀은 시프트량(dxInt)이 통상
+   * pointSize 의 수 배라 한 틱에 이 좁은 마진 밖으로 빠져나가고, 장기 잔재는 REFRESH_INTERVAL 강제
+   * full 이 정리한다.
    * bufferCtx 는 합성 후 drawTip 을 위해 scale(pr)·unclip 상태로 복구되어야 하므로 save/restore 로 감싼다.
    * @param {HTMLCanvasElement} layerCanvas   합성할 점 레이어 canvas
    * @param {number} pointSize                clip 확장에 쓸 pointSize(multi-series 면 visible MAX)
@@ -1154,7 +1159,7 @@ class EvChart {
     const plotTop = plotBottom - yArea;
     const plotRight = xsp + xArea;
 
-    const clipLeft = xsp * pr;
+    const clipLeft = (xsp - pointSize) * pr;
     const clipTop = (plotTop - pointSize) * pr;
     const clipRight = (plotRight + pointSize) * pr;
     const clipBottom = (plotBottom + pointSize) * pr;
