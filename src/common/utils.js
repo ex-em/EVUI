@@ -1,4 +1,5 @@
-const windowConsole = window.console;
+// worker(render off-main) import 시 window 가 없으므로 globalThis 로 참조한다(window/worker 공통).
+const windowConsole = globalThis.console;
 export const Console = {
   log(...data) {
     windowConsole.log(...data);

@@ -1,0 +1,36 @@
+{
+  "step": 8,
+  "name": "worker-micro-poc",
+  "date": "2026-06-10",
+  "scope": "true micro (single chart, interaction off)",
+  "method": "vitest browser (Chromium, headless) — 실 WorkerRenderGate + OffscreenCanvas + transferToImageBitmap round-trip. warmup 5 + 30 samples, median.",
+  "gpu_status": "no-webgl (headless → SwiftShader-class software raster). bitmapMs/mainCommitMs SwiftShader-inflated(신뢰 낮음); packMs/transferMs/workerDrawMs/main-raster CPU(신뢰 높음).",
+  "render_cycle_ref": {
+    "60fps_ms": 16.67,
+    "product_data_update_ms": 1000,
+    "note": "worker 재래스터 cadence = 데이터 업데이트(제품 B-real=1s). interaction(hover)은 main overlay라 worker 비트리거."
+  },
+  "rows": [
+    {
+      "workload": "small-timeseries", "seriesCount": 10, "pointCount": 120,
+      "packMs": 0.0, "transferMs": 1.85, "workerDrawMs": 0.45, "bitmapMs_swiftshader": 8.95,
+      "mainCommitMs": 0.0, "roundtripMs": 11.55,
+      "mainOnlyBlockingMs": 0.3, "workerMainBlockingMs_partial": 0.05,
+      "transferLatencyMs": 1.85, "transferLatencyRatio_vs60fps_pct": 11.1, "transferLatencyRatio_vs1s_pct": 0.19,
+      "jsHeapBytes": 18200000, "bitmapInFlightMax": 1, "droppedFrameCount": 0, "renderEpochLag": 0
+    },
+    {
+      "workload": "medium-timeseries", "seriesCount": 20, "pointCount": 500,
+      "packMs": 0.1, "transferMs": 8.35, "workerDrawMs": 4.25, "bitmapMs_swiftshader": 72.4,
+      "mainCommitMs": 0.0, "roundtripMs": 85.6,
+      "mainOnlyBlockingMs": 2.5, "workerMainBlockingMs_partial": 0.15,
+      "transferLatencyMs": 8.45, "transferLatencyRatio_vs60fps_pct": 50.7, "transferLatencyRatio_vs1s_pct": 0.85,
+      "jsHeapBytes": 18200000, "bitmapInFlightMax": 1, "droppedFrameCount": 0, "renderEpochLag": 0
+    }
+  ],
+  "caveats": [
+    "workerMainBlocking 은 pack+commit 만 — postMessage 직렬화(main-resident)는 transferMs 안에 섞여 별도 미분리 → workerMainBlocking 은 과소(낙관) 추정.",
+    "bitmapMs(8.95/72.4)는 SwiftShader 아티팩트. 실 GPU(Step 0: drawImage 3%)에선 훨씬 작음 → roundtrip 과대.",
+    "main-only raster(0.3/2.5ms)도 SwiftShader 영향(실 GPU에선 CPU path-build만) — 절대 TBT 감소량 판정엔 headed 실 GPU 필요."
+  ]
+}

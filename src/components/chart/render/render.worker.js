@@ -53,8 +53,11 @@ function renderSnapshot(msg) {
   rasterSeries(snapshot, instances, ctx);
   const drawMs = performance.now() - t0;
 
+  const t1 = performance.now();
   const bitmap = canvas.transferToImageBitmap();
-  self.postMessage({ type: 'rendered', epoch, bitmap, drawMs }, [bitmap]);
+  const bitmapMs = performance.now() - t1;
+
+  self.postMessage({ type: 'rendered', epoch, bitmap, drawMs, bitmapMs }, [bitmap]);
 }
 
 self.onmessage = (event) => {
