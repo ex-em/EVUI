@@ -147,6 +147,7 @@ const chartData =
 | padding    | Object          | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값                                                                                                                                                                   |
 | syncHover  | boolean         | true                                      | options.syncHover가 true인 EvChartGroup으로 감싼경우, 해당 차트에서는 그룹으로 묶긴 차트들 사이의 syncHover선을 그리고싶지 않을 때 사용하는 속성 (time관련된 축을 가질때만 적용됩니다) |
 | eventBehavior | Object                    | ([상세](#eventbehavior))                  | 이벤트별 동작 설정 | | 
+| shallowDataWatch | Boolean                | false                                     | data prop의 deep watch를 끄는 opt-in(큰 데이터 갱신 성능 최적화) ([상세](#shallowdatawatch)) | |
 
 #### axesX axesY
 
@@ -427,6 +428,42 @@ const chartOptions = {
 | legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
 
 - 3.4 버전부터 없어지는 옵션입니다.
+
+#### shallowDataWatch
+
+`data` prop에 대한 deep watch를 끄는 **성능 최적화 opt-in**(기본 `false`). 시리즈/데이터가 매우 많은 차트를 자주 갱신할 때 사용한다.
+
+- 기본(`false`)일 때 차트는 `data`를 deep watch하여 중첩된 값의 in-place 변경(예: `data.series.s1.push(...)`)까지 자동 감지한다. 이 deep 추적은 데이터 크기에 비례한 내부 비용(트리 전체 순회·재추적)을 매 갱신마다 유발한다.
+- `true`로 켜면 deep 추적을 끄고 **`data`의 top-level 참조가 바뀔 때만** 갱신한다. 따라서 데이터를 갱신할 때 **반드시 새 객체 참조를 할당**해야 한다(in-place 변경만 하면 차트가 갱신되지 않는다).
+- 최대 효과를 보려면 데이터를 `shallowRef`/`markRaw`로 비반응성으로 보유해 반응성 프록시 비용까지 제거한다.
+- **이 옵션은 차트 생성(mount) 시점에 1회만 평가된다.** 런타임에 값을 바꿔도 적용되지 않으며, 바꾸려면 `:key` 등으로 차트를 remount해야 한다.
+
+##### Example
+
+```js
+import { shallowRef } from 'vue';
+
+const chartData = shallowRef({
+  series: { s1: { name: 'series1' } },
+  data: { s1: [1, 2, 3] },
+  labels: ['a', 'b', 'c'],
+});
+
+const chartOptions = { type: 'line', shallowDataWatch: true };
+
+// ✅ 갱신: 새 top-level 참조 할당 → 차트 갱신됨
+chartData.value = {
+  ...chartData.value,
+  data: { s1: [1, 2, 3, 4] },
+};
+
+// ❌ in-place 변경: 참조가 그대로라 차트가 갱신되지 않음
+// chartData.value.data.s1.push(4);
+```
+
+```vue
+<ev-chart :data="chartData" :options="chartOptions" />
+```
 
 #### selectLabel
 
