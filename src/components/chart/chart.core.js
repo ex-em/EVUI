@@ -432,6 +432,9 @@ class EvChart {
 
     // static(axis/grid) 은 main buffer 에(worker bitmap 과 합성).
     this.drawStaticLayer(this.bufferCtx, hitInfo);
+    // hit-test 가 읽는 픽셀 기하(xp/yp/w/h)는 main 모델에 채운다 — 래스터는 worker 가 하지만 기하는
+    // main 에 있어야 hover hit-test/tooltip 이 동작한다(plan 원칙 4). computeGeometry 는 canvas 그리기 없음.
+    this.computeSeriesGeometry();
     // overlay/tip 은 main 즉답(별도 overlay canvas — series bitmap 과 무관).
     this.drawSeriesOverlay();
     this.drawTip();
@@ -553,6 +556,53 @@ class EvChart {
    *
    * @returns {undefined}
    */
+  /**
+   * worker 래스터 경로용 main hit-test 기하 패스(plan 원칙 4). 래스터(stroke/fill)는 worker 가 하지만
+   * hit-test 가 읽는 픽셀 기하(xp/yp/w/h)는 main 모델에 있어야 하므로, 여기서 series.computeGeometry 만
+   * 돌려 채운다(canvas 그리기 없음 — 싸다). worker micro 범위(line/bar/heatMap)와 동일 타입만 처리한다.
+   * @returns {undefined}
+   */
+  computeSeriesGeometry() {
+    const opt = {
+      chartRect: this.chartRect,
+      labelOffset: this.labelOffset,
+      axesSteps: this.axesSteps,
+      isHorizontal: this.options.horizontal,
+    };
+
+    let showSeriesCount = 0;
+    this.seriesInfo.charts.bar.forEach((id) => {
+      if (this.seriesList[id]?.show) {
+        showSeriesCount++;
+      }
+    });
+
+    ['line', 'heatMap'].forEach((chartType) => {
+      this.seriesInfo.charts[chartType].forEach((id) => {
+        this.seriesList[id]?.computeGeometry?.(opt);
+      });
+    });
+
+    const { thickness, cPadRatio, borderRadius } = this.options;
+    let showIndex = 0;
+    this.seriesInfo.charts.bar.forEach((id) => {
+      const series = this.seriesList[id];
+      if (series) {
+        series.computeGeometry?.({
+          ...opt,
+          thickness,
+          cPadRatio,
+          borderRadius,
+          showSeriesCount,
+          showIndex,
+        });
+        if (series.show) {
+          showIndex++;
+        }
+      }
+    });
+  }
+
   drawSeriesLayer(bufferCtx, hitInfo) {
     const {
       maxTip,
