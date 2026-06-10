@@ -130,7 +130,7 @@ export default {
     const generateData = (num) => {
       const data = [];
 
-      const floor = (number) => Math.floor(number / 1000) * 1000;
+      const floor = (number) => number;
 
       for (let i = 0; i < num; i++) {
         let randomX = 0;
@@ -159,10 +159,10 @@ export default {
       series2 = [];
 
       if (isInit) {
-        data = generateData(10000);
+        data = generateData(100000);
         isInit = false;
       } else {
-        data = generateData(100);
+        data = generateData(8000);
       }
 
       for (let i = 0; i < data.length; i++) {
