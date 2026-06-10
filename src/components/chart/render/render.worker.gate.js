@@ -30,6 +30,9 @@ export const RENDER_WORKER_STATE = {
 /** ready 핸드셰이크 timeout(ms). 초과 시 failed → main fallback. */
 const DEFAULT_INIT_TIMEOUT_MS = 3000;
 
+/** in-flight(미응답) worker 렌더 상한. 초과분은 보내지 않고 main 이 그 프레임을 그린다(coalescing 보수값). */
+const DEFAULT_MAX_IN_FLIGHT = 2;
+
 const NOOP = () => {};
 
 /**
@@ -125,8 +128,15 @@ export class WorkerRenderGate {
     this.worker = null;
     this.version = options.version ?? RENDER_SNAPSHOT_VERSION;
     this.initTimeoutMs = options.initTimeoutMs ?? DEFAULT_INIT_TIMEOUT_MS;
+    this.maxInFlight = options.maxInFlight ?? DEFAULT_MAX_IN_FLIGHT;
     this.hooks = { ...DEFAULT_HOOKS, ...(options.hooks || {}) };
     this._timer = null;
+
+    // worker 렌더 응답 라우팅(chart.core 가 주입). 기본 no-op.
+    this._frameHandler = NOOP;
+    this._errorHandler = NOOP;
+    // 미응답(in-flight) 렌더 수. 상한 초과 시 main 이 그 프레임을 그린다(stale frame pile-up 방지).
+    this._inFlight = 0;
 
     // 테스트/측정용 주입(기본 = 실제 구현). 공개 API 아님.
     this._isEnabled = options.isEnabled || isWorkerRenderEnabled;
@@ -180,6 +190,40 @@ export class WorkerRenderGate {
     return this.isReady() && canSerializeSnapshot(snapshot);
   }
 
+  /** worker 프레임(ImageBitmap) 도착 핸들러 주입(chart.core 가 epoch 비교 후 commit). */
+  setFrameHandler(fn) {
+    this._frameHandler = fn || NOOP;
+  }
+
+  /** worker 렌더 예외 핸들러 주입(chart.core 가 main fallback). */
+  setErrorHandler(fn) {
+    this._errorHandler = fn || NOOP;
+  }
+
+  /** in-flight 상한에 여유가 있어 worker 로 렌더를 보낼 수 있는지(없으면 main 이 그 프레임 처리). */
+  canAcceptRender() {
+    return this.isReady() && this._inFlight < this.maxInFlight;
+  }
+
+  /**
+   * series 래스터를 worker 로 보낸다(B2). packed 컬럼 버퍼는 transfer(packSeries 가 copy 한 사본).
+   * @param {object} snapshot      RenderInput (epoch 포함)
+   * @param {object} columns       packSeries(snapshot).columns
+   * @param {ArrayBuffer[]} transferList   transfer 대상 버퍼(copy 본)
+   * @returns {boolean} 전송 여부(미전송 시 main 이 그 프레임 처리)
+   */
+  render(snapshot, columns, transferList) {
+    if (!this.canAcceptRender() || !this.worker) {
+      return false;
+    }
+    this._inFlight += 1;
+    this.worker.postMessage(
+      { type: 'render', epoch: snapshot.epoch, snapshot, columns },
+      transferList || [],
+    );
+    return true;
+  }
+
   destroy() {
     this._clearTimer();
     if (this.worker) {
@@ -191,11 +235,21 @@ export class WorkerRenderGate {
 
   _handleMessage(event) {
     const msg = event && event.data;
-    if (msg && msg.type === 'ready' && this.state === RENDER_WORKER_STATE.INITIALIZING) {
+    if (!msg) {
+      return;
+    }
+    if (msg.type === 'ready' && this.state === RENDER_WORKER_STATE.INITIALIZING) {
       this._clearTimer();
       this.state = RENDER_WORKER_STATE.READY;
-    } else if (msg && msg.type === 'unsupported') {
+    } else if (msg.type === 'unsupported') {
       this._fail('worker-unsupported');
+    } else if (msg.type === 'rendered') {
+      this._inFlight = Math.max(0, this._inFlight - 1);
+      this._frameHandler(msg);
+    } else if (msg.type === 'render-error') {
+      this._inFlight = Math.max(0, this._inFlight - 1);
+      this.hooks.onRenderException(msg.message);
+      this._errorHandler(msg);
     }
   }
 

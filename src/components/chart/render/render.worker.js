@@ -36,8 +36,10 @@ function renderSnapshot(msg) {
   const rect = snapshot.chartRect ?? {};
   const cssWidth = rect.width ?? 0;
   const cssHeight = rect.height ?? 0;
-  const deviceWidth = Math.max(1, Math.round(cssWidth * pixelRatio));
-  const deviceHeight = Math.max(1, Math.round(cssHeight * pixelRatio));
+  // main bufferCanvas/displayCanvas 는 `width * pixelRatio` 를 canvas.width 에 대입(정수 truncation).
+  // 동일 device 크기로 맞춰야 bitmap 이 1:1 합성되고 ensureCanvas 가 매 프레임 재할당하지 않는다.
+  const deviceWidth = Math.max(1, Math.floor(cssWidth * pixelRatio));
+  const deviceHeight = Math.max(1, Math.floor(cssHeight * pixelRatio));
 
   ensureCanvas(deviceWidth, deviceHeight);
 

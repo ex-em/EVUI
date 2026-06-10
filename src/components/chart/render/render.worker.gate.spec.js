@@ -176,6 +176,83 @@ describe('WorkerRenderGate — async ready 상태기계', () => {
   });
 });
 
+describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
+  const makeReadyGate = (opts = {}) => {
+    const gate = new WorkerRenderGate({
+      isEnabled: () => true,
+      isSupported: () => true,
+      createWorker: makeFakeWorker,
+      ...opts,
+    });
+    gate.start();
+    gate.worker.onmessage({ data: { type: 'ready' } });
+    return gate;
+  };
+
+  it('ready 이고 in-flight 여유가 있으면 render 가 series 를 worker 로 보낸다(transfer 포함)', () => {
+    const gate = makeReadyGate();
+    const buf = new ArrayBuffer(8);
+    const sent = gate.render({ epoch: 3 }, { s0: {} }, [buf]);
+
+    expect(sent).toBe(true);
+    expect(gate.worker.postMessage).toHaveBeenLastCalledWith(
+      { type: 'render', epoch: 3, snapshot: { epoch: 3 }, columns: { s0: {} } },
+      [buf],
+    );
+  });
+
+  it('not-ready 이면 render 는 false(main 이 그 프레임 처리)', () => {
+    const gate = new WorkerRenderGate({
+      isEnabled: () => true,
+      isSupported: () => true,
+      createWorker: makeFakeWorker,
+    });
+    gate.start(); // INITIALIZING (ready 미수신)
+    expect(gate.canAcceptRender()).toBe(false);
+    expect(gate.render({ epoch: 1 }, {}, [])).toBe(false);
+  });
+
+  it('in-flight 상한 초과분은 보내지 않는다(coalescing)', () => {
+    const gate = makeReadyGate({ maxInFlight: 2 });
+    expect(gate.render({ epoch: 1 }, {}, [])).toBe(true);
+    expect(gate.render({ epoch: 2 }, {}, [])).toBe(true);
+    // 2개 in-flight → 상한 → 미전송
+    expect(gate.canAcceptRender()).toBe(false);
+    expect(gate.render({ epoch: 3 }, {}, [])).toBe(false);
+
+    // rendered 응답 1개 → in-flight 감소 → 다시 수용
+    gate.worker.onmessage({ data: { type: 'rendered', epoch: 1, bitmap: { close() {} } } });
+    expect(gate.canAcceptRender()).toBe(true);
+  });
+
+  it('rendered 메시지 → frameHandler 호출 + in-flight 감소', () => {
+    const gate = makeReadyGate();
+    const onFrame = vi.fn();
+    gate.setFrameHandler(onFrame);
+    gate.render({ epoch: 5 }, {}, []);
+
+    const frame = { type: 'rendered', epoch: 5, bitmap: { close() {} }, drawMs: 1.2 };
+    gate.worker.onmessage({ data: frame });
+
+    expect(onFrame).toHaveBeenCalledWith(frame);
+    expect(gate.canAcceptRender()).toBe(true);
+  });
+
+  it('render-error 메시지 → onRenderException 훅 + errorHandler(main fallback)', () => {
+    const onRenderException = vi.fn();
+    const gate = makeReadyGate({ hooks: { onRenderException } });
+    const onError = vi.fn();
+    gate.setErrorHandler(onError);
+    gate.render({ epoch: 9 }, {}, []);
+
+    gate.worker.onmessage({ data: { type: 'render-error', epoch: 9, message: 'boom' } });
+
+    expect(onRenderException).toHaveBeenCalledWith('boom');
+    expect(onError).toHaveBeenCalled();
+    expect(gate.canAcceptRender()).toBe(true);
+  });
+});
+
 describe('WorkerRenderGate — ready 핸드셰이크 timeout', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
