@@ -1,4 +1,14 @@
-import { ref, reactive, computed, watch, getCurrentInstance, nextTick, onUpdated } from 'vue';
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  getCurrentInstance,
+  nextTick,
+  onUpdated,
+  toRaw,
+  isReactive,
+} from 'vue';
 import { cloneDeep, cloneDeepWith, defaults, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
@@ -283,8 +293,24 @@ const isImmutableDateLike = (value) =>
     typeof value.toDate === 'function' &&
     typeof value.format === 'function');
 
+/**
+ * F1: 클론 시 reactive proxy를 toRaw로 벗긴 뒤 복사해 per-value `get`/`noTracking` trap 비용을 제거한다.
+ * (probe: 클론 서브트리가 self-time의 ~30%, 그 중 상당수가 proxy traversal trap). deep copy·immutable
+ * date 보존 동작은 동일. CLONE_RAW_UNWRAP=false면 기존(unwrap 없는) 경로로, 측정 A/B·회귀 대조에 쓴다.
+ */
+export const CLONE_RAW_UNWRAP = true;
+
 export const cloneChartData = (data) =>
-  cloneDeepWith(data, (value) => (isImmutableDateLike(value) ? value : undefined));
+  cloneDeepWith(data, function cloneCustomizer(value) {
+    if (isImmutableDateLike(value)) {
+      return value;
+    }
+    if (CLONE_RAW_UNWRAP && isReactive(value)) {
+      // reactive면 raw로 벗겨 동일 customizer로 재귀 복사 → 이후 nested 접근이 trap을 타지 않는다.
+      return cloneDeepWith(toRaw(value), cloneCustomizer);
+    }
+    return undefined;
+  });
 
 const useWidgetClickEvent = () => {
   let timer = null;
