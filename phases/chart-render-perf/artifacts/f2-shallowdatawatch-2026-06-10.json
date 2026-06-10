@@ -1,0 +1,49 @@
+{
+  "measurement": "F2 options.shallowDataWatch — deep watch opt-out 효과 검증",
+  "date": "2026-06-10",
+  "branch": "feat-chart-worker-offload",
+  "commit_under_test": "91116296 (feat(chart): props.data deep-watch opt-out)",
+  "env": {
+    "tool": "Playwright MCP + CDP (page.context().newCDPSession)",
+    "method": "Profiler(200µs sampling), self-time by functionName 집계, 9s window",
+    "throttle": "1x (no CPU throttle) — self% 비율은 throttle 무관하게 신뢰(probe 문서 기준)",
+    "repro": "docs PerfStressSingle.vue (line 10000 series x 50 points), 초당 1회 갱신",
+    "caveat": "headless 렌더(SwiftShader) render/drawImage 비중은 부풀 수 있으나, F2 타깃=reactivity/traverse 는 신뢰. PerfStressSingle 외 페이지의 정적 차트 82개는 tick당 미갱신이라 프로파일 비오염."
+  },
+  "deep_baseline_append_1x": {
+    "drawChart_panel_ms": { "p50": 670.9, "p95": 806.3, "max": 1082.5, "last": 751.1 },
+    "profile_window_ms": 10906,
+    "top_self_pct": {
+      "(program)": 14.3, "traverse": 11.0, "noTracking": 10.8, "set": 8.5,
+      "(anonymous)": 5.6, "getSeriesMinMax": 4.2, "track": 4.1, "get": 3.8,
+      "isRef2": 3.7, "(gc)": 3.5, "trigger": 3.4, "(idle)": 2.4,
+      "baseAssignValue": 2.1, "ownKeys": 1.8, "cleanupDeps": 1.7, "prepareDeps": 1.4, "toRaw": 1.4
+    },
+    "reactivity_sum_pct_approx": 52,
+    "note": "deep:true watch traverse 11% + Vue 반응성 트랩 다수. 메모리 GPU 프로파일(반응성 56%)과 일치."
+  },
+  "shallow_opt_in_shallowref_replace_1x": {
+    "drawChart_panel_ms": { "last": 102.3 },
+    "profile_window_ms": 9552,
+    "traverse_pct": 0.0,
+    "traverse_ms": 0.0,
+    "top_self_pct": {
+      "(idle)": 74.1, "(program)": 6.3, "(anonymous)": 4.3, "baseAssignValue": 2.1,
+      "(gc)": 1.6, "addSeriesDS": 0.9, "getSeriesMinMax": 0.8, "getXPos": 0.8,
+      "calculateX": 0.8, "draw": 0.8, "drawSeriesLayer": 0.7, "baseClone": 0.7,
+      "createDataSet": 0.3, "buildData": 0.3, "buildSeries": 0.3
+    },
+    "note": "traverse 0%. noTracking/set/track/get/trigger/isRef2/ownKeys/cleanupDeps/prepareDeps 전부 top 에서 소멸(데이터 비반응성 + deep 구독 없음). (idle) 2.4%→74.1% — tick당 활성 CPU 급감. 남은 비용=실제 차트 작업 + 소비자 전체 스냅샷 재생성(buildData/buildSeries)."
+  },
+  "verdict": {
+    "traverse": "11.0% → 0% (deep-watch O(N) deep-track 비용 소거)",
+    "reactivity_primitives": "~40%+ → ~0 (set/get/track/trigger/noTracking 등 소멸)",
+    "drawChart_per_tick": "~670ms → ~105ms (~84% 감소) — 메모리 실험치 ~85% 재현",
+    "conservative": "shallow 측정은 매 tick 전체 스냅샷(10000 series) 재생성 포함 → 실사용(시리즈 정의 재사용)에선 더 저렴",
+    "success_criteria_met": [
+      "profiler top entries 에서 traverse self-time 소거: 충족(0%)",
+      "drawChart 대폭 감소: 충족(~84%)",
+      "플래그 off(deep) 기존 동작 불변: 충족(기본 deep 경로 회귀 없음, chart 422 테스트 통과)"
+    ]
+  }
+}
