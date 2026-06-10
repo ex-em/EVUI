@@ -317,9 +317,10 @@ class EvChart {
   }
 
   /**
-   * realTimeScatter autoScale 용도: show 된 series 의 실제 데이터 y 최대값을 외부로 올린다.
-   * realTimeScatter.use=true 인 차트에서만 발생하며(그 외 타입은 집계를 건너뛰어 비용 0),
-   * 렌더마다(같은 값이어도) 발생한다 — 늦게 바인딩하는 소비처도 현재 최대값을 받게 하기 위함.
+   * show 된 series 의 실제 데이터 y 최대값을 외부로 올린다(realTimeScatter autoScale 등).
+   * 차트 타입과 무관하게 동작하며, 소비처가 @axes-data-max-change 를 바인딩했을 때만 발생한다 —
+   * 래퍼 리스너 자체가 구독 시에만 등록되므로(uses.js), 안 쓰는 차트는 집계 비용 0 이다.
+   * 발생 시점엔 렌더마다(같은 값이어도) emit 한다 — 늦게 바인딩하는 소비처도 현재 최대값을 받게 하기 위함.
    * 비용은 EvChart 가 이미 계산해 둔 series.minMax.maxY 를 series 수만큼(점 수 아님) 읽는 게 전부라,
    * 소비처가 동일 데이터를 따로 스캔(O(N))해 max 를 구하지 않아도 된다.
    * maxY 는 show 된 전 series 의 통합 최대값(단일 y축·세로 차트 기준, 축 구분 없음)이다.
@@ -327,10 +328,6 @@ class EvChart {
    * @returns {undefined}
    */
   emitDataMaxChange() {
-    if (!this.options.realTimeScatter?.use) {
-      return;
-    }
-
     const listener = this.listeners?.['axes-data-max-change'];
     if (typeof listener !== 'function') {
       return;
