@@ -74,6 +74,27 @@ draw/createDataSet 계열=render). total 4712ms 기준:
 - **절반 이상 단축** → F2(deep-watch) 없이는 어렵다(반응성의 약 1/3이 deepwatch 고유분).
 - **권고**: F1+F3 먼저 구현 → 재측정으로 clone+GC 동반 감소 실측. 충분하면 F2 영구 불필요. 부족하면 그때 default 유지 + opt-in으로만 F2 별도 논의(지금 결정 안 함).
 
+## ★★★ F0+F1 재측정 (chart-data-pipeline phase 후, A-single append, 6×)
+
+before = F0/F1 적용 전(`236b75de`) ↔ after = F0+F1 적용(`f3b25e9b`). 동일 조건(6× throttle, CDP Profiler call-tree 귀속).
+profiler total이 틱 수에 따라 달라지므로 **틱당 환산**으로 비교(틱 수 = 14000 / drawChart p50).
+
+| 지표 | before | after | 변화 |
+|---|---:|---:|---|
+| **drawChart p50 (mutate→flush 벽시계 = D4a)** | 5287ms | **4040ms** | **−24%** |
+| clone (틱당 환산) | ~619ms | ~179ms | **−71%** |
+| deepwatch traverse (틱당) | ~371ms | ~396ms | ~불변(F2 미적용) |
+| render (틱당) | ~160ms | ~155ms | 불변 |
+| self-time 비중: clone | 32.1% | **11.4%** | proxy trap 제거 |
+| self-time 비중: deepwatch | 19.2% | **25.3%(최대 잔여항)** | clone 감소로 상대 비중↑ |
+
+### 결론
+- **F0+F1으로 per-tick(D4a) ≈ −24%, clone 비용 ≈ −71%** (6× 근사). "F2 없이 ~1/3 단축" 권장 범위에 부합.
+- **이제 최대 잔여항은 deepwatch traverse(~25%, 틱당 ~396ms)** — F2(deep-watch 회피)를 해야만 줄지만 **소비자 in-place mutation 계약 위반이라 범위 밖**(default 유지). render/createDataSet는 여전히 <10%.
+- **라우팅(plan Step 1.5)**: 잔여 지배항이 render-thread가 아니라 deep-watch(메인) → **Worker/OffscreenCanvas는 여전히 무효**. F3(isEqual 3.8%)·F4(normalize ~0%)는 이득 작아 보류. 남은 큰 레버는 F2뿐인데 계약 제약으로 막힘.
+- **권고**: 실기기에서 D4a + 갱신 중 interaction latency/freeze(1차)를 측정해, 1차가 합격이면 **F2 없이 종료**(소비자 무수정 목표 달성). 1차 미달이면 그때 F2 opt-in을 사용자와 별도 논의.
+- ⚠️ 6× throttle 근사. 절대치·게이트 합격선은 저사양 실기기 확정 필요.
+
 ## B-real (comboChart / PerfStressDashboard, after)
 
 규모: `CHART_COUNT=8`, `SERIES_PER_CHART=20`, `POINTS_PER_SERIES=60`
