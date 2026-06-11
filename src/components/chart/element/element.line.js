@@ -114,6 +114,11 @@ class Line {
    * @property {boolean} [isBrush] - 브러시 사용 여부
    * @property {number} [unSelectedOpacity] - 비선택 시 opacity (0~1)
    */
+  /** 그릴 값(non-null o)이 하나라도 있는지. */
+  hasRenderableValue() {
+    return this.data.some((d) => d.o !== null && d.o !== undefined);
+  }
+
   /**
    * Draw series data
    * @param {LineDrawParam} param     object for drawing series data
@@ -139,6 +144,12 @@ class Line {
 
     // 기하(xp/yp)는 기하 패스가 채운다. 래스터 패스(이 아래)는 그 값을 읽기만 하고 mutate하지 않는다.
     this.computeGeometry(param);
+
+    // 전부 null 인 시리즈는 래스터가 픽셀을 0개 그리므로(기하는 위에서 채움) 래스터만 skip 한다.
+    // 'zero' 는 null→0 변환돼 o!==null 이라 자동 제외, stacked(isExistGrp)는 별도 경로라 제외.
+    if (!this.hasRenderableValue() && !this.isExistGrp) {
+      return;
+    }
 
     // about selectLabel
     const selectLabelOption = selectLabel?.option;
