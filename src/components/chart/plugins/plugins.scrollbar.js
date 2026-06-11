@@ -70,16 +70,23 @@ const module = {
           scrollbarOpt.range[0] = limitMin;
           scrollbarOpt.range[1] = limitMax;
         } else {
-          scrollbarOpt.range[0] = +min < limitMin ? limitMin : +min;
-          scrollbarOpt.range[1] = +max > limitMax ? limitMax : +max;
+          // 윈도우(폭 originalWidth)를 한계 [limitMin, limitMax] 안으로 이동시킨다.
+          // 라이브 데이터로 윈도우가 한계 밖으로 완전히 밀렸을 때 range 가 역전
+          // (range[0] > range[1])/붕괴되지 않도록 항상 폭을 유지한 채 가장자리에 정렬한다.
+          let lo = +min < limitMin ? limitMin : +min;
+          let hi = lo + originalWidth;
 
-          if (scrollbarOpt.range[1] - scrollbarOpt.range[0] < originalWidth) {
-            scrollbarOpt.range[0] = scrollbarOpt.range[1] - originalWidth;
+          if (hi > limitMax) {
+            hi = limitMax;
+            lo = hi - originalWidth;
 
-            if (scrollbarOpt.range[0] < limitMin) {
-              scrollbarOpt.range[0] = limitMin;
+            if (lo < limitMin) {
+              lo = limitMin;
             }
           }
+
+          scrollbarOpt.range[0] = lo;
+          scrollbarOpt.range[1] = hi;
         }
       }
     }
@@ -129,9 +136,14 @@ const module = {
       }
 
       this.initScrollbarRange(dir);
-      // range 가 갱신/clip 된 후 anchorEdge 재계산. 데이터만 업데이트 시 range 는 그대로
-      // 지만 limit 이 바뀌었을 수 있어 항상 호출한다.
-      this.updateScrollbarAnchorEdge(dir);
+      // anchorEdge 는 윈도우가 실제로 이동한 경우(range 옵션 변경=리사이즈/범위 지정 등)에만
+      // 재계산한다. 데이터만 업데이트된 경우 윈도우 위치는 그대로인데, 라이브 데이터로
+      // minMax(=한계)가 변하면 clip 으로 윈도우가 우연히 한계에 닿을 수 있다. 이때 anchorEdge
+      // 를 새로 만들면 자유 위치(중앙)에 둔 윈도우가 다음 리사이즈에 가장자리로 스냅되는
+      // 오탐이 생기므로(리뷰 #2), 데이터 업데이트 경로에서는 기존 anchorEdge 를 보존한다.
+      if (isUpdateAxesRange) {
+        this.updateScrollbarAnchorEdge(dir);
+      }
     }
     this.scrollbar[dir].use = !!newOpt?.[0].scrollbar?.use;
   },
