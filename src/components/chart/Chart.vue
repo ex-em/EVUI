@@ -259,7 +259,10 @@ export default {
           setDataForUseZoom(newData);
         }
       },
-      { deep: true, flush: 'post' },
+      // shallowDataWatch opt-in 이면 deep 추적을 끈다(큰 데이터의 O(N) deep-track 비용 제거).
+      // mount 시점 1회 평가 — 런타임 토글 불가. deep:false 면 props.data top-level 참조가 바뀔 때만
+      // 발화하므로 소비자는 새 객체 참조를 할당해야 한다(in-place mutation 은 미감지).
+      { deep: !normalizedOptions.shallowDataWatch, flush: 'post' },
     );
 
     if (injectIsChartGroup && !injectGroupSelectedLabel?.value) {
