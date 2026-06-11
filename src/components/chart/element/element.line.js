@@ -294,6 +294,10 @@ class Line {
       const isLinearSingle =
         this.interpolation === 'linear' && this.data.filter((item) => item.o !== null).length === 1;
 
+      // 점마다 fill/stroke 하던 path-per-point를 색(focus/blur)별 배치로 모은다.
+      // strokeStyle은 위에서 시리즈당 1회 set(상수), fillStyle만 그룹별로 갈린다.
+      const focusPoints = [];
+      const blurPoints = [];
       this.data.forEach((curr, ix) => {
         if (curr.xp === null || curr.yp === null || curr.o === null) {
           return;
@@ -306,10 +310,18 @@ class Line {
           (!isLinearInterpolation && isNil(prevData) && isNil(nextData)) || isLinearSingle;
         const isSelectedLabel = selectedLabelIndexList.includes(ix);
         if (this.point || isSingle || isSelectedLabel) {
-          ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
-          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
+          (isSelectedLabel && !legendHitInfo ? focusPoints : blurPoints).push(curr);
         }
       });
+
+      if (blurPoints.length) {
+        ctx.fillStyle = blurStyle;
+        Canvas.drawPointBatch(ctx, this.pointStyle, this.pointSize, blurPoints);
+      }
+      if (focusPoints.length) {
+        ctx.fillStyle = focusStyle;
+        Canvas.drawPointBatch(ctx, this.pointStyle, this.pointSize, focusPoints);
+      }
     }
 
     ctx.restore();

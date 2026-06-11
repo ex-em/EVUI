@@ -144,6 +144,10 @@ class Scatter {
     // realtime은 createRealTimeScatterDataSet 적재 단계에서 dedupe 처리.
     const drawnKeys = new Set();
     const isDedupeOn = coordinateDedupe !== false;
+    // dedupe on이면 좌표 비겹침이 보장돼 색(stroke+fill)별 배치 렌더가 가능하다.
+    // legendHitInfo/dedupe off는 같은 좌표 중복 가능성이 있어(반투명 겹침 차이) per-point 유지.
+    const canBatch = isDedupeOn && !legendHitInfo;
+    const groups = canBatch ? new Map() : null;
 
     // Adjusted because Real Time Scatter is drawn from the back.
     for (let i = 0; i < this.data.length; i++) {
@@ -166,16 +170,36 @@ class Scatter {
           const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
           const color = overflowColor || item.dataColor || this.color;
           const strokeOpacity = this.getOpacity(param, color, idx);
-          ctx.strokeStyle = this.getCachedColor(color, strokeOpacity);
+          const strokeStyle = this.getCachedColor(color, strokeOpacity);
 
           const pointFillColor = item.dataColor || this.pointFill;
           const fillOpacity = this.getOpacity(param, pointFillColor, idx);
-          ctx.fillStyle = this.getCachedColor(pointFillColor, fillOpacity);
+          const fillStyle = this.getCachedColor(pointFillColor, fillOpacity);
 
-          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
-          if (isDedupeOn && !legendHitInfo) drawnKeys.add(key);
+          if (canBatch) {
+            const colorKey = `${strokeStyle} ${fillStyle}`;
+            let group = groups.get(colorKey);
+            if (!group) {
+              group = { strokeStyle, fillStyle, points: [] };
+              groups.set(colorKey, group);
+            }
+            group.points.push(item);
+            drawnKeys.add(key);
+          } else {
+            ctx.strokeStyle = strokeStyle;
+            ctx.fillStyle = fillStyle;
+            Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
+          }
         }
       }
+    }
+
+    if (canBatch) {
+      groups.forEach((group) => {
+        ctx.strokeStyle = group.strokeStyle;
+        ctx.fillStyle = group.fillStyle;
+        Canvas.drawPointBatch(ctx, this.pointStyle, this.pointSize, group.points);
+      });
     }
   }
 
@@ -194,6 +218,9 @@ class Scatter {
     let totalCount = 0;
 
     const isDedupeOnRT = coordinateDedupe !== false;
+    // dedupe on이면 좌표 비겹침이 보장돼 색별 배치 렌더 가능. 그 외는 per-point 유지(반투명 겹침 차이 회피).
+    const canBatch = isDedupeOnRT && !legendHitInfo;
+    const groups = canBatch ? new Map() : null;
 
     for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
@@ -220,13 +247,33 @@ class Scatter {
             const strokeOpacity = this.getOpacity(param, baseStrokeColor, j);
             const fillOpacity = this.getOpacity(param, baseFillColor, j);
 
-            ctx.strokeStyle = this.getCachedColor(baseStrokeColor, strokeOpacity);
-            ctx.fillStyle = this.getCachedColor(baseFillColor, fillOpacity);
+            const strokeStyle = this.getCachedColor(baseStrokeColor, strokeOpacity);
+            const fillStyle = this.getCachedColor(baseFillColor, fillOpacity);
 
-            Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+            if (canBatch) {
+              const colorKey = `${strokeStyle} ${fillStyle}`;
+              let group = groups.get(colorKey);
+              if (!group) {
+                group = { strokeStyle, fillStyle, points: [] };
+                groups.set(colorKey, group);
+              }
+              group.points.push(item);
+            } else {
+              ctx.strokeStyle = strokeStyle;
+              ctx.fillStyle = fillStyle;
+              Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+            }
           }
         }
       }
+    }
+
+    if (canBatch) {
+      groups.forEach((group) => {
+        ctx.strokeStyle = group.strokeStyle;
+        ctx.fillStyle = group.fillStyle;
+        Canvas.drawPointBatch(ctx, pointStyle, pointSize, group.points);
+      });
     }
 
     // findGraphData(realTimeScatter)에서 역순 탐색 시 global index 계산에 사용한다.
