@@ -1,7 +1,12 @@
 <template>
   <div class="case" @pointermove="perf.onPointerMove">
     <resizable-wrapper>
-      <ev-chart :data="chartData" :options="chartOptions" @mouse-move="perf.onChartMouseMove" />
+      <ev-chart
+        :key="isShallowWatch ? 'shallow' : 'deep'"
+        :data="boundData"
+        :options="boundOptions"
+        @mouse-move="perf.onChartMouseMove"
+      />
     </resizable-wrapper>
   </div>
   <div class="description">
@@ -14,11 +19,15 @@
     <ev-toggle v-model="isLive" />
     <span class="toggle-label">Append(슬라이딩 윈도우) 모드 — 끄면 Full-replace</span>
     <ev-toggle v-model="isAppendMode" />
+    <span class="toggle-label">
+      shallowDataWatch (shallowRef + top-level 참조교체, deep watch off)
+    </span>
+    <ev-toggle v-model="isShallowWatch" />
   </div>
 </template>
 
 <script>
-import { watch, ref, onBeforeUnmount, reactive } from 'vue';
+import { watch, ref, computed, onBeforeUnmount, reactive, shallowRef } from 'vue';
 import { usePerfHarness } from '../../perfHarness';
 
 // 측정 규모 조절용 상수 (Step 0a 선결 분류 ①: 시리즈당 포인트 수 vs 화면 가로 픽셀)
@@ -60,11 +69,16 @@ export default {
       return data;
     };
 
-    const chartData = reactive({
+    const buildSnapshot = () => ({
       series: buildSeries(),
       labels: buildLabels(),
       data: buildData(),
     });
+
+    // deep 모드(기본): reactive 데이터 + in-place/sub-replace 갱신 → deep watch traverse 비용 발생.
+    const chartData = reactive(buildSnapshot());
+    // shallow 모드: 비반응성(shallowRef) 데이터 + top-level 참조 교체 → deep watch off(traverse 0).
+    const shallowChartData = shallowRef(buildSnapshot());
 
     const chartOptions = reactive({
       type: 'line',
@@ -96,12 +110,23 @@ export default {
 
     const isLive = ref(false);
     const isAppendMode = ref(true);
+    const isShallowWatch = ref(false);
     const liveInterval = ref();
+
+    // shallowDataWatch on 이면 shallowRef + shallowDataWatch:true 로 바꿔 차트를 remount(:key)한다.
+    const boundData = computed(() => (isShallowWatch.value ? shallowChartData.value : chartData));
+    const boundOptions = computed(() => ({
+      ...chartOptions,
+      shallowDataWatch: isShallowWatch.value,
+    }));
 
     // 갱신 방식 토글 — append형(슬라이딩 윈도우) vs full-replace.
     // plan Q2 분류(append+fixed range vs full-replace+rescale) 측정용.
     const mutateChartData = () => {
-      if (isAppendMode.value) {
+      if (isShallowWatch.value) {
+        // shallow 모드: 항상 새 top-level 참조 할당(in-place 변경은 deep off 라 미감지).
+        shallowChartData.value = buildSnapshot();
+      } else if (isAppendMode.value) {
         chartData.labels.shift();
         chartData.labels.push(String(labelCounter++));
         Object.values(chartData.data).forEach((seriesData) => {
@@ -133,10 +158,11 @@ export default {
     return {
       SERIES_COUNT,
       POINTS_PER_SERIES,
-      chartData,
-      chartOptions,
+      boundData,
+      boundOptions,
       isLive,
       isAppendMode,
+      isShallowWatch,
       perf,
     };
   },
