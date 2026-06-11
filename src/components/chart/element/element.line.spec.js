@@ -322,6 +322,146 @@ describe('Chart Interpolation', () => {
 });
 
 /**
+ * line 연속 동일픽셀 lineTo 생략(path 생략) 테스트 — 시각 회귀(Chart.visual.spec.js)와 분리된 축.
+ *
+ * 검증 목표:
+ *  1) 데이터 불변성: 직전에 찍은 점과 완전히 같은 픽셀로의 lineTo 만 생략한다. 동일 좌표로의
+ *     lineTo 는 zero-length no-op 이므로, 중복 점을 가진 데이터의 stroke 명령 시퀀스가
+ *     중복을 제거한 데이터의 시퀀스와 완전히 동일해야 한다.
+ *  2) 생략 제외 조건: 서로 다른 픽셀의 점(방향 전환점 포함)·null 경계(moveTo)·marker 기준점
+ *     (xp/yp)은 생략되지 않는다.
+ *
+ * fill(area)·marker 는 stroke path 와 분리된 별도 경로다 — fill 은 자체 path 를 xp/yp 로 다시
+ * 그리고, marker 는 별도 루프가 xp/yp 를 읽어 그린다. 본 최적화는 stroke 의 lineTo 분기에만
+ * 적용되고 xp/yp 는 매 점 항상 설정되므로(4번 테스트) fill/marker 경계는 보존된다. step-line
+ * 보간은 element.line.js draw 에 존재하지 않으므로 적용 대상이 아니다.
+ */
+describe('element.line path 생략 (연속 동일 픽셀 lineTo)', () => {
+  // stroke 의 moveTo/lineTo 만 기록하는 mock canvas context.
+  const makeCtx = () => {
+    const cmds = [];
+    const noop = () => {};
+    return {
+      cmds,
+      save: noop,
+      restore: noop,
+      beginPath: noop,
+      closePath: noop,
+      stroke: noop,
+      fill: noop,
+      setLineDash: noop,
+      arc: noop,
+      fillRect: noop,
+      createLinearGradient: () => ({ addColorStop: noop }),
+      moveTo(x, y) {
+        cmds.push(['moveTo', x, y]);
+      },
+      lineTo(x, y) {
+        cmds.push(['lineTo', x, y]);
+      },
+    };
+  };
+
+  // 축 범위·차트 영역을 고정해 동일 raw → 동일 픽셀이 결정적으로 나오게 한다.
+  const baseParam = (ctx) => ({
+    ctx,
+    chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    axesSteps: { x: [{ graphMin: 0, graphMax: 4 }], y: [{ graphMin: 0, graphMax: 100 }] },
+    isBrush: true,
+  });
+
+  const makeLine = (data) => {
+    const line = new Line('s0', {}, 0);
+    line.data = data;
+    line.xAxisIndex = 0;
+    line.yAxisIndex = 0;
+    line.interpolation = 'none';
+    line.combo = false;
+    line.isExistGrp = false;
+    line.fill = false;
+    line.point = false;
+    line.show = true;
+    return line;
+  };
+
+  it('연속 동일 픽셀 점의 lineTo 를 생략하며, 중복 제거 데이터와 명령 시퀀스가 동일하다', () => {
+    const dataWithDup = [
+      { x: 0, y: 10, o: 10 },
+      { x: 1, y: 20, o: 20 },
+      { x: 1, y: 20, o: 20 }, // 직전과 완전히 같은 픽셀 → 생략 대상
+      { x: 1, y: 20, o: 20 }, // 생략 대상
+      { x: 2, y: 30, o: 30 },
+    ];
+    const dataNoDup = [
+      { x: 0, y: 10, o: 10 },
+      { x: 1, y: 20, o: 20 },
+      { x: 2, y: 30, o: 30 },
+    ];
+
+    const ctxDup = makeCtx();
+    makeLine(dataWithDup).draw(baseParam(ctxDup));
+
+    const ctxNoDup = makeCtx();
+    makeLine(dataNoDup).draw(baseParam(ctxNoDup));
+
+    // 데이터 불변성: 중복 점이 있어도 stroke 명령 시퀀스는 중복 없는 데이터와 완전히 동일.
+    expect(ctxDup.cmds).toEqual(ctxNoDup.cmds);
+    expect(ctxDup.cmds.filter((c) => c[0] === 'moveTo')).toHaveLength(1);
+    expect(ctxDup.cmds.filter((c) => c[0] === 'lineTo')).toHaveLength(2);
+
+    // 연속 명령에 동일 좌표가 남아있지 않음(중복이 실제로 제거됨).
+    for (let i = 1; i < ctxDup.cmds.length; i++) {
+      const [, px, py] = ctxDup.cmds[i - 1];
+      const [, x, y] = ctxDup.cmds[i];
+      expect(px === x && py === y).toBe(false);
+    }
+  });
+
+  it('서로 다른 픽셀의 점(방향 전환점 포함)은 모두 보존한다', () => {
+    // V 형태: 가운데가 방향 전환점이며 세 점 모두 다른 픽셀.
+    const data = [
+      { x: 0, y: 0, o: 0 },
+      { x: 1, y: 50, o: 50 },
+      { x: 2, y: 0, o: 0 },
+    ];
+    const ctx = makeCtx();
+    makeLine(data).draw(baseParam(ctx));
+
+    expect(ctx.cmds.filter((c) => c[0] === 'moveTo')).toHaveLength(1);
+    expect(ctx.cmds.filter((c) => c[0] === 'lineTo')).toHaveLength(2);
+  });
+
+  it('null 경계는 moveTo 로 끊기며 생략 대상이 아니다', () => {
+    const data = [
+      { x: 0, y: 10, o: 10 },
+      { x: 1, y: null, o: null }, // null → path 끊김(moveTo)
+      { x: 2, y: 20, o: 20 },
+    ];
+    const ctx = makeCtx();
+    makeLine(data).draw(baseParam(ctx));
+
+    // 생략은 lineTo 분기에만 적용 → null 경계의 moveTo 는 그대로 유지.
+    expect(ctx.cmds.filter((c) => c[0] === 'moveTo')).toHaveLength(3);
+    expect(ctx.cmds.filter((c) => c[0] === 'lineTo')).toHaveLength(0);
+  });
+
+  it('생략된 점도 xp/yp 가 설정된다 (marker/area fill 기준점 보존)', () => {
+    const data = [
+      { x: 0, y: 10, o: 10 },
+      { x: 1, y: 20, o: 20 },
+      { x: 1, y: 20, o: 20 }, // lineTo 는 생략되지만 좌표는 계산되어야 함
+    ];
+    makeLine(data).draw(baseParam(makeCtx()));
+
+    data.forEach((p) => {
+      expect(typeof p.xp).toBe('number');
+      expect(typeof p.yp).toBe('number');
+    });
+  });
+});
+
+/**
  * 마커 배치 렌더링 — isSingle(양옆 null) 고립점이 point:false 에서도 마커로 그려지는데,
  * 이를 점마다 fill/stroke(path-per-point) 하던 것을 색(blur/focus)별 배치로 모은다.
  * 라이브 대시보드(5초 라벨 그리드 × 10초 데이터 → 50% null 교차)에서 fill/stroke 콜 폭주를 막는 핵심.

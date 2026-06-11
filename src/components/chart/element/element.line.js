@@ -191,6 +191,9 @@ class Line {
 
     // draw line
     let prevValid;
+    // 직전에 path 에 찍은(moveTo/lineTo) 픽셀 — 동일 픽셀 lineTo 생략 판정용.
+    let lastDrawnX = null;
+    let lastDrawnY = null;
     this.data.forEach((curr) => {
       let x = getXPos(curr.x);
       let y = getYPos(curr.y);
@@ -217,8 +220,14 @@ class Line {
         (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))
       ) {
         ctx.moveTo(x, y);
-      } else {
+        lastDrawnX = x;
+        lastDrawnY = y;
+      } else if (x !== lastDrawnX || y !== lastDrawnY) {
+        // 직전과 완전히 같은 픽셀로의 lineTo 는 zero-length no-op 이라 생략(출력 불변).
+        // moveTo(위 분기)·null 경계는 비대상이고, fill·marker 는 별도 경로(xp/yp 항상 설정)라 무영향.
         ctx.lineTo(x, y);
+        lastDrawnX = x;
+        lastDrawnY = y;
       }
 
       prevValid = curr;
