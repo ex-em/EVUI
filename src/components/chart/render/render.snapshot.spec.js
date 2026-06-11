@@ -297,3 +297,74 @@ describe('render.snapshot — pack/transfer 안전 (copy 경계)', () => {
     expect(columns.s0.length).toBe(1000);
   });
 });
+
+/**
+ * 빈(전부 null) line 시리즈는 worker 가 그려도 픽셀 0개라 스냅샷(=pack/postMessage)에서 제외한다.
+ * element.line draw-skip 과 동일 판정(hasRenderableValue, isExistGrp 제외). 비-line·isExistGrp·값 있는
+ * 시리즈는 그대로 포함.
+ */
+describe('render.snapshot — 빈 시리즈 제외 (worker 직렬화 비용 절감)', () => {
+  const makeLineWith = (id, data, extra = {}) => {
+    const line = new Line(id, { color: '#000' }, 0);
+    line.show = true;
+    line.xAxisIndex = 0;
+    line.yAxisIndex = 0;
+    line.isExistGrp = false;
+    line.data = data;
+    Object.assign(line, extra);
+    return line;
+  };
+
+  const allNull = [
+    { x: 0, y: null, o: null, b: 0 },
+    { x: 1, y: null, o: null, b: 0 },
+  ];
+  const withValue = [
+    { x: 0, y: 10, o: 10, b: 0 },
+    { x: 1, y: 20, o: 20, b: 0 },
+  ];
+
+  const makeOrderedCore = (seriesList, order) => ({
+    pixelRatio: 1,
+    chartRect: {},
+    labelOffset: {},
+    axesSteps: { x: [], y: [] },
+    options: { type: 'line' },
+    seriesInfo: { charts: { line: order, bar: [], scatter: [], heatMap: [], pie: [] } },
+    seriesList,
+  });
+
+  it('all-null line 시리즈는 series 맵·seriesOrder·pack 에서 모두 빠진다', () => {
+    const core = makeOrderedCore(
+      { full: makeLineWith('full', withValue), empty: makeLineWith('empty', allNull) },
+      ['full', 'empty'],
+    );
+    const snapshot = toRenderSnapshot(core, 1);
+
+    expect(Object.keys(snapshot.series)).toEqual(['full']);
+    expect(snapshot.seriesOrder.line).toEqual(['full']);
+    expect(Object.keys(packSeries(snapshot).columns)).toEqual(['full']);
+  });
+
+  it('isExistGrp(stacked) all-null 시리즈는 제외하지 않는다', () => {
+    const core = makeOrderedCore(
+      { grp: makeLineWith('grp', allNull, { isExistGrp: true }) },
+      ['grp'],
+    );
+    const snapshot = toRenderSnapshot(core, 1);
+
+    expect(Object.keys(snapshot.series)).toEqual(['grp']);
+    expect(snapshot.seriesOrder.line).toEqual(['grp']);
+  });
+
+  it("값이 0(예: interpolation 'zero' 변환 결과)인 시리즈는 제외하지 않는다", () => {
+    const zeros = [
+      { x: 0, y: 0, o: 0, b: 0 },
+      { x: 1, y: 0, o: 0, b: 0 },
+    ];
+    const core = makeOrderedCore({ z: makeLineWith('z', zeros) }, ['z']);
+    const snapshot = toRenderSnapshot(core, 1);
+
+    expect(Object.keys(snapshot.series)).toEqual(['z']);
+  });
+});
