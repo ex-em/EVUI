@@ -77,6 +77,65 @@ class Line {
   }
 
   /**
+   * Compute pixel geometry (xp/yp) for each data point and store it on the main model.
+   * 기하 계산만 수행한다(canvas 그리기 없음). hit-test가 이 결과(item.xp/yp)를 소비한다.
+   * draw(래스터 패스)와 분리되어 worker offload 시 main 모델 기하가 유지된다.
+   * 좌표 의미·grp null 보정·alias·반올림은 draw와 완전히 동일해야 한다.
+   * @param {LineDrawParam} param
+   * @returns {undefined}
+   */
+  computeGeometry(param) {
+    if (!this.show) {
+      return;
+    }
+
+    const { chartRect, labelOffset, axesSteps } = param;
+    const isLinearInterpolation = this.useLinearInterpolation();
+
+    let barAreaByCombo = 0;
+    const minmaxX = axesSteps.x[this.xAxisIndex];
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    let xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+
+    if (this.combo) {
+      barAreaByCombo = xArea / (this.data.length || 1);
+      xArea -= barAreaByCombo;
+      this.size.comboOffset = barAreaByCombo;
+    }
+
+    const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
+    const ysp = chartRect.y2 - labelOffset.bottom;
+
+    const getXPos = (val) => {
+      const _val = Math.min(Math.max(val, minmaxX.graphMin), minmaxX.graphMax);
+      return Canvas.calculateX(_val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    };
+
+    const getYPos = (val) => {
+      const _val = Math.min(Math.max(val, minmaxY.graphMin), minmaxY.graphMax);
+      return Canvas.calculateY(_val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+    };
+
+    this.data.forEach((curr) => {
+      let x = getXPos(curr.x);
+      let y = getYPos(curr.y);
+
+      if (this.isExistGrp && isLinearInterpolation && curr.o === null) {
+        y = getYPos(curr.b ?? 0);
+      }
+
+      if (x !== null) {
+        x += Util.aliasPixel(x);
+      }
+
+      curr.xp = x;
+      curr.yp = y;
+    });
+  }
+
+  /**
    * @typedef {Object} LineDrawParam
    * @property {CanvasRenderingContext2D} ctx - 캔버스 렌더링 컨텍스트
    * @property {object} chartRect - 차트 영역 정보
@@ -111,6 +170,9 @@ class Line {
       unSelectedOpacity,
       displayOverflow,
     } = param;
+
+    // 기하(xp/yp)는 기하 패스가 채운다. 래스터 패스(이 아래)는 그 값을 읽기만 하고 mutate하지 않는다.
+    this.computeGeometry(param);
 
     // about selectLabel
     const selectLabelOption = selectLabel?.option;
@@ -195,19 +257,9 @@ class Line {
     let lastDrawnX = null;
     let lastDrawnY = null;
     this.data.forEach((curr) => {
-      let x = getXPos(curr.x);
-      let y = getYPos(curr.y);
-
-      if (this.isExistGrp && isLinearInterpolation && curr.o === null) {
-        y = getYPos(curr.b ?? 0);
-      }
-
-      if (x !== null) {
-        x += Util.aliasPixel(x);
-      }
-
-      curr.xp = x;
-      curr.yp = y;
+      // 기하 패스(computeGeometry)가 채운 xp/yp를 읽는다. 여기서 mutate하지 않는다.
+      const x = curr.xp;
+      const y = curr.yp;
 
       if (isLinearInterpolation && curr.o === null) {
         return;

@@ -65,11 +65,88 @@ class Scatter {
       return;
     }
 
+    // 기하(xp/yp)는 기하 패스(computeGeometry)가 채운다. 아래 래스터 패스는 그 값을 읽기만 한다.
+    this.computeGeometry(param);
+
     if (this.realTimeScatter) {
       this.realTimeScatterDraw(param);
     } else {
       this.defaultScatterDraw(param);
     }
+  }
+
+  /**
+   * Compute pixel geometry (xp/yp) for drawable points and store it on the main model.
+   * draw와 동일한 dedupe/legend 필터로 그려질 점만 calcItem 한다(기존 동작과 동일).
+   * 래스터 패스(draw)는 calcItem을 호출하지 않고 여기서 채운 xp/yp를 읽는다.
+   * @param {object} param
+   * @returns {undefined}
+   */
+  computeGeometry(param) {
+    if (!this.show) {
+      return;
+    }
+
+    if (this.realTimeScatter) {
+      this.computeRealTimeGeometry(param);
+    } else {
+      this.computeDefaultGeometry(param);
+    }
+  }
+
+  computeDefaultGeometry(param) {
+    const { duple, legendHitInfo, coordinateDedupe } = param;
+    const drawnKeys = new Set();
+    const isDedupeOn = coordinateDedupe !== false;
+
+    for (let i = 0; i < this.data.length; i++) {
+      const item = this.data[i];
+      const key = Util.coordinateKey(item.x, item.y);
+      let shouldDraw;
+      if (legendHitInfo) {
+        shouldDraw = legendHitInfo.sId === this.sId;
+      } else if (isDedupeOn) {
+        shouldDraw = duple.get(key) === this.sId && !drawnKeys.has(key);
+      } else {
+        shouldDraw = true;
+      }
+
+      if (shouldDraw) {
+        this.calcItem(item, param);
+
+        if (item.xp !== null && item.yp !== null) {
+          if (isDedupeOn && !legendHitInfo) drawnKeys.add(key);
+        }
+      }
+    }
+  }
+
+  computeRealTimeGeometry(param) {
+    const { duple, legendHitInfo, coordinateDedupe } = param;
+    const isDedupeOnRT = coordinateDedupe !== false;
+    let totalCount = 0;
+
+    for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
+      for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
+        const item = this.data[this.sId]?.dataGroup[i]?.data[j];
+        totalCount++;
+
+        let shouldDraw;
+        if (legendHitInfo) {
+          shouldDraw = legendHitInfo.sId === this.sId;
+        } else if (isDedupeOnRT) {
+          shouldDraw = duple.get(Util.coordinateKey(item.x, item.y)) === this.sId;
+        } else {
+          shouldDraw = true;
+        }
+
+        if (shouldDraw) {
+          this.calcItem(item, param);
+        }
+      }
+    }
+
+    this._rtTotalCount = totalCount;
   }
 
   /**
@@ -164,8 +241,7 @@ class Scatter {
       }
 
       if (shouldDraw) {
-        this.calcItem(item, param);
-
+        // 기하(xp/yp)는 computeGeometry가 채운다. 여기서는 읽기만 한다.
         if (item.xp !== null && item.yp !== null) {
           const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
           const color = overflowColor || item.dataColor || this.color;
@@ -238,8 +314,7 @@ class Scatter {
         }
 
         if (shouldDraw) {
-          this.calcItem(item, param);
-
+          // 기하(xp/yp)는 computeGeometry가 채운다. 여기서는 읽기만 한다.
           if (item.xp !== null && item.yp !== null) {
             const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
             const baseStrokeColor = overflowColor || item.color || this.color;
