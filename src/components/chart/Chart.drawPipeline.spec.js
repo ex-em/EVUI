@@ -148,6 +148,134 @@ describe('drawChart 파이프라인 호출 순서 (prepare/scrollbar/emit/series
 });
 
 /**
+ * worker series 래스터 경로 (Step 8, B2):
+ * ready + in-flight 여유면 series 를 worker 로 보내고 main series 래스터를 건너뛴다.
+ * bitmap 도착 시 compositing(clear→buffer(axis)→bitmap) + close(메모리), epoch stale-drop,
+ * render-error → main fallback.
+ */
+describe('worker series 래스터 경로 (Step 8)', () => {
+  const makeWorkerChart = ({ accept = true } = {}) => {
+    const calls = [];
+    const rec =
+      (name, ret) =>
+      (...args) => {
+        calls.push({ name, args });
+        return ret;
+      };
+
+    const displayOps = [];
+    const displayCtx = {
+      clearRect: (...args) => displayOps.push({ op: 'clearRect', args }),
+      drawImage: (...args) => displayOps.push({ op: 'drawImage', args }),
+    };
+
+    let sendOk = accept;
+    const gate = {
+      canAcceptRender: () => sendOk,
+      render: rec('gate.render', accept),
+      setFrameHandler() {},
+      setErrorHandler() {},
+    };
+
+    const chart = Object.assign(Object.create(EvChart.prototype), {
+      bufferCtx: { id: 'buffer' },
+      bufferCanvas: { width: 200, height: 100 },
+      displayCanvas: { width: 200, height: 100 },
+      displayCtx,
+      overlayCtx: null,
+      scrollbar: { x: { use: false }, y: { use: false } },
+      listeners: {},
+      renderEpoch: 0,
+      renderWorkerGate: gate,
+      // snapshot/pack 입력(toRenderSnapshot/packSeries 가 읽는 최소 필드).
+      pixelRatio: 2,
+      chartRect: { x1: 0, x2: 200, y1: 0, y2: 100, chartWidth: 200, chartHeight: 100, width: 200, height: 100 },
+      labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      axesSteps: { x: [], y: [] },
+      options: {},
+      seriesInfo: { charts: { pie: [], bar: [], line: [], scatter: [], heatMap: [] } },
+      seriesList: {},
+      initScale: rec('initScale'),
+      prepareScale: rec('prepareScale', { scaleChange: null, scrollbarLabelOffset: {} }),
+      updateScrollbarPosition: rec('updateScrollbarPosition'),
+      drawStaticLayer: rec('drawStaticLayer'),
+      drawSeriesLayer: rec('drawSeriesLayer'),
+      drawSeriesOverlay: rec('drawSeriesOverlay'),
+      drawTip: rec('drawTip'),
+      commitToDisplay: rec('commitToDisplay'),
+    });
+
+    const setSendOk = (v) => {
+      sendOk = v;
+    };
+    return { chart, calls, displayOps, gate, setSendOk };
+  };
+
+  const names = (calls) => calls.map((c) => c.name);
+
+  it('ready 면 static 은 main, series 는 worker 로 보내고 main series 래스터를 건너뛴다', () => {
+    const { chart, calls } = makeWorkerChart({ accept: true });
+    chart.drawChart();
+
+    const order = names(calls);
+    expect(order).toContain('drawStaticLayer');
+    expect(order).toContain('gate.render');
+    // main series 래스터·즉시 commit 은 호출되지 않는다(bitmap 도착 시 합성).
+    expect(order).not.toContain('drawSeriesLayer');
+    expect(order).not.toContain('commitToDisplay');
+    // epoch 가 증가했다.
+    expect(chart.renderEpoch).toBe(1);
+  });
+
+  it('worker 미전송(in-flight 상한 등)이면 main 이 그 프레임의 series 를 그린다', () => {
+    const { chart, calls } = makeWorkerChart({ accept: false });
+    // canAcceptRender=true 지만 render 가 false 반환하는 경계.
+    chart.renderWorkerGate.canAcceptRender = () => true;
+    chart.renderWorkerGate.render = (...args) => {
+      calls.push({ name: 'gate.render', args });
+      return false;
+    };
+    chart.drawChart();
+
+    const order = names(calls);
+    expect(order).toContain('gate.render');
+    expect(order).toContain('drawSeriesLayer');
+    expect(order).toContain('commitToDisplay');
+  });
+
+  it('commitWorkerFrame: epoch 일치 → commitToDisplay(clear+axis)→bitmap 합성 + bitmap.close()', () => {
+    const { chart, displayOps } = makeWorkerChart();
+    // commitToDisplay 가 display clear+static blit 을 atomic 하게 수행(내부에서 clearRect). 그 위에 bitmap 합성.
+    chart.commitToDisplay = (ctx, canvas) => displayOps.push({ op: 'commitToDisplay', canvas });
+    chart.renderEpoch = 4;
+    const close = vi.fn();
+    const bitmap = { close };
+
+    chart.commitWorkerFrame({ epoch: 4, bitmap });
+
+    expect(displayOps.map((o) => o.op)).toEqual(['commitToDisplay', 'drawImage']);
+    expect(close).toHaveBeenCalledTimes(1);
+  });
+
+  it('commitWorkerFrame: stale epoch → drop + bitmap.close(), display 미변경', () => {
+    const { chart, displayOps } = makeWorkerChart();
+    chart.renderEpoch = 9;
+    const close = vi.fn();
+
+    chart.commitWorkerFrame({ epoch: 7, bitmap: { close } });
+
+    expect(close).toHaveBeenCalledTimes(1);
+    expect(displayOps).toHaveLength(0);
+  });
+
+  it('drawSeriesLayerFallback: render-error 시 main series 래스터 + commit', () => {
+    const { chart, calls } = makeWorkerChart();
+    chart.drawSeriesLayerFallback();
+    expect(names(calls)).toEqual(['drawSeriesLayer', 'commitToDisplay']);
+  });
+});
+
+/**
  * RenderCore 경계 가드 (Step 5):
  * RenderCore 단계는 ChartShell 주입값(pixelRatio)만으로 동작하며 document/window/scrollbar DOM/
  * listener 를 직접 읽거나 호출하지 않는다.

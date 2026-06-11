@@ -1,9 +1,24 @@
 import { isNil } from 'lodash-es';
 import { billions, millions, quadrillion, trillion, truthy } from '@/common/utils';
 
-// Text Size 측정용 singleton canvas
-const textMeasureCanvas = document.createElement('canvas');
-const textMeasureCtx = textMeasureCanvas.getContext('2d');
+// Text Size 측정용 2D 컨텍스트(싱글톤).
+// import 시점에 DOM을 만지면 worker(document 없음)에서 import만 해도 throw하므로
+// 최초 호출 시 lazy 생성한다. document가 있으면 canvas, 없으면 OffscreenCanvas로 분기.
+let textMeasureCtx = null;
+
+function getTextMeasureCtx() {
+  if (textMeasureCtx) {
+    return textMeasureCtx;
+  }
+
+  if (typeof document !== 'undefined') {
+    textMeasureCtx = document.createElement('canvas').getContext('2d');
+  } else if (typeof OffscreenCanvas !== 'undefined') {
+    textMeasureCtx = new OffscreenCanvas(1, 1).getContext('2d');
+  }
+
+  return textMeasureCtx;
+}
 
 // colorStringToRgba 결과 캐시. 시리즈 색상은 update 간 거의 불변이고 동일 (색,opacity)
 // 조합이 반복 파싱되므로, 불변 문자열 결과를 메모이즈해 정규식 재실행을 제거한다.
@@ -271,10 +286,12 @@ export default {
       return { width: 2, height: 2 };
     }
 
-    textMeasureCtx.save();
+    const ctx = getTextMeasureCtx();
 
-    textMeasureCtx.font = fontStyle;
-    const metrics = textMeasureCtx.measureText(text);
+    ctx.save();
+
+    ctx.font = fontStyle;
+    const metrics = ctx.measureText(text);
 
     const fontSizeMatch = fontStyle.match(/(\d+(?:\.\d+)?)px/);
     const fontSize = fontSizeMatch ? Number(fontSizeMatch[1]) : 14;
@@ -282,7 +299,7 @@ export default {
     // DOM 기본 line-height 보정 (대략 1.2 ~ 1.3)
     const lineHeight = fontSize * 1.2;
 
-    textMeasureCtx.restore();
+    ctx.restore();
 
     return {
       width: Math.max(Math.ceil(metrics.width), 2),
