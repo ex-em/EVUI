@@ -350,3 +350,62 @@ describe('plugins.interaction findClosestDataIndex', () => {
     expect(result).toBe(-1);
   });
 });
+
+describe('plugins.interaction buildLabelValidMask', () => {
+  it('가시 시리즈 중 유효(non-null) o 값을 가진 라벨만 1로 표시한다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({ data: [{ o: 1 }, { o: null }, { o: 3 }] }),
+      s2: createClosestSeries({ data: [{ o: null }, { o: 2 }, { o: null }] }),
+    });
+
+    // 라벨0: s1, 라벨1: s2, 라벨2: s1 이 각각 유효 → 모두 1
+    expect(Array.from(chart.buildLabelValidMask())).toEqual([1, 1, 1]);
+  });
+
+  it('모든 가시 시리즈가 null/undefined 인 라벨은 0이다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({ data: [{ o: 1 }, { o: null }, { o: undefined }] }),
+      s2: createClosestSeries({ data: [{ o: 5 }, { o: null }, { o: null }] }),
+    });
+
+    expect(Array.from(chart.buildLabelValidMask())).toEqual([1, 0, 0]);
+  });
+
+  it('show=false 시리즈의 값은 mask 에 반영되지 않는다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({ show: false, data: [{ o: 1 }, { o: 2 }] }),
+      s2: createClosestSeries({ data: [{ o: null }, { o: 9 }] }),
+    });
+
+    // 라벨0: 값을 가진 건 show=false 인 s1 뿐 → 0, 라벨1: 가시 s2 가 유효 → 1
+    expect(Array.from(chart.buildLabelValidMask())).toEqual([0, 1]);
+  });
+
+  it('mask 길이는 가시 시리즈의 최대 데이터 길이를 따른다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({ data: [{ o: 1 }] }),
+      s2: createClosestSeries({ data: [{ o: 1 }, { o: 2 }, { o: 3 }] }),
+    });
+
+    expect(chart.buildLabelValidMask().length).toBe(3);
+  });
+
+  it('결과를 this.labelValidMask 에 캐시하고 동일 Uint8Array 참조를 반환한다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({ data: [{ o: 1 }] }),
+    });
+
+    const mask = chart.buildLabelValidMask();
+    expect(mask).toBeInstanceOf(Uint8Array);
+    expect(chart.labelValidMask).toBe(mask);
+  });
+
+  it('sIds 미지정 시 전체 시리즈를 대상으로 한다', () => {
+    const chart = createChartForClosestIndex({
+      s1: createClosestSeries({ data: [{ o: null }] }),
+      s2: createClosestSeries({ data: [{ o: 7 }] }),
+    });
+
+    expect(Array.from(chart.buildLabelValidMask())).toEqual([1]);
+  });
+});
