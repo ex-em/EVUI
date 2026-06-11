@@ -1,0 +1,299 @@
+import { describe, it, expect } from 'vitest';
+import Line from '../element/element.line';
+import Bar from '../element/element.bar';
+import Pie from '../element/element.pie';
+import {
+  RENDER_SNAPSHOT_VERSION,
+  toRenderSnapshot,
+  extractRenderGeometry,
+  packSeries,
+} from './render.snapshot';
+
+/**
+ * Step 6: render-snapshot-contract — worker 입력/기하 계약 가드.
+ *
+ * 스냅샷→RenderCore 라운드트립은 이 step 에선 테스트(오프라인) 한정이며 프로덕션 렌더 경로에
+ * 연결하지 않는다(실제 소비자 경로는 Step 7/8). 여기선 계약(직렬화·결정성·기하 동치·pack copy 경계)만 검증한다.
+ */
+
+const baseParam = () => ({
+  chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+  labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+  axesSteps: {
+    x: [{ graphMin: 0, graphMax: 4, minIndex: 0, maxIndex: 4 }],
+    y: [{ graphMin: 0, graphMax: 100, minIndex: 0, maxIndex: 4 }],
+  },
+});
+
+const makeLine = () => {
+  const line = new Line('lineA', { color: '#112233' }, 0);
+  line.show = true;
+  line.xAxisIndex = 0;
+  line.yAxisIndex = 0;
+  line.data = [
+    { x: 0, y: 10, o: 10, b: 0 },
+    { x: 1, y: 20, o: 20, b: 0 },
+    { x: 2, y: null, o: null, b: 0 },
+    { x: 3, y: 40, o: 40, b: 0 },
+  ];
+  return line;
+};
+
+const makeBar = () => {
+  const bar = new Bar('barA', { color: '#445566' }, 0, false);
+  bar.show = true;
+  bar.xAxisIndex = 0;
+  bar.yAxisIndex = 0;
+  bar.data = [
+    { x: 0, y: 10, o: 10, b: 0 },
+    { x: 1, y: 30, o: 30, b: 0 },
+    { x: 2, y: 50, o: 50, b: 0 },
+  ];
+  return bar;
+};
+
+const makePie = () => {
+  const pie = new Pie('pieA', {}, 0);
+  pie.data = [
+    { value: 30, sa: 0, ea: 1 },
+    { value: 70, sa: 1, ea: 4 },
+  ];
+  // pie 기하는 plugins.pie 가 main 에서 인스턴스에 써 둔다(여기선 그 결과를 직접 모사).
+  pie.centerX = 50;
+  pie.centerY = 60;
+  pie.radius = 40;
+  pie.startAngle = 0;
+  pie.endAngle = 2 * Math.PI;
+  return pie;
+};
+
+/**
+ * computeGeometry 를 선행 호출한(=Step 2 main 기하가 채워진) core-유사 fixture 를 만든다.
+ * @param {object} [opts]
+ * @returns {object}
+ */
+const makeCore = (opts = {}) => {
+  const param = baseParam();
+  const line = makeLine();
+  const bar = makeBar();
+  const pie = makePie();
+
+  // main 기하 계산(Step 2). draw 없이 기하만.
+  line.computeGeometry(param);
+  bar.computeGeometry({ ...param, showIndex: 0, showSeriesCount: 1, thickness: 1, cPadRatio: 0.2 });
+
+  return {
+    pixelRatio: 2,
+    chartRect: param.chartRect,
+    labelOffset: param.labelOffset,
+    axesSteps: param.axesSteps,
+    options: {
+      type: 'line',
+      horizontal: false,
+      thickness: 1,
+      cPadRatio: 0.2,
+      coordinateDedupe: false,
+      // 직렬화 불가 콜백이 섞여 들어와도 스냅샷에서 빠져야 한다.
+      onClick: () => {},
+      ...opts.options,
+    },
+    seriesInfo: { charts: { line: ['lineA'], bar: ['barA'], scatter: [], heatMap: [], pie: ['pieA'] } },
+    seriesList: { lineA: line, barA: bar, pieA: pie },
+  };
+};
+
+describe('render.snapshot — RenderInput 계약 (직렬화/결정성)', () => {
+  it('structured-clone smoke: 스냅샷이 structuredClone 가능하고 function/class 가 없다', () => {
+    const core = makeCore();
+    const snapshot = toRenderSnapshot(core, 1);
+
+    // function/class instance 가 섞였다면 structuredClone 이 throw 한다.
+    expect(() => structuredClone(snapshot)).not.toThrow();
+
+    // 어디에도 function 이 없어야 한다(재귀 검사).
+    const assertNoFunction = (val) => {
+      if (val && typeof val === 'object') {
+        Object.values(val).forEach(assertNoFunction);
+      } else {
+        expect(typeof val).not.toBe('function');
+      }
+    };
+    assertNoFunction(snapshot);
+
+    // options 의 콜백(onClick)은 누락돼야 한다.
+    expect(snapshot.options).not.toHaveProperty('onClick');
+    // 시리즈 클래스 인스턴스가 plain 메타로 추출됐다.
+    expect(snapshot.series.lineA.sId).toBe('lineA');
+    expect(snapshot.series.lineA.type).toBe('line');
+    expect(snapshot.version).toBe(RENDER_SNAPSHOT_VERSION);
+  });
+
+  it('series 메타에 function(showValue.formatter / color 콜백)이 들어와도 drop 된다', () => {
+    const core = makeCore();
+    core.seriesList.barA.showValue = { use: true, fontSize: 12, formatter: () => 'X' };
+    core.seriesList.lineA.color = () => '#fff';
+
+    const snapshot = toRenderSnapshot(core, 1);
+
+    expect(() => structuredClone(snapshot)).not.toThrow();
+    expect(snapshot.series.barA.showValue).toEqual({ use: true, fontSize: 12 });
+    expect(snapshot.series.barA.showValue).not.toHaveProperty('formatter');
+    // color 콜백은 drop → 키 누락(worker-unsupported → main fallback).
+    expect(snapshot.series.lineA).not.toHaveProperty('color');
+  });
+
+  it('axesSteps 의 function 필드는 제외되고 수치만 남는다', () => {
+    const core = makeCore();
+    core.axesSteps.x[0].format = (v) => `${v}`;
+
+    const snapshot = toRenderSnapshot(core, 1);
+
+    expect(snapshot.axesSteps.x[0].graphMin).toBe(0);
+    expect(snapshot.axesSteps.x[0].graphMax).toBe(4);
+    expect(snapshot.axesSteps.x[0]).not.toHaveProperty('format');
+  });
+
+  it('deterministic: 같은 model 입력이면 epoch 외 모든 필드가 동일하다', () => {
+    const a = toRenderSnapshot(makeCore(), 1);
+    const b = toRenderSnapshot(makeCore(), 99);
+
+    expect(a.epoch).toBe(1);
+    expect(b.epoch).toBe(99);
+
+    const stripEpoch = (s) => ({ ...s, epoch: 0 });
+    expect(stripEpoch(a)).toEqual(stripEpoch(b));
+  });
+
+  it('seriesOrder 가 seriesInfo.charts 그리기 순서를 보존한다', () => {
+    const snapshot = toRenderSnapshot(makeCore(), 1);
+    expect(snapshot.seriesOrder).toEqual({
+      line: ['lineA'],
+      bar: ['barA'],
+      scatter: [],
+      heatMap: [],
+      pie: ['pieA'],
+    });
+  });
+});
+
+describe('render.snapshot — RenderGeometry 계약 (main 계산 = 정답)', () => {
+  it('geometry 동치: extractRenderGeometry 가 computeGeometry 후 item.xp/yp 와 동일(line)', () => {
+    const core = makeCore();
+    const geom = extractRenderGeometry(core);
+
+    const line = core.seriesList.lineA;
+    expect(geom.lineA.kind).toBe('point');
+    expect(geom.lineA.xp).toEqual(line.data.map((d) => d.xp));
+    expect(geom.lineA.yp).toEqual(line.data.map((d) => d.yp));
+  });
+
+  it('geometry 동치: bar 는 xp/yp/w/h 를 모두 노출한다', () => {
+    const core = makeCore();
+    const geom = extractRenderGeometry(core);
+
+    const bar = core.seriesList.barA;
+    expect(geom.barA.kind).toBe('rect');
+    expect(geom.barA.xp).toEqual(bar.data.map((d) => d.xp));
+    expect(geom.barA.yp).toEqual(bar.data.map((d) => d.yp));
+    expect(geom.barA.w).toEqual(bar.data.map((d) => d.w));
+    expect(geom.barA.h).toEqual(bar.data.map((d) => d.h));
+    // 실제로 채워진 픽셀 기하다(전부 null 이 아님).
+    expect(geom.barA.xp.some((v) => typeof v === 'number')).toBe(true);
+  });
+
+  it('pie 는 각도 기반 기하로 노출된다(xp/yp/w/h 강제 안 함)', () => {
+    const core = makeCore();
+    const geom = extractRenderGeometry(core);
+
+    expect(geom.pieA).toEqual({
+      kind: 'arc',
+      centerX: 50,
+      centerY: 60,
+      radius: 40,
+      startAngle: 0,
+      endAngle: 2 * Math.PI,
+      slices: [
+        { sa: 0, ea: 1 },
+        { sa: 1, ea: 4 },
+      ],
+    });
+  });
+
+  it('extractRenderGeometry 는 재계산하지 않는다(computeGeometry 미선행이면 xp=null)', () => {
+    const bareLine = makeLine(); // computeGeometry 호출 전
+    const core = {
+      seriesList: { lineA: bareLine },
+    };
+    const geom = extractRenderGeometry(core);
+    expect(geom.lineA.xp).toEqual([null, null, null, null]);
+  });
+});
+
+describe('render.snapshot — pack/transfer 안전 (copy 경계)', () => {
+  it('packSeries 는 Float64Array + transferable buffer 로 묶고 null 은 NaN sentinel 이 된다', () => {
+    const snapshot = toRenderSnapshot(makeCore(), 1);
+    const { columns, transferList } = packSeries(snapshot);
+
+    expect(columns.lineA.x).toBeInstanceOf(Float64Array);
+    expect(columns.lineA.length).toBe(4);
+    // line.data[2].y = null → NaN
+    expect(Number.isNaN(columns.lineA.y[2])).toBe(true);
+    expect(columns.lineA.y[0]).toBe(10);
+
+    // pie 는 value 컬럼.
+    expect(columns.pieA.value).toBeInstanceOf(Float64Array);
+    expect(Array.from(columns.pieA.value)).toEqual([30, 70]);
+
+    // transferList 는 새로 만든 사본 버퍼들.
+    expect(transferList.length).toBeGreaterThan(0);
+    transferList.forEach((buf) => expect(buf).toBeInstanceOf(ArrayBuffer));
+  });
+
+  it('항상 copy: pack 한 버퍼를 transfer(detach)해도 스냅샷 원본 배열이 멀쩡하다', () => {
+    const snapshot = toRenderSnapshot(makeCore(), 1);
+    const sourceX = snapshot.series.lineA.data.x;
+    const sourceSnapshot = sourceX.slice();
+
+    const { columns } = packSeries(snapshot);
+    const packedBuffer = columns.lineA.x.buffer;
+
+    // worker 로 transfer 하는 상황을 모사: 패킹된 버퍼를 detach.
+    structuredClone(packedBuffer, { transfer: [packedBuffer] });
+    expect(packedBuffer.byteLength).toBe(0); // 패킹 버퍼는 detach 됨
+
+    // 그러나 main 이 계속 쓰는 원본 plain 배열은 detach 되지 않는다(copy 경계).
+    expect(snapshot.series.lineA.data.x).toEqual(sourceSnapshot);
+    expect(snapshot.series.lineA.data.x[0]).toBe(0);
+  });
+
+  it('대용량 직렬화 벤치(방향성): 1000×60 pack 시간 기록(Step 8 packMs 기준선)', () => {
+    // 60 시리즈 × 1000 포인트.
+    const series = {};
+    for (let s = 0; s < 60; s++) {
+      const x = new Array(1000);
+      const y = new Array(1000);
+      const o = new Array(1000);
+      const b = new Array(1000);
+      for (let i = 0; i < 1000; i++) {
+        x[i] = i;
+        y[i] = i * 0.5;
+        o[i] = i * 0.5;
+        b[i] = 0;
+      }
+      series[`s${s}`] = { sId: `s${s}`, type: 'line', data: { x, y, o, b } };
+    }
+    const snapshot = { version: RENDER_SNAPSHOT_VERSION, epoch: 0, series };
+
+    const t0 = performance.now();
+    const { columns, transferList } = packSeries(snapshot);
+    const packMs = performance.now() - t0;
+
+    // eslint-disable-next-line no-console
+    console.log(`[render.snapshot] pack 1000x60 (60 series x 1000 pts) packMs=${packMs.toFixed(2)}ms`);
+
+    // 방향성 가드: 완료되고(throw 없음) 60×4 컬럼 버퍼가 나온다.
+    expect(Object.keys(columns)).toHaveLength(60);
+    expect(transferList).toHaveLength(60 * 4);
+    expect(columns.s0.length).toBe(1000);
+  });
+});
