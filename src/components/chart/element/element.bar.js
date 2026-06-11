@@ -35,6 +35,173 @@ class Bar {
   }
 
   /**
+   * Compute pixel geometry (xp/yp/w/h) for each bar and store it on the main model.
+   * 기하 계산만 수행한다(canvas 그리기 없음). hit-test가 item.xp/yp/w/h 및 size/visibleStartIndex/
+   * filteredCount를 소비한다. 좌표 의미·stacked 누적·반올림·null 처리는 draw와 동일해야 한다.
+   * @param {object} param     object for drawing series data
+   * @returns {undefined}
+   */
+  computeGeometry(param) {
+    if (!this.show) {
+      return;
+    }
+
+    const chartRect = param.chartRect;
+    const labelOffset = param.labelOffset;
+    const axesSteps = param.axesSteps;
+    const showIndex = param.showIndex;
+    const thickness = param.thickness;
+    const showSeriesCount = param.showSeriesCount;
+
+    this.isHorizontal = param.isHorizontal;
+
+    const { isHorizontal } = this;
+
+    let x;
+    let y;
+
+    const minmaxX = axesSteps.x[this.xAxisIndex];
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    let totalCount = this.data.length;
+    const [minIndex, maxIndex] = isHorizontal
+      ? [minmaxY.minIndex, minmaxY.maxIndex]
+      : [minmaxX.minIndex, minmaxX.maxIndex];
+
+    if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
+      totalCount = maxIndex - minIndex + 1;
+    }
+
+    const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+
+    const xAxisPosition = chartRect.x1 + labelOffset.left;
+    const yAxisPosition = chartRect.y2 - labelOffset.bottom;
+    const xZeroPosition = Canvas.calculateX(0, minmaxX.graphMin, minmaxX.graphMax, xArea);
+    const yZeroPosition = Canvas.calculateY(0, minmaxY.graphMin, minmaxY.graphMax, yArea);
+
+    const xsp = isHorizontal ? xAxisPosition + xZeroPosition : xAxisPosition;
+    const ysp = isHorizontal ? yAxisPosition : yAxisPosition + yZeroPosition;
+
+    const dArea = isHorizontal ? yArea : xArea;
+    const cArea = dArea / (totalCount || 1);
+
+    let cPad;
+    const isUnableToDrawCategoryPadding = param.cPadRatio >= 1 || param.cPadRatio <= 0;
+    if (isUnableToDrawCategoryPadding) {
+      cPad = 2;
+    } else {
+      cPad = Math.max((dArea * (param.cPadRatio / 2)) / totalCount, 2);
+    }
+
+    let bArea;
+    let w;
+    let h;
+
+    bArea = cArea > cPad * 2 ? cArea - cPad * 2 : cArea;
+    bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
+
+    const size = this.calculateBarSize(thickness, bArea);
+    w = isHorizontal ? null : size;
+    h = isHorizontal ? size : null;
+
+    const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
+    const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
+
+    this.size.cat = cArea;
+    this.size.bar = bArea;
+    this.size.cPad = cPad;
+    this.size.bPad = bPad;
+    this.size.w = w;
+    this.size.h = h;
+    this.size.ix = barSeriesX;
+    this.chartRect = chartRect;
+    this.labelOffset = labelOffset;
+    this.borderRadius = param.borderRadius;
+    this.filteredCount = totalCount;
+
+    const startIndex = truthyNumber(minIndex) ? minIndex : 0;
+    const endIndex = truthyNumber(maxIndex) ? maxIndex : this.data.length - 1;
+
+    this.visibleStartIndex = startIndex;
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      const screenIndex = i - startIndex;
+      const item = this.data[i];
+      if (item) {
+        const categoryPoint = isHorizontal
+          ? ysp - cArea * screenIndex - cPad
+          : xsp + cArea * screenIndex + cPad;
+
+        if (isHorizontal) {
+          x = xsp;
+          y = Math.round(categoryPoint - (bArea * barSeriesX - (h + bPad)));
+        } else {
+          x = Math.round(categoryPoint + (bArea * barSeriesX - (w + bPad)));
+          y = ysp;
+        }
+
+        if (isHorizontal) {
+          const barValue = item.b ? item.o : item.x;
+          const _barValue = Math.min(Math.max(barValue, minmaxX.graphMin), minmaxX.graphMax);
+          w = Canvas.calculateX(
+            _barValue,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea,
+            -xZeroPosition,
+          );
+
+          if (item.b) {
+            const _baseValue = Math.min(Math.max(item.b, minmaxX.graphMin), minmaxX.graphMax);
+            x = Canvas.calculateX(
+              _baseValue,
+              minmaxX.graphMin,
+              minmaxX.graphMax,
+              xArea,
+              xsp - xZeroPosition,
+            );
+          }
+
+          const minimumBarWidth = barValue > 0 ? -1 : 1;
+          w = barValue && Math.abs(w) === 0 ? minimumBarWidth : w;
+        } else {
+          const barValue = item.b ? item.o : item.y;
+          const _barValue = Math.min(Math.max(barValue, minmaxY.graphMin), minmaxY.graphMax);
+          h = Canvas.calculateY(
+            _barValue,
+            minmaxY.graphMin,
+            minmaxY.graphMax,
+            yArea,
+            -yZeroPosition,
+          );
+
+          if (item.b) {
+            const _baseValue = Math.min(Math.max(item.b, minmaxY.graphMin), minmaxY.graphMax);
+            y = Canvas.calculateY(
+              _baseValue,
+              minmaxY.graphMin,
+              minmaxY.graphMax,
+              yArea,
+              ysp - yZeroPosition,
+            );
+          }
+
+          const minimumBarHeight = barValue > 0 ? -1 : 1;
+          h = barValue && Math.abs(h) === 0 ? minimumBarHeight : h;
+        }
+
+        // 좌표 및 인덱스 정보 세팅 (툴팁/hover용)
+        item.xp = x; // eslint-disable-line
+        item.yp = y; // eslint-disable-line
+        item.w = w; // eslint-disable-line
+        item.h = isHorizontal ? -h : h; // eslint-disable-line
+        item.index = i;
+      }
+    }
+  }
+
+  /**
    * Draw series data
    * @param {object} param     object for drawing series data
    *
@@ -44,6 +211,9 @@ class Bar {
     if (!this.show) {
       return;
     }
+
+    // 기하(xp/yp/w/h)는 기하 패스가 채운다. 아래 래스터 패스는 로컬 재계산으로 그리며 mutate하지 않는다.
+    this.computeGeometry(param);
 
     const ctx = param.ctx;
     const chartRect = param.chartRect;
@@ -260,13 +430,7 @@ class Bar {
             index: i,
           });
         }
-
-        // 좌표 및 인덱스 정보 세팅 (툴팁/hover용)
-        item.xp = x; // eslint-disable-line
-        item.yp = y; // eslint-disable-line
-        item.w = w; // eslint-disable-line
-        item.h = isHorizontal ? -h : h; // eslint-disable-line
-        item.index = i;
+        // 기하(xp/yp/w/h/index)는 computeGeometry가 채운다. 래스터 패스는 mutate하지 않는다.
       }
     }
   }

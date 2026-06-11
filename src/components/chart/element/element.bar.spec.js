@@ -7,6 +7,44 @@ const createBar = (overrides = {}) => {
   return bar;
 };
 
+const noop = () => {};
+const makeCtx = () => ({
+  save: noop,
+  restore: noop,
+  beginPath: noop,
+  closePath: noop,
+  fill: noop,
+  fillRect: noop,
+  stroke: noop,
+  clip: noop,
+  moveTo: noop,
+  lineTo: noop,
+  arcTo: noop,
+  measureText: () => ({ width: 0 }),
+});
+
+const baseParam = (ctx) => ({
+  ctx,
+  chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+  labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+  axesSteps: { x: [{ graphMin: 0, graphMax: 4 }], y: [{ graphMin: 0, graphMax: 100 }] },
+  showIndex: 0,
+  showSeriesCount: 1,
+  isHorizontal: false,
+  thickness: 1,
+  cPadRatio: 0.2,
+  borderRadius: 0,
+});
+
+const makeBar = (data) => {
+  const bar = new Bar('s0', { color: '#000000' }, 0, false);
+  bar.data = data;
+  bar.xAxisIndex = 0;
+  bar.yAxisIndex = 0;
+  bar.show = true;
+  return bar;
+};
+
 describe('Bar Element', () => {
   describe('calculateBarSize', () => {
     it('px 문자열을 파싱하여 크기를 반환한다', () => {
@@ -244,6 +282,67 @@ describe('Bar Element', () => {
       const item = bar.findGraphData([40, 10], false, undefined, false);
       expect(item.hit).toBe(false);
       expect(item.directHit).toBeFalsy();
+    });
+  });
+
+  /**
+   * 기하/래스터 분리 회귀 가드 — computeGeometry(기하 패스)와 draw(래스터 패스)의 hit-test
+   * 기하(xp/yp/w/h) 일관성을 검증한다(Step 2 geometry-hittest-split).
+   */
+  describe('기하/래스터 분리 (computeGeometry ↔ draw)', () => {
+    it('computeGeometry 단독으로 hit-test용 xp/yp/w/h + visibleStartIndex/filteredCount 가 채워진다', () => {
+      const data = [
+        { x: 0, y: 20, o: 20 },
+        { x: 1, y: 50, o: 50 },
+        { x: 2, y: 80, o: 80 },
+      ];
+      const bar = makeBar(data);
+      bar.computeGeometry(baseParam(null)); // ctx 없이도 동작(그리기 없음)
+
+      data.forEach((p) => {
+        expect(typeof p.xp).toBe('number');
+        expect(typeof p.yp).toBe('number');
+        expect(typeof p.w).toBe('number');
+        expect(typeof p.h).toBe('number');
+      });
+      expect(bar.visibleStartIndex).toBe(0);
+      expect(bar.filteredCount).toBe(3);
+      // 값이 클수록 막대 높이(|h|)가 커진다.
+      expect(Math.abs(data[2].h)).toBeGreaterThan(Math.abs(data[0].h));
+    });
+
+    it('래스터 패스(draw)는 기하를 바꾸지 않는다 — computeGeometry 결과와 동일', () => {
+      const data = [
+        { x: 0, y: 20, o: 20 },
+        { x: 1, y: 50, o: 50 },
+        { x: 2, y: 80, o: 80 },
+      ];
+      const geomBar = makeBar(data.map((d) => ({ ...d })));
+      geomBar.computeGeometry(baseParam(null));
+      const expected = geomBar.data.map(({ xp, yp, w, h }) => ({ xp, yp, w, h }));
+
+      const drawBar = makeBar(data.map((d) => ({ ...d })));
+      drawBar.draw(baseParam(makeCtx()));
+      const drawn = drawBar.data.map(({ xp, yp, w, h }) => ({ xp, yp, w, h }));
+
+      expect(drawn).toEqual(expected);
+    });
+
+    it('update→hover 일관성: 데이터 갱신 후 다시 계산하면 막대 높이가 최신 데이터로 갱신된다', () => {
+      const data = [
+        { x: 0, y: 20, o: 20 },
+        { x: 1, y: 50, o: 50 },
+      ];
+      const bar = makeBar(data);
+      bar.computeGeometry(baseParam(null));
+      const before = data[0].h;
+
+      data[0].y = 90;
+      data[0].o = 90;
+      bar.computeGeometry(baseParam(null));
+
+      expect(data[0].h).not.toBe(before);
+      expect(Math.abs(data[0].h)).toBeGreaterThan(Math.abs(before));
     });
   });
 });

@@ -90,3 +90,97 @@ describe('HeatMap Element', () => {
     });
   });
 });
+
+/**
+ * heatMap overlay 분리 회귀 가드 — 래스터(draw, worker 후보)와 highlight overlay(drawOverlay, main)
+ * 분리(Step 3 rendercore-series-raster).
+ *
+ *  1) draw(래스터)는 overlayCtx를 만지지 않는다 — getItemInfo가 isHighlight를 줘도 itemHighlight를
+ *     호출하지 않는다(=overlay가 worker 후보 raster에 섞이지 않는다).
+ *  2) drawOverlay(main)는 show && isHighlight 항목만 전달된 overlayCtx로 highlight한다.
+ *  3) overlayCtx가 없으면(brush) drawOverlay는 no-op.
+ */
+describe('element.heatMap overlay 분리 (draw 래스터 ↔ drawOverlay overlay)', () => {
+  const noop = () => {};
+  const makeCtx = () => ({
+    save: noop,
+    restore: noop,
+    beginPath: noop,
+    closePath: noop,
+    fill: noop,
+    stroke: noop,
+    arc: noop,
+    rect: noop,
+    fillRect: noop,
+    measureText: () => ({ width: 0 }),
+    fillText: noop,
+  });
+
+  // 기하/색 결정 로직은 stub으로 고정해 overlay 라우팅만 검증한다.
+  const makeHeatMap = () => {
+    const hm = Object.create(HeatMap.prototype);
+    Object.assign(hm, {
+      show: true,
+      xAxisIndex: 0,
+      yAxisIndex: 0,
+      data: [{ x: 0, y: 0, o: 50 }],
+      size: { w: 0, h: 0 },
+      stroke: { show: false, lineWidth: 0 },
+      showValue: { use: false },
+      computeGeometry: noop,
+      calculateXY: () => 10,
+      getItemInfo: () => ({
+        show: true,
+        opacity: 1,
+        dataColor: 'rgb(1,2,3)',
+        id: 'color#0',
+        isHighlight: true,
+      }),
+      drawItem: noop,
+      drawValueLabels: noop,
+    });
+
+    const highlightCtxList = [];
+    hm.itemHighlight = (_item, ctx) => highlightCtxList.push(ctx);
+
+    return { hm, highlightCtxList };
+  };
+
+  const baseParam = (extra) => ({
+    chartRect: { x1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    axesSteps: {
+      x: [{ oriSteps: 1, graphMin: 0, graphMax: 1 }],
+      y: [{ oriSteps: 1, graphMin: 0, graphMax: 1 }],
+    },
+    selectItem: { option: {}, selected: {} },
+    selectLabel: { option: {}, selected: {} },
+    ...extra,
+  });
+
+  it('draw(래스터)는 isHighlight여도 itemHighlight(overlay)를 호출하지 않는다', () => {
+    const { hm, highlightCtxList } = makeHeatMap();
+    hm.draw(baseParam({ ctx: makeCtx() }));
+    expect(highlightCtxList).toHaveLength(0);
+  });
+
+  it('drawOverlay(main)는 show && isHighlight 항목을 전달된 overlayCtx로 highlight한다', () => {
+    const { hm, highlightCtxList } = makeHeatMap();
+    const overlayCtx = makeCtx();
+    hm.drawOverlay(baseParam({ overlayCtx }));
+    expect(highlightCtxList).toEqual([overlayCtx]);
+  });
+
+  it('drawOverlay는 overlayCtx가 없으면(brush) no-op', () => {
+    const { hm, highlightCtxList } = makeHeatMap();
+    hm.drawOverlay(baseParam({ overlayCtx: undefined }));
+    expect(highlightCtxList).toHaveLength(0);
+  });
+
+  it('drawOverlay는 isHighlight=false면 highlight하지 않는다', () => {
+    const { hm, highlightCtxList } = makeHeatMap();
+    hm.getItemInfo = () => ({ show: true, isHighlight: false });
+    hm.drawOverlay(baseParam({ overlayCtx: makeCtx() }));
+    expect(highlightCtxList).toHaveLength(0);
+  });
+});
