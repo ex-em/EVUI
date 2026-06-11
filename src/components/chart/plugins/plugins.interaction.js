@@ -1073,10 +1073,13 @@ const modules = {
               }
             }
 
-            // fallback 후보: hit 여부와 무관하게 거리가 가장 가까운 시리즈.
+            // fallback 후보: 거리가 가장 가까운 시리즈. ② hitId 는 한 번 정해지면 풀리지 않으므로,
+            // 이미 hit 이 잡힌 뒤에는 fallback 이 소비되지 않는다(아래 `if (hitId === null)` 에서만 사용).
+            // 따라서 hitId 가 아직 없을 때만 calcBoxDistance 를 계산해 hover 당 중복 계산을 줄인다.
             // 참고: 이 블록은 outer `if (gdata !== null && gdata !== undefined)` 안에 있어서
             // 값이 null 인 시리즈는 items 수집 단계에서 이미 걸러진 상태. 별도 null 값 가드 불필요.
             if (
+              hitId === null &&
               item.data.xp !== undefined &&
               item.data.yp !== undefined &&
               item.data.xp !== null &&
@@ -1120,6 +1123,49 @@ const modules = {
     }
 
     return { items, hitId, maxTip: [maxs, maxv], maxHighlight };
+  },
+
+  /**
+   * 라벨 인덱스별 "유효(non-null) o 값을 가진 가시(show) 시리즈가 하나라도 있는가"를 사전 계산한다.
+   *
+   * findClosestDataIndex 가 hover 마다 라벨별로 sIds.some() 을 돌려 유효성을 검사하던 것
+   * (O(라벨×시리즈) — hit test 의 dominant term)을, 이 mask 의 O(1) 조회로 대체하기 위한 것이다.
+   * 빌드 자체는 O(라벨×시리즈)이지만 hover 가 아니라 createDataSet(데이터 변경·시리즈 show 토글)
+   * 시점에 1회만 수행되므로 hover hot path 에서 곱셈항이 사라진다.
+   *
+   * 무효화: 데이터 변경·범례(show) 토글은 모두 update()→createDataSet() 를 재호출하며,
+   * createDataSet 가 끝날 때 이 mask 를 다시 만든다(아래 model.store.createDataSet 참고).
+   *
+   * @param {array} [sIds] series IDs (기본: 전체 시리즈)
+   * @returns {Uint8Array} mask[i] === 1 이면 라벨 i 에 유효 데이터를 가진 가시 시리즈가 존재
+   */
+  buildLabelValidMask(sIds) {
+    const ids = sIds ?? Object.keys(this.seriesList);
+
+    let maxLen = 0;
+    for (let s = 0; s < ids.length; s++) {
+      const series = this.seriesList[ids[s]];
+      if (series?.show && series.data?.length > maxLen) {
+        maxLen = series.data.length;
+      }
+    }
+
+    const mask = new Uint8Array(maxLen);
+    for (let s = 0; s < ids.length; s++) {
+      const series = this.seriesList[ids[s]];
+      if (series?.show && series.data) {
+        const { data } = series;
+        for (let i = 0; i < data.length; i++) {
+          const o = data[i]?.o;
+          if (o !== null && o !== undefined) {
+            mask[i] = 1;
+          }
+        }
+      }
+    }
+
+    this.labelValidMask = mask;
+    return mask;
   },
 
   /**
@@ -1176,14 +1222,17 @@ const modules = {
     let closestDistance = Infinity;
     let closestIndex = -1;
 
+    // ③ per-label 유효성 검사: 매 hover sIds.some()(O(라벨×시리즈)) 대신 사전계산 mask 를 O(1) 조회한다.
+    // 정상 경로에서는 createDataSet 가 mask 를 만들어두지만, createDataSet 를 거치지 않는 경로
+    // (예: 단위 테스트)에서도 동일 결과를 내도록 mask 가 없거나 길이가 모자라면 여기서 1회 build & cache.
+    let mask = this.labelValidMask;
+    if (!disableNullLabelSnap && (!mask || mask.length < referenceData.length)) {
+      mask = this.buildLabelValidMask(sIds);
+    }
+
     // 각 라벨에서 가장 가까운 것 찾기 (disableNullLabelSnap=true 면 all-null 라벨도 후보)
     for (let i = 0; i < referenceData.length; i++) {
-      const hasValidData =
-        disableNullLabelSnap ||
-        sIds.some((sId) => {
-          const series = this.seriesList[sId];
-          return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
-        });
+      const hasValidData = disableNullLabelSnap || mask[i] === 1;
 
       if (hasValidData) {
         const point = referenceData[i];

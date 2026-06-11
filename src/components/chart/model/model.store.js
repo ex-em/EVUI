@@ -58,68 +58,80 @@ const modules = {
           for (let s = 0; s < seriesIDs.length; s++) {
             const seriesID = seriesIDs[s];
             const series = this.seriesList[seriesID];
-            const rawData = data?.[seriesID];
-            const { passingValue, interpolation } = series;
-            const needsTransform =
-              interpolation === 'zero' || (passingValue != null && passingValue !== undefined);
 
-            let hasPassingValueInData = false;
-            let sData;
+            // show=false 시리즈는 element.draw 가 이미 그리지 않고, getStoreMinMax·
+            // buildLabelValidMask 도 show 시리즈만 집계하므로(축 범위·hit test 에 미반영)
+            // 변환 자체를 건너뛴다 — 출력 불변. show 상태는 덮어쓰지 않는다(다시 켜면
+            // update()→createDataSet 재호출로 현재 데이터로 변환됨).
+            if (series && series.show !== false) {
+              const rawData = data?.[seriesID];
+              const { passingValue, interpolation } = series;
+              const needsTransform = interpolation === 'zero'
+                || (passingValue != null && passingValue !== undefined);
 
-            if (!rawData) {
-              sData = rawData;
-            } else if (!needsTransform) {
-              sData = rawData;
-            } else {
-              sData = new Array(rawData.length);
-              for (let i = 0; i < rawData.length; i++) {
-                const item = rawData[i];
-                if (interpolation === 'zero' && !item) {
-                  sData[i] = 0;
-                } else if (item === passingValue) {
-                  hasPassingValueInData = true;
-                  sData[i] = null;
-                } else {
-                  sData[i] = item;
-                }
-              }
-            }
+              let hasPassingValueInData = false;
+              let sData;
 
-            series.hasPassingValueInData = hasPassingValueInData;
-
-            if (series && sData) {
-              const inStackGroup = series.isExistGrp && !series.isOverlapping;
-              let tops = null;
-              if (inStackGroup) {
-                tops = stackTops.get(series.groupIndex);
-                if (!tops) {
-                  tops = { pos: [], neg: [] };
-                  stackTops.set(series.groupIndex, tops);
-                }
-              }
-
-              if (inStackGroup && series.stackIndex) {
-                series.data = this.addSeriesStackDS(sData, label, series.stackIndex, tops);
+              if (!rawData) {
+                sData = rawData;
+              } else if (!needsTransform) {
+                sData = rawData;
               } else {
-                series.data = this.addSeriesDS(
-                  sData,
-                  label,
-                  series.isExistGrp,
-                  basePassingValue,
-                  series.data,
-                );
+                sData = new Array(rawData.length);
+                for (let i = 0; i < rawData.length; i++) {
+                  const item = rawData[i];
+                  if (interpolation === 'zero' && !item) {
+                    sData[i] = 0;
+                  } else if (item === passingValue) {
+                    hasPassingValueInData = true;
+                    sData[i] = null;
+                  } else {
+                    sData[i] = item;
+                  }
+                }
               }
-              series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
 
-              // 이 시리즈가 이후 스택 시리즈의 base 가 되므로 누적 top 갱신
-              if (inStackGroup) {
-                this.updateStackTops(tops, series);
+              series.hasPassingValueInData = hasPassingValueInData;
+
+              if (sData) {
+                const inStackGroup = series.isExistGrp && !series.isOverlapping;
+                let tops = null;
+                if (inStackGroup) {
+                  tops = stackTops.get(series.groupIndex);
+                  if (!tops) {
+                    tops = { pos: [], neg: [] };
+                    stackTops.set(series.groupIndex, tops);
+                  }
+                }
+
+                if (inStackGroup && series.stackIndex) {
+                  series.data = this.addSeriesStackDS(sData, label, series.stackIndex, tops);
+                } else {
+                  series.data = this.addSeriesDS(
+                    sData,
+                    label,
+                    series.isExistGrp,
+                    basePassingValue,
+                    series.data,
+                  );
+                }
+                series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
+
+                // 이 시리즈가 이후 스택 시리즈의 base 가 되므로 누적 top 갱신
+                if (inStackGroup) {
+                  this.updateStackTops(tops, series);
+                }
               }
             }
           }
         }
       }
     });
+
+    // ③ hit test 사전계산: 라벨별 "유효 데이터를 가진 가시 시리즈 존재" mask 를 여기서 1회 만든다.
+    // 데이터 변경·범례(show) 토글은 모두 update()→createDataSet() 를 거치므로 이 시점 재계산이 곧 무효화다.
+    // (interaction 모듈이 mixin 된 정상 인스턴스에서만 동작. createDataSet 단독 단위 테스트 대비 optional 호출.)
+    this.buildLabelValidMask?.();
   },
 
   /**
