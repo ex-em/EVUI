@@ -172,17 +172,13 @@ function extractSeriesData(series) {
  * @returns {object} RenderInput 스냅샷
  */
 export function toRenderSnapshot(core, epoch = 0) {
-  const seriesOrder = {};
-  const charts = core.seriesInfo?.charts ?? {};
-  Object.keys(charts).forEach((type) => {
-    seriesOrder[type] = (charts[type] ?? []).slice();
-  });
-
   const series = {};
   const seriesList = core.seriesList ?? {};
   Object.keys(seriesList).forEach((id) => {
     const s = seriesList[id];
-    if (!s) {
+    // 전부 null 인 line 시리즈는 worker 가 그려도 픽셀 0개(element.line draw-skip)라 pack/postMessage 를
+    // 생략한다 — element.line.draw 와 동일 판정(hasRenderableValue, isExistGrp 제외).
+    if (!s || (typeof s.hasRenderableValue === 'function' && !s.isExistGrp && !s.hasRenderableValue())) {
       return;
     }
     series[id] = {
@@ -194,6 +190,13 @@ export function toRenderSnapshot(core, epoch = 0) {
     if (s.type === 'heatMap' && s.labels) {
       series[id].labels = toPlain(s.labels) ?? {};
     }
+  });
+
+  // seriesOrder 는 스냅샷에 포함된 시리즈만 참조한다(제외된 빈 시리즈는 worker 가 그리지 않음).
+  const seriesOrder = {};
+  const charts = core.seriesInfo?.charts ?? {};
+  Object.keys(charts).forEach((type) => {
+    seriesOrder[type] = (charts[type] ?? []).filter((id) => series[id]);
   });
 
   return {
