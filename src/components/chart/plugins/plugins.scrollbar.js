@@ -31,6 +31,9 @@ const module = {
 
     if (scrollbarOpt.resetPosition) {
       scrollbarOpt.range = axisOpt?.[0]?.range?.length ? [...axisOpt[0].range] : null;
+      // range 변경 후엔 anchor 재계산(불변식). isInit 상태로 재진입(resize 등)할 때
+      // 아래 !isInit 블록을 타지 않아 anchorEdge 가 stale 해지는 것을 방지한다.
+      this.updateScrollbarAnchorEdge(dir);
     }
 
     if (!scrollbarOpt.isInit) {
@@ -48,23 +51,17 @@ const module = {
 
   initScrollbarRange(dir) {
     const scrollbarOpt = this.scrollbar[dir];
-    const axesType = scrollbarOpt.type;
     const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
 
     if (scrollbarOpt.range?.length && labels.length) {
       const [min, max] = scrollbarOpt.range;
-      let limitMin;
-      let limitMax;
 
       if (truthyNumber(min) && truthyNumber(max)) {
-        if (axesType === 'step') {
-          limitMin = 0;
-          limitMax = labels.length - 1;
-        } else {
-          const minMax = this.minMax[dir]?.[0];
-          limitMin = +minMax.min;
-          limitMax = +minMax.max;
+        const limits = this.getScrollbarLimits(dir);
+        if (!limits) {
+          return;
         }
+        const { limitMin, limitMax } = limits;
 
         const originalWidth = max - min;
         const availableWidth = limitMax - limitMin;
@@ -459,12 +456,25 @@ const module = {
     const scrollbarOpt = this.scrollbar[dir];
     if (scrollbarOpt?.type === 'step') {
       const labels = this.options.type === 'heatMap' ? this.data.labels[dir] : this.data.labels;
-      if (!labels?.length) return null;
+      if (!labels?.length) {
+        return null;
+      }
       return { limitMin: 0, limitMax: labels.length - 1 };
     }
     const minMax = this.minMax?.[dir]?.[0];
-    if (!minMax) return null;
-    return { limitMin: +minMax.min, limitMax: +minMax.max };
+    // 데이터 min/max 가 아직 확정되지 않은 경우(첫 데이터 로드 직전의 stale minMax 등)
+    // null 을 +로 0 으로 강제하면(+null === 0) time/linear 축 range 가 [0,0] 으로
+    // 오염된다. 한계를 알 수 없을 때는 null 을 반환해 호출부가 range 를 건드리지 않게 한다.
+    if (minMax?.min == null || minMax?.max == null) {
+      return null;
+    }
+
+    const limitMin = +minMax.min;
+    const limitMax = +minMax.max;
+    if (!Number.isFinite(limitMin) || !Number.isFinite(limitMax)) {
+      return null;
+    }
+    return { limitMin, limitMax };
   },
 
   /**
