@@ -281,11 +281,14 @@ class EvChart {
     this.axesSteps = this.calculateSteps();
   }
 
-  emitAxesScaleChange() {
-    if (typeof this.listeners?.['axes-scale-change'] !== 'function') {
-      return;
-    }
-
+  /**
+   * Compute the axes-scale-change payload (RenderCore — DOM/listener-free).
+   * listener 호출은 하지 않는다 — payload(또는 변경 없음 시 null)만 반환하고,
+   * ChartShell(drawChart)이 그 결과로 listener 를 호출한다.
+   *
+   * @returns {?object} axes-scale-change payload, or null when nothing watched changed
+   */
+  computeAxesScaleChange() {
     const prev = this._lastEmittedAxesRange;
     const curr = this.labelRange;
 
@@ -304,20 +307,59 @@ class EvChart {
     });
 
     if (xSame && ySame) {
-      return;
+      return null;
     }
 
     this._lastEmittedAxesRange = curr;
 
-    const payload = {
+    return {
       x: curr.x.map(toPayloadAxis),
       y: curr.y.map(toPayloadAxis),
     };
-    this.listeners['axes-scale-change'](payload);
   }
 
   /**
-   * To draw canvas chart, it processes several sequential jobs
+   * Prepare scale (RenderCore — DOM/scrollbar/listener-free).
+   * axesRange→labelOffset→labelRange→steps→adjustXAndYAxisWidth 를 계산하고,
+   * scrollbar DOM 배치(ChartShell)에 쓸 pre-adjust labelOffset 스냅샷과
+   * axes-scale-change payload 를 반환한다(직접 listener 호출/ DOM write 안 함).
+   *
+   * 주의: scrollbar 배치는 adjustXAndYAxisWidth 가 labelOffset 을 재계산하기 *전* 값으로
+   * 그려져 왔으므로(기존 동작), 그 시점 스냅샷을 따로 잡아 반환한다.
+   *
+   * @returns {{ scaleChange: ?object, scrollbarLabelOffset: object }}
+   */
+  prepareScale() {
+    this.axesRange = this.getAxesRange();
+    this.labelOffset = this.getLabelOffset();
+    this.labelRange = this.getAxesLabelRange();
+
+    // scrollbar DOM 배치는 adjust 이전 labelOffset 으로 계산돼 왔다(동작 보존).
+    const scrollbarLabelOffset = this.labelOffset;
+
+    this.axesSteps = this.calculateSteps();
+
+    this.adjustXAndYAxisWidth();
+
+    return {
+      scaleChange: this.computeAxesScaleChange(),
+      scrollbarLabelOffset,
+    };
+  }
+
+  /**
+   * To draw canvas chart, it processes several sequential jobs.
+   *
+   * Orchestration layer — ChartShell(main 전용)과 RenderCore(DOM-free, worker 후보) 단계를 엮는다:
+   *   - initScale       : ChartShell(window pixelRatio 읽기) → RenderCore prepareLayout(buffer transform)
+   *                       + main 소유 overlay transform
+   *   - prepareScale    : RenderCore(scale 계산) → scrollbar 기하·scale-change payload 반환(DOM/listener 없음)
+   *   - updateScrollbarPosition : ChartShell(scrollbar DOM 스타일 write)
+   *   - axes-scale-change       : ChartShell(payload 로 listener 호출)
+   *   - drawStaticLayer/drawSeriesLayer : RenderCore(주입형 bufferCtx 래스터)
+   *   - drawSeriesOverlay/drawTip       : ChartShell(main overlay/tip — interaction 즉답)
+   *   - commitToDisplay : RenderCore 출력단(buffer→display blit)
+   *
    * @param {any} [hitInfo=undefined]    from mousemove callback (object or object[] of undefined)
    *
    * @returns {undefined}
@@ -325,28 +367,47 @@ class EvChart {
   drawChart(hitInfo) {
     this.initScale();
 
-    this.axesRange = this.getAxesRange();
-    this.labelOffset = this.getLabelOffset();
-
-    this.labelRange = this.getAxesLabelRange();
+    const { scaleChange, scrollbarLabelOffset } = this.prepareScale();
 
     if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
-      this.updateScrollbarPosition();
+      this.updateScrollbarPosition(scrollbarLabelOffset);
     }
 
-    this.axesSteps = this.calculateSteps();
+    if (scaleChange && typeof this.listeners?.['axes-scale-change'] === 'function') {
+      this.listeners['axes-scale-change'](scaleChange);
+    }
 
-    this.adjustXAndYAxisWidth();
-
-    this.emitAxesScaleChange();
-
-    this.drawAxis(hitInfo);
-    this.drawSeries(hitInfo);
+    this.drawStaticLayer(this.bufferCtx, hitInfo);
+    this.drawSeriesLayer(this.bufferCtx, hitInfo);
+    this.drawSeriesOverlay();
 
     this.drawTip();
 
-    if (this.bufferCanvas && this.bufferCanvas?.width > 1 && this.bufferCanvas?.height > 1) {
-      this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
+    this.commitToDisplay(this.displayCtx, this.bufferCanvas);
+  }
+
+  /**
+   * Commit the rendered buffer canvas to the display canvas (buffer→display blit).
+   * Render pipeline의 출력단 경계 — RenderCore 단계 호출이 canvas 핸들을 주입받아
+   * 호출할 수 있도록 별도 함수로 추출. (Worker 경로에선 ImageBitmap blit으로 치환될 자리)
+   * @param {CanvasRenderingContext2D} displayCtx   destination display context
+   * @param {HTMLCanvasElement} bufferCanvas        source buffer canvas
+   *
+   * @returns {undefined}
+   */
+  commitToDisplay(displayCtx, bufferCanvas) {
+    // clear+blit 를 present 시점에 atomic 하게 수행(clear() 가 더 이상 display 를 비우지 않음).
+    if (this.displayCanvas) {
+      const ratio = this.pixelRatio < 1 ? this.pixelRatio : 1;
+      displayCtx.clearRect(
+        0,
+        0,
+        this.displayCanvas.width / ratio,
+        this.displayCanvas.height / ratio,
+      );
+    }
+    if (bufferCanvas && bufferCanvas?.width > 1 && bufferCanvas?.height > 1) {
+      displayCtx.drawImage(bufferCanvas, 0, 0);
     }
   }
 
@@ -388,12 +449,16 @@ class EvChart {
   }
 
   /**
-   * Draw each series
+   * Draw each series raster (RenderCore series 래스터 레이어).
+   * 순수 series 래스터만 bufferCtx(주입형 핸들)에 그린다 — overlay(interaction 즉답)·tip(formatter
+   * 실행/hit state mutate)은 이 경로에 포함하지 않는다(worker 후보). overlay는 drawSeriesOverlay,
+   * tip은 drawTip이 main에서 별도 처리한다.
+   * @param {CanvasRenderingContext2D} bufferCtx     destination buffer context (worker 경로에선 주입됨)
    * @param {any} [hitInfo=undefined]   legend mouseover callback (object or undefined)
    *
    * @returns {undefined}
    */
-  drawSeries(hitInfo) {
+  drawSeriesLayer(bufferCtx, hitInfo) {
     const {
       maxTip,
       selectLabel,
@@ -405,7 +470,7 @@ class EvChart {
     } = this.options;
 
     const opt = {
-      ctx: this.bufferCtx,
+      ctx: bufferCtx,
       chartRect: this.chartRect,
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
@@ -413,7 +478,6 @@ class EvChart {
       selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
       selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
       selectItem: { option: selectItem, selected: this.defaultSelectItemInfo },
-      overlayCtx: this.overlayCtx,
       isBrush: !!brush,
       displayOverflow,
       unSelectedOpacity,
@@ -490,21 +554,27 @@ class EvChart {
             const legendHitInfo = hitInfo?.legend;
 
             if (this.options.sunburst) {
-              this.drawSunburst({
-                selectInfo,
-                legendHitInfo,
-                unSelectedOpacity: opt.unSelectedOpacity,
-              });
+              this.drawSunburst(
+                {
+                  selectInfo,
+                  legendHitInfo,
+                  unSelectedOpacity: opt.unSelectedOpacity,
+                },
+                bufferCtx,
+              );
             } else {
-              this.drawPie({
-                selectInfo,
-                legendHitInfo,
-                unSelectedOpacity: opt.unSelectedOpacity,
-              });
+              this.drawPie(
+                {
+                  selectInfo,
+                  legendHitInfo,
+                  unSelectedOpacity: opt.unSelectedOpacity,
+                },
+                bufferCtx,
+              );
             }
 
             if (this.options.doughnutHoleSize > 0) {
-              this.drawDoughnutHole();
+              this.drawDoughnutHole(bufferCtx);
             }
             break;
           }
@@ -546,6 +616,34 @@ class EvChart {
           }
         }
       }
+    }
+  }
+
+  /**
+   * Draw series highlight onto the overlay layer (main 전용 interaction 즉답 레이어).
+   * 래스터(drawSeriesLayer, worker 후보)에서 분리해 main의 overlayCtx에만 그린다.
+   * 현재 series 래스터 경로에서 overlay highlight를 쓰는 타입은 heatMap뿐이다(line/bar/scatter의
+   * 선택/crosshair overlay는 interaction 플러그인이, pie highlight도 interaction 경로가 담당).
+   * brush 차트는 overlayCanvas가 없어 overlayCtx가 없다 → 각 series.drawOverlay에서 no-op.
+   *
+   * @returns {undefined}
+   */
+  drawSeriesOverlay() {
+    const overlayCtx = this.overlayCtx;
+    if (!overlayCtx) {
+      return;
+    }
+
+    const opt = {
+      overlayCtx,
+      chartRect: this.chartRect,
+      labelOffset: this.labelOffset,
+      axesSteps: this.axesSteps,
+    };
+
+    const heatMapSeries = this.seriesInfo.charts.heatMap;
+    for (let ix = 0; ix < heatMapSeries.length; ix++) {
+      this.seriesList[heatMapSeries[ix]]?.drawOverlay?.(opt);
     }
   }
 
@@ -620,12 +718,24 @@ class EvChart {
   }
 
   /**
-   * Draw each axis
+   * Draw the static layer (axis/grid/base labels) into the injected buffer context
+   * (RenderCore static 레이어 경계, Step 2.5-c). drawSeriesLayer(Step 3)와 동일하게 bufferCtx를
+   * 주입받아 worker가 자체 OffscreenCanvas ctx로 축을 래스터할 수 있게 한다(main 경로에선
+   * this.bufferCtx와 동일하므로 픽셀 변화 없음).
+   *
+   * 캐시 결정: **캐시 보류**(분리만 수행). drawAxis는 완전 static이 아니라 — 상호작용 상태
+   * (hitInfo blurred label·selectItem.showLabelTip, scale.js:374-442)와 동적 rescale(scale min/max·
+   * 범례 토글 series.show — model/model.store.js:1400)·plotLines/plotBands를 같은 패스에서 소비한다.
+   * 안전한 캐시 키가 이 상태를 빠짐없이 포함해야 하는데 그 범위가 너무 넓어 stale axis 오염 위험이
+   * 크므로, 캐시는 후속 단계로 미루고 RenderCore 경계 분리(=worker ctx 주입점)만 둔다.
+   * @param {CanvasRenderingContext2D} bufferCtx   destination buffer context (worker 경로에선 주입됨)
+   * @param {any} [hitInfo=undefined]   hit/hover information for axis interaction labels
    *
    * @returns {undefined}
    */
-  drawAxis(hitInfo) {
+  drawStaticLayer(bufferCtx, hitInfo) {
     this.axesX.forEach((axis, index) => {
+      axis.ctx = bufferCtx;
       axis.draw(
         this.chartRect,
         this.labelOffset,
@@ -637,6 +747,7 @@ class EvChart {
     });
 
     this.axesY.forEach((axis, index) => {
+      axis.ctx = bufferCtx;
       axis.draw(
         this.chartRect,
         this.labelOffset,
@@ -700,11 +811,13 @@ class EvChart {
   }
 
   /**
-   * Reset devicePixelRatio for high DPI
+   * Compute the device pixel ratio (window.devicePixelRatio + display ctx backing store).
+   * ChartShell 경계 — window/ctx DOM-property 를 읽으므로 RenderCore(prepareLayout)에 주입할
+   * 값을 main 에서 계산한다. Worker 경로엔 window 가 없으므로 RenderCore 가 직접 읽지 않는다.
    *
-   * @returns {undefined}
+   * @returns {number} device pixel ratio
    */
-  initScale() {
+  computePixelRatio() {
     const devicePixelRatio = window.devicePixelRatio || 1;
     const backingStoreRatio =
       this.displayCtx.webkitBackingStorePixelRatio ||
@@ -714,7 +827,19 @@ class EvChart {
       this.displayCtx.backingStorePixelRatio ||
       1;
 
-    this.pixelRatio = devicePixelRatio / backingStoreRatio;
+    return devicePixelRatio / backingStoreRatio;
+  }
+
+  /**
+   * Prepare layout transform on the injected buffer ctx (RenderCore — DOM-free).
+   * pixelRatio 는 ChartShell(computePixelRatio)이 주입한다. buffer ctx 의 transform 만 소유하며
+   * overlay ctx 의 transform 은 main(ChartShell) 소유이므로 여기서 건드리지 않는다.
+   * @param {number} pixelRatio    injected device pixel ratio
+   *
+   * @returns {undefined}
+   */
+  prepareLayout(pixelRatio) {
+    this.pixelRatio = pixelRatio;
 
     if (this.oldPixelRatio !== this.pixelRatio) {
       this.oldPixelRatio = this.pixelRatio;
@@ -724,9 +849,22 @@ class EvChart {
     // 이렇게 하면 매 update마다 canvas.width 재대입(트랜스폼 리셋)에 의존하지 않아도 되어
     // setWidth/setHeight에서 크기 변경이 없을 때 비트맵 재할당을 건너뛸 수 있다.
     this.bufferCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+  }
+
+  /**
+   * Reset devicePixelRatio for high DPI (ChartShell layout entry — resize 등에서 직접 사용).
+   * device pixel ratio 를 읽어 RenderCore(prepareLayout)에 주입하고, main 소유인
+   * overlay ctx transform 을 함께 적용한다.
+   *
+   * @returns {undefined}
+   */
+  initScale() {
+    const pixelRatio = this.computePixelRatio();
+
+    this.prepareLayout(pixelRatio);
 
     if (this.overlayCtx) {
-      this.overlayCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+      this.overlayCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     }
   }
 
@@ -1198,14 +1336,7 @@ class EvChart {
    */
   clear() {
     this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
-    if (this.displayCanvas) {
-      this.displayCtx.clearRect(
-        0,
-        0,
-        this.displayCanvas.width / this.clearRectRatio,
-        this.displayCanvas.height / this.clearRectRatio,
-      );
-    }
+    // display 는 여기서 비우지 않는다 — commit 시점(commitToDisplay)에 clear+blit 를 atomic 하게 수행한다.
     if (this.bufferCanvas) {
       this.bufferCtx.clearRect(
         0,

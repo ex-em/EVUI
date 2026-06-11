@@ -32,7 +32,11 @@ class Pie {
   }
 
   /**
-   * Draw series data
+   * Draw series data (래스터 패스).
+   * pie/doughnut의 기하는 각도 기반(centerX/centerY/radius/startAngle/endAngle)이며 이미 main에서
+   * plugins.pie.js가 계산해 series 인스턴스에 저장한다(타입별 RenderGeometry). draw는 그 기하를
+   * 읽어 ctx에 그리기만 하므로 line/bar류의 기하/래스터 분리가 이미 충족돼 있다(별도 computeGeometry 불필요).
+   * findGraphData(hit-test)도 동일하게 인스턴스 각도 기하를 소비한다.
    * @param context
    * @param strokeOptions
    * @param unSelectedOpacity

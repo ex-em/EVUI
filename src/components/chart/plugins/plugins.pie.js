@@ -7,8 +7,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawPie(hitInfo) {
-    const ctx = this.bufferCtx;
+  drawPie(hitInfo, ctx = this.bufferCtx) {
     const chartRect = this.chartRect;
     const pieDataSet = this.pieDataSet;
     const pieOption = this.options;
@@ -110,8 +109,7 @@ const modules = {
    *
    * @returns {undefined}
    */
-  drawSunburst(hitInfo) {
-    const ctx = this.bufferCtx;
+  drawSunburst(hitInfo, ctx = this.bufferCtx) {
     const { width, height } = this.chartRect;
     const pieDataSet = this.pieDataSet;
     const pieOption = this.options;
