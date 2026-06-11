@@ -462,6 +462,119 @@ describe('element.line path 생략 (연속 동일 픽셀 lineTo)', () => {
 });
 
 /**
+ * 빈(all-null) 시리즈 래스터 skip — 전부 null 인 line 시리즈는 픽셀을 0개 그리므로(선/마커/fill 없음)
+ * 래스터를 통째로 건너뛴다. 단 computeGeometry(기하)는 유지해 hover/indicator/label-snap 이 동작하고,
+ * series.data 는 그대로라 범례/툴팁도 불변. 'zero' 변환(o=0)·stacked(isExistGrp)는 제외 대상.
+ */
+describe('element.line 빈(all-null) 시리즈 래스터 skip', () => {
+  const noop = () => {};
+  const makeCtx = () => {
+    const n = { beginPath: 0, moveTo: 0, lineTo: 0, stroke: 0, fill: 0, arc: 0 };
+    return {
+      n,
+      save: noop,
+      restore: noop,
+      closePath: noop,
+      setLineDash: noop,
+      fillRect: noop,
+      strokeRect: noop,
+      createLinearGradient: () => ({ addColorStop: noop }),
+      beginPath() { n.beginPath++; },
+      moveTo() { n.moveTo++; },
+      lineTo() { n.lineTo++; },
+      stroke() { n.stroke++; },
+      fill() { n.fill++; },
+      arc() { n.arc++; },
+    };
+  };
+
+  // isBrush:false 라야 마커 블록까지 실행된다(skip 이 마커도 막는지 검증).
+  const baseParam = (ctx) => ({
+    ctx,
+    chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    axesSteps: { x: [{ graphMin: 0, graphMax: 4 }], y: [{ graphMin: 0, graphMax: 100 }] },
+    isBrush: false,
+  });
+
+  const makeLine = (data, overrides = {}) => {
+    const line = new Line('s0', { interpolation: overrides.interpolation ?? 'none' }, 0);
+    line.data = data;
+    line.xAxisIndex = 0;
+    line.yAxisIndex = 0;
+    line.combo = false;
+    line.isExistGrp = overrides.isExistGrp ?? false;
+    line.fill = false;
+    line.point = false;
+    line.show = true;
+    return line;
+  };
+
+  it('all-null(interpolation none) 시리즈는 canvas 래스터를 전혀 호출하지 않는다', () => {
+    const data = [
+      { x: 0, y: null, o: null },
+      { x: 1, y: null, o: null },
+      { x: 2, y: null, o: null },
+    ];
+    const ctx = makeCtx();
+    makeLine(data).draw(baseParam(ctx));
+
+    expect(ctx.n.beginPath).toBe(0);
+    expect(ctx.n.moveTo).toBe(0);
+    expect(ctx.n.lineTo).toBe(0);
+    expect(ctx.n.arc).toBe(0);
+    expect(ctx.n.fill).toBe(0);
+    // 기하는 유지: computeGeometry 가 xp 를 채웠다.
+    data.forEach((p) => expect(typeof p.xp).toBe('number'));
+  });
+
+  it('값이 하나라도 있으면 정상적으로 그린다(skip 안 됨)', () => {
+    const data = [
+      { x: 0, y: null, o: null },
+      { x: 1, y: 20, o: 20 },
+      { x: 2, y: null, o: null },
+    ];
+    const ctx = makeCtx();
+    makeLine(data).draw(baseParam(ctx));
+
+    expect(ctx.n.beginPath).toBeGreaterThan(0);
+    expect(ctx.n.moveTo).toBeGreaterThan(0);
+  });
+
+  it('빈 배열(data.length===0)도 skip 된다', () => {
+    const ctx = makeCtx();
+    makeLine([]).draw(baseParam(ctx));
+
+    expect(ctx.n.beginPath).toBe(0);
+    expect(ctx.n.moveTo).toBe(0);
+  });
+
+  it("interpolation 'zero' 로 0 변환된 데이터(o=0)는 skip 하지 않는다", () => {
+    // createDataSet 이 null→0 으로 바꾼 뒤 상태 모사.
+    const data = [
+      { x: 0, y: 0, o: 0 },
+      { x: 1, y: 0, o: 0 },
+      { x: 2, y: 0, o: 0 },
+    ];
+    const ctx = makeCtx();
+    makeLine(data, { interpolation: 'zero' }).draw(baseParam(ctx));
+
+    expect(ctx.n.moveTo).toBeGreaterThan(0);
+  });
+
+  it('all-null + isExistGrp(stacked) 는 skip 하지 않는다', () => {
+    const data = [
+      { x: 0, y: null, o: null },
+      { x: 1, y: null, o: null },
+    ];
+    const ctx = makeCtx();
+    makeLine(data, { isExistGrp: true }).draw(baseParam(ctx));
+
+    expect(ctx.n.beginPath).toBeGreaterThan(0);
+  });
+});
+
+/**
  * 마커 배치 렌더링 — isSingle(양옆 null) 고립점이 point:false 에서도 마커로 그려지는데,
  * 이를 점마다 fill/stroke(path-per-point) 하던 것을 색(blur/focus)별 배치로 모은다.
  * 라이브 대시보드(5초 라벨 그리드 × 10초 데이터 → 50% null 교차)에서 fill/stroke 콜 폭주를 막는 핵심.
