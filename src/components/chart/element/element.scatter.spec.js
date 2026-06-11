@@ -5,7 +5,8 @@ import Canvas from '../helpers/helpers.canvas';
 /**
  * Scatter draw 메서드를 격리해서 테스트하기 위해 chartRect/axesSteps 등을 모두 입력하는
  * 대신, calcItem 을 항등 매핑으로 바꿔 item.x/y 가 그대로 xp/yp 로 들어가게 한다.
- * drawPoint 호출 횟수로 실제 그려진 점 수를 검증한다.
+ * 실제 그려진 점 수 검증: dedupe on 경로는 색별 배치(drawPointBatch)로 그리므로 배치된 점 총합을,
+ * dedupe off 경로는 per-point(drawPoint) 호출 수를 센다.
  */
 const createDrawParam = () => ({
   ctx: {},
@@ -16,6 +17,10 @@ const createDrawParam = () => ({
   selectInfo: null,
   unSelectedOpacity: 0.3,
 });
+
+// drawPointBatch(ctx, style, radius, points) 의 모든 호출에 걸쳐 배치된 점 총합.
+const sumBatchedPoints = (spy) =>
+  spy.mock.calls.reduce((n, call) => n + (call[3]?.length ?? 0), 0);
 
 const createScatter = ({ realTimeScatter = false } = {}) => {
   const scatter = new Scatter('s1', { color: '#000000', pointFill: '#000000' }, 0, realTimeScatter);
@@ -46,10 +51,10 @@ describe('Scatter Element', () => {
       param.duple.set('10|20', 's1');
       param.duple.set('30|40', 's1');
 
-      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      const spy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
       scatter.draw(param);
 
-      expect(spy).toHaveBeenCalledTimes(2);
+      expect(sumBatchedPoints(spy)).toBe(2);
     });
 
     it('coordinateDedupe=false 일 때는 모든 중복 좌표를 그대로 그린다 (#2011 opt-out 보존)', () => {
@@ -80,10 +85,10 @@ describe('Scatter Element', () => {
       param.duple.set('2|2', 's1');
       param.duple.set('3|3', 's1');
 
-      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      const spy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
       scatter.draw(param);
 
-      expect(spy).toHaveBeenCalledTimes(3);
+      expect(sumBatchedPoints(spy)).toBe(3);
     });
 
     it('duple 이 다른 시리즈를 owner 로 지정한 좌표는 그리지 않는다 (시리즈 간 dedupe)', () => {
@@ -96,10 +101,10 @@ describe('Scatter Element', () => {
       param.duple.set('10|20', 'otherSeries');
       param.duple.set('30|40', 's1');
 
-      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      const spy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
       scatter.draw(param);
 
-      expect(spy).toHaveBeenCalledTimes(1);
+      expect(sumBatchedPoints(spy)).toBe(1);
     });
   });
 
@@ -124,10 +129,10 @@ describe('Scatter Element', () => {
       param.duple.set('1|2', 's1');
       param.duple.set('2|1', 's1');
 
-      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      const spy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
       scatter.draw(param);
 
-      expect(spy).toHaveBeenCalledTimes(3);
+      expect(sumBatchedPoints(spy)).toBe(3);
       expect(scatter._rtTotalCount).toBe(3);
     });
 
