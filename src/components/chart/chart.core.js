@@ -16,6 +16,8 @@ import TooltipVirtualScroll from './plugins/plugins.tooltip.virtualScroll';
 import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 import Blit from './chart.blit';
+import { WorkerRenderGate } from './render/render.worker.gate';
+import { toRenderSnapshot, packSeries } from './render/render.snapshot';
 
 // realtime scatter blit: 시프트 누적으로 생기는 sub-pixel 오차를 주기적으로 리셋하기 위해,
 // 이 프레임 수마다 게이트 통과 여부와 무관하게 full redraw 로 돌아가 픽셀을 절대 좌표와 일치시킨다.
@@ -108,6 +110,19 @@ class EvChart {
     this.legendHover = null;
 
     this.initBlitState();
+
+    // worker 렌더 게이트. 차트별 opt-in(`options.workerRender`, 기본 off)으로만 진입한다 →
+    // opt-in 하지 않으면 worker 미진입 = 기존 main 경로 100% 유지(아래 drawChart 의 worker 분기는 ready 일 때만).
+    this.renderWorkerGate = new WorkerRenderGate({
+      isEnabled: () => !!this.options.workerRender,
+    });
+    // display frame ↔ hit-test model 일관성 / stale frame drop 용 단조 증가 epoch(Step 8).
+    this.renderEpoch = 0;
+    this.renderWorkerGate.setFrameHandler((msg) => this.commitWorkerFrame(msg));
+    this.renderWorkerGate.setErrorHandler(() => this.drawSeriesLayerFallback());
+    // opt-in off / 미지원 / 생성 실패 / 미준비는 gate 상태기계가 처리하고 drawChart 는 ready 일 때만
+    // worker 분기하므로, 꺼져있거나 실패해도 main 경로(무회귀).
+    this.renderWorkerGate.start();
   }
 
   /**
@@ -404,7 +419,7 @@ class EvChart {
    *
    * @returns {undefined}
    */
-  drawChart(hitInfo) {
+  drawChart(hitInfo, forceMainSeries) {
     this.initScale();
 
     const { scaleChange, scrollbarLabelOffset } = this.prepareScale();
@@ -419,12 +434,97 @@ class EvChart {
 
     this.emitDataMaxChange();
 
+    // worker 분기(Step 8, kill switch 뒤): ready 이고 in-flight 여유가 있을 때만 series 를 worker 로.
+    // 기본 off(start() 미호출)면 항상 false → 아래 main 경로로 fall through(기존 동작 불변).
+    // forceMainSeries: resize 처럼 캔버스가 막 리사이즈(=자동 clear)된 프레임은 worker 의 비동기 합성을
+    // 기다리면 display 가 blank 로 깜빡인다 → 이 프레임은 main 으로 동기 렌더해 즉시 채운다.
+    if (!forceMainSeries && this.tryDrawSeriesOnWorker(hitInfo)) {
+      return;
+    }
+
     this.drawStaticLayer(this.bufferCtx, hitInfo);
     this.drawSeriesLayer(this.bufferCtx, hitInfo);
     this.drawSeriesOverlay();
 
     this.drawTip();
 
+    this.commitToDisplay(this.displayCtx, this.bufferCanvas);
+  }
+
+  /**
+   * worker series 래스터 경로(Step 8 micro PoC, B2). ready + in-flight 여유가 있을 때만 진입한다.
+   *
+   * 책임 분리(plan 원칙 3·4): static(axis/grid) 는 main buffer 에, overlay/tip(interaction 즉답)도 main 에
+   * 그대로 그린다. **series 래스터만** worker 로 보내고(자체 OffscreenCanvas → ImageBitmap), 도착 시
+   * commitWorkerFrame 이 epoch 비교 후 합성한다. 디스플레이 캔버스를 transfer 하지 않으므로 worker 가
+   * 실패/미응답이면 이 함수가 false 를 반환해 호출부가 main 래스터로 fallback 한다.
+   *
+   * micro 범위 = interaction off → hit-test 기하를 main 에 채우는 패스는 생략(Step 9 통합에서 추가).
+   *
+   * @param {any} [hitInfo]
+   * @returns {boolean} worker 로 보냈으면 true(main series 래스터 생략), 아니면 false(main 경로)
+   */
+  tryDrawSeriesOnWorker(hitInfo) {
+    if (!this.renderWorkerGate?.canAcceptRender()) {
+      return false;
+    }
+
+    this.renderEpoch += 1;
+    const epoch = this.renderEpoch;
+    const snapshot = toRenderSnapshot(this, epoch);
+    const { columns, transferList } = packSeries(snapshot);
+
+    // static(axis/grid) 은 main buffer 에(worker bitmap 과 합성).
+    this.drawStaticLayer(this.bufferCtx, hitInfo);
+    // hit-test 가 읽는 픽셀 기하(xp/yp/w/h)는 main 모델에 채운다 — 래스터는 worker 가 하지만 기하는
+    // main 에 있어야 hover hit-test/tooltip 이 동작한다(plan 원칙 4). computeGeometry 는 canvas 그리기 없음.
+    this.computeSeriesGeometry();
+    // overlay/tip 은 main 즉답(별도 overlay canvas — series bitmap 과 무관).
+    this.drawSeriesOverlay();
+    this.drawTip();
+
+    const sent = this.renderWorkerGate.render(snapshot, columns, transferList);
+    if (!sent) {
+      // in-flight 상한 등으로 미전송 → main 이 이 프레임의 series 를 그린다.
+      this.drawSeriesLayer(this.bufferCtx, hitInfo);
+      this.commitToDisplay(this.displayCtx, this.bufferCanvas);
+    }
+    return true;
+  }
+
+  /**
+   * worker 프레임(ImageBitmap) 도착 시 display 에 합성한다(Step 8 compositing order).
+   * 순서: clear(display) → static(axis/grid, main buffer) → series bitmap(worker).
+   * epoch 가 현재와 다르면 stale frame 으로 drop 하고 bitmap 을 즉시 close(메모리).
+   *
+   * @param {{epoch:number, bitmap:ImageBitmap}} msg
+   * @returns {undefined}
+   */
+  commitWorkerFrame(msg) {
+    const bitmap = msg?.bitmap;
+    if (!bitmap) {
+      return;
+    }
+    if (msg.epoch !== this.renderEpoch) {
+      bitmap.close();
+      return;
+    }
+
+    // commitToDisplay 가 display clear + static(buffer) blit 을 atomic 하게 수행 → series bitmap 합성.
+    const ctx = this.displayCtx;
+    this.commitToDisplay(ctx, this.bufferCanvas);
+    ctx.drawImage(bitmap, 0, 0);
+    bitmap.close();
+  }
+
+  /**
+   * worker 렌더 예외 시 main series 래스터로 fallback 한다(Step 7 상태기계 → main RenderCore).
+   * static 은 이미 main buffer 에 있으므로 series 만 그려 합성한다.
+   *
+   * @returns {undefined}
+   */
+  drawSeriesLayerFallback() {
+    this.drawSeriesLayer(this.bufferCtx, undefined);
     this.commitToDisplay(this.displayCtx, this.bufferCanvas);
   }
 
@@ -624,6 +724,53 @@ class EvChart {
    *
    * @returns {undefined}
    */
+  /**
+   * worker 래스터 경로용 main hit-test 기하 패스(plan 원칙 4). 래스터(stroke/fill)는 worker 가 하지만
+   * hit-test 가 읽는 픽셀 기하(xp/yp/w/h)는 main 모델에 있어야 하므로, 여기서 series.computeGeometry 만
+   * 돌려 채운다(canvas 그리기 없음 — 싸다). worker micro 범위(line/bar/heatMap)와 동일 타입만 처리한다.
+   * @returns {undefined}
+   */
+  computeSeriesGeometry() {
+    const opt = {
+      chartRect: this.chartRect,
+      labelOffset: this.labelOffset,
+      axesSteps: this.axesSteps,
+      isHorizontal: this.options.horizontal,
+    };
+
+    let showSeriesCount = 0;
+    this.seriesInfo.charts.bar.forEach((id) => {
+      if (this.seriesList[id]?.show) {
+        showSeriesCount++;
+      }
+    });
+
+    ['line', 'heatMap'].forEach((chartType) => {
+      this.seriesInfo.charts[chartType].forEach((id) => {
+        this.seriesList[id]?.computeGeometry?.(opt);
+      });
+    });
+
+    const { thickness, cPadRatio, borderRadius } = this.options;
+    let showIndex = 0;
+    this.seriesInfo.charts.bar.forEach((id) => {
+      const series = this.seriesList[id];
+      if (series) {
+        series.computeGeometry?.({
+          ...opt,
+          thickness,
+          cPadRatio,
+          borderRadius,
+          showSeriesCount,
+          showIndex,
+        });
+        if (series.show) {
+          showIndex++;
+        }
+      }
+    });
+  }
+
   drawSeriesLayer(bufferCtx, hitInfo) {
     const {
       maxTip,
@@ -1546,7 +1693,9 @@ class EvChart {
    */
   clear() {
     this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
-    // display 는 여기서 비우지 않는다 — commit 시점(commitToDisplay)에 clear+blit 를 atomic 하게 수행한다.
+    // display 는 여기서 비우지 않는다 — commit 시점(commitToDisplay/commitWorkerFrame)에 clear+blit 한다.
+    // worker 경로는 series 를 비동기로 합성하므로, 미리 display 를 비우면 프레임 도착 전까지 blank 가 되고
+    // (epoch drop 시 영구) "그려졌다 사라진다" 가 된다. 이전 프레임을 새 프레임 준비 시점까지 유지한다.
     if (this.bufferCanvas) {
       this.bufferCtx.clearRect(
         0,
@@ -1589,7 +1738,9 @@ class EvChart {
 
     this.initScale();
     this.chartRect = this.getChartRect();
-    this.drawChart();
+    // resize 는 캔버스를 막 리사이즈해 display 가 비워진 상태 → worker 비동기 합성을 기다리면 깜빡인다.
+    // 이 프레임은 main 으로 동기 렌더한다(steady-state tick 은 계속 worker 사용).
+    this.drawChart(undefined, true);
     if (this.dragInfoBackup) {
       this.drawSelectionArea?.(this.dragInfoBackup);
     }
@@ -1843,6 +1994,10 @@ class EvChart {
 
     if (this.isInitTooltip) {
       this.tooltipDestroy();
+    }
+
+    if (this.renderWorkerGate) {
+      this.renderWorkerGate.destroy();
     }
 
     if (this.renderVisibleLegendsFrameId != null) {

@@ -266,6 +266,9 @@ const DEFAULT_OPTIONS = {
   eventBehavior: {
     legendClick: 'update',
   },
+  // series 래스터를 worker(OffscreenCanvas)로 오프로드할지 여부(차트별 opt-in). 기본 off(무회귀).
+  // 미지원 환경(SSR/OffscreenCanvas 부재)은 게이트 feature-detect 가 main 으로 fallback 한다.
+  workerRender: false,
   // props.data deep-watch 를 끄는 opt-in(차트별). 기본 false(=deep watch 유지, 기존 동작 무회귀).
   // true 면 Chart.vue 의 data watch 가 deep:false 로 등록되어 큰 데이터의 O(N) deep-track(traverse·
   // 재추적·trigger 팬아웃) 비용을 제거한다. 단 deep 없이는 in-place mutation 을 자동 감지 못 하므로
