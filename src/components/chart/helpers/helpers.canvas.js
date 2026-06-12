@@ -194,7 +194,6 @@ export default {
       default:
         ctx.moveTo(x + radius, y);
         ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.closePath();
         break;
     }
   },
