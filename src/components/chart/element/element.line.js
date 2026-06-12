@@ -348,40 +348,53 @@ class Line {
       // 모든 점을 단일 path 에 모아 fill/stroke 를 1회만 호출하도록 batching 한다.
       const canBatch = !NON_CIRCLE_POINT_STYLES.has(pointStyle);
 
+      // 점 그리기 판정은 circle/비-circle 두 분기 공통이므로 이 함수 한 곳에서만 관리한다.
+      // (두 분기는 "어떤 점을 그리느냐"가 아니라 "어떻게 그리느냐"만 달라야 한다.)
+      // 반환값: 0 = 그리지 않음, 1 = 일반(blur), 2 = 강조(focus).
+      // hot loop라 점당 객체 할당을 피하려고 객체 대신 정수 코드를 반환한다.
+      const pointDrawKind = (ix) => {
+        const curr = data[ix];
+        if (curr.xp === null || curr.yp === null || curr.o === null) {
+          return 0;
+        }
+
+        let isSingle;
+        if (isLinearSingle) {
+          isSingle = true;
+        } else if (!isLinearInterpolation) {
+          const prevO = ix > 0 ? data[ix - 1].o : null;
+          const nextO = ix + 1 < dataLen ? data[ix + 1].o : null;
+          isSingle = prevO == null && nextO == null;
+        } else {
+          isSingle = false;
+        }
+
+        const isSelectedLabel = selectedLabelIndexSet ? selectedLabelIndexSet.has(ix) : false;
+        if (!(this.point || isSingle || isSelectedLabel)) {
+          return 0;
+        }
+        return isSelectedLabel && !legendHitInfo ? 2 : 1;
+      };
+
       if (canBatch) {
         let blurPathOpen = false;
         let focusPoints = null;
 
         for (let ix = 0; ix < dataLen; ix++) {
-          const curr = data[ix];
-          if (curr.xp !== null && curr.yp !== null && curr.o !== null) {
-            let isSingle;
-            if (isLinearSingle) {
-              isSingle = true;
-            } else if (!isLinearInterpolation) {
-              const prevO = ix > 0 ? data[ix - 1].o : null;
-              const nextO = ix + 1 < dataLen ? data[ix + 1].o : null;
-              isSingle = prevO == null && nextO == null;
+          const kind = pointDrawKind(ix);
+          if (kind !== 0) {
+            const curr = data[ix];
+            if (kind === 2) {
+              if (focusPoints === null) focusPoints = [];
+              focusPoints.push(curr);
             } else {
-              isSingle = false;
-            }
-
-            const isSelectedLabel = selectedLabelIndexSet
-              ? selectedLabelIndexSet.has(ix)
-              : false;
-            if (this.point || isSingle || isSelectedLabel) {
-              if (isSelectedLabel && !legendHitInfo) {
-                if (focusPoints === null) focusPoints = [];
-                focusPoints.push(curr);
-              } else {
-                if (!blurPathOpen) {
-                  ctx.beginPath();
-                  blurPathOpen = true;
-                }
-                // arc 직전 moveTo 로 sub-path 를 분리해 점 사이 line 연결을 막는다.
-                ctx.moveTo(curr.xp + pointSize, curr.yp);
-                ctx.arc(curr.xp, curr.yp, pointSize, 0, TWO_PI);
+              if (!blurPathOpen) {
+                ctx.beginPath();
+                blurPathOpen = true;
               }
+              // arc 직전 moveTo 로 sub-path 를 분리해 점 사이 line 연결을 막는다.
+              ctx.moveTo(curr.xp + pointSize, curr.yp);
+              ctx.arc(curr.xp, curr.yp, pointSize, 0, TWO_PI);
             }
           }
         }
@@ -403,26 +416,11 @@ class Line {
         }
       } else {
         for (let ix = 0; ix < dataLen; ix++) {
-          const curr = data[ix];
-          if (curr.xp !== null && curr.yp !== null && curr.o !== null) {
-            let isSingle;
-            if (isLinearSingle) {
-              isSingle = true;
-            } else if (!isLinearInterpolation) {
-              const prevO = ix > 0 ? data[ix - 1].o : null;
-              const nextO = ix + 1 < dataLen ? data[ix + 1].o : null;
-              isSingle = prevO == null && nextO == null;
-            } else {
-              isSingle = false;
-            }
-
-            const isSelectedLabel = selectedLabelIndexSet
-              ? selectedLabelIndexSet.has(ix)
-              : false;
-            if (this.point || isSingle || isSelectedLabel) {
-              ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
-              Canvas.drawPoint(ctx, pointStyle, pointSize, curr.xp, curr.yp);
-            }
+          const kind = pointDrawKind(ix);
+          if (kind !== 0) {
+            const curr = data[ix];
+            ctx.fillStyle = kind === 2 ? focusStyle : blurStyle;
+            Canvas.drawPoint(ctx, pointStyle, pointSize, curr.xp, curr.yp);
           }
         }
       }
