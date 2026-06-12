@@ -89,6 +89,20 @@ class Line {
       return;
     }
 
+    // (데이터 버전, 스케일 버전) 이 직전과 같고 data 참조도 동일하면 xp/yp 는 이미 current → skip.
+    // legendHitInfo/selectSeries 는 스타일만 바꾸고 geometry 불변이라 키에 없음(그래서 hover 재렌더가
+    // 재계산을 건너뛴다). 버전 미전달(테스트/엣지 호출)이면 canMemo=false 로 항상 재계산(무회귀).
+    // 키는 숫자 필드 비교로 둔다 — 시리즈가 수만 개일 때 문자열 키 생성이 매 프레임 할당이 되지 않도록.
+    const canMemo = param.scaleVersion != null && param.dataEpoch != null;
+    if (
+      canMemo
+      && this._lastDataEpoch === param.dataEpoch
+      && this._lastScaleVersion === param.scaleVersion
+      && this._lastGeomData === this.data
+    ) {
+      return;
+    }
+
     const { chartRect, labelOffset, axesSteps } = param;
     const isLinearInterpolation = this.useLinearInterpolation();
 
@@ -148,6 +162,12 @@ class Line {
       curr.xp = x;
       curr.yp = y;
     });
+
+    if (canMemo) {
+      this._lastDataEpoch = param.dataEpoch;
+      this._lastScaleVersion = param.scaleVersion;
+      this._lastGeomData = this.data;
+    }
   }
 
   /**
