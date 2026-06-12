@@ -175,7 +175,7 @@ describe('Bar Element', () => {
 
   /**
    * 기하/래스터 분리 회귀 가드 — computeGeometry(기하 패스)와 draw(래스터 패스)의 hit-test
-   * 기하(xp/yp/w/h) 일관성을 검증한다(Step 2 geometry-hittest-split).
+   * 기하(xp/yp/w/h) 일관성을 검증한다.
    */
   describe('기하/래스터 분리 (computeGeometry ↔ draw)', () => {
     it('computeGeometry 단독으로 hit-test용 xp/yp/w/h + visibleStartIndex/filteredCount 가 채워진다', () => {

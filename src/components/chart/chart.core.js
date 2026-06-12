@@ -108,7 +108,7 @@ class EvChart {
     // opt-in 하지 않으면 worker 미진입 = 기존 main 경로 100% 유지(아래 drawChart 의 worker 분기는 ready 일 때만).
     this.renderWorkerGate = new WorkerRenderGate({
       isEnabled: () => !!this.options.workerRender,
-      // 관측성(이슈4): worker 실패/예외를 Console.warn(worker-safe)으로 노출해 무신호 사망을 막는다.
+      // worker 실패/예외를 Console.warn(worker-safe)으로 노출해 무신호 사망을 막는다.
       // opt-in-off(기능 미사용)는 정상 흐름이라 silent. unsupported 는 전용 hook 이 없어 onFallback 에서,
       // 그 외 실패는 onInitFailure/onRenderException 이 한 번씩만 알린다(중복 로깅 방지).
       hooks: {
@@ -123,7 +123,7 @@ class EvChart {
         },
       },
     });
-    // display frame ↔ hit-test model 일관성 / stale frame drop 용 단조 증가 epoch(Step 8).
+    // display frame ↔ hit-test model 일관성 / stale frame drop 용 단조 증가 epoch.
     this.renderEpoch = 0;
     this.renderWorkerGate.setFrameHandler((msg) => this.commitWorkerFrame(msg));
     this.renderWorkerGate.setErrorHandler((msg) => this.drawSeriesLayerFallback(msg));
@@ -396,7 +396,7 @@ class EvChart {
   drawChart(hitInfo, forceMainSeries) {
     // epoch 는 *모든* drawChart 진입에서 증가시킨다(worker 전송 프레임뿐 아니라 resize·main-only·hover
     // 프레임 포함). 그래야 main 이 그린 더 새로운 프레임 뒤에 늦게 도착한 stale worker 비트맵/에러가
-    // commitWorkerFrame·drawSeriesLayerFallback 의 epoch 비교에서 항상 drop 된다(이슈1 경합 차단).
+    // commitWorkerFrame·drawSeriesLayerFallback 의 epoch 비교에서 항상 drop 된다.
     this.renderEpoch += 1;
     this.initScale();
 
@@ -410,7 +410,7 @@ class EvChart {
       this.listeners['axes-scale-change'](scaleChange);
     }
 
-    // worker 분기(Step 8, kill switch 뒤): ready 이고 in-flight 여유가 있을 때만 series 를 worker 로.
+    // worker 분기: ready 이고 in-flight 여유가 있을 때만 series 를 worker 로.
     // 기본 off(start() 미호출)면 항상 false → 아래 main 경로로 fall through(기존 동작 불변).
     // forceMainSeries: resize 처럼 캔버스가 막 리사이즈(=자동 clear)된 프레임은 worker 의 비동기 합성을
     // 기다리면 display 가 blank 로 깜빡인다 → 이 프레임은 main 으로 동기 렌더해 즉시 채운다.
@@ -428,14 +428,13 @@ class EvChart {
   }
 
   /**
-   * worker series 래스터 경로(Step 8 micro PoC, B2). ready + in-flight 여유가 있을 때만 진입한다.
+   * worker series 래스터 경로. ready + in-flight 여유가 있을 때만 진입한다.
    *
-   * 책임 분리(plan 원칙 3·4): static(axis/grid) 는 main buffer 에, overlay/tip(interaction 즉답)도 main 에
-   * 그대로 그린다. **series 래스터만** worker 로 보내고(자체 OffscreenCanvas → ImageBitmap), 도착 시
-   * commitWorkerFrame 이 epoch 비교 후 합성한다. 디스플레이 캔버스를 transfer 하지 않으므로 worker 가
-   * 실패/미응답이면 이 함수가 false 를 반환해 호출부가 main 래스터로 fallback 한다.
-   *
-   * micro 범위 = interaction off → hit-test 기하를 main 에 채우는 패스는 생략(Step 9 통합에서 추가).
+   * 책임 분리: static(axis/grid) 는 main buffer 에, overlay/tip(interaction 즉답)도 main 에 그대로 그린다.
+   * hit-test 기하(xp/yp/w/h)도 main 모델에 채운다. **series 래스터만** worker 로 보내고(자체
+   * OffscreenCanvas → ImageBitmap), 도착 시 commitWorkerFrame 이 epoch 비교 후 합성한다. 디스플레이
+   * 캔버스를 transfer 하지 않으므로 worker 가 실패/미응답이면 이 함수가 false 를 반환해 호출부가 main
+   * 래스터로 fallback 한다.
    *
    * @param {any} [hitInfo]
    * @returns {boolean} worker 로 보냈으면 true(main series 래스터 생략), 아니면 false(main 경로)
@@ -445,26 +444,26 @@ class EvChart {
       return false;
     }
     // 시리즈 타입/축/상호작용 상태가 worker 재구성(line·bar(non-time)·heatMap, 숫자 축, 무선택)으로
-    // 동등 렌더 가능한 프레임만 worker 로 보낸다. 아니면 main 경로(무회귀). (이슈2/3/7/8)
+    // 동등 렌더 가능한 프레임만 worker 로 보낸다. 아니면 main 경로(무회귀).
     if (!this.canRenderSeriesOnWorker(hitInfo).ok) {
       return false;
     }
 
-    // epoch 는 drawChart 진입부에서 이미 증가시켰다(이슈1) — 여기서는 현재 값을 그대로 스냅샷에 싣는다.
+    // epoch 는 drawChart 진입부에서 이미 증가시켰다 — 여기서는 현재 값을 그대로 스냅샷에 싣는다.
     const epoch = this.renderEpoch;
     const snapshot = toRenderSnapshot(this, epoch);
     const { columns, transferList } = packSeries(snapshot);
 
     // static(axis/grid) 과 hit-test 기하는 두 경로(전송/미전송) 공통이라 먼저 그린다.
     // static 은 main buffer 에(worker bitmap 과 합성). 기하(xp/yp/w/h)는 래스터를 worker 가 하더라도
-    // hover hit-test/tooltip 이 읽도록 main 모델에 채운다(plan 원칙 4). computeGeometry 는 canvas 그리기 없음.
+    // hover hit-test/tooltip 이 읽도록 main 모델에 채운다. computeGeometry 는 canvas 그리기 없음.
     this.drawStaticLayer(this.bufferCtx, hitInfo);
     this.computeSeriesGeometry();
 
     const sent = this.renderWorkerGate.render(snapshot, columns, transferList);
     if (!sent) {
       // in-flight 상한 등으로 미전송 → main 이 이 프레임의 series 를 그린다.
-      // main 경로와 동일 순서(static→series→overlay→tip)로 z-order 를 맞춘다(이슈8).
+      // main 경로와 동일 순서(static→series→overlay→tip)로 z-order 를 맞춘다.
       this.drawSeriesLayer(this.bufferCtx, hitInfo);
     }
     // overlay 는 별도 overlay canvas(series bitmap 과 무관). tip 은 buffer 에 그리지만 위 가드가
@@ -486,11 +485,11 @@ class EvChart {
    * @returns {{ok:boolean, reason?:string}}
    */
   canRenderSeriesOnWorker(hitInfo) {
-    // (이슈7) hover/legend hit — 이번 프레임(hitInfo) 또는 잔류(lastHitInfo). drawTip 이 buffer 에 그린다.
+    // hover/legend hit — 이번 프레임(hitInfo) 또는 잔류(lastHitInfo). drawTip 이 buffer 에 그린다.
     if (hitInfo || this.lastHitInfo) {
       return { ok: false, reason: 'hit-info' };
     }
-    // (이슈7/8) maxTip(상시)·select 사용 — tip/selection 이 main buffer 에 그려져 worker bitmap 과 어긋난다.
+    // maxTip(상시)·select 사용 — tip/selection 이 main buffer 에 그려져 worker bitmap 과 어긋난다.
     if (this.hasMainBufferTipState()) {
       return { ok: false, reason: 'buffer-tip-state' };
     }
@@ -498,7 +497,7 @@ class EvChart {
     const charts = this.seriesInfo?.charts ?? {};
     const supported = { line: true, bar: true, heatMap: true };
 
-    // (이슈2) 미지원 타입(scatter/pie 등)에 visible 시리즈가 있으면 worker 가 그 시리즈를 무음 누락한다.
+    // 미지원 타입(scatter/pie 등)에 visible 시리즈가 있으면 worker 가 그 시리즈를 무음 누락한다.
     const unsupported = Object.keys(charts).find(
       (type) => !supported[type] && (charts[type] ?? []).some((id) => this.seriesList[id]?.show !== false),
     );
@@ -506,7 +505,7 @@ class EvChart {
       return { ok: false, reason: `unsupported-type:${unsupported}` };
     }
 
-    // (이슈2) TimeBar(opt.timeMode)는 worker 가 일반 Bar 로 재구성한다 → 시간축 bar 가 깨진다.
+    // TimeBar(opt.timeMode)는 worker 가 일반 Bar 로 재구성한다 → 시간축 bar 가 깨진다.
     const hasVisibleTimeBar = (charts.bar ?? []).some((id) => {
       const s = this.seriesList[id];
       return s?.show !== false && s?.timeMode;
@@ -515,7 +514,7 @@ class EvChart {
       return { ok: false, reason: 'time-bar' };
     }
 
-    // (이슈3) time(Date)·step(category, string) 축은 line/bar 데이터의 x/y 가 비숫자 → snapshot 이 null 로
+    // time(Date)·step(category, string) 축은 line/bar 데이터의 x/y 가 비숫자 → snapshot 이 null 로
     // 떨궈 worker 가 0픽셀을 그린다. heatMap 은 자체 label 재구성 경로라 제외(현행 동작 유지).
     if (this.hasNonNumericAxisForLineBar()) {
       return { ok: false, reason: 'non-numeric-axis' };
@@ -526,7 +525,7 @@ class EvChart {
 
   /**
    * main buffer(bufferCtx)에 tip/선택 표시를 그리는 상태인지. 이 상태면 worker bitmap 합성 순서상
-   * tip 이 series 에 가려지거나(z-order 역전) 선택/dim 이 worker 프레임에서 누락된다(이슈7/8).
+   * tip 이 series 에 가려지거나(z-order 역전) 선택/dim 이 worker 프레임에서 누락된다.
    * runtime select-info 객체 대신 그것을 켜는 options 플래그로 판정한다(안정적·null 모호성 없음).
    * @returns {boolean}
    */
@@ -542,7 +541,7 @@ class EvChart {
 
   /**
    * visible line/bar 시리즈가 있고 축(x 또는 y) 중 time/step(category)이 있으면 true.
-   * 해당 축의 라벨 데이터(Date/string)는 비숫자라 worker snapshot 에서 null 처리된다(이슈3).
+   * 해당 축의 라벨 데이터(Date/string)는 비숫자라 worker snapshot 에서 null 처리된다.
    * @returns {boolean}
    */
   hasNonNumericAxisForLineBar() {
@@ -559,7 +558,7 @@ class EvChart {
   }
 
   /**
-   * worker 프레임(ImageBitmap) 도착 시 display 에 합성한다(Step 8 compositing order).
+   * worker 프레임(ImageBitmap) 도착 시 display 에 합성한다.
    * 순서: clear(display) → static(axis/grid, main buffer) → series bitmap(worker).
    * epoch 가 현재와 다르면 stale frame 으로 drop 하고 bitmap 을 즉시 close(메모리).
    *
@@ -584,11 +583,11 @@ class EvChart {
   }
 
   /**
-   * worker 렌더 예외/사망 시 main series 래스터로 fallback 한다(Step 7 상태기계 → main RenderCore).
+   * worker 렌더 예외/사망 시 main series 래스터로 fallback 한다.
    * static 은 이미 main buffer 에 있으므로 series 만 그려 합성한다.
    *
    * render-error 로 들어온 경우(msg 있음) stale 에러(이미 더 새 프레임이 그려짐)면 fallback 하지 않는다 —
-   * 그리지 않으면 현재 화면을 stale series 로 덮지 않는다(이슈1 정합). worker 사망(_fail, msg 없음)으로
+   * 그리지 않으면 현재 화면을 stale series 로 덮지 않는다. worker 사망(_fail, msg 없음)으로
    * 들어온 경우는 현재 프레임을 그려야 하므로 epoch 비교 없이 항상 그린다.
    *
    * @param {{epoch:number}} [msg]   render-error 메시지(worker 사망 fallback 시 미전달)
@@ -675,9 +674,9 @@ class EvChart {
    * @returns {undefined}
    */
   /**
-   * worker 래스터 경로용 main hit-test 기하 패스(plan 원칙 4). 래스터(stroke/fill)는 worker 가 하지만
+   * worker 래스터 경로용 main hit-test 기하 패스. 래스터(stroke/fill)는 worker 가 하지만
    * hit-test 가 읽는 픽셀 기하(xp/yp/w/h)는 main 모델에 있어야 하므로, 여기서 series.computeGeometry 만
-   * 돌려 채운다(canvas 그리기 없음 — 싸다). worker micro 범위(line/bar/heatMap)와 동일 타입만 처리한다.
+   * 돌려 채운다(canvas 그리기 없음 — 싸다). worker 지원 타입(line/bar/heatMap)과 동일 타입만 처리한다.
    * @returns {undefined}
    */
   computeSeriesGeometry() {
@@ -982,7 +981,7 @@ class EvChart {
 
   /**
    * Draw the static layer (axis/grid/base labels) into the injected buffer context
-   * (RenderCore static 레이어 경계, Step 2.5-c). drawSeriesLayer(Step 3)와 동일하게 bufferCtx를
+   * (RenderCore static 레이어 경계). drawSeriesLayer 와 동일하게 bufferCtx를
    * 주입받아 worker가 자체 OffscreenCanvas ctx로 축을 래스터할 수 있게 한다(main 경로에선
    * this.bufferCtx와 동일하므로 픽셀 변화 없음).
    *

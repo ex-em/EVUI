@@ -1,16 +1,15 @@
 /* eslint-env worker */
 /**
- * worker 렌더 엔트리 (Step 8: worker-micro-poc).
+ * worker 렌더 엔트리.
  *
- * B2 원칙(plan.md 불변 원칙 7): worker 는 *자체* OffscreenCanvas 를 생성해 series 를 래스터하고
- * `transferToImageBitmap()` 으로 ImageBitmap 을 main 에 보낸다. 디스플레이 캔버스를
- * `transferControlToOffscreen` 으로 받지 않으므로 main 은 캔버스 소유권을 유지하고 worker 실패 시
- * main fallback 이 항상 가능하다.
+ * worker 는 *자체* OffscreenCanvas 를 생성해 series 를 래스터하고 `transferToImageBitmap()` 으로
+ * ImageBitmap 을 main 에 보낸다. 디스플레이 캔버스를 `transferControlToOffscreen` 으로 받지 않으므로
+ * main 은 캔버스 소유권을 유지하고 worker 실패 시 main fallback 이 항상 가능하다.
  *
  * 메시지:
  *  - {type:'init', version}            → OffscreenCanvas 지원 확인 후 {type:'ready'|'unsupported'} 응답
  *  - {type:'render', epoch, snapshot, columns}
- *      → 자체 OffscreenCanvas 에 series 래스터(Step 3 element draw 재사용) → transferToImageBitmap
+ *      → 자체 OffscreenCanvas 에 series 래스터(element draw 재사용) → transferToImageBitmap
  *      → {type:'rendered', epoch, bitmap, drawMs} (bitmap transfer) 응답. 예외 시 {type:'render-error'}.
  *
  * 래스터 알고리즘은 새로 구현하지 않는다 — `render.unpack.js` 가 스냅샷에서 element 인스턴스를
@@ -88,7 +87,7 @@ self.onmessage = (event) => {
     try {
       renderSnapshot(msg);
     } catch (err) {
-      // name/stack 까지 실어 main 에서 원인 진단이 가능하게 한다(이슈5).
+      // name/stack 까지 실어 main 에서 원인 진단이 가능하게 한다.
       self.postMessage({
         type: 'render-error',
         epoch: msg.epoch,

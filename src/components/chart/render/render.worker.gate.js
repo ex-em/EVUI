@@ -1,18 +1,16 @@
 /**
- * RenderCore worker 게이트 (Step 7: layer-arch-and-killswitch).
+ * RenderCore worker 게이트.
  *
  * 레이어 소유권·opt-in 게이트·worker 생명주기를 담당한다. worker 진입은 차트별 `options.workerRender`
  * (기본 off)로만 켜지며, opt-in 하지 않으면 worker 미진입 = 기존 main 경로 100% 유지.
  *
- * 레이어 경계·invalidation·B2 캔버스 소유권 전체 표는 `phases/chart-worker-offload/worker-arch.md` 참조.
- *
- * 핵심 계약(리뷰 반영):
- *  - **B2**: worker 는 *자체* OffscreenCanvas 를 만들어 `transferToImageBitmap()` → main `drawImage`.
+ * 핵심 계약:
+ *  - **캔버스 소유권**: worker 는 *자체* OffscreenCanvas 를 만들어 `transferToImageBitmap()` → main `drawImage`.
  *    디스플레이 캔버스를 `transferControlToOffscreen` 으로 넘기지 *않는다*(일방향 transfer = fallback 불가).
  *    따라서 worker 진입은 transfer 게이트가 아니라 **async ready 핸드셰이크**(initializing→ready→failed)다.
  *  - **opt-in**: worker 진입은 차트별 옵션(`options.workerRender`, 기본 off)으로만 켠다. chart.core 가
- *    `isEnabled: () => !!options.workerRender` 를 게이트에 주입한다(전역 플래그 없음 → OSS 무회귀).
- *  - **관측성**: init 실패 / render 예외 / timeout / main fallback 전환 hook 자리(기본 no-op).
+ *    `isEnabled: () => !!options.workerRender` 를 게이트에 주입한다(전역 플래그 없음 → 무회귀).
+ *  - **관측성**: init 실패 / render 예외 / timeout / main fallback 전환 hook(chart.core 가 Console.warn 주입).
  */
 
 /** worker 가 모르는 스냅샷 버전이면 main fallback. render.snapshot.js 와 동일 값. */
@@ -20,7 +18,7 @@ import { RENDER_SNAPSHOT_VERSION } from './render.snapshot';
 /**
  * worker 를 inline(blob)으로 번들한다. lib 빌드가 worker 를 별도 에셋(`/assets/render.worker-*.js`)으로
  * emit 하면 소비자 앱 루트에 그 경로가 없어 404 → worker 미로드. inline 은 소비자 번들러/에셋 서빙과
- * 무관하게 항상 로드된다(대가: 번들 크기 +worker, CSP blob 허용 필요). Step 10 소비자 패키징.
+ * 무관하게 항상 로드된다(대가: 번들 크기 +worker, CSP blob 허용 필요).
  */
 import RenderWorkerInline from './render.worker.js?worker&inline';
 
@@ -38,16 +36,16 @@ const DEFAULT_INIT_TIMEOUT_MS = 3000;
 /** in-flight(미응답) worker 렌더 상한. 초과분은 보내지 않고 main 이 그 프레임을 그린다(coalescing 보수값). */
 const DEFAULT_MAX_IN_FLIGHT = 2;
 
-/** 연속 render-error 임계치. 초과 시 worker 를 포기(_fail)하고 영구 main 경로로 — 무한 재시도 방지(이슈5). */
+/** 연속 render-error 임계치. 초과 시 worker 를 포기(_fail)하고 영구 main 경로로 — 무한 재시도 방지. */
 const DEFAULT_MAX_RENDER_ERRORS = 3;
 
 const NOOP = () => {};
 
 /**
- * 관측성 훅 자리(기본 no-op). Step 8/9 에서 실제 로깅/메트릭을 주입한다.
+ * 관측성 훅(기본 no-op, chart.core 가 실제 로깅을 주입).
  *  - onInitFailure(reason)    : worker 생성 실패 / onerror / unsupported
  *  - onTimeout(reason)        : ready 핸드셰이크 timeout
- *  - onRenderException(reason): worker 렌더 예외(Step 8)
+ *  - onRenderException(reason): worker 렌더 예외
  *  - onFallback(reason)       : main 경로로 전환
  */
 const DEFAULT_HOOKS = {
@@ -60,7 +58,7 @@ const DEFAULT_HOOKS = {
 /**
  * worker 렌더 환경 feature-detect.
  *  - Worker / OffscreenCanvas 존재(SSR·jsdom 은 둘 중 하나 부재로 false)
- *  - B2 경로에 필요한 OffscreenCanvas.transferToImageBitmap 존재
+ *  - bitmap 합성 경로에 필요한 OffscreenCanvas.transferToImageBitmap 존재
  */
 export function detectWorkerRenderSupport() {
   return (
@@ -86,7 +84,6 @@ export function canSerializeSnapshot(snapshot) {
 /**
  * inline(blob) worker 를 생성한다. 생성 자체가 throw 할 수 있으므로(예: CSP 가 blob/data worker 차단)
  * try/catch 는 호출처(start)가 소유한다 — 에러 객체를 onInitFailure 로 보내 원인 진단이 가능하게 한다.
- * (이전 구현은 여기서 catch 해 null 만 돌려 에러를 폐기했음 — 이슈4.)
  */
 export function createRenderWorker() {
   return new RenderWorkerInline();
@@ -114,7 +111,7 @@ export class WorkerRenderGate {
     this._errorHandler = NOOP;
     // 미응답(in-flight) 렌더 수. 상한 초과 시 main 이 그 프레임을 그린다(stale frame pile-up 방지).
     this._inFlight = 0;
-    // 연속 render-error 수(rendered 성공 시 0 으로 리셋). 임계치 초과 시 worker 포기(이슈5).
+    // 연속 render-error 수(rendered 성공 시 0 으로 리셋). 임계치 초과 시 worker 포기.
     this._renderErrorStreak = 0;
 
     // worker 진입 여부(차트별 opt-in). chart.core 가 `() => !!options.workerRender` 를 주입한다.
@@ -145,7 +142,7 @@ export class WorkerRenderGate {
     try {
       worker = this._createWorker();
     } catch (e) {
-      // worker 생성 throw(예: CSP blob 차단) — 에러 객체를 그대로 넘겨 원인 진단 가능하게 한다(이슈4).
+      // worker 생성 throw(예: CSP blob 차단) — 에러 객체를 그대로 넘겨 원인 진단 가능하게 한다.
       this.state = RENDER_WORKER_STATE.FAILED;
       this.hooks.onInitFailure(e);
       this.hooks.onFallback('worker-create-failed');
@@ -195,7 +192,7 @@ export class WorkerRenderGate {
   }
 
   /**
-   * series 래스터를 worker 로 보낸다(B2). packed 컬럼 버퍼는 transfer(packSeries 가 copy 한 사본).
+   * series 래스터를 worker 로 보낸다. packed 컬럼 버퍼는 transfer(packSeries 가 copy 한 사본).
    * @param {object} snapshot      RenderInput (epoch 포함)
    * @param {object} columns       packSeries(snapshot).columns
    * @param {ArrayBuffer[]} transferList   transfer 대상 버퍼(copy 본)
@@ -238,7 +235,7 @@ export class WorkerRenderGate {
     }
     if (msg.type === 'ready' && this.state === RENDER_WORKER_STATE.INITIALIZING) {
       // 스냅샷 계약 버전 불일치(stale/캐시된 다른 버전 worker 번들)면 fallback — 잘못된 worker 가
-      // READY 가 되어 깨진 프레임을 그리는 것을 막는다(리뷰 반영).
+      // READY 가 되어 깨진 프레임을 그리는 것을 막는다.
       if (msg.version !== this.version) {
         this._fail('version-mismatch');
         return;
@@ -253,7 +250,7 @@ export class WorkerRenderGate {
       this._frameHandler(msg);
     } else if (msg.type === 'render-error') {
       this._inFlight = Math.max(0, this._inFlight - 1);
-      // payload 전체(name/stack 포함) 전달 — 원인 진단 가능(이슈5). streak 은 모든 에러에 누적한다.
+      // payload 전체(name/stack 포함) 전달 — 원인 진단 가능. streak 은 모든 에러에 누적한다.
       this.hooks.onRenderException(msg);
       // fallback draw 는 _errorHandler 가 epoch 비교로 current 프레임에만 적용한다(stale 에러는 화면 안 덮음).
       this._errorHandler(msg);
@@ -280,7 +277,7 @@ export class WorkerRenderGate {
       this.worker = null;
     }
     // worker 사망 시 응답이 안 온 in-flight 프레임은 영영 안 온다. main 이 series 를 그려야 안 그러면
-    // 다음 외부 이벤트(정적 차트면 영원히)까지 이전 프레임이 남아 화면이 동결된다(이슈6).
+    // 다음 외부 이벤트(정적 차트면 영원히)까지 이전 프레임이 남아 화면이 동결된다.
     const hadInFlight = this._inFlight > 0;
     this._inFlight = 0;
     this.hooks.onInitFailure(reason);
