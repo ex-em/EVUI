@@ -70,7 +70,7 @@ describe('WorkerRenderGate — fallback 결정 (worker vs main)', () => {
     expect(onFallback).toHaveBeenCalledWith('unsupported');
   });
 
-  it('worker 생성 실패(worker-URL smoke 깨짐) → FAILED + onInitFailure + onFallback', () => {
+  it('worker 생성 실패(null 반환) → FAILED + onInitFailure + onFallback', () => {
     const onInitFailure = vi.fn();
     const onFallback = vi.fn();
     const gate = new WorkerRenderGate({
@@ -86,6 +86,25 @@ describe('WorkerRenderGate — fallback 결정 (worker vs main)', () => {
     expect(gate.shouldRenderOnWorker({})).toBe(false);
   });
 
+  it('worker 생성 throw(예: CSP blob 차단) → FAILED + onInitFailure 에 에러 객체 전달(이슈4)', () => {
+    const onInitFailure = vi.fn();
+    const onFallback = vi.fn();
+    const err = new Error('blocked by CSP');
+    const gate = new WorkerRenderGate({
+      isEnabled: () => true,
+      isSupported: () => true,
+      createWorker: () => {
+        throw err;
+      },
+      hooks: { onInitFailure, onFallback },
+    });
+
+    expect(gate.start()).toBe(RENDER_WORKER_STATE.FAILED);
+    // 에러 객체가 폐기되지 않고 그대로 전달된다(원인 진단 가능).
+    expect(onInitFailure).toHaveBeenCalledWith(err);
+    expect(onFallback).toHaveBeenCalledWith('worker-create-failed');
+  });
+
   it('직렬화 불가 스냅샷이면 ready 여도 main(worker 미선택)', () => {
     const gate = new WorkerRenderGate({
       isEnabled: () => true,
@@ -93,7 +112,7 @@ describe('WorkerRenderGate — fallback 결정 (worker vs main)', () => {
       createWorker: makeFakeWorker,
     });
     gate.start();
-    gate.worker.onmessage({ data: { type: 'ready' } });
+    gate.worker.onmessage({ data: { type: 'ready', version: gate.version } });
 
     expect(gate.isReady()).toBe(true);
     expect(gate.shouldRenderOnWorker({ a: 1 })).toBe(true);
@@ -122,7 +141,7 @@ describe('WorkerRenderGate — async ready 상태기계', () => {
       createWorker: makeFakeWorker,
     });
     gate.start();
-    gate.worker.onmessage({ data: { type: 'ready' } });
+    gate.worker.onmessage({ data: { type: 'ready', version: gate.version } });
 
     expect(gate.state).toBe(RENDER_WORKER_STATE.READY);
     expect(gate.isReady()).toBe(true);
@@ -157,6 +176,25 @@ describe('WorkerRenderGate — async ready 상태기계', () => {
 
     expect(gate.state).toBe(RENDER_WORKER_STATE.FAILED);
   });
+
+  it('ready 인데 스냅샷 버전 불일치 → version-mismatch 로 FAILED, main fallback', () => {
+    const onInitFailure = vi.fn();
+    const onFallback = vi.fn();
+    const gate = new WorkerRenderGate({
+      isEnabled: () => true,
+      isSupported: () => true,
+      createWorker: makeFakeWorker,
+      hooks: { onInitFailure, onFallback },
+    });
+    gate.start();
+    // stale/다른 버전 worker 번들이 잘못된 version 을 echo.
+    gate.worker.onmessage({ data: { type: 'ready', version: gate.version + 99 } });
+
+    expect(gate.state).toBe(RENDER_WORKER_STATE.FAILED);
+    expect(gate.isReady()).toBe(false);
+    expect(onInitFailure).toHaveBeenCalledWith('version-mismatch');
+    expect(onFallback).toHaveBeenCalledWith('version-mismatch');
+  });
 });
 
 describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
@@ -168,7 +206,7 @@ describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
       ...opts,
     });
     gate.start();
-    gate.worker.onmessage({ data: { type: 'ready' } });
+    gate.worker.onmessage({ data: { type: 'ready', version: gate.version } });
     return gate;
   };
 
@@ -268,7 +306,7 @@ describe('WorkerRenderGate — ready 핸드셰이크 timeout', () => {
       initTimeoutMs: 1000,
     });
     gate.start();
-    gate.worker.onmessage({ data: { type: 'ready' } });
+    gate.worker.onmessage({ data: { type: 'ready', version: gate.version } });
 
     vi.advanceTimersByTime(5000);
 
