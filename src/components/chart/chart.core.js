@@ -113,7 +113,7 @@ class EvChart {
       // 그 외 실패는 onInitFailure/onRenderException 이 한 번씩만 알린다(중복 로깅 방지).
       hooks: {
         onInitFailure: (info) =>
-          Console.warn('[EvChart] workerRender 초기화 실패 — main 렌더로 fallback:', info),
+          Console.warn('[EvChart] workerRender 비활성화 — main 렌더로 fallback:', info),
         onRenderException: (info) =>
           Console.warn('[EvChart] workerRender 렌더 예외 — main 렌더로 fallback:', info),
         onFallback: (reason) => {
