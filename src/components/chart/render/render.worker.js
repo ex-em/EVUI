@@ -67,7 +67,16 @@ self.onmessage = (event) => {
   }
 
   if (msg.type === 'init') {
-    const supported = typeof OffscreenCanvas !== 'undefined';
+    // OffscreenCanvas 존재만으로는 부족하다 — 2d context 를 실제로 얻을 수 있어야 render 가 성공한다.
+    // 미지원이면 매 프레임 render-error 를 내지 않도록 init 핸드셰이크에서 미리 걸러 main 경로로 보낸다.
+    let supported = typeof OffscreenCanvas !== 'undefined';
+    if (supported) {
+      try {
+        supported = !!new OffscreenCanvas(1, 1).getContext('2d');
+      } catch (e) {
+        supported = false;
+      }
+    }
     self.postMessage({
       type: supported ? 'ready' : 'unsupported',
       version: msg.version,
@@ -79,10 +88,13 @@ self.onmessage = (event) => {
     try {
       renderSnapshot(msg);
     } catch (err) {
+      // name/stack 까지 실어 main 에서 원인 진단이 가능하게 한다(이슈5).
       self.postMessage({
         type: 'render-error',
         epoch: msg.epoch,
         message: String((err && err.message) || err),
+        name: err && err.name,
+        stack: err && err.stack,
       });
     }
   }

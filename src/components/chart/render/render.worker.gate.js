@@ -38,6 +38,9 @@ const DEFAULT_INIT_TIMEOUT_MS = 3000;
 /** in-flight(미응답) worker 렌더 상한. 초과분은 보내지 않고 main 이 그 프레임을 그린다(coalescing 보수값). */
 const DEFAULT_MAX_IN_FLIGHT = 2;
 
+/** 연속 render-error 임계치. 초과 시 worker 를 포기(_fail)하고 영구 main 경로로 — 무한 재시도 방지(이슈5). */
+const DEFAULT_MAX_RENDER_ERRORS = 3;
+
 const NOOP = () => {};
 
 /**
@@ -102,6 +105,7 @@ export class WorkerRenderGate {
     this.version = options.version ?? RENDER_SNAPSHOT_VERSION;
     this.initTimeoutMs = options.initTimeoutMs ?? DEFAULT_INIT_TIMEOUT_MS;
     this.maxInFlight = options.maxInFlight ?? DEFAULT_MAX_IN_FLIGHT;
+    this.maxRenderErrors = options.maxRenderErrors ?? DEFAULT_MAX_RENDER_ERRORS;
     this.hooks = { ...DEFAULT_HOOKS, ...(options.hooks || {}) };
     this._timer = null;
 
@@ -110,6 +114,8 @@ export class WorkerRenderGate {
     this._errorHandler = NOOP;
     // 미응답(in-flight) 렌더 수. 상한 초과 시 main 이 그 프레임을 그린다(stale frame pile-up 방지).
     this._inFlight = 0;
+    // 연속 render-error 수(rendered 성공 시 0 으로 리셋). 임계치 초과 시 worker 포기(이슈5).
+    this._renderErrorStreak = 0;
 
     // worker 진입 여부(차트별 opt-in). chart.core 가 `() => !!options.workerRender` 를 주입한다.
     // 주입이 없으면 보수적으로 off(기존 main 경로 유지).
@@ -200,10 +206,19 @@ export class WorkerRenderGate {
       return false;
     }
     this._inFlight += 1;
-    this.worker.postMessage(
-      { type: 'render', epoch: snapshot.epoch, snapshot, columns },
-      transferList || [],
-    );
+    try {
+      this.worker.postMessage(
+        { type: 'render', epoch: snapshot.epoch, snapshot, columns },
+        transferList || [],
+      );
+    } catch (e) {
+      // postMessage 실패(clone/detach 불가, worker 사망) → in-flight 누수 방지 + worker 포기(main 경로).
+      // 미전송이므로 false 를 돌려 호출부(main)가 이 프레임을 그린다.
+      this._inFlight = Math.max(0, this._inFlight - 1);
+      this.hooks.onRenderException(e);
+      this._fail('post-message-failed');
+      return false;
+    }
     return true;
   }
 
@@ -234,11 +249,19 @@ export class WorkerRenderGate {
       this._fail('worker-unsupported');
     } else if (msg.type === 'rendered') {
       this._inFlight = Math.max(0, this._inFlight - 1);
+      this._renderErrorStreak = 0;
       this._frameHandler(msg);
     } else if (msg.type === 'render-error') {
       this._inFlight = Math.max(0, this._inFlight - 1);
-      this.hooks.onRenderException(msg.message);
+      // payload 전체(name/stack 포함) 전달 — 원인 진단 가능(이슈5). streak 은 모든 에러에 누적한다.
+      this.hooks.onRenderException(msg);
+      // fallback draw 는 _errorHandler 가 epoch 비교로 current 프레임에만 적용한다(stale 에러는 화면 안 덮음).
       this._errorHandler(msg);
+      this._renderErrorStreak += 1;
+      if (this._renderErrorStreak >= this.maxRenderErrors) {
+        // 결정적 실패(예: 2d context 미지원)로 매 프레임 비용만 지불하는 무한 재시도 차단.
+        this._fail('render-error-threshold');
+      }
     }
   }
 
@@ -256,8 +279,16 @@ export class WorkerRenderGate {
       this.worker.terminate();
       this.worker = null;
     }
+    // worker 사망 시 응답이 안 온 in-flight 프레임은 영영 안 온다. main 이 series 를 그려야 안 그러면
+    // 다음 외부 이벤트(정적 차트면 영원히)까지 이전 프레임이 남아 화면이 동결된다(이슈6).
+    const hadInFlight = this._inFlight > 0;
+    this._inFlight = 0;
     this.hooks.onInitFailure(reason);
     this.hooks.onFallback(reason);
+    if (hadInFlight) {
+      // msg 없이 호출 → drawSeriesLayerFallback() 가 현재 프레임을 그린다(epoch 비교 없음).
+      this._errorHandler();
+    }
   }
 
   _clearTimer() {
