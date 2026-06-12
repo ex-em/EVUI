@@ -81,17 +81,12 @@ export function canSerializeSnapshot(snapshot) {
 }
 
 /**
- * 조기 worker-URL smoke(리뷰: Step 10 → 7 로 앞당김).
- * `new Worker(new URL('...', import.meta.url), {type:'module'})` 가 ESM import / UMD(require) / SSR 에서
- * 번들/실행 가능한지 여기서 확인한다. 깨지면(throw) null 을 돌려 feature-detect 가 main fallback 하도록 한다.
- * (전체 매트릭스 경화는 Step 10.)
+ * inline(blob) worker 를 생성한다. 생성 자체가 throw 할 수 있으므로(예: CSP 가 blob/data worker 차단)
+ * try/catch 는 호출처(start)가 소유한다 — 에러 객체를 onInitFailure 로 보내 원인 진단이 가능하게 한다.
+ * (이전 구현은 여기서 catch 해 null 만 돌려 에러를 폐기했음 — 이슈4.)
  */
 export function createRenderWorker() {
-  try {
-    return new RenderWorkerInline();
-  } catch (e) {
-    return null;
-  }
+  return new RenderWorkerInline();
 }
 
 /**
@@ -140,7 +135,16 @@ export class WorkerRenderGate {
       return this.state;
     }
 
-    const worker = this._createWorker();
+    let worker;
+    try {
+      worker = this._createWorker();
+    } catch (e) {
+      // worker 생성 throw(예: CSP blob 차단) — 에러 객체를 그대로 넘겨 원인 진단 가능하게 한다(이슈4).
+      this.state = RENDER_WORKER_STATE.FAILED;
+      this.hooks.onInitFailure(e);
+      this.hooks.onFallback('worker-create-failed');
+      return this.state;
+    }
     if (!worker) {
       this.state = RENDER_WORKER_STATE.FAILED;
       this.hooks.onInitFailure('worker-create-failed');
@@ -218,6 +222,12 @@ export class WorkerRenderGate {
       return;
     }
     if (msg.type === 'ready' && this.state === RENDER_WORKER_STATE.INITIALIZING) {
+      // 스냅샷 계약 버전 불일치(stale/캐시된 다른 버전 worker 번들)면 fallback — 잘못된 worker 가
+      // READY 가 되어 깨진 프레임을 그리는 것을 막는다(리뷰 반영).
+      if (msg.version !== this.version) {
+        this._fail('version-mismatch');
+        return;
+      }
       this._clearTimer();
       this.state = RENDER_WORKER_STATE.READY;
     } else if (msg.type === 'unsupported') {

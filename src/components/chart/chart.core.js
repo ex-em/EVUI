@@ -1,4 +1,4 @@
-import { mobileCheck, truthyNumber } from '@/common/utils';
+import { mobileCheck, truthyNumber, Console } from '@/common/utils';
 import Util, { calcExtraWidthLabel } from './helpers/helpers.util';
 import Model from './model';
 import TimeScale from './scale/scale.time';
@@ -115,6 +115,20 @@ class EvChart {
     // opt-in 하지 않으면 worker 미진입 = 기존 main 경로 100% 유지(아래 drawChart 의 worker 분기는 ready 일 때만).
     this.renderWorkerGate = new WorkerRenderGate({
       isEnabled: () => !!this.options.workerRender,
+      // 관측성(이슈4): worker 실패/예외를 Console.warn(worker-safe)으로 노출해 무신호 사망을 막는다.
+      // opt-in-off(기능 미사용)는 정상 흐름이라 silent. unsupported 는 전용 hook 이 없어 onFallback 에서,
+      // 그 외 실패는 onInitFailure/onRenderException 이 한 번씩만 알린다(중복 로깅 방지).
+      hooks: {
+        onInitFailure: (info) =>
+          Console.warn('[EvChart] workerRender 초기화 실패 — main 렌더로 fallback:', info),
+        onRenderException: (info) =>
+          Console.warn('[EvChart] workerRender 렌더 예외 — main 렌더로 fallback:', info),
+        onFallback: (reason) => {
+          if (reason === 'unsupported') {
+            Console.warn('[EvChart] workerRender 미지원 환경 — main 렌더 사용');
+          }
+        },
+      },
     });
     // display frame ↔ hit-test model 일관성 / stale frame drop 용 단조 증가 epoch(Step 8).
     this.renderEpoch = 0;
