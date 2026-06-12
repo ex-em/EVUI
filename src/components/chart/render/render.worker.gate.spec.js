@@ -318,20 +318,25 @@ describe('WorkerRenderGate — worker 렌더 라우팅', () => {
     expect(onError).not.toHaveBeenCalled();
   });
 
-  it('render() postMessage throw → in-flight 누수 없이 false + onRenderException + _fail', () => {
+  it('render() postMessage throw → in-flight 0 + onRenderException + _fail, errorHandler 미호출(호출부가 그림)', () => {
     const onRenderException = vi.fn();
     const gate = makeReadyGate({ hooks: { onRenderException } });
+    const onError = vi.fn();
+    gate.setErrorHandler(onError);
+    gate.render({ epoch: 1 }, {}, []); // 정상 전송 → in-flight 1
     const err = new Error('DataCloneError');
     gate.worker.postMessage = () => {
       throw err;
     };
 
-    const sent = gate.render({ epoch: 1 }, {}, []);
+    const sent = gate.render({ epoch: 2 }, {}, []);
 
     expect(sent).toBe(false);
     expect(gate._inFlight).toBe(0); // 누수 없음
     expect(onRenderException).toHaveBeenCalledWith(err);
     expect(gate.state).toBe(RENDER_WORKER_STATE.FAILED);
+    // 미전송이라 호출부(main)가 이 프레임을 그리므로 _fail 이 errorHandler 로 같은 프레임을 또 그리지 않는다.
+    expect(onError).not.toHaveBeenCalled();
   });
 });
 
