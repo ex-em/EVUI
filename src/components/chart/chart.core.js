@@ -472,28 +472,118 @@ class EvChart {
     if (!this.renderWorkerGate?.canAcceptRender()) {
       return false;
     }
+    // 시리즈 타입/축/상호작용 상태가 worker 재구성(line·bar(non-time)·heatMap, 숫자 축, 무선택)으로
+    // 동등 렌더 가능한 프레임만 worker 로 보낸다. 아니면 main 경로(무회귀). (이슈2/3/7/8)
+    if (!this.canRenderSeriesOnWorker(hitInfo).ok) {
+      return false;
+    }
 
     // epoch 는 drawChart 진입부에서 이미 증가시켰다(이슈1) — 여기서는 현재 값을 그대로 스냅샷에 싣는다.
     const epoch = this.renderEpoch;
     const snapshot = toRenderSnapshot(this, epoch);
     const { columns, transferList } = packSeries(snapshot);
 
-    // static(axis/grid) 은 main buffer 에(worker bitmap 과 합성).
+    // static(axis/grid) 과 hit-test 기하는 두 경로(전송/미전송) 공통이라 먼저 그린다.
+    // static 은 main buffer 에(worker bitmap 과 합성). 기하(xp/yp/w/h)는 래스터를 worker 가 하더라도
+    // hover hit-test/tooltip 이 읽도록 main 모델에 채운다(plan 원칙 4). computeGeometry 는 canvas 그리기 없음.
     this.drawStaticLayer(this.bufferCtx, hitInfo);
-    // hit-test 가 읽는 픽셀 기하(xp/yp/w/h)는 main 모델에 채운다 — 래스터는 worker 가 하지만 기하는
-    // main 에 있어야 hover hit-test/tooltip 이 동작한다(plan 원칙 4). computeGeometry 는 canvas 그리기 없음.
     this.computeSeriesGeometry();
-    // overlay/tip 은 main 즉답(별도 overlay canvas — series bitmap 과 무관).
-    this.drawSeriesOverlay();
-    this.drawTip();
 
     const sent = this.renderWorkerGate.render(snapshot, columns, transferList);
     if (!sent) {
       // in-flight 상한 등으로 미전송 → main 이 이 프레임의 series 를 그린다.
+      // main 경로와 동일 순서(static→series→overlay→tip)로 z-order 를 맞춘다(이슈8).
       this.drawSeriesLayer(this.bufferCtx, hitInfo);
+    }
+    // overlay 는 별도 overlay canvas(series bitmap 과 무관). tip 은 buffer 에 그리지만 위 가드가
+    // maxTip·select·hover 상태를 모두 막으므로 worker 전송 프레임에서 그릴 tip 이 없다(z-order 무관).
+    this.drawSeriesOverlay();
+    this.drawTip();
+    if (!sent) {
       this.commitToDisplay(this.displayCtx, this.bufferCanvas);
     }
     return true;
+  }
+
+  /**
+   * worker series 래스터 경로 진입 가능 여부. worker 재구성/기하(render.unpack·render.snapshot)는
+   * line·bar(non-time)·heatMap + 숫자 축만 동등 렌더하며, 선택/maxTip/hover tip 은 main buffer 전용이라
+   * worker 프레임에 반영되지 않는다. 하나라도 어긋나면 main 경로로 보내 무회귀를 보장한다.
+   *
+   * @param {any} [hitInfo]   legend/hover hit (drawChart 인자)
+   * @returns {{ok:boolean, reason?:string}}
+   */
+  canRenderSeriesOnWorker(hitInfo) {
+    // (이슈7) hover/legend hit — 이번 프레임(hitInfo) 또는 잔류(lastHitInfo). drawTip 이 buffer 에 그린다.
+    if (hitInfo || this.lastHitInfo) {
+      return { ok: false, reason: 'hit-info' };
+    }
+    // (이슈7/8) maxTip(상시)·select 사용 — tip/selection 이 main buffer 에 그려져 worker bitmap 과 어긋난다.
+    if (this.hasMainBufferTipState()) {
+      return { ok: false, reason: 'buffer-tip-state' };
+    }
+
+    const charts = this.seriesInfo?.charts ?? {};
+    const supported = { line: true, bar: true, heatMap: true };
+
+    // (이슈2) 미지원 타입(scatter/pie 등)에 visible 시리즈가 있으면 worker 가 그 시리즈를 무음 누락한다.
+    const unsupported = Object.keys(charts).find(
+      (type) => !supported[type] && (charts[type] ?? []).some((id) => this.seriesList[id]?.show !== false),
+    );
+    if (unsupported) {
+      return { ok: false, reason: `unsupported-type:${unsupported}` };
+    }
+
+    // (이슈2) TimeBar(opt.timeMode)는 worker 가 일반 Bar 로 재구성한다 → 시간축 bar 가 깨진다.
+    const hasVisibleTimeBar = (charts.bar ?? []).some((id) => {
+      const s = this.seriesList[id];
+      return s?.show !== false && s?.timeMode;
+    });
+    if (hasVisibleTimeBar) {
+      return { ok: false, reason: 'time-bar' };
+    }
+
+    // (이슈3) time(Date)·step(category, string) 축은 line/bar 데이터의 x/y 가 비숫자 → snapshot 이 null 로
+    // 떨궈 worker 가 0픽셀을 그린다. heatMap 은 자체 label 재구성 경로라 제외(현행 동작 유지).
+    if (this.hasNonNumericAxisForLineBar()) {
+      return { ok: false, reason: 'non-numeric-axis' };
+    }
+
+    return { ok: true };
+  }
+
+  /**
+   * main buffer(bufferCtx)에 tip/선택 표시를 그리는 상태인지. 이 상태면 worker bitmap 합성 순서상
+   * tip 이 series 에 가려지거나(z-order 역전) 선택/dim 이 worker 프레임에서 누락된다(이슈7/8).
+   * runtime select-info 객체 대신 그것을 켜는 options 플래그로 판정한다(안정적·null 모호성 없음).
+   * @returns {boolean}
+   */
+  hasMainBufferTipState() {
+    const opt = this.options ?? {};
+    return !!(
+      opt.maxTip?.use
+      || opt.selectItem?.use
+      || opt.selectLabel?.use
+      || opt.selectSeries?.use
+    );
+  }
+
+  /**
+   * visible line/bar 시리즈가 있고 축(x 또는 y) 중 time/step(category)이 있으면 true.
+   * 해당 축의 라벨 데이터(Date/string)는 비숫자라 worker snapshot 에서 null 처리된다(이슈3).
+   * @returns {boolean}
+   */
+  hasNonNumericAxisForLineBar() {
+    const charts = this.seriesInfo?.charts ?? {};
+    const hasLineBar = ['line', 'bar'].some((type) =>
+      (charts[type] ?? []).some((id) => this.seriesList[id]?.show !== false),
+    );
+    if (!hasLineBar) {
+      return false;
+    }
+    const isNonNumeric = (axis) => axis?.type === 'time' || axis?.type === 'step';
+    return (this.options?.axesX ?? []).some(isNonNumeric)
+      || (this.options?.axesY ?? []).some(isNonNumeric);
   }
 
   /**
