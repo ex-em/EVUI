@@ -258,6 +258,9 @@ export class WorkerRenderGate {
       this._renderErrorStreak += 1;
       if (this._renderErrorStreak >= this.maxRenderErrors) {
         // 결정적 실패(예: 2d context 미지원)로 매 프레임 비용만 지불하는 무한 재시도 차단.
+        // 위 _errorHandler(msg) 가 이미 현재 프레임을 처리했으므로 in-flight 를 비워 _fail 의
+        // in-flight 복구가 같은 프레임을 또 그리지 않게 한다.
+        this._inFlight = 0;
         this._fail('render-error-threshold');
       }
     }
