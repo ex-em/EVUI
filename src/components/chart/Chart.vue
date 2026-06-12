@@ -244,7 +244,9 @@ export default {
           setOptionsForUseZoom(newOpt);
         }
       },
-      { deep: true, flush: 'post' },
+      // shallowOptionsWatch opt-in 이면 deep 추적을 끈다(매 갱신 deep traverse 비용 제거).
+      // 소비자는 options 변경 시 새 top-level 참조를 할당해야 한다(in-place 변경은 미감지).
+      { deep: !normalizedOptions.shallowOptionsWatch, flush: 'post' },
     );
 
     watch(
