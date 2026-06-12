@@ -7,7 +7,7 @@ import {
 } from './render.worker.gate';
 
 /**
- * Step 7: layer-arch-and-killswitch — worker 게이트(kill switch · feature-detect · ready 상태기계 · fallback).
+ * worker 게이트(opt-in 게이트 · feature-detect · ready 상태기계 · fallback).
  *
  * 이 step 은 실제 worker 렌더를 연결하지 않으므로, 여기선 **경로 결정(worker vs main)** 과
  * **async ready 상태기계(initializing→ready→failed)** 만 검증한다. 기존 렌더 golden 회귀는 test:visual 담당.
@@ -86,7 +86,7 @@ describe('WorkerRenderGate — fallback 결정 (worker vs main)', () => {
     expect(gate.shouldRenderOnWorker({})).toBe(false);
   });
 
-  it('worker 생성 throw(예: CSP blob 차단) → FAILED + onInitFailure 에 에러 객체 전달(이슈4)', () => {
+  it('worker 생성 throw(예: CSP blob 차단) → FAILED + onInitFailure 에 에러 객체 전달', () => {
     const onInitFailure = vi.fn();
     const onFallback = vi.fn();
     const err = new Error('blocked by CSP');
@@ -197,7 +197,7 @@ describe('WorkerRenderGate — async ready 상태기계', () => {
   });
 });
 
-describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
+describe('WorkerRenderGate — worker 렌더 라우팅', () => {
   const makeReadyGate = (opts = {}) => {
     const gate = new WorkerRenderGate({
       isEnabled: () => true,
@@ -269,7 +269,7 @@ describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
     const errMsg = { type: 'render-error', epoch: 9, message: 'boom', name: 'TypeError', stack: 's' };
     gate.worker.onmessage({ data: errMsg });
 
-    // name/stack 진단 위해 payload 전체를 넘긴다(이슈5).
+    // name/stack 진단 위해 payload 전체를 넘긴다.
     expect(onRenderException).toHaveBeenCalledWith(errMsg);
     expect(onError).toHaveBeenCalledWith(errMsg);
     expect(gate.canAcceptRender()).toBe(true);
@@ -284,7 +284,7 @@ describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
     expect(gate._renderErrorStreak).toBe(0);
   });
 
-  it('연속 render-error 가 임계치(maxRenderErrors) 도달 → FAILED(무한 재시도 차단, 이슈5)', () => {
+  it('연속 render-error 가 임계치(maxRenderErrors) 도달 → FAILED(무한 재시도 차단)', () => {
     const onInitFailure = vi.fn();
     const gate = makeReadyGate({ maxRenderErrors: 3, hooks: { onInitFailure } });
     for (let i = 1; i <= 3; i++) {
@@ -295,7 +295,7 @@ describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
     expect(onInitFailure).toHaveBeenCalledWith('render-error-threshold');
   });
 
-  it('_fail 시 in-flight 프레임이 있으면 errorHandler 로 main fallback 을 그린다(화면 동결 방지, 이슈6)', () => {
+  it('_fail 시 in-flight 프레임이 있으면 errorHandler 로 main fallback 을 그린다(화면 동결 방지)', () => {
     const gate = makeReadyGate();
     const onError = vi.fn();
     gate.setErrorHandler(onError);
@@ -318,7 +318,7 @@ describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
     expect(onError).not.toHaveBeenCalled();
   });
 
-  it('render() postMessage throw → in-flight 누수 없이 false + onRenderException + _fail(이슈6/리뷰)', () => {
+  it('render() postMessage throw → in-flight 누수 없이 false + onRenderException + _fail', () => {
     const onRenderException = vi.fn();
     const gate = makeReadyGate({ hooks: { onRenderException } });
     const err = new Error('DataCloneError');

@@ -1,9 +1,9 @@
 /**
- * RenderCore worker 측 재구성/래스터 (Step 8: worker-micro-poc).
+ * RenderCore worker 측 재구성/래스터.
  *
- * worker 는 main 으로부터 **plain RenderInput 스냅샷(Step 6)** 만 받는다(class instance/함수 clone 없음).
+ * worker 는 main 으로부터 **plain RenderInput 스냅샷** 만 받는다(class instance/함수 clone 없음).
  * 이 모듈은 그 스냅샷에서 element 렌더러 인스턴스를 **재구성**하고 worker 의 OffscreenCanvas ctx 에
- * **Step 3 의 series 래스터(element `draw()`)를 그대로 호출**해 그린다.
+ * **series 래스터(element `draw()`)를 그대로 호출**해 그린다.
  *
  * 핵심(금지사항 준수): **series 래스터를 새로 구현하지 않는다.** stroke/fill/path 빌드 알고리즘은
  * `element.line.js` / `element.bar.js` / `element.heatmap.js` 의 `draw()` 를 재사용한다. 이 모듈이 하는 일은
@@ -11,10 +11,10 @@
  *  (2) packed 컬럼(Float64, NaN sentinel) → data point 객체 복원,
  *  (3) drawSeriesLayer(chart.core.js)와 동일한 per-type 디스패치 루프(트리비얼 orchestration).
  * 좌표/기하(xp/yp/w/h)는 `draw()` 가 내부 `computeGeometry` 로 재계산하므로 worker 로 보낼 필요가 없다
- * (hit-test 용 main 기하는 Step 2 가 main 에서 계산 — render-contract.md §2).
+ * (hit-test 용 main 기하는 main 이 계산한다).
  *
- * micro PoC 범위: line / bar / heatMap, interaction 비활성(select 옵션·legendHitInfo 없음).
- * scatter / pie 는 Step 9 통합에서.
+ * 지원 범위: line / bar / heatMap, interaction 비활성(select 옵션·legendHitInfo 없음).
+ * scatter / pie 는 미지원(진입 가드가 main 경로로 보낸다).
  */
 
 import Line from '../element/element.line';
@@ -31,7 +31,7 @@ function nanToNull(value) {
 
 /**
  * packed 컬럼(Float64Array + length)을 data point 객체 배열로 복원한다.
- * line/bar/heatMap = {x,y,o,b}. (pie=value 는 micro 범위 밖)
+ * line/bar/heatMap = {x,y,o,b}. (pie=value 는 지원 범위 밖)
  * @param {{length:number, x?:Float64Array, y?:Float64Array, o?:Float64Array, b?:Float64Array}} cols
  * @returns {Array<{x:?number,y:?number,o:?number,b:?number}>}
  */
@@ -55,7 +55,7 @@ function rebuildData(cols) {
 
 /**
  * 스냅샷 + packed 컬럼에서 element 렌더러 인스턴스를 재구성한다(class/함수 clone 없이 plain 입력만으로).
- * 생성자의 defaultsDeep/merge 가 메타에 없는 옵션을 기본값으로 채우므로, 메타 화이트리스트(Step 6)만으로
+ * 생성자의 defaultsDeep/merge 가 메타에 없는 옵션을 기본값으로 채우므로, 메타 화이트리스트만으로
  * 기본 line/bar/heatMap 렌더러가 복원된다.
  * @param {object} snapshot   toRenderSnapshot 결과
  * @param {object} columns    packSeries(snapshot).columns
@@ -94,7 +94,7 @@ export function reconstructSeries(snapshot, columns) {
 
     if (inst) {
       inst.data = data;
-      // heatMap 은 calculateXY 가 category label 배열을 쓰므로 복원한다(Step 8 발견).
+      // heatMap 은 calculateXY 가 category label 배열을 쓰므로 복원한다.
       if (meta.type === 'heatMap' && meta.labels) {
         inst.labels = meta.labels;
       }
@@ -108,7 +108,7 @@ export function reconstructSeries(snapshot, columns) {
 
 /**
  * 재구성한 인스턴스를 worker ctx 에 래스터한다. drawSeriesLayer(chart.core.js)의 per-type 디스패치를
- * micro 범위(line/bar/heatMap, interaction off)로 좁혀 그대로 따른다 — 래스터는 element `draw()` 재사용.
+ * 지원 범위(line/bar/heatMap, interaction off)로 좁혀 그대로 따른다 — 래스터는 element `draw()` 재사용.
  * @param {object} snapshot    toRenderSnapshot 결과
  * @param {Object<string,object>} instances   reconstructSeries 결과
  * @param {CanvasRenderingContext2D|OffscreenCanvasRenderingContext2D} ctx   worker offscreen ctx
@@ -118,7 +118,7 @@ export function rasterSeries(snapshot, instances, ctx) {
   const options = snapshot.options ?? {};
   const order = snapshot.seriesOrder ?? {};
 
-  // micro PoC = interaction off. select* 는 main overlay 소유라 스냅샷에서 제외(Step 6) →
+  // interaction off. select* 는 main overlay 소유라 스냅샷에서 제외 →
   // element draw 가 destructure 만 하므로 inert default(use:false / selected null)를 주입한다.
   const inertSelect = { option: { use: false }, selected: null };
   const opt = {

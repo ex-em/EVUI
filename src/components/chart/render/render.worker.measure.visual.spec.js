@@ -5,11 +5,11 @@ import { reconstructSeries, rasterSeries } from './render.unpack';
 import { WorkerRenderGate, RENDER_WORKER_STATE } from './render.worker.gate';
 
 /**
- * Step 8 micro PoC 측정(A.2 표 + 리뷰 추가 지표). **실 Worker + OffscreenCanvas + transferToImageBitmap**
+ * worker 렌더 측정. **실 Worker + OffscreenCanvas + transferToImageBitmap**
  * 라운드트립을 browser(Chromium)에서 구동해 pack/transfer/workerDraw/bitmap/commit/main-blocking 을 격리한다.
  *
  * 주의(헤드리스 caveat): vitest browser 는 headless 라 GPU 합성이 아닌 SwiftShader 일 수 있다. 그 경우
- * **bitmapMs/commitMs(=transferToImageBitmap/drawImage)는 부풀려진다**(Step 0 실 GPU 재측정에서 drawImage
+ * **bitmapMs/commitMs(=transferToImageBitmap/drawImage)는 부풀려진다**(실 GPU 재측정에서 drawImage
  * 3% 뿐임이 확인됨). 반면 **packMs/transferMs/workerDrawMs/main-raster 는 CPU 비용이라 신뢰도 높다**.
  * GPU status 를 함께 기록해 판정 시 caveat 를 명시한다.
  *
@@ -106,7 +106,7 @@ function waitReady(gate, timeoutMs = 4000) {
   });
 }
 
-describe('Step 8 micro PoC 측정 (실 worker B2 round-trip)', () => {
+describe('worker 렌더 측정 (실 worker round-trip)', () => {
   const WORKLOADS = [
     { label: 'small-timeseries', seriesCount: 10, pointCount: 120 },
     { label: 'medium-timeseries', seriesCount: 20, pointCount: 500 },

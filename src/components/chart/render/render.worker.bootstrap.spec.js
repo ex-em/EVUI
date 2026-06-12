@@ -6,7 +6,7 @@ import { toRenderSnapshot, packSeries } from './render.snapshot';
 import { reconstructSeries, rasterSeries } from './render.unpack';
 
 /**
- * Step 8 worker bootstrap 증명: 대표 타입(line/bar/heatMap)이 **RenderInput(plain snapshot)만으로**
+ * worker bootstrap 증명: 대표 타입(line/bar/heatMap)이 **RenderInput(plain snapshot)만으로**
  * worker 에서 재구성 + 래스터될 수 있음을 검증한다(class instance / 함수 clone 없이).
  *
  * 전송 경계를 실제로 흉내내기 위해 snapshot/columns 를 `structuredClone` 한 뒤(= 함수·class 가 있으면
@@ -24,7 +24,7 @@ const HEAT_MAP_COLOR = {
   decimalPoint: 0,
 };
 
-/** 호출된 ctx 메서드 이름을 기록하는 recording context(jsdom 용 — 실제 픽셀 래스터는 browser PoC). */
+/** 호출된 ctx 메서드 이름을 기록하는 recording context(jsdom 용 — 실제 픽셀 래스터는 브라우저에서). */
 function makeRecordingCtx() {
   const calls = new Set();
   const gradient = { addColorStop: () => {} };
@@ -131,7 +131,7 @@ function buildCore(type) {
   };
 }
 
-describe('render worker bootstrap (Step 8)', () => {
+describe('render worker bootstrap', () => {
   const types = ['line', 'bar', 'heatMap'];
 
   types.forEach((type) => {

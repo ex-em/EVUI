@@ -661,7 +661,7 @@ describe('element.line 마커 배치 렌더링', () => {
 
 /**
  * 기하/래스터 분리 회귀 가드 — computeGeometry(기하 패스, main 저장)와 draw(래스터 패스)의
- * hit-test 기하(xp/yp) 일관성을 검증한다(Step 2 geometry-hittest-split).
+ * hit-test 기하(xp/yp) 일관성을 검증한다.
  *
  *  1) computeGeometry 단독 호출만으로 hit-test가 읽는 xp/yp 가 채워진다(canvas 없이도).
  *  2) 래스터 패스(draw)는 기하를 바꾸지 않는다 — computeGeometry 결과와 draw 후 결과가 동일.
