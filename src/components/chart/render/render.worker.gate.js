@@ -209,9 +209,10 @@ export class WorkerRenderGate {
         transferList || [],
       );
     } catch (e) {
-      // postMessage 실패(clone/detach 불가, worker 사망) → in-flight 누수 방지 + worker 포기(main 경로).
-      // 미전송이므로 false 를 돌려 호출부(main)가 이 프레임을 그린다.
-      this._inFlight = Math.max(0, this._inFlight - 1);
+      // postMessage 실패(clone/detach 불가, worker 사망) → worker 포기(main 경로).
+      // 미전송이므로 false 를 돌려 호출부(main)가 이 프레임을 그린다. 호출부가 현재 프레임을 다시 그리므로
+      // in-flight 를 0 으로 비워 _fail 의 in-flight 복구(_errorHandler)가 같은 프레임을 또 그리지 않게 한다.
+      this._inFlight = 0;
       this.hooks.onRenderException(e);
       this._fail('post-message-failed');
       return false;

@@ -16,6 +16,7 @@
  * 재구성하고 element `draw()` 를 호출한다(이중 구현 금지).
  */
 
+import { RENDER_SNAPSHOT_VERSION } from './render.snapshot';
 import { reconstructSeries, rasterSeries } from './render.unpack';
 
 /** worker 가 재사용하는 OffscreenCanvas(크기 변경 시에만 재할당). */
@@ -76,9 +77,11 @@ self.onmessage = (event) => {
         supported = false;
       }
     }
+    // 게이트가 보낸 msg.version 을 echo 하지 않고 worker 가 *자기 빌드의* 스냅샷 계약 버전을 보낸다.
+    // 그래야 게이트의 version 비교가 worker 번들과 main 번들의 실제 계약 일치를 검증한다(echo 면 항상 일치).
     self.postMessage({
       type: supported ? 'ready' : 'unsupported',
-      version: msg.version,
+      version: RENDER_SNAPSHOT_VERSION,
     });
     return;
   }
