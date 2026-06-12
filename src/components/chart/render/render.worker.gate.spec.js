@@ -259,18 +259,79 @@ describe('WorkerRenderGate — worker 렌더 라우팅 (Step 8)', () => {
     expect(gate.canAcceptRender()).toBe(true);
   });
 
-  it('render-error 메시지 → onRenderException 훅 + errorHandler(main fallback)', () => {
+  it('render-error 메시지 → onRenderException 훅(payload 전체) + errorHandler(main fallback)', () => {
     const onRenderException = vi.fn();
     const gate = makeReadyGate({ hooks: { onRenderException } });
     const onError = vi.fn();
     gate.setErrorHandler(onError);
     gate.render({ epoch: 9 }, {}, []);
 
-    gate.worker.onmessage({ data: { type: 'render-error', epoch: 9, message: 'boom' } });
+    const errMsg = { type: 'render-error', epoch: 9, message: 'boom', name: 'TypeError', stack: 's' };
+    gate.worker.onmessage({ data: errMsg });
 
-    expect(onRenderException).toHaveBeenCalledWith('boom');
-    expect(onError).toHaveBeenCalled();
+    // name/stack 진단 위해 payload 전체를 넘긴다(이슈5).
+    expect(onRenderException).toHaveBeenCalledWith(errMsg);
+    expect(onError).toHaveBeenCalledWith(errMsg);
     expect(gate.canAcceptRender()).toBe(true);
+  });
+
+  it('rendered 응답은 render-error streak 을 0 으로 리셋한다', () => {
+    const gate = makeReadyGate({ maxRenderErrors: 3 });
+    gate.render({ epoch: 1 }, {}, []);
+    gate.worker.onmessage({ data: { type: 'render-error', epoch: 1, message: 'x' } });
+    gate.render({ epoch: 2 }, {}, []);
+    gate.worker.onmessage({ data: { type: 'rendered', epoch: 2, bitmap: { close() {} } } });
+    expect(gate._renderErrorStreak).toBe(0);
+  });
+
+  it('연속 render-error 가 임계치(maxRenderErrors) 도달 → FAILED(무한 재시도 차단, 이슈5)', () => {
+    const onInitFailure = vi.fn();
+    const gate = makeReadyGate({ maxRenderErrors: 3, hooks: { onInitFailure } });
+    for (let i = 1; i <= 3; i++) {
+      gate.render({ epoch: i }, {}, []);
+      gate.worker.onmessage({ data: { type: 'render-error', epoch: i, message: 'boom' } });
+    }
+    expect(gate.state).toBe(RENDER_WORKER_STATE.FAILED);
+    expect(onInitFailure).toHaveBeenCalledWith('render-error-threshold');
+  });
+
+  it('_fail 시 in-flight 프레임이 있으면 errorHandler 로 main fallback 을 그린다(화면 동결 방지, 이슈6)', () => {
+    const gate = makeReadyGate();
+    const onError = vi.fn();
+    gate.setErrorHandler(onError);
+    gate.render({ epoch: 1 }, {}, []); // in-flight 1
+    expect(gate._inFlight).toBe(1);
+
+    // worker 사망(onerror) — in-flight 응답은 영영 안 온다.
+    gate.worker.onerror(new Error('died'));
+
+    expect(gate.state).toBe(RENDER_WORKER_STATE.FAILED);
+    expect(onError).toHaveBeenCalled(); // main 이 현재 프레임을 그림
+  });
+
+  it('_fail 시 in-flight 가 없으면 errorHandler 를 호출하지 않는다', () => {
+    const gate = makeReadyGate();
+    const onError = vi.fn();
+    gate.setErrorHandler(onError);
+    // 렌더를 보낸 적 없음 → in-flight 0.
+    gate.worker.onerror(new Error('died'));
+    expect(onError).not.toHaveBeenCalled();
+  });
+
+  it('render() postMessage throw → in-flight 누수 없이 false + onRenderException + _fail(이슈6/리뷰)', () => {
+    const onRenderException = vi.fn();
+    const gate = makeReadyGate({ hooks: { onRenderException } });
+    const err = new Error('DataCloneError');
+    gate.worker.postMessage = () => {
+      throw err;
+    };
+
+    const sent = gate.render({ epoch: 1 }, {}, []);
+
+    expect(sent).toBe(false);
+    expect(gate._inFlight).toBe(0); // 누수 없음
+    expect(onRenderException).toHaveBeenCalledWith(err);
+    expect(gate.state).toBe(RENDER_WORKER_STATE.FAILED);
   });
 });
 
