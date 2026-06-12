@@ -112,7 +112,7 @@ class EvChart {
     // display frame ↔ hit-test model 일관성 / stale frame drop 용 단조 증가 epoch(Step 8).
     this.renderEpoch = 0;
     this.renderWorkerGate.setFrameHandler((msg) => this.commitWorkerFrame(msg));
-    this.renderWorkerGate.setErrorHandler(() => this.drawSeriesLayerFallback());
+    this.renderWorkerGate.setErrorHandler((msg) => this.drawSeriesLayerFallback(msg));
     // opt-in off / 미지원 / 생성 실패 / 미준비는 gate 상태기계가 처리하고 drawChart 는 ready 일 때만
     // worker 분기하므로, 꺼져있거나 실패해도 main 경로(무회귀).
     this.renderWorkerGate.start();
@@ -380,6 +380,10 @@ class EvChart {
    * @returns {undefined}
    */
   drawChart(hitInfo, forceMainSeries) {
+    // epoch 는 *모든* drawChart 진입에서 증가시킨다(worker 전송 프레임뿐 아니라 resize·main-only·hover
+    // 프레임 포함). 그래야 main 이 그린 더 새로운 프레임 뒤에 늦게 도착한 stale worker 비트맵/에러가
+    // commitWorkerFrame·drawSeriesLayerFallback 의 epoch 비교에서 항상 drop 된다(이슈1 경합 차단).
+    this.renderEpoch += 1;
     this.initScale();
 
     const { scaleChange, scrollbarLabelOffset } = this.prepareScale();
@@ -427,7 +431,7 @@ class EvChart {
       return false;
     }
 
-    this.renderEpoch += 1;
+    // epoch 는 drawChart 진입부에서 이미 증가시켰다(이슈1) — 여기서는 현재 값을 그대로 스냅샷에 싣는다.
     const epoch = this.renderEpoch;
     const snapshot = toRenderSnapshot(this, epoch);
     const { columns, transferList } = packSeries(snapshot);
@@ -476,12 +480,20 @@ class EvChart {
   }
 
   /**
-   * worker 렌더 예외 시 main series 래스터로 fallback 한다(Step 7 상태기계 → main RenderCore).
+   * worker 렌더 예외/사망 시 main series 래스터로 fallback 한다(Step 7 상태기계 → main RenderCore).
    * static 은 이미 main buffer 에 있으므로 series 만 그려 합성한다.
    *
+   * render-error 로 들어온 경우(msg 있음) stale 에러(이미 더 새 프레임이 그려짐)면 fallback 하지 않는다 —
+   * 그리지 않으면 현재 화면을 stale series 로 덮지 않는다(이슈1 정합). worker 사망(_fail, msg 없음)으로
+   * 들어온 경우는 현재 프레임을 그려야 하므로 epoch 비교 없이 항상 그린다.
+   *
+   * @param {{epoch:number}} [msg]   render-error 메시지(worker 사망 fallback 시 미전달)
    * @returns {undefined}
    */
-  drawSeriesLayerFallback() {
+  drawSeriesLayerFallback(msg) {
+    if (msg && msg.epoch !== this.renderEpoch) {
+      return;
+    }
     this.drawSeriesLayer(this.bufferCtx, undefined);
     this.commitToDisplay(this.displayCtx, this.bufferCanvas);
   }

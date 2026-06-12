@@ -268,9 +268,118 @@ describe('worker series 래스터 경로 (Step 8)', () => {
     expect(displayOps).toHaveLength(0);
   });
 
-  it('drawSeriesLayerFallback: render-error 시 main series 래스터 + commit', () => {
+  it('drawSeriesLayerFallback: worker 사망(msg 없음) 시 main series 래스터 + commit', () => {
     const { chart, calls } = makeWorkerChart();
     chart.drawSeriesLayerFallback();
+    expect(names(calls)).toEqual(['drawSeriesLayer', 'commitToDisplay']);
+  });
+});
+
+/**
+ * epoch 경합 가드 (이슈1): renderEpoch 는 worker 전송 프레임뿐 아니라 *모든* drawChart 진입에서 증가한다.
+ * 그래야 resize(forceMainSeries)·main-only·hover 로 main 이 그린 더 새로운 프레임 뒤에 늦게 도착한
+ * stale worker 비트맵/에러가 epoch 비교에서 항상 drop 된다(stale 합성/덮어쓰기 방지).
+ */
+describe('epoch 경합 가드 (이슈1)', () => {
+  const makeWorkerChart = ({ accept = true } = {}) => {
+    const calls = [];
+    const rec =
+      (name, ret) =>
+      (...args) => {
+        calls.push({ name, args });
+        return ret;
+      };
+
+    const displayOps = [];
+    const displayCtx = {
+      clearRect: (...args) => displayOps.push({ op: 'clearRect', args }),
+      drawImage: (...args) => displayOps.push({ op: 'drawImage', args }),
+    };
+
+    const gate = {
+      canAcceptRender: () => accept,
+      render: rec('gate.render', accept),
+      setFrameHandler() {},
+      setErrorHandler() {},
+    };
+
+    const chart = Object.assign(Object.create(EvChart.prototype), {
+      bufferCtx: { id: 'buffer' },
+      bufferCanvas: { width: 200, height: 100 },
+      displayCanvas: { width: 200, height: 100 },
+      displayCtx,
+      overlayCtx: null,
+      scrollbar: { x: { use: false }, y: { use: false } },
+      listeners: {},
+      renderEpoch: 0,
+      renderWorkerGate: gate,
+      pixelRatio: 2,
+      chartRect: { x1: 0, x2: 200, y1: 0, y2: 100, chartWidth: 200, chartHeight: 100, width: 200, height: 100 },
+      labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      axesSteps: { x: [], y: [] },
+      options: {},
+      seriesInfo: { charts: { pie: [], bar: [], line: [], scatter: [], heatMap: [] } },
+      seriesList: {},
+      initScale: rec('initScale'),
+      prepareScale: rec('prepareScale', { scaleChange: null, scrollbarLabelOffset: {} }),
+      updateScrollbarPosition: rec('updateScrollbarPosition'),
+      computeSeriesGeometry: rec('computeSeriesGeometry'),
+      drawStaticLayer: rec('drawStaticLayer'),
+      drawSeriesLayer: rec('drawSeriesLayer'),
+      drawSeriesOverlay: rec('drawSeriesOverlay'),
+      drawTip: rec('drawTip'),
+      commitToDisplay: rec('commitToDisplay'),
+    });
+
+    return { chart, calls, displayOps, gate };
+  };
+
+  const names = (calls) => calls.map((c) => c.name);
+
+  it('worker 전송(epoch=N) 후 resize(forceMainSeries) 가 epoch 를 N+1 로 올린다', () => {
+    const { chart } = makeWorkerChart({ accept: true });
+    chart.drawChart();
+    expect(chart.renderEpoch).toBe(1);
+
+    // resize 프레임: forceMainSeries=true → main 동기 렌더. epoch 가 또 증가해야 한다.
+    chart.drawChart(undefined, true);
+    expect(chart.renderEpoch).toBe(2);
+  });
+
+  it('resize 로 main 이 그린 뒤 도착한 stale worker 비트맵(이전 epoch)은 drop 된다', () => {
+    const { chart, displayOps } = makeWorkerChart({ accept: true });
+    chart.commitToDisplay = (ctx, canvas) => displayOps.push({ op: 'commitToDisplay', canvas });
+
+    chart.drawChart(); // worker 전송, epoch=1
+    chart.drawChart(undefined, true); // resize main 렌더, epoch=2
+    displayOps.length = 0;
+
+    const close = vi.fn();
+    chart.commitWorkerFrame({ epoch: 1, bitmap: { close } }); // 이전 epoch 비트맵 도착
+
+    expect(close).toHaveBeenCalledTimes(1); // drop + close
+    expect(displayOps).toHaveLength(0); // display 미변경(덮어쓰기 없음)
+  });
+
+  it('canAcceptRender=false 로 main 이 그린 프레임도 epoch 를 올린다(stale worker 프레임 drop 근거)', () => {
+    const { chart } = makeWorkerChart({ accept: false });
+    chart.drawChart();
+    // worker 미진입 → main 경로지만 epoch 는 증가.
+    expect(chart.renderEpoch).toBe(1);
+  });
+
+  it('drawSeriesLayerFallback(msg): stale epoch 면 그리지 않는다(현재 화면 보존)', () => {
+    const { chart, calls } = makeWorkerChart();
+    chart.renderEpoch = 5;
+    chart.drawSeriesLayerFallback({ epoch: 3 });
+    expect(names(calls)).not.toContain('drawSeriesLayer');
+    expect(names(calls)).not.toContain('commitToDisplay');
+  });
+
+  it('drawSeriesLayerFallback(msg): current epoch 면 main series 래스터 + commit', () => {
+    const { chart, calls } = makeWorkerChart();
+    chart.renderEpoch = 5;
+    chart.drawSeriesLayerFallback({ epoch: 5 });
     expect(names(calls)).toEqual(['drawSeriesLayer', 'commitToDisplay']);
   });
 });
