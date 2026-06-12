@@ -3,8 +3,7 @@ import EvChart from './chart.core';
 
 /**
  * drawChart 파이프라인 호출 순서 회귀 가드 — prepare(RenderCore)/scrollbar·emit(ChartShell)/
- * series 래스터(buffer)/overlay(main)/tip(main) 분리
- * (Step 3 series-raster · Step 4 static-layer · Step 5 rendercore-prepare).
+ * series 래스터(buffer)/overlay(main)/tip(main) 분리.
  *
  * 검증 목표:
  *  1) drawChart 서브 호출 순서·composite(commitToDisplay)가 분리 전과 동일하다.
@@ -148,12 +147,12 @@ describe('drawChart 파이프라인 호출 순서 (prepare/scrollbar/emit/series
 });
 
 /**
- * worker series 래스터 경로 (Step 8, B2):
+ * worker series 래스터 경로:
  * ready + in-flight 여유면 series 를 worker 로 보내고 main series 래스터를 건너뛴다.
  * bitmap 도착 시 compositing(clear→buffer(axis)→bitmap) + close(메모리), epoch stale-drop,
  * render-error → main fallback.
  */
-describe('worker series 래스터 경로 (Step 8)', () => {
+describe('worker series 래스터 경로', () => {
   const makeWorkerChart = ({ accept = true } = {}) => {
     const calls = [];
     const rec =
@@ -241,7 +240,7 @@ describe('worker series 래스터 경로 (Step 8)', () => {
     expect(order).toContain('gate.render');
     expect(order).toContain('drawSeriesLayer');
     expect(order).toContain('commitToDisplay');
-    // 미전송 fallback 은 main 경로와 동일 z-order: series → overlay → tip → commit (이슈8).
+    // 미전송 fallback 은 main 경로와 동일 z-order: series → overlay → tip → commit.
     expect(order.indexOf('drawSeriesLayer')).toBeLessThan(order.indexOf('drawSeriesOverlay'));
     expect(order.indexOf('drawSeriesOverlay')).toBeLessThan(order.indexOf('drawTip'));
     expect(order.indexOf('drawTip')).toBeLessThan(order.indexOf('commitToDisplay'));
@@ -280,11 +279,11 @@ describe('worker series 래스터 경로 (Step 8)', () => {
 });
 
 /**
- * epoch 경합 가드 (이슈1): renderEpoch 는 worker 전송 프레임뿐 아니라 *모든* drawChart 진입에서 증가한다.
+ * epoch 경합 가드: renderEpoch 는 worker 전송 프레임뿐 아니라 *모든* drawChart 진입에서 증가한다.
  * 그래야 resize(forceMainSeries)·main-only·hover 로 main 이 그린 더 새로운 프레임 뒤에 늦게 도착한
  * stale worker 비트맵/에러가 epoch 비교에서 항상 drop 된다(stale 합성/덮어쓰기 방지).
  */
-describe('epoch 경합 가드 (이슈1)', () => {
+describe('epoch 경합 가드', () => {
   const makeWorkerChart = ({ accept = true } = {}) => {
     const calls = [];
     const rec =
@@ -389,10 +388,10 @@ describe('epoch 경합 가드 (이슈1)', () => {
 });
 
 /**
- * worker 진입 가드 (이슈2/3/7/8): canRenderSeriesOnWorker 는 worker 재구성으로 동등 렌더 가능한
+ * worker 진입 가드: canRenderSeriesOnWorker 는 worker 재구성으로 동등 렌더 가능한
  * 프레임(line·bar(non-time)·heatMap, 숫자 축, hover/select/maxTip 없음)만 ok=true 를 준다.
  */
-describe('worker 진입 가드 canRenderSeriesOnWorker (이슈2/3/7/8)', () => {
+describe('worker 진입 가드 canRenderSeriesOnWorker', () => {
   const makeGuardChart = ({ charts = {}, seriesList = {}, options = {}, lastHitInfo } = {}) =>
     Object.assign(Object.create(EvChart.prototype), {
       seriesInfo: { charts: { pie: [], bar: [], line: [], scatter: [], heatMap: [], ...charts } },
@@ -505,7 +504,7 @@ describe('worker 진입 가드 canRenderSeriesOnWorker (이슈2/3/7/8)', () => {
 });
 
 /**
- * RenderCore 경계 가드 (Step 5):
+ * RenderCore 경계 가드:
  * RenderCore 단계는 ChartShell 주입값(pixelRatio)만으로 동작하며 document/window/scrollbar DOM/
  * listener 를 직접 읽거나 호출하지 않는다.
  */

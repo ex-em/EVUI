@@ -93,7 +93,7 @@ describe('HeatMap Element', () => {
 
 /**
  * heatMap overlay 분리 회귀 가드 — 래스터(draw, worker 후보)와 highlight overlay(drawOverlay, main)
- * 분리(Step 3 rendercore-series-raster).
+ * 분리.
  *
  *  1) draw(래스터)는 overlayCtx를 만지지 않는다 — getItemInfo가 isHighlight를 줘도 itemHighlight를
  *     호출하지 않는다(=overlay가 worker 후보 raster에 섞이지 않는다).

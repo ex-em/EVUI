@@ -10,10 +10,9 @@ import {
 } from './render.snapshot';
 
 /**
- * Step 6: render-snapshot-contract — worker 입력/기하 계약 가드.
+ * worker 입력/기하 계약 가드.
  *
- * 스냅샷→RenderCore 라운드트립은 이 step 에선 테스트(오프라인) 한정이며 프로덕션 렌더 경로에
- * 연결하지 않는다(실제 소비자 경로는 Step 7/8). 여기선 계약(직렬화·결정성·기하 동치·pack copy 경계)만 검증한다.
+ * 계약(직렬화·결정성·기하 동치·pack copy 경계)을 검증한다.
  */
 
 const baseParam = () => ({
@@ -68,7 +67,7 @@ const makePie = () => {
 };
 
 /**
- * computeGeometry 를 선행 호출한(=Step 2 main 기하가 채워진) core-유사 fixture 를 만든다.
+ * computeGeometry 를 선행 호출한(=main 기하가 채워진) core-유사 fixture 를 만든다.
  * @param {object} [opts]
  * @returns {object}
  */
@@ -78,7 +77,7 @@ const makeCore = (opts = {}) => {
   const bar = makeBar();
   const pie = makePie();
 
-  // main 기하 계산(Step 2). draw 없이 기하만.
+  // main 기하 계산. draw 없이 기하만.
   line.computeGeometry(param);
   bar.computeGeometry({ ...param, showIndex: 0, showSeriesCount: 1, thickness: 1, cPadRatio: 0.2 });
 
@@ -266,7 +265,7 @@ describe('render.snapshot — pack/transfer 안전 (copy 경계)', () => {
     expect(snapshot.series.lineA.data.x[0]).toBe(0);
   });
 
-  it('대용량 직렬화 벤치(방향성): 1000×60 pack 시간 기록(Step 8 packMs 기준선)', () => {
+  it('대용량 직렬화 벤치(방향성): 1000×60 pack 시간 기록(packMs 기준선)', () => {
     // 60 시리즈 × 1000 포인트.
     const series = {};
     for (let s = 0; s < 60; s++) {

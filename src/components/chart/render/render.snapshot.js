@@ -1,5 +1,5 @@
 /**
- * RenderCore worker 입력/기하 계약 (Step 6: render-snapshot-contract).
+ * RenderCore worker 입력/기하 계약.
  *
  * worker(OffscreenCanvas)로 넘길 렌더 입력은 **plain · serializable · versioned · deterministic** 이어야
  * 한다. 이 모듈은 그 계약을 코드로 고정한다:
@@ -7,17 +7,11 @@
  *  - `toRenderSnapshot(core, epoch)` : RenderCore(prepare + series raster)가 필요로 하는 최소 입력을
  *    Vue proxy / function(formatter) / class instance / circular ref 없이 plain object 로 추출한다.
  *  - `extractRenderGeometry(core)`   : hit-test 가 소비하는 기하(xp/yp/w/h, pie 는 각도 기반)를 plain 으로
- *    추출한다. **기본 정책 = main 계산(Step 2 computeGeometry)이 정답** — 기하는 싸고 hit-test 가
+ *    추출한다. **기본 정책 = main 의 computeGeometry 계산이 정답** — 기하는 싸고 hit-test 가
  *    main 에서 즉시 필요하므로 worker 가 계산해 되돌려주지 않는다. 이 함수는 그 main-계산 결과를
  *    그대로 읽어 계약 형태로 노출할 뿐, 재계산하지 않는다(두 번째 진실 원천 방지).
  *  - `packSeries(snapshot)`          : 대량 수치를 Float64 typed array + Transferable ArrayBuffer 로 묶는다.
  *    **항상 copy**(원본 detach 금지) — main 이 계속 쓰는 source 버퍼를 transfer 하면 깨진다.
- *
- * 전체 계약 표(RenderInput 필드, RenderGeometry, formatter/range 매트릭스, per-type pack, font 동기화)는
- * `phases/chart-worker-offload/render-contract.md` 참조.
- *
- * 주의: 이 모듈은 Step 6 에선 **테스트(오프라인) 한정**이며 프로덕션 렌더 경로에 연결하지 않는다
- * (실제 소비자 경로는 Step 7/8). 실제 worker 생성/transfer 도 Step 8 에서 한다.
  */
 
 /** 스냅샷 포맷 버전. 호환 깨짐 변경 시 +1. worker 가 버전 불일치 시 main fallback 판정에 사용. */
@@ -185,7 +179,7 @@ export function toRenderSnapshot(core, epoch = 0) {
       ...pickPlain(s, SERIES_META_KEYS),
       data: extractSeriesData(s),
     };
-    // heatMap 래스터는 category label 배열(this.labels)을 calculateXY 에서 소비한다(Step 8 발견).
+    // heatMap 래스터는 category label 배열(this.labels)을 calculateXY 에서 소비한다.
     // 문자열 label 은 Float64 pack 불가라 별도 plain 배열로 전달(per-type pack 한계 → render-contract §5).
     if (s.type === 'heatMap' && s.labels) {
       series[id].labels = toPlain(s.labels) ?? {};
@@ -211,7 +205,7 @@ export function toRenderSnapshot(core, epoch = 0) {
     },
     options: {
       ...pickPlain(core.options, OPTION_KEYS),
-      // heatMap 재구성 입력(Step 8): legend.type 파생 plain boolean(함수/객체 아님).
+      // heatMap 재구성 입력: legend.type 파생 plain boolean(함수/객체 아님).
       isGradient: core.options?.legend?.type === 'gradient',
     },
     seriesOrder,
@@ -221,7 +215,7 @@ export function toRenderSnapshot(core, epoch = 0) {
 
 /**
  * hit-test 가 소비하는 기하를 plain 으로 추출한다(RenderGeometry 계약).
- * **재계산하지 않는다** — main(Step 2 computeGeometry)이 이미 각 data point/series 인스턴스에 써 둔
+ * **재계산하지 않는다** — main 의 computeGeometry 가 이미 각 data point/series 인스턴스에 써 둔
  * 값을 그대로 읽어 타입별 형태로 노출할 뿐이다(두 번째 진실 원천 방지). 따라서 computeGeometry 를
  * 선행 호출한 model 에서만 의미 있는 값이 나온다.
  *
