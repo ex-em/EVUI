@@ -126,14 +126,13 @@ describe('helpers.canvas', () => {
       };
     };
 
-    it('drawPoint circle: beginPath→moveTo→arc→closePath→fill→stroke', () => {
+    it('drawPoint circle: beginPath→moveTo→arc→fill→stroke (closePath 없음)', () => {
       const ctx = makeCtx();
       Canvas.drawPoint(ctx, 'circle', 3, 10, 20);
       expect(ctx.cmds.map((c) => c[0])).toEqual([
         'beginPath',
         'moveTo',
         'arc',
-        'closePath',
         'fill',
         'stroke',
       ]);

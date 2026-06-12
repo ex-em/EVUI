@@ -367,7 +367,6 @@ class Line {
           ctx.moveTo(singleData.xp - lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, getYPos(singleData.b) ?? endPoint);
-          ctx.closePath();
           return;
         }
 
@@ -396,8 +395,6 @@ class Line {
                 ctx.lineTo(xp, bp);
               }
             }
-
-            ctx.closePath();
           }
         }
       });
