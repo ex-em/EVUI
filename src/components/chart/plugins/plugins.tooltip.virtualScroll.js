@@ -241,11 +241,16 @@ const modules = {
     for (let k = 0; k < count; k++) {
       const idx = s.range.start + k;
       const h = children[k].offsetHeight;
-      if (h > 0 && h !== s.heights[idx]) {
-        s.heights[idx] = h;
-        changed = true;
+      // display:none 상태(첫 draw가 setCustomTooltipLayoutPosition 이전에 호출됨)에서는
+      // offsetHeight가 0이다. 이때 measured로 표기하면 추정 높이가 실측으로 굳어져
+      // 이후 휠 입력 시 점프가 발생하므로, 실제로 측정된(h>0) 경우에만 measured 처리한다.
+      if (h > 0) {
+        if (h !== s.heights[idx]) {
+          s.heights[idx] = h;
+          changed = true;
+        }
+        s.measured[idx] = true;
       }
-      s.measured[idx] = true;
       sum += h;
     }
 
