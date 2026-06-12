@@ -29,6 +29,10 @@ const modules = {
    * @returns {boolean}
    */
   _shouldVirtualizeCustomTooltip(itemsCount) {
+    // 직전에 row 탐지에 실패했으면(현재 마크업 구조로는 가상 스크롤 불가) 매 mousemove마다
+    // formatter 실행·파싱을 반복하지 않도록 단락한다. 플래그는 데이터/옵션 변경으로 마크업이
+    // 달라질 수 있는 render() 시점에 리셋된다.
+    if (this._vsDetectFailed) return false;
     const opt = this.options?.tooltip;
     if (!opt?.formatter?.html) return false;
     const vs = opt.virtualScroll;
@@ -331,6 +335,8 @@ const modules = {
 
     const found = this._findCustomTooltipRows(parsed, seriesList.length);
     if (!found) {
+      // 동일 마크업이 유지되는 동안 재시도(formatter+파싱 2회/move)를 막는다. render()에서 리셋.
+      this._vsDetectFailed = true;
       if (!this._vsWarnedFallback) {
         this._vsWarnedFallback = true;
         // eslint-disable-next-line no-console

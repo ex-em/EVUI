@@ -1245,6 +1245,9 @@ class EvChart {
   render(hitInfo) {
     if (this.isInit) {
       this.invalidateClientRectCache();
+      // 데이터/옵션 변경으로 formatter.html 마크업이 달라질 수 있으므로 가상 스크롤
+      // row 탐지 실패 플래그를 리셋해 다음 hover에서 다시 시도한다.
+      this._vsDetectFailed = false;
       this.clear();
       this.chartRect = this.getChartRect();
       this.drawChart(hitInfo);
