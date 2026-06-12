@@ -46,6 +46,24 @@ class Bar {
       return;
     }
 
+    // (데이터 버전, 스케일 버전, showIndex, showSeriesCount) 가 직전과 같고 data 참조도 동일하면
+    // xp/yp/w/h 는 이미 current → skip. bar 는 가시성 토글로 막대 폭/위치(showIndex/showSeriesCount
+    // 의존)가 바뀌므로 둘을 비교에 포함한다. 버전 미전달이면 canMemo=false 로 항상 재계산(무회귀).
+    // 숫자 필드 비교 — 시리즈가 수만 개일 때 문자열 키 생성이 매 프레임 할당이 되지 않도록.
+    const canMemo = param.scaleVersion != null && param.dataEpoch != null;
+    const showIndex0 = param.showIndex ?? 0;
+    const showSeriesCount0 = param.showSeriesCount ?? 0;
+    if (
+      canMemo
+      && this._lastDataEpoch === param.dataEpoch
+      && this._lastScaleVersion === param.scaleVersion
+      && this._lastShowIndex === showIndex0
+      && this._lastShowSeriesCount === showSeriesCount0
+      && this._lastGeomData === this.data
+    ) {
+      return;
+    }
+
     const chartRect = param.chartRect;
     const labelOffset = param.labelOffset;
     const axesSteps = param.axesSteps;
@@ -198,6 +216,14 @@ class Bar {
         item.h = isHorizontal ? -h : h; // eslint-disable-line
         item.index = i;
       }
+    }
+
+    if (canMemo) {
+      this._lastDataEpoch = param.dataEpoch;
+      this._lastScaleVersion = param.scaleVersion;
+      this._lastShowIndex = showIndex0;
+      this._lastShowSeriesCount = showSeriesCount0;
+      this._lastGeomData = this.data;
     }
   }
 

@@ -402,6 +402,11 @@ class EvChart {
 
     const { scaleChange, scrollbarLabelOffset } = this.prepareScale();
 
+    // geometry(xp/yp) 가 의존하는 스케일 입력(chartRect/labelOffset/axesSteps min·max/pixelRatio 등)이
+    // 직전 프레임과 같은지 한 토큰으로 판정해 _scaleVersion 을 갱신한다. computeGeometry 가 (데이터 버전,
+    // 스케일 버전) 키로 재계산을 skip 하는 데 쓴다(hover/스타일 변경 프레임은 둘 다 불변 → skip).
+    this.computeScaleVersion();
+
     if (this.scrollbar?.x?.use || this.scrollbar?.y?.use) {
       this.updateScrollbarPosition(scrollbarLabelOffset);
     }
@@ -674,6 +679,41 @@ class EvChart {
    * @returns {undefined}
    */
   /**
+   * geometry(xp/yp/w/h) 가 의존하는 스케일 입력을 한 토큰으로 직렬화해 직전과 비교, 바뀌었으면
+   * _scaleVersion 을 올린다. axesSteps 의 graphMin/graphMax 와 bar 배치 인자(thickness/cPadRatio/
+   * borderRadius)·horizontal 까지 포함해야 stale 좌표를 막는다(누락 시 캐시가 옛 스케일로 고정).
+   * O(축 개수) 비용(점 개수와 무관)이라 매 프레임 호출해도 싸다.
+   * @returns {undefined}
+   */
+  computeScaleVersion() {
+    const cr = this.chartRect ?? {};
+    const lo = this.labelOffset ?? {};
+    const opt = this.options ?? {};
+    const xs = this.axesSteps?.x ?? [];
+    const ys = this.axesSteps?.y ?? [];
+
+    let key =
+      `${cr.x1},${cr.x2},${cr.y1},${cr.y2},${cr.chartWidth},${cr.chartHeight}|`
+      + `${lo.left},${lo.right},${lo.top},${lo.bottom}|`
+      + `${this.pixelRatio}|${opt.horizontal ? 1 : 0}|`
+      + `${opt.thickness},${opt.cPadRatio},${opt.borderRadius}|`;
+    for (let i = 0; i < xs.length; i++) {
+      const a = xs[i];
+      key += `${a?.graphMin}:${a?.graphMax}:${a?.minIndex}:${a?.maxIndex}:${a?.oriSteps};`;
+    }
+    key += '|';
+    for (let i = 0; i < ys.length; i++) {
+      const a = ys[i];
+      key += `${a?.graphMin}:${a?.graphMax}:${a?.minIndex}:${a?.maxIndex}:${a?.oriSteps};`;
+    }
+
+    if (key !== this._scaleKey) {
+      this._scaleKey = key;
+      this._scaleVersion = (this._scaleVersion ?? 0) + 1;
+    }
+  }
+
+  /**
    * worker 래스터 경로용 main hit-test 기하 패스. 래스터(stroke/fill)는 worker 가 하지만
    * hit-test 가 읽는 픽셀 기하(xp/yp/w/h)는 main 모델에 있어야 하므로, 여기서 series.computeGeometry 만
    * 돌려 채운다(canvas 그리기 없음 — 싸다). worker 지원 타입(line/bar/heatMap)과 동일 타입만 처리한다.
@@ -685,6 +725,8 @@ class EvChart {
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
       isHorizontal: this.options.horizontal,
+      dataEpoch: this._dataEpoch,
+      scaleVersion: this._scaleVersion,
     };
 
     let showSeriesCount = 0;
@@ -744,6 +786,8 @@ class EvChart {
       displayOverflow,
       unSelectedOpacity,
       isHorizontal: this.options.horizontal,
+      dataEpoch: this._dataEpoch,
+      scaleVersion: this._scaleVersion,
     };
 
     let showIndex = 0;

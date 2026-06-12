@@ -621,3 +621,83 @@ describe('element.line 기하/래스터 분리 (computeGeometry ↔ draw)', () =
     expect(data[1].yp).toBeLessThan(before); // 값이 커지면 yp(위쪽) 작아짐
   });
 });
+
+/**
+ * geometry 메모이즈(Step 1) 회귀 가드 — (dataEpoch, scaleVersion) 키가 직전과 같고 data 참조도
+ * 동일하면 computeGeometry 본문(xp/yp 재계산)을 skip 한다. hover/스타일 변경 프레임의 낭비 제거.
+ * 키가 바뀌거나(데이터·스케일 변경) data 참조가 바뀌면 재계산해 stale 을 막는다.
+ */
+describe('element.line geometry 메모이즈 (Step 1)', () => {
+  const makeLine = (data) => {
+    const line = new Line('s0', {}, 0);
+    line.data = data;
+    line.xAxisIndex = 0;
+    line.yAxisIndex = 0;
+    line.interpolation = 'none';
+    line.combo = false;
+    line.isExistGrp = false;
+    line.show = true;
+    return line;
+  };
+  const param = (dataEpoch, scaleVersion) => ({
+    chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    axesSteps: { x: [{ graphMin: 0, graphMax: 4 }], y: [{ graphMin: 0, graphMax: 100 }] },
+    dataEpoch,
+    scaleVersion,
+  });
+
+  it('동일 (dataEpoch, scaleVersion) + 동일 data 참조 → 두 번째 호출은 skip (값 변경이 반영 안 됨)', () => {
+    const data = [{ x: 0, y: 10, o: 10 }, { x: 4, y: 30, o: 30 }];
+    const line = makeLine(data);
+    line.computeGeometry(param(1, 1));
+    const cached = data[1].yp;
+
+    // data 배열을 in-place 로 바꿔도 키가 같으면 skip → cached 그대로(=skip 증명).
+    data[1].y = 90;
+    data[1].o = 90;
+    line.computeGeometry(param(1, 1));
+    expect(data[1].yp).toBe(cached);
+  });
+
+  it('scaleVersion 변경 → 재계산', () => {
+    const data = [{ x: 0, y: 10, o: 10 }, { x: 4, y: 30, o: 30 }];
+    const line = makeLine(data);
+    line.computeGeometry(param(1, 1));
+    data[1].y = 90;
+    data[1].o = 90;
+    line.computeGeometry(param(1, 2)); // 스케일 버전만 +1 → 재계산
+    expect(data[1].yp).toBeLessThan(30); // y=90 반영(yp 작아짐)
+  });
+
+  it('dataEpoch 변경 → 재계산', () => {
+    const data = [{ x: 0, y: 10, o: 10 }, { x: 4, y: 30, o: 30 }];
+    const line = makeLine(data);
+    line.computeGeometry(param(1, 1));
+    const before = data[1].yp;
+    data[1].y = 90;
+    data[1].o = 90;
+    line.computeGeometry(param(2, 1)); // 데이터 버전만 +1 → 재계산
+    expect(data[1].yp).not.toBe(before);
+  });
+
+  it('data 참조 변경 → 재계산 (같은 키여도 새 배열이면 stale 방지)', () => {
+    const line = makeLine([{ x: 0, y: 10, o: 10 }, { x: 4, y: 30, o: 30 }]);
+    line.computeGeometry(param(1, 1));
+    const next = [{ x: 0, y: 90, o: 90 }, { x: 4, y: 95, o: 95 }];
+    line.data = next;
+    line.computeGeometry(param(1, 1)); // 키 동일하지만 data 참조 다름 → 재계산
+    expect(typeof next[0].yp).toBe('number');
+    expect(next[0].yp).toBeLessThan(50); // y=90 반영
+  });
+
+  it('버전 미전달(canMemo=false) → 항상 재계산 (무회귀)', () => {
+    const data = [{ x: 0, y: 10, o: 10 }, { x: 4, y: 30, o: 30 }];
+    const line = makeLine(data);
+    line.computeGeometry(param(undefined, undefined));
+    data[1].y = 90;
+    data[1].o = 90;
+    line.computeGeometry(param(undefined, undefined));
+    expect(data[1].yp).toBeLessThan(30); // 재계산되어 y=90 반영
+  });
+});

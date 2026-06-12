@@ -11,6 +11,9 @@ const modules = {
    * @returns {undefined}
    */
   createDataSet(data, label) {
+    // 데이터셋이 재생성될 때마다 +1. computeGeometry 가 (dataEpoch, scaleVersion) 키로 geometry
+    // 재계산을 skip 하는 데 쓴다 — 데이터 변경 프레임은 이 증가로 전 시리즈 geometry 가 무효화된다.
+    this._dataEpoch = (this._dataEpoch ?? 0) + 1;
     Object.keys(this.seriesInfo.charts).forEach((typeKey) => {
       const seriesIDs = this.seriesInfo.charts[typeKey];
 
