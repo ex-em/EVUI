@@ -385,8 +385,10 @@ const modules = {
 
     const vs = opt.virtualScroll || {};
     const learned = this._vsLearnedAverageHeight;
+    // 이전 세션에서 실측한 평균(learned)이 정적 추정값보다 정확하므로 최우선 사용한다.
+    // (DEFAULT_OPTIONS가 estimatedRowHeight를 항상 채우므로, learned를 뒤에 두면 도달 불가)
     const estimated =
-      vs.estimatedRowHeight ?? learned ?? DEFAULT_ESTIMATED_ROW_HEIGHT;
+      learned ?? vs.estimatedRowHeight ?? DEFAULT_ESTIMATED_ROW_HEIGHT;
 
     this.vsState = {
       scrollEl: rowContainer,
