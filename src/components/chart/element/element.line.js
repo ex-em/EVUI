@@ -75,14 +75,29 @@ class Line {
     const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
+    // Canvas.calculateX/Y 는 호출마다 scalingFactor(=area/(max-min)) division 을 재계산했다.
+    // 이 값은 포인트마다 불변이라 루프 밖에서 1회만 구하고 calculateX/Y 의 산술을 인라인한다.
+    // clamp(Math.min/Math.max)·반올림(ceil/floor)·alias 는 calculateX/Y 와 동일하게 유지하므로
+    // 좌표는 bit-identical(draw fill·hit-test parity 유지). val 은 clamp 후 항상 in-range·non-null 이라
+    // calculateX/Y 의 null/범위 반환 분기는 발생하지 않는다.
+    const xMin = minmaxX.graphMin;
+    const xMax = minmaxX.graphMax;
+    const yMin = minmaxY.graphMin;
+    const yMax = minmaxY.graphMax;
+    const xScale = xArea / (xMax - xMin);
+    const yScale = yArea / (yMax - yMin);
+    const yMinOrZero = yMin || 0;
+
     const getXPos = (val) => {
-      const _val = Math.min(Math.max(val, minmaxX.graphMin), minmaxX.graphMax);
-      return Canvas.calculateX(_val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+      const _val = Math.min(Math.max(val, xMin), xMax);
+      return Math.ceil(xsp + xScale * (_val - xMin));
     };
 
     const getYPos = (val) => {
-      const _val = Math.min(Math.max(val, minmaxY.graphMin), minmaxY.graphMax);
-      return Canvas.calculateY(_val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
+      const _val = Math.min(Math.max(val, yMin), yMax);
+      return ysp
+        ? Math.floor(ysp - yScale * (_val - yMinOrZero))
+        : Math.floor(-(yScale * (_val - yMinOrZero)));
     };
 
     this.data.forEach((curr) => {
