@@ -295,6 +295,22 @@ describe('WorkerRenderGate — worker 렌더 라우팅', () => {
     expect(onInitFailure).toHaveBeenCalledWith('render-error-threshold');
   });
 
+  it('임계치 도달 시 in-flight 가 남아도 같은 프레임을 이중으로 그리지 않는다', () => {
+    const gate = makeReadyGate({ maxRenderErrors: 2, maxInFlight: 3 });
+    const onError = vi.fn();
+    gate.setErrorHandler(onError);
+    // 3개 전송 후 연속 에러로 임계치(2) 도달 — 마지막 에러 시점에도 in-flight 가 남아 있다.
+    gate.render({ epoch: 1 }, {}, []);
+    gate.render({ epoch: 2 }, {}, []);
+    gate.render({ epoch: 3 }, {}, []);
+    gate.worker.onmessage({ data: { type: 'render-error', epoch: 1, message: 'x' } });
+    gate.worker.onmessage({ data: { type: 'render-error', epoch: 2, message: 'x' } }); // 임계치 → _fail
+
+    expect(gate.state).toBe(RENDER_WORKER_STATE.FAILED);
+    // 에러 1건당 errorHandler 1회씩 = 2회. _fail 의 in-flight 복구가 추가로 그리지 않는다.
+    expect(onError).toHaveBeenCalledTimes(2);
+  });
+
   it('_fail 시 in-flight 프레임이 있으면 errorHandler 로 main fallback 을 그린다(화면 동결 방지)', () => {
     const gate = makeReadyGate();
     const onError = vi.fn();
