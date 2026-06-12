@@ -241,6 +241,10 @@ describe('worker series 래스터 경로 (Step 8)', () => {
     expect(order).toContain('gate.render');
     expect(order).toContain('drawSeriesLayer');
     expect(order).toContain('commitToDisplay');
+    // 미전송 fallback 은 main 경로와 동일 z-order: series → overlay → tip → commit (이슈8).
+    expect(order.indexOf('drawSeriesLayer')).toBeLessThan(order.indexOf('drawSeriesOverlay'));
+    expect(order.indexOf('drawSeriesOverlay')).toBeLessThan(order.indexOf('drawTip'));
+    expect(order.indexOf('drawTip')).toBeLessThan(order.indexOf('commitToDisplay'));
   });
 
   it('commitWorkerFrame: epoch 일치 → commitToDisplay(clear+axis)→bitmap 합성 + bitmap.close()', () => {
@@ -381,6 +385,122 @@ describe('epoch 경합 가드 (이슈1)', () => {
     chart.renderEpoch = 5;
     chart.drawSeriesLayerFallback({ epoch: 5 });
     expect(names(calls)).toEqual(['drawSeriesLayer', 'commitToDisplay']);
+  });
+});
+
+/**
+ * worker 진입 가드 (이슈2/3/7/8): canRenderSeriesOnWorker 는 worker 재구성으로 동등 렌더 가능한
+ * 프레임(line·bar(non-time)·heatMap, 숫자 축, hover/select/maxTip 없음)만 ok=true 를 준다.
+ */
+describe('worker 진입 가드 canRenderSeriesOnWorker (이슈2/3/7/8)', () => {
+  const makeGuardChart = ({ charts = {}, seriesList = {}, options = {}, lastHitInfo } = {}) =>
+    Object.assign(Object.create(EvChart.prototype), {
+      seriesInfo: { charts: { pie: [], bar: [], line: [], scatter: [], heatMap: [], ...charts } },
+      seriesList,
+      options,
+      lastHitInfo,
+    });
+
+  it('순수 numeric line + linear 축 + 무상태 → ok', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
+  });
+
+  it('visible scatter(미지원 타입)가 섞인 combo → false (unsupported-type)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'], scatter: ['s1'] },
+      seriesList: { l1: { type: 'line', show: true }, s1: { type: 'scatter', show: true } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }] },
+    });
+    const r = chart.canRenderSeriesOnWorker();
+    expect(r.ok).toBe(false);
+    expect(r.reason).toContain('unsupported-type');
+  });
+
+  it('hidden scatter(show:false)는 worker 누락돼도 무방 → ok', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'], scatter: ['s1'] },
+      seriesList: { l1: { type: 'line', show: true }, s1: { type: 'scatter', show: false } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
+  });
+
+  it('visible TimeBar(timeMode) → false (time-bar)', () => {
+    const chart = makeGuardChart({
+      charts: { bar: ['b1'] },
+      seriesList: { b1: { type: 'bar', show: true, timeMode: true } },
+      options: { axesX: [{ type: 'time' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker().reason).toBe('time-bar');
+  });
+
+  it('line + time 축(비숫자 x) → false (non-numeric-axis)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'time' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker().reason).toBe('non-numeric-axis');
+  });
+
+  it('line + step(category) 축 → false (non-numeric-axis)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'step' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker().reason).toBe('non-numeric-axis');
+  });
+
+  it('maxTip.use → false (buffer-tip-state)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }], maxTip: { use: true } },
+    });
+    expect(chart.canRenderSeriesOnWorker().reason).toBe('buffer-tip-state');
+  });
+
+  it('selectItem.use → false (buffer-tip-state)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }], selectItem: { use: true } },
+    });
+    expect(chart.canRenderSeriesOnWorker().reason).toBe('buffer-tip-state');
+  });
+
+  it('hitInfo(이번 프레임 hover) → false (hit-info)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker({ some: 'hit' }).reason).toBe('hit-info');
+  });
+
+  it('lastHitInfo(잔류 hover) → false (hit-info)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }] },
+      lastHitInfo: { x: 1, y: 2 },
+    });
+    expect(chart.canRenderSeriesOnWorker().reason).toBe('hit-info');
+  });
+
+  it('heatMap + step 축은 자체 label 재구성 경로라 ok 유지', () => {
+    const chart = makeGuardChart({
+      charts: { heatMap: ['h1'] },
+      seriesList: { h1: { type: 'heatMap', show: true } },
+      options: { axesX: [{ type: 'step' }], axesY: [{ type: 'step' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
   });
 });
 
