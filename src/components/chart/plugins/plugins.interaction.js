@@ -507,8 +507,13 @@ const modules = {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
       if (!isTooltipVisible) return;
 
+      // 가상 스크롤 활성 세션에서는 모듈이 실제 스크롤 컨테이너(rowContainer)를 알고 있으므로
+      // 이를 최우선으로 사용한다. (커스텀 툴팁 경로에서 tooltipBodyDOM은 detach 상태라 사용 불가)
       const scrollTarget =
-        this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget) ||
+        this.vsState?.scrollEl ||
+        (this.options.tooltip.htmlScrollTarget
+          ? this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget)
+          : null) ||
         this.tooltipBodyDOM;
       if (!scrollTarget || scrollTarget.scrollHeight <= scrollTarget.clientHeight) {
         this.hideTooltipDOM();
@@ -528,7 +533,15 @@ const modules = {
       }
     };
 
-    if (this.options?.tooltip?.useScrollbar) {
+    // 가상 스크롤은 스크롤을 전제로 한 기능이므로, VS가 활성화될 수 있는 차트
+    // (formatter.html + virtualScroll 미비활성)에서는 useScrollbar와 무관하게 wheel 핸들러를
+    // 보장한다. 그렇지 않으면 기본 설정(useScrollbar:false)에서 잘려나간 행에 접근할 수 없다.
+    const tooltipOpt = this.options?.tooltip;
+    const canVirtualScroll =
+      !!tooltipOpt?.formatter?.html &&
+      !!tooltipOpt?.virtualScroll &&
+      tooltipOpt.virtualScroll.use !== false;
+    if (tooltipOpt?.useScrollbar || canVirtualScroll) {
       this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
     }
     if (this.options?.tooltip?.throttledMove) {
