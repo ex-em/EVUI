@@ -16,6 +16,7 @@ import TooltipVirtualScroll from './plugins/plugins.tooltip.virtualScroll';
 import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 import Blit from './chart.blit';
+import Selection from './chart.selection';
 import { WorkerRenderGate } from './render/render.worker.gate';
 import { toRenderSnapshot, packSeries } from './render/render.snapshot';
 
@@ -110,6 +111,7 @@ class EvChart {
     this.legendHover = null;
 
     this.initBlitState();
+    this.initSelectionBaseState();
 
     // worker 렌더 게이트. 차트별 opt-in(`options.workerRender`, 기본 off)으로만 진입한다 →
     // opt-in 하지 않으면 worker 미진입 = 기존 main 경로 100% 유지(아래 drawChart 의 worker 분기는 ready 일 때만).
@@ -911,7 +913,7 @@ class EvChart {
     });
   }
 
-  drawSeriesLayer(bufferCtx, hitInfo) {
+  drawSeriesLayer(bufferCtx, hitInfo, layerOptions = {}) {
     const {
       maxTip,
       selectLabel,
@@ -922,15 +924,20 @@ class EvChart {
       unSelectedOpacity,
     } = this.options;
 
+    // noSelection: chart.selection 의 base 라스터용. selection/maxTip/selectItem 을 무력화해
+    // 모든 시리즈를 정상 opacity 로 그린다(partial 렌더에서 흐리게 합성할 baseline).
+    const noSel = layerOptions.noSelection === true;
+    const emptySel = { seriesId: [], dataIndex: [] };
+
     const opt = {
       ctx: bufferCtx,
       chartRect: this.chartRect,
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
       maxTipOpt: { background: maxTip.background, color: maxTip.color },
-      selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
-      selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
-      selectItem: { option: selectItem, selected: this.defaultSelectItemInfo },
+      selectLabel: { option: selectLabel, selected: noSel ? emptySel : this.defaultSelectInfo },
+      selectSeries: { option: selectSeries, selected: noSel ? emptySel : this.defaultSelectInfo },
+      selectItem: { option: selectItem, selected: noSel ? {} : this.defaultSelectItemInfo },
       isBrush: !!brush,
       displayOverflow,
       unSelectedOpacity,
@@ -1490,6 +1497,15 @@ class EvChart {
         this.pointsLayerValid = false; // 치수 변경 → baseline 무효화(다음 full redraw 에서 재구성)
       }
     }
+
+    // selectSeries 부분 렌더 base 도 동일하게 치수 변경 시에만 재할당하고 baseline 을 무효화한다.
+    if (this.seriesBaseCanvas) {
+      const dw = Math.floor(width * this.pixelRatio);
+      if (this.seriesBaseCanvas.width !== dw) {
+        this.seriesBaseCanvas.width = dw;
+        this._seriesBaseBuilt = false;
+      }
+    }
   }
 
   /**
@@ -1527,6 +1543,14 @@ class EvChart {
         this.pointsLayerA.height = dh;
         this.pointsLayerB.height = dh;
         this.pointsLayerValid = false;
+      }
+    }
+
+    if (this.seriesBaseCanvas) {
+      const dh = Math.floor(height * this.pixelRatio);
+      if (this.seriesBaseCanvas.height !== dh) {
+        this.seriesBaseCanvas.height = dh;
+        this._seriesBaseBuilt = false;
       }
     }
   }
@@ -1905,9 +1929,18 @@ class EvChart {
       // 데이터/옵션 변경으로 formatter.html 마크업이 달라질 수 있으므로 가상 스크롤
       // row 탐지 실패 플래그를 리셋해 다음 hover에서 다시 시도한다.
       this._vsDetectFailed = false;
+      // selectSeries 강조만 바뀐 프레임은 전체 재렌더 대신 base(정상 series)를 흐리게 합성하고
+      // 선택 시리즈만 진하게 redraw 한다. 게이트(base fresh·hover/legend 없음·지원 타입 등) 미충족 시
+      // 아래 full redraw 로 폴백한다(무회귀).
+      if (this.canPartialSelectionRender(hitInfo)) {
+        this.drawSelectionPartial(hitInfo);
+        return;
+      }
       this.clear();
       this.chartRect = this.getChartRect();
       this.drawChart(hitInfo);
+      // full redraw 후 base 라스터를 최신화한다(다음 selection 프레임의 partial 진입 조건).
+      this.maybeRebuildSeriesBase();
     }
   }
 
@@ -2206,5 +2239,7 @@ class EvChart {
 // (chart.core.blitGate.spec.js)가 Object.create(EvChart.prototype) 로 인스턴스 없이 메서드를
 // 호출하므로, 다른 plugin mixin 처럼 this(인스턴스)가 아니라 prototype 에 합쳐야 한다.
 Object.assign(EvChart.prototype, Blit);
+// selectSeries 강조 부분 렌더 메서드(chart.selection.js)를 prototype 에 합친다(Blit 과 동일 이유).
+Object.assign(EvChart.prototype, Selection);
 
 export default EvChart;
