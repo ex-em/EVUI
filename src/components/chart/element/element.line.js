@@ -294,9 +294,6 @@ class Line {
         ysp,
       );
 
-    const includeNegativeValue = this.data.some((data) => data.o < 0);
-    const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
-
     // draw line
     let prevValid;
     // 직전에 path 에 찍은(moveTo/lineTo) 픽셀 — 동일 픽셀 lineTo 생략 판정용.
@@ -340,6 +337,10 @@ class Line {
     if (this.fill && this.data.length) {
       ctx.beginPath();
 
+      // endPoint(fill 바닥)는 fill 경로에서만 쓰이므로 여기서 계산한다(비-fill 시리즈는 전체 스캔 skip).
+      const includeNegativeValue = this.data.some((data) => data.o < 0);
+      const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
+
       const fillColor = Util.colorStringToRgba(this.fillColor || mainColor, fillOpacity);
       if (this.fill?.gradient) {
         let maxValueYPos = this.data[0].yp;
@@ -366,24 +367,32 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map((item) => item?.o);
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
-      for (let i = 0; i < valueArray.length + 1; i++) {
+      // valueArray(this.data.map(o)) 중간 배열을 만들지 않고 this.data[i]?.o 를 직접 읽는다(매 draw 할당 제거).
+      const len = this.data.length;
+      for (let i = 0; i < len + 1; i++) {
+        const v = this.data[i]?.o;
         if (
-          (isLinearInterpolation && isUndefined(valueArray[i])) ||
-          (!isLinearInterpolation && isNil(valueArray[i]))
+          (isLinearInterpolation && isUndefined(v)) ||
+          (!isLinearInterpolation && isNil(v))
         ) {
           if (start !== null && end !== null) {
-            const temp = valueArray.slice(start, i);
-            const lastNormalValueIndex = temp.findLastIndex(
-              (item) => !isNil(item) && item !== null,
-            );
-            needFillDataIndexList.push([start, start + lastNormalValueIndex]);
+            // 직전 slice(start,i).findLastIndex(...) 와 동치: [start,i) 의 마지막 non-nil 절대 인덱스.
+            // 없으면 start + (-1) = start - 1 로 떨어지던 동작까지 동일하게 유지.
+            let lastNormalAbs = start - 1;
+            for (let j = i - 1; j >= start; j--) {
+              const w = this.data[j]?.o;
+              if (!isNil(w) && w !== null) {
+                lastNormalAbs = j;
+                break;
+              }
+            }
+            needFillDataIndexList.push([start, lastNormalAbs]);
             start = null;
             end = null;
           }
-        } else if (isLinearInterpolation && valueArray[i] === null) {
+        } else if (isLinearInterpolation && v === null) {
           end = i;
         } else {
           start = start === null ? i : start;
