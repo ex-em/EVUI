@@ -1685,9 +1685,9 @@ class EvChart {
       this.createPointsLayers();
     }
     if (updateSeries) {
-      this.seriesInfo = null;
-      this.seriesList = null;
-      this.lastTip = null;
+      // 직전 인스턴스를 보관해 reconcileSeriesSet 이 변경분만 add/recreate 하고 나머지는 재사용한다
+      // (점객체 풀 + geometry 메모이즈 보존). seriesInfo.charts 인덱스만 매번 새로 만든다.
+      const prevSeriesList = this.seriesList;
 
       this.seriesInfo = {
         charts: {
@@ -1699,10 +1699,9 @@ class EvChart {
         },
         count: 0,
       };
-      this.seriesList = {};
       this.lastTip = { pos: null, value: null };
 
-      this.createSeriesSet(series, options.type, options.horizontal, groups);
+      this.reconcileSeriesSet(series, options.type, options.horizontal, groups, prevSeriesList);
 
       if (this.legendDOM && !options.legend.external) {
         this.updateLegend();
