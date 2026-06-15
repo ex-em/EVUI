@@ -114,7 +114,8 @@ class Line {
         : Math.floor(-(yScale * (_val - yMinOrZero)));
     };
 
-    this.data.forEach((curr) => {
+    for (let i = 0; i < this.data.length; i++) {
+      const curr = this.data[i];
       let x = getXPos(curr.x);
       let y = getYPos(curr.y);
 
@@ -128,7 +129,7 @@ class Line {
 
       curr.xp = x;
       curr.yp = y;
-    });
+    }
 
     if (canMemo) {
       this._lastDataEpoch = param.dataEpoch;
@@ -280,30 +281,32 @@ class Line {
     // 직전에 path 에 찍은(moveTo/lineTo) 픽셀 — 동일 픽셀 lineTo 생략 판정용.
     let lastDrawnX = null;
     let lastDrawnY = null;
-    this.data.forEach((curr) => {
+    for (let i = 0; i < this.data.length; i++) {
+      const curr = this.data[i];
       // 기하 패스(computeGeometry)가 채운 xp/yp를 읽는다. 여기서 mutate하지 않는다.
       const x = curr.xp;
       const y = curr.yp;
 
-      if (isLinearInterpolation && curr.o === null) {
-        return;
-      } else if (
-        (isNil(prevValid?.y) && !this.isExistGrp) ||
-        (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))
-      ) {
-        ctx.moveTo(x, y);
-        lastDrawnX = x;
-        lastDrawnY = y;
-      } else if (x !== lastDrawnX || y !== lastDrawnY) {
-        // 직전과 완전히 같은 픽셀로의 lineTo 는 zero-length no-op 이라 생략(출력 불변).
-        // moveTo(위 분기)·null 경계는 비대상이고, fill·marker 는 별도 경로(xp/yp 항상 설정)라 무영향.
-        ctx.lineTo(x, y);
-        lastDrawnX = x;
-        lastDrawnY = y;
-      }
+      // linear interpolation 의 null 점은 path 에 반영하지 않고 prevValid 도 갱신하지 않는다(기존 early-return 동치).
+      if (!(isLinearInterpolation && curr.o === null)) {
+        if (
+          (isNil(prevValid?.y) && !this.isExistGrp) ||
+          (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))
+        ) {
+          ctx.moveTo(x, y);
+          lastDrawnX = x;
+          lastDrawnY = y;
+        } else if (x !== lastDrawnX || y !== lastDrawnY) {
+          // 직전과 완전히 같은 픽셀로의 lineTo 는 zero-length no-op 이라 생략(출력 불변).
+          // moveTo(위 분기)·null 경계는 비대상이고, fill·marker 는 별도 경로(xp/yp 항상 설정)라 무영향.
+          ctx.lineTo(x, y);
+          lastDrawnX = x;
+          lastDrawnY = y;
+        }
 
-      prevValid = curr;
-    });
+        prevValid = curr;
+      }
+    }
 
     ctx.stroke();
     if (this.segments) {
@@ -425,21 +428,20 @@ class Line {
       // strokeStyle은 위에서 시리즈당 1회 set(상수), fillStyle만 그룹별로 갈린다.
       const focusPoints = [];
       const blurPoints = [];
-      this.data.forEach((curr, ix) => {
-        if (curr.xp === null || curr.yp === null || curr.o === null) {
-          return;
-        }
+      for (let ix = 0; ix < this.data.length; ix++) {
+        const curr = this.data[ix];
+        if (!(curr.xp === null || curr.yp === null || curr.o === null)) {
+          const prevData = this.data[ix - 1]?.o;
+          const nextData = this.data[ix + 1]?.o;
 
-        const prevData = this.data[ix - 1]?.o;
-        const nextData = this.data[ix + 1]?.o;
-
-        const isSingle =
-          (!isLinearInterpolation && isNil(prevData) && isNil(nextData)) || isLinearSingle;
-        const isSelectedLabel = selectedLabelIndexList.includes(ix);
-        if (this.point || isSingle || isSelectedLabel) {
-          (isSelectedLabel && !legendHitInfo ? focusPoints : blurPoints).push(curr);
+          const isSingle =
+            (!isLinearInterpolation && isNil(prevData) && isNil(nextData)) || isLinearSingle;
+          const isSelectedLabel = selectedLabelIndexList.includes(ix);
+          if (this.point || isSingle || isSelectedLabel) {
+            (isSelectedLabel && !legendHitInfo ? focusPoints : blurPoints).push(curr);
+          }
         }
-      });
+      }
 
       if (blurPoints.length) {
         ctx.fillStyle = blurStyle;
