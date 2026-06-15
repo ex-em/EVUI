@@ -708,7 +708,7 @@ class EvChart {
       // pointsLayer 에 1회만 raster 하고 buffer 에는 합성만 한다 — buffer 와 layer 에 같은 점을
       // 두 번 그리는 비용을 제거. legend hover 처럼 점 외형이 달라지는 렌더만 buffer 에 직접
       // 그리고, 그 경우에도 데이터가 그대로면(스탬프 불변) 레이어 재구성은 생략한다.
-      this.drawAxis(hitInfo);
+      this.drawStaticLayer(this.bufferCtx, hitInfo);
       let rebuilt = false;
       let coordsRefreshed = false;
       if (!forceOff && this.canRouteFallbackViaLayer(hitInfo)) {
@@ -720,11 +720,11 @@ class EvChart {
             this.getMaxVisibleScatterPointSize(),
           );
         } else {
-          this.drawSeries(hitInfo); // 레이어 사용 불가(치수 미확보 등) → 기존 직접 경로
+          this.drawSeriesLayer(this.bufferCtx, hitInfo); // 레이어 사용 불가(치수 미확보 등) → 기존 직접 경로
           coordsRefreshed = true;
         }
       } else {
-        this.drawSeries(hitInfo);
+        this.drawSeriesLayer(this.bufferCtx, hitInfo);
         rebuilt = this.maybeRebuildPointsLayer(false);
         // legend hover 렌더(hitInfo.legend)는 호버 series 만 calcItem 을 타므로 전체 좌표
         // 갱신이 아니다 — 그 외 직접 drawSeries 는 보이는 점 전체의 xp/yp 를 갱신한다.

@@ -592,7 +592,7 @@ const blit = {
     }
 
     // 6) buffer 재구성: 축 새로 그리고 점 레이어를 plot 영역에 합성(clip 확장 = MAX pointSize)
-    this.drawAxis(hitInfo);
+    this.drawStaticLayer(this.bufferCtx, hitInfo);
     this.compositePointsLayer(dst, maxPointSize);
 
     return true;
