@@ -438,22 +438,40 @@ describe('worker 진입 가드 canRenderSeriesOnWorker', () => {
     expect(chart.canRenderSeriesOnWorker().reason).toBe('time-bar');
   });
 
-  it('line + time 축(비숫자 x) → false (non-numeric-axis)', () => {
+  it('line + time 축 → ok (snapshot 이 좌표를 타임스탬프로 정규화)', () => {
     const chart = makeGuardChart({
       charts: { line: ['l1'] },
       seriesList: { l1: { type: 'line', show: true } },
       options: { axesX: [{ type: 'time' }], axesY: [{ type: 'linear' }] },
     });
-    expect(chart.canRenderSeriesOnWorker().reason).toBe('non-numeric-axis');
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
   });
 
-  it('line + step(category) 축 → false (non-numeric-axis)', () => {
+  it('line + step 축 → ok (snapshot 이 좌표를 Number 로 정규화)', () => {
     const chart = makeGuardChart({
       charts: { line: ['l1'] },
       seriesList: { l1: { type: 'line', show: true } },
       options: { axesX: [{ type: 'step' }], axesY: [{ type: 'linear' }] },
     });
-    expect(chart.canRenderSeriesOnWorker().reason).toBe('non-numeric-axis');
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
+  });
+
+  it('bar(non-timeMode) + time 축 → ok', () => {
+    const chart = makeGuardChart({
+      charts: { bar: ['b1'] },
+      seriesList: { b1: { type: 'bar', show: true } },
+      options: { axesX: [{ type: 'time' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
+  });
+
+  it('bar + step 축(수직) → ok', () => {
+    const chart = makeGuardChart({
+      charts: { bar: ['b1'] },
+      seriesList: { b1: { type: 'bar', show: true } },
+      options: { axesX: [{ type: 'step' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
   });
 
   it('maxTip.use → false (buffer-tip-state)', () => {

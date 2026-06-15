@@ -525,8 +525,9 @@ class EvChart {
 
   /**
    * worker series 래스터 경로 진입 가능 여부. worker 재구성/기하(render.unpack·render.snapshot)는
-   * line·bar(non-time)·heatMap + 숫자 축만 동등 렌더하며, 선택/maxTip/hover tip 은 main buffer 전용이라
-   * worker 프레임에 반영되지 않는다. 하나라도 어긋나면 main 경로로 보내 무회귀를 보장한다.
+   * line·bar(timeMode 제외)·heatMap 을 동등 렌더하며(time/step 축은 snapshot 이 좌표를 숫자로 정규화),
+   * 선택/maxTip/hover tip 은 main buffer 전용이라 worker 프레임에 반영되지 않는다. 하나라도 어긋나면
+   * main 경로로 보내 무회귀를 보장한다.
    *
    * @param {any} [hitInfo]   legend/hover hit (drawChart 인자)
    * @returns {{ok:boolean, reason?:string}}
@@ -561,12 +562,9 @@ class EvChart {
       return { ok: false, reason: 'time-bar' };
     }
 
-    // time(Date)·step(category, string) 축은 line/bar 데이터의 x/y 가 비숫자 → snapshot 이 null 로
-    // 떨궈 worker 가 0픽셀을 그린다. heatMap 은 자체 label 재구성 경로라 제외(현행 동작 유지).
-    if (this.hasNonNumericAxisForLineBar()) {
-      return { ok: false, reason: 'non-numeric-axis' };
-    }
-
+    // time(Date)·step(string) 축은 render.snapshot 의 extractSeriesData 가 좌표를 숫자로 정규화한다
+    // (time→타임스탬프, step→Number). worker 는 메인과 동일 element 코드로 좌표를 재계산하므로
+    // bit-identical. timeMode bar 만 위에서 차단한다.
     return { ok: true };
   }
 
@@ -586,23 +584,6 @@ class EvChart {
     );
   }
 
-  /**
-   * visible line/bar 시리즈가 있고 축(x 또는 y) 중 time/step(category)이 있으면 true.
-   * 해당 축의 라벨 데이터(Date/string)는 비숫자라 worker snapshot 에서 null 처리된다.
-   * @returns {boolean}
-   */
-  hasNonNumericAxisForLineBar() {
-    const charts = this.seriesInfo?.charts ?? {};
-    const hasLineBar = ['line', 'bar'].some((type) =>
-      (charts[type] ?? []).some((id) => this.seriesList[id]?.show !== false),
-    );
-    if (!hasLineBar) {
-      return false;
-    }
-    const isNonNumeric = (axis) => axis?.type === 'time' || axis?.type === 'step';
-    return (this.options?.axesX ?? []).some(isNonNumeric)
-      || (this.options?.axesY ?? []).some(isNonNumeric);
-  }
 
   /**
    * worker 프레임(ImageBitmap) 도착 시 display 에 합성한다.
