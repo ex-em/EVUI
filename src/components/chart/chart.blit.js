@@ -841,6 +841,9 @@ const blit = {
     const reverse = !!this.options.seriesReverse;
     for (let i = 0; i < scatterList.length; i++) {
       const entry = reverse ? scatterList[scatterList.length - 1 - i] : scatterList[i];
+      // 기하 패스를 먼저 돌려 item.xp/yp 를 채운다 — realTimeScatterDraw 는 좌표를 읽기만 하므로
+      // element.draw() 를 거치지 않는 이 직접 호출 경로에선 computeGeometry 를 명시 호출해야 한다.
+      entry.series.computeGeometry(baseParam);
       entry.series.realTimeScatterDraw(baseParam);
     }
 

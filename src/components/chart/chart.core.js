@@ -470,8 +470,14 @@ class EvChart {
       return;
     }
 
-    this.drawStaticLayer(this.bufferCtx, hitInfo);
-    this.drawSeriesLayer(this.bufferCtx, hitInfo);
+    if (this.options.realTimeScatter?.use) {
+      // realtime scatter 는 worker 미지원이라 항상 main 경로다. blit fast-path 통합
+      // 진입점으로 보내 매 틱 strip-only 렌더(또는 조건 미달 시 내부에서 full 폴백)한다.
+      this.drawAxisAndSeries(hitInfo);
+    } else {
+      this.drawStaticLayer(this.bufferCtx, hitInfo);
+      this.drawSeriesLayer(this.bufferCtx, hitInfo);
+    }
     this.drawSeriesOverlay();
 
     this.drawTip();
