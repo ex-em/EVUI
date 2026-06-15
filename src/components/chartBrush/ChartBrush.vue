@@ -187,7 +187,7 @@ export default {
               });
             }
 
-            evChart.data = cloneDeep(data);
+            evChart.data = cloneDeep(getNormalizedData(data));
 
             evChart.update({
               updateSeries: isUpdateSeries,
