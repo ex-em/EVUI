@@ -14,6 +14,8 @@
  *    **항상 copy**(원본 detach 금지) — main 이 계속 쓰는 source 버퍼를 transfer 하면 깨진다.
  */
 
+import { normalizeTimeValue } from '../scale/scale.time';
+
 /** 스냅샷 포맷 버전. 호환 깨짐 변경 시 +1. worker 가 버전 불일치 시 main fallback 판정에 사용. */
 export const RENDER_SNAPSHOT_VERSION = 1;
 
@@ -126,13 +128,38 @@ function pickPlain(source, keys) {
 }
 
 /**
+ * 좌표값을 축 타입에 맞춰 worker 가 산술에 쓸 수 있는 숫자로 정규화한다.
+ *  - time : Date/문자열 → 타임스탬프(숫자). graphMin/Max 도 타임스탬프라 메인과 동일 산술.
+ *  - step : 숫자/숫자문자열('5') → 숫자. 카테고리 문자열('Mon') → null(메인도 NaN 으로 미렌더 — 동등).
+ *  - 그 외(linear) : 숫자만 통과, 비숫자는 null(기존 동작).
+ * @param {*} value
+ * @param {string} axisType  'time' | 'step' | 'linear' 등
+ * @returns {number|null}
+ */
+function normalizeCoord(value, axisType) {
+  if (axisType === 'time') {
+    return normalizeTimeValue(value);
+  }
+  if (typeof value === 'number') {
+    return value;
+  }
+  if (axisType === 'step') {
+    const n = Number(value);
+    return Number.isFinite(n) ? n : null;
+  }
+  return null;
+}
+
+/**
  * 시리즈 한 개의 수치 데이터를 컬럼형(plain number 배열)으로 추출한다.
  * pie 는 x/y 좌표가 없으므로 value 컬럼으로, 나머지는 x/y/o/b 컬럼으로.
+ * x/y 는 축 타입(time/step)에 따라 숫자로 정규화한다(worker 가 메인과 동일 좌표 재계산).
  * null 은 plain 배열에선 null 로 보존(typed array pack 시 NaN sentinel 로 치환 — packSeries 참고).
  * @param {{type:string, data:Array}} series
+ * @param {{x:string, y:string}} axisTypes  해당 시리즈 축 타입(미전달 시 linear)
  * @returns {object} columnar data
  */
-function extractSeriesData(series) {
+function extractSeriesData(series, axisTypes = {}) {
   const data = series.data ?? [];
 
   if (series.type === 'pie') {
@@ -141,14 +168,16 @@ function extractSeriesData(series) {
     };
   }
 
+  const xType = axisTypes.x ?? 'linear';
+  const yType = axisTypes.y ?? 'linear';
   const x = new Array(data.length);
   const y = new Array(data.length);
   const o = new Array(data.length);
   const b = new Array(data.length);
   for (let i = 0; i < data.length; i++) {
     const d = data[i] ?? {};
-    x[i] = typeof d.x === 'number' ? d.x : null;
-    y[i] = typeof d.y === 'number' ? d.y : null;
+    x[i] = normalizeCoord(d.x, xType);
+    y[i] = normalizeCoord(d.y, yType);
     o[i] = typeof d.o === 'number' ? d.o : null;
     b[i] = typeof d.b === 'number' ? d.b : null;
   }
@@ -175,9 +204,11 @@ export function toRenderSnapshot(core, epoch = 0) {
     if (!s || (typeof s.hasRenderableValue === 'function' && !s.isExistGrp && !s.hasRenderableValue())) {
       return;
     }
+    const xType = core.options?.axesX?.[s.xAxisIndex ?? 0]?.type ?? 'linear';
+    const yType = core.options?.axesY?.[s.yAxisIndex ?? 0]?.type ?? 'linear';
     series[id] = {
       ...pickPlain(s, SERIES_META_KEYS),
-      data: extractSeriesData(s),
+      data: extractSeriesData(s, { x: xType, y: yType }),
     };
     // heatMap 래스터는 category label 배열(this.labels)을 calculateXY 에서 소비한다.
     // 문자열 label 은 Float64 pack 불가라 별도 plain 배열로 전달(per-type pack 한계 → render-contract §5).
