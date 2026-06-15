@@ -91,9 +91,31 @@ const modules = {
     }
 
     if (maxTipOpt.use && !isExistSelectedLabel) {
-      const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
-      const seriesInfo = this.seriesList[maxSID];
-      maxArgs = this.calculateTipInfo(seriesInfo, 'max', null);
+      // step/time-category 축은 range 없이도 minIndex=0, maxIndex=last를 채우므로 숫자 여부로는
+      // 클리핑을 판별 못 한다. 빈 윈도우=미표시, 부분 클리핑=윈도우 재계산, 전체=전역 캐시.
+      const axesSteps = isHorizontal ? this.axesSteps.y[0] : this.axesSteps.x[0];
+      const minIndex = axesSteps?.minIndex;
+      const maxIndex = axesSteps?.maxIndex;
+      const labelCount = (isHorizontal ? this.axesY[0] : this.axesX[0])?.labels?.length;
+      const fullLast = Number.isFinite(labelCount) ? labelCount - 1 : maxIndex;
+      const hasWindow = Number.isFinite(minIndex) && Number.isFinite(maxIndex);
+      const isEmptyWindow = hasWindow && maxIndex < minIndex;
+      const isClippingWindow = hasWindow && (minIndex > 0 || maxIndex < fullLast);
+
+      let maxSID;
+      let windowMax = null;
+      if (isEmptyWindow) {
+        maxSID = undefined;
+      } else if (isClippingWindow) {
+        windowMax = this.getVisibleWindowMaxSeries(minIndex, maxIndex);
+        maxSID = windowMax?.sId;
+      } else {
+        maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
+      }
+
+      const seriesInfo = maxSID ? this.seriesList[maxSID] : null;
+      if (seriesInfo) {
+        maxArgs = this.calculateTipInfo(seriesInfo, 'max', windowMax);
 
       // dp 가 null 이면 max 데이터가 axis range 밖이라는 신호. drawTextTip 이 null 을 0 으로
       // 강제 변환해 maxTip 이 좌상단에 찍히는 회귀를 막는다.
@@ -109,8 +131,9 @@ const modules = {
         }
         this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
 
-        if (maxTipOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ...maxArgs });
+          if (maxTipOpt.showIndicator) {
+            this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ...maxArgs });
+          }
         }
       }
     }
@@ -158,7 +181,20 @@ const modules = {
       return false;
     }
 
-    let ldata = type === 'bar' ? maxDomainIndex : maxDomain;
+    // tipType === 'max' + hitInfo: drawTips에서 미리 산출한 가시 윈도우 max override.
+    // 일반 'max' 경로는 series.minMax(전역 캐시)를 그대로 사용.
+    // bar는 인덱스로, line/scatter는 도메인 값으로 위치를 잡으므로(maxDomainIndex/maxDomain
+    // 비대칭과 동일) override의 ldata도 타입에 맞춰 고른다.
+    const overrideLdata = type === 'bar' ? hitInfo?.index : hitInfo?.domain;
+    const hasMaxOverride = tipType === 'max' && hitInfo
+      && Number.isFinite(overrideLdata) && Number.isFinite(hitInfo.value);
+
+    let ldata;
+    if (hasMaxOverride) {
+      ldata = overrideLdata;
+    } else {
+      ldata = type === 'bar' ? maxDomainIndex : maxDomain;
+    }
 
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
@@ -169,7 +205,12 @@ const modules = {
       }
     }
 
-    let value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
+    let value;
+    if (hasMaxOverride) {
+      value = hitInfo.value;
+    } else {
+      value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
+    }
     let label;
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
