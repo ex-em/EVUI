@@ -509,37 +509,35 @@ class EvChart {
 
     const sent = this.renderWorkerGate.render(snapshot, columns, transferList);
     if (!sent) {
-      // in-flight 상한 등으로 미전송 → main 이 이 프레임의 series 를 그린다.
-      // main 경로와 동일 순서(static→series→overlay→tip)로 z-order 를 맞춘다.
+      // in-flight 상한 등으로 미전송 → main 이 이 프레임을 그린다(main 경로와 동일 z-order:
+      // series→overlay→tip→commit).
       this.drawSeriesLayer(this.bufferCtx, hitInfo);
-    }
-    // overlay 는 별도 overlay canvas(series bitmap 과 무관). tip 은 buffer 에 그리지만 위 가드가
-    // maxTip·select·hover 상태를 모두 막으므로 worker 전송 프레임에서 그릴 tip 이 없다(z-order 무관).
-    this.drawSeriesOverlay();
-    this.drawTip();
-    if (!sent) {
+      this.drawSeriesOverlay();
+      this.drawTip();
       this.commitToDisplay(this.displayCtx, this.bufferCanvas);
+    } else {
+      // 전송 프레임: overlay(별도 canvas)만 그린다. series 는 worker, tip(maxTip/selectItem/selectLabel)은
+      // commitWorkerFrame 이 series bitmap 위에 그린다(z-order). 여기서 tip 을 buffer 에 그리면 가려진다.
+      this.drawSeriesOverlay();
     }
     return true;
   }
 
   /**
    * worker series 래스터 경로 진입 가능 여부. worker 재구성/기하(render.unpack·render.snapshot)는
-   * line·bar(timeMode 제외)·heatMap 을 동등 렌더하며(time/step 축은 snapshot 이 좌표를 숫자로 정규화),
-   * 선택/maxTip/hover tip 은 main buffer 전용이라 worker 프레임에 반영되지 않는다. 하나라도 어긋나면
-   * main 경로로 보내 무회귀를 보장한다.
+   * line·bar(timeMode 제외)·heatMap 을 동등 렌더하며(time/step 축은 snapshot 이 좌표를 숫자로 정규화).
+   * select/maxTip 은 selection 을 snapshot 으로 전달해 worker 가 raster 에 반영하고, tip 은 commitWorkerFrame
+   * 이 series bitmap 위에 그린다(z-order). hover(hitInfo/lastHitInfo)만 main 전용 — series 를 안 바꾸고
+   * overlayCanvas 만 갱신하므로 worker 왕복이 불필요. 하나라도 어긋나면 main 경로로 보내 무회귀를 보장한다.
    *
    * @param {any} [hitInfo]   legend/hover hit (drawChart 인자)
    * @returns {{ok:boolean, reason?:string}}
    */
   canRenderSeriesOnWorker(hitInfo) {
-    // hover/legend hit — 이번 프레임(hitInfo) 또는 잔류(lastHitInfo). drawTip 이 buffer 에 그린다.
+    // hover/legend hit — 이번 프레임(hitInfo) 또는 잔류(lastHitInfo). hover 강조는 overlay 소유지만
+    // legendHitInfo 는 series raster 를 바꾸고 hover tip 도 매 프레임 갱신되므로 main 경로로 처리한다.
     if (hitInfo || this.lastHitInfo) {
       return { ok: false, reason: 'hit-info' };
-    }
-    // maxTip(상시)·select 사용 — tip/selection 이 main buffer 에 그려져 worker bitmap 과 어긋난다.
-    if (this.hasMainBufferTipState()) {
-      return { ok: false, reason: 'buffer-tip-state' };
     }
 
     const charts = this.seriesInfo?.charts ?? {};
@@ -569,25 +567,11 @@ class EvChart {
   }
 
   /**
-   * main buffer(bufferCtx)에 tip/선택 표시를 그리는 상태인지. 이 상태면 worker bitmap 합성 순서상
-   * tip 이 series 에 가려지거나(z-order 역전) 선택/dim 이 worker 프레임에서 누락된다.
-   * runtime select-info 객체 대신 그것을 켜는 options 플래그로 판정한다(안정적·null 모호성 없음).
-   * @returns {boolean}
-   */
-  hasMainBufferTipState() {
-    const opt = this.options ?? {};
-    return !!(
-      opt.maxTip?.use
-      || opt.selectItem?.use
-      || opt.selectLabel?.use
-      || opt.selectSeries?.use
-    );
-  }
-
-  /**
    * worker 프레임(ImageBitmap) 도착 시 display 에 합성한다.
-   * 순서: clear(display) → static(axis/grid, main buffer) → series bitmap(worker).
+   * 순서: clear(display) → static(axis/grid, main buffer) → series bitmap(worker) → tip(series 위).
    * epoch 가 현재와 다르면 stale frame 으로 drop 하고 bitmap 을 즉시 close(메모리).
+   * tip 은 series bitmap 위에 그려야 z-order 가 맞으므로 여기서 displayCtx 에 그린다(buffer 가 아닌).
+   * tip 은 main 인스턴스가 그리므로 maxTip/selectItem formatter 등 콜백이 그대로 동작한다.
    *
    * @param {{epoch:number, bitmap:ImageBitmap}} msg
    * @returns {undefined}
@@ -607,6 +591,14 @@ class EvChart {
     this.commitToDisplay(ctx, this.bufferCanvas);
     ctx.drawImage(bitmap, 0, 0);
     bitmap.close();
+
+    // series bitmap 위에 tip(maxTip/selectItem/selectLabel). bufferCtx 는 setTransform(pixelRatio)가
+    // 걸려 있지만 displayCtx 는 transform 이 없으므로(commitToDisplay 는 device-px blit) tip 좌표(CSS-px)가
+    // 어긋나지 않도록 동일 transform 을 걸고 그린다.
+    ctx.save();
+    ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+    this.drawTip(ctx);
+    ctx.restore();
   }
 
   /**
@@ -1109,8 +1101,10 @@ class EvChart {
 
   /**
    * Draw Tip with hitInfo and defaultSelectItemInfo
+   * @param {CanvasRenderingContext2D} [ctx]  그릴 ctx. worker 경로(commitWorkerFrame)는 series bitmap
+   *   위에 합성하려고 displayCtx 를 넘긴다(미전달 시 drawTips 가 main buffer 사용).
    */
-  drawTip() {
+  drawTip(ctx) {
     let tipLocationInfo;
 
     if (this.lastHitInfo) {
@@ -1123,7 +1117,7 @@ class EvChart {
       tipLocationInfo = null;
     }
 
-    this.drawTips?.(tipLocationInfo);
+    this.drawTips?.(tipLocationInfo, ctx);
   }
 
   /**
