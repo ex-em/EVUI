@@ -166,6 +166,9 @@ describe('worker series 래스터 경로', () => {
     const displayCtx = {
       clearRect: (...args) => displayOps.push({ op: 'clearRect', args }),
       drawImage: (...args) => displayOps.push({ op: 'drawImage', args }),
+      save() {},
+      restore() {},
+      setTransform: vi.fn(),
     };
 
     let sendOk = accept;
@@ -246,8 +249,8 @@ describe('worker series 래스터 경로', () => {
     expect(order.indexOf('drawTip')).toBeLessThan(order.indexOf('commitToDisplay'));
   });
 
-  it('commitWorkerFrame: epoch 일치 → commitToDisplay(clear+axis)→bitmap 합성 + bitmap.close()', () => {
-    const { chart, displayOps } = makeWorkerChart();
+  it('commitWorkerFrame: epoch 일치 → commitToDisplay→bitmap→drawTip(series 위) + bitmap.close()', () => {
+    const { chart, displayOps, calls } = makeWorkerChart();
     // commitToDisplay 가 display clear+static blit 을 atomic 하게 수행(내부에서 clearRect). 그 위에 bitmap 합성.
     chart.commitToDisplay = (ctx, canvas) => displayOps.push({ op: 'commitToDisplay', canvas });
     chart.renderEpoch = 4;
@@ -256,7 +259,11 @@ describe('worker series 래스터 경로', () => {
 
     chart.commitWorkerFrame({ epoch: 4, bitmap });
 
+    // static blit → series bitmap. tip 은 그 뒤에 displayCtx 에 그린다(z-order: series 위).
     expect(displayOps.map((o) => o.op)).toEqual(['commitToDisplay', 'drawImage']);
+    expect(names(calls)).toContain('drawTip');
+    // tip 좌표(CSS-px)가 고해상도에서 어긋나지 않도록 displayCtx 에 pixelRatio transform 을 건다(DPR 가드).
+    expect(chart.displayCtx.setTransform).toHaveBeenCalledWith(2, 0, 0, 2, 0, 0);
     expect(close).toHaveBeenCalledTimes(1);
   });
 
@@ -474,22 +481,31 @@ describe('worker 진입 가드 canRenderSeriesOnWorker', () => {
     expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
   });
 
-  it('maxTip.use → false (buffer-tip-state)', () => {
+  it('maxTip.use → ok (selection/tip 은 worker 로; tip 은 commitWorkerFrame 이 합성)', () => {
     const chart = makeGuardChart({
       charts: { line: ['l1'] },
       seriesList: { l1: { type: 'line', show: true } },
       options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }], maxTip: { use: true } },
     });
-    expect(chart.canRenderSeriesOnWorker().reason).toBe('buffer-tip-state');
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
   });
 
-  it('selectItem.use → false (buffer-tip-state)', () => {
+  it('selectItem.use → ok (selection 을 snapshot 으로 전달해 worker 가 반영)', () => {
     const chart = makeGuardChart({
       charts: { line: ['l1'] },
       seriesList: { l1: { type: 'line', show: true } },
       options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }], selectItem: { use: true } },
     });
-    expect(chart.canRenderSeriesOnWorker().reason).toBe('buffer-tip-state');
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
+  });
+
+  it('selectSeries.use → ok', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }], selectSeries: { use: true } },
+    });
+    expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
   });
 
   it('hitInfo(이번 프레임 hover) → false (hit-info)', () => {
@@ -499,6 +515,15 @@ describe('worker 진입 가드 canRenderSeriesOnWorker', () => {
       options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }] },
     });
     expect(chart.canRenderSeriesOnWorker({ some: 'hit' }).reason).toBe('hit-info');
+  });
+
+  it('legend hover(hitInfo.legend) → false (hit-info; legendHitInfo 는 series raster 변경)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1'] },
+      seriesList: { l1: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }] },
+    });
+    expect(chart.canRenderSeriesOnWorker({ legend: { sId: 'l1' } }).reason).toBe('hit-info');
   });
 
   it('lastHitInfo(잔류 hover) → false (hit-info)', () => {

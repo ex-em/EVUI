@@ -7,10 +7,12 @@ const modules = {
   /**
    * Draw TextTip with tip's locationInfo
    * @param {object} [tipLocationInfo=undefined]   tip location information
+   * @param {CanvasRenderingContext2D} [ctx=this.bufferCtx]  그릴 ctx. worker 경로는 series bitmap 위에
+   *   합성하려고 displayCtx 를 넘긴다(기본은 main buffer).
    *
    * @returns {undefined}
    */
-  drawTips(tipLocationInfo) {
+  drawTips(tipLocationInfo, ctx = this.bufferCtx) {
     const opt = this.options;
     let tooltipValueFormatter = null;
     const isHorizontal = !!opt.horizontal;
@@ -28,7 +30,7 @@ const modules = {
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
       isExistSelectedLabel =
-        opt.type === 'heatMap' ? this.drawLabelTipForHeatMap() : this.drawTipForSelectedLabel();
+        opt.type === 'heatMap' ? this.drawLabelTipForHeatMap(ctx) : this.drawTipForSelectedLabel(ctx);
     }
 
     const executeDrawIndicator = (tipOpt) => {
@@ -66,12 +68,13 @@ const modules = {
                 tipType: 'sel',
                 seriesOpt: seriesInfo,
                 isSamePos,
+                ctx,
                 ...selArgs,
               });
             }
 
             if (tipOpt.showIndicator) {
-              this.drawFixedIndicator({ opt: tipOpt, seriesOpt: seriesInfo, ...selArgs });
+              this.drawFixedIndicator({ opt: tipOpt, seriesOpt: seriesInfo, ctx, ...selArgs });
             }
           }
 
@@ -129,10 +132,10 @@ const modules = {
         } else {
           maxArgs.text = numberWithComma(maxArgs.value);
         }
-        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
+        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ctx, ...maxArgs });
 
           if (maxTipOpt.showIndicator) {
-            this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ...maxArgs });
+            this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ctx, ...maxArgs });
           }
         }
       }
@@ -306,7 +309,7 @@ const modules = {
   },
   drawFixedIndicator(param) {
     const isHorizontal = !!this.options.horizontal;
-    const ctx = this.bufferCtx;
+    const ctx = param.ctx ?? this.bufferCtx;
     const { graphX, graphY, xArea, yArea, xsp, ysp, dp, type, value, opt, seriesOpt } = param;
     let offset = 0;
 
@@ -361,7 +364,7 @@ const modules = {
    * none Text
    * @returns {boolean} Whether drew at least one tip
    */
-  drawTipForSelectedLabel() {
+  drawTipForSelectedLabel(ctx = this.bufferCtx) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const labelTipOpt = opt.selectLabel;
@@ -514,7 +517,7 @@ const modules = {
           ) + offset;
 
         this.showTip({
-          context: this.bufferCtx,
+          context: ctx,
           x: isHorizontal ? dataPos : labelPos,
           y: isHorizontal ? labelPos : dataPos,
           opt: labelTipOpt,
@@ -530,7 +533,7 @@ const modules = {
    * Draw Selected Label Tip
    * @returns {boolean} Whether drew at least one tip
    */
-  drawLabelTipForHeatMap() {
+  drawLabelTipForHeatMap(ctx = this.bufferCtx) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const labelTipOpt = opt.selectLabel;
@@ -562,7 +565,7 @@ const modules = {
         const dp = labelCenter + labelGap / 2;
 
         this.showTip({
-          context: this.bufferCtx,
+          context: ctx,
           x: isHorizontal ? gp : dp,
           y: isHorizontal ? dp : gp,
           opt: labelTipOpt,
@@ -582,7 +585,7 @@ const modules = {
    */
   drawTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
-    const ctx = this.bufferCtx;
+    const ctx = param.ctx ?? this.bufferCtx;
     const { graphX, graphY, xArea, yArea, xsp, xep, ysp } = param;
     const { dp, value, text, opt, type, tipType, isSamePos, seriesOpt } = param;
 
