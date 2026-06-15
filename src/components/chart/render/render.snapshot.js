@@ -17,7 +17,7 @@
 import { normalizeTimeValue } from '../scale/scale.time';
 
 /** 스냅샷 포맷 버전. 호환 깨짐 변경 시 +1. worker 가 버전 불일치 시 main fallback 판정에 사용. */
-export const RENDER_SNAPSHOT_VERSION = 1;
+export const RENDER_SNAPSHOT_VERSION = 2;
 
 /**
  * RenderInput 에 담는 옵션 원시값 화이트리스트.
@@ -185,6 +185,47 @@ function extractSeriesData(series, axisTypes = {}) {
 }
 
 /**
+ * worker series raster 가 selection 을 메인과 동일하게 반영하도록, element draw 가 실제로 읽는
+ * selection 필드만 plain 으로 추출한다(rich `selected.data` 배열은 draw 가 안 읽으므로 제외).
+ *  - selectSeries.selected = defaultSelectInfo.seriesId, selectLabel.selected = defaultSelectInfo(dataIndex/label/targetAxis)
+ *  - selectItem.selected = defaultSelectItemInfo(dataIndex/seriesID)
+ *  - option 필드(use/useSeriesOpacity/showBorder/borderStyle/useBothAxis)는 draw 가 읽는 것만(함수 없음).
+ * rasterSeries 가 이 평면 구조를 {option, selected} 로 재구성한다(render.unpack).
+ * @param {object} core
+ * @returns {object} selection 스냅샷
+ */
+function extractSelection(core) {
+  const opt = core.options ?? {};
+  const info = core.defaultSelectInfo;
+  const itemInfo = core.defaultSelectItemInfo;
+  return {
+    selectSeries: {
+      use: !!opt.selectSeries?.use,
+      selected: { seriesId: toPlain(info?.seriesId) ?? [] },
+    },
+    selectItem: {
+      use: !!opt.selectItem?.use,
+      useSeriesOpacity: !!opt.selectItem?.useSeriesOpacity,
+      showBorder: !!opt.selectItem?.showBorder,
+      borderStyle: toPlain(opt.selectItem?.borderStyle) ?? null,
+      selected: itemInfo
+        ? { dataIndex: itemInfo.dataIndex ?? null, seriesID: itemInfo.seriesID ?? null }
+        : null,
+    },
+    selectLabel: {
+      use: !!opt.selectLabel?.use,
+      useSeriesOpacity: !!opt.selectLabel?.useSeriesOpacity,
+      useBothAxis: !!opt.selectLabel?.useBothAxis,
+      selected: {
+        dataIndex: toPlain(info?.dataIndex) ?? [],
+        label: toPlain(info?.label) ?? [],
+        targetAxis: info?.targetAxis ?? null,
+      },
+    },
+  };
+}
+
+/**
  * RenderCore(prepare + series raster)가 필요로 하는 최소 입력을 plain·serializable·versioned 스냅샷으로
  * 추출한다. function / Vue proxy / class instance / circular ref 없음(structured-clone 가능).
  *
@@ -239,6 +280,7 @@ export function toRenderSnapshot(core, epoch = 0) {
       // heatMap 재구성 입력: legend.type 파생 plain boolean(함수/객체 아님).
       isGradient: core.options?.legend?.type === 'gradient',
     },
+    selection: extractSelection(core),
     seriesOrder,
     series,
   };

@@ -118,9 +118,10 @@ export function rasterSeries(snapshot, instances, ctx) {
   const options = snapshot.options ?? {};
   const order = snapshot.seriesOrder ?? {};
 
-  // interaction off. select* 는 main overlay 소유라 스냅샷에서 제외 →
-  // element draw 가 destructure 만 하므로 inert default(use:false / selected null)를 주입한다.
-  const inertSelect = { option: { use: false }, selected: null };
+  // selection 은 snapshot.selection(extractSelection)으로 전달된다. drawSeriesLayer(chart.core.js)가
+  // element draw 에 넘기는 {option, selected} 구조와 동형으로 재구성한다(없으면 use:false → normal 렌더).
+  // hover/legend 강조는 overlay canvas 소유라 worker 와 무관(스냅샷에 없음).
+  const sel = snapshot.selection ?? {};
   const opt = {
     ctx,
     chartRect: snapshot.chartRect,
@@ -129,9 +130,27 @@ export function rasterSeries(snapshot, instances, ctx) {
     isHorizontal: !!options.horizontal,
     displayOverflow: options.displayOverflow,
     unSelectedOpacity: options.unSelectedOpacity,
-    selectItem: inertSelect,
-    selectLabel: inertSelect,
-    selectSeries: inertSelect,
+    selectSeries: {
+      option: { use: sel.selectSeries?.use ?? false },
+      selected: sel.selectSeries?.selected ?? null,
+    },
+    selectItem: {
+      option: {
+        use: sel.selectItem?.use ?? false,
+        useSeriesOpacity: sel.selectItem?.useSeriesOpacity ?? false,
+        showBorder: sel.selectItem?.showBorder ?? false,
+        borderStyle: sel.selectItem?.borderStyle ?? null,
+      },
+      selected: sel.selectItem?.selected ?? null,
+    },
+    selectLabel: {
+      option: {
+        use: sel.selectLabel?.use ?? false,
+        useSeriesOpacity: sel.selectLabel?.useSeriesOpacity ?? false,
+        useBothAxis: sel.selectLabel?.useBothAxis ?? false,
+      },
+      selected: sel.selectLabel?.selected ?? null,
+    },
   };
 
   (order.line ?? []).forEach((id) => instances[id]?.draw({ ...opt }));

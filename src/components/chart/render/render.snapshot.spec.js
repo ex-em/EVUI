@@ -425,3 +425,69 @@ describe('render.snapshot — 축 타입별 좌표 정규화 (time/step worker �
     expect(snapshot.series.l.data.x[1]).toBeNull();
   });
 });
+
+describe('render.snapshot — selection 직렬화 (select 옵션 worker 허용)', () => {
+  it('RENDER_SNAPSHOT_VERSION 은 2 (worker 입력 계약 변경)', () => {
+    expect(RENDER_SNAPSHOT_VERSION).toBe(2);
+  });
+
+  it('selection 블록이 element draw 가 읽는 최소 필드만 담는다(rich data 제외)', () => {
+    const core = makeCore({
+      options: {
+        selectSeries: { use: true },
+        selectItem: { use: true, useSeriesOpacity: true, showBorder: true, borderStyle: { lineWidth: 2 } },
+        selectLabel: { use: true, useSeriesOpacity: true, useBothAxis: true },
+      },
+    });
+    core.defaultSelectInfo = {
+      seriesId: ['lineA'],
+      dataIndex: [1, 2],
+      label: ['Mon', 'Tue'],
+      targetAxis: 'xAxis',
+      data: [{ huge: 'rich-object', fn: () => {} }], // draw 가 안 읽는 rich 배열
+    };
+    core.defaultSelectItemInfo = { dataIndex: 3, seriesID: 'barA', data: { rich: true } };
+
+    const snapshot = toRenderSnapshot(core, 1);
+    const sel = snapshot.selection;
+
+    expect(sel.selectSeries).toEqual({ use: true, selected: { seriesId: ['lineA'] } });
+    expect(sel.selectItem).toEqual({
+      use: true, useSeriesOpacity: true, showBorder: true, borderStyle: { lineWidth: 2 },
+      selected: { dataIndex: 3, seriesID: 'barA' },
+    });
+    expect(sel.selectLabel).toEqual({
+      use: true, useSeriesOpacity: true, useBothAxis: true,
+      selected: { dataIndex: [1, 2], label: ['Mon', 'Tue'], targetAxis: 'xAxis' },
+    });
+    // rich data 배열/함수는 selection 어디에도 없어야 한다.
+    expect(JSON.stringify(sel)).not.toContain('rich');
+    expect(() => structuredClone(snapshot)).not.toThrow();
+  });
+
+  it('선택 상태 없음(defaultSelectInfo 부재): use 플래그만 반영, selected 는 빈/null', () => {
+    const core = makeCore({ options: { selectSeries: { use: true } } });
+    const snapshot = toRenderSnapshot(core, 1);
+
+    expect(snapshot.selection.selectSeries).toEqual({ use: true, selected: { seriesId: [] } });
+    expect(snapshot.selection.selectItem.selected).toBeNull();
+  });
+
+  it('select 옵션의 formatter 콜백이 섞여도 snapshot 에 함수가 없다', () => {
+    const core = makeCore({
+      options: { selectItem: { use: true, formatter: () => 'X', borderStyle: { color: '#f00' } } },
+    });
+    const snapshot = toRenderSnapshot(core, 1);
+
+    const assertNoFunction = (val) => {
+      if (val && typeof val === 'object') {
+        Object.values(val).forEach(assertNoFunction);
+      } else {
+        expect(typeof val).not.toBe('function');
+      }
+    };
+    assertNoFunction(snapshot.selection);
+    // borderStyle 의 plain 값은 보존.
+    expect(snapshot.selection.selectItem.borderStyle).toEqual({ color: '#f00' });
+  });
+});
