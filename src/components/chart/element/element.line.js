@@ -103,7 +103,7 @@ class Line {
       return;
     }
 
-    const { chartRect, labelOffset, axesSteps } = param;
+    const { chartRect, labelOffset, axesSteps, displayOverflow } = param;
     const isLinearInterpolation = this.useLinearInterpolation();
 
     let barAreaByCombo = 0;
@@ -122,11 +122,10 @@ class Line {
     const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    // Canvas.calculateX/Y 는 호출마다 scalingFactor(=area/(max-min)) division 을 재계산했다.
-    // 이 값은 포인트마다 불변이라 루프 밖에서 1회만 구하고 calculateX/Y 의 산술을 인라인한다.
-    // clamp(Math.min/Math.max)·반올림(ceil/floor)·alias 는 calculateX/Y 와 동일하게 유지하므로
-    // 좌표는 bit-identical(draw fill·hit-test parity 유지). val 은 clamp 후 항상 in-range·non-null 이라
-    // calculateX/Y 의 null/범위 반환 분기는 발생하지 않는다.
+    // calculateX/Y 의 scalingFactor(=area/(max-min)) division 을 루프 밖에서 1회만 구해 인라인한다.
+    // 범위 밖(또는 null)이면 Canvas.calculateX/Y 와 동일하게 null 을 반환해 숨김/라인 끊기를 유지한다.
+    // 값 축(Y)은 displayOverflow 가 켜졌을 때만 graphMax 로 clamp(상단 경계 표시), 꺼지면 null(숨김).
+    // X 는 clamp 하지 않는다(라인 세로 전용 — calculateX 와 동일). in-range 좌표는 bit-identical.
     const xMin = minmaxX.graphMin;
     const xMax = minmaxX.graphMax;
     const yMin = minmaxY.graphMin;
@@ -136,15 +135,20 @@ class Line {
     const yMinOrZero = yMin || 0;
 
     const getXPos = (val) => {
-      const _val = Math.min(Math.max(val, xMin), xMax);
-      return Math.ceil(xsp + xScale * (_val - xMin));
+      if (val === null || val === undefined || val < xMin || val > xMax) {
+        return null;
+      }
+      return Math.ceil(xsp + xScale * (val - xMin));
     };
 
     const getYPos = (val) => {
-      const _val = Math.min(Math.max(val, yMin), yMax);
+      const v = displayOverflow && val > yMax ? yMax : val;
+      if (v === null || v === undefined || v < yMin || v > yMax) {
+        return null;
+      }
       return ysp
-        ? Math.floor(ysp - yScale * (_val - yMinOrZero))
-        : Math.floor(-(yScale * (_val - yMinOrZero)));
+        ? Math.floor(ysp - yScale * (v - yMinOrZero))
+        : Math.floor(-(yScale * (v - yMinOrZero)));
     };
 
     for (let i = 0; i < this.data.length; i++) {
@@ -563,13 +567,30 @@ class Line {
           ctx.stroke();
         }
       } else {
+        // 비-circle 스타일도 색(focus/blur) 그룹별로 모아 drawPointBatch 로 1회씩 그린다
+        // (path-per-point fill/stroke flush 제거). circle 은 위 inline arc 경로가 처리한다.
+        let blurPts = null;
+        let focusPts = null;
         for (let ix = 0; ix < dataLen; ix++) {
           const kind = pointDrawKind(ix);
           if (kind !== 0) {
             const curr = data[ix];
-            ctx.fillStyle = kind === 2 ? focusStyle : blurStyle;
-            Canvas.drawPoint(ctx, pointStyle, pointSize, curr.xp, curr.yp);
+            if (kind === 2) {
+              if (focusPts === null) focusPts = [];
+              focusPts.push(curr);
+            } else {
+              if (blurPts === null) blurPts = [];
+              blurPts.push(curr);
+            }
           }
+        }
+        if (blurPts !== null) {
+          ctx.fillStyle = blurStyle;
+          Canvas.drawPointBatch(ctx, pointStyle, pointSize, blurPts);
+        }
+        if (focusPts !== null) {
+          ctx.fillStyle = focusStyle;
+          Canvas.drawPointBatch(ctx, pointStyle, pointSize, focusPts);
         }
       }
     }

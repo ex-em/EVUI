@@ -441,8 +441,9 @@ describe('element.line path 생략 (연속 동일 픽셀 lineTo)', () => {
     const ctx = makeCtx();
     makeLine(data).draw(baseParam(ctx));
 
-    // 생략은 lineTo 분기에만 적용 → null 경계의 moveTo 는 그대로 유지.
-    expect(ctx.cmds.filter((c) => c[0] === 'moveTo')).toHaveLength(3);
+    // null 경계(yp=null)는 라인을 끊고 prevValid 를 리셋한다(3.4 동작) — moveTo 없이 다음 valid 점이
+    // 새 moveTo 로 재시작. 따라서 valid 점(idx 0,2)만 moveTo 2회, lineTo 0회.
+    expect(ctx.cmds.filter((c) => c[0] === 'moveTo')).toHaveLength(2);
     expect(ctx.cmds.filter((c) => c[0] === 'lineTo')).toHaveLength(0);
   });
 
@@ -593,7 +594,10 @@ describe('element.line 마커 배치 렌더링', () => {
     stroke: noop,
     fill: noop,
     setLineDash: noop,
-    arc: noop,
+    arcCount: 0,
+    arc() {
+      this.arcCount += 1;
+    },
     moveTo: noop,
     lineTo: noop,
     fillRect: noop,
@@ -624,7 +628,7 @@ describe('element.line 마커 배치 렌더링', () => {
     return line;
   };
 
-  it('교차 null 데이터: 모든 고립점(isSingle)을 단일 batch로 모아 그린다 (per-point drawPoint 미사용)', () => {
+  it('교차 null 데이터: 모든 고립점(isSingle)을 마커로 그린다 (circle inline-arc 배치, per-point drawPoint 미사용)', () => {
     // #.#.#  — 비-null 점(idx 0,2,4)이 전부 양옆 null → isSingle, point:false 여도 마커 그려짐.
     const data = [
       { x: 0, y: 10, o: 10 },
@@ -633,29 +637,31 @@ describe('element.line 마커 배치 렌더링', () => {
       { x: 3, y: null, o: null },
       { x: 4, y: 30, o: 30 },
     ];
-    const batchSpy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
     const pointSpy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
 
-    makeLine(data).draw(baseParam(makeCtx()));
+    const ctx = makeCtx();
+    makeLine(data).draw(baseParam(ctx));
 
-    // 같은 색(blur) 한 그룹 → batch 1회, 점 3개. path-per-point drawPoint 는 호출되지 않음.
+    // circle 기본 스타일 → canBatch 경로: 점마다 ctx.arc 로 single path 에 모아 fill/stroke 1회.
+    // 고립점 3개 → arc 3회, per-point Canvas.drawPoint 는 호출되지 않음.
     expect(pointSpy).not.toHaveBeenCalled();
-    expect(batchSpy).toHaveBeenCalledTimes(1);
-    expect(batchSpy.mock.calls[0][3]).toHaveLength(3);
+    expect(ctx.arcCount).toBe(3);
   });
 
-  it('마커 대상이 없으면 batch 를 호출하지 않는다', () => {
+  it('마커 대상이 없으면 arc 를 호출하지 않는다', () => {
     // 연속 데이터 + point:false → isSingle 아님, selectedLabel 없음 → 마커 없음.
     const data = [
       { x: 0, y: 10, o: 10 },
       { x: 1, y: 20, o: 20 },
       { x: 2, y: 30, o: 30 },
     ];
-    const batchSpy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
+    const pointSpy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
 
-    makeLine(data).draw(baseParam(makeCtx()));
+    const ctx = makeCtx();
+    makeLine(data).draw(baseParam(ctx));
 
-    expect(batchSpy).not.toHaveBeenCalled();
+    expect(ctx.arcCount).toBe(0);
+    expect(pointSpy).not.toHaveBeenCalled();
   });
 });
 

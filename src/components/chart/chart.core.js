@@ -325,6 +325,11 @@ class EvChart {
    * @returns {?object} axes-scale-change payload, or null when nothing watched changed
    */
   computeAxesScaleChange() {
+    // 구독자가 없으면 payload 계산 자체를 건너뛴다(3.4 emitAxesScaleChange 동작 보존 — 무구독 비용 0).
+    if (typeof this.listeners?.['axes-scale-change'] !== 'function') {
+      return null;
+    }
+
     const prev = this._lastEmittedAxesRange;
     const curr = this.labelRange;
 

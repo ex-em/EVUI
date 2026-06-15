@@ -13,14 +13,18 @@ describe('addSeriesStackDS — 죽은 캐시 제거 + 풀 재사용', () => {
   });
 
   // 베이스(s0) + 그 위(s1) 2단 스택을 빌드한다.
+  // createDataSet 와 동일하게 그룹 누적 top(stackTops)을 유지하며 base→top 순으로 빌드한다.
   const buildStack = (ctx, s0vals, s1vals, prev0, prev1) => {
     const labels = s0vals.map((_, i) => i);
     ctx.seriesList.s0 = ctx.seriesList.s0
       ?? { show: true, passingValue: null, isExistGrp: true, stackIndex: 0, data: [] };
     ctx.seriesList.s1 = ctx.seriesList.s1
       ?? { show: true, passingValue: null, isExistGrp: true, stackIndex: 1, data: [] };
-    ctx.seriesList.s0.data = modules.addSeriesStackDS.call(ctx, s0vals, labels, [], 0, prev0);
-    ctx.seriesList.s1.data = modules.addSeriesStackDS.call(ctx, s1vals, labels, ['s0'], 1, prev1);
+    const tops = { pos: [], neg: [] };
+    ctx.seriesList.s0.data = modules.addSeriesStackDS.call(ctx, s0vals, labels, 0, tops, prev0);
+    modules.updateStackTops.call(ctx, tops, ctx.seriesList.s0);
+    ctx.seriesList.s1.data = modules.addSeriesStackDS.call(ctx, s1vals, labels, 1, tops, prev1);
+    modules.updateStackTops.call(ctx, tops, ctx.seriesList.s1);
     return { s0: ctx.seriesList.s0.data, s1: ctx.seriesList.s1.data };
   };
 
