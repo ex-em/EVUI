@@ -98,6 +98,7 @@ const modules = {
                     label,
                     series.bsIds,
                     series.stackIndex,
+                    series.data,
                   );
                 } else {
                   series.data = this.addSeriesDS(
@@ -484,18 +485,16 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesStackDS(data, label, bsIds, sIdx = 0) {
+  addSeriesStackDS(data, label, bsIds, sIdx = 0, prevData) {
     const seriesList = this.seriesList;
     const isHorizontal = this.options.horizontal;
     const sdata = [];
-    const basePositionCache = new Map();
+    // 직전 데이터셋의 점객체를 재사용(addSeriesDS 와 동일 전략) — 매 틱 N개 객체 할당/GC 제거.
+    const pool = Array.isArray(prevData) ? prevData : null;
 
+    // baseIndex 는 호출 내 상수, dataIndex 는 점마다 유일이라 캐시 키가 점마다 새로 생겨 hit 이
+    // 발생하지 않았다(측정상 0%). 죽은 캐시(문자열 키 생성 + Map 연산)를 제거하고 walk 만 수행한다.
     const getBaseDataPosition = (baseIndex, dataIndex, curr) => {
-      const key = `${baseIndex}-${dataIndex}-${curr >= 0 ? 'pos' : 'neg'}`;
-      if (basePositionCache.has(key)) {
-        return basePositionCache.get(key);
-      }
-
       let result = 0;
       let idx = baseIndex;
 
@@ -520,7 +519,6 @@ const modules = {
         idx--;
       }
 
-      basePositionCache.set(key, result);
       return result;
     };
 
@@ -550,7 +548,8 @@ const modules = {
           gdata = oData;
         }
 
-        sdata.push(this.addData(gdata, ldata, odata, bdata));
+        const reused = pool && pool[sdata.length];
+        sdata.push(this.addData(gdata, ldata, odata, bdata, reused || null));
       }
     });
 
@@ -670,8 +669,7 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint} data for each graph point
    */
-  addData(gdata, ldata, odata = null, bdata = null) {
-    let data;
+  addData(gdata, ldata, odata = null, bdata = null, target = null) {
     let gdataValue = null;
     let odataValue = null;
     let gdataColor = null;
@@ -693,12 +691,17 @@ const modules = {
       odataValue = odata ?? null;
     }
 
+    // target 이 주어지면 그 객체를 재사용(점객체 풀)해 매 틱 N개 객체 할당(GC 압력)을 줄인다.
+    const data = target || {};
     if (this.options.horizontal) {
-      data = { x: gdataValue, y: ldata, o: odataValue, b: bdata };
+      data.x = gdataValue;
+      data.y = ldata;
     } else {
-      data = { x: ldata, y: gdataValue, o: odataValue, b: bdata };
+      data.x = ldata;
+      data.y = gdataValue;
     }
-
+    data.o = odataValue;
+    data.b = bdata;
     data.xp = null;
     data.yp = null;
     data.w = null;
