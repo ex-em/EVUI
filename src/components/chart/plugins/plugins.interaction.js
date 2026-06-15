@@ -1518,6 +1518,15 @@ const modules = {
    * @returns {boolean}
    */
   selectSeriesByData(seriesIdList) {
+    // 선택이 실제로 바뀌지 않았으면 재렌더하지 않는다. 차트 그룹에서 한 차트를 선택하면
+    // 제품이 나머지 차트의 selectedSeries 를 빈 배열로 리셋(재할당)하는데, deep watch 가
+    // 이를 변경으로 보고 selectSeriesByData([]) 를 매번 호출한다. 값이 동일(빈→빈)하면
+    // render() 가 noSelection 으로 full redraw 폴백하는 비용만 발생하므로 여기서 차단한다.
+    const prev = this.defaultSelectInfo?.seriesId ?? [];
+    const next = seriesIdList ?? [];
+    if (prev.length === next.length && prev.every((v, i) => v === next[i])) {
+      return;
+    }
     this.defaultSelectInfo.seriesId = seriesIdList;
     this.render();
   },
