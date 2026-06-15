@@ -34,6 +34,7 @@ describe('drawChart 파이프라인 호출 순서 (prepare/scrollbar/emit/series
       overlayCtx,
       bufferCanvas: { width: 100, height: 100 },
       displayCtx: { id: 'display' },
+      options: {},
       scrollbar: scrollbar ?? { x: { use: false }, y: { use: false } },
       listeners: listener ? { 'axes-scale-change': listener } : {},
       initScale: rec('initScale'),
