@@ -108,7 +108,14 @@ const modules = {
                 }
 
                 if (inStackGroup && series.stackIndex) {
-                  series.data = this.addSeriesStackDS(sData, label, series.stackIndex, tops);
+                  // 3.4 stackTops base 조회(O(1)) 유지 + 직전 data 를 풀로 전달(점객체 재사용, GC 절감)
+                  series.data = this.addSeriesStackDS(
+                    sData,
+                    label,
+                    series.stackIndex,
+                    tops,
+                    series.data,
+                  );
                 } else {
                   series.data = this.addSeriesDS(
                     sData,
@@ -533,16 +540,19 @@ const modules = {
    * @param {object}  label   chart label
    * @param {number}  sIdx    series ordered index
    * @param {{pos: number[], neg: number[]}}  tops  스택 그룹의 부호별 누적 top(base 위치)
+   * @param {ChartSeriesDataPoint[]} [prevData]  직전 데이터셋(점객체 풀 재사용용)
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesStackDS(data, label, sIdx = 0, tops = null) {
+  addSeriesStackDS(data, label, sIdx = 0, tops = null, prevData) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
     const posTop = tops?.pos;
     const negTop = tops?.neg;
+    // 직전 데이터셋의 점객체를 재사용(addSeriesDS 와 동일 전략) — 매 틱 N개 객체 할당/GC 제거.
+    const pool = Array.isArray(prevData) ? prevData : null;
 
     data.forEach((curr, index) => {
       // base(아래 스택) 위치: 부호별 누적 top 에서 O(1) 조회.
@@ -570,7 +580,8 @@ const modules = {
           gdata = oData;
         }
 
-        sdata.push(this.addData(gdata, ldata, odata, bdata));
+        const reused = pool && pool[sdata.length];
+        sdata.push(this.addData(gdata, ldata, odata, bdata, reused || null));
       }
     });
 
@@ -732,8 +743,7 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint} data for each graph point
    */
-  addData(gdata, ldata, odata = null, bdata = null) {
-    let data;
+  addData(gdata, ldata, odata = null, bdata = null, target = null) {
     let gdataValue = null;
     let odataValue = null;
     let gdataColor = null;
@@ -755,12 +765,17 @@ const modules = {
       odataValue = odata ?? null;
     }
 
+    // target 이 주어지면 그 객체를 재사용(점객체 풀)해 매 틱 N개 객체 할당(GC 압력)을 줄인다.
+    const data = target || {};
     if (this.options.horizontal) {
-      data = { x: gdataValue, y: ldata, o: odataValue, b: bdata };
+      data.x = gdataValue;
+      data.y = ldata;
     } else {
-      data = { x: ldata, y: gdataValue, o: odataValue, b: bdata };
+      data.x = ldata;
+      data.y = gdataValue;
     }
-
+    data.o = odataValue;
+    data.b = bdata;
     data.xp = null;
     data.yp = null;
     data.w = null;
