@@ -38,6 +38,8 @@ import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
 import AxesScaleChange from './example/AxesScaleChange';
 import ShowValue from './example/ShowValue';
 import ShowValueRaw from './example/ShowValue?raw';
+import DisplayOverflow from './example/DisplayOverflow';
+import DisplayOverflowRaw from './example/DisplayOverflow?raw';
 
 export default {
   mdText,
@@ -145,6 +147,12 @@ export default {
         'showValue 옵션의 align(start/center/out/end)과 horizontal 조합을 인터랙티브하게 테스트할 수 있습니다.',
       component: ShowValue,
       parsedData: parse(ShowValueRaw).descriptor,
+    },
+    DisplayOverflow: {
+      description:
+        'displayOverflow 옵션으로 값 축(세로=Y, 가로=X) range를 초과한 막대를 경계까지 기본 시리즈 색으로 표시할 수 있습니다(false 기본값이면 숨김). 가로 모드 토글로 값 축 전환 동작을 확인할 수 있습니다.',
+      component: DisplayOverflow,
+      parsedData: parse(DisplayOverflowRaw).descriptor,
     },
   },
 };

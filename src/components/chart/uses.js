@@ -1,5 +1,5 @@
 import { ref, reactive, computed, watch, getCurrentInstance, nextTick, onUpdated } from 'vue';
-import { cloneDeep, defaultsDeep, isEqual } from 'lodash-es';
+import { cloneDeep, cloneDeepWith, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
 
@@ -74,6 +74,9 @@ const DEFAULT_OPTIONS = {
   },
   reverse: false,
   horizontal: false,
+  // 값 축(value axis: horizontal ? X : Y)의 graphMax 를 초과하는 데이터를
+  // 경계에 모아 표시할지 여부. false 면 range 밖 데이터는 숨긴다(scatter 기존 동작 유지).
+  displayOverflow: false,
   overlapping: {
     use: false,
   },
@@ -91,7 +94,7 @@ const DEFAULT_OPTIONS = {
     borderColor: '#666666',
     shadowOpacity: 0.25,
     useShadow: false,
-    throttledMove: false,
+    throttledMove: true,
     debouncedHide: false,
     useScrollbar: false,
     textOverflow: 'wrap',
@@ -108,6 +111,14 @@ const DEFAULT_OPTIONS = {
       left: 16,
     },
     showHeader: true,
+    // 시리즈가 많을 때(html formatter 한정) 가상 스크롤로 보이는 행만 라이브 DOM에 부착하여
+    // 레이아웃/페인트 비용을 O(N) → O(viewport)로 줄인다.
+    virtualScroll: {
+      use: 'auto', // 'auto' | true | false. 'auto'면 시리즈 수 >= threshold일 때 자동 활성
+      threshold: 50,
+      estimatedRowHeight: 28,
+      overscan: 5,
+    },
   },
   indicator: {
     use: true,
@@ -254,6 +265,21 @@ const DEFAULT_DATA = {
   data: {},
 };
 
+/**
+ * dayjs/Date 등 불변(immutable) 날짜 값은 깊은 복제 대상에서 제외하고 참조만 공유한다.
+ * 메서드가 새 인스턴스를 반환하는 불변 객체라 제자리 변형이 없으므로 스냅샷 격리가 깨지지 않으며,
+ * time-axis 차트에서 labels의 dayjs 인스턴스를 통째로 깊은 복제하던 비용(수천 개)을 제거한다.
+ */
+const isImmutableDateLike = (value) =>
+  value instanceof Date ||
+  (value !== null &&
+    typeof value === 'object' &&
+    typeof value.toDate === 'function' &&
+    typeof value.format === 'function');
+
+export const cloneChartData = (data) =>
+  cloneDeepWith(data, (value) => (isImmutableDateLike(value) ? value : undefined));
+
 const useWidgetClickEvent = () => {
   let timer = null;
   const Delay = 200;
@@ -284,7 +310,8 @@ const useWidgetClickEvent = () => {
 };
 
 export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
-  const { props, emit } = getCurrentInstance();
+  const instance = getCurrentInstance();
+  const { props, emit } = instance;
 
   const getNormalizedOptions = (options) => {
     const normalizedOptions = defaultsDeep({}, options, DEFAULT_OPTIONS);
@@ -406,6 +433,14 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
       emit('axes-scale-change', result);
     },
   };
+
+  // 소비처가 @axes-data-max-change 를 바인딩했을 때만 래퍼를 등록한다.
+  // 미등록 시 core(emitDataMaxChange)가 리스너 부재로 일찍 빠져 집계 비용이 0 이 된다.
+  if (instance.vnode.props?.onAxesDataMaxChange) {
+    eventListeners['axes-data-max-change'] = (maxY) => {
+      emit('axes-data-max-change', maxY);
+    };
+  }
 
   return {
     eventListeners,
@@ -619,7 +654,7 @@ export const useZoomModel = (
   const setDataForUseZoom = (newData) => {
     if (isUpdateDataForUseZoom.value) {
       if (!isExecuteZoom.value) {
-        evChartClone.data = evChartGroupRef ? cloneDeep(newData) : [cloneDeep(newData)];
+        evChartClone.data = evChartGroupRef ? cloneChartData(newData) : [cloneChartData(newData)];
 
         if (evChartZoomOptions.zoom.keepZoomStatus) {
           isUpdateDataForUseZoom.value = false;

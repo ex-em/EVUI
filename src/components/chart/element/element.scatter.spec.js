@@ -153,5 +153,114 @@ describe('Scatter Element', () => {
 
       expect(spy).toHaveBeenCalledTimes(2);
     });
+
+    it('item.k 가 있으면 좌표 재계산 없이 캐시 키로 duple 을 조회한다', () => {
+      const scatter = createScatter({ realTimeScatter: true });
+      scatter.data = {
+        s1: {
+          dataGroup: [{ data: [{ x: 1, y: 1, k: 'K1' }] }],
+        },
+      };
+      const param = createDrawParam();
+      // 캐시 키로만 owner 매칭되고, 재계산 키('1|1')는 무시되어야 한다.
+      param.duple.set('K1', 's1');
+      param.duple.set('1|1', 'otherSeries');
+
+      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      scatter.draw(param);
+
+      expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it('coordinateDedupe=true + 빈 duple 이면 아무 점도 그리지 않는다 (단일-series 경로가 false 를 넘겨야 하는 이유)', () => {
+      // chart.core 의 단일 series 스킵 경로가 실수로 coordinateDedupe=true 를 넘기면(=duple 미수집)
+      // 모든 점의 owner 판정(duple.get(key) === sId)이 탈락해 예외 없이 빈 차트가 된다.
+      // element 측 불변식으로 이 위험 상태를 명시 고정한다(배선 회귀는 chart.core.scatterDedupe.spec 에서 잠금).
+      const scatter = createScatter({ realTimeScatter: true });
+      scatter.data = {
+        s1: {
+          dataGroup: [
+            {
+              data: [
+                { x: 1, y: 1 },
+                { x: 2, y: 2 },
+              ],
+            },
+          ],
+        },
+      };
+      const param = createDrawParam(); // coordinateDedupe: true, duple: 빈 Map
+
+      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      scatter.draw(param);
+
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('show=false 면 dedupe 우회(coordinateDedupe=false)여도 draw() 가드로 아무것도 안 그린다', () => {
+      // 단일 series dedupe 스킵 시 duple 이 비어도 숨긴 series 가 되살아나지 않음을 보장.
+      // 숨김 억제는 duple 이 아니라 draw() 진입 가드(!this.show)가 담당한다.
+      const scatter = createScatter({ realTimeScatter: true });
+      scatter.show = false;
+      scatter.data = {
+        s1: {
+          dataGroup: [
+            {
+              data: [
+                { x: 1, y: 1 },
+                { x: 2, y: 2 },
+              ],
+            },
+          ],
+        },
+      };
+      const param = createDrawParam();
+      param.coordinateDedupe = false;
+
+      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      scatter.draw(param);
+
+      expect(spy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('displayOverflow — 값 축(Y) 초과 처리 (기본값 false 회귀 방지)', () => {
+    // displayOverflow 가 DEFAULT_OPTIONS 에 추가되면서 기본값이 true 로 들어가면,
+    // 옵션을 지정하지 않은 기존 scatter 의 range 초과 포인트가 숨김 → 경계 표시로 뒤집힌다.
+    // 기본값은 false(=숨김) 여야 하고, calcItem 은 그 동작을 그대로 반영해야 한다.
+    const calcParam = ({ displayOverflow }) => ({
+      chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
+      labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      axesSteps: { x: [{ graphMin: 0, graphMax: 100 }], y: [{ graphMin: 0, graphMax: 100 }] },
+      displayOverflow,
+    });
+
+    // 실제 calcItem 구현을 써야 displayOverflow clamp 를 검증할 수 있다(항등 매핑 모킹 X).
+    const realScatter = () => {
+      const scatter = new Scatter('s1', { color: '#000000', pointFill: '#000000' }, 0, false);
+      scatter.show = true;
+      return scatter;
+    };
+
+    it('displayOverflow=false(기본)면 Y>graphMax 데이터는 yp=null 로 숨겨진다', () => {
+      const scatter = realScatter();
+      const item = { x: 50, y: 500 }; // graphMax(100) 초과
+      scatter.calcItem(item, calcParam({ displayOverflow: false }));
+      expect(item.yp).toBe(null);
+    });
+
+    it('displayOverflow=true 면 Y>graphMax 데이터가 경계로 clamp 되어 yp 가 non-null', () => {
+      const scatter = realScatter();
+      const item = { x: 50, y: 500 };
+      scatter.calcItem(item, calcParam({ displayOverflow: true }));
+      expect(item.yp).not.toBe(null);
+    });
+
+    it('range 안 데이터는 displayOverflow 와 무관하게 항상 그려진다', () => {
+      const scatter = realScatter();
+      const item = { x: 50, y: 50 };
+      scatter.calcItem(item, calcParam({ displayOverflow: false }));
+      expect(item.yp).not.toBe(null);
+    });
   });
 });

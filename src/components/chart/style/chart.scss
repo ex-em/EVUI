@@ -300,6 +300,7 @@
   z-index: 850;
   top: 0;
   left: 0;
+  will-change: transform;
   overflow-y: hidden;
   overflow-x: hidden;
   border-radius: 8px;
@@ -321,6 +322,17 @@
   .ev-chart-tooltip-body {
     overflow-x: hidden;
     overflow-y: hidden;
+  }
+
+  .ev-chart-tooltip-virtual__spacer {
+    flex-shrink: 0;
+    pointer-events: none;
+    overflow-anchor: none;
+  }
+
+  .ev-chart-tooltip-virtual__viewport {
+    // 자식들의 자연 높이 합으로 결정되도록 별도 스타일 없음
+    overflow-anchor: none;
   }
 
   .ev-chart-tooltip-custom {

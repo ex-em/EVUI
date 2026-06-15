@@ -239,10 +239,10 @@ const modules = {
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
     const reversedPosY = mouseY - tooltipDOMHeight - distanceMouseAndTooltip;
-    this.tooltipDOM.style.left =
-      expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
-    this.tooltipDOM.style.top =
-      expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
+    const posX = expectedPosX > maximumPosX ? reversedPosX : expectedPosX;
+    const posY = expectedPosY > maximumPosY ? reversedPosY : expectedPosY;
+    // left/top 대신 transform을 사용해 합성(compositor) 레이어에서 이동시켜 레이아웃/리페인트를 회피한다.
+    this.tooltipDOM.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
   },
 
   /**
@@ -339,6 +339,9 @@ const modules = {
 
     this.setTooltipDOMStyle(opt);
 
+    // 루프 내에서 offsetWidth를 반복 읽으면 강제 동기 레이아웃이 발생하므로 한 번만 읽는다.
+    const tooltipWidth = this.tooltipDOM.offsetWidth;
+
     let textLineCnt = 1;
     for (let ix = 0; ix < seriesList.length; ix++) {
       const gdata = seriesList[ix].data;
@@ -426,7 +429,7 @@ const modules = {
           ? opt.fontColor.value(curTooltipInfo)
           : (opt.fontColor.value ?? opt.fontColor);
       ctx.textAlign = 'right';
-      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(valueText, tooltipWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
 
@@ -487,6 +490,8 @@ const modules = {
 
     this.setTooltipDOMStyle(opt);
 
+    const tooltipWidth = this.tooltipDOM.offsetWidth;
+
     // draw tooltip contents (series, value combination)
     ctx.save();
     ctx.scale(this.pixelRatio, this.pixelRatio);
@@ -543,7 +548,7 @@ const modules = {
       typeof opt.fontColor.value === 'function'
         ? opt.fontColor.value(curTooltipInfo)
         : (opt.fontColor.value ?? opt.fontColor);
-    ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+    ctx.fillText(valueText, tooltipWidth - boxPadding.r, itemY);
     ctx.closePath();
   },
 
@@ -614,6 +619,9 @@ const modules = {
     }
 
     this.setTooltipDOMStyle(opt);
+
+    // 루프 내에서 offsetWidth를 반복 읽으면 강제 동기 레이아웃이 발생하므로 한 번만 읽는다.
+    const tooltipWidth = this.tooltipDOM.offsetWidth;
 
     let textLineCnt = 1;
     for (let ix = 0; ix < seriesList.length; ix++) {
@@ -702,7 +710,7 @@ const modules = {
         typeof opt.fontColor.value === 'function'
           ? opt.fontColor.value(curTooltipInfo)
           : (opt.fontColor.value ?? opt.fontColor);
-      ctx.fillText(valueText, this.tooltipDOM.offsetWidth - boxPadding.r, itemY);
+      ctx.fillText(valueText, tooltipWidth - boxPadding.r, itemY);
       ctx.restore();
       ctx.closePath();
 
@@ -740,10 +748,9 @@ const modules = {
     const expectedPosY = mouseY + distanceMouseAndTooltip;
     const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
     const reversedPosY = mouseY - tooltipDOMSize?.height - distanceMouseAndTooltip;
-    this.tooltipDOM.style.left =
-      expectedPosX > maximumPosX ? `${reversedPosX}px` : `${expectedPosX}px`;
-    this.tooltipDOM.style.top =
-      expectedPosY > maximumPosY ? `${reversedPosY}px` : `${expectedPosY}px`;
+    const posX = expectedPosX > maximumPosX ? reversedPosX : expectedPosX;
+    const posY = expectedPosY > maximumPosY ? reversedPosY : expectedPosY;
+    this.tooltipDOM.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
   },
 
   /**
@@ -753,31 +760,42 @@ const modules = {
    */
   drawCustomTooltip(hitInfoItems) {
     const opt = this.options?.tooltip;
-    if (opt.formatter?.html) {
-      this.tooltipDOM.innerHTML = '';
+    if (!opt?.formatter?.html) return;
 
-      const seriesList = [];
-      Object.keys(hitInfoItems).forEach((sId) => {
-        seriesList.push({
-          sId,
-          data: hitInfoItems[sId].data,
-          color: hitInfoItems[sId].color,
-          name: hitInfoItems[sId].name,
-          dataId: hitInfoItems[sId].id,
-          index: hitInfoItems[sId].index,
-        });
-      });
+    const itemsCount = Object.keys(hitInfoItems).length;
 
-      const userCustomTooltipBody = Util.htmlToElement(opt?.formatter?.html(seriesList));
-      if (userCustomTooltipBody) {
-        this.tooltipDOM.appendChild(userCustomTooltipBody);
-      }
-
-      this.tooltipDOM.style.overflowY = 'hidden';
-      this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
-      this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
-      this.tooltipDOM.style.color = opt.fontColor?.title ?? opt.fontColor;
+    // 가상 스크롤 경로 (자동/명시 활성 + 휴리스틱 성공 시)
+    if (this._shouldVirtualizeCustomTooltip?.(itemsCount)) {
+      const ok = this.drawCustomTooltipVirtual(hitInfoItems);
+      if (ok) return;
+      // 휴리스틱 실패 시 기존 경로로 fallback
     }
+
+    // 기존 경로 (전체 부착)
+    this._teardownCustomTooltipVirtualScroll?.();
+    this.tooltipDOM.innerHTML = '';
+
+    const seriesList = [];
+    Object.keys(hitInfoItems).forEach((sId) => {
+      seriesList.push({
+        sId,
+        data: hitInfoItems[sId].data,
+        color: hitInfoItems[sId].color,
+        name: hitInfoItems[sId].name,
+        dataId: hitInfoItems[sId].id,
+        index: hitInfoItems[sId].index,
+      });
+    });
+
+    const userCustomTooltipBody = Util.htmlToElement(opt.formatter.html(seriesList));
+    if (userCustomTooltipBody) {
+      this.tooltipDOM.appendChild(userCustomTooltipBody);
+    }
+
+    this.tooltipDOM.style.overflowY = 'hidden';
+    this.tooltipDOM.style.backgroundColor = opt.backgroundColor;
+    this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
+    this.tooltipDOM.style.color = opt.fontColor?.title ?? opt.fontColor;
   },
 
   /**
@@ -958,6 +976,30 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
+    const isCategoryMode = options.horizontal
+      ? options.axesY?.every((axis) => axis.categoryMode)
+      : options.axesX?.every((axis) => axis.categoryMode);
+
+    if (isCategoryMode) {
+      const labelsCount = this.data.labels.length;
+      if (!labelsCount) return null;
+      let hoverRatio;
+
+      if (options.horizontal) {
+        const chartHeight = graphPos.y2 - graphPos.y1;
+        hoverRatio = (offsetY - graphPos.y1) / chartHeight;
+      } else {
+        const chartWidth = graphPos.x2 - graphPos.x1;
+        hoverRatio = (offsetX - graphPos.x1) / chartWidth;
+      }
+
+      const index = Math.min(
+        Math.max(Math.floor(hoverRatio * labelsCount), 0),
+        labelsCount - 1,
+      );
+      return +this.data.labels[index];
+    }
+
     if (options.horizontal) {
       const chartHeight = graphPos.y2 - graphPos.y1;
       const hoverYAxis = offsetY - graphPos.y1;
@@ -988,7 +1030,7 @@ const modules = {
     const fromTime = +this.data.labels?.[0];
     const toTime = +this.data.labels?.[this.data.labels.length - 1];
     const [clientX, clientY] = mousePosition;
-    const { top, bottom, left, right } = this.chartDOM.getBoundingClientRect();
+    const { top, bottom, left, right } = this.getChartDOMClientRect();
 
     const isHoveredChart = inRange(clientX, left, right) && inRange(clientY, bottom, top);
     if (isHoveredChart) {
@@ -1060,7 +1102,7 @@ const modules = {
     }
 
     const { horizontal } = this.options;
-    const rect = this.chartDOM.getBoundingClientRect();
+    const rect = this.getChartDOMClientRect();
     const [mouseX, mouseY] = mousePosition;
     const isHoveredChart =
       inRange(mouseX, rect.left, rect.right) && inRange(mouseY, rect.bottom, rect.top);
@@ -1175,6 +1217,7 @@ const modules = {
   },
 
   tooltipDestroy() {
+    this._teardownCustomTooltipVirtualScroll?.();
     if (this.tooltipDOM) {
       this.tooltipDOM.remove();
       this.tooltipDOM = null;

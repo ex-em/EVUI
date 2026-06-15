@@ -50,13 +50,18 @@ const modules = {
           const firstSeriesId = seriesIDs[0];
           const basePassingValue = this.seriesList[firstSeriesId]?.passingValue;
 
+          // 스택 그룹별 부호별 누적 top(base 위치)을 유지해 base 조회를 O(1)로 만든다.
+          // (기존 addSeriesStackDS 의 bsIds 역방향 탐색 O(S) 제거 → 그룹 전체 O(L·S²)→O(L·S).
+          //  null 이 많아도 비용이 일정 — 매 포인트마다 바닥까지 훑던 최악 케이스가 사라진다.)
+          const stackTops = new Map();
+
           for (let s = 0; s < seriesIDs.length; s++) {
             const seriesID = seriesIDs[s];
             const series = this.seriesList[seriesID];
             const rawData = data?.[seriesID];
             const { passingValue, interpolation } = series;
-            const needsTransform = interpolation === 'zero'
-              || (passingValue != null && passingValue !== undefined);
+            const needsTransform =
+              interpolation === 'zero' || (passingValue != null && passingValue !== undefined);
 
             let hasPassingValueInData = false;
             let sData;
@@ -83,17 +88,33 @@ const modules = {
             series.hasPassingValueInData = hasPassingValueInData;
 
             if (series && sData) {
-              if (series.isExistGrp && series.stackIndex && !series.isOverlapping) {
-                series.data = this.addSeriesStackDS(sData, label, series.bsIds, series.stackIndex);
+              const inStackGroup = series.isExistGrp && !series.isOverlapping;
+              let tops = null;
+              if (inStackGroup) {
+                tops = stackTops.get(series.groupIndex);
+                if (!tops) {
+                  tops = { pos: [], neg: [] };
+                  stackTops.set(series.groupIndex, tops);
+                }
+              }
+
+              if (inStackGroup && series.stackIndex) {
+                series.data = this.addSeriesStackDS(sData, label, series.stackIndex, tops);
               } else {
                 series.data = this.addSeriesDS(
                   sData,
                   label,
                   series.isExistGrp,
                   basePassingValue,
+                  series.data,
                 );
               }
               series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
+
+              // 이 시리즈가 이후 스택 시리즈의 base 가 되므로 누적 top 갱신
+              if (inStackGroup) {
+                this.updateStackTops(tops, series);
+              }
             }
           }
         }
@@ -111,7 +132,9 @@ const modules = {
     const keys = Object.keys(datas);
 
     const minMaxValues = {
-      maxY: 0,
+      // 음수 전용 데이터에서 maxY 가 0 으로 clamp 되지 않도록 -Infinity 에서 시작한다.
+      // 유효 데이터가 하나도 없으면 아래 fallback(isFinite(minY) 검사)에서 0/0 으로 되돌린다.
+      maxY: -Infinity,
       minY: Infinity,
       fromTime: 0,
       toTime: 0,
@@ -248,6 +271,10 @@ const modules = {
       // coordinateDedupe=false 는 #2011 에서 "모든 중복 좌표 표시" opt-out 으로 도입됐다.
       // data 레이어에서 dedupe 가 강제되면 draw 레이어의 opt-out 도 무력화되므로 옵션을 존중한다.
       const isDedupeOn = this.options.coordinateDedupe !== false;
+      // blit fast-path 안전장치: 이번 틱 신규 점이 윈도우 우측단(toTime)에서 몇 초(=버킷) 뒤까지
+      // 들어왔는지의 최댓값. 신규 점이 우측 strip 보다 오래된 버킷에 떨어지면(지연/역순 데이터)
+      // strip-only redraw 로는 그 점이 누락되므로, draw 단계가 이 값을 보고 full redraw 로 폴백한다.
+      let maxDirtyAge = -1;
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
         if (item) {
@@ -270,18 +297,51 @@ const modules = {
                 y: item.y,
                 o: item.value ?? item.y,
                 color: item.color,
+                // 렌더 단계 dedupe 가 매 프레임 재생성하던 좌표 키를 push 시점에 1회 캐시.
+                // dedupe off 면 draw 가 키를 보지 않으므로 저장하지 않는다.
+                // 단일 scatter series 면 canSkipRealtimeScatterDedupe 가 항상 스킵 → element 가
+                // k 를 읽지 않으므로 저장 자체를 생략한다(configured count 는 legend toggle 에 안 흔들림).
+                k: isDedupeOn && this.seriesInfo.charts.scatter.length > 1 ? dedupeKey : undefined,
               });
 
               group.max = Math.max(group.max, item.y);
               group.min = Math.min(group.min, item.y);
+
+              // 신규 점이 우측단에서 (toTime - xAxisTime)/1000 버킷만큼 뒤. 시간 정렬돼 있어 비용 0에 가까움.
+              const age = (dataset.toTime - xAxisTime) / 1000;
+              if (age > maxDirtyAge) {
+                maxDirtyAge = age;
+              }
             }
           }
         }
       }
 
+      // 11.5) blit fast-path 용 틱 메타 기록. 모두 위에서 이미 계산된 값이라 추가 비용이 없다.
+      //  - gapCount   : 이번 틱 링 전진량(왼쪽으로 시프트될 버킷 수)
+      //  - prevToTime : 덮기 전 윈도우 우측단 시간(시프트량 dx 산출용)
+      //  - toTime     : 갱신된 우측단 시간
+      //  - length     : 윈도우 버킷 수(= range)
+      //  - start/endIndex : 링 포인터(신규 strip 버킷 매핑용)
+      //  - maxDirtyAge : 신규 점이 우측단에서 떨어진 최대 버킷 거리(-1=신규 없음). strip 범위 밖이면 full 폴백.
+      // draw 단계(chart.core.evaluateBlitGate / element.scatter.realTimeScatterDrawStrip)가 소비한다.
+      dataset.lastTick = {
+        // 데이터 틱 단조 시퀀스. toTime/endIndex 는 sub-second 틱(gapCount 0)에서 그대로라
+        // "데이터가 갱신됐는가" 판정(points layer 스탬프)에는 seq 가 필요하다.
+        seq: (dataset.lastTick?.seq ?? 0) + 1,
+        gapCount,
+        prevToTime,
+        toTime: dataset.toTime,
+        length,
+        startIndex: dataset.startIndex,
+        endIndex: dataset.endIndex,
+        maxDirtyAge,
+      };
+
       // 12) series min/max 계산 (fromTime ~ toTime 범위 내 데이터만 포함)
       const MS_PER_SECOND = 1000;
-      const tempMinMax = { maxY: 0, minY: Infinity };
+      // maxY 도 minY 와 대칭으로 -Infinity 에서 시작 — 음수 데이터의 실제 최대값을 잡는다.
+      const tempMinMax = { maxY: -Infinity, minY: Infinity };
 
       for (let i = 0; i < length; i++) {
         const g = dataGroup[i];
@@ -456,57 +516,23 @@ const modules = {
    * Take data and label to create stack data for each series
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
-   * @param {array}   bsIds   stacked base data ID List
    * @param {number}  sIdx    series ordered index
+   * @param {{pos: number[], neg: number[]}}  tops  스택 그룹의 부호별 누적 top(base 위치)
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesStackDS(data, label, bsIds, sIdx = 0) {
-    const seriesList = this.seriesList;
+  addSeriesStackDS(data, label, sIdx = 0, tops = null) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
-    const basePositionCache = new Map();
+    const posTop = tops?.pos;
+    const negTop = tops?.neg;
 
-    const getBaseDataPosition = (baseIndex, dataIndex, curr) => {
-      const key = `${baseIndex}-${dataIndex}-${curr >= 0 ? 'pos' : 'neg'}`;
-      if (basePositionCache.has(key)) {
-        return basePositionCache.get(key);
-      }
-
-      let result = 0;
-      let idx = baseIndex;
-
-      while (idx >= 0) {
-        const baseSeries = seriesList[bsIds[idx]];
-        if (baseSeries?.show) {
-          const baseData = baseSeries.data[dataIndex];
-          const position = isHorizontal ? baseData?.x : baseData?.y;
-          const baseValue = baseData?.o;
-
-          const isPassingValue =
-            !Util.isNullOrUndefined(baseSeries.passingValue) &&
-            baseSeries.passingValue === baseValue;
-
-          const isSameSign = (curr >= 0 && baseValue >= 0) || (curr < 0 && baseValue < 0);
-
-          if (position != null && !isPassingValue && isSameSign) {
-            result = position;
-            break;
-          }
-        }
-        idx--;
-      }
-
-      basePositionCache.set(key, result);
-      return result;
-    };
-
-    const lastBaseIndex = bsIds.length - 1;
     data.forEach((curr, index) => {
-      const baseIndex = Math.max(0, lastBaseIndex);
-      let bdata = getBaseDataPosition(baseIndex, index, curr); // base(previous) series data
+      // base(아래 스택) 위치: 부호별 누적 top 에서 O(1) 조회.
+      // 기존 bsIds 역방향 탐색과 동치 — 가장 최근에 갱신된 "보이는 동일부호 유효 base"가 곧 누적 top.
+      let bdata = (curr >= 0 ? posTop?.[index] : negTop?.[index]) ?? 0; // base(previous) series data
       let odata = curr; // current series original data
       let ldata = label[index]; // label data
       let gdata = curr; // current series data which added previous series's value
@@ -537,6 +563,46 @@ const modules = {
   },
 
   /**
+   * 방금 data 가 계산된 스택 시리즈로 그룹의 부호별 누적 top(base 위치)을 갱신한다.
+   * addSeriesStackDS 의 base 조회를 O(1) 로 만들기 위한 보조 상태이며,
+   * 갱신 규칙은 기존 getBaseDataPosition 의 accept 조건과 동치다:
+   *   show 시리즈만, position(null 아님) && passingValue 아님 → 해당 부호 버킷에 기록.
+   * 인덱스는 series.data(압축본) 기준으로 기록하고 조회는 라벨 인덱스로 하므로
+   * 기존 `baseSeries.data[dataIndex]` 접근과 동일한 정렬을 유지한다.
+   * @param {{pos: number[], neg: number[]}}  tops  그룹 누적 top
+   * @param {object}  series  방금 data 가 계산된 시리즈
+   *
+   * @returns {undefined}
+   */
+  updateStackTops(tops, series) {
+    if (!series.show) {
+      return;
+    }
+
+    const isHorizontal = this.options.horizontal;
+    const passingValue = series.passingValue;
+    const usePassingValue = !Util.isNullOrUndefined(passingValue);
+    const data = series.data;
+    const pos = tops.pos;
+    const neg = tops.neg;
+
+    for (let i = 0; i < data.length; i++) {
+      const p = data[i];
+      const position = isHorizontal ? p.x : p.y;
+      const baseValue = p.o;
+      const isPassingValue = usePassingValue && baseValue === passingValue;
+
+      if (position != null && !isPassingValue) {
+        if (baseValue >= 0) {
+          pos[i] = position;
+        } else {
+          neg[i] = position;
+        }
+      }
+    }
+  },
+
+  /**
    * Take data and label to create data for each series
    * @param {object}  data    chart series info
    * @param {object}  label   chart label
@@ -546,10 +612,13 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesDS(data, label, isBase, passingValue) {
+  addSeriesDS(data, label, isBase, passingValue, prevData) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
     const usePassingValue = isBase && !Util.isNullOrUndefined(passingValue);
+    // 직전 데이터셋의 포인트 객체를 재사용해 매 update마다의 N개 객체 할당(GC 압력)을 제거한다.
+    // 모든 포인트 객체는 동일한 10필드 형태이고 아래에서 전 필드를 덮어쓰므로 stale 값 위험이 없다.
+    const pool = Array.isArray(prevData) ? prevData : null;
 
     for (let i = 0; i < data.length; i++) {
       let gdata = data[i];
@@ -563,18 +632,36 @@ const modules = {
       if (ldata !== null) {
         const value = usePassingValue && gdata === passingValue ? 0 : gdata;
 
-        if ((value !== null && typeof value === 'object')
-          || (gdata !== null && typeof gdata === 'object')) {
+        if (
+          (value !== null && typeof value === 'object') ||
+          (gdata !== null && typeof gdata === 'object')
+        ) {
           sdata.push(this.addData(value, ldata, gdata));
         } else {
           const v = value ?? null;
           const o = gdata ?? null;
-          sdata.push(isHorizontal
-            ? { x: v, y: ldata, o, b: null, xp: null, yp: null,
-                w: null, h: null, dataColor: null, dataTextColor: null }
-            : { x: ldata, y: v, o, b: null, xp: null, yp: null,
-                w: null, h: null, dataColor: null, dataTextColor: null },
-          );
+          const reused = pool && pool[sdata.length];
+
+          if (reused && typeof reused === 'object') {
+            reused.x = isHorizontal ? v : ldata;
+            reused.y = isHorizontal ? ldata : v;
+            reused.o = o;
+            reused.b = null;
+            reused.xp = null;
+            reused.yp = null;
+            reused.w = null;
+            reused.h = null;
+            reused.dataColor = null;
+            reused.dataTextColor = null;
+            sdata.push(reused);
+          } else {
+            sdata.push(isHorizontal
+              ? { x: v, y: ldata, o, b: null, xp: null, yp: null,
+                  w: null, h: null, dataColor: null, dataTextColor: null }
+              : { x: ldata, y: v, o, b: null, xp: null, yp: null,
+                  w: null, h: null, dataColor: null, dataTextColor: null },
+            );
+          }
         }
       }
     }

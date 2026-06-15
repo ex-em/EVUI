@@ -3,277 +3,140 @@
     <ev-chart-group :options="{ syncHover }">
       <resizable-wrapper height="50%">
         <ev-chart
-          v-model:selectedSeries="defaultSelectSeries"
-          :data="chartData1"
-          :options="chartOptions1"
-          @click="onClick"
+          :data="lineChartData"
+          :options="lineChartOption"
         />
       </resizable-wrapper>
       <resizable-wrapper height="50%">
         <ev-chart
-          v-model:selectedSeries="defaultSelectSeries"
-          :data="chartData2"
-          :options="chartOptions2"
-          @click="onClick"
+          :data="barChartData"
+          :options="barChartOption"
         />
       </resizable-wrapper>
     </ev-chart-group>
   </div>
 
   <div class="description">
-    <ev-toggle v-model="syncHover" />
-    <span>그룹 호버 동기화</span>
-    <br />
-    <br />
-    <ev-toggle v-model="syncHoverChart1" />
-    <span>첫번째 차트 호버 동기화</span>
-    <br />
-    <br />
-    <ev-toggle v-model="syncHoverChart2" />
-    <span>두번째 차트 호버 동기화</span>
-    <br />
-    <br />
-    <ev-toggle v-model="isLive" />
-    <span> 데이터 자동 업데이트 </span>
-    <br />
-    <br />
-    <ev-button type="primary" shape="radius" @click="changeSelectedSeries('inc')"> + </ev-button>
-    <ev-button type="primary" shape="radius" @click="changeSelectedSeries('dec')"> - </ev-button>
-    <span> v-model:selectedSeries 변경 </span>
-    <br />
-    <br />
-    <div>
-      <div class="badge yellow">v-model:selectedSeries</div>
-      {{ defaultSelectSeries }}
-      <br />
-      <br />
-      <div class="badge yellow">클릭 이벤트 데이터 (selected)</div>
-      {{ clickedSeries }}
-      <br />
-      <br />
+    <div class="description-row">
+      <label class="description-label">그룹 호버 동기화</label>
+      <ev-toggle v-model="syncHover" />
+    </div>
+    <div class="description-row">
+      <label class="description-label">Line Chart - x축 시간 개수</label>
+      <ev-input-number v-model="lineChartLabelCount" />
+    </div>
+    <div class="description-row">
+      <label class="description-label">Bar Chart - x축 시간 개수</label>
+      <ev-input-number v-model="barChartLabelCount" />
     </div>
   </div>
 </template>
 
 <script>
-import { onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const groupHoveredLabel = ref();
+    const lineChartLabelCount = ref(10);
+    const barChartLabelCount = ref(10);
 
-    const chartData1 = reactive({
-      series: {
-        series1: { name: 'series#1' },
-        series2: { name: 'series#2' },
-        series3: { name: 'series#3' },
-        series4: { name: 'series#4' },
-        series5: { name: 'series#5' },
-      },
-      labels: [],
-      data: {
-        series1: [],
-        series2: [],
-        series3: [],
-        series4: [],
-        series5: [],
-      },
-    });
-    const chartData2 = reactive({
-      series: {
-        series1: { name: 'series1', fill: true, point: false },
-        series2: { name: 'series2', fill: true, point: false },
-        series3: { name: 'series3', fill: true, point: false },
-        series4: { name: 'series4', fill: true, point: false },
-        series5: { name: 'series5', fill: true, point: false },
-      },
-      labels: [],
-      groups: [['series1', 'series2', 'series3', 'series4', 'series5']],
-      data: {
-        series1: [],
-        series2: [],
-        series3: [],
-        series4: [],
-        series5: [],
-      },
-    });
-
-    const syncHoverChart1 = ref(true);
-
-    const chartOptions1 = ref({
-      syncHover: syncHoverChart1.value,
-      type: 'line',
-      width: '100%',
-      height: '100%',
-      title: {
-        show: false,
-      },
-      legend: {
-        show: true,
-        position: 'right',
-      },
-      axesX: [
-        {
-          type: 'time',
-          timeFormat: 'HH:mm:ss',
-          interval: 'second',
-        },
-      ],
-      axesY: [
-        {
-          type: 'linear',
-          showGrid: true,
-          startToZero: true,
-          autoScaleRatio: 0.1,
-        },
-      ],
-      selectSeries: {
-        use: true,
-        limit: 2,
-        useDeselectOverflow: true,
-      },
-      indicator: {
-        color: '#626872',
-        segments: [4, 2],
-      },
-    });
-
-    watch(syncHoverChart1, (newSyncHoverChart1) => {
-      chartOptions1.value.syncHover = newSyncHoverChart1;
-    });
-
-    const syncHoverChart2 = ref(true);
-
-    const chartOptions2 = ref({
-      syncHover: syncHoverChart2.value,
-      type: 'line',
-      width: '100%',
-      height: '100%',
-      title: {
-        show: false,
-      },
-      legend: {
-        show: true,
-        position: 'right',
-      },
-      axesX: [
-        {
-          type: 'time',
-          timeFormat: 'HH:mm:ss',
-          interval: 'second',
-        },
-      ],
-      axesY: [
-        {
-          type: 'linear',
-          showGrid: true,
-          startToZero: true,
-          autoScaleRatio: 0.1,
-        },
-      ],
-      selectSeries: {
-        use: true,
-        limit: 2,
-        useDeselectOverflow: true,
-      },
-      indicator: {
-        color: '#626872',
-        segments: [4, 2],
-      },
-    });
-
-    watch(syncHoverChart2, (newSyncHoverChart2) => {
-      chartOptions2.value.syncHover = newSyncHoverChart2;
-    });
-
-    const clickedSeries = ref();
-    const onClick = (e) => {
-      clickedSeries.value = e.selected;
+    const getTimeLabels = (count) => {
+      return Array.from({ length: count }, (_, index) => dayjs('2026-05-14 00:00:00').add(index * 5, 'second').valueOf());
     };
 
-    const defaultSelectSeries = ref({
-      seriesId: ['series1'],
-    });
-    const changeSelectedSeries = (type) => {
-      const selectedList = defaultSelectSeries.value.seriesId;
-      let idx;
-      if (selectedList.length === 0) {
-        selectedList.push('series1');
-      } else {
-        idx = +selectedList.pop()[6];
-        if (type === 'inc') {
-          idx = idx < 5 ? idx + 1 : 1;
-        } else {
-          idx = idx > 1 ? idx - 1 : 5;
-        }
-      }
-      selectedList.push(`series${idx}`);
+    const getValues = (count) => {
+      return Array.from({ length: count }, (_, index) => Math.floor(Math.random() * 100));
     };
 
     const syncHover = ref(true);
 
-    const isLive = ref(false);
-    const liveInterval = ref();
-    let timeValue = dayjs().format('YYYY-MM-DD HH:mm:ss');
-
-    const addRandomChartData = () => {
-      if (isLive.value) {
-        chartData1.labels.shift();
-        chartData2.labels.shift();
-      }
-
-      timeValue = dayjs(timeValue).add(6, 'second');
-      chartData1.labels.push(dayjs(timeValue));
-      chartData2.labels.push(dayjs(timeValue));
-
-      Object.values(chartData1.data).forEach((seriesData) => {
-        if (isLive.value) {
-          seriesData.shift();
-        }
-        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
-      });
-      Object.values(chartData2.data).forEach((seriesData) => {
-        if (isLive.value) {
-          seriesData.shift();
-        }
-        seriesData.push(Math.floor(Math.random() * (5000 - 5 + 1)) + 5);
-      });
-    };
-
-    onMounted(() => {
-      for (let ix = 0; ix < 10; ix++) {
-        addRandomChartData();
-      }
+    const lineChartData = reactive({
+      series: {
+        series1: { name: 'series#1' },
+      },
+      labels: getTimeLabels(lineChartLabelCount.value),
+      data: {
+        series1: getValues(lineChartLabelCount.value),
+      },
     });
 
-    watch(isLive, (newValue) => {
-      if (newValue) {
-        addRandomChartData();
-        liveInterval.value = setInterval(addRandomChartData, 6000);
-      } else {
-        clearInterval(liveInterval.value);
-      }
+    const barChartData = reactive({
+      series: {
+        series1: { name: 'series1', fill: true, point: false },
+      },
+      labels: getTimeLabels(barChartLabelCount.value),
+      data: {
+        series1: getValues(barChartLabelCount.value),
+      },
     });
 
-    onBeforeUnmount(() => {
-      clearInterval(liveInterval.value);
+    watch(lineChartLabelCount, (newCount) => {
+      lineChartData.labels = getTimeLabels(newCount);
+      lineChartData.data.series1 = getValues(newCount);
+    });
+
+    watch(barChartLabelCount, (newCount) => {
+      barChartData.labels = getTimeLabels(newCount);
+      barChartData.data.series1 = getValues(newCount);
+    });
+
+    const lineChartOption = ref({
+      syncHover: syncHover.value,
+      type: 'line',
+      legend: {
+        show: false,
+      },
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: {
+            time: 5,
+            unit: 'second',
+          },
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+        },
+      ],
+    });
+
+    const barChartOption = ref({
+      syncHover: syncHover.value,
+      type: 'bar',
+      thickness: 0.6,
+      legend: {
+        show: false,
+      },
+      axesX: [
+        {
+          type: 'time',
+          timeFormat: 'HH:mm:ss',
+          interval: {
+            time: 5,
+            unit: 'second',
+          },
+          categoryMode: true,
+        },
+      ],
+      axesY: [
+        {
+          type: 'linear',
+        },
+      ],
     });
 
     return {
       syncHover,
-      syncHoverChart1,
-      syncHoverChart2,
-      chartData1,
-      chartData2,
-      chartOptions1,
-      chartOptions2,
-      clickedSeries,
-      defaultSelectSeries,
-      isLive,
-      onClick,
-      changeSelectedSeries,
-      groupHoveredLabel,
+      lineChartData,
+      barChartData,
+      lineChartOption,
+      barChartOption,
+      lineChartLabelCount,
+      barChartLabelCount,
     };
   },
 };
@@ -282,5 +145,18 @@ export default {
 <style lang="scss" scoped>
 .description {
   position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.description-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+
+  .description-label {
+    width: 150px;
+  }
 }
 </style>

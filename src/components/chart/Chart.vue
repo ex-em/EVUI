@@ -18,11 +18,11 @@ import {
   toRef,
   computed,
 } from 'vue';
-import { cloneDeep, isEqual, debounce } from 'lodash-es';
+import { isEqual, debounce } from 'lodash-es';
 import { resize } from '@/directives/resize';
 import EvChart from './chart.core';
 import EvChartToolbar from './ChartToolbar';
-import { useModel, useWrapper, useZoomModel } from './uses';
+import { useModel, useWrapper, useZoomModel, cloneChartData } from './uses';
 
 export default {
   name: 'EvChart',
@@ -88,6 +88,7 @@ export default {
     'click-legend',
     'update:legendData',
     'axes-scale-change',
+    'axes-data-max-change',
   ],
   setup(props, { emit }) {
     let evChart = null;
@@ -206,7 +207,9 @@ export default {
         const isUpdateTooltip =
           newOpt.tooltip.use && !isEqual(newOpt.tooltip, evChart.options.tooltip);
 
-        evChart.options = cloneDeep(newOpt);
+        // getNormalizedOptions는 defaultsDeep({}, ...)로 props와 분리된 새 객체를 반환하므로
+        // 추가 cloneDeep 없이 그대로 할당한다.
+        evChart.options = newOpt;
 
         scheduleUpdate({
           updateSeries: false,
@@ -232,14 +235,20 @@ export default {
         const newData = props.options.realTimeScatter?.use
           ? { ...chartData, groups: [], labels: [] }
           : getNormalizedData(chartData);
+        // series/groups를 두 번 깊은 비교하지 않도록 각 키를 한 번씩만 비교해 재사용한다.
+        const isUpdateSeriesData = !isEqual(newData.series, evChart.data.series);
+        const isUpdateGroups = !isEqual(newData.groups, evChart.data.groups);
+
         const isUpdateSeries =
-          !isEqual(newData.series, evChart.data.series) ||
-          !isEqual(newData.groups, evChart.data.groups) ||
-          props.options.type === 'heatMap';
+          isUpdateSeriesData || isUpdateGroups || props.options.type === 'heatMap';
 
-        const isUpdateData = !isEqual(newData, evChart.data);
+        const isUpdateData =
+          isUpdateSeriesData ||
+          isUpdateGroups ||
+          !isEqual(newData.labels, evChart.data.labels) ||
+          !isEqual(newData.data, evChart.data.data);
 
-        evChart.data = props.options.realTimeScatter?.use ? newData : cloneDeep(newData);
+        evChart.data = props.options.realTimeScatter?.use ? newData : cloneChartData(newData);
 
         scheduleUpdate({
           updateSeries: isUpdateSeries,

@@ -1,3 +1,16 @@
+# [3.10.0](https://github.com/ex-em/EVUI/compare/3.9.3...3.10.0) (2026-06-05)
+
+
+### Bug Fixes
+
+* **chart:** axis range 밖 데이터의 잘못된 렌더링·tooltip·maxTip 수정 ([15380a9](https://github.com/ex-em/EVUI/commit/15380a9d13e78b66562a54df191d4c58803a5e90))
+
+
+### Features
+
+* **chart:** line·bar 에 displayOverflow (값 축 초과 경계 표시) 추가 ([97f716e](https://github.com/ex-em/EVUI/commit/97f716e8e63e2c80b678fcc9ab34a4e2bc6f0a93))
+* **tabPanel:** 활성화된 적 있는 탭만 mount하는 lazy prop 추가 ([71f78f8](https://github.com/ex-em/EVUI/commit/71f78f82b926f79539826ac5d3b34b16c9db2f2e))
+
 ## [3.9.3](https://github.com/ex-em/EVUI/compare/3.9.2...3.9.3) (2026-05-22)
 
 

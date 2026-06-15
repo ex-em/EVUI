@@ -12,8 +12,14 @@ import GradientLegend from './plugins/plugins.legend.gradient';
 import Scrollbar from './plugins/plugins.scrollbar';
 import Interaction from './plugins/plugins.interaction';
 import Tooltip from './plugins/plugins.tooltip';
+import TooltipVirtualScroll from './plugins/plugins.tooltip.virtualScroll';
 import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
+import Blit from './chart.blit';
+
+// realtime scatter blit: 시프트 누적으로 생기는 sub-pixel 오차를 주기적으로 리셋하기 위해,
+// 이 프레임 수마다 게이트 통과 여부와 무관하게 full redraw 로 돌아가 픽셀을 절대 좌표와 일치시킨다.
+const BLIT_REFRESH_INTERVAL = 300;
 
 class EvChart {
   constructor(
@@ -29,6 +35,7 @@ class EvChart {
 
     if (!options.brush) {
       Object.assign(this, Tooltip);
+      Object.assign(this, TooltipVirtualScroll);
       Object.assign(this, Interaction);
       Object.assign(this, Tip);
       Object.assign(this, Legend);
@@ -99,6 +106,8 @@ class EvChart {
     this.defaultSelectInfo = defaultSelectInfo;
 
     this.legendHover = null;
+
+    this.initBlitState();
   }
 
   /**
@@ -315,6 +324,39 @@ class EvChart {
   }
 
   /**
+   * show 된 series 의 실제 데이터 y 최대값을 외부로 올린다(realTimeScatter autoScale 등).
+   * 차트 타입과 무관하게 동작하며, 소비처가 @axes-data-max-change 를 바인딩했을 때만 발생한다 —
+   * 래퍼 리스너 자체가 구독 시에만 등록되므로(uses.js), 안 쓰는 차트는 집계 비용 0 이다.
+   * 발생 시점엔 렌더마다(같은 값이어도) emit 한다 — 늦게 바인딩하는 소비처도 현재 최대값을 받게 하기 위함.
+   * 비용은 EvChart 가 이미 계산해 둔 series.minMax.maxY 를 series 수만큼(점 수 아님) 읽는 게 전부라,
+   * 소비처가 동일 데이터를 따로 스캔(O(N))해 max 를 구하지 않아도 된다.
+   * maxY 는 show 된 전 series 의 통합 최대값(단일 y축·세로 차트 기준, 축 구분 없음)이다.
+   *
+   * @returns {undefined}
+   */
+  emitDataMaxChange() {
+    const listener = this.listeners?.['axes-data-max-change'];
+    if (typeof listener !== 'function') {
+      return;
+    }
+
+    let maxY = -Infinity;
+    Object.values(this.seriesList).forEach((series) => {
+      if (!series?.show || !series.minMax) {
+        return;
+      }
+      // minMax.maxY 가 유한수인 series 만 포함한다(0·음수 포함). 제외: show=false·minMax 미정의·
+      // 비유한값(일반 차트의 빈 series 는 maxY=null, realtime scatter 는 전 series 무데이터 시 0 폴백).
+      const m = series.minMax.maxY;
+      if (Number.isFinite(m) && m > maxY) {
+        maxY = m;
+      }
+    });
+
+    listener(Number.isFinite(maxY) ? maxY : null);
+  }
+
+  /**
    * To draw canvas chart, it processes several sequential jobs
    * @param {any} [hitInfo=undefined]    from mousemove callback (object or object[] of undefined)
    *
@@ -337,17 +379,112 @@ class EvChart {
     this.adjustXAndYAxisWidth();
 
     this.emitAxesScaleChange();
+    this.emitDataMaxChange();
+
     if (!this.isNotUseIndicator?.() && this.options?.indicator?.use !== false) {
       this.updateIndicatorHitBounds?.();
     }
 
-    this.drawAxis(hitInfo);
-    this.drawSeries(hitInfo);
+    this.drawAxisAndSeries(hitInfo);
 
     this.drawTip();
 
     if (this.bufferCanvas && this.bufferCanvas?.width > 1 && this.bufferCanvas?.height > 1) {
       this.displayCtx.drawImage(this.bufferCanvas, 0, 0);
+    }
+
+    // 다음 틱 게이트 비교용 스냅샷 (full/fast 어느 경로든 갱신).
+    this._blitPrev = this.snapshotBlitState();
+  }
+
+  /**
+   * 축과 series 를 buffer 에 그린다.
+   *
+   * realtime scatter 가 조건을 만족하면 이전 프레임 라스터를 재활용하는 blit fast-path 로,
+   * 아니면 기존 full redraw 로 그린다. 어느 경로를 타든 화면 출력은 동일하다.
+   * @param {any} hitInfo  click/hover 정보(있으면 blit 대신 full redraw)
+   * @returns {undefined}
+   */
+  drawAxisAndSeries(hitInfo) {
+    // realtime scatter blit fast-path 진입 가능 여부 평가.
+    const blitGate = this.evaluateBlitGate(hitInfo);
+
+    const forceOff = typeof window !== 'undefined' && window.__EVUI_BLIT_FORCE_OFF__ === true;
+    // 디버그 override 는 0(매 틱 강제 full)도 유효값이므로 ||(falsy 무시) 대신 Number.isFinite 로 본다.
+    const overrideInterval =
+      typeof window !== 'undefined' ? window.__EVUI_BLIT_REFRESH_INTERVAL__ : undefined;
+    const refreshInterval = Number.isFinite(overrideInterval)
+      ? overrideInterval
+      : this._blitRefreshInterval || BLIT_REFRESH_INTERVAL;
+    const wantBlit =
+      blitGate.ok &&
+      !forceOff &&
+      this.pointsLayerValid &&
+      this.pointsLayersSized() &&
+      this._framesSinceFullRedraw < refreshInterval;
+
+    // 게이트 외 차단 사유(레이어 유효성/치수/주기 refresh)도 diag 에 집계한다 — 게이트는
+    // 통과했는데 blit 이 안 도는 경우의 원인을 구분하기 위함.
+    const blitBlockers = {
+      blockedByForceOff: forceOff,
+      blockedByLayerInvalid: !this.pointsLayerValid,
+      blockedByLayerUnsized: !this.pointsLayersSized(),
+      blockedByRefreshDue: this._framesSinceFullRedraw >= refreshInterval,
+    };
+
+    let didBlit = false;
+    if (wantBlit) {
+      didBlit = this.drawChartBlitFastPath(hitInfo, blitGate);
+    }
+
+    this.recordBlitDiag(blitGate, didBlit, blitBlockers);
+
+    if (didBlit) {
+      this._framesSinceFullRedraw++;
+      // blit 도 레이어 내용을 현재 상태로 전진시킨다 — 스탬프를 갱신해야 직후의 데이터 불변
+      // 폴백 렌더(legend hover 등)가 불필요한 rebuild 를 건너뛸 수 있다.
+      this._pointsLayerStamp = this.computePointsLayerStamp();
+      this._pointsLayerOptionsRef = this.options;
+      // strip 밖 점들의 item.xp/yp 는 이번 시프트를 반영하지 못했다 — hit-test 진입 시 지연 재계산.
+      this._hitCoordsDirty = true;
+    } else {
+      // full redraw 폴백. 점 외형이 기본 상태인 렌더(데이터 틱, hover 해제 등)는 scatter 점을
+      // pointsLayer 에 1회만 raster 하고 buffer 에는 합성만 한다 — buffer 와 layer 에 같은 점을
+      // 두 번 그리는 비용을 제거. legend hover 처럼 점 외형이 달라지는 렌더만 buffer 에 직접
+      // 그리고, 그 경우에도 데이터가 그대로면(스탬프 불변) 레이어 재구성은 생략한다.
+      this.drawAxis(hitInfo);
+      let rebuilt = false;
+      let coordsRefreshed = false;
+      if (!forceOff && this.canRouteFallbackViaLayer(hitInfo)) {
+        // 주기 강제 full(refreshDue)은 drift 리셋이 목적이므로 스탬프가 같아도 재raster 강제.
+        rebuilt = this.maybeRebuildPointsLayer(blitBlockers.blockedByRefreshDue);
+        if (this.pointsLayerValid) {
+          this.compositePointsLayer(
+            this.getPointsLayers().src,
+            this.getMaxVisibleScatterPointSize(),
+          );
+        } else {
+          this.drawSeries(hitInfo); // 레이어 사용 불가(치수 미확보 등) → 기존 직접 경로
+          coordsRefreshed = true;
+        }
+      } else {
+        this.drawSeries(hitInfo);
+        rebuilt = this.maybeRebuildPointsLayer(false);
+        // legend hover 렌더(hitInfo.legend)는 호버 series 만 calcItem 을 타므로 전체 좌표
+        // 갱신이 아니다 — 그 외 직접 drawSeries 는 보이는 점 전체의 xp/yp 를 갱신한다.
+        coordsRefreshed = !hitInfo?.legend;
+      }
+      if (rebuilt || coordsRefreshed) {
+        // rebuild(전 series realTimeScatterDraw) 또는 전체 drawSeries 가 좌표를 새로 썼다.
+        this._hitCoordsDirty = false;
+      }
+      if (rebuilt) {
+        // baseline 이 실제로 재구성된 경우에만 drift 카운터를 리셋한다. 레이어를 보존한 폴백
+        // 렌더(rebuild 생략)는 레이어의 누적 상태도 그대로이므로 카운터를 유지해야
+        // 주기적 강제 full(REFRESH_INTERVAL)의 drift 상한이 깨지지 않는다.
+        this._framesSinceFullRedraw = 0;
+        this._blitCarry = 0;
+      }
     }
   }
 
@@ -374,7 +511,9 @@ class EvChart {
             const dataItems = seriesDatas[i]?.data || [];
             for (let j = 0; j < dataItems.length; j++) {
               const item = dataItems[j];
-              duple.set(Util.coordinateKey(item.x, item.y), series.sId);
+              // item.k 는 push 단계(model.store)에서 1회 생성·캐시한 좌표 키.
+              // 렌더마다 문자열을 재생성하지 않고 재사용한다(없으면 폴백).
+              duple.set(item.k ?? Util.coordinateKey(item.x, item.y), series.sId);
             }
           }
         } else {
@@ -386,6 +525,34 @@ class EvChart {
         }
       }
     }
+  }
+
+  /**
+   * realtime scatter에서 "보이는" series가 1개뿐이면 cross-series dedupe가 무의미하다.
+   * - push 단계(model.store)에서 series 내부 (x,y) 유일성이 이미 보장되고,
+   * - realTimeScatterDraw 에는 intra-series drawnKeys 필터가 없어 duple 은 오직 owner 판정용이다.
+   * 따라서 단일 series 면 duple 을 채우거나 조회하지 않고 전부 그려도 결과가 동일하다.
+   * 정지(non-realtime) 모드는 push-dedupe 가 없어 duple+drawnKeys 에 의존하므로 스킵 대상이 아니다
+   * (duple 이 비면 모든 점이 owner 판정에서 탈락해 아무것도 안 그려진다).
+   * coordinateDedupe 옵션 자체는 호출부(drawSeries)에서 함께 판정한다.
+   * @param {string[]} scatterSeriesIds   this.seriesInfo.charts.scatter
+   *
+   * @returns {boolean}
+   */
+  canSkipRealtimeScatterDedupe(scatterSeriesIds) {
+    if (!this.options.realTimeScatter?.use) {
+      return false;
+    }
+    let shownCount = 0;
+    for (let i = 0; i < scatterSeriesIds.length; i++) {
+      if (this.seriesList[scatterSeriesIds[i]]?.show) {
+        shownCount++;
+        if (shownCount > 1) {
+          return false;
+        }
+      }
+    }
+    return shownCount === 1;
   }
 
   /**
@@ -441,8 +608,16 @@ class EvChart {
       const chartType = chartKeys[ix];
       const chartTypeSet = this.seriesInfo.charts[chartType];
 
-      if (chartType === 'scatter' && this.options.coordinateDedupe) {
-        this.collectDuplicatePoints(duple, chartTypeSet);
+      // scatter 의 이번 렌더 유효 dedupe 여부.
+      // 단일 realtime series 면 dedupe 가 무의미하므로 수집/조회를 건너뛴다(전부 그림).
+      let scatterDedupe = false;
+      if (chartType === 'scatter') {
+        scatterDedupe =
+          this.options.coordinateDedupe !== false &&
+          !this.canSkipRealtimeScatterDedupe(chartTypeSet);
+        if (scatterDedupe) {
+          this.collectDuplicatePoints(duple, chartTypeSet);
+        }
       }
 
       for (let jx = 0; jx < chartTypeSet.length; jx++) {
@@ -537,7 +712,7 @@ class EvChart {
               legendHitInfo,
               selectInfo,
               duple,
-              coordinateDedupe: this.options.coordinateDedupe,
+              coordinateDedupe: scatterDedupe,
               ...opt,
             });
             break;
@@ -721,10 +896,13 @@ class EvChart {
       this.oldPixelRatio = this.pixelRatio;
     }
 
-    this.bufferCtx.scale(this.pixelRatio, this.pixelRatio);
+    // 누적형 scale() 대신 절대 변환(setTransform)을 사용해 idempotent하게 만든다.
+    // 이렇게 하면 매 update마다 canvas.width 재대입(트랜스폼 리셋)에 의존하지 않아도 되어
+    // setWidth/setHeight에서 크기 변경이 없을 때 비트맵 재할당을 건너뛸 수 있다.
+    this.bufferCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
 
     if (this.overlayCtx) {
-      this.overlayCtx.scale(this.pixelRatio, this.pixelRatio);
+      this.overlayCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
     }
   }
 
@@ -743,6 +921,42 @@ class EvChart {
     this.setHeight(height);
 
     return { width, height };
+  }
+
+  /**
+   * Viewport 기준 overlayCanvas 위치/크기를 캐시해 반환한다.
+   * mousemove마다 getBoundingClientRect를 호출하면 강제 동기 레이아웃이 발생하므로
+   * resize/render/scroll/mouseleave 시점에만 무효화한다.
+   *
+   * @returns {DOMRect|undefined} cached overlay client rect
+   */
+  getOverlayClientRect() {
+    if (!this.cachedOverlayRect && this.overlayCanvas) {
+      this.cachedOverlayRect = this.overlayCanvas.getBoundingClientRect();
+    }
+    return this.cachedOverlayRect;
+  }
+
+  /**
+   * Viewport 기준 chartDOM 위치/크기를 캐시해 반환한다. (indicator sync 경로용)
+   *
+   * @returns {DOMRect|undefined} cached chartDOM client rect
+   */
+  getChartDOMClientRect() {
+    if (!this.cachedChartDOMRect && this.chartDOM) {
+      this.cachedChartDOMRect = this.chartDOM.getBoundingClientRect();
+    }
+    return this.cachedChartDOMRect;
+  }
+
+  /**
+   * 캐시된 client rect를 무효화한다.
+   *
+   * @returns {undefined}
+   */
+  invalidateClientRectCache() {
+    this.cachedOverlayRect = null;
+    this.cachedChartDOMRect = null;
   }
 
   /**
@@ -818,14 +1032,36 @@ class EvChart {
       return;
     }
 
-    this.displayCanvas.width = width * this.pixelRatio;
+    // canvas.width 재대입은 크기가 같아도 비트맵 재할당+clear+컨텍스트 리셋을 유발한다.
+    // 실제 device-pixel 폭이 바뀐 경우에만 재설정해 매 update마다의 재할당을 제거한다.
+    // (clear()가 매 렌더에서 캔버스를 비우므로 재할당의 암묵적 clear는 불필요하다.)
+    const deviceWidth = width * this.pixelRatio;
+    if (this._deviceWidth === deviceWidth) {
+      return;
+    }
+    this._deviceWidth = deviceWidth;
+
+    this.displayCanvas.width = deviceWidth;
     this.displayCanvas.style.width = `${width}px`;
-    this.bufferCanvas.width = width * this.pixelRatio;
+    this.bufferCanvas.width = deviceWidth;
     this.bufferCanvas.style.width = `${width}px`;
 
     if (this.overlayCanvas) {
-      this.overlayCanvas.width = width * this.pixelRatio;
+      this.overlayCanvas.width = deviceWidth;
       this.overlayCanvas.style.width = `${width}px`;
+    }
+
+    // pointsLayer 는 치수가 실제로 바뀔 때만 재할당한다. canvas.width 대입은 값이 같아도 비트맵을
+    // 전부 지우므로, render() 마다 호출되는 이 경로에서 무조건 대입하면 blit 누적 픽셀이 매 틱 사라진다.
+    // 비교값은 canvas.width 대입 시의 정수 절삭 규칙과 동일하게 floor 한다 — DOM 폭이 소수(예: 590.5)면
+    // float 비교는 영원히 불일치해 매 렌더 소거+무효화가 반복된다.
+    if (this.pointsLayerA) {
+      const dw = Math.floor(width * this.pixelRatio);
+      if (this.pointsLayerA.width !== dw) {
+        this.pointsLayerA.width = dw;
+        this.pointsLayerB.width = dw;
+        this.pointsLayerValid = false; // 치수 변경 → baseline 무효화(다음 full redraw 에서 재구성)
+      }
     }
   }
 
@@ -840,14 +1076,31 @@ class EvChart {
       return;
     }
 
-    this.displayCanvas.height = height * this.pixelRatio;
+    // setWidth와 동일하게 device-pixel 높이가 바뀐 경우에만 재설정한다.
+    const deviceHeight = height * this.pixelRatio;
+    if (this._deviceHeight === deviceHeight) {
+      return;
+    }
+    this._deviceHeight = deviceHeight;
+
+    this.displayCanvas.height = deviceHeight;
     this.displayCanvas.style.height = `${height}px`;
-    this.bufferCanvas.height = height * this.pixelRatio;
+    this.bufferCanvas.height = deviceHeight;
     this.bufferCanvas.style.height = `${height}px`;
 
     if (this.overlayCanvas) {
-      this.overlayCanvas.height = height * this.pixelRatio;
+      this.overlayCanvas.height = deviceHeight;
       this.overlayCanvas.style.height = `${height}px`;
+    }
+
+    // setWidth 와 동일 이유: 치수 변경 시에만 재할당(매 틱 clear 방지). floor 도 setWidth 와 동일.
+    if (this.pointsLayerA) {
+      const dh = Math.floor(height * this.pixelRatio);
+      if (this.pointsLayerA.height !== dh) {
+        this.pointsLayerA.height = dh;
+        this.pointsLayerB.height = dh;
+        this.pointsLayerValid = false;
+      }
     }
   }
 
@@ -971,11 +1224,24 @@ class EvChart {
       return;
     }
 
+    // 데이터 갱신 시 hover fast-path 시그니처를 무효화한다.
+    if (updateData || updateSeries) {
+      this._lastHoverSig = '';
+    }
+
     this.updateScrollbar(updateData, updateByScrollbar);
 
     this.resetProps();
 
     this.updateSeries = updateSeries;
+    // series 구성 변동(추가/삭제/legend toggle) → 점 baseline 무효화(다음 full redraw 에서 재구성).
+    if (updateSeries) {
+      this.pointsLayerValid = false;
+    }
+    // realTimeScatter 가 런타임에 켜졌는데 레이어가 없으면 생성한다.
+    if (this.options.realTimeScatter?.use && !this.pointsLayerA) {
+      this.createPointsLayers();
+    }
     if (updateSeries) {
       this.seriesInfo = null;
       this.seriesList = null;
@@ -1178,9 +1444,13 @@ class EvChart {
    * @returns {undefined}
    */
   resize(promiseRes) {
+    this.invalidateClientRectCache();
     this.clear();
     this.bufferCtx.restore();
     this.bufferCtx.save();
+
+    // 리사이즈는 기하가 바뀌므로 점 baseline 을 무효화한다(아래 drawChart 에서 full redraw 로 재구성).
+    this.pointsLayerValid = false;
 
     if (this.options.axesX?.[0]?.scrollbar?.use || this.options.axesY?.[0]?.scrollbar?.use) {
       this.initScrollbar();
@@ -1208,6 +1478,10 @@ class EvChart {
    */
   render(hitInfo) {
     if (this.isInit) {
+      this.invalidateClientRectCache();
+      // 데이터/옵션 변경으로 formatter.html 마크업이 달라질 수 있으므로 가상 스크롤
+      // row 탐지 실패 플래그를 리셋해 다음 hover에서 다시 시도한다.
+      this._vsDetectFailed = false;
       this.clear();
       this.chartRect = this.getChartRect();
       this.drawChart(hitInfo);
@@ -1433,6 +1707,9 @@ class EvChart {
       this.overlayCanvas.removeEventListener('mousedown', this.onMouseDown);
       this.overlayCanvas.removeEventListener('wheel', this.onWheel);
       window.removeEventListener('click', this.dragTouchSelectionEvent);
+      if (this.invalidateRectOnScroll) {
+        window.removeEventListener('scroll', this.invalidateRectOnScroll, { capture: true });
+      }
     }
 
     if (this.isInitTooltip) {
@@ -1497,5 +1774,10 @@ class EvChart {
     }
   }
 }
+
+// realtime scatter blit fast-path 메서드(chart.blit.js)를 합친다. 단위 테스트
+// (chart.core.blitGate.spec.js)가 Object.create(EvChart.prototype) 로 인스턴스 없이 메서드를
+// 호출하므로, 다른 plugin mixin 처럼 this(인스턴스)가 아니라 prototype 에 합쳐야 한다.
+Object.assign(EvChart.prototype, Blit);
 
 export default EvChart;

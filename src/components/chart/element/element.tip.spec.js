@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import modules from './element.tip';
 
-const createCtx = ({ lastTip = { pos: null, value: null, label: null } } = {}) =>
+const createCtx = ({ lastTip = { pos: null, value: null, label: null }, displayOverflow = false } = {}) =>
   Object.assign(Object.create(modules), {
-    options: { horizontal: false },
+    options: { horizontal: false, displayOverflow },
     chartRect: { x1: 0, x2: 100, y1: 0, y2: 100, chartWidth: 100, chartHeight: 100 },
     labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
     axesSteps: { x: [{ graphMin: 0, graphMax: 10 }], y: [{ graphMin: 0, graphMax: 100 }] },
@@ -87,5 +87,67 @@ describe('element.tip calculateTipInfo — sel 분기 label 우선 동작', () =
 
     expect(result.label).toBe('A');
     expect(result.value).toBe(50);
+  });
+});
+
+describe('element.tip calculateTipInfo — axis range 밖 maxDomain', () => {
+  // maxDomain 이 graphMax 를 초과하면 Canvas.calculateX 가 null 을 반환 → dp=null.
+  // drawTips 의 호출부 가드(dp !== null) 가 빠지면 drawTextTip 이 null 을 0 으로 강제 변환해
+  // maxTip 이 좌상단에 찍히는 회귀가 발생한다.
+  it('maxDomain 이 graphMax 초과 → dp 는 null 로 반환된다', () => {
+    const ctx = createCtx();
+    const series = buildSeries({ minMax: { maxDomain: 9999, maxDomainIndex: 0, maxX: 10, maxY: 100 } });
+    const result = ctx.calculateTipInfo(series, 'max', null);
+    expect(result.dp).toBe(null);
+  });
+
+  it('maxDomain 이 graphMin 미만 → dp 는 null 로 반환된다', () => {
+    const ctx = createCtx();
+    const series = buildSeries({ minMax: { maxDomain: -1, maxDomainIndex: 0, maxX: 10, maxY: 100 } });
+    const result = ctx.calculateTipInfo(series, 'max', null);
+    expect(result.dp).toBe(null);
+  });
+
+  it('range 안 maxDomain 은 dp 가 valid 한 수치로 반환된다', () => {
+    const ctx = createCtx();
+    const series = buildSeries({ minMax: { maxDomain: 5, maxDomainIndex: 0, maxX: 10, maxY: 100 } });
+    const result = ctx.calculateTipInfo(series, 'max', null);
+    expect(typeof result.dp).toBe('number');
+    expect(result.dp).not.toBe(null);
+  });
+});
+
+describe('element.tip calculateTipInfo — displayOverflow 값축 초과 가드', () => {
+  // 값(maxY)이 Y graphMax 를 초과하면 displayOverflow 여부에 따라 tip 표시가 갈린다.
+  // displayOverflow=false → 포인트가 숨겨지므로 maxTip/sel tip 도 숨김(false 반환).
+  // displayOverflow=true → 경계에 표시되므로 tip 도 표시.
+  const overflowSeries = () =>
+    buildSeries({ minMax: { maxDomain: 5, maxDomainIndex: 0, maxX: 10, maxY: 150 } });
+
+  it('값(maxY)>graphMax + displayOverflow=false → max tip false(숨김)', () => {
+    const ctx = createCtx({ displayOverflow: false });
+    expect(ctx.calculateTipInfo(overflowSeries(), 'max', null)).toBe(false);
+  });
+
+  it('값>graphMax + displayOverflow=true → tip 표시(객체, dp non-null)', () => {
+    const ctx = createCtx({ displayOverflow: true });
+    const result = ctx.calculateTipInfo(overflowSeries(), 'max', null);
+    expect(result).not.toBe(false);
+    expect(result.dp).not.toBe(null);
+  });
+
+  it('sel: 값>graphMax + displayOverflow=false → false(hover tip 숨김)', () => {
+    const ctx = createCtx({ displayOverflow: false });
+    const result = ctx.calculateTipInfo(overflowSeries(), 'sel', {
+      label: 5, value: 150, useStack: false, dataIndex: 0,
+    });
+    expect(result).toBe(false);
+  });
+
+  it('값이 range 안이면 displayOverflow=false 라도 정상 tip', () => {
+    const ctx = createCtx({ displayOverflow: false });
+    const series = buildSeries({ minMax: { maxDomain: 5, maxDomainIndex: 0, maxX: 10, maxY: 80 } });
+    const result = ctx.calculateTipInfo(series, 'max', null);
+    expect(result).not.toBe(false);
   });
 });

@@ -204,7 +204,8 @@ class Scatter {
         if (legendHitInfo) {
           shouldDraw = legendHitInfo.sId === this.sId;
         } else if (isDedupeOnRT) {
-          shouldDraw = duple.get(Util.coordinateKey(item.x, item.y)) === this.sId;
+          // item.k 는 push 단계에서 캐시한 좌표 키. 렌더마다 재생성하지 않는다(없으면 폴백).
+          shouldDraw = duple.get(item.k ?? Util.coordinateKey(item.x, item.y)) === this.sId;
         } else {
           shouldDraw = true;
         }
@@ -232,6 +233,109 @@ class Scatter {
     // findGraphData(realTimeScatter)에서 역순 탐색 시 global index 계산에 사용한다.
     // draw 단계에서 이미 전체 순회를 하기 때문에 여기서 캐시하면 mousemove마다 카운트용 1패스를 줄일 수 있다.
     this._rtTotalCount = totalCount;
+  }
+
+  /**
+   * blit fast-path 전용: 지정한 dataGroup 버킷의 점만 그린다.
+   * multi-series 면 param.duple(strip-local owner 맵)로 cross-series dedupe 를 적용해 full redraw 와
+   * 픽셀이 일치한다(같은 좌표는 owner series 만 그림). 단일 series(duple 없음/coordinateDedupe=false)면
+   * 전부 그린다. 좌표/색/마커 계산은 realTimeScatterDraw 와 동일한 calcItem + drawPoint 경로를 쓴다.
+   * 호출자(chart.core fast-path)가 ctx 변환을 scale(pixelRatio)로 맞춰 둔 상태여야 한다.
+   * @param {CanvasRenderingContext2D} ctx          점 레이어 컨텍스트(scale(pr) 적용 상태)
+   * @param {number[]} bucketIdxList                그릴 dataGroup 버킷 인덱스 목록(링 인덱스)
+   * @param {object} param                          calcItem/색 계산 + duple/coordinateDedupe(owner 판정용)
+   * @returns {undefined}
+   */
+  realTimeScatterDrawStrip(ctx, bucketIdxList, param) {
+    if (!this.show) {
+      return;
+    }
+    const dataGroup = this.data[this.sId]?.dataGroup;
+    if (!dataGroup) {
+      return;
+    }
+
+    const { duple, coordinateDedupe } = param;
+    // multi-series: owner 가 아닌 좌표는 skip(drawSeries 의 dedupe 와 동일). 단일이면 duple 없음 → 전부 그림.
+    const isDedupeOn = coordinateDedupe !== false && !!duple;
+
+    const minmaxY = param.axesSteps.y[this.yAxisIndex];
+    const pointStyle =
+      typeof this.pointStyle === 'string' ? this.pointStyle : this.pointStyle.value;
+    const pointSize = typeof this.pointSize === 'number' ? this.pointSize : this.pointSize.value;
+
+    for (let b = 0; b < bucketIdxList.length; b++) {
+      const group = dataGroup[bucketIdxList[b]];
+      if (!group?.data) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      for (let j = 0; j < group.data.length; j++) {
+        const item = group.data[j];
+
+        if (isDedupeOn && duple.get(item.k ?? Util.coordinateKey(item.x, item.y)) !== this.sId) {
+          // 이 좌표의 owner 가 아니면 그리지 않는다(cross-series overdraw 방지).
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
+        this.calcItem(item, param);
+
+        if (item.xp !== null && item.yp !== null) {
+          const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
+          const baseStrokeColor = overflowColor || item.color || this.color;
+          const baseFillColor = overflowColor || item.color || this.pointFill || this.color;
+
+          const strokeOpacity = this.getOpacity(param, baseStrokeColor, j);
+          const fillOpacity = this.getOpacity(param, baseFillColor, j);
+
+          ctx.strokeStyle = this.getCachedColor(baseStrokeColor, strokeOpacity);
+          ctx.fillStyle = this.getCachedColor(baseFillColor, fillOpacity);
+
+          Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+        }
+      }
+    }
+  }
+
+  /**
+   * blit 틱으로 스테일해진 hit-test 좌표(item.xp/yp)를 현재 축 매핑으로 일괄 재계산한다.
+   * raster 는 하지 않는다 — calcItem 의 좌표 부수효과만 사용(tooltip/dragSelect/highlight 용).
+   * @param {object} param   { chartRect, labelOffset, axesSteps, displayOverflow }
+   * @returns {undefined}
+   */
+  refreshRtHitCoords(param) {
+    const dataGroup = this.data[this.sId]?.dataGroup;
+    if (!dataGroup) {
+      return;
+    }
+    for (let i = 0; i < dataGroup.length; i++) {
+      const items = dataGroup[i]?.data;
+      if (!items) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      for (let j = 0; j < items.length; j++) {
+        this.calcItem(items[j], param);
+      }
+    }
+  }
+
+  /**
+   * realtime scatter 전체 점 수를 dataGroup 길이 합으로 갱신한다(O(버킷), 점 수와 무관).
+   * blit fast-path 는 전체 순회를 건너뛰므로 mousemove(findGraphData)용 _rtTotalCount 를 별도로 맞춘다.
+   * @returns {number} 총 점 수
+   */
+  refreshRtTotalCount() {
+    let totalCount = 0;
+    const dataGroup = this.data[this.sId]?.dataGroup;
+    if (dataGroup) {
+      for (let i = 0; i < dataGroup.length; i++) {
+        totalCount += dataGroup[i]?.data?.length ?? 0;
+      }
+    }
+    this._rtTotalCount = totalCount;
+    return totalCount;
   }
 
   /**

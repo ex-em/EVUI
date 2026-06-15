@@ -156,10 +156,11 @@ const chartData =
 | borderColor         | Hex, RGB, RGBA Code(String) | '#666666'                                  | tooltip 테두리 색상                                     |                                                                     |
 | useShadow           | Boolean                     | false                                      | 그림자 사용 여부                                        |                                                                     |
 | shadowOpacity       | Number                      | 0.25                                       | 그림자 투명도                                           |                                                                     |
-| throttledMove       | Boolean                     | false                                      | 데이터 조회 Throttling 처리 유무                        |                                                                     |
+| throttledMove       | Boolean                     | true                                       | 데이터 조회 Throttling 처리 유무                        |                                                                     |
 | debouncedHide       | Boolean                     | false                                      | 좌표 이동 시 tooltip hide 여부                          |                                                                     |
 | sortByValue         | Boolean                     | true                                       | 값을 기준으로 정렬할지의 여부                           |                                                                     |
 | useScrollbar        | Boolean                     | false                                      | 스크롤바 사용 여부                                      |                                                                     |
+| htmlScrollTarget    | String                      |                                            | `formatter.html` 커스텀 툴팁에서 휠 스크롤을 전달할 내부 요소의 CSS 셀렉터 (가상 스크롤 활성 시에는 자동 처리되어 불필요) | '.ev-chart-tooltip-custom__body' |
 | maxHeight           | Number                      |                                            | 툴팁의 최대 높이                                        |                                                                     |
 | maxWidth            | Number                      |                                            | 툴팁의 최대 너비                                        |                                                                     |
 | textOverflow        | String                      | 'wrap'                                     | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis                                                   |
@@ -172,6 +173,7 @@ const chartData =
 | showHeader          | Boolean                     | true                                       | Tooltip의 Header 영역 표시 여부                         |
 | formatter           | function / Object           | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
 | returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
+| virtualScroll       | Object                      | { use: 'auto', threshold: 50, estimatedRowHeight: 28, overscan: 5 } | `formatter.html` 사용 시 가상 스크롤로 보이는 행만 라이브 DOM에 부착. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 부여하면 안정적으로 활성화됨 | use: 'auto' \| true \| false |
 
 ```ts
 const chartOptions = {

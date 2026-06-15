@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import modules from './model.store';
+import Util from '../helpers/helpers.util';
 
 /**
  * model.store의 메서드들은 차트 인스턴스의 this에 바인딩되어 사용됨.
@@ -613,17 +614,15 @@ describe('model.store getItem (selectLabel indicator 용)', () => {
 describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
   const SECOND = 1000;
 
-  const buildRealTimeStore = (range = 5, options = {}) => {
+  const buildRealTimeStore = (range = 5, options = {}, scatterIds = ['series1']) => {
     const store = Object.create(modules);
     Object.assign(store, {
       isInit: false,
       updateSeries: false,
       dataSet: {},
       options: { realTimeScatter: { range }, ...options },
-      seriesInfo: { charts: { scatter: ['series1'] } },
-      seriesList: {
-        series1: {},
-      },
+      seriesInfo: { charts: { scatter: scatterIds } },
+      seriesList: Object.fromEntries(scatterIds.map((id) => [id, {}])),
     });
     return store;
   };
@@ -715,5 +714,154 @@ describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
     const groups = store.dataSet.series1.dataGroup;
     const totalPoints = groups.reduce((acc, g) => acc + g.data.length, 0);
     expect(totalPoints).toBe(4);
+  });
+
+  it('multi-series 면 push 된 point 에 좌표 키(k)를 캐시한다 (렌더 단계 재계산 제거)', () => {
+    // configured scatter series 2개 이상이어야 cross-series dedupe 가 살아 element 가 k 를 읽는다.
+    const store = buildRealTimeStore(5, {}, ['series1', 'series2']);
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({ series1: [{ x: t, y: 10 }] });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const point = groups.flatMap((g) => g.data).find((p) => p.y === 10);
+    // 캐시 키는 draw 폴백이 쓰는 Util.coordinateKey 와 동일 포맷이어야 한다(lockstep 보장).
+    expect(point.k).toBe(Util.coordinateKey(point.x, point.y));
+  });
+
+  it('단일 scatter series 면 dedupe on 이어도 k 를 저장하지 않는다 (canSkip → element 가 k 미사용)', () => {
+    const store = buildRealTimeStore(5, {}, ['series1']);
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({ series1: [{ x: t, y: 10 }] });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const point = groups.flatMap((g) => g.data).find((p) => p.y === 10);
+    expect(point.k).toBeUndefined();
+  });
+
+  it('coordinateDedupe=false 면 키를 캐시하지 않는다 (draw 가 키를 보지 않음)', () => {
+    // multi-series 라 k 저장 게이트(series>1)는 통과 — 캐시 생략 사유는 오직 dedupe off.
+    const store = buildRealTimeStore(5, { coordinateDedupe: false }, ['series1', 'series2']);
+    const t = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({ series1: [{ x: t, y: 10 }] });
+
+    const groups = store.dataSet.series1.dataGroup;
+    const point = groups.flatMap((g) => g.data).find((p) => p.y === 10);
+    expect(point.k).toBeUndefined();
+  });
+});
+
+describe('model.store createDataSet stack (누적 top 기반)', () => {
+  /**
+   * 세로 스택 막대 그룹 컨텍스트를 만든다.
+   * series: [{ id, data, show?, passingValue? }] (스택 순서대로 = bottom→top)
+   */
+  const buildStackStore = (series, options = {}) => {
+    const seriesList = {};
+    const rawData = {};
+    series.forEach((s, idx) => {
+      seriesList[s.id] = {
+        data: [],
+        passingValue: s.passingValue ?? null,
+        interpolation: null,
+        isExistGrp: true,
+        isOverlapping: false,
+        groupIndex: 0,
+        stackIndex: idx, // bottom(0) → addSeriesDS, 그 위는 addSeriesStackDS
+        show: s.show ?? true,
+        xAxisIndex: 0,
+        yAxisIndex: 0,
+      };
+      rawData[s.id] = s.data;
+    });
+
+    const store = Object.assign(Object.create(modules), {
+      seriesList,
+      options: { horizontal: false, sunburst: false, ...options },
+      seriesInfo: { charts: { bar: series.map((s) => s.id) } },
+    });
+
+    return { store, seriesList, rawData };
+  };
+
+  const ys = (series) => series.data.map((p) => p.y);
+  const bs = (series) => series.data.map((p) => p.b);
+
+  it('정상 값은 아래 시리즈의 누적 top 위에 쌓인다', () => {
+    const { store, seriesList, rawData } = buildStackStore([
+      { id: 's0', data: [10, 1, 5] },
+      { id: 's1', data: [20, 30, 2] },
+      { id: 's2', data: [5, 5, 5] },
+    ]);
+
+    store.createDataSet(rawData, [0, 1, 2]);
+
+    expect(ys(seriesList.s0)).toEqual([10, 1, 5]);
+    expect(ys(seriesList.s1)).toEqual([30, 31, 7]); // base + 값
+    expect(ys(seriesList.s2)).toEqual([35, 36, 12]);
+    expect(bs(seriesList.s2)).toEqual([30, 31, 7]); // 각 포인트의 base = 아래 누적 top
+  });
+
+  it('아래 시리즈가 null 인 라벨에서는 그 자리를 건너뛰고 다음 유효 base 위에 쌓인다', () => {
+    const { store, seriesList, rawData } = buildStackStore([
+      { id: 's0', data: [10, null, 5] }, // i1 null
+      { id: 's1', data: [20, 30, null] }, // i2 null
+      { id: 's2', data: [5, 5, 5] },
+    ]);
+
+    store.createDataSet(rawData, [0, 1, 2]);
+
+    // s1 i1: s0 가 null → baseline(0) 위에 쌓임
+    expect(seriesList.s1.data[1].b).toBe(0);
+    expect(seriesList.s1.data[1].y).toBe(30);
+    // s2 i2: s1 이 null → s0(=5) 위에 쌓임 (s1 자리를 건너뜀)
+    expect(seriesList.s2.data[2].b).toBe(5);
+    expect(seriesList.s2.data[2].y).toBe(10);
+  });
+
+  it('부호가 다른 base 는 건너뛰고 같은 부호의 누적 top 위에 쌓인다', () => {
+    const { store, seriesList, rawData } = buildStackStore([
+      { id: 's0', data: [10] }, // +
+      { id: 's1', data: [-5] }, // -
+      { id: 's2', data: [-3] }, // -
+      { id: 's3', data: [4] }, // + → s0(=10) 위에
+    ]);
+
+    store.createDataSet(rawData, [0]);
+
+    expect(seriesList.s1.data[0].b).toBe(0); // 첫 음수 → baseline
+    expect(seriesList.s2.data[0].b).toBe(-5); // 음수 누적 top
+    expect(seriesList.s2.data[0].y).toBe(-8);
+    expect(seriesList.s3.data[0].b).toBe(10); // 양수 base(s0) 위 — s1/s2(음수) 건너뜀
+    expect(seriesList.s3.data[0].y).toBe(14);
+  });
+
+  it('숨겨진(show=false) 시리즈는 누적 top 에 기여하지 않는다', () => {
+    const { store, seriesList, rawData } = buildStackStore([
+      { id: 's0', data: [10] },
+      { id: 's1', data: [100], show: false }, // 숨김 → base 에서 제외
+      { id: 's2', data: [5] },
+    ]);
+
+    store.createDataSet(rawData, [0]);
+
+    // s2 는 숨겨진 s1(=100)이 아니라 s0(=10) 위에 쌓여야 한다
+    expect(seriesList.s2.data[0].b).toBe(10);
+    expect(seriesList.s2.data[0].y).toBe(15);
+  });
+
+  it('passingValue 인 base 는 건너뛴다', () => {
+    const { store, seriesList, rawData } = buildStackStore([
+      { id: 's0', data: [10] },
+      { id: 's1', data: [-1], passingValue: -1 }, // passingValue → base 제외
+      { id: 's2', data: [5] },
+    ]);
+
+    store.createDataSet(rawData, [0]);
+
+    expect(seriesList.s2.data[0].b).toBe(10); // s1(passing) 건너뛰고 s0 위
+    expect(seriesList.s2.data[0].y).toBe(15);
   });
 });

@@ -3,6 +3,21 @@ import { COLOR, LINE_OPTION } from '../helpers/helpers.constant';
 import Util from '../helpers/helpers.util';
 import Canvas from '../helpers/helpers.canvas';
 
+// Canvas.drawPoint 의 switch 에서 default 분기 (원/circle) 로 떨어지는 스타일은
+// 모든 점을 단일 path 에 합쳐 fill/stroke 1회로 그릴 수 있다.
+// 그 외 스타일은 도형별 closePath 처리가 달라 batching 대상에서 제외한다.
+const NON_CIRCLE_POINT_STYLES = new Set([
+  'triangle',
+  'rect',
+  'rectRounded',
+  'rectRot',
+  'cross',
+  'crossRot',
+  'star',
+  'line',
+]);
+const TWO_PI = Math.PI * 2;
+
 class Line {
   constructor(sId, opt, sIdx) {
     const merged = defaultsDeep({}, opt, LINE_OPTION);
@@ -44,6 +59,24 @@ class Line {
   }
 
   /**
+   * x가 null/undefined가 아닌 데이터만 필터링한 배열을 반환한다.
+   * mousemove마다 호출되는 findGraphData가 매번 새 배열을 만들지 않도록
+   * this.data 참조(+ length)로 메모이즈한다. 새 배열로 교체되거나 길이가 바뀌면
+   * 자동으로 재계산된다. (in-place push에 의한 stale도 length 비교로 감지)
+   */
+  _getValidGData() {
+    const src = this.data;
+    const cache = this._validGDataCache;
+    if (cache && cache.src === src && cache.length === src.length) {
+      return cache.value;
+    }
+
+    const value = src.filter((data) => !Util.isNullOrUndefined(data.x));
+    this._validGDataCache = { src, length: src.length, value };
+    return value;
+  }
+
+  /**
    * @typedef {Object} LineDrawParam
    * @property {CanvasRenderingContext2D} ctx - 캔버스 렌더링 컨텍스트
    * @property {object} chartRect - 차트 영역 정보
@@ -76,6 +109,7 @@ class Line {
       legendHitInfo,
       isBrush,
       unSelectedOpacity,
+      displayOverflow,
     } = param;
 
     // about selectLabel
@@ -137,22 +171,21 @@ class Line {
     const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
-    const getXPos = (val) => {
-      const _val = Math.min(
-        Math.max(val, minmaxX.graphMin),
-        minmaxX.graphMax
+    const getXPos = (val) =>
+      Canvas.calculateX(val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
+    // 값 축(현재 line 은 세로 전용 → 값 축 = Y)이 graphMax 를 초과하면, displayOverflow 가
+    // 켜졌을 때만 graphMax 로 clamp 해 상단 경계에 표시한다(scatter 와 동일). 꺼져 있으면 raw →
+    // calculateY 가 null 반환 → 숨김. horizontal line 지원 시 값 축이 X 로 바뀌므로
+    // getXPos 에도 동일 clamp 를 적용해야 한다.
+    const getYPos = (val) =>
+      Canvas.calculateY(
+        displayOverflow && val > minmaxY.graphMax ? minmaxY.graphMax : val,
+        minmaxY.graphMin,
+        minmaxY.graphMax,
+        yArea,
+        ysp,
       );
-      return Canvas.calculateX(_val, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
-    };
 
-    const getYPos = (val) => {
-      const _val = Math.min(
-        Math.max(val, minmaxY.graphMin),
-        minmaxY.graphMax
-      );
-      return Canvas.calculateY(_val, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp);
-    };
-    
     const includeNegativeValue = this.data.some((data) => data.o < 0);
     const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
 
@@ -174,6 +207,10 @@ class Line {
       curr.yp = y;
 
       if (isLinearInterpolation && curr.o === null) {
+        return;
+      } else if (x === null || y === null) {
+        // axis range 밖 데이터는 라인을 끊고 prevValid 도 리셋해 다음 valid 포인트가 moveTo 로 재시작하도록.
+        prevValid = undefined;
         return;
       } else if (
         (isNil(prevValid?.y) && !this.isExistGrp) ||
@@ -251,6 +288,10 @@ class Line {
       needFillDataIndexList.forEach(([startIndex, endIndex]) => {
         if (startIndex === endIndex) {
           const singleData = this.data[startIndex];
+          // axis range 밖이면 xp/yp 가 null. 그대로 ctx 에 전달하면 좌상단으로 fill 이 튕긴다.
+          if (singleData.xp === null || singleData.yp === null) {
+            return;
+          }
           ctx.moveTo(singleData.xp - lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, getYPos(singleData.b) ?? endPoint);
@@ -258,13 +299,19 @@ class Line {
           return;
         }
 
+        let pathStarted = false;
         for (let ix = startIndex; ix <= endIndex; ix++) {
           const currData = this.data[ix];
+          // axis range 밖 (xp/yp null) 이면 path 추가는 건너뛰고 다음 valid 포인트에서 새 path 를 시작.
+          const isInRange = currData.xp !== null && currData.yp !== null;
 
-          if (ix === startIndex) {
-            ctx.moveTo(currData.xp, currData.yp);
-          } else if (currData.o !== null) {
-            ctx.lineTo(currData.xp, currData.yp);
+          if (isInRange) {
+            if (!pathStarted) {
+              ctx.moveTo(currData.xp, currData.yp);
+              pathStarted = true;
+            } else if (currData.o !== null) {
+              ctx.lineTo(currData.xp, currData.yp);
+            }
           }
 
           if (ix === endIndex) {
@@ -272,7 +319,7 @@ class Line {
               const nextData = this.data[jx];
               const xp = getXPos(nextData.x);
 
-              if (nextData.o !== null) {
+              if (xp !== null && nextData.o !== null) {
                 const bp = getYPos(nextData.b) ?? getYPos(0);
                 ctx.lineTo(xp, bp);
               }
@@ -291,25 +338,110 @@ class Line {
       ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
       const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
       const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
-      const isLinearSingle =
-        this.interpolation === 'linear' && this.data.filter((item) => item.o !== null).length === 1;
 
-      this.data.forEach((curr, ix) => {
+      // isLinearSingle: 전체 filter 대신 2개 발견 시점에 즉시 종료.
+      let isLinearSingle = false;
+      if (this.interpolation === 'linear') {
+        let nonNullCount = 0;
+        for (let i = 0; i < this.data.length; i++) {
+          if (this.data[i].o !== null) {
+            nonNullCount++;
+            if (nonNullCount > 1) break;
+          }
+        }
+        isLinearSingle = nonNullCount === 1;
+      }
+
+      // includes(O(n)) → Set(O(1))
+      const selectedLabelIndexSet = selectedLabelIndexList.length
+        ? new Set(selectedLabelIndexList)
+        : null;
+
+      const pointSize = this.pointSize;
+      const pointStyle = this.pointStyle;
+      const data = this.data;
+      const dataLen = data.length;
+      // 다수 series × 다수 point 환경에서 점마다 beginPath/fill/stroke 를 호출하면
+      // 캔버스 rasterizer flush 가 수만 회 발생한다. circle 스타일(default)일 때는
+      // 모든 점을 단일 path 에 모아 fill/stroke 를 1회만 호출하도록 batching 한다.
+      const canBatch = !NON_CIRCLE_POINT_STYLES.has(pointStyle);
+
+      // 점 그리기 판정은 circle/비-circle 두 분기 공통이므로 이 함수 한 곳에서만 관리한다.
+      // (두 분기는 "어떤 점을 그리느냐"가 아니라 "어떻게 그리느냐"만 달라야 한다.)
+      // 반환값: 0 = 그리지 않음, 1 = 일반(blur), 2 = 강조(focus).
+      // hot loop라 점당 객체 할당을 피하려고 객체 대신 정수 코드를 반환한다.
+      const pointDrawKind = (ix) => {
+        const curr = data[ix];
         if (curr.xp === null || curr.yp === null || curr.o === null) {
-          return;
+          return 0;
         }
 
-        const prevData = this.data[ix - 1]?.o;
-        const nextData = this.data[ix + 1]?.o;
-
-        const isSingle =
-          (!isLinearInterpolation && isNil(prevData) && isNil(nextData)) || isLinearSingle;
-        const isSelectedLabel = selectedLabelIndexList.includes(ix);
-        if (this.point || isSingle || isSelectedLabel) {
-          ctx.fillStyle = isSelectedLabel && !legendHitInfo ? focusStyle : blurStyle;
-          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, curr.xp, curr.yp);
+        let isSingle;
+        if (isLinearSingle) {
+          isSingle = true;
+        } else if (!isLinearInterpolation) {
+          const prevO = ix > 0 ? data[ix - 1].o : null;
+          const nextO = ix + 1 < dataLen ? data[ix + 1].o : null;
+          isSingle = prevO == null && nextO == null;
+        } else {
+          isSingle = false;
         }
-      });
+
+        const isSelectedLabel = selectedLabelIndexSet ? selectedLabelIndexSet.has(ix) : false;
+        if (!(this.point || isSingle || isSelectedLabel)) {
+          return 0;
+        }
+        return isSelectedLabel && !legendHitInfo ? 2 : 1;
+      };
+
+      if (canBatch) {
+        let blurPathOpen = false;
+        let focusPoints = null;
+
+        for (let ix = 0; ix < dataLen; ix++) {
+          const kind = pointDrawKind(ix);
+          if (kind !== 0) {
+            const curr = data[ix];
+            if (kind === 2) {
+              if (focusPoints === null) focusPoints = [];
+              focusPoints.push(curr);
+            } else {
+              if (!blurPathOpen) {
+                ctx.beginPath();
+                blurPathOpen = true;
+              }
+              // arc 직전 moveTo 로 sub-path 를 분리해 점 사이 line 연결을 막는다.
+              ctx.moveTo(curr.xp + pointSize, curr.yp);
+              ctx.arc(curr.xp, curr.yp, pointSize, 0, TWO_PI);
+            }
+          }
+        }
+        if (blurPathOpen) {
+          ctx.fillStyle = blurStyle;
+          ctx.fill();
+          ctx.stroke();
+        }
+        if (focusPoints !== null) {
+          ctx.beginPath();
+          for (let i = 0; i < focusPoints.length; i++) {
+            const p = focusPoints[i];
+            ctx.moveTo(p.xp + pointSize, p.yp);
+            ctx.arc(p.xp, p.yp, pointSize, 0, TWO_PI);
+          }
+          ctx.fillStyle = focusStyle;
+          ctx.fill();
+          ctx.stroke();
+        }
+      } else {
+        for (let ix = 0; ix < dataLen; ix++) {
+          const kind = pointDrawKind(ix);
+          if (kind !== 0) {
+            const curr = data[ix];
+            ctx.fillStyle = kind === 2 ? focusStyle : blurStyle;
+            Canvas.drawPoint(ctx, pointStyle, pointSize, curr.xp, curr.yp);
+          }
+        }
+      }
     }
 
     ctx.restore();
@@ -358,7 +490,7 @@ class Line {
     const xp = offset[0];
     const yp = offset[1];
     const item = { data: null, hit: false, color: this.color };
-    const gdata = this.data.filter((data) => !Util.isNullOrUndefined(data.x));
+    const gdata = this._getValidGData();
     const isLinearInterpolation = this.useLinearInterpolation();
 
     // line 포인트 "정확 히트" 판정용 반경.

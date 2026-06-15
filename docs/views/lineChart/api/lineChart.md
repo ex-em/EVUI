@@ -143,6 +143,7 @@ const chartData =
 | tooltip    | Object          | ([상세](#tooltip))                        | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성                                                                                                                                       |                                 |
 | indicator  | Object          | ([상세](#indicator))                      | 지표선                                                                                                                                                                                 |                                 |
 | maxTip     | Object          | ([상세](#maxtip))                         | 최대값에 tip 표시(값 표시) 여부 및 속성                                                                                                                                                |                                 |
+| displayOverflow | Boolean    | false                                     | 값 축(Y)의 range로 제한한 범위를 초과한 데이터를 경계에 모아 표시할지 여부. false면 range 밖 데이터는 숨겨집니다.                                                                       | true, false                     |
 | selectItem | Object          | ([상세](#selectitem))                     | 차트 아이템 선택 기능 활성화 여부 및 속성                                                                                                                                              |                                 |
 | padding    | Object          | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값                                                                                                                                                                   |
 | syncHover  | boolean         | true                                      | options.syncHover가 true인 EvChartGroup으로 감싼경우, 해당 차트에서는 그룹으로 묶긴 차트들 사이의 syncHover선을 그리고싶지 않을 때 사용하는 속성 (time관련된 축을 가질때만 적용됩니다) |
@@ -302,10 +303,11 @@ const chartData =
 | borderColor         | Hex, RGB, RGBA Code(String) | '#666666'                                  | tooltip 테두리 색상                                     |                                                                     |
 | useShadow           | Boolean                     | false                                      | 그림자 사용 여부                                        |                                                                     |
 | shadowOpacity       | Number                      | 0.25                                       | 그림자 투명도                                           |                                                                     |
-| throttledMove       | Boolean                     | false                                      | 데이터 조회 Throttling 처리 유무                        |                                                                     |
+| throttledMove       | Boolean                     | true                                       | 데이터 조회 Throttling 처리 유무                        |                                                                     |
 | debouncedHide       | Boolean                     | false                                      | 좌표 이동 시 tooltip hide 여부                          |                                                                     |
 | sortByValue         | Boolean                     | true                                       | 값을 기준으로 정렬할지의 여부                           |                                                                     |
 | useScrollbar        | Boolean                     | false                                      | 스크롤바 사용 여부                                      |                                                                     |
+| htmlScrollTarget    | String                      |                                            | `formatter.html` 커스텀 툴팁에서 휠 스크롤을 전달할 내부 요소의 CSS 셀렉터 (가상 스크롤 활성 시에는 자동 처리되어 불필요) | '.ev-chart-tooltip-custom__body' |
 | maxHeight           | Number                      |                                            | 툴팁의 최대 높이                                        |                                                                     |
 | maxWidth            | Number                      |                                            | 툴팁의 최대 너비                                        |                                                                     |
 | textOverflow        | String                      | 'wrap'                                     | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis                                                   |
@@ -318,6 +320,7 @@ const chartData =
 | showHeader          | Boolean                     | true                                       | Tooltip의 Header 영역 표시 여부                         |
 | formatter           | function / Object           | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
 | returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
+| virtualScroll       | Object                      | { use: 'auto', threshold: 50, estimatedRowHeight: 28, overscan: 5 } | `formatter.html` 사용 시 가상 스크롤로 보이는 행만 라이브 DOM에 부착. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 부여하면 안정적으로 활성화됨 | use: 'auto' \| true \| false (auto는 threshold 초과 시 자동) |
 
 ```ts
 const chartOptions = {
@@ -493,6 +496,7 @@ const chartOptions = {
 | drag-select | data, range  | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
 | click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 | axes-scale-change | | 차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 정보를 반환한다. 단, axes옵션에 scaleRange가 true이고 scale 정보가 변경될때만 이벤트를 발생시킨다. ex)<br><br> {<br> x: [{ minSteps, maxSteps }], <br>   y: [{ minSteps, maxSteps }]<br>} | |
+| axes-data-max-change | maxY | show 된 series 들의 **실제 데이터 y 최대값**(number)을 반환한다. axes-scale-change(라벨 스텝 개수)와 달리 데이터 값이다. 차트가 내부적으로 이미 계산한 series.minMax.maxY 를 재사용하므로 소비처가 동일 데이터를 따로 스캔해 max 를 구하지 않아도 된다. **차트 타입과 무관하게** 사용할 수 있으며, 이 이벤트를 바인딩한 경우에만 발생한다(바인딩 안 하면 집계 비용 0). 발생 시엔 렌더마다(같은 값이어도) 발생한다. 유효한(유한수) 데이터가 있는 show 된 series 가 하나도 없으면 — 보이는 series 가 없거나 모두 빈 데이터면 — null 을 emit 한다. 단, realTimeScatter 는 전 series 가 빈 데이터일 때 내부 minMax 가 0 으로 폴백되어 0 이 emit 된다. maxY 는 show 된 전 series 의 **통합 최대값(단일 y축·세로 차트 기준, 축 구분 없음)** 이라 다중 y축에서는 축별 구분이 되지 않는다. realTimeScatter autoScale 의 데이터 최대값 용도로 도입됐으나 line·bar 등 다른 차트에서도 동일하게 동작한다. |
 
 - 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
 

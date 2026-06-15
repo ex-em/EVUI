@@ -31,33 +31,59 @@ const modules = {
       }
 
       const ctx = this.overlayCtx;
+      const itemKeys = Object.keys(hitInfo.items);
+      const hasItems = itemKeys.length > 0;
       const hasLineSeries = Object.values(this.seriesList || {}).some(
         (series) => series.type === 'line',
       );
 
+      // hover 시그니처: hitId + 시리즈/dataIndex 집합이 동일하면 같은 데이터 포인트 위.
+      // formatter.html 경로에서 비용 가장 큰 drawCustomTooltip(고객 formatter + htmlToElement +
+      // virtualScroll teardown→reinit) 만 스킵하고, 나머지(overlay/indicator/listener/hoveredLabel)
+      // 흐름은 그대로 유지한다. fast path 를 더 넓히면 부수 효과가 생길 수 있어 보수적으로 둔다.
+      let hoverSig = '';
+      if (hasItems) {
+        hoverSig = `h=${hitInfo.hitId}`;
+        const sortedKeys = itemKeys.slice().sort();
+        for (let i = 0; i < sortedKeys.length; i++) {
+          const k = sortedKeys[i];
+          hoverSig += `|${k}:${hitInfo.items[k].index}`;
+        }
+      }
+
+      const skipCustomTooltipRedraw =
+        hoverSig !== '' &&
+        hoverSig === this._lastHoverSig &&
+        this.tooltipDOM &&
+        this.tooltipDOM.style.display !== 'none';
+
       this.overlayClear();
 
-      if (Object.keys(hitInfo.items).length) {
+      if (hasItems) {
         if (tooltip.use && this.isInitTooltip) {
           this.drawItemsHighlight(hitInfo, ctx);
 
           if (typeof tooltip?.returnValue === 'function') {
             const seriesList = [];
-            Object.keys(hitInfo.items).forEach((sId) => {
+            for (let i = 0; i < itemKeys.length; i++) {
+              const sId = itemKeys[i];
+              const it = hitInfo.items[sId];
               seriesList.push({
                 sId,
-                data: hitInfo.items[sId].data,
-                color: hitInfo.items[sId].color,
-                name: hitInfo.items[sId].name,
-                dataId: hitInfo.items[sId].id,
-                index: hitInfo.items[sId].index,
+                data: it.data,
+                color: it.color,
+                name: it.name,
+                dataId: it.id,
+                index: it.index,
               });
-            });
+            }
 
             this.hideTooltipDOM();
             tooltip.returnValue(seriesList, e);
           } else if (tooltip?.formatter?.html) {
-            this.drawCustomTooltip(hitInfo?.items);
+            if (!skipCustomTooltipRedraw) {
+              this.drawCustomTooltip(hitInfo?.items);
+            }
             this.setCustomTooltipLayoutPosition(hitInfo, e);
           } else {
             this.setTooltipLayoutPosition(hitInfo, e);
@@ -94,6 +120,8 @@ const modules = {
 
         this.hideTooltipDOM();
       }
+
+      this._lastHoverSig = hoverSig;
 
       if (this.dragInfoBackup) {
         this.drawSelectionArea(this.dragInfoBackup);
@@ -154,6 +182,12 @@ const modules = {
 
         this.tooltipClear();
       }
+
+      // 다음 hover 진입 시 fast path 가 stale 시그니처로 잘못 매치되지 않도록 초기화한다.
+      this._lastHoverSig = '';
+
+      // 다음 hover 시작 시 레이아웃 변화를 반영하도록 캐시를 무효화한다.
+      this.invalidateClientRectCache();
       this.listeners['mouse-leave']();
     };
 
@@ -501,8 +535,13 @@ const modules = {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
       if (!isTooltipVisible) return;
 
+      // 가상 스크롤 활성 세션에서는 모듈이 실제 스크롤 컨테이너(rowContainer)를 알고 있으므로
+      // 이를 최우선으로 사용한다. (커스텀 툴팁 경로에서 tooltipBodyDOM은 detach 상태라 사용 불가)
       const scrollTarget =
-        this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget) ||
+        this.vsState?.scrollEl ||
+        (this.options.tooltip.htmlScrollTarget
+          ? this.tooltipDOM?.querySelector(this.options.tooltip.htmlScrollTarget)
+          : null) ||
         this.tooltipBodyDOM;
       if (!scrollTarget || scrollTarget.scrollHeight <= scrollTarget.clientHeight) {
         this.hideTooltipDOM();
@@ -522,7 +561,15 @@ const modules = {
       }
     };
 
-    if (this.options?.tooltip?.useScrollbar) {
+    // 가상 스크롤은 스크롤을 전제로 한 기능이므로, VS가 활성화될 수 있는 차트
+    // (formatter.html + virtualScroll 미비활성)에서는 useScrollbar와 무관하게 wheel 핸들러를
+    // 보장한다. 그렇지 않으면 기본 설정(useScrollbar:false)에서 잘려나간 행에 접근할 수 없다.
+    const tooltipOpt = this.options?.tooltip;
+    const canVirtualScroll =
+      !!tooltipOpt?.formatter?.html &&
+      !!tooltipOpt?.virtualScroll &&
+      tooltipOpt.virtualScroll.use !== false;
+    if (tooltipOpt?.useScrollbar || canVirtualScroll) {
       this.overlayCanvas.addEventListener('wheel', this.onWheel, { passive: false });
     }
     if (this.options?.tooltip?.throttledMove) {
@@ -537,6 +584,14 @@ const modules = {
 
     this.dragTouchSelectionEvent = (e) => this.dragTouchSelectionDestroy(e);
     window.addEventListener('click', this.dragTouchSelectionEvent);
+
+    // 스크롤 시 viewport 기준 위치가 바뀌므로 캐시된 client rect를 무효화한다.
+    // scroll 이벤트는 버블링하지 않으므로 capture 단계로 모든 스크롤 컨테이너를 감지한다.
+    this.invalidateRectOnScroll = () => this.invalidateClientRectCache();
+    window.addEventListener('scroll', this.invalidateRectOnScroll, {
+      capture: true,
+      passive: true,
+    });
   },
 
   /**
@@ -742,7 +797,7 @@ const modules = {
    */
   getMousePosition(evt) {
     const e = evt.originalEvent || evt;
-    const rect = this.overlayCanvas.getBoundingClientRect();
+    const rect = this.getOverlayClientRect();
     return [e.clientX - rect.left, e.clientY - rect.top, rect.width, rect.height];
   },
 
@@ -910,6 +965,8 @@ const modules = {
    * }} hit item information
    */
   findHitItem(offset, disableNullLabelSnap = false) {
+    // realtime scatter blit 틱은 strip 밖 점들의 xp/yp 갱신을 건너뛴다 — hit-test 전에 지연 복구.
+    this.ensureHitCoordsFresh?.();
     const sIds = Object.keys(this.seriesList);
     const items = {};
     const isHorizontal = !!this.options.horizontal;
@@ -1040,16 +1097,12 @@ const modules = {
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     // all-null 라벨인 경우 synthetic items[''] 로 label/index 만 채워 전달.
-    if (disableNullLabelSnap
-        && Object.keys(items).length === 0
-        && targetDataIndex !== -1) {
+    if (disableNullLabelSnap && Object.keys(items).length === 0 && targetDataIndex !== -1) {
       const refSeriesID = sIds.find((sId) => {
         const s = this.seriesList[sId];
         return s?.show && s?.data?.length > 0;
       });
-      const refPoint = refSeriesID
-        ? this.seriesList[refSeriesID].data?.[targetDataIndex]
-        : null;
+      const refPoint = refSeriesID ? this.seriesList[refSeriesID].data?.[targetDataIndex] : null;
       if (refPoint) {
         items[''] = {
           id: '',
@@ -1122,10 +1175,12 @@ const modules = {
 
     // 각 라벨에서 가장 가까운 것 찾기 (disableNullLabelSnap=true 면 all-null 라벨도 후보)
     for (let i = 0; i < referenceData.length; i++) {
-      const hasValidData = disableNullLabelSnap || sIds.some((sId) => {
-        const series = this.seriesList[sId];
-        return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
-      });
+      const hasValidData =
+        disableNullLabelSnap ||
+        sIds.some((sId) => {
+          const series = this.seriesList[sId];
+          return series?.show && series.data?.[i]?.o !== null && series.data?.[i]?.o !== undefined;
+        });
 
       if (hasValidData) {
         const point = referenceData[i];
@@ -1148,11 +1203,11 @@ const modules = {
         }
       }
     }
-    
+
     if (closestIndex === -1) {
       return -1;
     }
-    
+
     // 최소 hover snap 반경 (px)
     // - 데이터 밀도가 높을 때 avgInterval이 1px 이하로 감소하는 문제 보정
     // - 마우스 포인터의 실제 조작 정밀도(≈1px 이하)보다 충분히 넓은 범위를 확보하여 안정적인 hover 보장
@@ -1160,7 +1215,7 @@ const modules = {
     // → 6px은 과도하게 넓지 않으면서도 안정적인 선택이 가능한 절충값
     const MIN_SNAP_THRESHOLD_PX = 6;
     const snapThreshold = Math.max(avgInterval, MIN_SNAP_THRESHOLD_PX);
-    
+
     if (closestDistance >= snapThreshold) {
       const useLinearInterpolation = sIds.some((sId) => {
         const series = this.seriesList[sId];
@@ -1228,6 +1283,24 @@ const modules = {
         ? tooltipOpt?.formatter
         : tooltipOpt?.formatter?.value;
 
+    // 동일 itemData 객체에 대한 포맷 결과를 캐시한다.
+    // 데이터가 새 배열/새 객체로 갱신되면 WeakMap 키가 사라져 자동 GC되므로 무효화도 자동.
+    // 같은 mousemove 윈도우 안에서 hover 중 큰 비용(고객 value formatter; big.js 등)을 1회만 부담.
+    const useCache =
+      itemData !== null && typeof itemData === 'object' && tooltipValueFormatter;
+    if (useCache) {
+      if (!this._tooltipValueCache) {
+        this._tooltipValueCache = new WeakMap();
+      }
+      const bucket = this._tooltipValueCache.get(itemData);
+      if (bucket !== undefined) {
+        const cached = bucket[seriesId];
+        if (cached !== undefined) {
+          return cached;
+        }
+      }
+    }
+
     let formattedTxt = value;
     if (tooltipValueFormatter) {
       if (opt.type === 'pie') {
@@ -1264,6 +1337,15 @@ const modules = {
       } else {
         formattedTxt = numberWithComma(value);
       }
+    }
+
+    if (useCache) {
+      let bucket = this._tooltipValueCache.get(itemData);
+      if (!bucket) {
+        bucket = Object.create(null);
+        this._tooltipValueCache.set(itemData, bucket);
+      }
+      bucket[seriesId] = formattedTxt;
     }
 
     return formattedTxt;
@@ -1584,6 +1666,8 @@ const modules = {
    * @returns {object}
    */
   findSelectedItems(range) {
+    // realtime scatter blit 틱 이후의 스테일 xp/yp 를 drag select 전에 지연 복구.
+    this.ensureHitCoordsFresh?.();
     const items = [];
     const sIds = Object.keys(this.seriesList);
     for (let ix = 0; ix < sIds.length; ix++) {
