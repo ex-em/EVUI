@@ -138,7 +138,7 @@ describe('EvChart.drawSeries (게이트 → element 배선)', () => {
     const s0 = rtSeries('s0', { x: 1, y: 1, k: '1|1' });
     const core = createDrawCore({ s0 });
 
-    core.drawSeries();
+    core.drawSeriesLayer(core.bufferCtx);
 
     expect(s0.draw).toHaveBeenCalledTimes(1);
     const arg = s0.draw.mock.calls[0][0];
@@ -151,7 +151,7 @@ describe('EvChart.drawSeries (게이트 → element 배선)', () => {
     const s1 = rtSeries('s1', { x: 2, y: 2, k: '2|2' });
     const core = createDrawCore({ s0, s1 });
 
-    core.drawSeries();
+    core.drawSeriesLayer(core.bufferCtx);
 
     expect(s0.draw).toHaveBeenCalledTimes(1);
     expect(s1.draw).toHaveBeenCalledTimes(1);
@@ -171,7 +171,7 @@ describe('EvChart.drawSeries (게이트 → element 배선)', () => {
     const s1 = rtSeries('s1', { x: 2, y: 2, k: '2|2' }, false);
     const core = createDrawCore({ s0, s1 });
 
-    core.drawSeries();
+    core.drawSeriesLayer(core.bufferCtx);
 
     expect(s0.draw.mock.calls[0][0].coordinateDedupe).toBe(false);
   });

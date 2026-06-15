@@ -171,10 +171,11 @@ describe('Scatter Element', () => {
       param.duple.set('K1', 's1');
       param.duple.set('1|1', 'otherSeries');
 
-      const spy = vi.spyOn(Canvas, 'drawPoint').mockImplementation(() => {});
+      // dedupe on(circle) 경로 → 색별 배치(drawPointBatch). owner 매칭된 1점만 배치된다.
+      const spy = vi.spyOn(Canvas, 'drawPointBatch').mockImplementation(() => {});
       scatter.draw(param);
 
-      expect(spy).toHaveBeenCalledTimes(1);
+      expect(sumBatchedPoints(spy)).toBe(1);
     });
 
     it('coordinateDedupe=true + 빈 duple 이면 아무 점도 그리지 않는다 (단일-series 경로가 false 를 넘겨야 하는 이유)', () => {

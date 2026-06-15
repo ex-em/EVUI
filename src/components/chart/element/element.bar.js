@@ -161,9 +161,12 @@ class Bar {
 
         if (isHorizontal) {
           const barValue = item.b ? item.o : item.x;
-          const _barValue = Math.min(Math.max(barValue, minmaxX.graphMin), minmaxX.graphMax);
+          // displayOverflow 가 켜졌을 때만 graphMax 초과 값을 경계로 clamp, 꺼지면 raw → null(숨김).
+          // draw(래스터) 와 동일한 좌표 의미를 유지해 hit-test 기하가 일치하도록 한다.
+          const drawValue =
+            param.displayOverflow && barValue > minmaxX.graphMax ? minmaxX.graphMax : barValue;
           w = Canvas.calculateX(
-            _barValue,
+            drawValue,
             minmaxX.graphMin,
             minmaxX.graphMax,
             xArea,
@@ -171,9 +174,9 @@ class Bar {
           );
 
           if (item.b) {
-            const _baseValue = Math.min(Math.max(item.b, minmaxX.graphMin), minmaxX.graphMax);
+            // stack-base 위치는 raw 유지 (세그먼트 값만 clamp).
             x = Canvas.calculateX(
-              _baseValue,
+              item.b,
               minmaxX.graphMin,
               minmaxX.graphMax,
               xArea,
@@ -182,12 +185,14 @@ class Bar {
           }
 
           const minimumBarWidth = barValue > 0 ? -1 : 1;
-          w = barValue && Math.abs(w) === 0 ? minimumBarWidth : w;
+          // w === null 은 axis range 밖이라는 신호이므로 minimumBarWidth 보정에서 제외한다.
+          w = barValue && w !== null && Math.abs(w) === 0 ? minimumBarWidth : w;
         } else {
           const barValue = item.b ? item.o : item.y;
-          const _barValue = Math.min(Math.max(barValue, minmaxY.graphMin), minmaxY.graphMax);
+          const drawValue =
+            param.displayOverflow && barValue > minmaxY.graphMax ? minmaxY.graphMax : barValue;
           h = Canvas.calculateY(
-            _barValue,
+            drawValue,
             minmaxY.graphMin,
             minmaxY.graphMax,
             yArea,
@@ -195,9 +200,9 @@ class Bar {
           );
 
           if (item.b) {
-            const _baseValue = Math.min(Math.max(item.b, minmaxY.graphMin), minmaxY.graphMax);
+            // stack-base 위치는 raw 유지 (세그먼트 값만 clamp).
             y = Canvas.calculateY(
-              _baseValue,
+              item.b,
               minmaxY.graphMin,
               minmaxY.graphMax,
               yArea,
@@ -206,7 +211,7 @@ class Bar {
           }
 
           const minimumBarHeight = barValue > 0 ? -1 : 1;
-          h = barValue && Math.abs(h) === 0 ? minimumBarHeight : h;
+          h = barValue && h !== null && Math.abs(h) === 0 ? minimumBarHeight : h;
         }
 
         // 좌표 및 인덱스 정보 세팅 (툴팁/hover용)
