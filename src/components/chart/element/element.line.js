@@ -217,11 +217,25 @@ class Line {
     const fillOpacity = this.extent.downplay ? this.fillOpacity * extent.opacity : this.fillOpacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
 
+    // colorStringToRgba 결과를 슬롯별로 인스턴스 캐시한다 — 입력(색,opacity)이 불변인 프레임에서
+    // 전역 Map 조회 + `${색}|${opacity}` 키 문자열 생성을 건너뛴다(hover/툴팁 등 재렌더에서 반복 호출).
+    // opacity 가 시그니처에 포함돼 hover/선택으로 extent.opacity 가 바뀌면 자동 재계산된다(stale 색 방지).
+    const cache = this._rgbaCache || (this._rgbaCache = {});
+    const resolveRgba = (slot, colorStr, opacity) => {
+      const c = cache[slot];
+      if (c !== undefined && c.s === colorStr && c.o === opacity) {
+        return c.v;
+      }
+      const v = Util.colorStringToRgba(colorStr, opacity);
+      cache[slot] = { s: colorStr, o: opacity, v };
+      return v;
+    };
+
     ctx.beginPath();
     ctx.save();
     ctx.lineJoin = 'round';
     ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
+    ctx.strokeStyle = resolveRgba('stroke', mainColor, mainColorOpacity);
     if (this.segments) {
       ctx.setLineDash(this.segments);
     }
@@ -304,7 +318,7 @@ class Line {
       const includeNegativeValue = this.data.some((data) => data.o < 0);
       const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
 
-      const fillColor = Util.colorStringToRgba(this.fillColor || mainColor, fillOpacity);
+      const fillColor = resolveRgba('fill', this.fillColor || mainColor, fillOpacity);
       if (this.fill?.gradient) {
         let maxValueYPos = this.data[0].yp;
         let minValueYBottomPos = this.data[0].y;
@@ -401,9 +415,9 @@ class Line {
 
     // Draw points
     if (!isBrush) {
-      ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
-      const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
-      const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
+      ctx.strokeStyle = resolveRgba('stroke', mainColor, mainColorOpacity);
+      const focusStyle = resolveRgba('focus', pointFillColor, 1);
+      const blurStyle = resolveRgba('blur', pointFillColor, pointFillColorOpacity);
       const isLinearSingle =
         this.interpolation === 'linear' && this.data.filter((item) => item.o !== null).length === 1;
 
