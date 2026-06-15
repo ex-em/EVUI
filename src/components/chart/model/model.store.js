@@ -820,6 +820,57 @@ const modules = {
     return def;
   },
 
+  /**
+   * 가시 윈도우 [minIndex, maxIndex] 안에서 visible 시리즈를 스캔해 최댓값 점을
+   * { sId, value, index, domain }으로 반환한다. axis range로 일부만 보일 때 maxTip이
+   * 윈도우 밖 전역 max를 가리키지 않게 하기 위함(전역 series.minMax 캐시는 안 건드림).
+   *
+   * bar/line/scatter 모두 후보다(combo에서 line이 윈도우 max거나 line-only 카테고리/step
+   * 축에서도 maxTip 필요). 위치 좌표가 타입별로 다르므로(bar=index, line/scatter=domain)
+   * 비교용 value와 위치용 domain을 함께 돌려준다.
+   *
+   * @param {number} minIndex 윈도우 시작 인덱스
+   * @param {number} maxIndex 윈도우 끝 인덱스 (inclusive)
+   * @returns {{sId: string, value: number, index: number, domain: number}|null}
+   *   value: 값 축 값(vertical=y, horizontal=x), domain: 도메인 축 값(vertical=x, horizontal=y).
+   *   null인 경우 두 가지:
+   *   (1) minIndex/maxIndex가 비유한이거나 빈 윈도우(maxIndex < minIndex),
+   *   (2) 윈도우 안에 유효한(finite) 값이 하나도 없음.
+   */
+  getVisibleWindowMaxSeries(minIndex, maxIndex) {
+    if (
+      !Number.isFinite(minIndex)
+      || !Number.isFinite(maxIndex)
+      || maxIndex < minIndex
+    ) {
+      return null;
+    }
+
+    const isHorizontal = this.options.horizontal;
+    let best = null;
+
+    const sIds = Object.keys(this.seriesList);
+    for (let s = 0; s < sIds.length; s += 1) {
+      const series = this.seriesList[sIds[s]];
+      if (series?.show && series.data?.length) {
+        const lo = Math.max(0, minIndex);
+        const hi = Math.min(series.data.length - 1, maxIndex);
+        for (let i = lo; i <= hi; i += 1) {
+          const p = series.data[i];
+          const v = isHorizontal ? p?.x : p?.y;
+          // null뿐 아니라 NaN/Infinity도 후보에서 제외한다. 비유한값이 best로 뽑히면
+          // calculateTipInfo의 Number.isFinite 가드에서 탈락해 윈도우와 무관한 전역 max로
+          // 조용히 폴백하기 때문(maxTip이 엉뚱한 위치에 그려짐).
+          if (Number.isFinite(v) && (!best || v > best.value)) {
+            best = { sId: series.sId, value: v, index: i, domain: isHorizontal ? p?.y : p?.x };
+          }
+        }
+      }
+    }
+
+    return best;
+  },
+
   getSeriesValueOptForHeatMap(series) {
     const { data, colorState, isGradient } = series;
     const colorOpt = this.options.heatMapColor;
