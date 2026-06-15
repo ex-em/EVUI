@@ -542,7 +542,6 @@ class EvChart {
     );
   }
 
-
   /**
    * worker 프레임(ImageBitmap) 도착 시 display 에 합성한다.
    * 순서: clear(display) → static(axis/grid, main buffer) → series bitmap(worker).
