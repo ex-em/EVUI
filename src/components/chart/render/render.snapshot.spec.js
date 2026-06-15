@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import dayjs from 'dayjs';
 import Line from '../element/element.line';
 import Bar from '../element/element.bar';
 import Pie from '../element/element.pie';
@@ -365,5 +366,62 @@ describe('render.snapshot — 빈 시리즈 제외 (worker 직렬화 비용 절�
     const snapshot = toRenderSnapshot(core, 1);
 
     expect(Object.keys(snapshot.series)).toEqual(['z']);
+  });
+});
+
+describe('render.snapshot — 축 타입별 좌표 정규화 (time/step worker 허용)', () => {
+  const makeLineData = (id, data, axisType) => {
+    const line = new Line(id, { color: '#000' }, 0);
+    line.show = true;
+    line.xAxisIndex = 0;
+    line.yAxisIndex = 0;
+    line.data = data;
+    return {
+      pixelRatio: 1,
+      chartRect: {},
+      labelOffset: {},
+      axesSteps: { x: [], y: [] },
+      options: { type: 'line', axesX: [{ type: axisType }], axesY: [{ type: 'linear' }] },
+      seriesInfo: { charts: { line: [id], bar: [], scatter: [], heatMap: [], pie: [] } },
+      seriesList: { [id]: line },
+    };
+  };
+
+  it('time 축: Date/문자열 x 가 타임스탬프(숫자)로 정규화된다', () => {
+    const date = new Date('2020-01-01');
+    const core = makeLineData(
+      't',
+      [{ x: date, y: 10, o: 10, b: 0 }, { x: '2020-01-02', y: 20, o: 20, b: 0 }],
+      'time',
+    );
+    const snapshot = toRenderSnapshot(core, 1);
+
+    // Date 객체는 timestamp 가 그대로 보존되고, 문자열은 dayjs 파싱 결과와 동일해야 한다.
+    expect(snapshot.series.t.data.x[0]).toBe(date.valueOf());
+    expect(snapshot.series.t.data.x[1]).toBe(dayjs('2020-01-02').valueOf());
+  });
+
+  it('step 축: 숫자문자열 x 는 숫자로, 카테고리 문자열 x 는 null 로 정규화된다', () => {
+    const core = makeLineData(
+      's',
+      [{ x: '5', y: 10, o: 10, b: 0 }, { x: 'Mon', y: 20, o: 20, b: 0 }],
+      'step',
+    );
+    const snapshot = toRenderSnapshot(core, 1);
+
+    expect(snapshot.series.s.data.x[0]).toBe(5);
+    expect(snapshot.series.s.data.x[1]).toBeNull();
+  });
+
+  it('linear 축(회귀): 비숫자 x 는 기존대로 null', () => {
+    const core = makeLineData(
+      'l',
+      [{ x: 0, y: 10, o: 10, b: 0 }, { x: 'nope', y: 20, o: 20, b: 0 }],
+      'linear',
+    );
+    const snapshot = toRenderSnapshot(core, 1);
+
+    expect(snapshot.series.l.data.x[0]).toBe(0);
+    expect(snapshot.series.l.data.x[1]).toBeNull();
   });
 });
