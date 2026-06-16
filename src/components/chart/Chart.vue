@@ -136,6 +136,7 @@ export default {
         );
 
     const YIELD_AFTER_INTERACTION_MS = 150;
+    const nowMs = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
     let pendingUpdate = null;
     let pendingTimer = null;
 
@@ -153,24 +154,38 @@ export default {
         }
       }
 
-      clearTimeout(pendingTimer);
-      // 인터랙션 직후(YIELD_AFTER_INTERACTION_MS 이내)에는 데이터/polling 재렌더를 미뤄
-      // hover/click 즉답을 보장한다. 그룹이면 그룹 공유 시각, 아니면 자기 차트 시각을 본다.
-      // 미뤄도 pendingUpdate 는 최신값으로 coalesce 되고 인터랙션이 멈추면 곧 flush 된다.
-      const lastInteractionAt = injectGroupInteraction
-        ? injectGroupInteraction.at
-        : evChart?._lastInteractionAt ?? 0;
-      const elapsed =
-        (typeof performance !== 'undefined' ? performance.now() : Date.now()) - lastInteractionAt;
-      const delay =
-        elapsed < YIELD_AFTER_INTERACTION_MS ? YIELD_AFTER_INTERACTION_MS - elapsed : 0;
-      pendingTimer = setTimeout(() => {
+      // fire 시점에 deferUntil 을 재검사한다. 타이머가 떠 있는 사이 deferPollingRedraw 가
+      // deferUntil 을 더 미래로 연장했을 수 있는데(그룹은 차트별 클로저 타이머를 직접 못 만짐),
+      // 그 경우 아직 미래면 남은 시간만큼 재예약(in-flight 재무장)한다.
+      const flush = () => {
+        const deferUntil = injectGroupInteraction?.deferUntil ?? 0;
+        const remaining = deferUntil - nowMs();
+        if (remaining > 0) {
+          pendingTimer = setTimeout(flush, remaining);
+          return;
+        }
         if (pendingUpdate && evChart) {
           evChart.update(pendingUpdate);
         }
         pendingUpdate = null;
         pendingTimer = null;
-      }, delay);
+      };
+
+      clearTimeout(pendingTimer);
+      // 인터랙션 직후(YIELD_AFTER_INTERACTION_MS 이내)에는 데이터/polling 재렌더를 미뤄
+      // hover/click 즉답을 보장한다. 그룹이면 그룹 공유 시각, 아니면 자기 차트 시각을 본다.
+      // 추가로 deferPollingRedraw 가 설정한 deferUntil 까지도 미룬다(detail/popup 우선 페인트).
+      // 미뤄도 pendingUpdate 는 최신값으로 coalesce 되고 보류가 끝나면 곧 flush 된다.
+      const lastInteractionAt = injectGroupInteraction
+        ? injectGroupInteraction.at
+        : evChart?._lastInteractionAt ?? 0;
+      const now = nowMs();
+      const elapsed = now - lastInteractionAt;
+      const interactionDelay =
+        elapsed < YIELD_AFTER_INTERACTION_MS ? YIELD_AFTER_INTERACTION_MS - elapsed : 0;
+      const deferUntil = injectGroupInteraction?.deferUntil ?? 0;
+      const deferDelay = deferUntil > now ? deferUntil - now : 0;
+      pendingTimer = setTimeout(flush, Math.max(interactionDelay, deferDelay));
     };
 
     const createChart = () => {
