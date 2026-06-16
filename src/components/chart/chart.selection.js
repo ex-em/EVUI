@@ -29,9 +29,19 @@ const selection = {
     this._baseScaleVersion = null;
     this._baseOptionsRef = null;
 
+    // static(축/그리드/라벨) 라스터 캐시. 무효화 키는 series base 와 동일이나 별도 플래그로 추적.
+    this.staticBaseCanvas = null;
+    this.staticBaseCtx = null;
+    this._staticBaseBuilt = false;
+    this._staticBaseDataEpoch = null;
+    this._staticBaseScaleVersion = null;
+    this._staticBaseOptionsRef = null;
+
     if (this.options.selectSeries?.use && !this.options.brush) {
       this.seriesBaseCanvas = document.createElement('canvas');
       this.seriesBaseCtx = this.seriesBaseCanvas.getContext('2d');
+      this.staticBaseCanvas = document.createElement('canvas');
+      this.staticBaseCtx = this.staticBaseCanvas.getContext('2d');
     }
   },
 
@@ -52,6 +62,22 @@ const selection = {
   },
 
   /**
+   * static base 오프스크린이 현재 buffer 치수와 일치하는지(seriesBaseSized 미러).
+   * @returns {boolean}
+   */
+  staticBaseSized() {
+    if (!this.staticBaseCanvas || !this.bufferCanvas) {
+      return false;
+    }
+    return (
+      this.staticBaseCanvas.width === this.bufferCanvas.width &&
+      this.staticBaseCanvas.height === this.bufferCanvas.height &&
+      this.staticBaseCanvas.width > 1 &&
+      this.staticBaseCanvas.height > 1
+    );
+  },
+
+  /**
    * base 라스터가 현재 상태(데이터·스케일·옵션·치수)와 일치하는가.
    * @returns {boolean}
    */
@@ -66,8 +92,22 @@ const selection = {
   },
 
   /**
-   * full redraw 직후(render 경로) base 라스터를 필요할 때만 재구성한다.
-   * selectSeries.use 가 아니면 즉시 반환(비용 0). 이미 fresh 면 skip.
+   * static base 라스터가 현재 상태와 일치하는가(series base 와 동일 키, 별도 필드).
+   * @returns {boolean}
+   */
+  isStaticBaseFresh() {
+    return (
+      this._staticBaseBuilt &&
+      this.staticBaseSized() &&
+      this._staticBaseDataEpoch === this._dataEpoch &&
+      this._staticBaseScaleVersion === this._scaleVersion &&
+      this._staticBaseOptionsRef === this.options
+    );
+  },
+
+  /**
+   * full redraw 직후(render 경로) series/static base 를 각자 stale 일 때만 재구성한다.
+   * selectSeries.use 가 아니면 즉시 반환(비용 0).
    * @returns {undefined}
    */
   maybeRebuildSeriesBase() {
@@ -78,12 +118,15 @@ const selection = {
     if (!this.seriesBaseCanvas || !this.seriesBaseSized()) {
       // 치수 미확보(초기/리사이즈 직후) — 다음 기회에 재시도.
       this._seriesBaseBuilt = false;
+      this._staticBaseBuilt = false;
       return;
     }
-    if (this.isSeriesBaseFresh()) {
-      return;
+    if (!this.isSeriesBaseFresh()) {
+      this.rebuildSeriesBase();
     }
-    this.rebuildSeriesBase();
+    if (!this.isStaticBaseFresh()) {
+      this.rebuildStaticBase();
+    }
   },
 
   /**
@@ -112,6 +155,40 @@ const selection = {
     this._baseDataEpoch = this._dataEpoch;
     this._baseScaleVersion = this._scaleVersion;
     this._baseOptionsRef = this.options;
+  },
+
+  /**
+   * static(축/그리드/라벨)을 staticBaseCtx 에 hitInfo=undefined 로 그려 partial 렌더 baseline 으로 캐시.
+   * 그린 시점의 무효화 키를 기록한다.
+   * @returns {undefined}
+   */
+  rebuildStaticBase() {
+    const ctx = this.staticBaseCtx;
+    if (!ctx || !this.staticBaseSized()) {
+      this._staticBaseBuilt = false;
+      return;
+    }
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.staticBaseCanvas.width, this.staticBaseCanvas.height);
+    ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+
+    this.drawStaticLayer(ctx, undefined);
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+
+    // drawStaticLayer 가 axis.ctx 를 staticBaseCtx 로 남기므로 bufferCtx 로 되돌린다.
+    this.axesX.forEach((axis) => {
+      axis.ctx = this.bufferCtx;
+    });
+    this.axesY.forEach((axis) => {
+      axis.ctx = this.bufferCtx;
+    });
+
+    this._staticBaseBuilt = true;
+    this._staticBaseDataEpoch = this._dataEpoch;
+    this._staticBaseScaleVersion = this._scaleVersion;
+    this._staticBaseOptionsRef = this.options;
   },
 
   /**
@@ -194,6 +271,35 @@ const selection = {
   },
 
   /**
+   * static base 캐시를 blit 해도 안전한 프레임인지 판정한다.
+   * blur(selectLabel.useLabelOpacity) 활성 시 라벨이 선택에 의존 → 캐시 부정확. hit 프레임도 제외.
+   * @param {any} hitInfo
+   * @returns {boolean}
+   */
+  canUseStaticBase(hitInfo) {
+    const opt = this.options;
+    if (opt.selectLabel?.use && opt.selectLabel?.useLabelOpacity) {
+      return false;
+    }
+    if (hitInfo || this.lastHitInfo || this.legendHover) {
+      return false;
+    }
+    return this.isStaticBaseFresh();
+  },
+
+  /**
+   * static base 라스터를 bufferCtx 에 그대로 합성한다(compositeSeriesBase 미러, opacity 1).
+   * @returns {undefined}
+   */
+  compositeStaticBase() {
+    const ctx = this.bufferCtx;
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.drawImage(this.staticBaseCanvas, 0, 0);
+    ctx.restore();
+  },
+
+  /**
    * 선택된 시리즈만 정상 opacity(highlight)로 bufferCtx 에 덧그린다(흐린 base 위 → z-order 위).
    * @returns {undefined}
    */
@@ -246,7 +352,12 @@ const selection = {
     // partial 은 initScale(prepareLayout)을 거치지 않으므로 bufferCtx transform 을 명시 복원한다.
     this.bufferCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
 
-    this.drawStaticLayer(this.bufferCtx, hitInfo);
+    // static 은 partial 프레임 간 불변이므로 캐시를 blit, 미사용이면 직접 재그린다.
+    if (this.canUseStaticBase(hitInfo)) {
+      this.compositeStaticBase();
+    } else {
+      this.drawStaticLayer(this.bufferCtx, hitInfo);
+    }
     // 선택이 있으면 base 를 흐리게 깔고 선택 시리즈만 진하게 덧그린다. 해제(무선택)면 base 를
     // 정상 opacity(1) 로 그대로 합성해 정상 차트를 복원한다(덧그릴 선택 시리즈 없음).
     const hasSelection = (this.defaultSelectInfo?.seriesId ?? []).length > 0;

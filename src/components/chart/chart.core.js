@@ -1195,11 +1195,10 @@ class EvChart {
    * 주입받아 worker가 자체 OffscreenCanvas ctx로 축을 래스터할 수 있게 한다(main 경로에선
    * this.bufferCtx와 동일하므로 픽셀 변화 없음).
    *
-   * 캐시 결정: **캐시 보류**(분리만 수행). drawAxis는 완전 static이 아니라 — 상호작용 상태
-   * (hitInfo blurred label·selectItem.showLabelTip, scale.js:374-442)와 동적 rescale(scale min/max·
-   * 범례 토글 series.show — model/model.store.js:1400)·plotLines/plotBands를 같은 패스에서 소비한다.
-   * 안전한 캐시 키가 이 상태를 빠짐없이 포함해야 하는데 그 범위가 너무 넓어 stale axis 오염 위험이
-   * 크므로, 캐시는 후속 단계로 미루고 RenderCore 경계 분리(=worker ctx 주입점)만 둔다.
+   * 캐시 결정: full 경로는 **캐시 안 함** — drawAxis가 상호작용 상태(hitInfo·selectItem.showLabelTip,
+   * scale.js:374-442)와 동적 rescale·plotLines를 같은 패스에서 소비해 안전한 캐시 키 범위가 너무 넓다.
+   * 단 selectSeries 부분 렌더(chart.selection.js)는 그 상태가 게이트로 배제돼 static 이 프레임 간 불변
+   * → 그 경로 한정으로 staticBaseCanvas 에 캐시 후 blit 한다.
    * @param {CanvasRenderingContext2D} bufferCtx   destination buffer context (worker 경로에선 주입됨)
    * @param {any} [hitInfo=undefined]   hit/hover information for axis interaction labels
    *
@@ -1498,12 +1497,19 @@ class EvChart {
       }
     }
 
-    // selectSeries 부분 렌더 base 도 동일하게 치수 변경 시에만 재할당하고 baseline 을 무효화한다.
+    // selectSeries 부분 렌더 base(series/static) 도 동일하게 치수 변경 시에만 재할당하고 baseline 을 무효화한다.
     if (this.seriesBaseCanvas) {
       const dw = Math.floor(width * this.pixelRatio);
       if (this.seriesBaseCanvas.width !== dw) {
         this.seriesBaseCanvas.width = dw;
         this._seriesBaseBuilt = false;
+      }
+    }
+    if (this.staticBaseCanvas) {
+      const dw = Math.floor(width * this.pixelRatio);
+      if (this.staticBaseCanvas.width !== dw) {
+        this.staticBaseCanvas.width = dw;
+        this._staticBaseBuilt = false;
       }
     }
   }
@@ -1551,6 +1557,13 @@ class EvChart {
       if (this.seriesBaseCanvas.height !== dh) {
         this.seriesBaseCanvas.height = dh;
         this._seriesBaseBuilt = false;
+      }
+    }
+    if (this.staticBaseCanvas) {
+      const dh = Math.floor(height * this.pixelRatio);
+      if (this.staticBaseCanvas.height !== dh) {
+        this.staticBaseCanvas.height = dh;
+        this._staticBaseBuilt = false;
       }
     }
   }

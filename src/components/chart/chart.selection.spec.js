@@ -80,6 +80,7 @@ const makeSelChart = (overrides = {}) => {
   });
   // fresh base: optionsRef 가 현재 options 와 동일해야 한다.
   chart._baseOptionsRef = chart.options;
+  chart._staticBaseOptionsRef = chart.options;
   return { chart, calls };
 };
 
@@ -281,5 +282,122 @@ describe('rebuildSeriesBase 계약', () => {
     });
     chart.maybeRebuildSeriesBase();
     expect(names(calls)).not.toContain('drawSeriesLayer');
+  });
+});
+
+// static base 캐시: staticBaseCanvas 가 있고 키가 fresh 한 stub.
+const ctxStub = () => ({
+  setTransform() {},
+  clearRect() {},
+  drawImage() {},
+  save() {},
+  restore() {},
+  globalAlpha: 1,
+});
+const withStaticBase = (overrides = {}) =>
+  makeSelChart({
+    staticBaseCanvas: { width: 200, height: 100 },
+    staticBaseCtx: ctxStub(),
+    _staticBaseBuilt: true,
+    _staticBaseDataEpoch: 1,
+    _staticBaseScaleVersion: 1,
+    ...overrides,
+  });
+
+describe('canUseStaticBase 게이트', () => {
+  it('fresh static base + 블러 비활성 + 무hit → true', () => {
+    const { chart } = withStaticBase();
+    expect(chart.canUseStaticBase()).toBe(true);
+  });
+
+  it('selectLabel.useLabelOpacity 활성 → false (라벨이 선택 의존)', () => {
+    const { chart } = withStaticBase({
+      options: { selectSeries: { use: true }, selectLabel: { use: true, useLabelOpacity: true } },
+    });
+    expect(chart.canUseStaticBase()).toBe(false);
+  });
+
+  it('hitInfo 있으면 → false', () => {
+    const { chart } = withStaticBase();
+    expect(chart.canUseStaticBase({ some: 'hit' })).toBe(false);
+  });
+
+  it('static base 미build → false', () => {
+    const { chart } = withStaticBase({ _staticBaseBuilt: false });
+    expect(chart.canUseStaticBase()).toBe(false);
+  });
+
+  it('static base stale(scaleVersion 불일치) → false', () => {
+    const { chart } = withStaticBase({ _staticBaseScaleVersion: 0 });
+    expect(chart.canUseStaticBase()).toBe(false);
+  });
+});
+
+describe('drawSelectionPartial static 캐시 분기', () => {
+  it('canUseStaticBase true → compositeStaticBase, drawStaticLayer 미호출', () => {
+    const composite = [];
+    const { chart, calls } = withStaticBase({
+      compositeStaticBase: () => composite.push('static'),
+      compositeSeriesBase: () => {},
+    });
+    chart.drawSelectionPartial();
+    expect(composite).toEqual(['static']);
+    expect(names(calls)).not.toContain('drawStaticLayer');
+  });
+
+  it('canUseStaticBase false(블러 활성) → drawStaticLayer 직접 호출', () => {
+    const composite = [];
+    const { chart, calls } = withStaticBase({
+      options: { selectSeries: { use: true }, selectLabel: { use: true, useLabelOpacity: true } },
+      compositeStaticBase: () => composite.push('static'),
+      compositeSeriesBase: () => {},
+    });
+    chart.drawSelectionPartial();
+    expect(composite).toEqual([]);
+    expect(names(calls)).toContain('drawStaticLayer');
+  });
+});
+
+describe('rebuildStaticBase 계약', () => {
+  it('drawStaticLayer(staticBaseCtx, undefined) 호출 + 키 기록 + axis.ctx 복원', () => {
+    const { chart, calls } = withStaticBase({
+      _staticBaseBuilt: false,
+      _staticBaseDataEpoch: null,
+      _dataEpoch: 7,
+      _scaleVersion: 3,
+      axesX: [{ ctx: 'old' }],
+      axesY: [{ ctx: 'old' }],
+    });
+    chart.rebuildStaticBase();
+
+    const layerCall = calls.find((c) => c.name === 'drawStaticLayer');
+    expect(layerCall).toBeTruthy();
+    expect(layerCall.args[0]).toBe(chart.staticBaseCtx);
+    expect(layerCall.args[1]).toBe(undefined);
+    expect(chart._staticBaseBuilt).toBe(true);
+    expect(chart._staticBaseDataEpoch).toBe(7);
+    expect(chart._staticBaseScaleVersion).toBe(3);
+    expect(chart._staticBaseOptionsRef).toBe(chart.options);
+    // axis.ctx 는 bufferCtx 로 복원된다.
+    expect(chart.axesX[0].ctx).toBe(chart.bufferCtx);
+    expect(chart.axesY[0].ctx).toBe(chart.bufferCtx);
+  });
+
+  it('maybeRebuildSeriesBase: series·static 모두 fresh 면 재구성 안함', () => {
+    const { chart, calls } = withStaticBase();
+    chart.maybeRebuildSeriesBase();
+    expect(names(calls)).not.toContain('drawSeriesLayer');
+    expect(names(calls)).not.toContain('drawStaticLayer');
+  });
+
+  it('maybeRebuildSeriesBase: static 만 stale 면 static 만 재구성', () => {
+    const { chart, calls } = withStaticBase({
+      _staticBaseBuilt: false,
+      axesX: [{ ctx: 'old' }],
+      axesY: [],
+    });
+    chart.maybeRebuildSeriesBase();
+    expect(names(calls)).not.toContain('drawSeriesLayer');
+    expect(names(calls)).toContain('drawStaticLayer');
   });
 });
