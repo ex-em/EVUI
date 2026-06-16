@@ -11,12 +11,25 @@ const modules = {
    * @returns {undefined}
    */
   createEventFunctions() {
+    // 마지막 사용자 인터랙션 시각을 기록한다. Chart.vue 의 scheduleUpdate 가 이 값을 읽어
+    // 인터랙션 직후 짧은 구간 동안 polling/데이터 재렌더를 미뤄 hover/click 즉답을 보장한다.
+    // 차트 그룹이면 _sharedInteraction(그룹 공유)에도 기록해 한 차트의 인터랙션이 그룹 전체
+    // 재렌더를 양보시킨다.
+    const markInteraction = () => {
+      const now = typeof performance !== 'undefined' ? performance.now() : Date.now();
+      this._lastInteractionAt = now;
+      if (this._sharedInteraction) {
+        this._sharedInteraction.at = now;
+      }
+    };
+
     /**
      * To show tooltip and item highlighting, add event listener on mousemove
      *
      * @returns {undefined}
      */
     this.onMouseMove = (e) => {
+      markInteraction();
       if (this.dragInfo?.isMove || this.isMobile) {
         return;
       }
@@ -200,6 +213,7 @@ const modules = {
      * @returns {undefined}
      */
     this.onDblClick = (e) => {
+      markInteraction();
       const args = { e };
       const offset = this.getMousePosition(e);
 
@@ -316,6 +330,7 @@ const modules = {
      * @returns {undefined}
      */
     this.onClick = (e) => {
+      markInteraction();
       if (this.isMouseMove) {
         this.isMouseMove = false;
         return;
@@ -526,6 +541,7 @@ const modules = {
      * @returns {undefined}
      */
     this.onMouseDown = (e) => {
+      markInteraction();
       const { dragSelection, type } = this.options;
 
       if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {

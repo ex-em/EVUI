@@ -99,6 +99,7 @@ export default {
     const injectGroupHoveredLabel = inject('groupHoveredLabel', null);
     const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
     const injectEvChartPropsInGroup = inject('evChartPropsInGroup', []);
+    const injectGroupInteraction = inject('groupInteraction', null);
 
     const {
       eventListeners,
@@ -134,6 +135,7 @@ export default {
           injectEvChartPropsInGroup,
         );
 
+    const YIELD_AFTER_INTERACTION_MS = 150;
     let pendingUpdate = null;
     let pendingTimer = null;
 
@@ -152,13 +154,23 @@ export default {
       }
 
       clearTimeout(pendingTimer);
+      // 인터랙션 직후(YIELD_AFTER_INTERACTION_MS 이내)에는 데이터/polling 재렌더를 미뤄
+      // hover/click 즉답을 보장한다. 그룹이면 그룹 공유 시각, 아니면 자기 차트 시각을 본다.
+      // 미뤄도 pendingUpdate 는 최신값으로 coalesce 되고 인터랙션이 멈추면 곧 flush 된다.
+      const lastInteractionAt = injectGroupInteraction
+        ? injectGroupInteraction.at
+        : evChart?._lastInteractionAt ?? 0;
+      const elapsed =
+        (typeof performance !== 'undefined' ? performance.now() : Date.now()) - lastInteractionAt;
+      const delay =
+        elapsed < YIELD_AFTER_INTERACTION_MS ? YIELD_AFTER_INTERACTION_MS - elapsed : 0;
       pendingTimer = setTimeout(() => {
         if (pendingUpdate && evChart) {
           evChart.update(pendingUpdate);
         }
         pendingUpdate = null;
         pendingTimer = null;
-      }, 0);
+      }, delay);
     };
 
     const createChart = () => {
@@ -182,6 +194,11 @@ export default {
         selected,
         injectBrushSeries,
       );
+
+      // 그룹이면 인터랙션 시각 공유 객체를 차트에 연결한다(한 차트 인터랙션 → 그룹 전체 양보).
+      if (injectGroupInteraction) {
+        evChart._sharedInteraction = injectGroupInteraction;
+      }
     };
 
     const drawChart = () => {

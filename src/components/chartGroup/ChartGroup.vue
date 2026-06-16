@@ -50,6 +50,7 @@ export default {
       brushSeries,
       evChartGroupRef,
       evChartPropsInGroup,
+      groupInteraction,
     } = useGroupModel();
 
     const normalizedOptions = getNormalizedOptions(props.options);
@@ -57,6 +58,7 @@ export default {
     provide('isChartGroup', true);
     provide('brushSeries', brushSeries);
     provide('evChartPropsInGroup', evChartPropsInGroup);
+    provide('groupInteraction', groupInteraction);
     const groupSelectedLabel = computed({
       get: () => props.groupSelectedLabel,
       set: (val) => emit('update:groupSelectedLabel', val),
