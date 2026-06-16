@@ -1,3 +1,78 @@
+# [3.11.0](https://github.com/ex-em/EVUI/compare/3.10.0...3.11.0) (2026-06-16)
+
+
+### Bug Fixes
+
+* **chart:** 3.4 rebase 정합 — displayOverflow/clamp parity + 무구독 가드 + 비-circle 배치 ([c637ca9](https://github.com/ex-em/EVUI/commit/c637ca9e21cfc20d9c12ec85b0dc4aa829e4c198))
+* **chart:** bar chart range maxTip 정확성 수정 ([a198d85](https://github.com/ex-em/EVUI/commit/a198d856acfcb203f27026db47186ee99702e089))
+* **chart:** blit fast-path 의 끊긴 drawAxis/drawSeries 호출 재배선 ([41cee1c](https://github.com/ex-em/EVUI/commit/41cee1c01f1d3dec3af65833bc2cfd40e0f27e63))
+* **chart:** minIndex/maxIndex 유효성 검사 로직 개선 ([8dfb809](https://github.com/ex-em/EVUI/commit/8dfb809041a8bce0b58a80263f5a96a4f97a8073))
+* **chart:** realtime scatter > maxY 0 clamp 제거 ([77f2d31](https://github.com/ex-em/EVUI/commit/77f2d31234155a432a62e8b0e08b50ffcbd32737))
+* **chart:** realtime scatter blit fast-path 재연결로 복원 ([cf1c230](https://github.com/ex-em/EVUI/commit/cf1c23053993841322dd675533eb17ac4f0be803)), closes [#2297](https://github.com/ex-em/EVUI/issues/2297)
+* **chart:** realtime scatter blit 좌단 점 잘림 수정 ([32d6ee8](https://github.com/ex-em/EVUI/commit/32d6ee8b572950f901e55736bd07f3ea6d7b182d))
+* **chart:** render-error 임계치 경로 이중 렌더 제거 ([dd4540e](https://github.com/ex-em/EVUI/commit/dd4540e4df29324d2e6e6c30cd1eaae0d707a68c))
+* **chart:** worker epoch 경합 차단 + 에러 fallback epoch 정합 (이슈1) ([b0d8cdf](https://github.com/ex-em/EVUI/commit/b0d8cdf46bc706489c30b3997ee46dcab6ffa3ea))
+* **chart:** worker 렌더에 passingValue·segments 옵션 누락 보완 ([ed95682](https://github.com/ex-em/EVUI/commit/ed9568269271eb89b92ef5d4666867a2733d4e42))
+* **chart:** worker 렌더에 point·fillOpacity 옵션 누락 보완 ([aabd98f](https://github.com/ex-em/EVUI/commit/aabd98f9e25088103a3c4a62b039239d01a026b5))
+* **chart:** worker 무한 재시도 차단 + in-flight 유실 복구 + postMessage 보호 (이슈5/6) ([c07da27](https://github.com/ex-em/EVUI/commit/c07da27f837d89b20f93da6c52421417a660dda0))
+* **chart:** worker 버전 핸드셰이크 실효화 + postMessage 실패 이중 렌더 제거 ([cb7b5bb](https://github.com/ex-em/EVUI/commit/cb7b5bb006bb51db8b324400224a3c0903172906))
+* **chart:** worker 진입 가드로 미지원 타입·비숫자 축·선택/tip 상태 차단 (이슈2/3/7/8) ([0afa576](https://github.com/ex-em/EVUI/commit/0afa576ea585b561a4504e5f22ec6ced959fddb0))
+* **chart:** workerRender 실패/예외 관측성 + 버전 불일치 fallback (이슈4) ([4fbc6d9](https://github.com/ex-em/EVUI/commit/4fbc6d99fd4527da4194619770b833bb2ba8e3ff))
+* **chart:** 가상 스크롤 학습 평균이 추정 높이에 반영되도록 우선순위 수정 ([a75d9e8](https://github.com/ex-em/EVUI/commit/a75d9e866275a83835d3f54ea77d44c7598f3a15))
+* **chart:** 가시 인덱스 계산 로직에서 Number.isFinite 사용으로 안정성 향상 ([916c044](https://github.com/ex-em/EVUI/commit/916c044a65b2503849386a8ee14c35297e071ebb))
+* **chart:** 개선된 가시 인덱스 계산 로직으로 데이터 렌더링 안정성 향상 ([baf95d4](https://github.com/ex-em/EVUI/commit/baf95d4ae4dcfc81361c1c4c69bf83309fcd4cb8))
+* **chart:** 기본 설정에서 가상 스크롤 툴팁 휠 스크롤 보장 ([109e8c4](https://github.com/ex-em/EVUI/commit/109e8c4f45b11a1edee359a930c3daa71371327a))
+* **chart:** 브러시 데이터 갱신 시 groups 누락 크래시 수정 ([7b23fb8](https://github.com/ex-em/EVUI/commit/7b23fb89b1802982e229ed46eba6ed41546ad391))
+* **chart:** 숨김 상태 측정으로 행 높이가 추정값으로 굳는 문제 수정 ([4e7da28](https://github.com/ex-em/EVUI/commit/4e7da286613c78efcbfaa737fbc1a104d9840156))
+* **chart:** 툴팁 가상스크롤 비-row 요소 순서 보존 ([4e4b80f](https://github.com/ex-em/EVUI/commit/4e4b80f01867bec7d591f292e211d8bc697d84bd))
+* getTimeLabel()이 categoryMode 축에서도 마우스 위치를 연속적인 시간값으로 보간 하는 현상 수정 ([05eb9c7](https://github.com/ex-em/EVUI/commit/05eb9c72958da2a1173e93fb9deee121597acea5))
+
+
+### Features
+
+* **chart:** axes-data-max-change 를 모든 차트 타입에서 사용 가능하게 일반화 ([2d12210](https://github.com/ex-em/EVUI/commit/2d12210b6a1359e860f943c0c227d9d2f1b9c725))
+* **chart:** axis range에 따른 가시 인덱스 보정 로직 추가 ([c9db6fe](https://github.com/ex-em/EVUI/commit/c9db6fef0d72e8456d91436b67aa58c27868a77c))
+* **chart:** props.data deep-watch opt-out 옵션 추가 (options.shallowDataWatch, 기본 off) ([e7d7807](https://github.com/ex-em/EVUI/commit/e7d780758ad33ab363e5eb82b996c00d140c54dc))
+* **chart:** scatter realtime 데이터 y 최대값을 올리는 axes-data-max-change 이벤트 추가 ([4ed4d95](https://github.com/ex-em/EVUI/commit/4ed4d9527d8b2649e91210d6e04d911e266bdd31))
+* **chart:** worker 렌더 오프로딩 chart.core 연결 + opt-in (options.workerRender, 기본 off) ([3de47b6](https://github.com/ex-em/EVUI/commit/3de47b65888a3b7fed7fa162ef4ed65aeb40c0c8))
+* **chart:** worker 렌더러 인프라 추가 (gate/entry/unpack, 미연결) ([783d497](https://github.com/ex-em/EVUI/commit/783d497b7e08f8b95d3a03a1ccc47af073f121dc))
+* **chart:** 렌더 스냅샷 계약 모듈 추가 (render.snapshot, 미연결) ([4330fa2](https://github.com/ex-em/EVUI/commit/4330fa20d1b7e11b15054f2c402e7b834bdd87c4))
+* **chart:** 인덱스 범위 계산 개선을 위해 TimeCategoryScale에 calculateScaleRange 메서드 추가 ([1a707fd](https://github.com/ex-em/EVUI/commit/1a707fd019264f3ef296c528719507a5690cf669))
+* **chart:** 커스텀 툴팁(html formatter) 가상 스크롤 지원 ([5065e59](https://github.com/ex-em/EVUI/commit/5065e59b860a065627c332217925c851f3fc8662))
+
+
+### Performance Improvements
+
+* **chart:** addSeriesStackDS 죽은 캐시 제거 + 점객체 풀 재사용 ([f6fc5bc](https://github.com/ex-em/EVUI/commit/f6fc5bc78a6c7749fbebb3d8b927d677403ad696))
+* **chart:** closePath per-point/per-region 제거 (dense 렌더 비용 제거) ([8b7e4ae](https://github.com/ex-em/EVUI/commit/8b7e4aeae8c5d910d327d5ded4cd2a9d4d6eba7f))
+* **chart:** custom tooltip hover 비용 절감 (시그니처 기반 redraw 스킵 + 포맷·필터 캐시) ([01e6c8d](https://github.com/ex-em/EVUI/commit/01e6c8d9550976cf251f9ed7231f6a418b248e47))
+* **chart:** geometry 메모이즈로 불변 프레임 재계산 skip (line/bar) ([328bd34](https://github.com/ex-em/EVUI/commit/328bd3435f7fe0de54655c15d98893d8c6510c87))
+* **chart:** hit-test hover 핫패스 축소 (라벨 유효성 mask 사전계산 + fallback 조건부) ([9bdf8dc](https://github.com/ex-em/EVUI/commit/9bdf8dcf5eaa321e95b3d669a6f0e985e573bf07))
+* **chart:** line computeGeometry scalingFactor 루프 밖 hoist ([ae5068f](https://github.com/ex-em/EVUI/commit/ae5068f9bc300fcc5d148ea19841a8eac4fe8f7d))
+* **chart:** line draw 매 프레임 할당 제거 (fill 경로 한정 스캔 + valueArray 제거) ([ed1a7fa](https://github.com/ex-em/EVUI/commit/ed1a7fa6f7881ea9e9eabe3ac811db4843dfcbca))
+* **chart:** line draw 색 변환을 인스턴스 슬롯 캐시로 (colorStringToRgba 호출부) ([83830bc](https://github.com/ex-em/EVUI/commit/83830bc548462f86a4befa764ec2d8b708d681a9))
+* **chart:** line draw 시 동일 픽셀 lineTo 생략 (draw-skip, 출력 불변) ([38d22cb](https://github.com/ex-em/EVUI/commit/38d22cb7c3cbff73431da120eae5eab04dc5c00c))
+* **chart:** line 시리즈 포인트 그리기 batching 으로 캔버스 flush 횟수 감소 ([9864004](https://github.com/ex-em/EVUI/commit/9864004a2b653198e0108ac754cf2fe172d257ff))
+* **chart:** line 전부-null 시리즈 래스터 skip (범례/툴팁/기하 불변) ([8fda18c](https://github.com/ex-em/EVUI/commit/8fda18cd6ae8e9316e82e83b07fa97b580d4b50d))
+* **chart:** line 핫 per-point 루프 forEach → for (draw/computeGeometry) ([5cbfcbf](https://github.com/ex-em/EVUI/commit/5cbfcbf0a30d69aaa8a7dede4cf9d6b6238085ca))
+* **chart:** memoize colorStringToRgba results ([95bf8da](https://github.com/ex-em/EVUI/commit/95bf8da3590749107e46eb936e0ab027b002f1a5))
+* **chart:** optimize addSeriesStackDS base lookup for many series with nulls ([19a2ccc](https://github.com/ex-em/EVUI/commit/19a2ccc304c496dfe8d90dcf6bc1d4dd2793be37))
+* **chart:** realtime scatter blit fast-path 도입으로 틱당 렌더 비용 절감 ([a42b90f](https://github.com/ex-em/EVUI/commit/a42b90f780bc9f94d4872bbb0afb08786d746f12))
+* **chart:** realtime scatter 중복 체크(dedupe) 비용 절감 ([7189897](https://github.com/ex-em/EVUI/commit/71898978ae3e41edf7494183f02438242cf840ee))
+* **chart:** reduce deep-watch callback cost in EvChart ([ee01a1e](https://github.com/ex-em/EVUI/commit/ee01a1e1569a09da28b74431243ca85ec6cd0874))
+* **chart:** reuse data point objects in addSeriesDS to reduce GC ([38e4030](https://github.com/ex-em/EVUI/commit/38e4030cb08dac76c9912580efb9ddddc97e0d09))
+* **chart:** select/maxTip 옵션에서도 worker 렌더 허용 (2/2) ([601675e](https://github.com/ex-em/EVUI/commit/601675e34c71c11185d00e4873daf0f8bd50bb52))
+* **chart:** skip canvas reallocation when size is unchanged ([2e3178e](https://github.com/ex-em/EVUI/commit/2e3178eeccc1004268eae559a232beac605e2b1a))
+* **chart:** time/step 축 line·bar 의 worker 진입 차단 제거 ([4ceab0f](https://github.com/ex-em/EVUI/commit/4ceab0f1cb7238805a411728445a8cc520b26812))
+* **chart:** updateSeries 시 series 인스턴스 증분 재조정(reconcileSeriesSet) ([ffdd5fc](https://github.com/ex-em/EVUI/commit/ffdd5fcb55f3462d82d452ea71fd8aff49c34d2b))
+* **chart:** worker snapshot 에 selection 상태 전달 (select 옵션 worker 허용 1/2) ([9c5126c](https://github.com/ex-em/EVUI/commit/9c5126c52c99cdee0f1147dceaa6b0fa2f4b7cf7))
+* **chart:** worker snapshot 에서 time/step 축 좌표 숫자 정규화 ([69eb517](https://github.com/ex-em/EVUI/commit/69eb5178b1345ec19166fea5e4dce785019eb3b7))
+* **chart:** worker 스냅샷에서 빈 시리즈 제외 (pack/postMessage 비용 절감) ([91b6572](https://github.com/ex-em/EVUI/commit/91b657232924c5db78560ca3d415cb750dc48369))
+* **chart:** 다중 차트 hover 시 강제 동기 레이아웃 제거 ([5717c4b](https://github.com/ex-em/EVUI/commit/5717c4ba55661bb9e56b4cc384d5e5f9be94bdf2))
+* **chart:** 데이터 파이프라인 cloneDeep/반응성 제거 (normalize 비-mutate, toRaw unwrap) ([6d29c82](https://github.com/ex-em/EVUI/commit/6d29c82cf8dfdb7b60233a700d5646e98a49970b))
+* **chart:** 점 마커 색상별 배치 렌더링으로 path-per-point 제거 ([acb935c](https://github.com/ex-em/EVUI/commit/acb935c28c6d5309385353c40544ac02c5b20e10))
+* **chart:** 커스텀 툴팁 row 탐지 실패 시 가상 스크롤 재시도 단락 ([857803d](https://github.com/ex-em/EVUI/commit/857803d1081da8602fd53aa9998d35c8490c3e4a))
+
 # [3.10.0](https://github.com/ex-em/EVUI/compare/3.9.3...3.10.0) (2026-06-05)
 
 
