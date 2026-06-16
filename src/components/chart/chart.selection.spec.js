@@ -154,9 +154,9 @@ describe('canPartialSelectionRender 게이트', () => {
     expect(chart.canPartialSelectionRender()).toBe(false);
   });
 
-  it('선택 시리즈 없음(seriesId []) → false (full 로 base 갱신 겸)', () => {
+  it('선택 시리즈 없음(seriesId []) + fresh base → true (해제도 base 정상 합성으로 partial)', () => {
     const { chart } = makeSelChart({ defaultSelectInfo: { seriesId: [] } });
-    expect(chart.canPartialSelectionRender()).toBe(false);
+    expect(chart.canPartialSelectionRender()).toBe(true);
   });
 
   it('scrollbar 활성 → false', () => {
@@ -201,6 +201,35 @@ describe('drawSelectionPartial 순서/대상', () => {
     expect(order.indexOf('drawTip')).toBeLessThan(order.indexOf('commitToDisplay'));
     // 전체 series 래스터는 호출되지 않는다.
     expect(order).not.toContain('drawSeriesLayer');
+  });
+
+  it('해제(seriesId []) → base 를 opacity 1 로 합성, 선택 시리즈 덧그리기 없음', () => {
+    const composite = [];
+    const { chart, calls } = makeSelChart({
+      defaultSelectInfo: { seriesId: [] },
+      compositeSeriesBase: (opacity) => composite.push(opacity),
+    });
+    chart.drawSelectionPartial();
+
+    const order = names(calls);
+    // 정상 partial 순서는 유지하되 선택 시리즈 redraw(series.draw)는 없다.
+    expect(order.indexOf('clear')).toBeLessThan(order.indexOf('drawStaticLayer'));
+    expect(order.indexOf('drawStaticLayer')).toBeLessThan(order.indexOf('drawSeriesOverlay'));
+    expect(order.indexOf('drawSeriesOverlay')).toBeLessThan(order.indexOf('drawTip'));
+    expect(order.indexOf('drawTip')).toBeLessThan(order.indexOf('commitToDisplay'));
+    expect(order).not.toContain('series.draw');
+    expect(order).not.toContain('drawSeriesLayer');
+    // base 는 정상 opacity(1) 로 합성.
+    expect(composite).toEqual([1]);
+  });
+
+  it('선택 있음 → base 를 unSelectedOpacity 로 흐리게 합성', () => {
+    const composite = [];
+    const { chart } = makeSelChart({
+      compositeSeriesBase: (opacity) => composite.push(opacity),
+    });
+    chart.drawSelectionPartial();
+    expect(composite).toEqual([0.3]);
   });
 
   it('drawSelectedSeriesOnly 는 defaultSelectInfo.seriesId 의 시리즈만 draw 한다', () => {

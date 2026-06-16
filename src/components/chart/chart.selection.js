@@ -158,11 +158,9 @@ const selection = {
     if ((charts.pie?.length ?? 0) > 0) {
       return false;
     }
-    // 선택 시리즈가 있어야 partial 의미가 있다(무선택/해제는 full 로 base 갱신 겸).
+    // 무선택(해제)도 partial 로 처리한다 — base(정상 opacity 시리즈)를 그대로 합성하면 정상 차트가
+    // 복원된다. base 가 stale 이면 위 isSeriesBaseFresh 체크가 이미 막으므로 안전.
     const selectedIds = this.defaultSelectInfo?.seriesId ?? [];
-    if (!selectedIds.length) {
-      return false;
-    }
     // 위에 덧그리는 선택 시리즈는 단순 redraw 가능한 타입만(bar 는 showIndex 슬롯 의존, fill/stack 은
     // 알파 합성 비선형). base 에는 전체 타입이 흐리게 깔리므로, 제약은 '진하게 덧그리는' 선택 시리즈에만.
     for (let i = 0; i < selectedIds.length; i++) {
@@ -249,8 +247,13 @@ const selection = {
     this.bufferCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
 
     this.drawStaticLayer(this.bufferCtx, hitInfo);
-    this.compositeSeriesBase(this.options.unSelectedOpacity);
-    this.drawSelectedSeriesOnly();
+    // 선택이 있으면 base 를 흐리게 깔고 선택 시리즈만 진하게 덧그린다. 해제(무선택)면 base 를
+    // 정상 opacity(1) 로 그대로 합성해 정상 차트를 복원한다(덧그릴 선택 시리즈 없음).
+    const hasSelection = (this.defaultSelectInfo?.seriesId ?? []).length > 0;
+    this.compositeSeriesBase(hasSelection ? this.options.unSelectedOpacity : 1);
+    if (hasSelection) {
+      this.drawSelectedSeriesOnly();
+    }
 
     this.drawSeriesOverlay();
     this.drawTip();
