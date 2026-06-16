@@ -176,6 +176,95 @@ class Line {
   }
 
   /**
+   * 마커(point) 판정에 필요한 컨텍스트를 1회 계산한다. draw 의 점 루프와
+   * collectMarkerOwners(픽셀 dedupe 사전 패스)가 동일 판정을 쓰도록 공유한다.
+   * @param {LineDrawParam} param
+   * @returns {{isLinearInterpolation:boolean, isLinearSingle:boolean,
+   *   selectedLabelIndexSet:(Set<number>|null), legendHitInfo:object}}
+   */
+  buildMarkerContext(param) {
+    const isLinearInterpolation = this.useLinearInterpolation();
+    // isLinearSingle: 전체 filter 대신 2개 발견 시점에 즉시 종료.
+    let isLinearSingle = false;
+    if (this.interpolation === 'linear') {
+      let nonNullCount = 0;
+      for (let i = 0; i < this.data.length; i++) {
+        if (this.data[i].o !== null) {
+          nonNullCount++;
+          if (nonNullCount > 1) {
+            break;
+          }
+        }
+      }
+      isLinearSingle = nonNullCount === 1;
+    }
+    // includes(O(n)) → Set(O(1))
+    const list = param.selectLabel?.selected?.dataIndex ?? [];
+    const selectedLabelIndexSet = list.length ? new Set(list) : null;
+    return {
+      isLinearInterpolation,
+      isLinearSingle,
+      selectedLabelIndexSet,
+      legendHitInfo: param.legendHitInfo,
+    };
+  }
+
+  /**
+   * 점 ix 의 마커 그리기 종류. 0 = 안 그림, 1 = 일반(blur), 2 = 강조(focus).
+   * @param {number} ix
+   * @param {object} mctx   buildMarkerContext 결과
+   * @returns {number}
+   */
+  markerKindAt(ix, mctx) {
+    const data = this.data;
+    const curr = data[ix];
+    if (curr.xp === null || curr.yp === null || curr.o === null) {
+      return 0;
+    }
+
+    let isSingle;
+    if (mctx.isLinearSingle) {
+      isSingle = true;
+    } else if (!mctx.isLinearInterpolation) {
+      const prevO = ix > 0 ? data[ix - 1].o : null;
+      const nextO = ix + 1 < data.length ? data[ix + 1].o : null;
+      isSingle = prevO == null && nextO == null;
+    } else {
+      isSingle = false;
+    }
+
+    const isSelectedLabel = mctx.selectedLabelIndexSet ? mctx.selectedLabelIndexSet.has(ix) : false;
+    if (!(this.point || isSingle || isSelectedLabel)) {
+      return 0;
+    }
+    return isSelectedLabel && !mctx.legendHitInfo ? 2 : 1;
+  }
+
+  /**
+   * cross-series 픽셀 dedupe 사전 패스: 이 시리즈의 마커 픽셀을 owner 맵에 등록한다.
+   * 시리즈를 그리는 순서대로 호출하면 Map.set 의 마지막-기록-승리로 owner = 최상위(나중에
+   * 그릴) 시리즈가 된다(= 현재 화면에서 보이는 점). draw 의 점 루프가 owner 만 그려 출력이
+   * 불변이다. geometry(xp/yp)는 computeGeometry 가 채우며 memo 라 draw 의 재호출은 비용이 없다.
+   * @param {LineDrawParam} param
+   * @param {Map<string,string>} owners   `${xp|0}|${yp|0}` → owner series sId
+   * @returns {undefined}
+   */
+  collectMarkerOwners(param, owners) {
+    if (!this.show) {
+      return;
+    }
+    this.computeGeometry(param);
+    const mctx = this.buildMarkerContext(param);
+    const data = this.data;
+    for (let ix = 0; ix < data.length; ix++) {
+      if (this.markerKindAt(ix, mctx) !== 0) {
+        const curr = data[ix];
+        owners.set(`${curr.xp | 0}|${curr.yp | 0}`, this.sId);
+      }
+    }
+  }
+
+  /**
    * @typedef {Object} LineDrawParam
    * @property {CanvasRenderingContext2D} ctx - 캔버스 렌더링 컨텍스트
    * @property {object} chartRect - 차트 영역 정보
@@ -473,24 +562,6 @@ class Line {
       const focusStyle = resolveRgba('focus', pointFillColor, 1);
       const blurStyle = resolveRgba('blur', pointFillColor, pointFillColorOpacity);
 
-      // isLinearSingle: 전체 filter 대신 2개 발견 시점에 즉시 종료.
-      let isLinearSingle = false;
-      if (this.interpolation === 'linear') {
-        let nonNullCount = 0;
-        for (let i = 0; i < this.data.length; i++) {
-          if (this.data[i].o !== null) {
-            nonNullCount++;
-            if (nonNullCount > 1) break;
-          }
-        }
-        isLinearSingle = nonNullCount === 1;
-      }
-
-      // includes(O(n)) → Set(O(1))
-      const selectedLabelIndexSet = selectedLabelIndexList.length
-        ? new Set(selectedLabelIndexList)
-        : null;
-
       const pointSize = this.pointSize;
       const pointStyle = this.pointStyle;
       const data = this.data;
@@ -500,32 +571,32 @@ class Line {
       // 모든 점을 단일 path 에 모아 fill/stroke 를 1회만 호출하도록 batching 한다.
       const canBatch = !NON_CIRCLE_POINT_STYLES.has(pointStyle);
 
+      // 마커 판정 컨텍스트(isLinearSingle/보간/선택라벨)는 collectMarkerOwners 사전 패스와
+      // 동일 판정을 쓰도록 buildMarkerContext/markerKindAt 한 곳에서 관리한다.
+      const markerCtx = this.buildMarkerContext(param);
+
+      // coordinateDedupe(opt-in) 시 cross-series 픽셀 dedupe. 마커가 불투명이라 같은
+      // device-pixel 에 겹친 점은 화면상 1개만 보이므로 owner(최상위 시리즈)만 그린다(출력 불변).
+      const markerOwners = param.markerOwners;
+      const drawnKeys = markerOwners ? new Set() : null;
+
       // 점 그리기 판정은 circle/비-circle 두 분기 공통이므로 이 함수 한 곳에서만 관리한다.
       // (두 분기는 "어떤 점을 그리느냐"가 아니라 "어떻게 그리느냐"만 달라야 한다.)
       // 반환값: 0 = 그리지 않음, 1 = 일반(blur), 2 = 강조(focus).
-      // hot loop라 점당 객체 할당을 피하려고 객체 대신 정수 코드를 반환한다.
       const pointDrawKind = (ix) => {
-        const curr = data[ix];
-        if (curr.xp === null || curr.yp === null || curr.o === null) {
+        const kind = this.markerKindAt(ix, markerCtx);
+        if (kind === 0) {
           return 0;
         }
-
-        let isSingle;
-        if (isLinearSingle) {
-          isSingle = true;
-        } else if (!isLinearInterpolation) {
-          const prevO = ix > 0 ? data[ix - 1].o : null;
-          const nextO = ix + 1 < dataLen ? data[ix + 1].o : null;
-          isSingle = prevO == null && nextO == null;
-        } else {
-          isSingle = false;
+        if (markerOwners) {
+          const curr = data[ix];
+          const key = `${curr.xp | 0}|${curr.yp | 0}`;
+          if (markerOwners.get(key) !== this.sId || drawnKeys.has(key)) {
+            return 0;
+          }
+          drawnKeys.add(key);
         }
-
-        const isSelectedLabel = selectedLabelIndexSet ? selectedLabelIndexSet.has(ix) : false;
-        if (!(this.point || isSingle || isSelectedLabel)) {
-          return 0;
-        }
-        return isSelectedLabel && !legendHitInfo ? 2 : 1;
+        return kind;
       };
 
       if (canBatch) {

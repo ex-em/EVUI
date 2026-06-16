@@ -960,6 +960,20 @@ class EvChart {
      */
     const duple = new Map();
 
+    // line cross-series 픽셀 dedupe(opt-in: coordinateDedupe). 마커가 불투명이라 같은 픽셀엔
+    // 1개만 보이므로, 그리기 전에 owner(그리는 순서상 마지막 = 최상위 시리즈) 맵을 만들어 그
+    // 시리즈만 마커를 그린다(출력 불변, 마커 fill/stroke 비용↓). scatter 의 duple owner 규칙과 동일하되
+    // 키만 데이터좌표 → 픽셀좌표다. 기본 off 라 미설정 line 차트는 무회귀.
+    let markerOwners = null;
+    const lineSet = this.seriesInfo.charts.line;
+    if (this.options.coordinateDedupe === true && lineSet?.length) {
+      markerOwners = new Map();
+      const lineParam = { legendHitInfo: hitInfo?.legend, ...opt };
+      for (let jx = 0; jx < lineSet.length; jx++) {
+        this.seriesList[lineSet[jx]].collectMarkerOwners(lineParam, markerOwners);
+      }
+    }
+
     const chartKeys = Object.keys(this.seriesInfo.charts);
 
     for (let ix = 0; ix < chartKeys.length; ix++) {
@@ -987,6 +1001,7 @@ class EvChart {
 
             series.draw({
               legendHitInfo,
+              markerOwners,
               ...opt,
             });
             break;
