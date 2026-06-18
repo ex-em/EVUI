@@ -1518,7 +1518,18 @@ const modules = {
    * @returns {boolean}
    */
   selectSeriesByData(seriesIdList) {
+    // 차트 그룹에서 비선택 차트의 selectedSeries 가 빈 배열로 반복 리셋(재할당)되며 deep watch 가
+    // 매 인터랙션마다 selectSeriesByData([]) 를 호출하는 스팸을 차단한다. 단 비교 기준은
+    // defaultSelectInfo.seriesId 가 아니라 '마지막으로 render 한 선택(_renderedSelectSeriesIds)' 이다 —
+    // onClick(setSelectedSeriesInfo)이 클릭 즉시 defaultSelectInfo.seriesId 를 선반영하므로, 그 값을
+    // 기준으로 비교하면 클릭한 차트는 항상 동일로 판정돼 선택/해제 render 가 스킵된다(하이라이트 누락).
+    const next = seriesIdList ?? [];
+    const rendered = this._renderedSelectSeriesIds;
+    if (rendered && rendered.length === next.length && rendered.every((v, i) => v === next[i])) {
+      return;
+    }
     this.defaultSelectInfo.seriesId = seriesIdList;
+    this._renderedSelectSeriesIds = [...next];
     this.render();
   },
 
