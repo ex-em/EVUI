@@ -467,6 +467,34 @@ chartData.value = {
 <ev-chart :data="chartData" :options="chartOptions" />
 ```
 
+#### shallowOptionsWatch
+
+`options` prop에 대한 deep watch를 끄는 **성능 최적화 opt-in**(기본 `false`). `options`를 자주 갱신하는(예: 축 범위를 computed로 매 틱 새로 만드는) 라이브 차트에서 deep traverse 비용을 제거할 때 사용한다.
+
+- 기본(`false`)일 때 차트는 `options`를 deep watch하여 중첩된 값의 in-place 변경까지 자동 감지한다. 이 deep 추적은 옵션 트리 전체를 매 갱신마다 순회하는 비용을 유발한다.
+- `true`로 켜면 deep 추적을 끄고 **`options`의 top-level 참조가 바뀔 때만** 갱신한다. 따라서 options를 변경할 때 **반드시 새 객체 참조를 할당**해야 한다(in-place 변경만 하면 차트가 갱신되지 않는다).
+- **이 옵션은 차트 생성(mount) 시점에 1회만 평가된다.** 런타임에 값을 바꿔도 적용되지 않으며, 바꾸려면 `:key` 등으로 차트를 remount해야 한다.
+- `shallowDataWatch`와 동일한 계약이다(`data` 대신 `options` 대상).
+
+##### Example
+
+```js
+const chartOptions = ref({ type: 'line', shallowOptionsWatch: true });
+
+// ✅ 갱신: 새 top-level 참조 할당 → 차트 갱신됨
+chartOptions.value = {
+  ...chartOptions.value,
+  axesX: [{ ...chartOptions.value.axesX[0], range: [0, 100] }],
+};
+
+// ❌ in-place 변경: 참조가 그대로라 차트가 갱신되지 않음
+// chartOptions.value.axesX[0].range = [0, 100];
+```
+
+```vue
+<ev-chart :data="chartData" :options="chartOptions" />
+```
+
 #### selectLabel
 
 | 이름                | 타입                        | 디폴트              | 설명                                                                       | 종류(예시)      |
