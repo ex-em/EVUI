@@ -919,7 +919,7 @@ class EvChart {
     });
   }
 
-  drawSeriesLayer(bufferCtx, hitInfo, layerOptions = {}) {
+  drawSeriesLayer(bufferCtx, hitInfo) {
     const {
       maxTip,
       selectLabel,
@@ -930,20 +930,15 @@ class EvChart {
       unSelectedOpacity,
     } = this.options;
 
-    // noSelection: chart.selection 의 base 라스터용. selection/maxTip/selectItem 을 무력화해
-    // 모든 시리즈를 정상 opacity 로 그린다(partial 렌더에서 흐리게 합성할 baseline).
-    const noSel = layerOptions.noSelection === true;
-    const emptySel = { seriesId: [], dataIndex: [] };
-
     const opt = {
       ctx: bufferCtx,
       chartRect: this.chartRect,
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
       maxTipOpt: { background: maxTip.background, color: maxTip.color },
-      selectLabel: { option: selectLabel, selected: noSel ? emptySel : this.defaultSelectInfo },
-      selectSeries: { option: selectSeries, selected: noSel ? emptySel : this.defaultSelectInfo },
-      selectItem: { option: selectItem, selected: noSel ? {} : this.defaultSelectItemInfo },
+      selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
+      selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
+      selectItem: { option: selectItem, selected: this.defaultSelectItemInfo },
       isBrush: !!brush,
       displayOverflow,
       unSelectedOpacity,
