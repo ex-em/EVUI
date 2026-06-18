@@ -16,6 +16,7 @@ import TooltipVirtualScroll from './plugins/plugins.tooltip.virtualScroll';
 import Pie from './plugins/plugins.pie';
 import Tip from './element/element.tip';
 import Blit from './chart.blit';
+import Selection from './chart.selection';
 import { WorkerRenderGate } from './render/render.worker.gate';
 import { toRenderSnapshot, packSeries } from './render/render.snapshot';
 
@@ -477,6 +478,13 @@ class EvChart {
     } else {
       this.drawStaticLayer(this.bufferCtx, hitInfo);
       this.drawSeriesLayer(this.bufferCtx, hitInfo);
+      // 선택 line 을 dimmed 시리즈 위에 한 번 더 그려 항상 최상위로(묻힘 방지). full redraw 는 선택
+      // 시리즈를 z-order 제자리에 그려 뒤 dimmed 시리즈에 묻히는데, 이 패스로 selected 를 맨 위로
+      // 통일한다(게이트 미충족 시 미적용=무회귀).
+      // transform 은 initScale→prepareLayout 가 pixelRatio 로 세팅한 상태가 유지되므로 추가 setTransform 불필요.
+      if (this.shouldDrawSelectedOnTop(hitInfo)) {
+        this.drawSelectedSeriesOnly();
+      }
     }
     this.drawSeriesOverlay();
 
@@ -911,7 +919,7 @@ class EvChart {
     });
   }
 
-  drawSeriesLayer(bufferCtx, hitInfo) {
+  drawSeriesLayer(bufferCtx, hitInfo, layerOptions = {}) {
     const {
       maxTip,
       selectLabel,
@@ -922,15 +930,20 @@ class EvChart {
       unSelectedOpacity,
     } = this.options;
 
+    // noSelection: chart.selection 의 base 라스터용. selection/maxTip/selectItem 을 무력화해
+    // 모든 시리즈를 정상 opacity 로 그린다(partial 렌더에서 흐리게 합성할 baseline).
+    const noSel = layerOptions.noSelection === true;
+    const emptySel = { seriesId: [], dataIndex: [] };
+
     const opt = {
       ctx: bufferCtx,
       chartRect: this.chartRect,
       labelOffset: this.labelOffset,
       axesSteps: this.axesSteps,
       maxTipOpt: { background: maxTip.background, color: maxTip.color },
-      selectLabel: { option: selectLabel, selected: this.defaultSelectInfo },
-      selectSeries: { option: selectSeries, selected: this.defaultSelectInfo },
-      selectItem: { option: selectItem, selected: this.defaultSelectItemInfo },
+      selectLabel: { option: selectLabel, selected: noSel ? emptySel : this.defaultSelectInfo },
+      selectSeries: { option: selectSeries, selected: noSel ? emptySel : this.defaultSelectInfo },
+      selectItem: { option: selectItem, selected: noSel ? {} : this.defaultSelectItemInfo },
       isBrush: !!brush,
       displayOverflow,
       unSelectedOpacity,
@@ -1188,11 +1201,8 @@ class EvChart {
    * 주입받아 worker가 자체 OffscreenCanvas ctx로 축을 래스터할 수 있게 한다(main 경로에선
    * this.bufferCtx와 동일하므로 픽셀 변화 없음).
    *
-   * 캐시 결정: **캐시 보류**(분리만 수행). drawAxis는 완전 static이 아니라 — 상호작용 상태
-   * (hitInfo blurred label·selectItem.showLabelTip, scale.js:374-442)와 동적 rescale(scale min/max·
-   * 범례 토글 series.show — model/model.store.js:1400)·plotLines/plotBands를 같은 패스에서 소비한다.
-   * 안전한 캐시 키가 이 상태를 빠짐없이 포함해야 하는데 그 범위가 너무 넓어 stale axis 오염 위험이
-   * 크므로, 캐시는 후속 단계로 미루고 RenderCore 경계 분리(=worker ctx 주입점)만 둔다.
+   * 캐시 결정: full 경로는 **캐시 안 함** — drawAxis가 상호작용 상태(hitInfo·selectItem.showLabelTip,
+   * scale.js:374-442)와 동적 rescale·plotLines를 같은 패스에서 소비해 안전한 캐시 키 범위가 너무 넓다.
    * @param {CanvasRenderingContext2D} bufferCtx   destination buffer context (worker 경로에선 주입됨)
    * @param {any} [hitInfo=undefined]   hit/hover information for axis interaction labels
    *
@@ -2206,5 +2216,7 @@ class EvChart {
 // (chart.core.blitGate.spec.js)가 Object.create(EvChart.prototype) 로 인스턴스 없이 메서드를
 // 호출하므로, 다른 plugin mixin 처럼 this(인스턴스)가 아니라 prototype 에 합쳐야 한다.
 Object.assign(EvChart.prototype, Blit);
+// selectSeries 강조 부분 렌더 메서드(chart.selection.js)를 prototype 에 합친다(Blit 과 동일 이유).
+Object.assign(EvChart.prototype, Selection);
 
 export default EvChart;
