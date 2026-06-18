@@ -78,6 +78,9 @@ export default {
         now + MAX_DEFER_MS,
       );
     };
+    // 자식 차트(또는 위젯)에서 차트 클릭/더블클릭 등으로 무거운 detail/popup 을 열 때 직접 호출할 수
+    // 있도록 provide 한다(groupInteraction 과 동일 주입 경로). expose(return) 는 부모 ref 용으로 유지.
+    provide('deferPollingRedraw', deferPollingRedraw);
     const groupSelectedLabel = computed({
       get: () => props.groupSelectedLabel,
       set: (val) => emit('update:groupSelectedLabel', val),
