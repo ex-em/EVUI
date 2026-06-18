@@ -29,7 +29,7 @@ describe('EvChartGroup Component', () => {
     // 슬롯 자식이 그룹의 provide('groupInteraction') 를 inject 하도록 실제 중첩 구조를 재현한다.
     const Capture = {
       name: 'Capture',
-      inject: ['groupInteraction'],
+      inject: ['groupInteraction', 'deferPollingRedraw'],
       render: () => null,
     };
     const Root = {
@@ -103,6 +103,15 @@ describe('EvChartGroup Component', () => {
       expect(typeof vm.onClickToolbar).toBe('function');
       expect('zoomOptions' in vm).toBe(true);
       expect('evChartGroupRef' in vm).toBe(true);
+    });
+
+    it('provide: 자식이 inject 한 deferPollingRedraw 로 그룹 양보를 트리거한다', () => {
+      const { wrapper, gi } = mountGroup();
+      const childDefer = wrapper.findComponent(Capture).vm.deferPollingRedraw;
+      const now = performance.now();
+      expect(typeof childDefer).toBe('function');
+      childDefer(500);
+      expect(gi.deferUntil).toBe(now + 500);
     });
   });
 });
