@@ -38,4 +38,11 @@ describe('chartGroup uses', () => {
       expect(result.zoom.toolbar.items.reset.icon).toBe('ev-icon-redo');
     });
   });
+
+  describe('groupInteraction', () => {
+    it('기본값은 deferUntil:0 이다', () => {
+      const { groupInteraction } = useGroupModel();
+      expect(groupInteraction).toEqual({ deferUntil: 0 });
+    });
+  });
 });

@@ -99,6 +99,7 @@ export default {
     const injectGroupHoveredLabel = inject('groupHoveredLabel', null);
     const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
     const injectEvChartPropsInGroup = inject('evChartPropsInGroup', []);
+    const injectGroupInteraction = inject('groupInteraction', null);
 
     const {
       eventListeners,
@@ -134,6 +135,7 @@ export default {
           injectEvChartPropsInGroup,
         );
 
+    const nowMs = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
     let pendingUpdate = null;
     let pendingTimer = null;
 
@@ -151,14 +153,30 @@ export default {
         }
       }
 
-      clearTimeout(pendingTimer);
-      pendingTimer = setTimeout(() => {
+      // fire 시점에 deferUntil 을 재검사한다. 타이머가 떠 있는 사이 deferPollingRedraw 가
+      // deferUntil 을 더 미래로 연장했을 수 있는데(그룹은 차트별 클로저 타이머를 직접 못 만짐),
+      // 그 경우 아직 미래면 남은 시간만큼 재예약(in-flight 재무장)한다.
+      const flush = () => {
+        const deferUntil = injectGroupInteraction?.deferUntil ?? 0;
+        const remaining = deferUntil - nowMs();
+        if (remaining > 0) {
+          pendingTimer = setTimeout(flush, remaining);
+          return;
+        }
         if (pendingUpdate && evChart) {
           evChart.update(pendingUpdate);
         }
         pendingUpdate = null;
         pendingTimer = null;
-      }, 0);
+      };
+
+      clearTimeout(pendingTimer);
+      // deferPollingRedraw 가 설정한 deferUntil 까지 데이터/polling 재렌더를 미룬다(detail/popup 우선 페인트).
+      // 미뤄도 pendingUpdate 는 최신값으로 coalesce 되고 보류가 끝나면 곧 flush 된다.
+      const now = nowMs();
+      const deferUntil = injectGroupInteraction?.deferUntil ?? 0;
+      const deferDelay = deferUntil > now ? deferUntil - now : 0;
+      pendingTimer = setTimeout(flush, deferDelay);
     };
 
     const createChart = () => {
