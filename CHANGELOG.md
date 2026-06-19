@@ -1,3 +1,18 @@
+# [3.12.0](https://github.com/ex-em/EVUI/compare/3.11.0...3.12.0) (2026-06-19)
+
+
+### Features
+
+* **chart:** ev-chart-group deferPollingRedraw provide (자식 차트 호출 가능) ([fbb3c28](https://github.com/ex-em/EVUI/commit/fbb3c28db918634ab2850b56a0ce247bdf80a7bf))
+* **chart:** selectSeries 선택 라인 항상 최상위(dimmed 묻힘 방지) ([38a3c95](https://github.com/ex-em/EVUI/commit/38a3c95f2a52d2b26a131d464c88fb57dd00b3de))
+
+
+### Performance Improvements
+
+* **chart:** selectSeries 변화 없으면 재렌더 스킵 ([b022539](https://github.com/ex-em/EVUI/commit/b0225395b2af3186a75940cb47225aa81dad3d6c))
+* **chart:** shallowOptionsWatch opt-in 추가 (options deep watch 비용 제거) ([4a65bef](https://github.com/ex-em/EVUI/commit/4a65befca997e0ef4edebbd7947d69504fca2166))
+* **chart:** 인터랙션 중 폴링 리드로우 양보(deferPollingRedraw) ([97b6373](https://github.com/ex-em/EVUI/commit/97b6373b46734e672a068aedecb340d0a959638f))
+
 # [3.11.0](https://github.com/ex-em/EVUI/compare/3.10.0...3.11.0) (2026-06-16)
 
 
