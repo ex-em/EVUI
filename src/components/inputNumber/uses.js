@@ -77,7 +77,17 @@ export function useModel() {
 
     if (!val && val !== 0) {
       // 값이 없을 경우
-      result = props.stepStrictly ? previousValue.value : null;
+      if (props.disableEmpty) {
+        // 빈 값 비허용: 0 을 기준으로 min/max 범위에 맞춰 보정
+        result = 0;
+        if ((props.min || props.min === 0) && result < props.min) {
+          result = props.min;
+        } else if ((props.max || props.max === 0) && result > props.max) {
+          result = props.max;
+        }
+      } else {
+        result = props.stepStrictly ? previousValue.value : null;
+      }
     } else if (isNaN(val)) {
       // 숫자 아닐 경우 - 문자열 들어 왔을 경우
       result = previousValue.value;

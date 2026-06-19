@@ -115,6 +115,54 @@ describe('EvInputNumber Component', () => {
     });
   });
 
+  describe('disableEmpty', () => {
+    it('기본값(false)에서는 값을 비우면 null 이 된다', async () => {
+      const wrapper = mount(EvInputNumber, { props: { modelValue: 80 } });
+      const input = wrapper.find('.ev-input');
+      await input.setValue('');
+      await input.trigger('change');
+
+      const emitted = wrapper.emitted('update:modelValue');
+      expect(emitted[emitted.length - 1][0]).toBe(null);
+    });
+
+    it('disableEmpty=true 이면 값을 비워도 0 이 된다', async () => {
+      const wrapper = mount(EvInputNumber, { props: { modelValue: 80, disableEmpty: true } });
+      const input = wrapper.find('.ev-input');
+      await input.setValue('');
+      await input.trigger('change');
+
+      const emitted = wrapper.emitted('update:modelValue');
+      expect(emitted[emitted.length - 1][0]).toBe(0);
+      expect(input.element.value).toBe('0');
+    });
+
+    it('disableEmpty=true 이고 값이 이미 0 일 때 비워도 화면에 0 이 표시된다', async () => {
+      const wrapper = mount(EvInputNumber, { props: { modelValue: 0, disableEmpty: true } });
+      const input = wrapper.find('.ev-input');
+      await input.setValue('');
+      await input.trigger('change');
+
+      expect(input.element.value).toBe('0');
+    });
+
+    it('disableEmpty=true 이면 min 보다 0 이 작을 때 min 으로 보정된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { modelValue: 50, disableEmpty: true, min: 10 },
+      });
+      const input = wrapper.find('.ev-input');
+      await input.setValue('');
+      await input.trigger('change');
+
+      const emitted = wrapper.emitted('update:modelValue');
+      expect(emitted[emitted.length - 1][0]).toBe(10);
+    });
+
+    it('기본 disableEmpty는 false이다', () => {
+      expect(EvInputNumber.props.disableEmpty.default).toBe(false);
+    });
+  });
+
   describe('기본값', () => {
     it('컴포넌트 이름이 EvInputNumber이다', () => {
       expect(EvInputNumber.name).toBe('EvInputNumber');
