@@ -239,7 +239,7 @@ export default {
       },
     });
 
-    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    const time = dayjs().format('YYYY-MM-DD 00:00:00');
     const chartData = {
       series: {
         series1: { name: 'series#1', fill: true },
@@ -255,7 +255,7 @@ export default {
         dayjs(time).add(6, 'day'),
       ],
       data: {
-        series1: [-50, 25, 36, 47, 0, 50, 100],
+        series1: [-50, 25, 36, 47, 0, 50, 90],
         series2: [80, 36, 25, 47, 15, 90, 0],
       },
     };
@@ -341,9 +341,6 @@ export default {
       title: {
         text: 'Chart Title',
         show: false,
-      },
-      tooltip: {
-        use: false,
       },
       legend: {
         show: false,
