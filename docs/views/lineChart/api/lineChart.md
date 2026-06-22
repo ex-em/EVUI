@@ -223,31 +223,95 @@ const chartData =
 | lineWidth | Number                             | 1         | 선 굵기                        |                                                                      |
 | label     | Object                             | null      | 표시할 label의 스타일을 정의   | ([상세](#plotlabel))                                                 |
 
+> `value`가 `0`이어도 선·라벨이 표시됩니다.
+
 ##### plotBand
 
-| 이름  | 타입                               | 디폴트    | 설명                                  | 종류(예시)                                                           |
-| ----- | ---------------------------------- | --------- | ------------------------------------- | -------------------------------------------------------------------- |
-| from  | Number(value), Date, Number(Index) | null      | 박스를 표시할 시작 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
-| to    | Number(value), Date, Number(Index) | null      | 박스를 표시할 종료 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
-| color | Hex, RGB, RGBA Code(String)        | '#FF0000' | 선 색상                               |                                                                      |
-| label | Object                             | null      | 표시할 label의 스타일을 정의          | ([상세](#plotlabel))                                                 |
+| 이름   | 타입                               | 디폴트    | 설명                                  | 종류(예시)                                                           |
+| ------ | ---------------------------------- | --------- | ------------------------------------- | -------------------------------------------------------------------- |
+| from   | Number(value), Date, Number(Index) | null      | 박스를 표시할 시작 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
+| to     | Number(value), Date, Number(Index) | null      | 박스를 표시할 종료 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
+| color  | Hex, RGB, RGBA Code(String)        | '#FF0000' | 박스(면) 배경 색상. `rgba(...)`로 투명도 지정 |                                                              |
+| border | Object \| null                     | null      | 밴드 start/end 모서리 stroke          | ([상세](#plotbandborder))                                            |
+| label  | Object                             | null      | 표시할 label의 스타일을 정의          | ([상세](#plotlabel))                                                 |
+
+> - `from`/`to`가 `0`이어도 표시됩니다.
+> - `label.showValue: true`이면 `from`·`to` 양 끝에 각각 값 라벨이 자동 바깥배치로 표시됩니다.
+
+###### plotBandBorder
+
+| 이름     | 타입                        | 디폴트 | 설명             | 종류(예시) |
+| -------- | --------------------------- | ------ | ---------------- | ---------- |
+| color    | Hex, RGB, RGBA Code(String) | -      | 모서리 선 색상   |            |
+| width    | Number                      | -      | 모서리 선 굵기   |            |
+| segments | Array\<number>              | -      | dash 간격(점선)  | [2, 2]     |
 
 ##### plotLabel
 
-| 이름          | 타입                        | 디폴트    | 설명                                                               | 종류(예시)                |
-| ------------- | --------------------------- | --------- | ------------------------------------------------------------------ | ------------------------- |
-| show          | Boolean                     | false     | label 표시 여부                                                    | true / false              |
-| fontSize      | Number                      | 12        | 폰트 크기                                                          |                           |
-| fontColor     | Hex, RGB, RGBA Code(String) | '#FF0000' | 폰트 색상                                                          |                           |
-| fillColor     | Hex, RGB, RGBA Code(String) | '#FFFFFF' | 박스 배경 색상                                                     |                           |
-| lineColor     | Hex, RGB, RGBA Code(String) | '#FF0000' | 박스 테두리 선 색상                                                |                           |
-| lineWidth     | Number                      | 0         | 테두리 선 굵기                                                     | 1 ~                       |
-| fontWeight    | Number                      | 400       | 폰트 굵기                                                          |                           |
-| fontFamily    | String                      | 'Roboto'  | 폰트 스타일                                                        |                           |
-| textAlign     | String                      | 'center'  | 수평 정렬                                                          | 'left', 'center', 'right' |
-| verticalAlign | String                      | 'middle'  | 수직 정렬                                                          | 'top', 'middle', 'bottom' |
-| textOverflow  | String                      | 'none'    | 라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리방안 | 'none', 'ellipsis'        |
-| maxWidth      | Number                      | null      | 라벨의 최대 너비                                                   |                           |
+| 이름            | 타입                        | 디폴트    | 설명                                                               | 종류(예시)                            |
+| --------------- | --------------------------- | --------- | ------------------------------------------------------------------ | ------------------------------------- |
+| show            | Boolean                     | false     | label 표시 여부                                                    | true / false                          |
+| text            | String \| null              | null      | 라벨 텍스트(=alias). `showValue: false`면 이 값을 그대로 표시       |                                       |
+| showValue       | Boolean                     | false     | `true` → `"{text} {value}"` 합성(value는 해당 축 formatter 적용)   | true / false                          |
+| fontSize        | Number                      | 12        | 폰트 크기                                                          |                                       |
+| fontColor       | Hex, RGB, RGBA Code(String) | '#FF0000' | 폰트 색상                                                          |                                       |
+| fillColor       | Hex, RGB, RGBA Code(String) | '#FFFFFF' | 박스 배경 색상. `rgba(...)`로 투명도 지정 가능                      |                                       |
+| lineColor       | Hex, RGB, RGBA Code(String) | '#FF0000' | 박스 테두리 선 색상                                                |                                       |
+| lineWidth       | Number                      | 0         | 테두리 선 굵기                                                     | 1 ~                                   |
+| fontWeight      | Number                      | 400       | 폰트 굵기                                                          |                                       |
+| fontFamily      | String                      | 'Roboto'  | 폰트 스타일                                                        |                                       |
+| position        | String                      | 'outside' | (Y축) 가로 배치. plot 밖 우측 / 안쪽 좌·우                         | 'outside', 'innerStart', 'innerEnd'   |
+| textAlign       | String                      | 'center'  | 수평 정렬                                                          | 'left', 'center', 'right'             |
+| verticalAlign   | String                      | 'middle'  | 수직 정렬                                                          | 'top', 'middle', 'bottom'             |
+| borderRadius    | Number                      | 0         | 라벨 박스 모서리 반경(px)                                          |                                       |
+| padding         | Number \| Object            | null      | 박스 안쪽 여백. 숫자 또는 `{ top, right, bottom, left }`. `null`이면 `fontSize/4` | 6, <br> { top: 4, bottom: 2 } |
+| pointer         | Object                      | ([상세](#pointer)) | 말풍선 꼬리                                              |                                       |
+| responsive      | Object                      | ([상세](#responsive)) | plot 너비 기준 단계 축약                              |                                       |
+| showTextOnHover | Object                      | ([상세](#showtextonhover)) | value-only 상태에서 hover 시 text tooltip       |                                       |
+| textOverflow    | String                      | 'none'    | 라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리방안 | 'none', 'ellipsis'                    |
+| maxWidth        | Number                      | null      | 라벨의 최대 너비                                                   |                                       |
+
+> - 배경 opacity는 별도 옵션 없이 `fillColor`에 `rgba(...)`를 주면 적용됩니다.
+> - X축(세로선/세로밴드) 라벨은 `position`·`verticalAlign`을 무시하고 **항상 plot 상단(top) 고정**, `textAlign`으로만 정렬됩니다.
+
+###### pointer
+
+| 이름  | 타입                                | 디폴트 | 설명                                          | 종류(예시) |
+| ----- | ----------------------------------- | ------ | --------------------------------------------- | ---------- |
+| show  | Boolean                             | false  | 말풍선 꼬리 표시 여부(방향은 배치 기준 자동)  | true / false |
+| color | Hex, RGB, RGBA Code(String) \| null | null   | 꼬리 색상. `null`이면 박스 배경색(`fillColor`) |            |
+
+###### responsive
+
+plot 너비(넓음→좁음) 기준 단계 축약. 둘 다 `null`이면 항상 풀(text+value) 표시.
+
+| 이름           | 타입           | 디폴트 | 설명                                             | 종류(예시) |
+| -------------- | -------------- | ------ | ------------------------------------------------ | ---------- |
+| valueOnlyBelow | Number \| null | null   | plot 너비 < 이 값 → **value만** 표시             | 400        |
+| hideBelow      | Number \| null | null   | plot 너비 < 이 값 → **라벨 미노출**(본체는 유지) | 200        |
+
+| 구간                                  | 표시         |
+| ------------------------------------- | ------------ |
+| 너비 ≥ `valueOnlyBelow`               | text + value |
+| `hideBelow` ≤ 너비 < `valueOnlyBelow` | value 만     |
+| 너비 < `hideBelow`                    | 라벨 미노출  |
+
+###### showTextOnHover
+
+value-only 상태에서 alias(text)가 가려지므로 hover로 보완(데스크탑 전용).
+
+| 이름            | 타입    | 디폴트                                 | 설명          | 종류(예시) |
+| --------------- | ------- | -------------------------------------- | ------------- | ---------- |
+| use             | Boolean | false                                  | 활성 여부     | true / false |
+| backgroundColor | String  | '#4C4C4C'                              | 배경 색상     |            |
+| fontColor       | String  | '#FFFFFF'                              | 폰트 색상     |            |
+| borderColor     | String  | '#666666'                              | 테두리 색상   |            |
+| borderRadius    | Number  | 4                                      | 모서리 반경   |            |
+| fontSize        | Number  | 12                                     | 폰트 크기     |            |
+| fontFamily      | String  | 'Roboto'                               | 폰트 패밀리   |            |
+| useShadow       | Boolean | false                                  | 그림자 사용   | true / false |
+| shadowOpacity   | Number  | 0.25                                   | 그림자 투명도 |            |
+| padding         | Object  | { top: 4, right: 8, bottom: 4, left: 8 } | 안쪽 여백   |            |
 
 #### title
 
