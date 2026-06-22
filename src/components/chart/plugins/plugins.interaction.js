@@ -26,7 +26,16 @@ const modules = {
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
 
-      if (tooltip?.showAllValueInRange && hitInfo?.items) {
+      // #6: 커서가 value-only 라벨 박스(plot 라벨, z-order 상 series 위) 안에 있으면 라벨 tooltip 을
+      // series tooltip 보다 우선한다. 해당 프레임의 series hit 을 비워 아래 파이프라인이 'no hit' 으로
+      // 동작하게 하고(series tooltip/highlight off), handlePlotLabelHover 가 라벨 tooltip 을 띄운다.
+      const plotLabelHit = this.findPlotLabelHitRegion(offset);
+      if (plotLabelHit) {
+        hitInfo.items = {};
+        hitInfo.hitId = null;
+      }
+
+      if (!plotLabelHit && tooltip?.showAllValueInRange && hitInfo?.items) {
         this.addNotHitInfo(hitInfo);
       }
 
@@ -121,6 +130,10 @@ const modules = {
         this.hideTooltipDOM();
       }
 
+      // value-only plot 라벨 hover → text tooltip (#6). 라벨 박스 위에선 위에서 series hit 을 비워
+      // 라벨을 우선한다.
+      this.handlePlotLabelHover(plotLabelHit, e);
+
       this._lastHoverSig = hoverSig;
 
       // 전용 드래그 캔버스를 쓰면 keepDisplay 영역이 그 캔버스에 그대로 남아 있어(매 hover의
@@ -180,6 +193,8 @@ const modules = {
       if (!dragSelection.use || !dragSelection.keepDisplay) {
         this.overlayClear();
       }
+
+      this.hidePlotLabelTooltip?.();
 
       if (tooltip.use && this.isInitTooltip) {
         if (typeof tooltip?.returnValue === 'function') {
@@ -1042,6 +1057,45 @@ const modules = {
     const e = evt.originalEvent || evt;
     const rect = this.getOverlayClientRect();
     return [e.clientX - rect.left, e.clientY - rect.top, rect.width, rect.height];
+  },
+
+  /**
+   * 커서 위치(offset)가 들어가는 value-only plot 라벨 hit 영역을 찾는다. (#6 showTextOnHover)
+   * @param {array} offset  getMousePosition() 결과 [x, y]
+   *
+   * @returns {object|null} 매칭된 라벨 hit 영역(text/style 포함) 또는 null
+   */
+  findPlotLabelHitRegion(offset) {
+    const regions = this.plotLabelHitRegions;
+
+    if (!regions?.length) {
+      return null;
+    }
+
+    const [x, y] = offset;
+    return (
+      regions.find(
+        (r) => x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height,
+      ) ?? null
+    );
+  },
+
+  /**
+   * value-only plot 라벨 hover 시 text tooltip 을 표시/숨김한다. (#6 showTextOnHover)
+   * 라벨 박스 위에선 라벨을 series tooltip 보다 우선하므로(onMouseMove 에서 series hit 을 비움),
+   * 여기서는 미리 구한 hit 영역만 받아 표시/숨김을 처리한다. (데스크탑 전용 — onMouseMove 가
+   * isMobile 에서 조기 반환)
+   * @param {object|null} hit  findPlotLabelHitRegion() 결과
+   * @param {MouseEvent} e     mousemove 이벤트
+   *
+   * @returns {undefined}
+   */
+  handlePlotLabelHover(hit, e) {
+    if (hit) {
+      this.showPlotLabelTooltip(hit, e.originalEvent || e);
+    } else {
+      this.hidePlotLabelTooltip?.();
+    }
   },
 
   /**

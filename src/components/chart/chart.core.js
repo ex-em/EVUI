@@ -488,7 +488,7 @@ class EvChart {
     }
     this.drawSeriesOverlay();
 
-    this.drawTip();
+    this.drawForeground(this.bufferCtx);
 
     this.commitToDisplay(this.displayCtx, this.bufferCanvas);
   }
@@ -532,7 +532,7 @@ class EvChart {
       // series→overlay→tip→commit).
       this.drawSeriesLayer(this.bufferCtx, hitInfo);
       this.drawSeriesOverlay();
-      this.drawTip();
+      this.drawForeground(this.bufferCtx);
       this.commitToDisplay(this.displayCtx, this.bufferCanvas);
     } else {
       // 전송 프레임: overlay(별도 canvas)만 그린다. series 는 worker, tip(maxTip/selectItem/selectLabel)은
@@ -616,7 +616,7 @@ class EvChart {
     // 어긋나지 않도록 동일 transform 을 걸고 그린다.
     ctx.save();
     ctx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
-    this.drawTip(ctx);
+    this.drawForeground(ctx);
     ctx.restore();
   }
 
@@ -636,6 +636,7 @@ class EvChart {
       return;
     }
     this.drawSeriesLayer(this.bufferCtx, undefined);
+    this.drawPlotsFront(this.bufferCtx);
     this.commitToDisplay(this.displayCtx, this.bufferCanvas);
   }
 
@@ -1204,6 +1205,7 @@ class EvChart {
    * @returns {undefined}
    */
   drawStaticLayer(bufferCtx, hitInfo) {
+    // grid/axis 만 그린다. plot(line/band/label)은 drawPlotsFront(front 패스)에서 그린다.
     this.axesX.forEach((axis, index) => {
       axis.ctx = bufferCtx;
       axis.draw(
@@ -1226,6 +1228,37 @@ class EvChart {
         this.defaultSelectInfo,
       );
     });
+  }
+
+  /**
+   * plot(line/band/label) front 패스. series 위(maxTip 아래)에 그린다.
+   * draw()가 캐시한 _plotGeom 으로 각 axis.drawPlots()를 ctx 에 그리고 hover hit 영역을 취합한다.
+   * @param {CanvasRenderingContext2D} [ctx]  그릴 ctx (main=bufferCtx, worker=displayCtx). 미전달 시 bufferCtx
+   *
+   * @returns {undefined}
+   */
+  drawPlotsFront(ctx = this.bufferCtx) {
+    this.plotLabelHitRegions = [];
+    [...(this.axesX ?? []), ...(this.axesY ?? [])].forEach((axis) => {
+      axis.ctx = ctx;
+      axis.drawPlots?.();
+      // value-only plot 라벨의 hover hit 영역 취합 (#6 showTextOnHover)
+      if (axis.plotLabelHitRegions?.length) {
+        this.plotLabelHitRegions.push(...axis.plotLabelHitRegions);
+      }
+    });
+  }
+
+  /**
+   * series 위에 그리는 전경(foreground) 레이어. z-order(뒤→앞) = 아래 호출 순서.
+   * **노출 순서를 바꾸려면 이 두 줄만 swap** (현재: maxTip 이 plot 위 → maxTip > plot > series).
+   * @param {CanvasRenderingContext2D} [ctx]  그릴 ctx (main=bufferCtx, worker=displayCtx)
+   *
+   * @returns {undefined}
+   */
+  drawForeground(ctx = this.bufferCtx) {
+    this.drawPlotsFront(ctx);
+    this.drawTip(ctx);
   }
 
   /**

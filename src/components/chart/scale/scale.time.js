@@ -777,105 +777,108 @@ class TimeScale extends Scale {
       }
     }
 
-    // plotBand / plotLine은 axisMin/axisMax 기준으로 위치를 계산하는 기존 구조를 유지
+    // plot 은 front 패스(drawPlots)로 분리 — geometry 만 캐시 (z-order: series 위·maxTip 아래)
+    // (plotBand/plotLine 은 axisMin/axisMax 기준 위치 계산 구조 유지)
     if (this.plotBands?.length || this.plotLines?.length) {
-      const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
-      const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
-      const padding = aliasPixel + 1;
-      const minX = aPos.x1;
-      const maxX = aPos.x2 + padding;
-      const minY = aPos.y1 - padding;
-      const maxY = aPos.y2;
+      this._plotGeom = { aPos, axisMin, axisMax, aliasPixel, chartRect, labelOffset };
+    }
+  }
 
-      this.plotBands?.forEach((plotBand) => {
-        const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
-        const {
-          from: userDefinedFrom,
-          to: userDefinedTo,
-          label: labelOpt,
-        } = mergedPlotBandOpt;
-        const from = !Util.isNullOrUndefined(userDefinedFrom)
-          ? Math.max(userDefinedFrom, axisMin)
-          : axisMin;
-        const to = !Util.isNullOrUndefined(userDefinedTo)
-          ? Math.min(userDefinedTo, axisMax)
-          : axisMax;
+  /**
+   * plotLine/plotBand/label 그리기 (front 패스). draw() 가 캐시한 _plotGeom 으로 그린다.
+   * ctx 는 호출부(chart.core.drawPlotsFront)가 axis.ctx 로 주입(main=buffer, worker=display).
+   *
+   * @returns {undefined}
+   */
+  drawPlots() {
+    if (!(this.plotBands?.length || this.plotLines?.length) || !this._plotGeom) {
+      return;
+    }
 
-        this.setPlotBandStyle(mergedPlotBandOpt);
+    const { aPos, axisMin, axisMax, aliasPixel, chartRect, labelOffset } = this._plotGeom;
+    const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+    const padding = aliasPixel + 1;
+    const minX = aPos.x1;
+    const maxX = aPos.x2 + padding;
+    const minY = aPos.y1 - padding;
+    const maxY = aPos.y2;
+    const bounds = { minX, maxX, minY, maxY };
+    this.plotLabelHitRegions = [];
 
-        let fromPos;
-        let toPos;
-        if (this.type === 'x') {
-          fromPos = Canvas.calculateX(from, axisMin, axisMax, xArea, minX);
-          toPos = Canvas.calculateX(to, axisMin, axisMax, xArea, minX);
+    this.plotBands?.forEach((plotBand) => {
+      const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
+      const {
+        from: userDefinedFrom,
+        to: userDefinedTo,
+        label: labelOpt,
+        border,
+      } = mergedPlotBandOpt;
+      const from = !Util.isNullOrUndefined(userDefinedFrom)
+        ? Math.max(userDefinedFrom, axisMin)
+        : axisMin;
+      const to = !Util.isNullOrUndefined(userDefinedTo)
+        ? Math.min(userDefinedTo, axisMax)
+        : axisMax;
 
-          if (fromPos === null || toPos === null) {
-            return;
-          }
+      let fromPos;
+      let toPos;
+      if (this.type === 'x') {
+        fromPos = Canvas.calculateX(from, axisMin, axisMax, xArea, minX);
+        toPos = Canvas.calculateX(to, axisMin, axisMax, xArea, minX);
 
-          this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
-        } else {
-          fromPos = Canvas.calculateY(from, axisMin, axisMax, yArea, maxY);
-          toPos = Canvas.calculateY(to, axisMin, axisMax, yArea, maxY);
-
-          if (fromPos === null || toPos === null) {
-            return;
-          }
-
-          this.drawYPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
-        }
-
-        if (labelOpt.show) {
-          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
-          const textXY = this.getPlotBandLabelPosition(
-            fromPos, toPos, labelOptions, maxX, minY,
-          );
-          this.drawPlotLabel(labelOptions, textXY);
-        }
-
-        ctx.restore();
-      });
-
-      this.plotLines?.forEach((plotLine) => {
-        if (!Number.isFinite(+plotLine.value)) {
+        if (fromPos === null || toPos === null) {
           return;
         }
 
-        const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
-        const { value, label: labelOpt } = mergedPlotLineOpt;
+        this.setPlotBandStyle(mergedPlotBandOpt);
+        this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY, border);
+      } else {
+        fromPos = Canvas.calculateY(from, axisMin, axisMax, yArea, maxY);
+        toPos = Canvas.calculateY(to, axisMin, axisMax, yArea, maxY);
 
-        let dataPos;
-        if (this.type === 'x') {
-          dataPos = Canvas.calculateX(value, axisMin, axisMax, xArea, minX);
-
-          if (dataPos === null) {
-            return;
-          }
-
-          this.setPlotLineStyle(mergedPlotLineOpt);
-          this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
-        } else {
-          dataPos = Canvas.calculateY(value, axisMin, axisMax, yArea, maxY);
-
-          if (dataPos === null) {
-            return;
-          }
-
-          this.setPlotLineStyle(mergedPlotLineOpt);
-          this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
+        if (fromPos === null || toPos === null) {
+          return;
         }
 
-        if (labelOpt.show) {
-          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
-          const textXY = this.getPlotLineLabelPosition(
-            dataPos, labelOptions, maxX, minY,
-          );
-          this.drawPlotLabel(labelOptions, textXY);
+        this.setPlotBandStyle(mergedPlotBandOpt);
+        this.drawYPlotBand(fromPos, toPos, minX, maxX, minY, maxY, border);
+      }
+
+      this.drawPlotBandLabel(fromPos, toPos, labelOpt, bounds, chartRect, from, to);
+    });
+
+    this.plotLines?.forEach((plotLine) => {
+      if (!Number.isFinite(+plotLine.value)) {
+        return;
+      }
+
+      const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
+      const { value, label: labelOpt } = mergedPlotLineOpt;
+
+      let dataPos;
+      if (this.type === 'x') {
+        dataPos = Canvas.calculateX(value, axisMin, axisMax, xArea, minX);
+
+        if (dataPos === null) {
+          return;
         }
 
-        ctx.restore();
-      });
-    }
+        this.setPlotLineStyle(mergedPlotLineOpt);
+        this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
+      } else {
+        dataPos = Canvas.calculateY(value, axisMin, axisMax, yArea, maxY);
+
+        if (dataPos === null) {
+          return;
+        }
+
+        this.setPlotLineStyle(mergedPlotLineOpt);
+        this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
+      }
+
+      this.drawPlotLineLabel(dataPos, labelOpt, bounds, chartRect, value);
+    });
   }
 }
 

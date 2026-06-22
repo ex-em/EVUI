@@ -56,6 +56,69 @@ const modules = {
   },
 
   /**
+   * value-only plot 라벨 hover 시 표시할 경량 텍스트 tooltip DOM 을 생성한다(지연 생성).
+   * series tooltip(tooltipDOM)과 별개의 단일 텍스트 요소.
+   *
+   * @returns {undefined}
+   */
+  createPlotLabelTooltipDOM() {
+    this.plotLabelTooltipDOM = document.createElement('div');
+    this.plotLabelTooltipDOM.className = 'ev-chart-plot-label-tooltip';
+    this.plotLabelTooltipDOM.style.position = 'fixed';
+    this.plotLabelTooltipDOM.style.display = 'none';
+    this.plotLabelTooltipDOM.style.pointerEvents = 'none';
+    this.plotLabelTooltipDOM.style.zIndex = '1000';
+    this.plotLabelTooltipDOM.style.whiteSpace = 'nowrap';
+    document.body.appendChild(this.plotLabelTooltipDOM);
+  },
+
+  /**
+   * plot 라벨 hover tooltip 을 region.text 로 표시한다.
+   * @param {object} region   { text, style } hover hit 영역
+   * @param {MouseEvent} evt  커서 위치(clientX/Y)
+   *
+   * @returns {undefined}
+   */
+  showPlotLabelTooltip(region, evt) {
+    if (!this.plotLabelTooltipDOM) {
+      this.createPlotLabelTooltipDOM();
+    }
+
+    const dom = this.plotLabelTooltipDOM;
+    const style = region.style ?? {};
+    const padding = style.padding ?? { top: 4, right: 8, bottom: 4, left: 8 };
+
+    const backgroundColor = style.backgroundColor ?? '#4C4C4C';
+    dom.textContent = region.text;
+    dom.style.backgroundColor = backgroundColor;
+    dom.style.color = style.fontColor ?? '#FFFFFF';
+    // borderColor 미지정 시 배경색과 동일 → 테두리가 보이지 않음
+    dom.style.border = `1px solid ${style.borderColor ?? backgroundColor}`;
+    dom.style.borderRadius = `${style.borderRadius ?? 4}px`;
+    dom.style.fontSize = `${style.fontSize ?? 12}px`;
+    dom.style.fontWeight = `${style.fontWeight ?? 400}`;
+    dom.style.fontFamily = style.fontFamily ?? 'Roboto';
+    dom.style.padding = `${padding.top}px ${padding.right}px ${padding.bottom}px ${padding.left}px`;
+    dom.style.boxShadow = style.useShadow
+      ? `2px 2px 4px rgba(0, 0, 0, ${style.shadowOpacity ?? 0.25})`
+      : 'none';
+    dom.style.left = `${evt.clientX + 10}px`;
+    dom.style.top = `${evt.clientY + 10}px`;
+    dom.style.display = 'block';
+  },
+
+  /**
+   * plot 라벨 hover tooltip 을 숨긴다.
+   *
+   * @returns {undefined}
+   */
+  hidePlotLabelTooltip() {
+    if (this.plotLabelTooltipDOM) {
+      this.plotLabelTooltipDOM.style.display = 'none';
+    }
+  },
+
+  /**
    * get Tooltip's font style by Type ('title' | 'contents')
    * @param {string} type  'title' | 'contents'
    * @returns {string}
@@ -1157,6 +1220,10 @@ const modules = {
     if (this.tooltipDOM) {
       this.tooltipDOM.remove();
       this.tooltipDOM = null;
+    }
+    if (this.plotLabelTooltipDOM) {
+      this.plotLabelTooltipDOM.remove();
+      this.plotLabelTooltipDOM = null;
     }
     this.isInitTooltip = false;
   },
