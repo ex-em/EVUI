@@ -159,11 +159,25 @@ export const AXIS_OPTION = {
   },
 };
 
+export const PLOT_LABEL_HOVER_TIP_OPTION = {
+  use: false,
+  backgroundColor: '#4C4C4C',
+  fontColor: '#FFFFFF',
+  borderColor: null, // null이면 backgroundColor 와 동일 → 테두리 미표시
+  borderRadius: 4,
+  fontSize: 12,
+  fontWeight: 400,
+  fontFamily: 'Roboto',
+  useShadow: false,
+  shadowOpacity: 0.25,
+  padding: { top: 4, right: 8, bottom: 4, left: 8 },
+};
+
 export const PLOT_LINE_LABEL_OPTION = {
   show: false,
   fontSize: 12,
   fontColor: '#FF0000',
-  fillColor: '#FFFFFF',
+  fillColor: '#FFFFFF', // 박스 배경. rgba 허용 → opacity 지원
   lineColor: '#FF0000',
   lineWidth: 0,
   fontWeight: 400,
@@ -172,6 +186,22 @@ export const PLOT_LINE_LABEL_OPTION = {
   textAlign: 'center',
   textOverflow: 'none', // 'none', 'ellipsis'
   maxWidth: null,
+  text: null, // 라벨 텍스트(=alias). showValue=false면 이 값을 그대로 표시
+  borderRadius: 0, // 라벨 박스 모서리 반경
+  gap: null, // 임계선↔라벨 박스 간격(px). null이면 자동(fontSize/4+2, X축 상단은 2)
+  padding: null, // 라벨 박스 안쪽 여백. number 또는 { top, right, bottom, left }. null이면 fontSize/4
+  pointer: {
+    // 말풍선 꼬리. 방향은 배치 기준 자동, 크기 고정
+    show: false,
+    color: null, // null이면 박스 배경색(fillColor) 사용
+  },
+  position: 'outside', // 'outside'(plot 밖 우측 여백) | 'innerStart'(plot 안 좌측) | 'innerEnd'(plot 안 우측)
+  showValue: false, // true → "text value" 합성 (value = 축 formatter)
+  responsive: {
+    valueOnlyBelow: null, // plot 너비 < 이 값 → value만
+    hideBelow: null, // plot 너비 < 이 값 → 라벨 미노출
+  },
+  showTextOnHover: PLOT_LABEL_HOVER_TIP_OPTION, // value-only 상태에서 hover 시 text tooltip
 };
 
 export const PLOT_LINE_OPTION = {
@@ -182,6 +212,7 @@ export const PLOT_LINE_OPTION = {
 
 export const PLOT_BAND_OPTION = {
   color: '#FAE59D',
+  border: null, // { color, width, segments } — start/end 모서리 stroke
 };
 
 export const HEAT_MAP_OPTION = {

@@ -428,68 +428,80 @@ class StepScale extends Scale {
       ctx.closePath();
     }
 
-    // draw plot lines and plot bands
+    // plot 은 front 패스(drawPlots)로 분리 — geometry 만 캐시 (z-order: series 위·maxTip 아래)
     if (this.plotBands?.length || this.plotLines?.length) {
-      const padding = Util.aliasPixel(ctx.lineWidth) + 1;
-      const minX = aPos.x1 + padding;
-      const maxX = aPos.x2;
-      const minY = aPos.y1 + padding;
-      const maxY = aPos.y2;
-      const labelGap = (endPoint - startPoint) / (this.labelStyle.show ? labels.length : 1);
-
-      this.plotBands?.forEach((plotBand) => {
-        if (!plotBand.from && !plotBand.to) {
-          return;
-        }
-
-        const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
-        const { from = 0, to = labels.length, label: labelOpt } = mergedPlotBandOpt;
-        const fromPos = Math.round(startPoint + labelGap * from);
-        const toPos = Math.round(startPoint + labelGap * to);
-
-        this.setPlotBandStyle(mergedPlotBandOpt);
-
-        if (this.type === 'x') {
-          this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
-        } else {
-          this.drawYPlotBand(fromPos, toPos, minX, maxX, minY, maxY);
-        }
-
-        if (labelOpt.show) {
-          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
-          const textXY = this.getPlotBandLabelPosition(fromPos, toPos, labelOptions, maxX, minY);
-          this.drawPlotLabel(labelOptions, textXY);
-        }
-
-        ctx.restore();
-      });
-
-      this.plotLines?.forEach((plotLine) => {
-        if (!plotLine.value) {
-          return;
-        }
-
-        const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
-        const { value, label: labelOpt } = mergedPlotLineOpt;
-        const dataPos = Math.round(startPoint + labelGap * value) + labelGap / 2;
-
-        this.setPlotLineStyle(mergedPlotLineOpt);
-
-        if (this.type === 'x') {
-          this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
-        } else {
-          this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
-        }
-
-        if (labelOpt.show) {
-          const labelOptions = this.getNormalizedLabelOptions(chartRect, labelOpt);
-          const textXY = this.getPlotLineLabelPosition(dataPos, labelOptions, maxX, minY);
-          this.drawPlotLabel(labelOptions, textXY);
-        }
-
-        ctx.restore();
-      });
+      this._plotGeom = {
+        aPos,
+        startPoint,
+        endPoint,
+        chartRect,
+        aliasPixel: Util.aliasPixel(ctx.lineWidth),
+      };
     }
+  }
+
+  /**
+   * plotLine/plotBand/label 그리기 (front 패스). draw() 가 캐시한 _plotGeom 으로 그린다.
+   * ctx 는 호출부(chart.core.drawPlotsFront)가 axis.ctx 로 주입(main=buffer, worker=display).
+   *
+   * @returns {undefined}
+   */
+  drawPlots() {
+    if (!(this.plotBands?.length || this.plotLines?.length) || !this._plotGeom) {
+      return;
+    }
+
+    const labels = this.labels;
+    const { aPos, startPoint, endPoint, chartRect, aliasPixel } = this._plotGeom;
+    const padding = aliasPixel + 1;
+    const minX = aPos.x1 + padding;
+    const maxX = aPos.x2;
+    const minY = aPos.y1 + padding;
+    const maxY = aPos.y2;
+    const labelGap = (endPoint - startPoint) / (this.labelStyle.show ? labels.length : 1);
+    const bounds = { minX, maxX, minY, maxY };
+    this.plotLabelHitRegions = [];
+
+    this.plotBands?.forEach((plotBand) => {
+      if (Util.isNullOrUndefined(plotBand.from) && Util.isNullOrUndefined(plotBand.to)) {
+        return;
+      }
+
+      const mergedPlotBandOpt = defaultsDeep({}, plotBand, PLOT_BAND_OPTION);
+      const { from = 0, to = labels.length, label: labelOpt, border } = mergedPlotBandOpt;
+      const fromPos = Math.round(startPoint + labelGap * from);
+      const toPos = Math.round(startPoint + labelGap * to);
+
+      this.setPlotBandStyle(mergedPlotBandOpt);
+
+      if (this.type === 'x') {
+        this.drawXPlotBand(fromPos, toPos, minX, maxX, minY, maxY, border);
+      } else {
+        this.drawYPlotBand(fromPos, toPos, minX, maxX, minY, maxY, border);
+      }
+
+      this.drawPlotBandLabel(fromPos, toPos, labelOpt, bounds, chartRect, from, to);
+    });
+
+    this.plotLines?.forEach((plotLine) => {
+      if (Util.isNullOrUndefined(plotLine.value)) {
+        return;
+      }
+
+      const mergedPlotLineOpt = defaultsDeep({}, plotLine, PLOT_LINE_OPTION);
+      const { value, label: labelOpt } = mergedPlotLineOpt;
+      const dataPos = Math.round(startPoint + labelGap * value) + labelGap / 2;
+
+      this.setPlotLineStyle(mergedPlotLineOpt);
+
+      if (this.type === 'x') {
+        this.drawXPlotLine(dataPos, minX, maxX, minY, maxY);
+      } else {
+        this.drawYPlotLine(dataPos, minX, maxX, minY, maxY);
+      }
+
+      this.drawPlotLineLabel(dataPos, labelOpt, bounds, chartRect, value);
+    });
   }
 
   /**
