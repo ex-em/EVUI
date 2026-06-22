@@ -702,8 +702,20 @@ const modules = {
     const mouseX = e.pageX;
     const mouseY = e.pageY;
 
-    const customTooltipEl = this.tooltipDOM.getElementsByClassName('ev-chart-tooltip-custom')?.[0];
-    if (!customTooltipEl && !this.tooltipDOM) {
+    if (!this.tooltipDOM) {
+      return;
+    }
+
+    let customTooltipEl = this.tooltipDOM.getElementsByClassName('ev-chart-tooltip-custom')?.[0];
+    // skip-redraw fast path 등으로 커스텀 엘리먼트가 비어 있을 수 있다. 같은 데이터 포인트에
+    // 머물러 fast path 가 계속 redraw 를 건너뛰는 경우, 여기서 한 번 그려 복구한다.
+    // (엘리먼트가 이미 있는 일반 경로에서는 재draw 하지 않으므로 비용/부작용 없음)
+    if (!customTooltipEl && hitInfo?.items && Object.keys(hitInfo.items).length) {
+      this.drawCustomTooltip(hitInfo.items);
+      customTooltipEl = this.tooltipDOM.getElementsByClassName('ev-chart-tooltip-custom')?.[0];
+    }
+    
+    if (!customTooltipEl) {
       return;
     }
 
