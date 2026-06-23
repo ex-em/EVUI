@@ -1,3 +1,10 @@
+## [3.12.1](https://github.com/ex-em/EVUI/compare/3.12.0...3.12.1) (2026-06-23)
+
+
+### Bug Fixes
+
+* **chart:** 커스텀 툴팁 위치 계산 시 offsetWidth undefined 크래시 수정 ([3c05826](https://github.com/ex-em/EVUI/commit/3c05826221efa5b9572c3cdd1b6f441195e39222))
+
 # [3.12.0](https://github.com/ex-em/EVUI/compare/3.11.0...3.12.0) (2026-06-19)
 
 
