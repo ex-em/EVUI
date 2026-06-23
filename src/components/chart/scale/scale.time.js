@@ -206,6 +206,116 @@ function generateVisibleTicks(graphMin, graphMax, meta) {
   return ticks;
 }
 
+const DAY_MS = 86400000;
+const SUB_DAY_UNITS = ['millisecond', 'second', 'minute', 'hour'];
+const divisorCache = new Map();
+
+/**
+ * n의 모든 약수를 오름차순으로 반환한다(결과 캐시).
+ *
+ * @param {number} n 양의 정수
+ * @returns {number[]} 오름차순 약수 배열
+ */
+function divisorsAsc(n) {
+  if (divisorCache.has(n)) {
+    return divisorCache.get(n);
+  }
+  const small = [];
+  const large = [];
+  for (let i = 1; i * i <= n; i += 1) {
+    if (n % i === 0) {
+      small.push(i);
+      if (i !== n / i) {
+        large.push(n / i);
+      }
+    }
+  }
+  const result = small.concat(large.reverse());
+  divisorCache.set(n, result);
+  return result;
+}
+
+/**
+ * base interval을 maxSteps에 맞춰 "정수배"로 확장한다(boundary 정렬 제약 없음).
+ *
+ * 위상(phase) 독립적인 worst-case tick 수 floor(span / M) + 1 이 maxSteps 이하가
+ * 되는 최소 배수를 선택한다.
+ *
+ * @param {{ ms: number, unit: string|null, time: number|null }} baseMeta base interval
+ * @param {number} span graphMax - graphMin
+ * @param {number} maxSteps 최대 tick 수
+ * @returns {{ ms: number, unit: string|null, time: number|null }} 확장된 meta
+ */
+function expandByInteger(baseMeta, span, maxSteps) {
+  const estimated = Math.ceil(span / baseMeta.ms);
+  let multiplier = estimated > maxSteps
+    ? Math.max(1, Math.floor(estimated / maxSteps))
+    : 1;
+  let ms = baseMeta.ms * multiplier;
+  const MAX_MULTIPLIER = multiplier + 10000;
+  while (
+    multiplier <= MAX_MULTIPLIER
+    && Math.floor(span / ms) + 1 > maxSteps
+  ) {
+    multiplier += 1;
+    ms = baseMeta.ms * multiplier;
+  }
+  return baseMeta.unit
+    ? { ms, unit: baseMeta.unit, time: (baseMeta.time || 1) * multiplier }
+    : { ms, unit: null, time: null };
+}
+
+/**
+ * base interval을 maxSteps에 맞춰 확장한 meta를 반환한다.
+ *
+ * sub-day 단위(ms/s/m/h)이고 base가 하루(24h)를 나누어떨어지면, 확장 후보를
+ * "하루를 나누어떨어지는 base의 배수"로 제한한다. 확장 interval이 항상 하루의
+ * 약수가 되므로 startOf('day') 기준 격자가 자정마다 동일해진다. 따라서 실시간
+ * 슬라이딩 윈도우가 자정을 넘어 기준점(anchor)이 24h 이동해도 라벨이 점프하지
+ * 않는다(예: 24를 못 나누는 20h를 피하고 24h를 선택).
+ *
+ * 그 외(number/auto interval, day 이상 단위, 하루를 못 나누는 base)는 기존처럼
+ * base의 정수배로 확장한다. number/auto interval은 epoch(0) 기준 정렬이라 본래
+ * 자정 점프가 없고, day 이상 단위는 startOf('year') 등 별도 anchor를 사용한다.
+ *
+ * @param {{ ms: number, unit: string|null, time: number|null }} baseMeta base interval
+ * @param {number} span graphMax - graphMin
+ * @param {number} maxSteps 최대 tick 수
+ * @returns {{ ms: number, unit: string|null, time: number|null }} 확장된 meta
+ */
+function expandIntervalMeta(baseMeta, span, maxSteps) {
+  const fits = (ms) => Math.floor(span / ms) + 1 <= maxSteps;
+
+  // base 자체가 maxSteps를 만족하면 확장 불필요
+  if (fits(baseMeta.ms)) {
+    return baseMeta;
+  }
+
+  // sub-day 단위 + base가 하루의 약수 → 하루의 약수 범위 안에서만 확장
+  if (
+    baseMeta.unit
+    && SUB_DAY_UNITS.includes(baseMeta.unit)
+    && DAY_MS % baseMeta.ms === 0
+  ) {
+    // k가 (DAY_MS / baseMs)의 약수면 k * baseMs 가 하루를 나누어떨어진다
+    const ks = divisorsAsc(DAY_MS / baseMeta.ms);
+    for (let i = 0; i < ks.length; i += 1) {
+      const candidateMs = baseMeta.ms * ks[i];
+      if (fits(candidateMs)) {
+        return {
+          ms: candidateMs,
+          unit: baseMeta.unit,
+          time: (baseMeta.time || 1) * ks[i],
+        };
+      }
+    }
+    // 하루(24h)로도 부족 → day 단위로 승격하여 정수배 확장
+    return expandByInteger({ ms: DAY_MS, unit: 'day', time: 1 }, span, maxSteps);
+  }
+
+  return expandByInteger(baseMeta, span, maxSteps);
+}
+
 /**
  * 임의의 값을 숫자(타임스탬프)로 정규화한다.
  * null/undefined → null, 유한한 숫자 → 그대로, 그 외 → dayjs로 파싱 후 valueOf()
@@ -401,38 +511,17 @@ class TimeScale extends Scale {
       baseMeta = { ms: autoMs, unit: null, time: null };
     }
 
-    // tick 생성 + maxSteps 초과 시 interval을 strict 배수로 확장
-    // 예상 tick 수에서 초기 multiplier를 추정하여 불필요한 반복을 줄인다
-    // fixedSteps인 경우 interval 확장을 하지 않으므로 multiplier는 항상 1
-    const estimatedTicks = Math.ceil((graphMax - graphMin) / baseMeta.ms);
-    let multiplier = (!this.fixedSteps && estimatedTicks > maxSteps)
-      ? Math.max(1, Math.floor(estimatedTicks / maxSteps))
-      : 1;
-    let ticks;
-    let currentMs;
+    // base interval을 maxSteps에 맞춰 확장한다.
+    // sub-day 단위는 "하루의 약수"로만 확장되어 자정 경계에서 격자가 점프하지
+    // 않고(예: 20h 회피 → 24h), 그 외는 정수배로 확장된다. fixedSteps면 확장하지
+    // 않고 base를 그대로 쓴다. 상세는 expandIntervalMeta 주석 참고.
+    const span = graphMax - graphMin;
+    const finalMeta = this.fixedSteps
+      ? baseMeta
+      : expandIntervalMeta(baseMeta, span, maxSteps);
+    const currentMs = finalMeta.ms;
 
-    const MAX_MULTIPLIER = multiplier + 10000;
-    while (multiplier <= MAX_MULTIPLIER) {
-      const currentMeta = baseMeta.unit
-        ? {
-            ms: baseMeta.ms * multiplier,
-            unit: baseMeta.unit,
-            time: (baseMeta.time || 1) * multiplier,
-          }
-        : {
-            ms: baseMeta.ms * multiplier,
-            unit: null,
-            time: null,
-          };
-
-      currentMs = currentMeta.ms;
-      ticks = generateVisibleTicks(graphMin, graphMax, currentMeta);
-
-      if (ticks.length <= maxSteps || this.fixedSteps) {
-        break;
-      }
-      multiplier++;
-    }
+    const ticks = generateVisibleTicks(graphMin, graphMax, finalMeta);
 
     return {
       steps: Math.max(0, ticks.length - 1),

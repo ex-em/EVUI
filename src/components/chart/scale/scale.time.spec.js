@@ -390,9 +390,11 @@ describe('TimeScale', () => {
 
     describe('maxSteps 확장 시 boundary 정렬', () => {
       it('interval: "minute" + maxSteps 초과 시 첫 tick은 확장된 interval boundary에 정렬된다', () => {
-        // graphMin(12:52)은 1분 boundary에 정렬되어 있으나,
-        // maxSteps 초과로 interval이 10분으로 확장되므로
-        // 첫 tick은 확장 interval boundary인 13:00부터 시작해야 한다.
+        // graphMin(12:52)은 1분 boundary에 정렬되어 있으나, maxSteps 초과로
+        // interval이 확장된다. 확장 후보는 "하루를 나누어떨어지는 base의 배수"로
+        // 제한되어(위상 독립 + 자정 경계 점프 없음) worst-case tick 수가 maxSteps를
+        // 넘지 않는 최소 약수가 선택된다. W=60분, maxSteps=6에서는 12분(1440의 약수,
+        // floor(60/12)+1=6)이 선택된다(11분은 하루를 못 나누므로 제외).
         const scale = createScale({ interval: 'minute' });
 
         const result = scale.calculateSteps({
@@ -403,13 +405,15 @@ describe('TimeScale', () => {
 
         expect(result.ticks).toEqual([
           ts('2026-04-23 13:00:00'),
-          ts('2026-04-23 13:10:00'),
-          ts('2026-04-23 13:20:00'),
-          ts('2026-04-23 13:30:00'),
-          ts('2026-04-23 13:40:00'),
-          ts('2026-04-23 13:50:00'),
+          ts('2026-04-23 13:12:00'),
+          ts('2026-04-23 13:24:00'),
+          ts('2026-04-23 13:36:00'),
+          ts('2026-04-23 13:48:00'),
         ]);
-        expect(result.interval).toBe(10 * 60 * 1000);
+        expect(result.interval).toBe(12 * 60 * 1000);
+        expect(result.ticks.length).toBeLessThanOrEqual(6);
+        // 확장 interval은 하루를 나누어떨어져야 한다(자정 점프 방지)
+        expect((24 * 60 * 60 * 1000) % result.interval).toBe(0);
 
         // 모든 tick은 확장 interval 간격으로 균등 배치
         for (let i = 1; i < result.ticks.length; i++) {
@@ -440,6 +444,73 @@ describe('TimeScale', () => {
         const dayStart = dayjs(result.graphMin).startOf('day').valueOf();
         result.ticks.forEach((tick) => {
           expect((tick - dayStart) % result.interval).toBe(0);
+        });
+      });
+
+      it('슬라이딩 윈도우: 폭/maxSteps가 같으면 위치가 달라도 interval/정렬이 유지된다', () => {
+        // 실시간 차트(5초마다 데이터 유입)에서 동일한 폭(10분)의 윈도우가 흐를 때,
+        // 윈도우 위치(phase)에 따라 interval이나 tick 정렬이 바뀌면 안 된다.
+        // (예: 0/4/8 → 3/6/9 로 라벨이 통째로 바뀌는 현상 방지)
+        const scale = createScale({ interval: 'minute' });
+        const WINDOW = 10 * 60 * 1000; // 10분
+        const STEP = 5 * 1000; // 5초
+
+        const base = ts('2026-04-23 12:00:00');
+        const results = [];
+        for (let i = 0; i < 24; i++) {
+          const min = base + i * STEP;
+          results.push(scale.calculateSteps({
+            minValue: min,
+            maxValue: min + WINDOW,
+            maxSteps: 3,
+          }));
+        }
+
+        const dayStart = dayjs(base).startOf('day').valueOf();
+        results.forEach((result) => {
+          // interval은 위치와 무관하게 동일해야 한다.
+          expect(result.interval).toBe(results[0].interval);
+          // 모든 tick은 동일한 절대 boundary 격자(day 시작 기준 interval 배수)에 정렬.
+          result.ticks.forEach((tick) => {
+            expect((tick - dayStart) % result.interval).toBe(0);
+          });
+          // 계약: tick 수는 maxSteps 이하.
+          expect(result.ticks.length).toBeLessThanOrEqual(3);
+        });
+      });
+
+      it('확장 interval은 하루를 나누어떨어진다: 자정을 넘어도 라벨이 점프하지 않는다', () => {
+        // 버그 재현 시나리오: interval=1h, 폭≈59h, maxSteps=3에서 기존 로직은
+        // 20h(=24를 못 나눔)로 확장되어, 윈도우가 자정을 넘는 순간 anchor가 24h
+        // 이동하며 모든 라벨이 4h씩 점프했다. 이제 하루의 약수(24h)로 확장되어
+        // 자정 기준점이 바뀌어도 동일한 절대 격자에 머문다.
+        const scale = createScale({ interval: { time: 1, unit: 'hour' } });
+        const WINDOW = 59 * 60 * 60 * 1000;
+        const STEP = 60 * 60 * 1000; // 1시간씩 이동(자정 횡단 포함)
+
+        const base = ts('2026-04-23 23:37:00');
+        const results = [];
+        for (let i = 0; i < 6; i++) {
+          const min = base + i * STEP;
+          results.push(scale.calculateSteps({
+            minValue: min,
+            maxValue: min + WINDOW,
+            maxSteps: 3,
+          }));
+        }
+
+        const DAY = 24 * 60 * 60 * 1000;
+        // 모든 윈도우 위치가 공유하는 단일 고정 기준점.
+        const fixedAnchor = dayjs(base).startOf('day').valueOf();
+        results.forEach((result) => {
+          // 확장 interval은 위치와 무관하게 동일하고 하루를 나누어떨어진다.
+          expect(result.interval).toBe(results[0].interval);
+          expect(DAY % result.interval).toBe(0);
+          expect(result.ticks.length).toBeLessThanOrEqual(3);
+          // 모든 위치의 tick이 동일한 절대 격자에 정렬 → 자정 점프 없음.
+          result.ticks.forEach((tick) => {
+            expect((tick - fixedAnchor) % result.interval).toBe(0);
+          });
         });
       });
     });
