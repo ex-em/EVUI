@@ -158,6 +158,19 @@ describe('EvInputNumber Component', () => {
       expect(emitted[emitted.length - 1][0]).toBe(10);
     });
 
+    it('disableEmpty=true 이고 stepStrictly 면 빈 값이 0 에 가장 가까운 step 값으로 스냅된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { modelValue: 5, disableEmpty: true, stepStrictly: true, min: -3, max: 10, step: 2 },
+      });
+      const input = wrapper.find('.ev-input');
+      await input.setValue('');
+      await input.trigger('change');
+
+      // 허용 step 값: -3, -1, 1, ... → 0 에 가장 가까운 값은 -1
+      const emitted = wrapper.emitted('update:modelValue');
+      expect(emitted[emitted.length - 1][0]).toBe(-1);
+    });
+
     it('기본 disableEmpty는 false이다', () => {
       expect(EvInputNumber.props.disableEmpty.default).toBe(false);
     });
