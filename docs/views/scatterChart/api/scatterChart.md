@@ -311,6 +311,11 @@ const chartOptions = {
 }
 ```
 
+> **`formatter.html` 마크업 안내**
+> - 반환하는 HTML의 **루트 element**가 툴팁 본문으로 부착되며, 위치/크기 계산도 이 루트를 기준으로 합니다. 루트 element는 1개여야 합니다.
+> - `ev-chart-tooltip-custom`(및 `__header`, `__body`) 클래스는 **선택**입니다. 사용하면 EVUI 기본 스타일과 휠 스크롤 기본 타겟(`htmlScrollTarget: '.ev-chart-tooltip-custom__body'`)이 자동 적용됩니다.
+> - 직접 마크업/클래스를 사용하는 경우, 스크롤이 필요하면 `htmlScrollTarget`을 해당 스크롤 요소의 셀렉터로 지정하세요.
+
 #### returnValue
 
 | 이름 | 타입 | 설명 | 종류(예시) |
