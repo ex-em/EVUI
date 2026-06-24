@@ -864,10 +864,13 @@ const modules = {
     const y1 = this.chartRect.y1 + this.labelOffset.top;
     const y2 = this.chartRect.y2 - this.labelOffset.bottom;
 
-    let xMin = x1;
-    let xMax = x2;
-    let yMin = y1;
-    let yMax = y2;
+    // 데이터가 존재하는 픽셀 구간(여러 축의 합집합)을 집계한다.
+    // Infinity로 시작해야 Math.min/Math.max가 calcDomainBounds 결과를 실제로 반영한다.
+    // (x1/x2로 시작하면 bounds가 항상 [x1,x2] 내부라 집계가 차트 경계로 되돌아가 빈 구간 좁히기가 무효화된다)
+    let xMin = Infinity;
+    let xMax = -Infinity;
+    let yMin = Infinity;
+    let yMax = -Infinity;
 
     if (options.horizontal) {
       const ySteps = this.axesSteps?.y || [];
@@ -884,6 +887,11 @@ const modules = {
           yMax = Math.max(yMax, bounds[1]);
         }
       }
+      // 도메인 bounds를 하나도 못 구한 경우(category/문자열 축 등) 차트 경계로 fallback
+      if (!Number.isFinite(yMin)) {
+        yMin = y1;
+        yMax = y2;
+      }
     } else {
       const xSteps = this.axesSteps?.x || [];
       for (let i = 0; i < xSteps.length; i += 1) {
@@ -898,6 +906,11 @@ const modules = {
           xMin = Math.min(xMin, bounds[0]);
           xMax = Math.max(xMax, bounds[1]);
         }
+      }
+      // 도메인 bounds를 하나도 못 구한 경우(category/문자열 축 등) 차트 경계로 fallback
+      if (!Number.isFinite(xMin)) {
+        xMin = x1;
+        xMax = x2;
       }
     }
 
