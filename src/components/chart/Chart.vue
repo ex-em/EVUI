@@ -18,7 +18,7 @@ import {
   toRef,
   computed,
 } from 'vue';
-import { isEqual, debounce } from 'lodash-es';
+import { isEqual, debounce, merge } from 'lodash-es';
 import { resize } from '@/directives/resize';
 import EvChart from './chart.core';
 import EvChartToolbar from './ChartToolbar';
@@ -100,6 +100,15 @@ export default {
     const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
     const injectEvChartPropsInGroup = inject('evChartPropsInGroup', []);
     const injectGroupInteraction = inject('groupInteraction', null);
+    // 임베딩 컨텍스트(예: docs 갤러리 썸네일)에서 옵션을 덮어쓰기 위한 주입 지점.
+    // setup·options watcher 양쪽에서 적용해 갱신 후에도 오버라이드가 유지되게 한다.
+    const injectOptionsOverride = inject('evChartOptionsOverride', null);
+    const applyOptionsOverride = (opts) => {
+      if (injectOptionsOverride) {
+        merge(opts, injectOptionsOverride);
+      }
+      return opts;
+    };
 
     const {
       eventListeners,
@@ -111,7 +120,7 @@ export default {
     } = useModel(injectGroupSelectedLabel, injectGroupHoveredLabel);
 
     const normalizedData = getNormalizedData(props.data);
-    const normalizedOptions = getNormalizedOptions(props.options);
+    const normalizedOptions = applyOptionsOverride(getNormalizedOptions(props.options));
     const selectedLabel = computed(() => props.selectedLabel);
     const selectedItem = computed(() => props.selectedItem);
 
@@ -219,7 +228,7 @@ export default {
     watch(
       () => props.options,
       (chartOpt) => {
-        const newOpt = getNormalizedOptions(chartOpt);
+        const newOpt = applyOptionsOverride(getNormalizedOptions(chartOpt));
         const prevLegendShow = evChart.options?.legend?.show ?? false;
         const isUpdateLegendType = !isEqual(newOpt.legend.table, evChart.options.legend.table);
         const isUpdateTooltip =

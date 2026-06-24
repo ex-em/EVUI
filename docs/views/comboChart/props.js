@@ -14,8 +14,6 @@ import LineBarSelectLabel from './example/LineBarSelectLabel';
 import LineBarSelectLabelRaw from './example/LineBarSelectLabel?raw';
 import AreaLine from './example/AreaLine';
 import AreaLineRaw from './example/AreaLine?raw';
-import PerfStressDashboard from './example/PerfStressDashboard';
-import PerfStressDashboardRaw from './example/PerfStressDashboard?raw';
 
 export default {
   mdText,
@@ -58,13 +56,6 @@ export default {
       description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
       component: LineBarSelectLabel,
       parsedData: parse(LineBarSelectLabelRaw).descriptor,
-    },
-    PerfStressDashboard: {
-      description:
-        'B-real 프로파일 성능 stress 예제 — 같은 timer에 묶여 동시에 갱신되는 다수 combo 차트 대시보드입니다. ' +
-        '차트 수·시리즈 수·포인트 수는 상수로 조절하며, heavy render job이 같은 window에 pile-up 되는 상황을 재현합니다.',
-      component: PerfStressDashboard,
-      parsedData: parse(PerfStressDashboardRaw).descriptor,
     },
   },
 };

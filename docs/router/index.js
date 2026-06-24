@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Intro from 'docs/views/Intro.vue';
 import PageView from 'docs/views/PageView';
+import GalleryView from 'docs/components/gallery/GalleryView.vue';
+import ExampleDetail from 'docs/components/gallery/ExampleDetail.vue';
+import ApiView from 'docs/components/gallery/ApiView.vue';
 import tabProps from 'docs/views/tab/props';
 import buttonProps from 'docs/views/button/props';
 import checkboxProps from 'docs/views/checkbox/props';
@@ -35,6 +38,49 @@ import pieChartProps from 'docs/views/pieChart/props';
 import treeGridProps from 'docs/views/treeGrid/props';
 import paginationProps from 'docs/views/pagination/props';
 import heatMapProps from 'docs/views/heatMap/props';
+
+// 차트 페이지는 갤러리(썸네일) + 상세 + API 3단 라우트로 구성한다.
+// gallery 라우트만 메뉴에 노출되고, 상세/API 는 hideInMenu 로 숨긴다.
+const makeChartRoutes = ({ path, name, props }) => {
+  const chartRoutes = [
+    {
+      path: `/${path}`,
+      name,
+      component: GalleryView,
+      props,
+      meta: { category: 'Chart', gallery: true },
+    },
+  ];
+  // API 문서(mdText)가 있는 차트만 /api 라우트를 둔다. (:exampleId 보다 먼저 정의)
+  if (props.mdText) {
+    chartRoutes.push({
+      path: `/${path}/api`,
+      name: `${name}Api`,
+      component: ApiView,
+      props,
+      meta: { category: 'Chart', hideInMenu: true },
+    });
+  }
+  chartRoutes.push({
+    path: `/${path}/:exampleId`,
+    name: `${name}Example`,
+    component: ExampleDetail,
+    props,
+    meta: { category: 'Chart', hideInMenu: true },
+  });
+  return chartRoutes;
+};
+
+const chartRoutes = [
+  { path: 'barChart', name: 'BarChart', props: barChartProps },
+  { path: 'lineChart', name: 'LineChart', props: lineChartProps },
+  { path: 'scatterChart', name: 'ScatterChart', props: scatterChartProps },
+  { path: 'pieChart', name: 'PieChart', props: pieChartProps },
+  { path: 'comboChart', name: 'ComboChart', props: comboChartProps },
+  { path: 'heatMap', name: 'HeatMap', props: heatMapProps },
+  { path: 'zoomChart', name: 'ZoomChart', props: zoomChartProps },
+  { path: 'brushChart', name: 'BrushChart', props: brushChartProps },
+].flatMap(makeChartRoutes);
 
 const routes = [
   {
@@ -231,78 +277,7 @@ const routes = [
       category: 'Table',
     },
   },
-  {
-    path: '/barChart',
-    name: 'BarChart',
-    component: PageView,
-    props: barChartProps,
-    meta: {
-      category: 'Chart',
-    },
-  },
-  {
-    path: '/lineChart',
-    name: 'LineChart',
-    component: PageView,
-    props: lineChartProps,
-    meta: {
-      category: 'Chart',
-    },
-  },
-  {
-    path: '/scatterChart',
-    name: 'ScatterChart',
-    component: PageView,
-    props: scatterChartProps,
-    meta: {
-      category: 'Chart',
-    },
-  },
-  {
-    path: '/pieChart',
-    name: 'PieChart',
-    component: PageView,
-    props: pieChartProps,
-    meta: {
-      category: 'Chart',
-    },
-  },
-  {
-    path: '/comboChart',
-    name: 'ComboChart',
-    component: PageView,
-    props: comboChartProps,
-    meta: {
-      category: 'Chart',
-    },
-  },
-  {
-    path: '/heatMap',
-    name: 'HeatMap',
-    component: PageView,
-    props: heatMapProps,
-    meta: {
-      category: 'Chart',
-    },
-  },
-  {
-    path: '/zoomChart',
-    name: 'ZoomChart',
-    component: PageView,
-    props: zoomChartProps,
-    meta: {
-      category: 'Chart',
-    },
-  },
-  {
-    path: '/brushChart',
-    name: 'BrushChart',
-    component: PageView,
-    props: brushChartProps,
-    meta: {
-      category: 'Chart',
-    },
-  },
+  ...chartRoutes,
   {
     path: '/message',
     name: 'Message',

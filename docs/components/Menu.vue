@@ -8,14 +8,14 @@
         v-model="searchText"
         class="evui-nav-search-input"
         type="text"
-        placeholder="메뉴 검색..."
+        placeholder="Search menu..."
         @keydown.esc="searchText = ''"
       />
       <i v-if="searchText" class="ev-icon-close evui-nav-search-clear" @click="searchText = ''" />
     </div>
 
     <!-- Menu list -->
-    <div class="evui-nav-menu-list">
+    <div ref="menuListRef" class="evui-nav-menu-list">
       <ev-menu v-model="currentMenu" :items="filteredMenu" @change="changeMenu" />
       <p v-if="searchText && !filteredMenu.length" class="evui-nav-no-results">
         검색 결과가 없습니다.
@@ -35,7 +35,8 @@
 </template>
 
 <script>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, nextTick, onMounted } from 'vue';
+import { kebabCase } from 'lodash-es';
 import router from '../router';
 
 export default {
@@ -51,66 +52,124 @@ export default {
     const currentMenu = ref(null);
     const searchText = ref('');
     const searchInputRef = ref(null);
+    const menuListRef = ref(null);
 
-    router.beforeEach((to, from, next) => {
-      if (!from.name) {
-        currentMenu.value = to.name;
-      }
-      next();
+    const route = router.currentRoute;
+
+    // 현재 경로의 최상위 세그먼트 ('/lineChart/fill' → '/lineChart')
+    const activeBasePath = computed(() => {
+      const [seg] = route.value.path.split('/').filter(Boolean);
+      return seg ? `/${seg}` : '';
     });
 
-    const menu = router
-      .getRoutes()
-      .filter((item) => item.name !== 'PageNotFound')
-      .reduce((acc, cur) => {
-        const menuInfoObj = {
-          text: cur.name,
-          value: cur.name,
-        };
-        if (!cur.meta.category) {
-          acc.push(menuInfoObj);
-        } else {
-          const idx = acc.findIndex((v) => v.text === cur.meta.category);
-          if (idx < 0) {
-            acc.push({
-              text: cur.meta.category,
-              value: cur.meta.category,
-              children: [menuInfoObj],
-            });
+    // 갤러리 라우트(meta.gallery)는 props.components 로부터 예제 children 을 만든다.
+    const buildExampleChildren = (record) => {
+      const components = record.props?.default?.components;
+      if (!record.meta.gallery || !components) {
+        return null;
+      }
+      return Object.keys(components).map((name) => ({
+        text: name,
+        value: `${record.path}/${kebabCase(name)}`,
+      }));
+    };
+
+    const baseMenu = computed(() =>
+      router
+        .getRoutes()
+        .filter((item) => item.name !== 'PageNotFound' && !item.meta.hideInMenu)
+        .reduce((acc, cur) => {
+          const exampleChildren = buildExampleChildren(cur);
+          let node;
+          if (exampleChildren?.length) {
+            // 갤러리 차트: '전체 보기'(갤러리) + 예제 목록 + API 문서를 children 으로 가진다.
+            const children = [{ text: '전체 보기', value: cur.name }, ...exampleChildren];
+            if (cur.props?.default?.mdText) {
+              children.push({ text: 'API', value: `${cur.name}Api` });
+            }
+            node = {
+              text: cur.name,
+              value: `${cur.name}__group`,
+              path: cur.path,
+              expand: cur.path === activeBasePath.value,
+              children,
+            };
           } else {
-            acc[idx].children.push(menuInfoObj);
+            node = { text: cur.name, value: cur.name, path: cur.path };
           }
+
+          if (!cur.meta.category) {
+            acc.push(node);
+          } else {
+            const idx = acc.findIndex((v) => v.text === cur.meta.category);
+            if (idx < 0) {
+              acc.push({ text: cur.meta.category, value: cur.meta.category, children: [node] });
+            } else {
+              acc[idx].children.push(node);
+            }
+          }
+          return acc;
+        }, []),
+    );
+
+    // 검색어를 노드 트리에 재귀 적용한다. 매칭되는 하위가 있으면 부모를 펼친다.
+    const filterNodes = (nodes, query) =>
+      nodes.reduce((acc, node) => {
+        const selfMatch = node.text.toLowerCase().includes(query);
+        if (node.children) {
+          if (selfMatch) {
+            acc.push({ ...node, expand: true });
+          } else {
+            const children = filterNodes(node.children, query);
+            if (children.length) {
+              acc.push({ ...node, children, expand: true });
+            }
+          }
+        } else if (selfMatch) {
+          acc.push(node);
         }
         return acc;
       }, []);
 
     const filteredMenu = computed(() => {
       const query = searchText.value.toLowerCase().trim();
-      if (!query) return menu;
-      return menu.reduce((acc, item) => {
-        if (item.children) {
-          // 카테고리명이 매칭되면 하위 메뉴 전체 표시
-          if (item.text.toLowerCase().includes(query)) {
-            acc.push(item);
-          } else {
-            // 하위 메뉴 중 매칭되는 항목만 필터링
-            const matchingChildren = item.children.filter((child) =>
-              child.text.toLowerCase().includes(query),
-            );
-            if (matchingChildren.length > 0) {
-              acc.push({ ...item, children: matchingChildren });
-            }
-          }
-        } else if (item.text.toLowerCase().includes(query)) {
-          acc.push(item);
-        }
-        return acc;
-      }, []);
+      if (!query) return baseMenu.value;
+      return filterNodes(baseMenu.value, query);
     });
 
     const changeMenu = (newVal) => {
-      router.push({ name: newVal.value });
+      // 예제 항목은 경로(value)로, 그 외에는 라우트 이름으로 이동한다.
+      if (typeof newVal.value === 'string' && newVal.value.startsWith('/')) {
+        router.push(newVal.value);
+      } else {
+        router.push({ name: newVal.value });
+      }
     };
+
+    // 현재 보고 있는 메뉴 항목으로 사이드바를 스크롤한다.
+    const scrollToActive = () => {
+      const container = menuListRef.value;
+      const activeEl = container?.querySelector('.ev-menu-item.active > .ev-menu-title');
+      if (activeEl) {
+        activeEl.scrollIntoView({ block: 'nearest' });
+      }
+    };
+
+    // 라우트 변경 시 active 값을 동기화하고 해당 항목으로 스크롤한다.
+    watch(
+      route,
+      () => {
+        currentMenu.value = route.value.params.exampleId
+          ? route.value.path
+          : route.value.name;
+        nextTick(() => requestAnimationFrame(scrollToActive));
+      },
+      { immediate: true },
+    );
+
+    onMounted(() => {
+      nextTick(() => requestAnimationFrame(scrollToActive));
+    });
 
     // 펼칠 때 검색 인풋에 자동 포커스
     watch(
@@ -125,11 +184,11 @@ export default {
     );
 
     return {
-      menu,
       filteredMenu,
       currentMenu,
       searchText,
       searchInputRef,
+      menuListRef,
       changeMenu,
     };
   },

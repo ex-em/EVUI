@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 
 export default {
   name: 'MenuItem',
@@ -119,6 +119,16 @@ export default {
         : true;
     const isExpand = ref(defaultExpand);
     const hasChild = computed(() => !!props.item.children && !!props.item.children.length);
+
+    // expand 속성이 외부에서 갱신되면 펼침 상태를 동기화한다.
+    watch(
+      () => props.item.expand,
+      (val) => {
+        if (props.expandable && typeof val === 'boolean') {
+          isExpand.value = val;
+        }
+      },
+    );
 
     const clickMenu = (params) => {
       if (hasChild.value && params.depth === props.depth) {
