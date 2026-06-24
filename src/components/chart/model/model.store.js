@@ -11,6 +11,9 @@ const modules = {
    * @returns {undefined}
    */
   createDataSet(data, label) {
+    // 데이터셋이 재생성될 때마다 +1. computeGeometry 가 (dataEpoch, scaleVersion) 키로 geometry
+    // 재계산을 skip 하는 데 쓴다 — 데이터 변경 프레임은 이 증가로 전 시리즈 geometry 가 무효화된다.
+    this._dataEpoch = (this._dataEpoch ?? 0) + 1;
     Object.keys(this.seriesInfo.charts).forEach((typeKey) => {
       const seriesIDs = this.seriesInfo.charts[typeKey];
 
@@ -58,68 +61,87 @@ const modules = {
           for (let s = 0; s < seriesIDs.length; s++) {
             const seriesID = seriesIDs[s];
             const series = this.seriesList[seriesID];
-            const rawData = data?.[seriesID];
-            const { passingValue, interpolation } = series;
-            const needsTransform =
-              interpolation === 'zero' || (passingValue != null && passingValue !== undefined);
 
-            let hasPassingValueInData = false;
-            let sData;
+            // show=false 시리즈는 element.draw 가 이미 그리지 않고, getStoreMinMax·
+            // buildLabelValidMask 도 show 시리즈만 집계하므로(축 범위·hit test 에 미반영)
+            // 변환 자체를 건너뛴다 — 출력 불변. show 상태는 덮어쓰지 않는다(다시 켜면
+            // update()→createDataSet 재호출로 현재 데이터로 변환됨).
+            if (series && series.show !== false) {
+              const rawData = data?.[seriesID];
+              const { passingValue, interpolation } = series;
+              const needsTransform = interpolation === 'zero'
+                || (passingValue != null && passingValue !== undefined);
 
-            if (!rawData) {
-              sData = rawData;
-            } else if (!needsTransform) {
-              sData = rawData;
-            } else {
-              sData = new Array(rawData.length);
-              for (let i = 0; i < rawData.length; i++) {
-                const item = rawData[i];
-                if (interpolation === 'zero' && !item) {
-                  sData[i] = 0;
-                } else if (item === passingValue) {
-                  hasPassingValueInData = true;
-                  sData[i] = null;
-                } else {
-                  sData[i] = item;
-                }
-              }
-            }
+              let hasPassingValueInData = false;
+              let sData;
 
-            series.hasPassingValueInData = hasPassingValueInData;
-
-            if (series && sData) {
-              const inStackGroup = series.isExistGrp && !series.isOverlapping;
-              let tops = null;
-              if (inStackGroup) {
-                tops = stackTops.get(series.groupIndex);
-                if (!tops) {
-                  tops = { pos: [], neg: [] };
-                  stackTops.set(series.groupIndex, tops);
-                }
-              }
-
-              if (inStackGroup && series.stackIndex) {
-                series.data = this.addSeriesStackDS(sData, label, series.stackIndex, tops);
+              if (!rawData) {
+                sData = rawData;
+              } else if (!needsTransform) {
+                sData = rawData;
               } else {
-                series.data = this.addSeriesDS(
-                  sData,
-                  label,
-                  series.isExistGrp,
-                  basePassingValue,
-                  series.data,
-                );
+                sData = new Array(rawData.length);
+                for (let i = 0; i < rawData.length; i++) {
+                  const item = rawData[i];
+                  if (interpolation === 'zero' && !item) {
+                    sData[i] = 0;
+                  } else if (item === passingValue) {
+                    hasPassingValueInData = true;
+                    sData[i] = null;
+                  } else {
+                    sData[i] = item;
+                  }
+                }
               }
-              series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
 
-              // 이 시리즈가 이후 스택 시리즈의 base 가 되므로 누적 top 갱신
-              if (inStackGroup) {
-                this.updateStackTops(tops, series);
+              series.hasPassingValueInData = hasPassingValueInData;
+
+              if (sData) {
+                const inStackGroup = series.isExistGrp && !series.isOverlapping;
+                let tops = null;
+                if (inStackGroup) {
+                  tops = stackTops.get(series.groupIndex);
+                  if (!tops) {
+                    tops = { pos: [], neg: [] };
+                    stackTops.set(series.groupIndex, tops);
+                  }
+                }
+
+                if (inStackGroup && series.stackIndex) {
+                  // 3.4 stackTops base 조회(O(1)) 유지 + 직전 data 를 풀로 전달(점객체 재사용, GC 절감)
+                  series.data = this.addSeriesStackDS(
+                    sData,
+                    label,
+                    series.stackIndex,
+                    tops,
+                    series.data,
+                  );
+                } else {
+                  series.data = this.addSeriesDS(
+                    sData,
+                    label,
+                    series.isExistGrp,
+                    basePassingValue,
+                    series.data,
+                  );
+                }
+                series.minMax = this.getSeriesMinMax(series.data, series.passingValue);
+
+                // 이 시리즈가 이후 스택 시리즈의 base 가 되므로 누적 top 갱신
+                if (inStackGroup) {
+                  this.updateStackTops(tops, series);
+                }
               }
             }
           }
         }
       }
     });
+
+    // ③ hit test 사전계산: 라벨별 "유효 데이터를 가진 가시 시리즈 존재" mask 를 여기서 1회 만든다.
+    // 데이터 변경·범례(show) 토글은 모두 update()→createDataSet() 를 거치므로 이 시점 재계산이 곧 무효화다.
+    // (interaction 모듈이 mixin 된 정상 인스턴스에서만 동작. createDataSet 단독 단위 테스트 대비 optional 호출.)
+    this.buildLabelValidMask?.();
   },
 
   /**
@@ -518,16 +540,19 @@ const modules = {
    * @param {object}  label   chart label
    * @param {number}  sIdx    series ordered index
    * @param {{pos: number[], neg: number[]}}  tops  스택 그룹의 부호별 누적 top(base 위치)
+   * @param {ChartSeriesDataPoint[]} [prevData]  직전 데이터셋(점객체 풀 재사용용)
    *
    * @typedef {import('./index').ChartSeriesDataPoint} ChartSeriesDataPoint
    *
    * @returns {ChartSeriesDataPoint[]} data for each series
    */
-  addSeriesStackDS(data, label, sIdx = 0, tops = null) {
+  addSeriesStackDS(data, label, sIdx = 0, tops = null, prevData) {
     const isHorizontal = this.options.horizontal;
     const sdata = [];
     const posTop = tops?.pos;
     const negTop = tops?.neg;
+    // 직전 데이터셋의 점객체를 재사용(addSeriesDS 와 동일 전략) — 매 틱 N개 객체 할당/GC 제거.
+    const pool = Array.isArray(prevData) ? prevData : null;
 
     data.forEach((curr, index) => {
       // base(아래 스택) 위치: 부호별 누적 top 에서 O(1) 조회.
@@ -555,7 +580,8 @@ const modules = {
           gdata = oData;
         }
 
-        sdata.push(this.addData(gdata, ldata, odata, bdata));
+        const reused = pool && pool[sdata.length];
+        sdata.push(this.addData(gdata, ldata, odata, bdata, reused || null));
       }
     });
 
@@ -717,8 +743,7 @@ const modules = {
    *
    * @returns {ChartSeriesDataPoint} data for each graph point
    */
-  addData(gdata, ldata, odata = null, bdata = null) {
-    let data;
+  addData(gdata, ldata, odata = null, bdata = null, target = null) {
     let gdataValue = null;
     let odataValue = null;
     let gdataColor = null;
@@ -740,12 +765,17 @@ const modules = {
       odataValue = odata ?? null;
     }
 
+    // target 이 주어지면 그 객체를 재사용(점객체 풀)해 매 틱 N개 객체 할당(GC 압력)을 줄인다.
+    const data = target || {};
     if (this.options.horizontal) {
-      data = { x: gdataValue, y: ldata, o: odataValue, b: bdata };
+      data.x = gdataValue;
+      data.y = ldata;
     } else {
-      data = { x: ldata, y: gdataValue, o: odataValue, b: bdata };
+      data.x = ldata;
+      data.y = gdataValue;
     }
-
+    data.o = odataValue;
+    data.b = bdata;
     data.xp = null;
     data.yp = null;
     data.w = null;

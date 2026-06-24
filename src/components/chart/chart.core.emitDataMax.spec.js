@@ -126,16 +126,15 @@ describe('EvChart.drawChart → emitDataMaxChange 호출부 배선', () => {
     core.bufferCanvas = undefined;
 
     // drawChart 가 부르는 형제 메서드는 전부 no-op stub — emitDataMaxChange 만 실제 실행한다.
+    // (RenderCore 분리 후 drawChart 는 prepareScale → 레이어 메서드를 호출한다.)
     core.initScale = vi.fn();
-    core.getAxesRange = vi.fn();
-    core.getLabelOffset = vi.fn();
-    core.getAxesLabelRange = vi.fn();
-    core.calculateSteps = vi.fn();
-    core.adjustXAndYAxisWidth = vi.fn();
-    core.emitAxesScaleChange = vi.fn();
-    core.drawAxis = vi.fn();
-    core.drawSeries = vi.fn();
+    core.prepareScale = vi.fn(() => ({ scaleChange: null, scrollbarLabelOffset: {} }));
+    core.tryDrawSeriesOnWorker = vi.fn(() => false);
+    core.drawStaticLayer = vi.fn();
+    core.drawSeriesLayer = vi.fn();
+    core.drawSeriesOverlay = vi.fn();
     core.drawTip = vi.fn();
+    core.commitToDisplay = vi.fn();
 
     return core;
   };

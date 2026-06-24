@@ -77,7 +77,24 @@ export function useModel() {
 
     if (!val && val !== 0) {
       // 값이 없을 경우
-      result = props.stepStrictly ? previousValue.value : null;
+      if (props.disableEmpty) {
+        // 빈 값 비허용: 0 을 기준값으로 사용
+        result = 0;
+        if (props.stepStrictly) {
+          // step-strictly 와 함께면 0 을 step 그리드에 스냅 (충돌 해소)
+          result = getValueCloseToStep(result, {
+            min: props.min === -Infinity ? 0 : props.min,
+            max: props.max,
+            step: props.step,
+          });
+        } else if ((props.min || props.min === 0) && result < props.min) {
+          result = props.min;
+        } else if ((props.max || props.max === 0) && result > props.max) {
+          result = props.max;
+        }
+      } else {
+        result = props.stepStrictly ? previousValue.value : null;
+      }
     } else if (isNaN(val)) {
       // 숫자 아닐 경우 - 문자열 들어 왔을 경우
       result = previousValue.value;

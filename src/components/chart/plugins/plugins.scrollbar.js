@@ -150,14 +150,17 @@ const module = {
 
   /**
    * update scrollbar position
+   * @param {object} [labelOffset]   ChartShell(drawChart)이 주입하는 pre-adjust labelOffset.
+   *   prepareScale 이 adjustXAndYAxisWidth 로 labelOffset 을 재계산하기 전 값으로 그려야
+   *   기존 동작과 동일하므로, RenderCore 가 그 시점 스냅샷을 넘긴다. 미지정 시 this.labelOffset.
    */
-  updateScrollbarPosition() {
+  updateScrollbarPosition(labelOffset) {
     if (this.scrollbar.x?.use && this.scrollbar.x?.isInit) {
-      this.setScrollbarPosition('x');
+      this.setScrollbarPosition('x', labelOffset);
     }
 
     if (this.scrollbar.y?.use && this.scrollbar.y?.isInit) {
-      this.setScrollbarPosition('y');
+      this.setScrollbarPosition('y', labelOffset);
     }
   },
 
@@ -246,7 +249,7 @@ const module = {
    * 부동소수점 누적 오차가 가장자리를 살짝 넘지 않도록 [0, maxPosition] 으로 보정한다.
    * @param dir axis direction ('x' | 'y')
    */
-  setScrollbarPosition(dir) {
+  setScrollbarPosition(dir, injectedLabelOffset) {
     const scrollbarOpt = this.scrollbar[dir];
     if (!scrollbarOpt.use || !scrollbarOpt.range) {
       return;
@@ -254,7 +257,7 @@ const module = {
 
     const scrollbarDOM = scrollbarOpt.dom;
     const chartRect = this.chartRect;
-    const labelOffset = this.labelOffset;
+    const labelOffset = injectedLabelOffset ?? this.labelOffset;
     const aPos = {
       x1: chartRect.x1 + labelOffset.left,
       x2: chartRect.x2 - labelOffset.right,

@@ -5,16 +5,20 @@ import Util from '../helpers/helpers.util';
  *
  * 동작 개요:
  *  1) `tooltip.formatter.html(items)`로 사용자가 반환한 HTML을 파싱한다.
- *  2) 파싱된 트리에서 row를 찾는다 (우선순위 순):
- *     a. `[data-evui-tooltip-row]` 속성이 있는 element들 — **권장**.
+ *  2) 파싱된 트리에서 가상화 대상 "컨테이너"를 찾는다 (행 탐지 기준, 우선순위 순):
+ *     a. `[data-evui-tooltip-row]` 속성 행의 개수가 series 수와 일치하고 부모가 동일 → 그 부모.
  *        - 사용자는 시리즈당 wrapper element 하나에 이 속성만 추가하면 된다.
  *     b. 휴리스틱: BFS로 자식 수가 `items.length`와 일치하는 가장 얕은 element.
  *        - row가 단순한 한 단계의 자식들로 구성된 경우에만 동작.
  *  3) 둘 다 실패하면 가상 스크롤 비활성, 기존 경로로 fallback (경고 1회).
- *  4) 사용자의 wrapper 구조는 그대로 두고, row만 분리하여 가상 스크롤 viewport를 통해
- *     가시 범위 행만 라이브 DOM에 부착한다.
- *  5) 가시 행은 부착 직후 측정하여 prefix sum 갱신, 앵커 보정으로 스크롤 점프 방지.
- *  6) ResizeObserver로 컨테이너 폭 변화 시 측정 무효화 후 재렌더.
+ *  4) **컨테이너의 직속 자식 전체**를 순서 보존 "아이템"으로 가상화한다.
+ *     - 행 = `[data-evui-tooltip-row]` 보유 / 비-row = 그 외 모든 직속 자식(그룹 헤더·구분선·marker 등).
+ *       분류 기준은 오직 `data-evui-tooltip-row` 속성 유무이며, 소비처 클래스명은 보지 않는다.
+ *     - 비-row는 자기 위치(자기 그룹 행 위/사이)를 보존한 채 행과 함께 스크롤되어 들어오고 나간다.
+ *  5) 가시 범위(행+비-row 통합 좌표계)의 아이템만 viewport에 부착하고 상/하 spacer로 나머지 높이 보전.
+ *  6) 가시 아이템은 부착 직후 측정하여 prefix sum 갱신, 앵커 보정으로 스크롤 점프 방지.
+ *     - 학습 평균/추정 높이는 **행 아이템만** 대상으로 계산해 키가 다른 비-row가 행 추정을 오염시키지 않게 한다.
+ *  7) ResizeObserver로 컨테이너 폭 변화 시 측정 무효화 후 재렌더.
  */
 
 const DEFAULT_MAX_HEIGHT = 480;
@@ -43,16 +47,18 @@ const modules = {
   },
 
   /**
-   * 파싱된 트리에서 row 배열과 그 공통 부모(rowContainer)를 찾는다.
+   * 파싱된 트리에서 가상화 대상 컨테이너를 찾는다.
+   * 컨테이너의 직속 자식 전체(행 + 비-row 데코레이션)가 가상화 아이템이 된다.
    *
    * @param {Element} root
-   * @param {number} itemsCount
-   * @returns {{rows: Element[], rowContainer: Element}|null}
+   * @param {number} itemsCount  series 수
+   * @returns {Element|null}
    */
-  _findCustomTooltipRows(root, itemsCount) {
+  _findCustomTooltipContainer(root, itemsCount) {
     if (!root || !root.querySelectorAll) return null;
 
-    // 1) 명시적 마커
+    // 1) 명시적 마커 — 행 개수가 series 수와 일치하고 부모가 동일하면 그 부모가 컨테이너.
+    //    부모에 비-row 형제(그룹 헤더·구분선·marker 등)가 섞여 있어도 컨테이너로 인정한다.
     const marked = root.querySelectorAll('[data-evui-tooltip-row]');
     if (marked.length === itemsCount && marked.length > 0) {
       const firstParent = marked[0].parentElement;
@@ -64,16 +70,17 @@ const modules = {
         }
       }
       if (sameParent) {
-        return { rows: Array.from(marked), rowContainer: firstParent };
+        return firstParent;
       }
     }
 
     // 2) BFS 휴리스틱 — 자식 수가 itemsCount와 일치하는 가장 얕은 element
+    //    (이 경로의 컨테이너 자식들은 전부 행이므로 비-row가 없는 기존 동작과 동일)
     const queue = [root];
     while (queue.length) {
       const node = queue.shift();
       if (node.children && node.children.length === itemsCount) {
-        return { rows: Array.from(node.children), rowContainer: node };
+        return node;
       }
       if (node.children) {
         for (let i = 0; i < node.children.length; i++) {
@@ -173,12 +180,13 @@ const modules = {
   },
 
   /**
-   * 가시 범위 행만 viewport에 부착한다. 다른 행은 detach 상태(this.vsState.rows 배열에 보존).
+   * 가시 범위 아이템만 viewport에 부착한다(행/비-row 무관, 원래 순서 보존).
+   * 다른 아이템은 detach 상태(this.vsState.items 배열에 보존).
    * 새 range가 직전 range와 동일하면 viewport 재구성을 건너뛰고 spacer만 갱신한다.
    */
   _renderVisibleCustomTooltipRows() {
     const s = this.vsState;
-    if (!s || !s.rows.length) return;
+    if (!s || !s.items.length) return;
 
     const range = this._computeCustomTooltipVisibleRange();
     const same = s.range.start === range.start && s.range.end === range.end;
@@ -190,8 +198,8 @@ const modules = {
       }
       const frag = document.createDocumentFragment();
       for (let i = range.start; i <= range.end; i++) {
-        const row = s.rows[i];
-        if (row) frag.appendChild(row);
+        const item = s.items[i];
+        if (item) frag.appendChild(item);
       }
       s.viewport.appendChild(frag);
       s.range = range;
@@ -225,8 +233,9 @@ const modules = {
   },
 
   /**
-   * viewport 자식들의 실제 높이를 측정해 캐시 업데이트.
-   * 첫 측정 시 미측정 row들도 학습된 평균으로 보정해 totalHeight 점프를 흡수한다.
+   * viewport 자식들의 실제 높이를 측정해 캐시 업데이트(행/비-row 모두 실측).
+   * 학습 평균은 **행 아이템만** 대상으로 계산해 키가 다른 비-row가 행 추정을 오염시키지 않게 하고,
+   * 미측정 '행'에만 평균을 적용해 totalHeight 점프를 흡수한다. (미측정 비-row는 실측 전까지 추정 유지)
    * 추정과 다르면 prefix sum 재계산 + 앵커 보정 후 다시 렌더.
    */
   _measureVisibleCustomTooltipRows() {
@@ -241,7 +250,8 @@ const modules = {
     const oldAnchorOffset = s.prefixSums[anchorIdx] || 0;
 
     let changed = false;
-    let sum = 0;
+    let rowSum = 0;
+    let rowCount = 0;
     for (let k = 0; k < count; k++) {
       const idx = s.range.start + k;
       const h = children[k].offsetHeight;
@@ -255,20 +265,26 @@ const modules = {
         }
         s.measured[idx] = true;
       }
-      sum += h;
+      // 학습 평균은 행 아이템만 대상으로 (키 큰 헤더 등 비-row가 행 추정을 오염시키지 않게)
+      if (s.isRow[idx] && h > 0) {
+        rowSum += h;
+        rowCount += 1;
+      }
     }
 
-    // 학습된 평균을 누적 (다음 세션 estimated)
-    const avg = sum / count;
-    s.learnedAverageHeight = avg;
+    // 학습된 행 평균을 누적 (다음 세션 estimated 부트스트랩)
+    if (rowCount > 0) {
+      const avg = rowSum / rowCount;
+      s.learnedAverageHeight = avg;
 
-    // 미측정 row들에 평균을 적용해 totalHeight 추정을 보정 (초기 점프 제거)
-    if (avg > 0 && Math.abs(avg - s.estimatedRowHeight) > 0.5) {
-      s.estimatedRowHeight = avg;
-      for (let i = 0; i < s.heights.length; i++) {
-        if (!s.measured[i] && s.heights[i] !== avg) {
-          s.heights[i] = avg;
-          changed = true;
+      // 미측정 '행'에만 평균을 적용해 totalHeight 추정을 보정 (초기 점프 제거)
+      if (avg > 0 && Math.abs(avg - s.estimatedRowHeight) > 0.5) {
+        s.estimatedRowHeight = avg;
+        for (let i = 0; i < s.heights.length; i++) {
+          if (s.isRow[i] && !s.measured[i] && s.heights[i] !== avg) {
+            s.heights[i] = avg;
+            changed = true;
+          }
         }
       }
     }
@@ -333,8 +349,8 @@ const modules = {
     const parsed = Util.htmlToElement(htmlString);
     if (!parsed || !parsed.children) return false;
 
-    const found = this._findCustomTooltipRows(parsed, seriesList.length);
-    if (!found) {
+    const container = this._findCustomTooltipContainer(parsed, seriesList.length);
+    if (!container) {
       // 동일 마크업이 유지되는 동안 재시도(formatter+파싱 2회/move)를 막는다. render()에서 리셋.
       this._vsDetectFailed = true;
       if (!this._vsWarnedFallback) {
@@ -350,41 +366,41 @@ const modules = {
       return false;
     }
 
-    const { rows, rowContainer } = found;
+    // 컨테이너 직속 자식 전체를 순서 보존 "아이템"으로 수집한다(행 + 비-row 데코레이션).
+    //  - 행 = `[data-evui-tooltip-row]` 보유 / 비-row = 그 외 모든 직속 자식.
+    //  - 분류 기준은 오직 속성 유무. 소비처 클래스명은 보지 않는다.
+    //  - 단, 마크된 행이 하나도 없으면(휴리스틱 BFS로 탐지된 균일-행 본문) 전부 '행'으로 간주해
+    //    학습 평균 보정 등 기존 동작을 보존한다.
+    const items = Array.from(container.children);
+    if (!items.length) return false;
+    const hasMark = (el) => !!(el.hasAttribute && el.hasAttribute('data-evui-tooltip-row'));
+    const markedExists = items.some(hasMark);
+    const isRow = items.map((el) => (markedExists ? hasMark(el) : true));
 
-    // 가상 스크롤 trio를 끼워넣을 위치 결정:
-    //  - 첫 행의 다음 형제부터 따라가며 "행 집합에 속하지 않는" 첫 노드를 anchor로 잡는다.
-    //    못 찾으면 null (= rowContainer 끝에 append).
-    //  - 이렇게 해야 비-row 형제(header/footer 등)는 그대로 보존되면서, 동시에 anchor가
-    //    이후 detach로 부모를 잃는 일이 없다.
-    const rowSet = new Set(rows);
-    const firstRow = rows[0];
-    let anchorBefore = firstRow ? firstRow.nextSibling : null;
-    while (anchorBefore && rowSet.has(anchorBefore)) {
-      anchorBefore = anchorBefore.nextSibling;
+    // 모든 아이템 detach(배열에 보존) 후 컨테이너를 비우고 trio를 그 자리에 삽입한다.
+    // 비-row도 아이템으로 함께 가상화하므로 더 이상 제자리 보존(anchorBefore) 로직이 필요 없다.
+    for (let i = 0; i < items.length; i++) {
+      const el = items[i];
+      if (el.parentNode) el.parentNode.removeChild(el);
+    }
+    while (container.firstChild) {
+      container.removeChild(container.firstChild);
     }
 
-    // 행 분리 (보존)
-    for (let i = 0; i < rows.length; i++) {
-      const row = rows[i];
-      if (row.parentNode) row.parentNode.removeChild(row);
-    }
-
-    // trio 생성·삽입. insertBefore(node, null)은 spec상 appendChild와 동치.
     const { topSpacer, viewport, bottomSpacer } = this._createVirtualScrollAnatomy();
-    rowContainer.insertBefore(topSpacer, anchorBefore);
-    rowContainer.insertBefore(viewport, anchorBefore);
-    rowContainer.insertBefore(bottomSpacer, anchorBefore);
+    container.appendChild(topSpacer);
+    container.appendChild(viewport);
+    container.appendChild(bottomSpacer);
 
-    // row 컨테이너를 스크롤 가능하게 설정 (사용자 CSS를 inline으로 덮어씀)
+    // 컨테이너를 스크롤 가능하게 설정 (사용자 CSS를 inline으로 덮어씀)
     const maxHeight = opt.maxHeight || DEFAULT_MAX_HEIGHT;
-    rowContainer.style.maxHeight = `${maxHeight}px`;
-    rowContainer.style.overflowY = 'auto';
-    rowContainer.style.overflowX = 'hidden';
+    container.style.maxHeight = `${maxHeight}px`;
+    container.style.overflowY = 'auto';
+    container.style.overflowX = 'hidden';
     // 가상 스크롤에서 spacer 높이가 바뀔 때마다 브라우저의 scroll anchoring이
     // scrollTop을 자동 보정해 휠 플릭 시 스크롤이 끝까지 튕겨가는 현상이 발생한다.
     // 우리가 prefix sum + 앵커 인덱스로 직접 위치를 관리하므로 브라우저 보정을 끈다.
-    rowContainer.style.overflowAnchor = 'none';
+    container.style.overflowAnchor = 'none';
 
     // 기존 정리 (이전 세션 리스너/옵저버 해제)
     this._teardownCustomTooltipVirtualScroll();
@@ -397,13 +413,14 @@ const modules = {
       learned ?? vs.estimatedRowHeight ?? DEFAULT_ESTIMATED_ROW_HEIGHT;
 
     this.vsState = {
-      scrollEl: rowContainer,
+      scrollEl: container,
       topSpacer,
       viewport,
       bottomSpacer,
-      rows,
-      heights: new Array(rows.length).fill(estimated),
-      measured: new Array(rows.length).fill(false),
+      items,
+      isRow,
+      heights: new Array(items.length).fill(estimated),
+      measured: new Array(items.length).fill(false),
       prefixSums: [],
       totalHeight: 0,
       range: { start: 0, end: -1 },
@@ -431,15 +448,15 @@ const modules = {
         this._renderVisibleCustomTooltipRows();
       });
     };
-    rowContainer.addEventListener('scroll', onScroll, { passive: true });
+    container.addEventListener('scroll', onScroll, { passive: true });
     this.vsState.onScroll = onScroll;
 
     // ResizeObserver: 폭 변화 시 측정 무효화
     if (typeof ResizeObserver !== 'undefined') {
-      let lastWidth = rowContainer.clientWidth;
+      let lastWidth = container.clientWidth;
       const ro = new ResizeObserver(() => {
         if (!this.vsState) return;
-        const w = rowContainer.clientWidth;
+        const w = container.clientWidth;
         if (w !== lastWidth) {
           lastWidth = w;
           this.vsState.measured.fill(false);
@@ -448,7 +465,7 @@ const modules = {
           this._renderVisibleCustomTooltipRows();
         }
       });
-      ro.observe(rowContainer);
+      ro.observe(container);
       this.vsState.resizeObserver = ro;
     }
 
@@ -464,7 +481,7 @@ const modules = {
     this.tooltipDOM.style.border = `1px solid ${opt.borderColor}`;
     this.tooltipDOM.style.color = opt.fontColor?.title ?? opt.fontColor;
 
-    // 첫 렌더 (이때 maxHeight 적용된 rowContainer는 clientHeight를 가지므로 가시 범위 계산 가능)
+    // 첫 렌더 (이때 maxHeight 적용된 container는 clientHeight를 가지므로 가시 범위 계산 가능)
     this._renderVisibleCustomTooltipRows();
 
     // 학습된 평균을 인스턴스 레벨에 보존 (다음 세션 estimated 부트스트랩)

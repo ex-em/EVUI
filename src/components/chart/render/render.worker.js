@@ -1,0 +1,103 @@
+/* eslint-env worker */
+/**
+ * worker 렌더 엔트리.
+ *
+ * worker 는 *자체* OffscreenCanvas 를 생성해 series 를 래스터하고 `transferToImageBitmap()` 으로
+ * ImageBitmap 을 main 에 보낸다. 디스플레이 캔버스를 `transferControlToOffscreen` 으로 받지 않으므로
+ * main 은 캔버스 소유권을 유지하고 worker 실패 시 main fallback 이 항상 가능하다.
+ *
+ * 메시지:
+ *  - {type:'init', version}            → OffscreenCanvas 지원 확인 후 {type:'ready'|'unsupported'} 응답
+ *  - {type:'render', epoch, snapshot, columns}
+ *      → 자체 OffscreenCanvas 에 series 래스터(element draw 재사용) → transferToImageBitmap
+ *      → {type:'rendered', epoch, bitmap, drawMs} (bitmap transfer) 응답. 예외 시 {type:'render-error'}.
+ *
+ * 래스터 알고리즘은 새로 구현하지 않는다 — `render.unpack.js` 가 스냅샷에서 element 인스턴스를
+ * 재구성하고 element `draw()` 를 호출한다(이중 구현 금지).
+ */
+
+import { RENDER_SNAPSHOT_VERSION } from './render.snapshot';
+import { reconstructSeries, rasterSeries } from './render.unpack';
+
+/** worker 가 재사용하는 OffscreenCanvas(크기 변경 시에만 재할당). */
+let canvas = null;
+let ctx = null;
+
+function ensureCanvas(width, height) {
+  if (!canvas || canvas.width !== width || canvas.height !== height) {
+    canvas = new OffscreenCanvas(width, height);
+    ctx = canvas.getContext('2d');
+  }
+}
+
+function renderSnapshot(msg) {
+  const { epoch, snapshot, columns } = msg;
+  const pixelRatio = snapshot.pixelRatio || 1;
+  const rect = snapshot.chartRect ?? {};
+  const cssWidth = rect.width ?? 0;
+  const cssHeight = rect.height ?? 0;
+  // main bufferCanvas/displayCanvas 는 `width * pixelRatio` 를 canvas.width 에 대입(정수 truncation).
+  // 동일 device 크기로 맞춰야 bitmap 이 1:1 합성되고 ensureCanvas 가 매 프레임 재할당하지 않는다.
+  const deviceWidth = Math.max(1, Math.floor(cssWidth * pixelRatio));
+  const deviceHeight = Math.max(1, Math.floor(cssHeight * pixelRatio));
+
+  ensureCanvas(deviceWidth, deviceHeight);
+
+  // main buffer 와 동일한 절대 변환(setTransform)으로 CSS px 좌표를 device px 로 스케일.
+  ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
+
+  const instances = reconstructSeries(snapshot, columns);
+
+  const t0 = performance.now();
+  rasterSeries(snapshot, instances, ctx);
+  const drawMs = performance.now() - t0;
+
+  const t1 = performance.now();
+  const bitmap = canvas.transferToImageBitmap();
+  const bitmapMs = performance.now() - t1;
+
+  self.postMessage({ type: 'rendered', epoch, bitmap, drawMs, bitmapMs }, [bitmap]);
+}
+
+self.onmessage = (event) => {
+  const msg = event.data;
+  if (!msg) {
+    return;
+  }
+
+  if (msg.type === 'init') {
+    // OffscreenCanvas 존재만으로는 부족하다 — 2d context 를 실제로 얻을 수 있어야 render 가 성공한다.
+    // 미지원이면 매 프레임 render-error 를 내지 않도록 init 핸드셰이크에서 미리 걸러 main 경로로 보낸다.
+    let supported = typeof OffscreenCanvas !== 'undefined';
+    if (supported) {
+      try {
+        supported = !!new OffscreenCanvas(1, 1).getContext('2d');
+      } catch (e) {
+        supported = false;
+      }
+    }
+    // 게이트가 보낸 msg.version 을 echo 하지 않고 worker 가 *자기 빌드의* 스냅샷 계약 버전을 보낸다.
+    // 그래야 게이트의 version 비교가 worker 번들과 main 번들의 실제 계약 일치를 검증한다(echo 면 항상 일치).
+    self.postMessage({
+      type: supported ? 'ready' : 'unsupported',
+      version: RENDER_SNAPSHOT_VERSION,
+    });
+    return;
+  }
+
+  if (msg.type === 'render') {
+    try {
+      renderSnapshot(msg);
+    } catch (err) {
+      // name/stack 까지 실어 main 에서 원인 진단이 가능하게 한다.
+      self.postMessage({
+        type: 'render-error',
+        epoch: msg.epoch,
+        message: String((err && err.message) || err),
+        name: err && err.name,
+        stack: err && err.stack,
+      });
+    }
+  }
+};

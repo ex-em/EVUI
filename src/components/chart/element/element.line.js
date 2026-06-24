@@ -77,6 +77,105 @@ class Line {
   }
 
   /**
+   * Compute pixel geometry (xp/yp) for each data point and store it on the main model.
+   * 기하 계산만 수행한다(canvas 그리기 없음). hit-test가 이 결과(item.xp/yp)를 소비한다.
+   * draw(래스터 패스)와 분리되어 worker offload 시 main 모델 기하가 유지된다.
+   * 좌표 의미·grp null 보정·alias·반올림은 draw와 완전히 동일해야 한다.
+   * @param {LineDrawParam} param
+   * @returns {undefined}
+   */
+  computeGeometry(param) {
+    if (!this.show) {
+      return;
+    }
+
+    // (데이터 버전, 스케일 버전) 이 직전과 같고 data 참조도 동일하면 xp/yp 는 이미 current → skip.
+    // legendHitInfo/selectSeries 는 스타일만 바꾸고 geometry 불변이라 키에 없음(그래서 hover 재렌더가
+    // 재계산을 건너뛴다). 버전 미전달(테스트/엣지 호출)이면 canMemo=false 로 항상 재계산(무회귀).
+    // 키는 숫자 필드 비교로 둔다 — 시리즈가 수만 개일 때 문자열 키 생성이 매 프레임 할당이 되지 않도록.
+    const canMemo = param.scaleVersion != null && param.dataEpoch != null;
+    if (
+      canMemo
+      && this._lastDataEpoch === param.dataEpoch
+      && this._lastScaleVersion === param.scaleVersion
+      && this._lastGeomData === this.data
+    ) {
+      return;
+    }
+
+    const { chartRect, labelOffset, axesSteps, displayOverflow } = param;
+    const isLinearInterpolation = this.useLinearInterpolation();
+
+    let barAreaByCombo = 0;
+    const minmaxX = axesSteps.x[this.xAxisIndex];
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    let xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+
+    if (this.combo) {
+      barAreaByCombo = xArea / (this.data.length || 1);
+      xArea -= barAreaByCombo;
+      this.size.comboOffset = barAreaByCombo;
+    }
+
+    const xsp = chartRect.x1 + labelOffset.left + barAreaByCombo / 2;
+    const ysp = chartRect.y2 - labelOffset.bottom;
+
+    // calculateX/Y 의 scalingFactor(=area/(max-min)) division 을 루프 밖에서 1회만 구해 인라인한다.
+    // 범위 밖(또는 null)이면 Canvas.calculateX/Y 와 동일하게 null 을 반환해 숨김/라인 끊기를 유지한다.
+    // 값 축(Y)은 displayOverflow 가 켜졌을 때만 graphMax 로 clamp(상단 경계 표시), 꺼지면 null(숨김).
+    // X 는 clamp 하지 않는다(라인 세로 전용 — calculateX 와 동일). in-range 좌표는 bit-identical.
+    const xMin = minmaxX.graphMin;
+    const xMax = minmaxX.graphMax;
+    const yMin = minmaxY.graphMin;
+    const yMax = minmaxY.graphMax;
+    const xScale = xArea / (xMax - xMin);
+    const yScale = yArea / (yMax - yMin);
+    const yMinOrZero = yMin || 0;
+
+    const getXPos = (val) => {
+      if (val === null || val === undefined || val < xMin || val > xMax) {
+        return null;
+      }
+      return Math.ceil(xsp + xScale * (val - xMin));
+    };
+
+    const getYPos = (val) => {
+      const v = displayOverflow && val > yMax ? yMax : val;
+      if (v === null || v === undefined || v < yMin || v > yMax) {
+        return null;
+      }
+      return ysp
+        ? Math.floor(ysp - yScale * (v - yMinOrZero))
+        : Math.floor(-(yScale * (v - yMinOrZero)));
+    };
+
+    for (let i = 0; i < this.data.length; i++) {
+      const curr = this.data[i];
+      let x = getXPos(curr.x);
+      let y = getYPos(curr.y);
+
+      if (this.isExistGrp && isLinearInterpolation && curr.o === null) {
+        y = getYPos(curr.b ?? 0);
+      }
+
+      if (x !== null) {
+        x += Util.aliasPixel(x);
+      }
+
+      curr.xp = x;
+      curr.yp = y;
+    }
+
+    if (canMemo) {
+      this._lastDataEpoch = param.dataEpoch;
+      this._lastScaleVersion = param.scaleVersion;
+      this._lastGeomData = this.data;
+    }
+  }
+
+  /**
    * @typedef {Object} LineDrawParam
    * @property {CanvasRenderingContext2D} ctx - 캔버스 렌더링 컨텍스트
    * @property {object} chartRect - 차트 영역 정보
@@ -88,6 +187,11 @@ class Line {
    * @property {boolean} [isBrush] - 브러시 사용 여부
    * @property {number} [unSelectedOpacity] - 비선택 시 opacity (0~1)
    */
+  /** 그릴 값(non-null o)이 하나라도 있는지. */
+  hasRenderableValue() {
+    return this.data.some((d) => d.o !== null && d.o !== undefined);
+  }
+
   /**
    * Draw series data
    * @param {LineDrawParam} param     object for drawing series data
@@ -111,6 +215,15 @@ class Line {
       unSelectedOpacity,
       displayOverflow,
     } = param;
+
+    // 기하(xp/yp)는 기하 패스가 채운다. 래스터 패스(이 아래)는 그 값을 읽기만 하고 mutate하지 않는다.
+    this.computeGeometry(param);
+
+    // 전부 null 인 시리즈는 래스터가 픽셀을 0개 그리므로(기하는 위에서 채움) 래스터만 skip 한다.
+    // 'zero' 는 null→0 변환돼 o!==null 이라 자동 제외, stacked(isExistGrp)는 별도 경로라 제외.
+    if (!this.hasRenderableValue() && !this.isExistGrp) {
+      return;
+    }
 
     // about selectLabel
     const selectLabelOption = selectLabel?.option;
@@ -143,11 +256,25 @@ class Line {
     const fillOpacity = this.extent.downplay ? this.fillOpacity * extent.opacity : this.fillOpacity;
     const lineWidth = this.lineWidth * extent.lineWidth;
 
+    // colorStringToRgba 결과를 슬롯별로 인스턴스 캐시한다 — 입력(색,opacity)이 불변인 프레임에서
+    // 전역 Map 조회 + `${색}|${opacity}` 키 문자열 생성을 건너뛴다(hover/툴팁 등 재렌더에서 반복 호출).
+    // opacity 가 시그니처에 포함돼 hover/선택으로 extent.opacity 가 바뀌면 자동 재계산된다(stale 색 방지).
+    const cache = this._rgbaCache || (this._rgbaCache = {});
+    const resolveRgba = (slot, colorStr, opacity) => {
+      const c = cache[slot];
+      if (c !== undefined && c.s === colorStr && c.o === opacity) {
+        return c.v;
+      }
+      const v = Util.colorStringToRgba(colorStr, opacity);
+      cache[slot] = { s: colorStr, o: opacity, v };
+      return v;
+    };
+
     ctx.beginPath();
     ctx.save();
     ctx.lineJoin = 'round';
     ctx.lineWidth = lineWidth;
-    ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
+    ctx.strokeStyle = resolveRgba('stroke', mainColor, mainColorOpacity);
     if (this.segments) {
       ctx.setLineDash(this.segments);
     }
@@ -186,43 +313,41 @@ class Line {
         ysp,
       );
 
-    const includeNegativeValue = this.data.some((data) => data.o < 0);
-    const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
-
     // draw line
     let prevValid;
-    this.data.forEach((curr) => {
-      let x = getXPos(curr.x);
-      let y = getYPos(curr.y);
+    // 직전에 path 에 찍은(moveTo/lineTo) 픽셀 — 동일 픽셀 lineTo 생략 판정용.
+    let lastDrawnX = null;
+    let lastDrawnY = null;
+    for (let i = 0; i < this.data.length; i++) {
+      const curr = this.data[i];
+      // 기하 패스(computeGeometry)가 채운 xp/yp를 읽는다. 여기서 mutate하지 않는다.
+      const x = curr.xp;
+      const y = curr.yp;
 
-      if (this.isExistGrp && isLinearInterpolation && curr.o === null) {
-        y = getYPos(curr.b ?? 0);
+      // linear interpolation 의 null 점은 path 에 반영하지 않고 prevValid 도 갱신하지 않는다(기존 early-return 동치).
+      if (!(isLinearInterpolation && curr.o === null)) {
+        if (x === null || y === null) {
+          // axis range 밖 데이터는 라인을 끊고 prevValid 도 리셋해 다음 valid 포인트가 moveTo 로 재시작하도록.
+          prevValid = undefined;
+        } else {
+          if (
+            (isNil(prevValid?.y) && !this.isExistGrp) ||
+            (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))
+          ) {
+            ctx.moveTo(x, y);
+            lastDrawnX = x;
+            lastDrawnY = y;
+          } else if (x !== lastDrawnX || y !== lastDrawnY) {
+            // 직전과 완전히 같은 픽셀로의 lineTo 는 zero-length no-op 이라 생략(출력 불변).
+            // moveTo(위 분기)·null 경계는 비대상이고, fill·marker 는 별도 경로(xp/yp 항상 설정)라 무영향.
+            ctx.lineTo(x, y);
+            lastDrawnX = x;
+            lastDrawnY = y;
+          }
+          prevValid = curr;
+        }
       }
-
-      if (x !== null) {
-        x += Util.aliasPixel(x);
-      }
-
-      curr.xp = x;
-      curr.yp = y;
-
-      if (isLinearInterpolation && curr.o === null) {
-        return;
-      } else if (x === null || y === null) {
-        // axis range 밖 데이터는 라인을 끊고 prevValid 도 리셋해 다음 valid 포인트가 moveTo 로 재시작하도록.
-        prevValid = undefined;
-        return;
-      } else if (
-        (isNil(prevValid?.y) && !this.isExistGrp) ||
-        (!isLinearInterpolation && (isNil(prevValid?.y) || isNil(curr.o)))
-      ) {
-        ctx.moveTo(x, y);
-      } else {
-        ctx.lineTo(x, y);
-      }
-
-      prevValid = curr;
-    });
+    }
 
     ctx.stroke();
     if (this.segments) {
@@ -233,7 +358,11 @@ class Line {
     if (this.fill && this.data.length) {
       ctx.beginPath();
 
-      const fillColor = Util.colorStringToRgba(this.fillColor || mainColor, fillOpacity);
+      // endPoint(fill 바닥)는 fill 경로에서만 쓰이므로 여기서 계산한다(비-fill 시리즈는 전체 스캔 skip).
+      const includeNegativeValue = this.data.some((data) => data.o < 0);
+      const endPoint = includeNegativeValue ? getYPos(0) : chartRect.y2 - labelOffset.bottom;
+
+      const fillColor = resolveRgba('fill', this.fillColor || mainColor, fillOpacity);
       if (this.fill?.gradient) {
         let maxValueYPos = this.data[0].yp;
         let minValueYBottomPos = this.data[0].y;
@@ -259,24 +388,32 @@ class Line {
       // ex) [10, passing, null, 10, 10, passing, 10] -> [[0, 1], [3, 6]]
       let start = null;
       let end = null;
-      const valueArray = this.data.map((item) => item?.o);
       /** @type {Array<[number, number]>} */
       const needFillDataIndexList = [];
-      for (let i = 0; i < valueArray.length + 1; i++) {
+      // valueArray(this.data.map(o)) 중간 배열을 만들지 않고 this.data[i]?.o 를 직접 읽는다(매 draw 할당 제거).
+      const len = this.data.length;
+      for (let i = 0; i < len + 1; i++) {
+        const v = this.data[i]?.o;
         if (
-          (isLinearInterpolation && isUndefined(valueArray[i])) ||
-          (!isLinearInterpolation && isNil(valueArray[i]))
+          (isLinearInterpolation && isUndefined(v)) ||
+          (!isLinearInterpolation && isNil(v))
         ) {
           if (start !== null && end !== null) {
-            const temp = valueArray.slice(start, i);
-            const lastNormalValueIndex = temp.findLastIndex(
-              (item) => !isNil(item) && item !== null,
-            );
-            needFillDataIndexList.push([start, start + lastNormalValueIndex]);
+            // 직전 slice(start,i).findLastIndex(...) 와 동치: [start,i) 의 마지막 non-nil 절대 인덱스.
+            // 없으면 start + (-1) = start - 1 로 떨어지던 동작까지 동일하게 유지.
+            let lastNormalAbs = start - 1;
+            for (let j = i - 1; j >= start; j--) {
+              const w = this.data[j]?.o;
+              if (!isNil(w) && w !== null) {
+                lastNormalAbs = j;
+                break;
+              }
+            }
+            needFillDataIndexList.push([start, lastNormalAbs]);
             start = null;
             end = null;
           }
-        } else if (isLinearInterpolation && valueArray[i] === null) {
+        } else if (isLinearInterpolation && v === null) {
           end = i;
         } else {
           start = start === null ? i : start;
@@ -295,7 +432,6 @@ class Line {
           ctx.moveTo(singleData.xp - lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, singleData.yp);
           ctx.lineTo(singleData.xp + lineWidth, getYPos(singleData.b) ?? endPoint);
-          ctx.closePath();
           return;
         }
 
@@ -324,8 +460,6 @@ class Line {
                 ctx.lineTo(xp, bp);
               }
             }
-
-            ctx.closePath();
           }
         }
       });
@@ -335,9 +469,9 @@ class Line {
 
     // Draw points
     if (!isBrush) {
-      ctx.strokeStyle = Util.colorStringToRgba(mainColor, mainColorOpacity);
-      const focusStyle = Util.colorStringToRgba(pointFillColor, 1);
-      const blurStyle = Util.colorStringToRgba(pointFillColor, pointFillColorOpacity);
+      ctx.strokeStyle = resolveRgba('stroke', mainColor, mainColorOpacity);
+      const focusStyle = resolveRgba('focus', pointFillColor, 1);
+      const blurStyle = resolveRgba('blur', pointFillColor, pointFillColorOpacity);
 
       // isLinearSingle: 전체 filter 대신 2개 발견 시점에 즉시 종료.
       let isLinearSingle = false;
@@ -433,13 +567,30 @@ class Line {
           ctx.stroke();
         }
       } else {
+        // 비-circle 스타일도 색(focus/blur) 그룹별로 모아 drawPointBatch 로 1회씩 그린다
+        // (path-per-point fill/stroke flush 제거). circle 은 위 inline arc 경로가 처리한다.
+        let blurPts = null;
+        let focusPts = null;
         for (let ix = 0; ix < dataLen; ix++) {
           const kind = pointDrawKind(ix);
           if (kind !== 0) {
             const curr = data[ix];
-            ctx.fillStyle = kind === 2 ? focusStyle : blurStyle;
-            Canvas.drawPoint(ctx, pointStyle, pointSize, curr.xp, curr.yp);
+            if (kind === 2) {
+              if (focusPts === null) focusPts = [];
+              focusPts.push(curr);
+            } else {
+              if (blurPts === null) blurPts = [];
+              blurPts.push(curr);
+            }
           }
+        }
+        if (blurPts !== null) {
+          ctx.fillStyle = blurStyle;
+          Canvas.drawPointBatch(ctx, pointStyle, pointSize, blurPts);
+        }
+        if (focusPts !== null) {
+          ctx.fillStyle = focusStyle;
+          Canvas.drawPointBatch(ctx, pointStyle, pointSize, focusPts);
         }
       }
     }

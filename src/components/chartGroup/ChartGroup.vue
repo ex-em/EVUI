@@ -50,6 +50,7 @@ export default {
       brushSeries,
       evChartGroupRef,
       evChartPropsInGroup,
+      groupInteraction,
     } = useGroupModel();
 
     const normalizedOptions = getNormalizedOptions(props.options);
@@ -57,6 +58,29 @@ export default {
     provide('isChartGroup', true);
     provide('brushSeries', brushSeries);
     provide('evChartPropsInGroup', evChartPropsInGroup);
+    provide('groupInteraction', groupInteraction);
+
+    // 차트 클릭으로 detail 패널/popup 을 여는 순간, 그룹 폴링 redraw 를 짧게(durationMs) 양보해
+    // 사용자가 연 것이 먼저 페인트되게 한다. one-shot bounded — 시간창이 지나면 자동 재개되므로
+    // detail 이 열려 있는 동안에도 차트는 계속 라이브 갱신된다(resume API 없음). 상태는 deferUntil
+    // 타임스탬프뿐이라 타이머/cleanup 불필요. 시계는 Chart.vue scheduleUpdate 와 동일하게 통일한다.
+    const MAX_DEFER_MS = 2000;
+    const DEFAULT_DEFER_MS = 800;
+    const nowMs = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
+    const deferPollingRedraw = (durationMs = DEFAULT_DEFER_MS) => {
+      const ms = Number.isFinite(durationMs)
+        ? Math.min(Math.max(durationMs, 0), MAX_DEFER_MS)
+        : DEFAULT_DEFER_MS;
+      const now = nowMs();
+      // 기존 deferUntil 보다 미래면 연장하되, 반복 호출로 무한 연장되지 않도록 now+MAX 로 상한.
+      groupInteraction.deferUntil = Math.min(
+        Math.max(groupInteraction.deferUntil, now + ms),
+        now + MAX_DEFER_MS,
+      );
+    };
+    // 자식 차트(또는 위젯)에서 차트 클릭/더블클릭 등으로 무거운 detail/popup 을 열 때 직접 호출할 수
+    // 있도록 provide 한다(groupInteraction 과 동일 주입 경로). expose(return) 는 부모 ref 용으로 유지.
+    provide('deferPollingRedraw', deferPollingRedraw);
     const groupSelectedLabel = computed({
       get: () => props.groupSelectedLabel,
       set: (val) => emit('update:groupSelectedLabel', val),
@@ -140,6 +164,7 @@ export default {
       evChartToolbarRef,
       zoomOptions: toRef(evChartZoomOptions, 'zoom'),
       onClickToolbar,
+      deferPollingRedraw,
     };
   },
 };

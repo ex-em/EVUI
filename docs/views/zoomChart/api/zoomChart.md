@@ -136,3 +136,36 @@ const options = {
   },
 }
 ```
+
+<br/>
+
+>## Methods
+
+<차트 그룹>의 `ref`로 호출하는 메서드.
+
+### deferPollingRedraw(durationMs)
+
+차트 클릭으로 detail 패널/popup을 여는 순간, 그룹 폴링(데이터 자동 갱신) redraw를 짧게 양보해 사용자가 연 것이 먼저 페인트되도록 한다. detail/popup을 띄우는 클릭 핸들러에서 호출한다. 미호출 시 양보 로직은 비활성(폴링 redraw가 평소대로 동작)이다.
+
+- `durationMs` (Number, 디폴트 `800`): 폴링 redraw를 미룰 시간(ms). `0`~`2000`(상한)으로 클램프된다.
+- one-shot이며 시간창이 지나면 자동으로 재개된다(별도 resume API 없음). detail이 열려 있는 동안에도 시간창 이후에는 차트가 계속 라이브 갱신된다.
+- 반복 호출하면 더 미래로 연장되되 `현재 시각 + 2000ms`로 상한이 걸려 무한 연장되지 않는다.
+- 그룹 내부의 자식 차트(또는 위젯)에서는 `inject('deferPollingRedraw')`로 동일 함수를 주입받아 직접 호출할 수도 있다.
+
+#### Example
+
+```vue
+<ev-chart-group ref="groupRef" :options="options">
+  <ev-chart ... @click="onOpenDetail" />
+</ev-chart-group>
+```
+
+```js
+const groupRef = ref();
+
+const onOpenDetail = () => {
+  // detail 패널을 여는 동안(디폴트 800ms) 그룹 폴링 redraw를 양보해 detail을 먼저 페인트
+  groupRef.value.deferPollingRedraw();
+  openDetailPanel();
+};
+```

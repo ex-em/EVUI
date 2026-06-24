@@ -1,5 +1,15 @@
-import { ref, reactive, computed, watch, getCurrentInstance, nextTick, onUpdated } from 'vue';
-import { cloneDeep, cloneDeepWith, defaultsDeep, isEqual } from 'lodash-es';
+import {
+  ref,
+  reactive,
+  computed,
+  watch,
+  getCurrentInstance,
+  nextTick,
+  onUpdated,
+  toRaw,
+  isReactive,
+} from 'vue';
+import { cloneDeep, cloneDeepWith, defaults, defaultsDeep, isEqual } from 'lodash-es';
 import { getQuantity } from '@/common/utils';
 import EvChartZoom from '@/components/chart/chartZoom.core';
 
@@ -256,6 +266,20 @@ const DEFAULT_OPTIONS = {
   eventBehavior: {
     legendClick: 'update',
   },
+  // series 래스터를 worker(OffscreenCanvas)로 오프로드할지 여부(차트별 opt-in). 기본 off(무회귀).
+  // 미지원 환경(SSR/OffscreenCanvas 부재)은 게이트 feature-detect 가 main 으로 fallback 한다.
+  workerRender: false,
+  // props.data deep-watch 를 끄는 opt-in(차트별). 기본 false(=deep watch 유지, 기존 동작 무회귀).
+  // true 면 Chart.vue 의 data watch 가 deep:false 로 등록되어 큰 데이터의 O(N) deep-track(traverse·
+  // 재추적·trigger 팬아웃) 비용을 제거한다. 단 deep 없이는 in-place mutation 을 자동 감지 못 하므로
+  // 소비자는 갱신 시 props.data 에 새 top-level 객체 참조를 할당해야 한다(미할당 시 미갱신).
+  // mount 시점 1회 평가 — 런타임 토글 불가(바꾸려면 :key 등으로 remount).
+  shallowDataWatch: false,
+  // props.options deep-watch 를 끄는 opt-in(차트별). 기본 false(=deep watch 유지, 무회귀).
+  // true 면 options watch 가 deep:false 로 등록돼 매 갱신 deep traverse 비용을 없앤다. 단 deep 없이는
+  // in-place mutation 을 자동 감지 못 하므로 소비자는 options 변경 시 새 top-level 참조를 할당해야 한다.
+  // mount 시점 1회 평가 — 런타임 토글 불가(바꾸려면 :key 등으로 remount). shallowDataWatch 와 동일 계약.
+  shallowOptionsWatch: false,
 };
 
 const DEFAULT_DATA = {
@@ -264,6 +288,15 @@ const DEFAULT_DATA = {
   labels: [],
   data: {},
 };
+
+/**
+ * F0: props.data를 정규화하되 **원본을 in-place mutate하지 않는다**.
+ * 기존 `defaultsDeep(data, DEFAULT_DATA)`는 lodash가 첫 인자(원본 reactive proxy)를 변형하고
+ * 같은 참조를 반환했다(누락 키 주입 → 원본 오염 + set/trigger trap). 빈 shallow copy를 target으로
+ * 써서 원본을 건드리지 않고, 누락된 top-level 키만 채운다(DEFAULT_DATA가 빈 컨테이너뿐이라 deep
+ * 보강은 불필요). 깊은 분리/클론은 이후 cloneChartData가 담당한다.
+ */
+export const normalizeData = (data) => defaults({ ...data }, DEFAULT_DATA);
 
 /**
  * dayjs/Date 등 불변(immutable) 날짜 값은 깊은 복제 대상에서 제외하고 참조만 공유한다.
@@ -277,8 +310,22 @@ const isImmutableDateLike = (value) =>
     typeof value.toDate === 'function' &&
     typeof value.format === 'function');
 
+/**
+ * F1: 클론 시 reactive proxy를 toRaw로 벗긴 뒤 복사해 per-value `get`/`noTracking` trap 비용을 제거한다.
+ * (probe: 클론 서브트리가 self-time의 ~30%, 그 중 상당수가 proxy traversal trap). deep copy·immutable
+ * date 보존 동작은 동일.
+ */
 export const cloneChartData = (data) =>
-  cloneDeepWith(data, (value) => (isImmutableDateLike(value) ? value : undefined));
+  cloneDeepWith(data, function cloneCustomizer(value) {
+    if (isImmutableDateLike(value)) {
+      return value;
+    }
+    if (isReactive(value)) {
+      // reactive면 raw로 벗겨 동일 customizer로 재귀 복사 → 이후 nested 접근이 trap을 타지 않는다.
+      return cloneDeepWith(toRaw(value), cloneCustomizer);
+    }
+    return undefined;
+  });
 
 const useWidgetClickEvent = () => {
   let timer = null;
@@ -331,7 +378,7 @@ export const useModel = (injectGroupSelectedLabel, injectGroupHoveredLabel) => {
 
     return normalizedOptions;
   };
-  const getNormalizedData = (data) => defaultsDeep(data, DEFAULT_DATA);
+  const getNormalizedData = normalizeData;
 
   const selectItemInfo = cloneDeep(props.selectedItem);
   const selectLabelInfo = cloneDeep(props.selectedLabel ?? injectGroupSelectedLabel?.value);

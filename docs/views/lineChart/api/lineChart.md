@@ -148,6 +148,7 @@ const chartData =
 | padding    | Object          | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값                                                                                                                                                                   |
 | syncHover  | boolean         | true                                      | options.syncHover가 true인 EvChartGroup으로 감싼경우, 해당 차트에서는 그룹으로 묶긴 차트들 사이의 syncHover선을 그리고싶지 않을 때 사용하는 속성 (time관련된 축을 가질때만 적용됩니다) |
 | eventBehavior | Object                    | ([상세](#eventbehavior))                  | 이벤트별 동작 설정 | | 
+| shallowDataWatch | Boolean                | false                                     | data prop의 deep watch를 끄는 opt-in(큰 데이터 갱신 성능 최적화) ([상세](#shallowdatawatch)) | |
 
 #### axesX axesY
 
@@ -320,7 +321,7 @@ const chartData =
 | showHeader          | Boolean                     | true                                       | Tooltip의 Header 영역 표시 여부                         |
 | formatter           | function / Object           | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
 | returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
-| virtualScroll       | Object                      | { use: 'auto', threshold: 50, estimatedRowHeight: 28, overscan: 5 } | `formatter.html` 사용 시 가상 스크롤로 보이는 행만 라이브 DOM에 부착. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 부여하면 안정적으로 활성화됨 | use: 'auto' \| true \| false (auto는 threshold 초과 시 자동) |
+| virtualScroll       | Object                      | { use: 'auto', threshold: 50, estimatedRowHeight: 28, overscan: 5 } | `formatter.html` 사용 시 가상 스크롤로 보이는 범위만 라이브 DOM에 부착. 시리즈당 wrapper element에 `data-evui-tooltip-row` 속성을 부여하면 안정적으로 활성화됨. 행 사이에 섞인 비-row 요소(그룹 헤더·구분선·marker 등)는 원래 순서를 보존한 채 함께 스크롤됨 | use: 'auto' \| true \| false (auto는 threshold 초과 시 자동) |
 
 ```ts
 const chartOptions = {
@@ -353,6 +354,11 @@ const chartOptions = {
     },
 }
 ```
+
+> **`formatter.html` 마크업 안내**
+> - 반환하는 HTML의 **루트 element**가 툴팁 본문으로 부착되며, 위치/크기 계산도 이 루트를 기준으로 합니다. 루트 element는 1개여야 합니다.
+> - `ev-chart-tooltip-custom`(및 `__header`, `__body`) 클래스는 **선택**입니다. 사용하면 EVUI 기본 스타일과 휠 스크롤 기본 타겟(`htmlScrollTarget: '.ev-chart-tooltip-custom__body'`)이 자동 적용됩니다.
+> - 직접 마크업/클래스를 사용하는 경우, 스크롤이 필요하면 `htmlScrollTarget`을 해당 스크롤 요소의 셀렉터로 지정하세요.
 
 #### returnValue
 
@@ -429,6 +435,70 @@ const chartOptions = {
 | legendClick | String | 'update' | 범례 클릭 시 동작. 'update': 차트 즉시 갱신, 'emitOnly': click-legend만 emit(이중 렌더 방지) | 'update' \| 'emitOnly' |
 
 - 3.4 버전부터 없어지는 옵션입니다.
+
+#### shallowDataWatch
+
+`data` prop에 대한 deep watch를 끄는 **성능 최적화 opt-in**(기본 `false`). 시리즈/데이터가 매우 많은 차트를 자주 갱신할 때 사용한다.
+
+- 기본(`false`)일 때 차트는 `data`를 deep watch하여 중첩된 값의 in-place 변경(예: `data.series.s1.push(...)`)까지 자동 감지한다. 이 deep 추적은 데이터 크기에 비례한 내부 비용(트리 전체 순회·재추적)을 매 갱신마다 유발한다.
+- `true`로 켜면 deep 추적을 끄고 **`data`의 top-level 참조가 바뀔 때만** 갱신한다. 따라서 데이터를 갱신할 때 **반드시 새 객체 참조를 할당**해야 한다(in-place 변경만 하면 차트가 갱신되지 않는다).
+- 최대 효과를 보려면 데이터를 `shallowRef`/`markRaw`로 비반응성으로 보유해 반응성 프록시 비용까지 제거한다.
+- **이 옵션은 차트 생성(mount) 시점에 1회만 평가된다.** 런타임에 값을 바꿔도 적용되지 않으며, 바꾸려면 `:key` 등으로 차트를 remount해야 한다.
+
+##### Example
+
+```js
+import { shallowRef } from 'vue';
+
+const chartData = shallowRef({
+  series: { s1: { name: 'series1' } },
+  data: { s1: [1, 2, 3] },
+  labels: ['a', 'b', 'c'],
+});
+
+const chartOptions = { type: 'line', shallowDataWatch: true };
+
+// ✅ 갱신: 새 top-level 참조 할당 → 차트 갱신됨
+chartData.value = {
+  ...chartData.value,
+  data: { s1: [1, 2, 3, 4] },
+};
+
+// ❌ in-place 변경: 참조가 그대로라 차트가 갱신되지 않음
+// chartData.value.data.s1.push(4);
+```
+
+```vue
+<ev-chart :data="chartData" :options="chartOptions" />
+```
+
+#### shallowOptionsWatch
+
+`options` prop에 대한 deep watch를 끄는 **성능 최적화 opt-in**(기본 `false`). `options`를 자주 갱신하는(예: 축 범위를 computed로 매 틱 새로 만드는) 라이브 차트에서 deep traverse 비용을 제거할 때 사용한다.
+
+- 기본(`false`)일 때 차트는 `options`를 deep watch하여 중첩된 값의 in-place 변경까지 자동 감지한다. 이 deep 추적은 옵션 트리 전체를 매 갱신마다 순회하는 비용을 유발한다.
+- `true`로 켜면 deep 추적을 끄고 **`options`의 top-level 참조가 바뀔 때만** 갱신한다. 따라서 options를 변경할 때 **반드시 새 객체 참조를 할당**해야 한다(in-place 변경만 하면 차트가 갱신되지 않는다).
+- **이 옵션은 차트 생성(mount) 시점에 1회만 평가된다.** 런타임에 값을 바꿔도 적용되지 않으며, 바꾸려면 `:key` 등으로 차트를 remount해야 한다.
+- `shallowDataWatch`와 동일한 계약이다(`data` 대신 `options` 대상).
+
+##### Example
+
+```js
+const chartOptions = ref({ type: 'line', shallowOptionsWatch: true });
+
+// ✅ 갱신: 새 top-level 참조 할당 → 차트 갱신됨
+chartOptions.value = {
+  ...chartOptions.value,
+  axesX: [{ ...chartOptions.value.axesX[0], range: [0, 100] }],
+};
+
+// ❌ in-place 변경: 참조가 그대로라 차트가 갱신되지 않음
+// chartOptions.value.axesX[0].range = [0, 100];
+```
+
+```vue
+<ev-chart :data="chartData" :options="chartOptions" />
+```
 
 #### selectLabel
 

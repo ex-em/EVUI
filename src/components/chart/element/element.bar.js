@@ -35,6 +35,204 @@ class Bar {
   }
 
   /**
+   * Compute pixel geometry (xp/yp/w/h) for each bar and store it on the main model.
+   * 기하 계산만 수행한다(canvas 그리기 없음). hit-test가 item.xp/yp/w/h 및 size/visibleStartIndex/
+   * filteredCount를 소비한다. 좌표 의미·stacked 누적·반올림·null 처리는 draw와 동일해야 한다.
+   * @param {object} param     object for drawing series data
+   * @returns {undefined}
+   */
+  computeGeometry(param) {
+    if (!this.show) {
+      return;
+    }
+
+    // (데이터 버전, 스케일 버전, showIndex, showSeriesCount) 가 직전과 같고 data 참조도 동일하면
+    // xp/yp/w/h 는 이미 current → skip. bar 는 가시성 토글로 막대 폭/위치(showIndex/showSeriesCount
+    // 의존)가 바뀌므로 둘을 비교에 포함한다. 버전 미전달이면 canMemo=false 로 항상 재계산(무회귀).
+    // 숫자 필드 비교 — 시리즈가 수만 개일 때 문자열 키 생성이 매 프레임 할당이 되지 않도록.
+    const canMemo = param.scaleVersion != null && param.dataEpoch != null;
+    const showIndex0 = param.showIndex ?? 0;
+    const showSeriesCount0 = param.showSeriesCount ?? 0;
+    if (
+      canMemo
+      && this._lastDataEpoch === param.dataEpoch
+      && this._lastScaleVersion === param.scaleVersion
+      && this._lastShowIndex === showIndex0
+      && this._lastShowSeriesCount === showSeriesCount0
+      && this._lastGeomData === this.data
+    ) {
+      return;
+    }
+
+    const chartRect = param.chartRect;
+    const labelOffset = param.labelOffset;
+    const axesSteps = param.axesSteps;
+    const showIndex = param.showIndex;
+    const thickness = param.thickness;
+    const showSeriesCount = param.showSeriesCount;
+
+    this.isHorizontal = param.isHorizontal;
+
+    const { isHorizontal } = this;
+
+    let x;
+    let y;
+
+    const minmaxX = axesSteps.x[this.xAxisIndex];
+    const minmaxY = axesSteps.y[this.yAxisIndex];
+
+    let totalCount = this.data.length;
+    const [minIndex, maxIndex] = isHorizontal
+      ? [minmaxY.minIndex, minmaxY.maxIndex]
+      : [minmaxX.minIndex, minmaxX.maxIndex];
+
+    if (truthyNumber(minIndex) && truthyNumber(maxIndex)) {
+      totalCount = maxIndex - minIndex + 1;
+    }
+
+    const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
+    const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
+
+    const xAxisPosition = chartRect.x1 + labelOffset.left;
+    const yAxisPosition = chartRect.y2 - labelOffset.bottom;
+    const xZeroPosition = Canvas.calculateX(0, minmaxX.graphMin, minmaxX.graphMax, xArea);
+    const yZeroPosition = Canvas.calculateY(0, minmaxY.graphMin, minmaxY.graphMax, yArea);
+
+    const xsp = isHorizontal ? xAxisPosition + xZeroPosition : xAxisPosition;
+    const ysp = isHorizontal ? yAxisPosition : yAxisPosition + yZeroPosition;
+
+    const dArea = isHorizontal ? yArea : xArea;
+    const cArea = dArea / (totalCount || 1);
+
+    let cPad;
+    const isUnableToDrawCategoryPadding = param.cPadRatio >= 1 || param.cPadRatio <= 0;
+    if (isUnableToDrawCategoryPadding) {
+      cPad = 2;
+    } else {
+      cPad = Math.max((dArea * (param.cPadRatio / 2)) / totalCount, 2);
+    }
+
+    let bArea;
+    let w;
+    let h;
+
+    bArea = cArea > cPad * 2 ? cArea - cPad * 2 : cArea;
+    bArea = this.isExistGrp ? bArea : bArea / showSeriesCount;
+
+    const size = this.calculateBarSize(thickness, bArea);
+    w = isHorizontal ? null : size;
+    h = isHorizontal ? size : null;
+
+    const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
+    const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
+
+    this.size.cat = cArea;
+    this.size.bar = bArea;
+    this.size.cPad = cPad;
+    this.size.bPad = bPad;
+    this.size.w = w;
+    this.size.h = h;
+    this.size.ix = barSeriesX;
+    this.chartRect = chartRect;
+    this.labelOffset = labelOffset;
+    this.borderRadius = param.borderRadius;
+    this.filteredCount = totalCount;
+
+    const startIndex = truthyNumber(minIndex) ? minIndex : 0;
+    const endIndex = truthyNumber(maxIndex) ? maxIndex : this.data.length - 1;
+
+    this.visibleStartIndex = startIndex;
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      const screenIndex = i - startIndex;
+      const item = this.data[i];
+      if (item) {
+        const categoryPoint = isHorizontal
+          ? ysp - cArea * screenIndex - cPad
+          : xsp + cArea * screenIndex + cPad;
+
+        if (isHorizontal) {
+          x = xsp;
+          y = Math.round(categoryPoint - (bArea * barSeriesX - (h + bPad)));
+        } else {
+          x = Math.round(categoryPoint + (bArea * barSeriesX - (w + bPad)));
+          y = ysp;
+        }
+
+        if (isHorizontal) {
+          const barValue = item.b ? item.o : item.x;
+          // displayOverflow 가 켜졌을 때만 graphMax 초과 값을 경계로 clamp, 꺼지면 raw → null(숨김).
+          // draw(래스터) 와 동일한 좌표 의미를 유지해 hit-test 기하가 일치하도록 한다.
+          const drawValue =
+            param.displayOverflow && barValue > minmaxX.graphMax ? minmaxX.graphMax : barValue;
+          w = Canvas.calculateX(
+            drawValue,
+            minmaxX.graphMin,
+            minmaxX.graphMax,
+            xArea,
+            -xZeroPosition,
+          );
+
+          if (item.b) {
+            // stack-base 위치는 raw 유지 (세그먼트 값만 clamp).
+            x = Canvas.calculateX(
+              item.b,
+              minmaxX.graphMin,
+              minmaxX.graphMax,
+              xArea,
+              xsp - xZeroPosition,
+            );
+          }
+
+          const minimumBarWidth = barValue > 0 ? -1 : 1;
+          // w === null 은 axis range 밖이라는 신호이므로 minimumBarWidth 보정에서 제외한다.
+          w = barValue && w !== null && Math.abs(w) === 0 ? minimumBarWidth : w;
+        } else {
+          const barValue = item.b ? item.o : item.y;
+          const drawValue =
+            param.displayOverflow && barValue > minmaxY.graphMax ? minmaxY.graphMax : barValue;
+          h = Canvas.calculateY(
+            drawValue,
+            minmaxY.graphMin,
+            minmaxY.graphMax,
+            yArea,
+            -yZeroPosition,
+          );
+
+          if (item.b) {
+            // stack-base 위치는 raw 유지 (세그먼트 값만 clamp).
+            y = Canvas.calculateY(
+              item.b,
+              minmaxY.graphMin,
+              minmaxY.graphMax,
+              yArea,
+              ysp - yZeroPosition,
+            );
+          }
+
+          const minimumBarHeight = barValue > 0 ? -1 : 1;
+          h = barValue && h !== null && Math.abs(h) === 0 ? minimumBarHeight : h;
+        }
+
+        // 좌표 및 인덱스 정보 세팅 (툴팁/hover용)
+        item.xp = x; // eslint-disable-line
+        item.yp = y; // eslint-disable-line
+        item.w = w; // eslint-disable-line
+        item.h = isHorizontal ? -h : h; // eslint-disable-line
+        item.index = i;
+      }
+    }
+
+    if (canMemo) {
+      this._lastDataEpoch = param.dataEpoch;
+      this._lastScaleVersion = param.scaleVersion;
+      this._lastShowIndex = showIndex0;
+      this._lastShowSeriesCount = showSeriesCount0;
+      this._lastGeomData = this.data;
+    }
+  }
+
+  /**
    * Draw series data
    * @param {object} param     object for drawing series data
    *
@@ -44,6 +242,9 @@ class Bar {
     if (!this.show) {
       return;
     }
+
+    // 기하(xp/yp/w/h)는 기하 패스가 채운다. 아래 래스터 패스는 로컬 재계산으로 그리며 mutate하지 않는다.
+    this.computeGeometry(param);
 
     const ctx = param.ctx;
     const chartRect = param.chartRect;
@@ -260,13 +461,7 @@ class Bar {
             index: i,
           });
         }
-
-        // 좌표 및 인덱스 정보 세팅 (툴팁/hover용)
-        item.xp = x; // eslint-disable-line
-        item.yp = y; // eslint-disable-line
-        item.w = w; // eslint-disable-line
-        item.h = isHorizontal ? -h : h; // eslint-disable-line
-        item.index = i;
+        // 기하(xp/yp/w/h/index)는 computeGeometry가 채운다. 래스터 패스는 mutate하지 않는다.
       }
     }
   }
