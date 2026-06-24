@@ -65,11 +65,88 @@ class Scatter {
       return;
     }
 
+    // 기하(xp/yp)는 기하 패스(computeGeometry)가 채운다. 아래 래스터 패스는 그 값을 읽기만 한다.
+    this.computeGeometry(param);
+
     if (this.realTimeScatter) {
       this.realTimeScatterDraw(param);
     } else {
       this.defaultScatterDraw(param);
     }
+  }
+
+  /**
+   * Compute pixel geometry (xp/yp) for drawable points and store it on the main model.
+   * draw와 동일한 dedupe/legend 필터로 그려질 점만 calcItem 한다(기존 동작과 동일).
+   * 래스터 패스(draw)는 calcItem을 호출하지 않고 여기서 채운 xp/yp를 읽는다.
+   * @param {object} param
+   * @returns {undefined}
+   */
+  computeGeometry(param) {
+    if (!this.show) {
+      return;
+    }
+
+    if (this.realTimeScatter) {
+      this.computeRealTimeGeometry(param);
+    } else {
+      this.computeDefaultGeometry(param);
+    }
+  }
+
+  computeDefaultGeometry(param) {
+    const { duple, legendHitInfo, coordinateDedupe } = param;
+    const drawnKeys = new Set();
+    const isDedupeOn = coordinateDedupe !== false;
+
+    for (let i = 0; i < this.data.length; i++) {
+      const item = this.data[i];
+      const key = Util.coordinateKey(item.x, item.y);
+      let shouldDraw;
+      if (legendHitInfo) {
+        shouldDraw = legendHitInfo.sId === this.sId;
+      } else if (isDedupeOn) {
+        shouldDraw = duple.get(key) === this.sId && !drawnKeys.has(key);
+      } else {
+        shouldDraw = true;
+      }
+
+      if (shouldDraw) {
+        this.calcItem(item, param);
+
+        if (item.xp !== null && item.yp !== null) {
+          if (isDedupeOn && !legendHitInfo) drawnKeys.add(key);
+        }
+      }
+    }
+  }
+
+  computeRealTimeGeometry(param) {
+    const { duple, legendHitInfo, coordinateDedupe } = param;
+    const isDedupeOnRT = coordinateDedupe !== false;
+    let totalCount = 0;
+
+    for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
+      for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
+        const item = this.data[this.sId]?.dataGroup[i]?.data[j];
+        totalCount++;
+
+        let shouldDraw;
+        if (legendHitInfo) {
+          shouldDraw = legendHitInfo.sId === this.sId;
+        } else if (isDedupeOnRT) {
+          shouldDraw = duple.get(Util.coordinateKey(item.x, item.y)) === this.sId;
+        } else {
+          shouldDraw = true;
+        }
+
+        if (shouldDraw) {
+          this.calcItem(item, param);
+        }
+      }
+    }
+
+    this._rtTotalCount = totalCount;
   }
 
   /**
@@ -144,6 +221,10 @@ class Scatter {
     // realtime은 createRealTimeScatterDataSet 적재 단계에서 dedupe 처리.
     const drawnKeys = new Set();
     const isDedupeOn = coordinateDedupe !== false;
+    // dedupe on이면 좌표 비겹침이 보장돼 색(stroke+fill)별 배치 렌더가 가능하다.
+    // legendHitInfo/dedupe off는 같은 좌표 중복 가능성이 있어(반투명 겹침 차이) per-point 유지.
+    const canBatch = isDedupeOn && !legendHitInfo;
+    const groups = canBatch ? new Map() : null;
 
     // Adjusted because Real Time Scatter is drawn from the back.
     for (let i = 0; i < this.data.length; i++) {
@@ -160,22 +241,41 @@ class Scatter {
       }
 
       if (shouldDraw) {
-        this.calcItem(item, param);
-
+        // 기하(xp/yp)는 computeGeometry가 채운다. 여기서는 읽기만 한다.
         if (item.xp !== null && item.yp !== null) {
           const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
           const color = overflowColor || item.dataColor || this.color;
           const strokeOpacity = this.getOpacity(param, color, idx);
-          ctx.strokeStyle = this.getCachedColor(color, strokeOpacity);
+          const strokeStyle = this.getCachedColor(color, strokeOpacity);
 
           const pointFillColor = item.dataColor || this.pointFill;
           const fillOpacity = this.getOpacity(param, pointFillColor, idx);
-          ctx.fillStyle = this.getCachedColor(pointFillColor, fillOpacity);
+          const fillStyle = this.getCachedColor(pointFillColor, fillOpacity);
 
-          Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
-          if (isDedupeOn && !legendHitInfo) drawnKeys.add(key);
+          if (canBatch) {
+            const colorKey = `${strokeStyle} ${fillStyle}`;
+            let group = groups.get(colorKey);
+            if (!group) {
+              group = { strokeStyle, fillStyle, points: [] };
+              groups.set(colorKey, group);
+            }
+            group.points.push(item);
+            drawnKeys.add(key);
+          } else {
+            ctx.strokeStyle = strokeStyle;
+            ctx.fillStyle = fillStyle;
+            Canvas.drawPoint(ctx, this.pointStyle, this.pointSize, item.xp, item.yp);
+          }
         }
       }
+    }
+
+    if (canBatch) {
+      groups.forEach((group) => {
+        ctx.strokeStyle = group.strokeStyle;
+        ctx.fillStyle = group.fillStyle;
+        Canvas.drawPointBatch(ctx, this.pointStyle, this.pointSize, group.points);
+      });
     }
   }
 
@@ -194,6 +294,9 @@ class Scatter {
     let totalCount = 0;
 
     const isDedupeOnRT = coordinateDedupe !== false;
+    // dedupe on이면 좌표 비겹침이 보장돼 색별 배치 렌더 가능. 그 외는 per-point 유지(반투명 겹침 차이 회피).
+    const canBatch = isDedupeOnRT && !legendHitInfo;
+    const groups = canBatch ? new Map() : null;
 
     for (let i = 0; i < this.data[this.sId]?.dataGroup?.length; i++) {
       for (let j = 0; j < this.data[this.sId]?.dataGroup[i]?.data.length; j++) {
@@ -211,8 +314,7 @@ class Scatter {
         }
 
         if (shouldDraw) {
-          this.calcItem(item, param);
-
+          // 기하(xp/yp)는 computeGeometry가 채운다. 여기서는 읽기만 한다.
           if (item.xp !== null && item.yp !== null) {
             const overflowColor = item.y > minmaxY.graphMax && this.overflowColor;
             const baseStrokeColor = overflowColor || item.color || this.color;
@@ -221,13 +323,33 @@ class Scatter {
             const strokeOpacity = this.getOpacity(param, baseStrokeColor, j);
             const fillOpacity = this.getOpacity(param, baseFillColor, j);
 
-            ctx.strokeStyle = this.getCachedColor(baseStrokeColor, strokeOpacity);
-            ctx.fillStyle = this.getCachedColor(baseFillColor, fillOpacity);
+            const strokeStyle = this.getCachedColor(baseStrokeColor, strokeOpacity);
+            const fillStyle = this.getCachedColor(baseFillColor, fillOpacity);
 
-            Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+            if (canBatch) {
+              const colorKey = `${strokeStyle} ${fillStyle}`;
+              let group = groups.get(colorKey);
+              if (!group) {
+                group = { strokeStyle, fillStyle, points: [] };
+                groups.set(colorKey, group);
+              }
+              group.points.push(item);
+            } else {
+              ctx.strokeStyle = strokeStyle;
+              ctx.fillStyle = fillStyle;
+              Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+            }
           }
         }
       }
+    }
+
+    if (canBatch) {
+      groups.forEach((group) => {
+        ctx.strokeStyle = group.strokeStyle;
+        ctx.fillStyle = group.fillStyle;
+        Canvas.drawPointBatch(ctx, pointStyle, pointSize, group.points);
+      });
     }
 
     // findGraphData(realTimeScatter)에서 역순 탐색 시 global index 계산에 사용한다.

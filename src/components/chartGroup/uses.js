@@ -41,6 +41,9 @@ export const useGroupModel = () => {
   const evChartGroupRef = ref();
   const evChartPropsInGroup = ref([]);
   const brushSeries = reactive({ list: [], chartIdx: null });
+  // deferUntil 은 deferPollingRedraw 로 설정하는 절대 타임스탬프로, 그 시각까지 그룹 polling 재렌더를
+  // 미룬다(detail/popup 우선 페인트). Chart.vue scheduleUpdate 가 이 값까지 양보한다.
+  const groupInteraction = { deferUntil: 0 };
   const getNormalizedOptions = (options) => defaultsDeep({}, options, DEFAULT_OPTIONS);
 
   return {
@@ -49,5 +52,6 @@ export const useGroupModel = () => {
     brushSeries,
     evChartGroupRef,
     evChartPropsInGroup,
+    groupInteraction,
   };
 };

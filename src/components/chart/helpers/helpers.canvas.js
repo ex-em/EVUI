@@ -1,5 +1,9 @@
 import Util from './helpers.util';
 
+// fill 없이 stroke만 하는 point style. 나머지(circle/triangle/rectRounded/rectRot)는 fill+stroke.
+// 'rect'는 fillRect/strokeRect를 써서 path 기반 배치가 불가하므로 별도 처리한다.
+const NON_FILL_POINT_STYLES = ['cross', 'crossRot', 'star', 'line'];
+
 export default {
   /**
    * Calculate X position
@@ -84,16 +88,44 @@ export default {
    * @returns {undefined}
    */
   drawPoint(ctx, style, radius, x, y) {
+    if (isNaN(radius) || radius <= 0) {
+      return;
+    }
+
+    // rect는 fillRect/strokeRect라 path 기반이 아님(기존과 동일). 기존 끝줄의 빈-path stroke()는 no-op이었음.
+    if (style === 'rect') {
+      const size = (1 / Math.SQRT2) * radius;
+      ctx.fillRect(x - size, y - size, 2 * size, 2 * size);
+      ctx.strokeRect(x - size, y - size, 2 * size, 2 * size);
+      return;
+    }
+
+    ctx.beginPath();
+    this._appendPointPath(ctx, style, radius, x, y);
+    if (!NON_FILL_POINT_STYLES.includes(style)) {
+      ctx.fill();
+    }
+    ctx.stroke();
+  },
+
+  /**
+   * 점 하나의 도형을 현재 path에 append한다(beginPath/fill/stroke 없음).
+   * 여러 점을 한 path에 모아 fill/stroke 1회로 배치 렌더링하기 위한 building block.
+   * circle은 직전 subpath 끝점→arc 시작점 연결선이 stroke에 남지 않도록 leading moveTo를 넣는다
+   * (단일 점에서는 path가 비어 있어 arc 암묵 시작점과 동일점이므로 zero-length no-op → 픽셀 불변).
+   * @param {object} ctx
+   * @param {string} style
+   * @param {number} radius
+   * @param {number} x
+   * @param {number} y
+   * @returns {undefined}
+   */
+  _appendPointPath(ctx, style, radius, x, y) {
     let edgeLength;
     let xOffset;
     let yOffset;
     let height;
     let size;
-
-    if (isNaN(radius) || radius <= 0) {
-      return;
-    }
-
     let offset;
     let leftX;
     let topY;
@@ -102,43 +134,30 @@ export default {
     switch (style) {
       // Default includes circle
       case 'triangle':
-        ctx.beginPath();
         edgeLength = (3 * radius) / Math.sqrt(3);
         height = (edgeLength * Math.sqrt(3)) / 2;
         ctx.moveTo(x - edgeLength / 2, y + height / 3);
         ctx.lineTo(x + edgeLength / 2, y + height / 3);
         ctx.lineTo(x, y - (2 * height) / 3);
         ctx.closePath();
-        ctx.fill();
-        break;
-      case 'rect':
-        size = (1 / Math.SQRT2) * radius;
-        ctx.beginPath();
-        ctx.fillRect(x - size, y - size, 2 * size, 2 * size);
-        ctx.strokeRect(x - size, y - size, 2 * size, 2 * size);
         break;
       case 'rectRounded':
         offset = radius / Math.SQRT2;
         leftX = x - offset;
         topY = y - offset;
         sideSize = Math.SQRT2 * radius;
-        ctx.beginPath();
         this.roundedRect(ctx, leftX, topY, sideSize, sideSize, radius / 2);
         ctx.closePath();
-        ctx.fill();
         break;
       case 'rectRot':
         size = (1 / Math.SQRT2) * radius;
-        ctx.beginPath();
         ctx.moveTo(x - size, y);
         ctx.lineTo(x, y + size);
         ctx.lineTo(x + size, y);
         ctx.lineTo(x, y - size);
         ctx.closePath();
-        ctx.fill();
         break;
       case 'cross':
-        ctx.beginPath();
         ctx.moveTo(x, y + radius);
         ctx.lineTo(x, y - radius);
         ctx.moveTo(x - radius, y);
@@ -146,7 +165,6 @@ export default {
         ctx.closePath();
         break;
       case 'crossRot':
-        ctx.beginPath();
         xOffset = Math.cos(Math.PI / 4) * radius;
         yOffset = Math.sin(Math.PI / 4) * radius;
         ctx.moveTo(x - xOffset, y - yOffset);
@@ -156,7 +174,6 @@ export default {
         ctx.closePath();
         break;
       case 'star':
-        ctx.beginPath();
         ctx.moveTo(x, y + radius);
         ctx.lineTo(x, y - radius);
         ctx.moveTo(x - radius, y);
@@ -170,19 +187,49 @@ export default {
         ctx.closePath();
         break;
       case 'line':
-        ctx.beginPath();
         ctx.moveTo(x - radius, y);
         ctx.lineTo(x + radius, y);
         ctx.closePath();
         break;
       default:
-        ctx.beginPath();
+        ctx.moveTo(x + radius, y);
         ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.fill();
         break;
     }
+  },
 
+  /**
+   * 같은 색(fillStyle/strokeStyle)인 점들을 한 path에 모아 fill/stroke를 1회만 호출한다.
+   * 호출자가 ctx.fillStyle/strokeStyle을 미리 set해야 한다. 점마다 path-per-point fill/stroke를
+   * 하던 비용을 그룹당 1회로 붕괴시킨다(라이브 대시보드 isSingle 마커 폭주 대응).
+   * @param {object} ctx
+   * @param {string} style
+   * @param {number} radius
+   * @param {Array<{xp:number, yp:number}>} points
+   * @returns {undefined}
+   */
+  drawPointBatch(ctx, style, radius, points) {
+    if (isNaN(radius) || radius <= 0 || !points || !points.length) {
+      return;
+    }
+
+    // rect는 path 기반이 아니라 batch 불가 → per-point fillRect/strokeRect(색은 그룹당 1회 set됨).
+    if (style === 'rect') {
+      const size = (1 / Math.SQRT2) * radius;
+      for (let i = 0; i < points.length; i++) {
+        ctx.fillRect(points[i].xp - size, points[i].yp - size, 2 * size, 2 * size);
+        ctx.strokeRect(points[i].xp - size, points[i].yp - size, 2 * size, 2 * size);
+      }
+      return;
+    }
+
+    ctx.beginPath();
+    for (let i = 0; i < points.length; i++) {
+      this._appendPointPath(ctx, style, radius, points[i].xp, points[i].yp);
+    }
+    if (!NON_FILL_POINT_STYLES.includes(style)) {
+      ctx.fill();
+    }
     ctx.stroke();
   },
 

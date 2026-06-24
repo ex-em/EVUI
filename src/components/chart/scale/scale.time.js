@@ -206,25 +206,35 @@ function generateVisibleTicks(graphMin, graphMax, meta) {
   return ticks;
 }
 
+/**
+ * 임의의 값을 숫자(타임스탬프)로 정규화한다.
+ * null/undefined → null, 유한한 숫자 → 그대로, 그 외 → dayjs로 파싱 후 valueOf()
+ *
+ * @param {*} value 정규화할 값
+ * @returns {number|null} 정규화된 타임스탬프 (유효하지 않으면 null)
+ */
+export function normalizeTimeValue(value) {
+  if (value == null) {
+    return null;
+  }
+
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+
+  const normalized = dayjs(value).valueOf();
+  return Number.isFinite(normalized) ? normalized : null;
+}
+
 class TimeScale extends Scale {
   /**
-   * 임의의 값을 숫자(타임스탬프)로 정규화한다.
-   * null/undefined → null, 유한한 숫자 → 그대로, 그 외 → dayjs로 파싱 후 valueOf()
+   * 임의의 값을 숫자(타임스탬프)로 정규화한다(모듈 레벨 normalizeTimeValue 위임).
    *
    * @param {*} value 정규화할 값
    * @returns {number|null} 정규화된 타임스탬프 (유효하지 않으면 null)
    */
   normalizeTimeValue(value) {
-    if (value == null) {
-      return null;
-    }
-
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : null;
-    }
-
-    const normalized = dayjs(value).valueOf();
-    return Number.isFinite(normalized) ? normalized : null;
+    return normalizeTimeValue(value);
   }
 
   /**

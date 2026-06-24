@@ -44,7 +44,7 @@ class LogarithmicScale extends Scale {
       max: maxValue,
       minLabel,
       maxLabel,
-      size: Util.calcTextSize(maxLabel, Util.getLabelStyle(this.labelStyle)),
+      size: Util.calcTextSizeCanvas(maxLabel, Util.getLabelStyle(this.labelStyle)),
     };
   }
 

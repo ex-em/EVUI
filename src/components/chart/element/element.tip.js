@@ -7,10 +7,12 @@ const modules = {
   /**
    * Draw TextTip with tip's locationInfo
    * @param {object} [tipLocationInfo=undefined]   tip location information
+   * @param {CanvasRenderingContext2D} [ctx=this.bufferCtx]  그릴 ctx. worker 경로는 series bitmap 위에
+   *   합성하려고 displayCtx 를 넘긴다(기본은 main buffer).
    *
    * @returns {undefined}
    */
-  drawTips(tipLocationInfo) {
+  drawTips(tipLocationInfo, ctx = this.bufferCtx) {
     const opt = this.options;
     let tooltipValueFormatter = null;
     const isHorizontal = !!opt.horizontal;
@@ -28,7 +30,7 @@ const modules = {
 
     if (labelTipOpt.use && labelTipOpt.showTip) {
       isExistSelectedLabel =
-        opt.type === 'heatMap' ? this.drawLabelTipForHeatMap() : this.drawTipForSelectedLabel();
+        opt.type === 'heatMap' ? this.drawLabelTipForHeatMap(ctx) : this.drawTipForSelectedLabel(ctx);
     }
 
     const executeDrawIndicator = (tipOpt) => {
@@ -66,12 +68,13 @@ const modules = {
                 tipType: 'sel',
                 seriesOpt: seriesInfo,
                 isSamePos,
+                ctx,
                 ...selArgs,
               });
             }
 
             if (tipOpt.showIndicator) {
-              this.drawFixedIndicator({ opt: tipOpt, seriesOpt: seriesInfo, ...selArgs });
+              this.drawFixedIndicator({ opt: tipOpt, seriesOpt: seriesInfo, ctx, ...selArgs });
             }
           }
 
@@ -91,9 +94,31 @@ const modules = {
     }
 
     if (maxTipOpt.use && !isExistSelectedLabel) {
-      const maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
-      const seriesInfo = this.seriesList[maxSID];
-      maxArgs = this.calculateTipInfo(seriesInfo, 'max', null);
+      // step/time-category 축은 range 없이도 minIndex=0, maxIndex=last를 채우므로 숫자 여부로는
+      // 클리핑을 판별 못 한다. 빈 윈도우=미표시, 부분 클리핑=윈도우 재계산, 전체=전역 캐시.
+      const axesSteps = isHorizontal ? this.axesSteps.y[0] : this.axesSteps.x[0];
+      const minIndex = axesSteps?.minIndex;
+      const maxIndex = axesSteps?.maxIndex;
+      const labelCount = (isHorizontal ? this.axesY[0] : this.axesX[0])?.labels?.length;
+      const fullLast = Number.isFinite(labelCount) ? labelCount - 1 : maxIndex;
+      const hasWindow = Number.isFinite(minIndex) && Number.isFinite(maxIndex);
+      const isEmptyWindow = hasWindow && maxIndex < minIndex;
+      const isClippingWindow = hasWindow && (minIndex > 0 || maxIndex < fullLast);
+
+      let maxSID;
+      let windowMax = null;
+      if (isEmptyWindow) {
+        maxSID = undefined;
+      } else if (isClippingWindow) {
+        windowMax = this.getVisibleWindowMaxSeries(minIndex, maxIndex);
+        maxSID = windowMax?.sId;
+      } else {
+        maxSID = this.minMax[isHorizontal ? 'x' : 'y'][0].maxSID;
+      }
+
+      const seriesInfo = maxSID ? this.seriesList[maxSID] : null;
+      if (seriesInfo) {
+        maxArgs = this.calculateTipInfo(seriesInfo, 'max', windowMax);
 
       // dp 가 null 이면 max 데이터가 axis range 밖이라는 신호. drawTextTip 이 null 을 0 으로
       // 강제 변환해 maxTip 이 좌상단에 찍히는 회귀를 막는다.
@@ -107,10 +132,11 @@ const modules = {
         } else {
           maxArgs.text = numberWithComma(maxArgs.value);
         }
-        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ...maxArgs });
+        this.drawTextTip({ opt: maxTipOpt, tipType: 'max', seriesOpt: seriesInfo, ctx, ...maxArgs });
 
-        if (maxTipOpt.showIndicator) {
-          this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ...maxArgs });
+          if (maxTipOpt.showIndicator) {
+            this.drawFixedIndicator({ opt: maxTipOpt, seriesOpt: seriesInfo, ctx, ...maxArgs });
+          }
         }
       }
     }
@@ -158,7 +184,20 @@ const modules = {
       return false;
     }
 
-    let ldata = type === 'bar' ? maxDomainIndex : maxDomain;
+    // tipType === 'max' + hitInfo: drawTips에서 미리 산출한 가시 윈도우 max override.
+    // 일반 'max' 경로는 series.minMax(전역 캐시)를 그대로 사용.
+    // bar는 인덱스로, line/scatter는 도메인 값으로 위치를 잡으므로(maxDomainIndex/maxDomain
+    // 비대칭과 동일) override의 ldata도 타입에 맞춰 고른다.
+    const overrideLdata = type === 'bar' ? hitInfo?.index : hitInfo?.domain;
+    const hasMaxOverride = tipType === 'max' && hitInfo
+      && Number.isFinite(overrideLdata) && Number.isFinite(hitInfo.value);
+
+    let ldata;
+    if (hasMaxOverride) {
+      ldata = overrideLdata;
+    } else {
+      ldata = type === 'bar' ? maxDomainIndex : maxDomain;
+    }
 
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
@@ -169,7 +208,12 @@ const modules = {
       }
     }
 
-    let value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
+    let value;
+    if (hasMaxOverride) {
+      value = hitInfo.value;
+    } else {
+      value = isHorizontal ? series.minMax.maxX : series.minMax.maxY;
+    }
     let label;
     if (tipType === 'sel') {
       if (hitInfo && hitInfo.label !== null) {
@@ -223,6 +267,18 @@ const modules = {
         } else {
           return false;
         }
+      } else {
+        // axis range가 가시 인덱스 window를 지정한 경우(step/timeCategory scale 등).
+        // bar는 size.cat이 visibleCount 기준이라 ldata도 가시 시작 인덱스를 기준으로 보정해야 한다.
+        const dirSteps = isHorizontal ? graphY : graphX;
+        const { minIndex, maxIndex } = dirSteps ?? {};
+        if (Number.isFinite(minIndex) && Number.isFinite(maxIndex)) {
+          if (ldata >= minIndex && ldata <= maxIndex) {
+            ldata -= minIndex;
+          } else {
+            return false;
+          }
+        }
       }
 
       if (isHorizontal) {
@@ -253,7 +309,7 @@ const modules = {
   },
   drawFixedIndicator(param) {
     const isHorizontal = !!this.options.horizontal;
-    const ctx = this.bufferCtx;
+    const ctx = param.ctx ?? this.bufferCtx;
     const { graphX, graphY, xArea, yArea, xsp, ysp, dp, type, value, opt, seriesOpt } = param;
     let offset = 0;
 
@@ -308,7 +364,7 @@ const modules = {
    * none Text
    * @returns {boolean} Whether drew at least one tip
    */
-  drawTipForSelectedLabel() {
+  drawTipForSelectedLabel(ctx = this.bufferCtx) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const labelTipOpt = opt.selectLabel;
@@ -368,6 +424,18 @@ const modules = {
             labelCount = Math.floor((+max - +min) / interval) + 1;
             startIndex = type === 'step' ? min : labelAxes.labels.findIndex((v) => v === +min);
             endIndex = type === 'step' ? max : labelAxes.labels.findIndex((v) => v === +max);
+          } else {
+            // axis range가 가시 인덱스 window를 지정한 경우 동일하게 화면 인덱스로 보정.
+            const stepInfo = isHorizontal ? this.axesSteps.y[0] : this.axesSteps.x[0];
+            if (
+              Number.isFinite(stepInfo?.minIndex)
+              && Number.isFinite(stepInfo?.maxIndex)
+              && stepInfo.minIndex < stepInfo.maxIndex
+            ) {
+              startIndex = stepInfo.minIndex;
+              endIndex = stepInfo.maxIndex;
+              labelCount = endIndex - startIndex + 1;
+            }
           }
         }
 
@@ -449,7 +517,7 @@ const modules = {
           ) + offset;
 
         this.showTip({
-          context: this.bufferCtx,
+          context: ctx,
           x: isHorizontal ? dataPos : labelPos,
           y: isHorizontal ? labelPos : dataPos,
           opt: labelTipOpt,
@@ -465,7 +533,7 @@ const modules = {
    * Draw Selected Label Tip
    * @returns {boolean} Whether drew at least one tip
    */
-  drawLabelTipForHeatMap() {
+  drawLabelTipForHeatMap(ctx = this.bufferCtx) {
     const opt = this.options;
     const isHorizontal = !!opt.horizontal;
     const labelTipOpt = opt.selectLabel;
@@ -497,7 +565,7 @@ const modules = {
         const dp = labelCenter + labelGap / 2;
 
         this.showTip({
-          context: this.bufferCtx,
+          context: ctx,
           x: isHorizontal ? gp : dp,
           y: isHorizontal ? dp : gp,
           opt: labelTipOpt,
@@ -517,7 +585,7 @@ const modules = {
    */
   drawTextTip(param) {
     const isHorizontal = !!this.options.horizontal;
-    const ctx = this.bufferCtx;
+    const ctx = param.ctx ?? this.bufferCtx;
     const { graphX, graphY, xArea, yArea, xsp, xep, ysp } = param;
     const { dp, value, text, opt, type, tipType, isSamePos, seriesOpt } = param;
 
