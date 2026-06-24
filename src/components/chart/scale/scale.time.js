@@ -278,6 +278,19 @@ function expandByInteger(baseMeta, span, maxSteps) {
  * base의 정수배로 확장한다. number/auto interval은 epoch(0) 기준 정렬이라 본래
  * 자정 점프가 없고, day 이상 단위는 startOf('year') 등 별도 anchor를 사용한다.
  *
+ * [알려진 한계 — DST/연말 경계]
+ * 위 "자정마다 anchor가 24h 이동" 전제는 "하루 = 86,400,000ms"가 항상 참일 때만
+ * 성립한다. 다음 두 경계에서는 anchor 이동폭이 24h가 아니라 라벨이 일회성으로
+ * 점프할 수 있다(드물고 작아 수용한 예외):
+ *   - DST 전환일: 하루가 23h(봄)/25h(가을)이라, sub-day 격자가 DST일 자정을
+ *     넘는 순간 23h%interval / 25h%interval 만큼(예: 4h interval이면 3h/1h) 밀린다.
+ *     한국(KST)은 DST 미시행이라 영향 없음. US/EU 등 DST 타임존을 사용처가 주입한
+ *     경우에만, 연 1~2회 발생.
+ *   - 연말: day 이상 단위가 다일(2·3일 등)로 확장되면 startOf('year') anchor 교체로
+ *     연 1회 다일 간격이 어긋날 수 있다.
+ * wall-clock 라벨을 유지하는 한 DST일의 불연속은 원리적으로 제거 불가하며(그날은
+ * 실시간 간격 자체가 23h/25h), 완전 제거하려면 타임존 인식 tick 재구성이 필요하다.
+ *
  * @param {{ ms: number, unit: string|null, time: number|null }} baseMeta base interval
  * @param {number} span graphMax - graphMin
  * @param {number} maxSteps 최대 tick 수
