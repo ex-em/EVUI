@@ -267,6 +267,34 @@ describe('EvInputNumber Component', () => {
       expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(before);
       expect(wrapper.find('.ev-input').element.value).toBe('0');
     });
+
+    it('기본 clampOnStep은 false이다', () => {
+      expect(EvInputNumber.props.clampOnStep.default).toBe(false);
+    });
+
+    it('clampOnStep + stepStrictly: 경계는 step 그리드 내 값으로 스냅된다', async () => {
+      // min=0,max=10,step=3 → 그리드 0,3,6,9. max(10)는 그리드 밖이므로 도달 가능한 최댓값은 9
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true, stepStrictly: true, min: 0, max: 10, step: 3, modelValue: 6 },
+      });
+
+      await wrapper.find('.step-up').trigger('click');
+
+      expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([9]);
+      expect(wrapper.find('.ev-input').element.value).toBe('9');
+    });
+
+    it('clampOnStep + stepStrictly: 스냅 결과가 동일하면 중복 emit하지 않는다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true, stepStrictly: true, min: 0, max: 10, step: 3, modelValue: 9 },
+      });
+      const before = wrapper.emitted('update:modelValue')?.length ?? 0;
+
+      await wrapper.find('.step-up').trigger('click');
+
+      expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(before);
+      expect(wrapper.find('.ev-input').element.value).toBe('9');
+    });
   });
 
   describe('기본값', () => {
