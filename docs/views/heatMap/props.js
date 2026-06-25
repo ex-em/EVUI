@@ -24,6 +24,8 @@ import StepAxis from './example/StepAxis';
 import StepAxisRaw from './example/StepAxis?raw';
 import LegendClickMode from './example/LegendClickMode';
 import LegendClickModeRaw from './example/LegendClickMode?raw';
+import Annotations from './example/Annotations';
+import AnnotationsRaw from './example/Annotations?raw';
 
 export default {
   mdText,
@@ -87,6 +89,13 @@ export default {
       description: 'Legend Click Mode',
       component: LegendClickMode,
       parsedData: parse(LegendClickModeRaw).descriptor,
+    },
+    Annotations: {
+      description:
+        'annotations 옵션으로 히트맵 위에 어노테이션/뱃지를 표시합니다. series 위치 어노테이션은 셀 '
+        + '중심에 정렬되며, axis 위치는 step 축의 x/y 라벨로 지정합니다.',
+      component: Annotations,
+      parsedData: parse(AnnotationsRaw).descriptor,
     },
   },
 };

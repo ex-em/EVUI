@@ -143,6 +143,7 @@ const chartData = {
 | axesY        | Object                    | 없음                                      | Y축에 대한 속성                                                                                                                                                                        | [상세](#axesx-axesy)            |
 | title        | Object                    | ([상세](#title))                          | 차트 상단에 위치할 차트 제목 표시 여부 및 속성                                                                                                                                         |                                 |
 | legend       | Object                    | ([상세](#legend))                         | 차트의 범례 표시 여부 및 속성                                                                                                                                                          |                                 |
+| annotations | Array | ([상세](#annotation)) | 차트 위에 표시할 어노테이션/뱃지 목록 | |
 | tooltip      | Object                    | ([상세](#tooltip))                        | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성                                                                                                                                       |                                 |
 | indicator    | Object                    | ([상세](#indicator))                      | 지표선                                                                                                                                                                                 |                                 |
 | maxTip       | Object                    | ([상세](#maxtip))                         | 최대값에 tip 표시(값 표시) 여부 및 속성                                                                                                                                                |                                 |
@@ -623,3 +624,104 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 | axes-data-max-change | maxY | show 된 series 들의 **실제 데이터 y 최대값**(number)을 반환한다. axes-scale-change(라벨 스텝 개수)와 달리 데이터 값이다. 차트가 내부적으로 이미 계산한 series.minMax.maxY 를 재사용하므로 소비처가 동일 데이터를 따로 스캔해 max 를 구하지 않아도 된다. **차트 타입과 무관하게** 사용할 수 있으며, 이 이벤트를 바인딩한 경우에만 발생한다(바인딩 안 하면 집계 비용 0). 발생 시엔 렌더마다(같은 값이어도) 발생한다. 유효한(유한수) 데이터가 있는 show 된 series 가 하나도 없으면 — 보이는 series 가 없거나 모두 빈 데이터면 — null 을 emit 한다. 단, realTimeScatter 는 전 series 가 빈 데이터일 때 내부 minMax 가 0 으로 폴백되어 0 이 emit 된다. maxY 는 show 된 전 series 의 **통합 최대값(단일 y축·세로 차트 기준, 축 구분 없음)** 이라 다중 y축에서는 축별 구분이 되지 않는다. realTimeScatter autoScale 의 데이터 최대값 용도로 도입됐으나 line·bar 등 다른 차트에서도 동일하게 동작한다. |
 
 - 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환
+
+#### annotation
+
+차트 위에 어노테이션/뱃지를 표시합니다. `options.annotations`에 **배열**로 지정하며, 배열 순서가 그리는 순서(z-order, 뒤 항목이 위)입니다. 어노테이션은 전용 레이어에 그려져 hover 하이라이트 위에 표시됩니다.
+
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|------|------|--------|------|-----------|
+| id | String | annotation-${index} | 식별/key 용도. 중복 시 콘솔 경고 | |
+| type | String | 'text' | 어노테이션 외형 종류 | 'text', 'badge', 'callout', 'circle' |
+| content | String \| Function | '' | 표시 텍스트(토큰/콜백 지원). circle은 무시 | [상세](#annotation-content) |
+| position | Object | ([상세](#annotation-position)) | 위치 지정 방식 | |
+| connector | Object | ([상세](#annotation-connector)) | 데이터 지점과 박스를 잇는 연결선(기본 비활성). callout은 무시 | |
+| style | Object | type별 기본값 | 외형/말풍선/도형 속성 | [상세](#annotation-style) |
+
+##### type 종류
+- `text` : 배경/테두리 없는 순수 텍스트(라벨)
+- `badge` : 배경 박스 + 라운딩을 가진 텍스트 뱃지
+- `callout` : 데이터 지점을 가리키는 꼬리가 달린 말풍선
+- `circle` : 텍스트 없는 강조용 원형 도형(`style.radius` 사용)
+
+##### annotation position
+
+위치 기준은 상호 배타적인 3가지 `type`으로 구분합니다.
+
+| 이름 | 적용 type | 타입 | 디폴트 | 설명 |
+|------|-----------|------|--------|------|
+| type | 공통 | String | 'pixel' | 'axis' \| 'pixel' \| 'series' |
+| offsetX | 공통 | Number | 0 | 기준점으로부터 X 오프셋(px) |
+| offsetY | 공통 | Number | 0 | 기준점으로부터 Y 오프셋(px) |
+| x | pixel | Number | 0 | canvas 좌상단(0,0) 기준 절대 X 좌표 |
+| y | pixel | Number | 0 | canvas 좌상단(0,0) 기준 절대 Y 좌표 |
+| xAxisIndex | axis | Number | 0 | 기준 X축 인덱스 |
+| yAxisIndex | axis | Number | 0 | 기준 Y축 인덱스 |
+| xValue | axis | Number \| String | null | X축 값(linear=숫자, time=숫자/날짜문자열, step=라벨/인덱스) |
+| yValue | axis | Number \| String | null | Y축 값 |
+| seriesId | series | String | null | 추적할 시리즈 id |
+| location | series | String \| Number | 'end' | 추적 위치. 'start' \| 'end' \| 데이터 인덱스. 파이는 무시 |
+
+- **이 차트의 `series` 기준점**: 막대의 값이 끝나는 변의 중앙(가로/세로 자동 판별)
+- **`axis` 위치**: 지원 (linear/time/step 축 값으로 지정)
+- 기준점이 축 범위/줌 영역 밖이거나, 추적 `series`가 숨김 상태(`show: false`, 범례 토글 포함)이면 그리지 않습니다. `pixel`은 항상 표시됩니다.
+
+##### annotation content
+
+- 문자열: 그대로 표시
+- 토큰 치환: `{xValue}` `{yValue}` `{seriesId}` `{seriesName}` `{dataIndex}` `{percentage}` (알 수 없는 토큰은 원문 유지)
+- 콜백 `(ctx) => string` : `ctx = { xValue, yValue, seriesId, seriesName, dataIndex, percentage }` (`percentage`는 파이 전용, 그 외 null)
+- `\n` 으로 멀티라인 지원
+
+##### annotation connector
+
+데이터 지점과 어노테이션 박스의 가장 가까운 경계를 잇는 선입니다.
+
+| 이름 | 타입 | 디폴트 | 설명 | 종류 |
+|------|------|--------|------|------|
+| enabled | Boolean | false | 연결선 사용 여부 | |
+| type | String | 'straight' | 선 모양 | 'straight', 'elbow' |
+| style.stroke | String | '#9E9E9E' | 선 색상 | |
+| style.strokeWidth | Number | 1 | 선 두께 | |
+| style.dashStyle | String | 'solid' | 점선 스타일 | 'solid', 'dash', 'dot' |
+
+> `callout`은 꼬리가 connector 역할을 하므로 connector를 켜도 자동으로 비활성화됩니다.
+
+##### annotation style
+
+text/badge/callout 공통 텍스트 속성과 type별 전용 속성을 `style` 하나로 통합합니다.
+
+| 이름 | 타입 | 설명 | 적용 type |
+|------|------|------|-----------|
+| color | String | 글자 색 | text, badge, callout |
+| backgroundColor | String | 배경 색('transparent' 가능) | 전체 |
+| borderColor | String | 테두리 색 | 전체 |
+| borderWidth | Number | 테두리 두께 | 전체 |
+| borderRadius | Number | 모서리 둥글기 | text, badge, callout |
+| padding | Number \| Array | 안쪽 여백. n / [상하,좌우] / [상,우,하,좌] | text, badge, callout |
+| fontSize | String | 글자 크기(예: '11px') | text, badge, callout |
+| fontWeight | String | 글자 굵기 | text, badge, callout |
+| fontFamily | String | 글꼴 | text, badge, callout |
+| textAlign | String | 정렬 | text, badge, callout |
+| anchor | String | 꼬리 방향('auto'는 offset 방향으로 결정) | callout |
+| arrowSize | Number | 꼬리 크기 | callout |
+| radius | Number | 원 반지름 | circle |
+
+**type별 style 기본값**
+
+| 속성 | text | badge | callout | circle |
+|------|------|-------|---------|--------|
+| color | #212121 | #8B2323 | #212121 | - |
+| backgroundColor | transparent | #FDF0F0 | #FFFFFF | rgba(178,76,76,0.15) |
+| borderColor | transparent | #B24C4C | #B0B0B0 | #B24C4C |
+| borderWidth | 0 | 1 | 1 | 1 |
+| borderRadius | 0 | 6 | 4 | - |
+| padding | [0,0] | [6,10] | [4,8] | - |
+| fontSize | 11px | 11px | 11px | - |
+| fontWeight | normal | normal | normal | - |
+| textAlign | center | center | center | - |
+| anchor | - | - | auto | - |
+| arrowSize | - | - | 4 | - |
+| radius | - | - | - | 10 |
+
+> 실제 사용 예시는 상단의 **Annotations** 예제를 참고하세요.
