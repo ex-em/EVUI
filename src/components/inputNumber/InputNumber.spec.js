@@ -176,6 +176,99 @@ describe('EvInputNumber Component', () => {
     });
   });
 
+  describe('clampOnStep', () => {
+    it('clampOnStep + min 미설정 + 값이 없는 상태에서 step-up 버튼으로 값이 조절된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true },
+      });
+
+      await wrapper.find('.step-up').trigger('click');
+
+      expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+      expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([0]);
+      expect(wrapper.find('.ev-input').element.value).toBe('0');
+    });
+
+    it('clampOnStep + min 미설정 + 값이 없는 상태에서 step-down 버튼으로 값이 조절된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true },
+      });
+
+      await wrapper.find('.step-down').trigger('click');
+
+      expect(wrapper.emitted('update:modelValue')).toBeTruthy();
+      expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([0]);
+      expect(wrapper.find('.ev-input').element.value).toBe('0');
+    });
+
+    it('clampOnStep + min 설정 + 값이 없는 상태에서 step-up 버튼으로 min부터 조절된다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true, min: 5 },
+      });
+
+      await wrapper.find('.step-up').trigger('click');
+
+      expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([5]);
+      expect(wrapper.find('.ev-input').element.value).toBe('5');
+    });
+
+    it('clampOnStep이 max를 초과하는 값을 max로 고정한다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true, max: 10, modelValue: 10 },
+      });
+
+      await wrapper.find('.step-up').trigger('click');
+
+      expect(wrapper.find('.ev-input').element.value).toBe('10');
+    });
+
+    it('clampOnStep이 min 미만의 값을 min으로 고정한다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true, min: 0, modelValue: 0 },
+      });
+
+      await wrapper.find('.step-down').trigger('click');
+
+      expect(wrapper.find('.ev-input').element.value).toBe('0');
+    });
+
+    it('clampOnStep + 범위 내 값은 step만큼 증가/감소한다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true, min: 0, max: 10, step: 2, modelValue: 4 },
+      });
+
+      await wrapper.find('.step-up').trigger('click');
+      expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([6]);
+
+      await wrapper.find('.step-down').trigger('click');
+      expect(wrapper.emitted('update:modelValue').at(-1)).toEqual([4]);
+    });
+
+    it('clampOnStep에서 max 도달 후 다시 step-up 해도 추가 emit이 발생하지 않는다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true, max: 10, modelValue: 10 },
+      });
+      const before = wrapper.emitted('update:modelValue')?.length ?? 0;
+
+      await wrapper.find('.step-up').trigger('click');
+
+      expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(before);
+      expect(wrapper.find('.ev-input').element.value).toBe('10');
+    });
+
+    it('clampOnStep에서 min 도달 후 다시 step-down 해도 추가 emit이 발생하지 않는다', async () => {
+      const wrapper = mount(EvInputNumber, {
+        props: { clampOnStep: true, min: 0, modelValue: 0 },
+      });
+      const before = wrapper.emitted('update:modelValue')?.length ?? 0;
+
+      await wrapper.find('.step-down').trigger('click');
+
+      expect(wrapper.emitted('update:modelValue')?.length ?? 0).toBe(before);
+      expect(wrapper.find('.ev-input').element.value).toBe('0');
+    });
+  });
+
   describe('기본값', () => {
     it('컴포넌트 이름이 EvInputNumber이다', () => {
       expect(EvInputNumber.name).toBe('EvInputNumber');

@@ -165,8 +165,9 @@ export function useStep(params) {
       return;
     }
 
+    const isEmpty = !currentValue.value && currentValue.value !== 0;
     let result;
-    if (!currentValue.value && currentValue.value !== 0) {
+    if (isEmpty) {
       result = props.min === -Infinity ? 0 : props.min;
     } else {
       const newValue = +currentValue.value;
@@ -184,7 +185,7 @@ export function useStep(params) {
       } else if (result > props.max) {
         result = props.max;
       }
-      if (result !== +currentValue.value) {
+      if (isEmpty || result !== +currentValue.value) {
         validateValue(result);
       }
     } else if (result >= props.min && result <= props.max) {
