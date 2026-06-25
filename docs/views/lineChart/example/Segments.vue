@@ -9,24 +9,24 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const time = dayjs().format('YYYY-MM-DD HH:mm:ss');
+    const baseTime = dayjs().format('YYYY-MM-DD 00:00:00');
     const chartData = {
       series: {
-        series1: { name: 'series#1', color: 'rgba(239, 58, 58, 0.5)', segments: [1, 2] },
-        series2: { name: 'series#2' },
+        thresholdSeries: { name: 'thresholdSeries', color: 'rgba(239, 58, 58, 0.5)', segments: [1, 2] },
+        dataSeries: { name: 'dataSeries' },
       },
       labels: [
-        dayjs(time),
-        dayjs(time).add(1, 'day'),
-        dayjs(time).add(2, 'day'),
-        dayjs(time).add(3, 'day'),
-        dayjs(time).add(4, 'day'),
-        dayjs(time).add(5, 'day'),
-        dayjs(time).add(6, 'day'),
+        dayjs(baseTime),
+        dayjs(baseTime).add(1, 'day'),
+        dayjs(baseTime).add(2, 'day'),
+        dayjs(baseTime).add(3, 'day'),
+        dayjs(baseTime).add(4, 'day'),
+        dayjs(baseTime).add(5, 'day'),
+        dayjs(baseTime).add(6, 'day'),
       ],
       data: {
-        series1: [25, 47, 47, 40, 50, 100, null],
-        series2: [100, 25, 47, 47, null, null, null],
+        thresholdSeries: [25, 47, 47, 40, 50, 100, null],
+        dataSeries: [100, 25, 47, 47, null, null, null],
       },
     };
 
@@ -71,6 +71,20 @@ export default {
           },
         },
       ],
+      annotations: [
+      {
+          id: 'threshold-badge',
+          type: 'badge',
+          content: 'Threshold',
+          position: {
+            type: 'series',
+            seriesId: 'thresholdSeries',
+            location: 'end',
+            offsetX: 10,
+            offsetY: -20,
+          },
+        },
+      ]
     };
 
     return {
