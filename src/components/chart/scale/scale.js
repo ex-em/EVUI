@@ -871,8 +871,6 @@ class Scale {
       padBottom,
       padLeft,
       lineGap: merged.gap != null ? merged.gap : defaultPad + 2, // 임계선↔박스 간격(gap 옵션 우선)
-      labelHalfWidth: labelWidth / 2,
-      labelHalfHeight: fontSize / 2,
       borderRadius: Math.max(0, merged.borderRadius ?? 0),
       hidden,
       valueOnly,
