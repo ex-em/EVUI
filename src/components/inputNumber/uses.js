@@ -185,7 +185,16 @@ export function useStep(params) {
       } else if (result > props.max) {
         result = props.max;
       }
-      if (isEmpty || result !== +currentValue.value) {
+      // stepStrictly 와 함께면 validateValue 가 경계값을 step 그리드로 재스냅하므로,
+      // 최종 스냅값 기준으로 변경 여부를 판단해 동일값 중복 emit 을 막는다.
+      const finalValue = props.stepStrictly
+        ? getValueCloseToStep(result, {
+            min: props.min === -Infinity ? 0 : props.min,
+            max: props.max,
+            step: props.step,
+          })
+        : result;
+      if (isEmpty || finalValue !== +currentValue.value) {
         validateValue(result);
       }
     } else if (result >= props.min && result <= props.max) {
