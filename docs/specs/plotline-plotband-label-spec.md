@@ -60,6 +60,7 @@ label: {
 
   // ── 신규 ──
   borderRadius: 0,           // 라벨 박스 모서리 반경(px). 0이면 사각
+  gap: null,                 // 임계선/임계영역↔라벨 박스 간격(px). null이면 자동(fontSize 기준, X축 상단은 2)
   padding: null,             // 라벨 박스 안쪽 여백. number(단축) 또는 { top, right, bottom, left }
                              //   (차트 padding·tooltip rowPadding 과 동일 형식). null이면 fontSize/4
   pointer: {                 // 말풍선 꼬리. 방향은 배치 기준 자동, 크기 고정

@@ -264,6 +264,7 @@ const chartData =
 | textAlign       | String                      | 'center'  | 수평 정렬                                                          | 'left', 'center', 'right'             |
 | verticalAlign   | String                      | 'middle'  | 수직 정렬                                                          | 'top', 'middle', 'bottom'             |
 | borderRadius    | Number                      | 0         | 라벨 박스 모서리 반경(px)                                          |                                       |
+| gap             | Number \| null              | null      | 임계선/임계영역과 라벨 박스 사이 간격(px). `null`이면 자동(fontSize 기준)          |                                       |
 | padding         | Number \| Object            | null      | 박스 안쪽 여백. 숫자 또는 `{ top, right, bottom, left }`. `null`이면 `fontSize/4` | 6, <br> { top: 4, bottom: 2 } |
 | pointer         | Object                      | ([상세](#pointer)) | 말풍선 꼬리                                              |                                       |
 | responsive      | Object                      | ([상세](#responsive)) | plot 너비 기준 단계 축약                              |                                       |
