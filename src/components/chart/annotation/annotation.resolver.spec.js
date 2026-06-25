@@ -28,13 +28,31 @@ const ctx = {
 
 describe('annotation.resolver', () => {
   describe('resolveLocationIndex', () => {
-    it('start/end/number/clamp/empty', () => {
+    it('start/end/number/clamp/empty (length 하위호환)', () => {
       expect(resolveLocationIndex('start', 5)).toBe(0);
       expect(resolveLocationIndex('end', 5)).toBe(4);
       expect(resolveLocationIndex(2, 5)).toBe(2);
       expect(resolveLocationIndex(99, 5)).toBe(4); // clamp
       expect(resolveLocationIndex(-3, 5)).toBe(0); // clamp
       expect(resolveLocationIndex('end', 0)).toBe(-1);
+    });
+    it('array: start/end 는 데이터 있는(non-null) 첫/마지막', () => {
+      const data = [{ y: null }, { y: 5 }, { y: 6 }, { y: null }];
+      expect(resolveLocationIndex('start', data)).toBe(1);
+      expect(resolveLocationIndex('end', data)).toBe(2);
+    });
+    it('array: 명시 인덱스는 null 여부 무관하게 그대로(clamp)', () => {
+      const data = [{ y: null }, { y: 5 }];
+      expect(resolveLocationIndex(0, data)).toBe(0);
+      expect(resolveLocationIndex(9, data)).toBe(1);
+    });
+    it('array: 전부 null 이면 -1', () => {
+      expect(resolveLocationIndex('start', [{ y: null }, { y: null }])).toBe(-1);
+      expect(resolveLocationIndex('end', [{ y: null }, { y: null }])).toBe(-1);
+    });
+    it('horizontal 은 x 필드로 값 유무 판정', () => {
+      const data = [{ x: null }, { x: 5 }];
+      expect(resolveLocationIndex('start', data, true)).toBe(1);
     });
   });
 
@@ -81,6 +99,51 @@ describe('annotation.resolver', () => {
       const ann = { position: { type: 'series', seriesId: 's1', location: 'end' } };
       // last index has yp null => hidden
       expect(resolveAnchor(ann, ctx).isVisible).toBe(false);
+    });
+
+    it('start skips leading null values to first data point', () => {
+      const skipCtx = {
+        seriesList: {
+          s: {
+            data: [
+              { x: 0, y: null, xp: 50, yp: null },
+              { x: 1, y: 20, xp: 100, yp: 240 },
+              { x: 2, y: 30, xp: 150, yp: 220 },
+            ],
+          },
+        },
+      };
+      const ann = { position: { type: 'series', seriesId: 's', location: 'start' } };
+      expect(resolveAnchor(ann, skipCtx)).toMatchObject({ x: 100, y: 240, isVisible: true });
+    });
+
+    it('end skips trailing null values to last data point', () => {
+      const skipCtx = {
+        seriesList: {
+          s: {
+            data: [
+              { x: 0, y: 10, xp: 50, yp: 260 },
+              { x: 1, y: 20, xp: 100, yp: 240 },
+              { x: 2, y: null, xp: 150, yp: null },
+            ],
+          },
+        },
+      };
+      const ann = { position: { type: 'series', seriesId: 's', location: 'end' } };
+      expect(resolveAnchor(ann, skipCtx)).toMatchObject({ x: 100, y: 240, isVisible: true });
+    });
+
+    it('hides when all data points are null', () => {
+      const allNull = { seriesList: { s: { data: [{ y: null, xp: null, yp: null }, { y: null, xp: null, yp: null }] } } };
+      const ann = { position: { type: 'series', seriesId: 's', location: 'start' } };
+      expect(resolveAnchor(ann, allNull).isVisible).toBe(false);
+    });
+
+    it('numeric index is literal (does not skip null)', () => {
+      const nullAt0 = { seriesList: { s: { data: [{ x: 0, y: null, xp: 50, yp: null }, { x: 1, y: 20, xp: 100, yp: 240 }] } } };
+      const ann = { position: { type: 'series', seriesId: 's', location: 0 } };
+      // 명시 인덱스 0 은 null 이어도 그대로 → yp null → 숨김
+      expect(resolveAnchor(ann, nullAt0).isVisible).toBe(false);
     });
     it('numeric index', () => {
       const ann = { position: { type: 'series', seriesId: 's1', location: 1 } };

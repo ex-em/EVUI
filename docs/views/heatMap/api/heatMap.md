@@ -443,7 +443,7 @@ const chartOptions = {
 | xValue | axis | Number \| String | null | X축 값(linear=숫자, time=숫자/날짜문자열, step=라벨/인덱스) |
 | yValue | axis | Number \| String | null | Y축 값 |
 | seriesId | series | String | null | 추적할 시리즈 id |
-| location | series | String \| Number | 'end' | 추적 위치. 'start' \| 'end' \| 데이터 인덱스. 파이는 무시 |
+| location | series | String \| Number | 'end' | 추적 위치. 'start' \| 'end' \| 데이터 인덱스('start'/'end'는 데이터 있는 non-null 첫/마지막). 파이는 무시 |
 
 - **이 차트의 `series` 기준점**: 셀 중심
 - **`axis` 위치**: 지원 (linear/time/step 축 값으로 지정)
