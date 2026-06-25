@@ -3,27 +3,52 @@ import { axisValueToPixel } from './annotation.axis';
 
 /**
  * position.type === 'series' 일 때 location 을 데이터 인덱스로 환산한다.
- *  - 'start' -> 0
- *  - 'end'   -> data.length - 1
- *  - number  -> [0, length-1] 로 clamp
+ *  - 'start' -> 데이터가 있는(non-null) 첫 번째 인덱스
+ *  - 'end'   -> 데이터가 있는(non-null) 마지막 인덱스
+ *  - number  -> [0, length-1] 로 clamp (명시 인덱스는 null 여부와 무관하게 그대로)
+ * data 에 배열을 넘기면 null 값을 건너뛴다. number(길이)를 넘기면(하위호환) start/end 는 0/length-1.
  * @param {('start'|'end'|number)} location
- * @param {number} length 데이터 길이
- * @returns {number} 인덱스 (length 0 이면 -1)
+ * @param {object[]|number} data 데이터 배열(권장) 또는 길이
+ * @param {boolean} [horizontal=false] 값축이 X축이면 true(가로 막대). 값 유무 판정 필드 선택용
+ * @returns {number} 인덱스 (없으면 -1)
  */
-export function resolveLocationIndex(location, length) {
+export function resolveLocationIndex(location, data, horizontal = false) {
+  const isArr = Array.isArray(data);
+  let length = 0;
+  if (isArr) {
+    length = data.length;
+  } else if (typeof data === 'number') {
+    length = data;
+  }
   if (length <= 0) {
     return -1;
-  }
-  if (location === 'start') {
-    return 0;
-  }
-  if (location === 'end') {
-    return length - 1;
   }
   if (typeof location === 'number' && Number.isInteger(location)) {
     return Math.min(Math.max(location, 0), length - 1);
   }
-  return length - 1;
+  // 값 유무: 값축(가로=x, 세로=y) 필드가 non-null 인지로 판정
+  const hasValue = pt => pt && (horizontal ? pt.x != null : pt.y != null);
+  if (location === 'start') {
+    if (!isArr) {
+      return 0;
+    }
+    for (let i = 0; i < length; i++) {
+      if (hasValue(data[i])) {
+        return i;
+      }
+    }
+    return -1;
+  }
+  // 'end' 및 그 외(기본 end)
+  if (!isArr) {
+    return length - 1;
+  }
+  for (let i = length - 1; i >= 0; i--) {
+    if (hasValue(data[i])) {
+      return i;
+    }
+  }
+  return -1;
 }
 
 /**
@@ -120,15 +145,15 @@ export function resolveAnchor(annotation, ctx) {
     if (!Array.isArray(data)) {
       return hidden;
     }
-    const idx = resolveLocationIndex(position.location, data.length);
+    // 'start'/'end' 는 데이터가 있는(non-null) 첫/마지막 포인트를 가리킨다(앞뒤 null 구간 건너뜀).
+    const idx = resolveLocationIndex(position.location, data, !!series.isHorizontal);
     const pt = idx >= 0 ? data[idx] : null;
-    // xp/yp 는 시리즈 기하 계산(computeGeometry) 결과. 줌으로 화면 밖이면 null → hide.
+    // 선택된 포인트가 줌으로 화면 밖이면(xp/yp null) 숨긴다. (전부 null 이면 idx=-1 → pt 없음)
     if (!pt || pt.xp == null || pt.yp == null) {
       return hidden;
     }
     // 기준점은 시리즈 타입에 따라 다르게 잡는다(xp/yp 는 박스형의 좌상단 코너, w/h 는 부호 포함 크기).
-    //  - bar : 막대의 '값 끝 가장자리 중심' — 카테고리축은 중앙, 값축은 막대 끝(tip). 막대 위 라벨/콜아웃의
-    //          자연스러운 위치다. isHorizontal 로 값축을 판별하며, 양수/음수·스택 막대 모두 부호로 처리된다.
+    //  - bar : 막대의 '값 끝 가장자리 중심'(카테고리축 중앙 + 값축 막대 끝). isHorizontal 로 값축 판별.
     //  - 그 외 박스형(heatMap 등) : 셀 중심(xp+w/2, yp+h/2)
     //  - line/scatter : w/h 가 null 이므로 점 좌표(xp/yp) 그대로
     let baseX = pt.xp;
@@ -185,7 +210,8 @@ export function buildContentContext(annotation, ctx) {
       base.percentage = series.data?.percentage ?? null;
       base.dataIndex = 0;
     } else if (Array.isArray(data)) {
-      const idx = resolveLocationIndex(position.location, data.length);
+      // anchor 와 동일한 인덱스(데이터 있는 첫/마지막)를 써서 토큰 값이 표시 위치와 일치하게 한다.
+      const idx = resolveLocationIndex(position.location, data, !!series.isHorizontal);
       base.dataIndex = idx;
       if (idx >= 0 && data[idx]) {
         base.xValue = data[idx].x;
