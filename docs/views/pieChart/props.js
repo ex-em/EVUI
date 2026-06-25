@@ -12,6 +12,8 @@ import ShowValue from './example/ShowValue';
 import ShowValueRaw from './example/ShowValue?raw';
 import Legend from './example/Legend';
 import LegendRaw from './example/Legend?raw';
+import Annotations from './example/Annotations';
+import AnnotationsRaw from './example/Annotations?raw';
 
 export default {
   mdText,
@@ -46,6 +48,13 @@ export default {
       description: 'Legend 영역에 Series Color, Name, Value 등을 표시할 수 있습니다.',
       component: Legend,
       parsedData: parse(LegendRaw).descriptor,
+    },
+    Annotations: {
+      description:
+        'annotations 옵션으로 파이 위에 어노테이션/뱃지를 표시합니다. series 위치 어노테이션은 조각(slice)의 '
+        + 'arc 중앙(각도 중간 지점)에 정렬됩니다. (파이는 x/y축이 없어 axis 위치는 미지원)',
+      component: Annotations,
+      parsedData: parse(AnnotationsRaw).descriptor,
     },
   },
 };

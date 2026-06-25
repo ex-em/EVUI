@@ -40,6 +40,8 @@ import ShowValue from './example/ShowValue';
 import ShowValueRaw from './example/ShowValue?raw';
 import DisplayOverflow from './example/DisplayOverflow';
 import DisplayOverflowRaw from './example/DisplayOverflow?raw';
+import Annotations from './example/Annotations';
+import AnnotationsRaw from './example/Annotations?raw';
 
 export default {
   mdText,
@@ -153,6 +155,13 @@ export default {
         'displayOverflow 옵션으로 값 축(세로=Y, 가로=X) range를 초과한 막대를 경계까지 기본 시리즈 색으로 표시할 수 있습니다(false 기본값이면 숨김). 가로 모드 토글로 값 축 전환 동작을 확인할 수 있습니다.',
       component: DisplayOverflow,
       parsedData: parse(DisplayOverflowRaw).descriptor,
+    },
+    Annotations: {
+      description:
+        'annotations 옵션으로 막대 위에 어노테이션/뱃지를 표시합니다. series 위치 어노테이션은 막대의 '
+        + '시각적 중심에 정렬되며, Horizontal 토글로 가로/세로 모두 중심 정렬이 유지되는지 확인할 수 있습니다.',
+      component: Annotations,
+      parsedData: parse(AnnotationsRaw).descriptor,
     },
   },
 };

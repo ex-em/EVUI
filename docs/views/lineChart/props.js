@@ -48,6 +48,8 @@ import UnSelectedOpacity from './example/UnSelectedOpacity';
 import UnSelectedOpacityRaw from './example/UnSelectedOpacity?raw';
 import PerfStressSingle from './example/PerfStressSingle';
 import PerfStressSingleRaw from './example/PerfStressSingle?raw';
+import Annotations from './example/Annotations';
+import AnnotationsRaw from './example/Annotations?raw';
 
 export default {
   mdText,
@@ -185,6 +187,13 @@ export default {
         '시리즈 수·포인트 수는 상수로 조절하며, append(슬라이딩 윈도우)/full-replace 갱신을 토글할 수 있습니다.',
       component: PerfStressSingle,
       parsedData: parse(PerfStressSingleRaw).descriptor,
+    },
+    Annotations: {
+      description:
+        'annotations 옵션으로 차트 위에 어노테이션/뱃지를 표시합니다. type(text/badge/callout/circle), '
+        + 'position(axis/pixel/series), content 토큰·콜백, connector(연결선)를 지원합니다.',
+      component: Annotations,
+      parsedData: parse(AnnotationsRaw).descriptor,
     },
   },
 };

@@ -16,6 +16,8 @@ import AxesScaleChange from './example/AxesScaleChange';
 import AxesScaleChangeRaw from './example/AxesScaleChange?raw';
 import TimeAxis from './example/TimeAxis';
 import TimeAxisRaw from './example/TimeAxis?raw';
+import Annotations from './example/Annotations';
+import AnnotationsRaw from './example/Annotations?raw';
 
 export default {
   mdText,
@@ -60,6 +62,13 @@ export default {
         '차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 확인할 수 있습니다.',
       component: AxesScaleChange,
       parsedData: parse(AxesScaleChangeRaw).descriptor,
+    },
+    Annotations: {
+      description:
+        'annotations 옵션으로 산점도 위에 어노테이션/뱃지를 표시합니다. series 위치 어노테이션은 포인트 '
+        + '중심에 정확히 정렬되며, axis(linear) 위치와 pixel 고정 라벨도 지원합니다.',
+      component: Annotations,
+      parsedData: parse(AnnotationsRaw).descriptor,
     },
   },
 };

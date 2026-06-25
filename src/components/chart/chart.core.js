@@ -19,6 +19,8 @@ import Blit from './chart.blit';
 import Selection from './chart.selection';
 import { WorkerRenderGate } from './render/render.worker.gate';
 import { toRenderSnapshot, packSeries } from './render/render.snapshot';
+import { normalizeAnnotations } from './annotation/annotation.normalize';
+import { drawAnnotations } from './annotation/annotation.draw';
 
 // realtime scatter blit: 시프트 누적으로 생기는 sub-pixel 오차를 주기적으로 리셋하기 위해,
 // 이 프레임 수마다 게이트 통과 여부와 무관하게 full redraw 로 돌아가 픽셀을 절대 좌표와 일치시킨다.
@@ -491,6 +493,8 @@ class EvChart {
     this.drawForeground(this.bufferCtx);
 
     this.commitToDisplay(this.displayCtx, this.bufferCanvas);
+
+    this.drawAnnotationLayer();
   }
 
   /**
@@ -539,6 +543,9 @@ class EvChart {
       // commitWorkerFrame 이 series bitmap 위에 그린다(z-order). 여기서 tip 을 buffer 에 그리면 가려진다.
       this.drawSeriesOverlay();
     }
+
+    this.drawAnnotationLayer();
+    
     return true;
   }
 
@@ -1131,6 +1138,112 @@ class EvChart {
   }
 
   /**
+   * 어노테이션 전용 캔버스(z-index:3, pointer-events:none)를 지연 생성한다.
+   * options.annotations 를 실제로 쓸 때만 호출되어, 미사용 차트의 캔버스 메모리/합성 레이어 비용을 없앤다.
+   * @returns {boolean} 사용 가능 여부(brush 차트 등은 false)
+   */
+  ensureAnnotationCanvas() {
+    if (this.annotationCtx) {
+      return true;
+    }
+    
+    // brush(미니맵) 차트는 overlay 도 없고 어노테이션을 쓰지 않는다.
+    if (this.options.brush || !this.chartDOM || !this.displayCanvas) {
+      return false;
+    }
+
+    const isPie = this.options.type === 'pie';
+    this.annotationCanvas = document.createElement('canvas');
+    this.annotationCanvas.setAttribute('style', 'display: block; z-index: 3;');
+    this.annotationCanvas.setAttribute('class', 'annotation-canvas');
+    this.annotationCtx = this.annotationCanvas.getContext('2d', { willReadFrequently: isPie });
+    this.chartDOM.appendChild(this.annotationCanvas);
+    this.annotationCanvas.style.position = 'absolute';
+    this.annotationCanvas.style.top = '0px';
+    this.annotationCanvas.style.left = '0px';
+    this.annotationCanvas.style.pointerEvents = 'none';
+
+    // 현재 display 캔버스 치수/배율로 즉시 정렬(이후 리사이즈는 setWidth/setHeight 가 동기화).
+    this.annotationCanvas.width = this.displayCanvas.width;
+    this.annotationCanvas.style.width = this.displayCanvas.style.width;
+    this.annotationCanvas.height = this.displayCanvas.height;
+    this.annotationCanvas.style.height = this.displayCanvas.style.height;
+    this.annotationCtx.setTransform(this.pixelRatio, 0, 0, this.pixelRatio, 0, 0);
+
+    return true;
+  }
+
+  /**
+   * 어노테이션 레이어를 전용 캔버스(시리즈/overlay 위, tooltip 아래)에 그린다. main/realtime 경로 공통.
+   * options.annotations 가 바뀔 때만 normalize 하고(참조 동일성 캐시), 매 프레임 좌표만 재해석한다.
+   * 좌표는 시리즈 기하(xp/yp)와 동일한 chartRect/labelOffset/axesSteps 계약을 쓰므로 줌/리사이즈에 일관.
+   * @returns {undefined}
+   */
+  drawAnnotationLayer() {
+    const raw = this.options?.annotations;
+    const hasAnnotations = Array.isArray(raw) && raw.length > 0;
+
+    if (!hasAnnotations) {
+      // 어노테이션 미사용: 캔버스를 만들지도, clear 하지도 않는다(미사용 차트 비용 0).
+      // 단, 직전 프레임에 그려둔 게 있으면(어노테이션이 제거된 경우) 한 번 지워 잔상을 없앤다.
+      if (this._hadAnnotations && this.annotationCtx) {
+        const r = this.pixelRatio < 1 ? this.pixelRatio : 1;
+        this.annotationCtx.clearRect(0, 0, this.annotationCanvas.width / r, this.annotationCanvas.height / r);
+        this._hadAnnotations = false;
+      }
+      return;
+    }
+
+    if (!this.ensureAnnotationCanvas()) {
+      return;
+    }
+
+    const ctx = this.annotationCtx;
+    // 전용 레이어(overlay 위)라 hover 하이라이트가 어노테이션을 가리지 않는다. hover repaint 는
+    // overlay 만 건드리므로 이 레이어는 geometry 가 바뀌는 drawChart 에서만 비우고 다시 그린다.
+    const ratio = this.pixelRatio < 1 ? this.pixelRatio : 1;
+    ctx.clearRect(0, 0, this.annotationCanvas.width / ratio, this.annotationCanvas.height / ratio);
+    this._hadAnnotations = true;
+
+    if (this._annotationSource !== raw) {
+      const { annotations, warnings } = normalizeAnnotations(raw);
+      this._normalizedAnnotations = annotations;
+      this._annotationSource = raw;
+      warnings.forEach((w) => Console.warn(w));
+    }
+
+    drawAnnotations(ctx, this._normalizedAnnotations, this.buildAnnotationViewport());
+  }
+
+  /**
+   * 어노테이션 좌표 해석용 viewport 컨텍스트를 만든다.
+   * axesSteps(graphMin/graphMax/minIndex/maxIndex)에 축 타입과 카테고리 라벨을 합쳐 디스크립터로 구성한다.
+   * @returns {object} { chartRect, labelOffset, axes, seriesList }
+   */
+  buildAnnotationViewport() {
+    // line/bar 는 labels 가 평면 배열(주로 카테고리 x축), heatMap 은 { x:[], y:[] } 객체다.
+    // step 축의 라벨→인덱스 변환에 쓰이므로 축 방향별로 알맞은 배열을 골라 넘긴다.
+    const rawLabels = this.data?.labels;
+    const isAxisLabelObject = rawLabels && !Array.isArray(rawLabels) && typeof rawLabels === 'object';
+    const xLabels = isAxisLabelObject ? rawLabels.x : rawLabels;
+    const yLabels = isAxisLabelObject ? rawLabels.y : rawLabels;
+    const buildAxes = (steps, axisOpts, labels) => (steps ?? []).map((step, i) => ({
+      ...step,
+      type: axisOpts?.[i]?.type || 'linear',
+      labels,
+    }));
+    return {
+      chartRect: this.chartRect,
+      labelOffset: this.labelOffset,
+      axes: {
+        x: buildAxes(this.axesSteps?.x, this.options?.axesX, xLabels),
+        y: buildAxes(this.axesSteps?.y, this.options?.axesY, yLabels),
+      },
+      seriesList: this.seriesList,
+    };
+  }
+
+  /**
    * Draw Tip with hitInfo and defaultSelectItemInfo
    * @param {CanvasRenderingContext2D} [ctx]  그릴 ctx. worker 경로(commitWorkerFrame)는 series bitmap
    *   위에 합성하려고 displayCtx 를 넘긴다(미전달 시 drawTips 가 main buffer 사용).
@@ -1389,6 +1502,10 @@ class EvChart {
     if (this.overlayCtx) {
       this.overlayCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     }
+    
+    if (this.annotationCtx) {
+      this.annotationCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+    }
   }
 
   /**
@@ -1536,6 +1653,11 @@ class EvChart {
       this.overlayCanvas.style.width = `${width}px`;
     }
 
+    if (this.annotationCanvas) {
+      this.annotationCanvas.width = deviceWidth;
+      this.annotationCanvas.style.width = `${width}px`;
+    }
+
     // pointsLayer 는 치수가 실제로 바뀔 때만 재할당한다. canvas.width 대입은 값이 같아도 비트맵을
     // 전부 지우므로, render() 마다 호출되는 이 경로에서 무조건 대입하면 blit 누적 픽셀이 매 틱 사라진다.
     // 비교값은 canvas.width 대입 시의 정수 절삭 규칙과 동일하게 floor 한다 — DOM 폭이 소수(예: 590.5)면
@@ -1575,6 +1697,11 @@ class EvChart {
     if (this.overlayCanvas) {
       this.overlayCanvas.height = deviceHeight;
       this.overlayCanvas.style.height = `${height}px`;
+    }
+
+    if (this.annotationCanvas) {
+      this.annotationCanvas.height = deviceHeight;
+      this.annotationCanvas.style.height = `${height}px`;
     }
 
     // setWidth 와 동일 이유: 치수 변경 시에만 재할당(매 틱 clear 방지).
