@@ -753,6 +753,179 @@ describe('model.store createRealTimeScatterDataSet (x,y) dedupe', () => {
   });
 });
 
+/**
+ * createRealTimeScatterDataSet 의 개별 series 만료 제거 회귀 테스트.
+ * realTimeScatter 의 기본 동작으로(별도 옵션 없이) 가시 윈도우 밖으로 완전히 밀려나고 신규 점도 없는
+ * series 를 즉시(grace 없음) 누적 저장소에서 제거하고, 나머지는 보존한다.
+ * 데이터 레이어만 검증한다(seriesList 인스턴스 부활은 통합/문서 레벨).
+ */
+describe('model.store createRealTimeScatterDataSet 개별 series 만료 제거', () => {
+  const SECOND = 1000;
+
+  const buildStore = ({ range = 5, scatterIds = ['a', 'b', 'c'] }) => {
+    const store = Object.create(modules);
+    Object.assign(store, {
+      isInit: false,
+      updateSeries: false,
+      dataSet: {},
+      options: {
+        realTimeScatter: { range },
+        legend: {},
+      },
+      seriesInfo: { charts: { scatter: [...scatterIds] } },
+      seriesList: Object.fromEntries(scatterIds.map((id) => [id, { show: true }])),
+    });
+    return store;
+  };
+
+  it('(a)범위 밖 + (b)신규 점 없음을 만족하는 즉시 해당 series 만 제거된다', () => {
+    const store = buildStore({ range: 5 });
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    // tick1: a,b,c 모두 점 → 3개 모두 보존
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      b: [{ x: t0, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+    expect(Object.keys(store.dataSet).sort()).toEqual(['a', 'b', 'c']);
+
+    // tick2: a,b 만 6초 뒤로 전진(c 의 점은 윈도우 밖) / c 는 빈 배열 → (a)+(b) 즉시 만족 → c 제거
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 6 * SECOND, y: 1 }],
+      b: [{ x: t0 + 6 * SECOND, y: 2 }],
+      c: [],
+    });
+
+    expect(store.dataSet.c).toBeUndefined();
+    expect(store.dataSet.a).toBeDefined();
+    expect(store.dataSet.b).toBeDefined();
+    expect(store.seriesList.c).toBeUndefined();
+    expect(store.seriesList.a).toBeDefined();
+    expect(store.seriesInfo.charts.scatter).toEqual(['a', 'b']);
+    expect(store.prunedRealTimeScatterSeries.has('c')).toBe(true);
+  });
+
+  it('데이터 틱에 키가 아예 없어도(빈 배열 아님) 동일하게 제거된다', () => {
+    const store = buildStore({ range: 5 });
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      b: [{ x: t0, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+    // 이후 틱은 c 키 자체를 보내지 않는다 — (b) 는 !datas[c]?.length 로 판정하므로 동일하게 만료.
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 6 * SECOND, y: 1 }],
+      b: [{ x: t0 + 6 * SECOND, y: 2 }],
+    });
+
+    expect(store.dataSet.c).toBeUndefined();
+    expect(store.dataSet.a).toBeDefined();
+  });
+
+  it('가시 범위 안에 점이 하나라도 있으면(=최근 점) 신규 점이 없어도 제거하지 않는다', () => {
+    const store = buildStore({ range: 10 });
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      b: [{ x: t0, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+
+    // a,b 를 range(10s) 안에서만 전진 → c 의 t0 점이 여전히 윈도우 안 → (a) false → 보존
+    for (let s = 1; s <= 5; s++) {
+      store.createRealTimeScatterDataSet({
+        a: [{ x: t0 + s * SECOND, y: 1 }],
+        b: [{ x: t0 + s * SECOND, y: 2 }],
+        c: [],
+      });
+    }
+
+    expect(store.dataSet.c).toBeDefined();
+    expect(store.seriesInfo.charts.scatter).toContain('c');
+  });
+
+  it('범위 밖이라도 이번 틱에 (오래된) 신규 점을 보내면(b=false) 제거하지 않는다', () => {
+    const store = buildStore({ range: 5 });
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      b: [{ x: t0, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+
+    // a,b 는 전진하여 c 의 점이 윈도우 밖((a) true)이 되지만, c 는 같은 틱에 (오래된) 점을 보낸다.
+    // 활성 series 로 보고 보존해야 한다((b) false).
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 6 * SECOND, y: 1 }],
+      b: [{ x: t0 + 6 * SECOND, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+
+    expect(store.dataSet.c).toBeDefined();
+    expect(store.seriesInfo.charts.scatter).toContain('c');
+  });
+
+  it('별도 옵션(expire) 없이 realTimeScatter 기본 동작으로 만료 제거된다', () => {
+    // options.realTimeScatter 에 range 만 있고 expire 설정이 전혀 없어도 제거되어야 한다.
+    const store = buildStore({ range: 5 });
+    expect(store.options.realTimeScatter.expire).toBeUndefined();
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      b: [{ x: t0, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 6 * SECOND, y: 1 }],
+      b: [{ x: t0 + 6 * SECOND, y: 2 }],
+      c: [],
+    });
+
+    expect(store.dataSet.c).toBeUndefined();
+    expect(store.prunedRealTimeScatterSeries.has('c')).toBe(true);
+  });
+
+  it('제거된 series 는 가드 때문에 신규 점이 와도 데이터 레이어에서 재생성되지 않는다', () => {
+    const store = buildStore({ range: 5 });
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      b: [{ x: t0, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 6 * SECOND, y: 1 }],
+      b: [{ x: t0 + 6 * SECOND, y: 2 }],
+      c: [],
+    });
+    expect(store.dataSet.c).toBeUndefined();
+
+    // c 키에 신규 점이 와도 prunedRealTimeScatterSeries 가드가 메인 루프에서 skip → 재생성 안 됨.
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 8 * SECOND, y: 1 }],
+      b: [{ x: t0 + 8 * SECOND, y: 2 }],
+      c: [{ x: t0 + 8 * SECOND, y: 3 }],
+    });
+    expect(store.dataSet.c).toBeUndefined();
+
+    // 부활(가드 해제, reconcileSeriesSet 가 하는 일)을 시뮬레이션하면 다시 누적된다.
+    store.prunedRealTimeScatterSeries.delete('c');
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 9 * SECOND, y: 1 }],
+      b: [{ x: t0 + 9 * SECOND, y: 2 }],
+      c: [{ x: t0 + 9 * SECOND, y: 3 }],
+    });
+    expect(store.dataSet.c).toBeDefined();
+  });
+});
+
 describe('model.store createDataSet stack (누적 top 기반)', () => {
   /**
    * 세로 스택 막대 그룹 컨텍스트를 만든다.
@@ -888,20 +1061,28 @@ describe('getVisibleWindowMaxSeries', () => {
 
   it('윈도우 안의 최댓값 시리즈/인덱스/값을 반환한다', () => {
     const store = buildStore({
-      a: barSeries('a', [10, 20, 100, 30, 40]),  // 전역 max 100 at idx=2
-      b: barSeries('b', [5, 50, 25, 60, 15]),    // 전역 max 60 at idx=3
+      a: barSeries('a', [10, 20, 100, 30, 40]), // 전역 max 100 at idx=2
+      b: barSeries('b', [5, 50, 25, 60, 15]), // 전역 max 60 at idx=3
     });
     // window [3, 4]: a는 30,40 / b는 60,15 → b의 idx=3, value=60이 윈도우 max
-    expect(store.getVisibleWindowMaxSeries(3, 4))
-      .toEqual({ sId: 'b', value: 60, index: 3, domain: 3 });
+    expect(store.getVisibleWindowMaxSeries(3, 4)).toEqual({
+      sId: 'b',
+      value: 60,
+      index: 3,
+      domain: 3,
+    });
   });
 
   it('전역 max가 윈도우 안이면 그대로 그 시리즈를 반환한다', () => {
     const store = buildStore({
       a: barSeries('a', [10, 20, 100, 30, 40]),
     });
-    expect(store.getVisibleWindowMaxSeries(1, 3))
-      .toEqual({ sId: 'a', value: 100, index: 2, domain: 2 });
+    expect(store.getVisibleWindowMaxSeries(1, 3)).toEqual({
+      sId: 'a',
+      value: 100,
+      index: 2,
+      domain: 2,
+    });
   });
 
   it('horizontal 차트는 p.x를 비교하고 domain은 p.y가 된다', () => {
@@ -911,13 +1092,21 @@ describe('getVisibleWindowMaxSeries', () => {
           sId: 'a',
           type: 'bar',
           show: true,
-          data: [{ x: 5, y: 0 }, { x: 99, y: 1 }, { x: 7, y: 2 }],
+          data: [
+            { x: 5, y: 0 },
+            { x: 99, y: 1 },
+            { x: 7, y: 2 },
+          ],
         },
       },
       options: { horizontal: true },
     });
-    expect(store.getVisibleWindowMaxSeries(0, 2))
-      .toEqual({ sId: 'a', value: 99, index: 1, domain: 1 });
+    expect(store.getVisibleWindowMaxSeries(0, 2)).toEqual({
+      sId: 'a',
+      value: 99,
+      index: 1,
+      domain: 1,
+    });
   });
 
   it('show=false 시리즈는 무시한다', () => {
@@ -925,8 +1114,12 @@ describe('getVisibleWindowMaxSeries', () => {
       a: { ...barSeries('a', [10, 20, 30]), show: false },
       b: barSeries('b', [5, 50, 15]),
     });
-    expect(store.getVisibleWindowMaxSeries(0, 2))
-      .toEqual({ sId: 'b', value: 50, index: 1, domain: 1 });
+    expect(store.getVisibleWindowMaxSeries(0, 2)).toEqual({
+      sId: 'b',
+      value: 50,
+      index: 1,
+      domain: 1,
+    });
   });
 
   // 회귀 가드(시나리오 2 — combo line+bar): line이 윈도우 max면 line을 반환해야 한다.
@@ -936,8 +1129,12 @@ describe('getVisibleWindowMaxSeries', () => {
       bar: barSeries('bar', [5, 50, 15]),
       line: { ...barSeries('line', [10, 80, 20]), type: 'line' },
     });
-    expect(store.getVisibleWindowMaxSeries(0, 2))
-      .toEqual({ sId: 'line', value: 80, index: 1, domain: 1 });
+    expect(store.getVisibleWindowMaxSeries(0, 2)).toEqual({
+      sId: 'line',
+      value: 80,
+      index: 1,
+      domain: 1,
+    });
   });
 
   // 회귀 가드(시나리오 1 — line-only 카테고리 축): bar가 없어도 null이 아니라
@@ -947,21 +1144,37 @@ describe('getVisibleWindowMaxSeries', () => {
       a: { ...barSeries('a', [10, 70, 30]), type: 'line' },
       b: { ...barSeries('b', [5, 40, 60]), type: 'line' },
     });
-    expect(store.getVisibleWindowMaxSeries(0, 2))
-      .toEqual({ sId: 'a', value: 70, index: 1, domain: 1 });
+    expect(store.getVisibleWindowMaxSeries(0, 2)).toEqual({
+      sId: 'a',
+      value: 70,
+      index: 1,
+      domain: 1,
+    });
   });
 
   it('윈도우가 data 길이 밖으로 넘어가도 안전하게 clamp 한다', () => {
     const store = buildStore({
       a: barSeries('a', [10, 20, 30]),
     });
-    expect(store.getVisibleWindowMaxSeries(0, 100))
-      .toEqual({ sId: 'a', value: 30, index: 2, domain: 2 });
+    expect(store.getVisibleWindowMaxSeries(0, 100)).toEqual({
+      sId: 'a',
+      value: 30,
+      index: 2,
+      domain: 2,
+    });
   });
 
   it('윈도우 안 모든 값이 null/undefined면 null을 반환한다', () => {
     const store = buildStore({
-      a: { sId: 'a', type: 'bar', show: true, data: [{ x: 0, y: null }, { x: 1, y: null }] },
+      a: {
+        sId: 'a',
+        type: 'bar',
+        show: true,
+        data: [
+          { x: 0, y: null },
+          { x: 1, y: null },
+        ],
+      },
     });
     expect(store.getVisibleWindowMaxSeries(0, 1)).toBeNull();
   });
@@ -970,16 +1183,36 @@ describe('getVisibleWindowMaxSeries', () => {
   // 탈락해 윈도우와 무관한 전역 max로 조용히 폴백). 유한한 실제 윈도우 max를 골라야 한다.
   it('NaN/Infinity 값은 후보에서 제외하고 유한한 max를 반환한다', () => {
     const store = buildStore({
-      a: { sId: 'a', type: 'bar', show: true,
-        data: [{ x: 0, y: NaN }, { x: 1, y: Infinity }, { x: 2, y: 42 }] },
+      a: {
+        sId: 'a',
+        type: 'bar',
+        show: true,
+        data: [
+          { x: 0, y: NaN },
+          { x: 1, y: Infinity },
+          { x: 2, y: 42 },
+        ],
+      },
     });
-    expect(store.getVisibleWindowMaxSeries(0, 2))
-      .toEqual({ sId: 'a', value: 42, index: 2, domain: 2 });
+    expect(store.getVisibleWindowMaxSeries(0, 2)).toEqual({
+      sId: 'a',
+      value: 42,
+      index: 2,
+      domain: 2,
+    });
   });
 
   it('윈도우 안 값이 NaN/Infinity뿐이면 null을 반환한다', () => {
     const store = buildStore({
-      a: { sId: 'a', type: 'bar', show: true, data: [{ x: 0, y: NaN }, { x: 1, y: Infinity }] },
+      a: {
+        sId: 'a',
+        type: 'bar',
+        show: true,
+        data: [
+          { x: 0, y: NaN },
+          { x: 1, y: Infinity },
+        ],
+      },
     });
     expect(store.getVisibleWindowMaxSeries(0, 1)).toBeNull();
   });
@@ -988,11 +1221,23 @@ describe('getVisibleWindowMaxSeries', () => {
   // 0이 제대로 max로 뽑히는지 막아두는 테스트.
   it('value 0도 유효한 max로 선정한다(음수만 있는 윈도우)', () => {
     const store = buildStore({
-      a: { sId: 'a', type: 'bar', show: true,
-        data: [{ x: 0, y: -5 }, { x: 1, y: 0 }, { x: 2, y: -3 }] },
+      a: {
+        sId: 'a',
+        type: 'bar',
+        show: true,
+        data: [
+          { x: 0, y: -5 },
+          { x: 1, y: 0 },
+          { x: 2, y: -3 },
+        ],
+      },
     });
-    expect(store.getVisibleWindowMaxSeries(0, 2))
-      .toEqual({ sId: 'a', value: 0, index: 1, domain: 1 });
+    expect(store.getVisibleWindowMaxSeries(0, 2)).toEqual({
+      sId: 'a',
+      value: 0,
+      index: 1,
+      domain: 1,
+    });
   });
 
   it('minIndex/maxIndex가 비유한이면 null을 반환한다 (가드)', () => {
@@ -1012,15 +1257,40 @@ describe('getVisibleWindowMaxSeries', () => {
   // 별도 분기 없이 일반 max 스캔만으로 양수 stack 차트가 자동 지원됨을 가드한다.
   it('stack 차트(양수): top 시리즈가 stack 총합으로 윈도우 max를 결정한다', () => {
     const store = buildStore({
-      base: { sId: 'base', type: 'bar', show: true,
-        data: [{ x: 0, y: 10, o: 10, b: 0 }, { x: 1, y: 20, o: 20, b: 0 }] },
-      mid:  { sId: 'mid',  type: 'bar', show: true,
-        data: [{ x: 0, y: 15, o: 5,  b: 10 }, { x: 1, y: 30, o: 10, b: 20 }] },
-      top:  { sId: 'top',  type: 'bar', show: true,
-        data: [{ x: 0, y: 18, o: 3,  b: 15 }, { x: 1, y: 35, o: 5,  b: 30 }] },
+      base: {
+        sId: 'base',
+        type: 'bar',
+        show: true,
+        data: [
+          { x: 0, y: 10, o: 10, b: 0 },
+          { x: 1, y: 20, o: 20, b: 0 },
+        ],
+      },
+      mid: {
+        sId: 'mid',
+        type: 'bar',
+        show: true,
+        data: [
+          { x: 0, y: 15, o: 5, b: 10 },
+          { x: 1, y: 30, o: 10, b: 20 },
+        ],
+      },
+      top: {
+        sId: 'top',
+        type: 'bar',
+        show: true,
+        data: [
+          { x: 0, y: 18, o: 3, b: 15 },
+          { x: 1, y: 35, o: 5, b: 30 },
+        ],
+      },
     });
     // 윈도우 [0, 1]: idx=1 stack 총합 35가 max, top 시리즈가 그 값을 보유.
-    expect(store.getVisibleWindowMaxSeries(0, 1))
-      .toEqual({ sId: 'top', value: 35, index: 1, domain: 1 });
+    expect(store.getVisibleWindowMaxSeries(0, 1)).toEqual({
+      sId: 'top',
+      value: 35,
+      index: 1,
+      domain: 1,
+    });
   });
 });

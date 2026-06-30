@@ -71,6 +71,21 @@ const modules = {
     const prev = prevSeriesList || {};
     const newSeriesList = {};
 
+    // 만료 제거(expire)된 realTimeScatter series 부활 일원화(재추가 방지 가드의 단일 해제 지점):
+    //  - 신규 점이 들어온 pruned 키는 가드에서 빼고 일반 경로로 재생성한다(부활).
+    //  - 신규 점이 없는 pruned 키는 data.series 에 키가 남아 있어도 재생성 대상에서 제외한다.
+    // (createRealTimeScatterDataSet 의 키 필터는 skip 만 하고 Set 에서 빼지 않으므로 해제는 여기서만.)
+    const prunedSet = this.prunedRealTimeScatterSeries;
+    if (prunedSet?.size) {
+      for (let i = 0; i < seriesKeys.length; i++) {
+        const key = seriesKeys[i];
+        if (prunedSet.has(key) && this.data?.data?.[key]?.length) {
+          prunedSet.delete(key);
+        }
+      }
+      seriesKeys = seriesKeys.filter((key) => !prunedSet.has(key));
+    }
+
     for (let i = 0; i < seriesKeys.length; i++) {
       const key = seriesKeys[i];
       const opt = series[key];

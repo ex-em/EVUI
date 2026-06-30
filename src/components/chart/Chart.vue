@@ -259,8 +259,19 @@ export default {
         const isUpdateSeriesData = !isEqual(newData.series, evChart.data.series);
         const isUpdateGroups = !isEqual(newData.groups, evChart.data.groups);
 
+        // 만료 제거된 realTimeScatter series 가 신규 점과 함께 돌아오면(부활) updateSeries 를 강제한다.
+        // 그래야 reconcileSeriesSet 이 돌아 seriesList/seriesInfo.charts.scatter 에 인스턴스를 복구하고
+        // (이 경로에서 prunedRealTimeScatterSeries 에서도 제거), pointsLayer baseline 도 무효화돼
+        // 부활 series 가 다시 그려지고 범례에도 표시된다.
+        const prunedSet = evChart.prunedRealTimeScatterSeries;
+        const isRevived =
+          !!prunedSet?.size &&
+          Object.keys(newData.data ?? {}).some(
+            (key) => prunedSet.has(key) && newData.data[key]?.length,
+          );
+
         const isUpdateSeries =
-          isUpdateSeriesData || isUpdateGroups || props.options.type === 'heatMap';
+          isUpdateSeriesData || isUpdateGroups || isRevived || props.options.type === 'heatMap';
 
         const isUpdateData =
           isUpdateSeriesData ||
@@ -358,6 +369,9 @@ export default {
               evChart.dataSet[series].dataGroup = [];
             }
           });
+
+          // 전체 리셋 후에는 만료 제거 가드도 비워, 데이터가 다시 오면 series 가 재생성되게 한다.
+          evChart.prunedRealTimeScatterSeries?.clear();
 
           emit('update:realTimeScatterReset', false);
         }
