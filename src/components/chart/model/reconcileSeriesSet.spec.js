@@ -78,7 +78,12 @@ describe('reconcileSeriesSet — series 증분 재조정', () => {
     const first = { ...ctx.seriesList };
 
     // 순서를 뒤집어 입력(앞에 신규를 넣어 index 를 민다)
-    const next = mkSeries({ s0: { name: 's0', color: '#000' }, s1: defs.s1, s2: defs.s2, s3: defs.s3 });
+    const next = mkSeries({
+      s0: { name: 's0', color: '#000' },
+      s1: defs.s1,
+      s2: defs.s2,
+      s3: defs.s3,
+    });
     reconcile(ctx, next);
 
     expect(ctx.seriesList.s1).toBe(first.s1);
@@ -150,5 +155,61 @@ describe('reconcileSeriesSet — series 증분 재조정', () => {
 
     reconcile(ctx, mkSeries(defs));
     expect(ctx.seriesList.s1.show).toBe(true); // opt.show(기본 true) 로 리셋
+  });
+});
+
+/**
+ * realTimeScatter 만료(prune) 후 부활 경로 가드.
+ * reconcileSeriesSet 이 재추가 방지 가드(prunedRealTimeScatterSeries)의 단일 해제 지점이다:
+ *  - 신규 점이 들어온 pruned 키 → 가드에서 빼고 일반 경로로 재생성(부활)
+ *  - 신규 점이 없는 pruned 키 → data.series 에 키가 남아 있어도 재생성 대상에서 제외(비부활)
+ */
+describe('reconcileSeriesSet — realTimeScatter 만료 series 부활 가드 해제', () => {
+  const makeCtx = () => ({
+    ...modules,
+    options: {
+      overlapping: { use: false },
+      realTimeScatter: { use: true },
+      legend: { type: 'plain' },
+      horizontal: false,
+    },
+    seriesInfo: { charts: { pie: [], bar: [], line: [], scatter: [], heatMap: [] }, count: 0 },
+    seriesList: {},
+  });
+
+  const reconcile = (ctx, series) => {
+    const prev = ctx.seriesList;
+    ctx.seriesInfo = { charts: { pie: [], bar: [], line: [], scatter: [], heatMap: [] }, count: 0 };
+    ctx.reconcileSeriesSet(series, 'line', false, [], prev);
+    return ctx.seriesList;
+  };
+
+  const series = {
+    active: { name: 'active', color: '#a11' },
+    dead: { name: 'dead', color: '#11a' },
+  };
+
+  it('신규 점이 들어온 pruned 키는 가드에서 빠지고 seriesList 에 부활한다', () => {
+    const ctx = makeCtx();
+    ctx.prunedRealTimeScatterSeries = new Set(['dead']);
+    ctx.data = { data: { active: [{ x: 1, y: 1 }], dead: [{ x: 2, y: 2 }] } };
+
+    reconcile(ctx, series);
+
+    expect(ctx.prunedRealTimeScatterSeries.has('dead')).toBe(false); // 가드 해제(부활)
+    expect(ctx.seriesList.dead).toBeDefined();
+    expect(ctx.seriesList.active).toBeDefined();
+  });
+
+  it('신규 점이 없는 pruned 키는 가드에 남고 seriesList 에서 제외된다(비부활)', () => {
+    const ctx = makeCtx();
+    ctx.prunedRealTimeScatterSeries = new Set(['dead']);
+    ctx.data = { data: { active: [{ x: 1, y: 1 }], dead: [] } };
+
+    reconcile(ctx, series);
+
+    expect(ctx.prunedRealTimeScatterSeries.has('dead')).toBe(true); // 가드 유지
+    expect(ctx.seriesList.dead).toBeUndefined(); // 재생성 제외
+    expect(ctx.seriesList.active).toBeDefined();
   });
 });
