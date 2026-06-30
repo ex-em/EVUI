@@ -441,6 +441,17 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 
 - 페이지단에서 chartData를 shallowRef / shallowReactive로 선언해야 합니다.
 
+##### 개별 series 자동 만료 (기본 동작)
+
+가시 범위 밖으로 완전히 밀려나고 신규 점도 끊긴 **개별 series** 는 누적 저장소·범례에서 **자동 제거**됩니다. 별도 옵션 없이 realTimeScatter 의 기본 동작이며, 누적 데이터가 무한정 쌓이는 것을 막습니다.
+
+- 제거 조건(AND, 만족하는 즉시 제거):
+  - **(a)** 해당 series 가 현재 가시 X축 범위 `[xMax - range, xMax]` 안에 점이 하나도 없음.
+  - **(b)** 이번 수신 `:data` 틱에 그 series 의 신규 점이 없음(이번 틱에 점을 보낸 series 는 보존).
+- "series 키 부재"로 판정하지 않습니다 — 죽은 series 키가 `data.series` 에 계속 남아 있어도, 위 (a)+(b)로만 판정합니다.
+- 제거된 series 는 신규 점이 다시 들어오면 자동으로 부활(재생성)합니다.
+- `v-model:realTimeScatterReset`(전체 초기화)과 독립적으로 동작합니다.
+
 ##### etc
 
 | 이름    | 타입   | 디폴트 | 설명 | 종류(예시) |

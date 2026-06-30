@@ -151,7 +151,14 @@ const modules = {
    * @returns {undefined}
    */
   createRealTimeScatterDataSet(datas) {
-    const keys = Object.keys(datas);
+    // 만료 제거(expire)된 series 는 신규 점이 도착하기 전까지 누적 저장소를 재생성하지 않는다.
+    // 소비자가 증분 틱에서 죽은 series 키(data.data 의 빈 배열)를 계속 보내도 orphan dataSet 으로
+    // 되살아나지 않게, 처리 대상 키에서 제외한다. 신규 점이 다시 오면 부활은 reconcileSeriesSet
+    // (updateSeries 강제)에서 일원화 처리하며, 그 시점엔 이미 prunedRealTimeScatterSeries 에서 빠진다.
+    const prunedSet = this.prunedRealTimeScatterSeries;
+    const keys = prunedSet?.size
+      ? Object.keys(datas).filter((key) => !prunedSet.has(key))
+      : Object.keys(datas);
 
     const minMaxValues = {
       // 음수 전용 데이터에서 maxY 가 0 으로 clamp 되지 않도록 -Infinity 에서 시작한다.
@@ -394,6 +401,10 @@ const modules = {
       minMaxValues.maxY = 0;
     }
 
+    // 개별 series 만료 제거(realTimeScatter 기본 동작). append 직후 스캔하므로 toTime 이 최신 상태다.
+    // seriesInfo.charts.scatter 를 splice 한 뒤 아래 forEach 가 잔여 series 만 순회하도록 여기서 호출.
+    this.pruneExpiredRealTimeScatterSeries(datas);
+
     this.seriesInfo.charts.scatter.forEach((seriesID) => {
       const series = this.seriesList[seriesID];
       series.data = this.dataSet;
@@ -407,6 +418,115 @@ const modules = {
         maxY: minMaxValues.maxY,
       };
     });
+  },
+
+  /**
+   * realTimeScatter 누적 저장소에서 개별 series 를 만료 제거한다.
+   *
+   * realTimeScatter 의 기본 동작이다(별도 옵션 없이 항상 동작). 가시 범위 밖으로 완전히 밀려나고
+   * 신규 점도 끊긴 series 가 누적 저장소·범례에 무한정 남지 않도록 자동 정리한다.
+   * 제거 조건(AND)을 만족하면 즉시 제거한다(grace 없음):
+   *  - (a) 가시 윈도우 `[globalToTime - range, globalToTime]` 안에 점이 하나도 없음.
+   *        ring 버퍼는 윈도우 밖 점을 비우고 점은 항상 `<= toTime` 에 존재하므로,
+   *        `ds.toTime < windowStart` 가 (a)와 정확히 등가다(series 별 최신 누적 x 로 O(1) short-circuit).
+   *  - (b) 이번 수신 틱에 그 series 의 신규 점이 없음(`!datas[sId]?.length`).
+   *        이번 틱에 점을 보낸 series 는 (오래된 점이라도) 활성으로 보고 보존한다.
+   * "series 키 부재"로는 판정하지 않는다 — 죽은 키가 data.series/data.data 에 남아 있을 수 있어서다.
+   *
+   * @param {object} datas  이번 틱 수신 데이터(createRealTimeScatterDataSet 인자)
+   * @returns {undefined}
+   */
+  pruneExpiredRealTimeScatterSeries(datas) {
+    const dataSet = this.dataSet;
+    const keys = Object.keys(dataSet);
+    if (!keys.length) {
+      return;
+    }
+
+    // 전역 윈도우 우측단 = 모든 series 의 toTime 중 최댓값(= 살아있는 series 의 최신 시각).
+    let globalToTime = 0;
+    for (let i = 0; i < keys.length; i++) {
+      const t = dataSet[keys[i]].toTime || 0;
+      if (t > globalToTime) {
+        globalToTime = t;
+      }
+    }
+
+    const range = this.options.realTimeScatter?.range || 300;
+    const windowStart = globalToTime - range * 1000;
+
+    const pruned = [];
+    for (let i = 0; i < keys.length; i++) {
+      const sId = keys[i];
+      const ds = dataSet[sId];
+      const hasNoVisiblePoint = ds.toTime < windowStart; // (a)
+      const hasNoNewData = !datas[sId]?.length; // (b)
+
+      // (a)+(b)면 가시 범위 밖으로 완전히 밀려났고 신규 점도 없으므로 즉시 제거한다(grace 없음).
+      if (hasNoVisiblePoint && hasNoNewData) {
+        pruned.push(sId);
+      }
+    }
+
+    if (!pruned.length) {
+      return;
+    }
+
+    for (let i = 0; i < pruned.length; i++) {
+      this.removeRealTimeScatterSeries(pruned[i]);
+    }
+
+    // 외부 범례는 update() 의 emitLegendData(매 데이터 틱) 로도 갱신되지만, 내부 범례는
+    // updateSeries=false 인 정상 틱에서 행이 재생성되지 않으므로 여기서 직접 rebuild 한다.
+    // (단위 테스트 store 에는 두 메서드가 없어 optional 호출.)
+    const legend = this.options.legend;
+    if (legend?.show && legend?.external) {
+      this.emitLegendData?.();
+    } else if (legend?.show) {
+      this.updateLegend?.();
+    }
+  },
+
+  /**
+   * 만료된 realTimeScatter series 하나를 누적 저장소·레지스트리·선택 상태에서 제거한다.
+   * 재추가 방지 가드(prunedRealTimeScatterSeries)에 등록해, data.series 에 키가 남아 있어도
+   * 신규 점이 오기 전까지는 createRealTimeScatterDataSet/reconcileSeriesSet 가 재생성하지 않는다.
+   *
+   * @param {string} sId  제거할 series ID
+   * @returns {undefined}
+   */
+  removeRealTimeScatterSeries(sId) {
+    delete this.dataSet[sId];
+
+    if (this.seriesList?.[sId]) {
+      delete this.seriesList[sId];
+    }
+
+    const scatter = this.seriesInfo?.charts?.scatter;
+    if (Array.isArray(scatter)) {
+      const idx = scatter.indexOf(sId);
+      if (idx !== -1) {
+        scatter.splice(idx, 1);
+      }
+    }
+
+    // show series 수 재계산(외부 범례 toggle 로직과 드리프트 방지). 단위 테스트엔 없어 optional.
+    this._updateSeriesCount?.();
+
+    // 재추가 방지 가드.
+    (this.prunedRealTimeScatterSeries ??= new Set()).add(sId);
+
+    // 선택 상태가 제거된 series 를 가리키면 해제.
+    const selSeriesId = this.defaultSelectInfo?.seriesId;
+    if (Array.isArray(selSeriesId)) {
+      const idx = selSeriesId.indexOf(sId);
+      if (idx !== -1) {
+        selSeriesId.splice(idx, 1);
+      }
+    }
+    if (this.defaultSelectItemInfo?.seriesID === sId) {
+      this.defaultSelectItemInfo = null;
+    }
   },
 
   /**

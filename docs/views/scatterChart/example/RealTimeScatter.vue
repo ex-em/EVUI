@@ -21,9 +21,24 @@
       </div>
       <div class="row-item">
         <span class="item-title"> change range (s) </span>
-        <ev-input-number v-model="realTimeScatterRange" class="component" :min="50" :step="50" />
+        <ev-input-number v-model="realTimeScatterRange" class="component" :min="10" :step="10" />
       </div>
     </div>
+    <div class="row">
+      <div class="row-item">
+        <label>series1 공급</label>
+        <ev-toggle v-model="feeding.series1" />
+      </div>
+      <div class="row-item">
+        <label>series2 공급</label>
+        <ev-toggle v-model="feeding.series2" />
+      </div>
+    </div>
+    <p class="guide">
+      특정 series 의 공급을 끄면, 그 series 의 누적 점이 가시 범위(range) 밖으로 모두 밀려난 뒤
+      신규 점이 없을 때 누적 저장소·범례에서 <b>자동 제거</b>됩니다(realTimeScatter 기본 동작).
+      다시 켜면 부활합니다. (빠르게 확인하려면 range 를 10s 수준으로 낮추세요.)
+    </p>
   </div>
 </template>
 
@@ -115,12 +130,16 @@ export default {
         virtualScroll: true,
       },
       displayOverflow: true,
+      selectItem: { use: true },
       realTimeScatter: {
         use: true,
         range: realTimeScatterRange.value, // 총 5분, 초 단위
       },
       seriesReverse: true,
     });
+
+    // series 별 데이터 공급 on/off. 끄면 그 series 는 빈 배열로 보내져(키는 유지) 만료 대상이 된다.
+    const feeding = reactive({ series1: true, series2: true });
 
     let timeoutId;
 
@@ -136,11 +155,11 @@ export default {
         let randomX = 0;
         let randomY = 0;
         if (!isInit) {
-          randomX = floor(Date.now() + getRandomInt(-3000, 0)); // -3초 ~ 현재
-          randomY = floor(getRandomInt(3000, 95000));
+          randomX = Math.round((Date.now() + getRandomInt(-3000, 0)) / 1000) * 1000; // 1초 격자
+          randomY = getRandomInt(3, 15) * 1000;
         } else {
-          randomX = floor(Date.now() + getRandomInt(-300000, 0)); // -5분 ~ 현재
-          randomY = floor(getRandomInt(3000, 57000));
+          randomX = Math.round((Date.now() + getRandomInt(-300000, 0)) / 1000) * 1000; // 1초 격자
+          randomY = getRandomInt(3, 15) * 1000;
         }
         const randomType = getRandomInt(0, 1);
 
@@ -159,10 +178,10 @@ export default {
       series2 = [];
 
       if (isInit) {
-        data = generateData(100000);
+        data = generateData(600);
         isInit = false;
       } else {
-        data = generateData(8000);
+        data = generateData(60);
       }
 
       for (let i = 0; i < data.length; i++) {
@@ -171,11 +190,13 @@ export default {
         const type = data[i].type;
 
         if (type === 1) {
-          series1.push({
-            x: dataX,
-            y: dataY / 1000,
-          });
-        } else {
+          if (feeding.series1) {
+            series1.push({
+              x: dataX,
+              y: dataY / 1000,
+            });
+          }
+        } else if (feeding.series2) {
           series2.push({
             x: dataX,
             y: dataY / 1000,
@@ -221,6 +242,8 @@ export default {
     const resetFlag = ref(false);
     const dataReset = () => {
       resetFlag.value = true;
+      feeding.series1 = true;
+      feeding.series2 = true;
       chartData.value = {
         series,
         data: {
@@ -239,6 +262,7 @@ export default {
       chartData,
       chartOptions,
       realTimeScatterRange,
+      feeding,
       resetFlag,
       dataReset,
     };
@@ -269,5 +293,12 @@ export default {
       min-width: 80px;
     }
   }
+}
+
+.guide {
+  margin-top: 12px;
+  line-height: 1.5;
+  font-size: 13px;
+  color: #555;
 }
 </style>
