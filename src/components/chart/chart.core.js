@@ -636,7 +636,10 @@ class EvChart {
       return;
     }
     this.drawSeriesLayer(this.bufferCtx, undefined);
-    this.drawPlotsFront(this.bufferCtx);
+    // aboveSeries:false 면 plot 은 이미 static(series 아래)에 그려졌으므로 위에 다시 그리지 않는다.
+    if (this.options.plot?.aboveSeries !== false) {
+      this.drawPlotsFront(this.bufferCtx);
+    }
     this.commitToDisplay(this.displayCtx, this.bufferCanvas);
   }
 
@@ -1228,6 +1231,12 @@ class EvChart {
         this.defaultSelectInfo,
       );
     });
+
+    // plot.aboveSeries:false → plot(임계선/밴드/라벨)을 series 아래에 두기 위해 static 단계(=series 직전)에
+    // 그린다. 기본(true)이면 여기서 그리지 않고 drawForeground 가 series 위에 그린다.
+    if (this.options.plot?.aboveSeries === false) {
+      this.drawPlotsFront(bufferCtx);
+    }
   }
 
   /**
@@ -1251,13 +1260,16 @@ class EvChart {
 
   /**
    * series 위에 그리는 전경(foreground) 레이어. z-order(뒤→앞) = 아래 호출 순서.
-   * **노출 순서를 바꾸려면 이 두 줄만 swap** (현재: maxTip 이 plot 위 → maxTip > plot > series).
+   * 기본 노출 순서: maxTip > plot > series. plot.aboveSeries:false 면 plot 은 drawStaticLayer 에서
+   * series 아래로 그려지므로 여기서는 tip 만 그린다(maxTip > series > plot).
    * @param {CanvasRenderingContext2D} [ctx]  그릴 ctx (main=bufferCtx, worker=displayCtx)
    *
    * @returns {undefined}
    */
   drawForeground(ctx = this.bufferCtx) {
-    this.drawPlotsFront(ctx);
+    if (this.options.plot?.aboveSeries !== false) {
+      this.drawPlotsFront(ctx);
+    }
     this.drawTip(ctx);
   }
 

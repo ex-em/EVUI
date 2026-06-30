@@ -95,6 +95,7 @@ const chartData =
   | dragSelection | Object | ([상세](#dragselection)) | drag-select의 사용 여부 | |
   | padding | Object | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값 |
   | tooltip | Object | ([상세](#tooltip)) | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성 | |
+  | plot | Object | ([상세](#plot)) | plotLines/plotBands(임계선·밴드)의 표시 z-order 전역 설정 | |
   | selectItem | Object | ([상세](#selectitem)) | 차트 아이템 선택 기능 활성화 여부 및 속성 | |
   | displayOverflow | Boolean | false | range로 설정한 y축 범위 이상의 값 표시 여부 | |
   | realTimeScatter | Object | ([상세](#realtimescatter)) | 실시간으로 데이터를 처리하는 real time scatter로 변경 여부 및 속성 | |
@@ -270,9 +271,10 @@ value-only 상태에서 alias(text)가 가려지므로 hover로 보완(데스크
 | use | Boolean | false | 활성 여부 | true / false |
 | backgroundColor | String | '#4C4C4C' | 배경 색상 | |
 | fontColor | String | '#FFFFFF' | 폰트 색상 | |
-| borderColor | String | '#666666' | 테두리 색상 | |
+| borderColor | String \| null | null | 테두리 색상. `null`이면 `backgroundColor`와 동일 → 테두리 미표시 | |
 | borderRadius | Number | 4 | 모서리 반경 | |
 | fontSize | Number | 12 | 폰트 크기 | |
+| fontWeight | Number | 400 | 폰트 굵기 | |
 | fontFamily | String | 'Roboto' | 폰트 패밀리 | |
 | useShadow | Boolean | false | 그림자 사용 | true / false |
 | shadowOpacity | Number | 0.25 | 그림자 투명도 | |
@@ -401,6 +403,17 @@ const chartOptions = {
     | name | String | 시리즈 이름 | 'Series 1' |
     | dataId | String | 데이터 ID | 'data_1' |
     | index | Number | 데이터 인덱스 | 0 |
+
+#### plot
+
+plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. maxTip 은 항상 최상단입니다.
+
+| 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
+|-----|------|-------|-----|-----|
+| aboveSeries | Boolean | true | 임계선/밴드를 series 위(true)에 그릴지, 아래(false)에 그릴지 | true / false |
+
+- `true`(기본): `maxTip > plot > series`
+- `false`: `maxTip > series > plot` (임계선/밴드가 데이터 시리즈 뒤로 깔림)
 
 #### selectItem
 
