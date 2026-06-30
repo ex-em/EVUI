@@ -203,6 +203,88 @@ describe('EvChart realtime scatter blit ↔ full redraw 픽셀 동등', () => {
     expect(color, `단일 series 는 색 불일치도 0 이어야 함(${color}px)`).toBe(0);
   }, 120000);
 
+  it('반투명(rgba alpha<1) 단일 series: opaqueFill 게이트로 blit off → full redraw 로 알파 정확(누적 없음)', async () => {
+    // #2 회귀 가드. strip 은 dirtyBuckets 의 점을 매 틱 전부 재그려, 시프트로 이미 옮겨진 옛 점 위에
+    // 덧칠한다 — opaque 면 멱등이지만 반투명이면 source-over 로 알파가 누적된다(α→2α-α²). 따라서
+    // 반투명 series 는 opaqueFill 게이트가 blit 을 막고 full redraw(rebuild+composite, 점당 1회)로 보낸다.
+    // 이 테스트는 ⑴ 반투명에서 blit 이 실제로 off(blitted===0) 되는지 ⑵ 그 결과 알파가 full 과 일치하는지 단언한다.
+    const TICK = 1000;
+    const options = mkOptions(60);
+    const FILL = 'rgba(223,98,100,0.4)';
+    // 희소 데이터: 버킷당 1점, y 를 넓게 분산 → 점이 공간적으로 안 겹쳐 알파가 포화되지 않는다.
+    // (밀집 데이터는 blit·full 둘 다 알파가 255로 포화돼 double-draw 누적이 가려진다.)
+    const genData = (toMs) => {
+      const s1 = [];
+      for (let i = 0; i < 55; i++) {
+        const x = toMs - 1 - i * 1000; // 버킷마다 1점(1초 간격)
+        const y = 5 + ((i * 37) % 90); // 5..95 분산
+        s1.push({ x, y });
+      }
+      return {
+        series: { series1: { name: 'series1', pointSize: 2, color: FILL, pointFill: FILL } },
+        data: { series1: s1 },
+      };
+    };
+
+    window.__EVUI_BLIT_REFRESH_INTERVAL__ = 100000;
+    window.__EVUI_BLIT_DEBUG__ = true;
+    window.__EVUI_BLIT_DIAG__ = undefined;
+
+    const { container, rerender } = render(EvChart, { props: { data: genData(BASE), options } });
+    await settle();
+
+    let now = BASE;
+    for (let t = 1; t <= 12; t++) {
+      now += TICK;
+      // eslint-disable-next-line no-await-in-loop
+      await rerender({ data: genData(now), options });
+      // eslint-disable-next-line no-await-in-loop
+      await settle();
+    }
+    // opaqueFill 게이트가 반투명 series 의 blit 을 전면 차단해야 한다(누적 라스터가 곧 full redraw).
+    expect(
+      window.__EVUI_BLIT_DIAG__?.blitted ?? 0,
+      `반투명인데 blit 이 실행됨(opaqueFill 게이트 미작동): ${JSON.stringify(window.__EVUI_BLIT_DIAG__)}`,
+    ).toBe(0);
+
+    const blit = getImageData(container);
+
+    // 단일 series highlight → legendHover full redraw(downplay 없음 → alpha 0.4 유지). 게이트로 이미
+    // 매 틱 full 이라 두 라스터가 같아야 한다(알파 누적 0).
+    const ec = window.__EVUI_BLIT_CHART__;
+    expect(ec, 'debug 차트 핸들 없음').toBeTruthy();
+    ec.highlightSeries('series1');
+    await settle();
+    const full = getImageData(container);
+
+    // "둘 다 on" 픽셀의 알파 채널 비교. double-draw 면 blit 알파(2α-α²≈163)가 full(α≈102)보다 ~60 높다.
+    // AA 가장자리 차이(<24)는 무시하고 알파 초과 > 40 인 픽셀만 센다. 정상(점당 1회)이면 ≈0.
+    const { w, h } = blit;
+    const x0 = Math.floor(0.08 * w);
+    const x1 = Math.ceil(0.99 * w);
+    const y0 = Math.floor(0.07 * h);
+    const y1 = Math.ceil(0.82 * h);
+    let alphaOver = 0;
+    let both = 0;
+    for (let y = y0; y < y1; y++) {
+      for (let x = x0; x < x1; x++) {
+        const i = (y * w + x) * 4;
+        const ba = blit.data[i + 3];
+        const fa = full.data[i + 3];
+        if (ba >= 32 && fa >= 32) {
+          both++;
+          if (ba - fa > 40) {
+            alphaOver++;
+          }
+        }
+      }
+    }
+    expect(
+      alphaOver,
+      `반투명 blit 알파 누적 ${alphaOver}px / 겹침 ${both}px — strip double-draw 회귀`,
+    ).toBeLessThanOrEqual(Math.max(4, Math.round(both * 0.01)));
+  }, 120000);
+
   it('2-series(seriesReverse) range 50 밀집: blit 누적과 동일 데이터 full redraw 의 점 위치가 픽셀 동일하다', async () => {
     // 데모와 동형(2 series, seriesReverse). legend hover 는 호버 series 만 그려 위치 비교가 불가하므로
     // force-off + 동일 데이터 재렌더(현재 carry 유지, 데이터 idempotent)로 full redraw 를 만든다.
