@@ -924,6 +924,33 @@ describe('model.store createRealTimeScatterDataSet 개별 series 만료 제거',
     });
     expect(store.dataSet.c).toBeDefined();
   });
+
+  // 렌더 윈도우(series.minMax.maxX)는 prune 윈도우(globalToTime = max toTime)와 같은 기준이어야 한다.
+  // 회귀: minMaxValues.toTime 이 마지막 처리 키의 toTime 으로 덮어써지면(last-write-wins), 죽은(stale)
+  // series 가 마지막 키이고 아직 prune 전이면, 살아있는 series 의 maxX 가 그 stale 시각에 묶여 축이 freeze 된다.
+  it('생존 series 의 maxX 는 stale 마지막 키가 아니라 전역 max toTime 을 따른다', () => {
+    const store = buildStore({ range: 10 });
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      b: [{ x: t0, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+
+    // a,b 만 +3s 전진(range 10 안이라 c 는 아직 prune 안 됨), c 는 빈 배열이면서 마지막 키.
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 3 * SECOND, y: 1 }],
+      b: [{ x: t0 + 3 * SECOND, y: 2 }],
+      c: [],
+    });
+
+    // c 는 아직 누적 저장소에 남아 있다(prune 전).
+    expect(store.dataSet.c).toBeDefined();
+    // 축 우측단은 전역 max(t0+3s)여야 한다 — c 의 stale toTime(t0)이 아니라.
+    expect(store.seriesList.a.minMax.maxX.valueOf()).toBe(t0 + 3 * SECOND);
+    expect(store.seriesList.b.minMax.maxX.valueOf()).toBe(t0 + 3 * SECOND);
+  });
 });
 
 describe('model.store createDataSet stack (누적 top 기반)', () => {
