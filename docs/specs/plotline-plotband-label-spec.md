@@ -25,7 +25,7 @@
 
 | 주제 | 결정 |
 |---|---|
-| **z-order** | **`maxTip > plot(line/band/label) > series`** 로 확정(스펙 변경 반영). plot 을 static 에서 떼어 **front 패스(`drawPlotsFront`)** 로 분리, `drawForeground`(`drawPlotsFront`→`drawTip`)를 통해 series 위·maxTip 아래에 그린다. 옵션화는 하지 않음. **순서 변경 시 `drawForeground`의 두 줄 swap.** (자세히는 §9) |
+| **z-order** | 기본 **`maxTip > plot(line/band/label) > series`**. plot 을 static 에서 떼어 **front 패스(`drawPlotsFront`)** 로 분리, `drawForeground`(`drawPlotsFront`→`drawTip`)를 통해 series 위·maxTip 아래에 그린다. **차트 옵션 `plot.aboveSeries`(기본 true)로 plot 을 series 위/아래 전환 가능**(false면 plot 을 series 아래로). maxTip 은 항상 최상단. (자세히는 §9) |
 | **0값 표시** | falsy 가드를 명시적 null/유한성 검사로 교체해 `0` 값/인덱스도 표시. |
 | **라벨 가로 배치** | 단일 옵션(`position`)으로 좌/우 끝 배치. alias·value를 좌/우로 **분리 배치하는 방안은 제외** — 묶어서 한쪽 끝에 표시. |
 | **라벨 텍스트** | 기존 `text`를 라벨(=alias)로 사용 (`alias` 신설 안 함). `showValue`로 value 합성. |
@@ -33,7 +33,7 @@
 | **value 포맷** | 해당 축의 `getLabelFormat()`(축 formatter) 적용. |
 | **PlotBand value** | `showValue` 시 `from`·`to` 양끝에 각각 라벨 표시(2개). |
 | **반응형 축약** | 너비 기준 3단계: 풀(text+value) → value만 → 미노출. |
-| **value-only hover tooltip** | 데스크탑 전용 / series tooltip 우선 / `showTextOnHover` 옵션(`use` **기본 false**) + **tooltip 스타일 지정 가능**. |
+| **value-only hover tooltip** | 데스크탑 전용 / **커서가 라벨 박스 위면 라벨 tooltip 우선**(그 외 영역은 series tooltip) / `showTextOnHover` 옵션(`use` **기본 false**) + **tooltip 스타일 지정 가능**. |
 
 ---
 
@@ -81,9 +81,10 @@ label: {
     use: false,              // 활성 여부 (기본 false)
     backgroundColor: '#4C4C4C',
     fontColor: '#FFFFFF',
-    borderColor: '#666666',
+    borderColor: null,       // null이면 backgroundColor 와 동일 → 테두리 미표시
     borderRadius: 4,
     fontSize: 12,
+    fontWeight: 400,
     fontFamily: 'Roboto',
     useShadow: false,
     shadowOpacity: 0.25,
@@ -150,10 +151,10 @@ value-only 상태(`hideBelow ≤ 너비 < valueOnlyBelow`)에서는 alias(text)�
 
 - **활성 조건**: `showTextOnHover.use: true` **그리고** 현재 value-only 상태일 때만.
 - **데스크탑 전용**: 모바일(`isMobile`)은 동작하지 않음.
-- **우선순위**: `findHitItem` 의 series hit 이 있으면 series tooltip 이 우선. series hit 이 **없을 때만** 라벨 tooltip 표시.
+- **우선순위**: **커서가 라벨 박스(value-only) 안에 있으면 라벨 tooltip 우선** — 그 프레임의 series hit 을 무시해 series tooltip 을 끄고 라벨 tooltip 을 표시한다(z-order 상 plot 이 series 위라 직접 hover 한 라벨이 이김). 라벨 박스 밖에서는 기존대로 series tooltip. (`onMouseMove` 가 `findPlotLabelHitRegion` 으로 판정)
 - **내용**: 해당 라벨의 `text`.
 - **표시 방식**: 경량 전용 DOM tooltip (series 용 `tooltipDOM` 과 별개). 커서 이탈 시 숨김.
-- **스타일**: `showTextOnHover` 의 `backgroundColor` / `fontColor` / `borderColor` / `borderRadius` / `fontSize` / `fontFamily` / `useShadow` / `shadowOpacity` / `padding` 으로 지정. 기본값은 series `tooltip` 룩앤필과 동일 계열.
+- **스타일**: `showTextOnHover` 의 `backgroundColor` / `fontColor` / `borderColor`(null이면 배경색=테두리 미표시) / `borderRadius` / `fontSize` / `fontWeight` / `fontFamily` / `useShadow` / `shadowOpacity` / `padding` 으로 지정. 기본값은 series `tooltip` 룩앤필과 동일 계열.
 
 ---
 
@@ -237,26 +238,30 @@ axesY: [{
 
 ---
 
-## 9. z-order: plot front 패스 (스펙 변경 반영)
+## 9. z-order: plot front 패스 + `plot.aboveSeries` 옵션
 
-목표 노출 순서: **`maxTip` > `plot(line/band/label)` > `series`** (maxTip 이 가장 앞).
+기본 노출 순서: **`maxTip` > `plot(line/band/label)` > `series`** (maxTip 이 가장 앞).
+차트 옵션 **`plot.aboveSeries`(기본 true)** 로 plot 을 series 위/아래 전환. `false`면 **`maxTip > series > plot`**. maxTip 은 항상 최상단.
 
 ### 구조
 한 버퍼에 **그리는 순서 = z-order**. plot 을 static(맨 뒤)에서 떼어내 series 위·tip 아래에 그린다.
 ```
-drawStaticLayer  : grid/axis 만
+drawStaticLayer  : grid/axis (+ aboveSeries:false 면 여기서 plot → series 아래)
 drawSeriesLayer  : series (또는 worker bitmap 합성)
-drawForeground(ctx):                 ← z-order 단일 제어점
-  drawPlotsFront(ctx) : plotLine/band/label    ← series 위
-  drawTip(ctx)        : maxTip/selectItem/tooltip  ← 가장 앞
+drawForeground(ctx):                 ← z-order 제어점
+  drawPlotsFront(ctx) : plotLine/band/label    ← aboveSeries:true(기본)일 때만, series 위
+  drawTip(ctx)        : maxTip/selectItem/tooltip  ← 항상 가장 앞
 → commit
 ```
-> **순서 변경**: `chart.core.js`의 `drawForeground` 안 두 줄(`drawTip`/`drawPlotsFront`) 순서만 swap.
-> 단, 경로가 2곳(동기 `drawChart`-buffer / 워커 `commitWorkerFrame`-displayCtx)이라 `drawForeground(ctx)`를 양쪽이 공유해 제어점은 사실상 한 곳. overlayCanvas(heatmap hover)·DOM tooltip(hover 툴팁)은 별도 레이어라 무관.
+> **위/아래 전환**: `plot.aboveSeries`. true면 `drawForeground`에서 plot 을 series 위에, false면 `drawStaticLayer` 끝에서 plot 을 series 아래(static)에 그린다(워커 경로는 buffer 위에 series bitmap 이 덮어 자동으로 아래에 깔림).
+> 경로가 2곳(동기 `drawChart`-buffer / 워커 `commitWorkerFrame`-displayCtx)이라 `drawForeground(ctx)`를 양쪽이 공유. 워커 사망 폴백(`drawSeriesLayerFallback`)도 동일 분기. overlayCanvas(heatmap hover)·DOM tooltip(hover 툴팁)은 별도 레이어라 무관.
 
 ### 구현
 - **scale ×3**: `draw()`의 plot 블록을 `drawPlots()`로 분리. `draw()`는 grid/axis 만 그리고 plot geometry 를 `this._plotGeom`에 캐시. `drawPlots()`는 캐시 + `this.ctx`로 그림(로직 동일, 위치만 이동).
-- **chart.core**: `drawPlotsFront(ctx)`(axes 순회 `drawPlots` + hover hit 영역 취합) / `drawForeground(ctx)` 신설. `drawTip` 호출부(메인/워커 미전송/`commitWorkerFrame`)를 `drawForeground`로 치환, 워커 사망 폴백엔 `drawPlotsFront` 추가.
+- **chart.core**: `drawPlotsFront(ctx)`(axes 순회 `drawPlots` + hover hit 영역 취합) / `drawForeground(ctx)` 신설. `drawTip` 호출부(메인/워커 미전송/`commitWorkerFrame`)를 `drawForeground`로 치환.
+- **`plot.aboveSeries` 분기**(기본값 `uses.js`의 `plot: { aboveSeries: true }`):
+  - `true`: `drawForeground`가 `drawPlotsFront`→`drawTip` (plot 이 series 위).
+  - `false`: `drawStaticLayer` 끝에서 `drawPlotsFront`(plot 이 series 아래) + `drawForeground`는 tip 만. 워커 사망 폴백도 동일 조건 분기.
 - 워커 경로: `drawStaticLayer`(전송 프레임)에서 캐시한 `_plotGeom`을 `commitWorkerFrame`이 displayCtx(+pixelRatio transform)에 그림. epoch 가드로 stale 방지.
 
 ### 검증

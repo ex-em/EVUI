@@ -135,6 +135,10 @@ const DEFAULT_OPTIONS = {
     color: '#EE7F44',
     segments: null,
   },
+  plot: {
+    // 임계선/밴드(plotLines·plotBands)를 series 위(true)/아래(false)에 그릴지. maxTip 은 항상 최상단.
+    aboveSeries: true,
+  },
   maxTip: {
     use: false,
     fixedPosTop: false,
