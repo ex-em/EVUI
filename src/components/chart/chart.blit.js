@@ -1,3 +1,5 @@
+import Util from './helpers/helpers.util';
+
 /**
  * EvChart realtime scatter blit fast-path 모듈.
  * chart.core.js 의 EvChart.prototype 에 Object.assign 으로 합쳐진다(메서드는 this 로 인스턴스에 접근).
@@ -244,6 +246,16 @@ const blit = {
       selectionOk,
       // blit 은 realtime scatter 전용이다.
       scatterOnly: this.hasOnlyVisibleScatter(),
+      // 반투명(rgba alpha<1) fill 이 있으면 full redraw 로 폴백한다. strip 은 시프트된 옛 라스터 위에
+      // 경계 버킷 점을 다시 그리므로(픽셀 제거 없는 덧그림), 반투명 점은 source-over 로 알파가 누적돼
+      // (α→2α-α²) full(점당 1회)보다 진해진다 → blit≠full. opaque 면 source-over 가 멱등이라 무해.
+      // 폴백 경로(rebuild+composite)는 점당 1회 그리므로 반투명도 정확하다(가속만 양보).
+      opaqueFill: this.hasOnlyOpaqueScatterFill(),
+      // 분수 pixelRatio(예: Windows 125%/150% = 1.25/1.5)에서는 정수 CSS px 시프트의 device 폭
+      // (gCss·pr)이 비정수가 돼 drawImage 시프트가 bilinear 리샘플(블러)을 일으키고, strip 밖 라스터에
+      // 매 틱 누적된다(blit≠full). 정수 pr 에서만 시프트가 bit-exact 하므로 분수면 full 폴백한다
+      // (rebuild+composite 는 시프트가 없어 분수 pr 에서도 정확).
+      deviceIntegerRatio: Number.isInteger(this.pixelRatio),
       hasPrev: !!prev,
       // 옵션 변화(색·스타일 등)는 레이어 픽셀을 바꿀 수 있다. Chart.vue options watcher 가
       // 변화 시 options 참조를 통째 교체하므로 참조 비교 1회로 보수적으로 차단한다.
@@ -307,6 +319,8 @@ const blit = {
       parts.seriesAligned &&
       parts.selectionOk &&
       parts.scatterOnly &&
+      parts.opaqueFill &&
+      parts.deviceIntegerRatio &&
       parts.hasPrev &&
       parts.optionsStable &&
       parts.yFixed &&
@@ -339,6 +353,28 @@ const blit = {
         if (this.seriesList[ids[j]]?.show) {
           return false;
         }
+      }
+    }
+    return true;
+  },
+
+  /**
+   * 보이는 scatter series 의 fill·stroke 가 전부 불투명(alpha=1)인가.
+   * 반투명(rgba alpha<1)이면 strip 의 경계 버킷 덧그림이 source-over 로 알파를 누적시켜 blit≠full 이
+   * 되므로 fast-path 를 막고 full redraw(점당 1회)로 폴백한다. Util.getOpacity 는 rgba 면 alpha 문자열,
+   * 그 외엔 '1' 을 돌려준다. 참고: series 단위 색만 검사한다 — point 별 rgba(item.color)까지는 보지
+   * 않는다(매 게이트 전수 스캔 비용 회피). 그런 경우엔 REFRESH_INTERVAL 강제 full 이 주기적으로 정정한다.
+   * @returns {boolean}
+   */
+  hasOnlyOpaqueScatterFill() {
+    const list = this.getBlitScatterSeriesList();
+    for (let i = 0; i < list.length; i++) {
+      const s = list[i].series;
+      if (
+        Number(Util.getOpacity(s.pointFill ?? s.color)) < 1 ||
+        Number(Util.getOpacity(s.color)) < 1
+      ) {
+        return false;
       }
     }
     return true;
@@ -440,6 +476,49 @@ const blit = {
   },
 
   /**
+   * blit strip 전용 cross-series owner 맵. dirtyBuckets 의 모든 점을 순회해 좌표→owner(sId) 를 채운다.
+   * 같은 좌표(=같은 ms=같은 버킷)는 strip 안에서 owner 가 닫히므로 전체 dedupe 없이 strip 만으로 정확하다
+   * (#2011 coordinateDedupe 존중 — owner 외 series 는 그 좌표를 그리지 않아 반투명 겹침/hollow 비침이
+   * full redraw 와 일치). 순서/owner 규칙은 collectDuplicatePoints 와 동일(seriesReverse 면 역순 순회 →
+   * 마지막 set 이 owner). blit 은 opaqueFill 게이트로 반투명 series 를 받지 않으므로 strip 의 cross-series
+   * 알파 누적 우려는 게이트가 차단한다(여기 dedupe 는 hollow 마커·z-order 정합을 보장).
+   * @param {Map<string,string>} duple       owner 맵(coordKey → sId)
+   * @param {number[]} dirtyBuckets           strip 으로 다시 그릴 ring 버킷 인덱스 목록
+   * @returns {undefined}
+   */
+  collectStripDuplicatePoints(duple, dirtyBuckets) {
+    const scatterIds = this.seriesInfo?.charts?.scatter ?? [];
+    const isReverseOrder = !!this.options.seriesReverse;
+    for (
+      let jx = isReverseOrder ? scatterIds.length - 1 : 0;
+      isReverseOrder ? jx >= 0 : jx < scatterIds.length;
+      isReverseOrder ? jx-- : jx++
+    ) {
+      const series = this.seriesList[scatterIds[jx]];
+      if (!series?.show) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      const dataGroup = series.data[series.sId]?.dataGroup;
+      if (!dataGroup) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
+      for (let b = 0; b < dirtyBuckets.length; b++) {
+        const group = dataGroup[dirtyBuckets[b]];
+        if (!group?.data) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+        for (let j = 0; j < group.data.length; j++) {
+          const item = group.data[j];
+          duple.set(item.k ?? Util.coordinateKey(item.x, item.y), series.sId);
+        }
+      }
+    }
+  },
+
+  /**
    * blit fast-path 본체. 게이트 통과 시 호출된다.
    * 이전 점 라스터를 왼쪽으로 dx 만큼 밀고(drawImage), 신규 시간대(strip)만 다시 그려 buffer 에
    * 합성한다. draw 라스터 비용을 "전체 점"에서 "신규 strip"으로 줄인다. 픽셀 복사라 좌표는 불변.
@@ -519,7 +598,9 @@ const blit = {
     //
     // 흰줄(comb) 불가 보장: 흰줄은 "픽셀을 지웠는데 다시 안 그리는" 경우(clear + clip 의 결손 컬럼)에만
     // 생긴다. 아래 시프트는 OLD 픽셀을 비트단위 무손실로 옮긴 뒤(정수좌표·동일크기 drawImage → 재양자화
-    // 없음) 그 위에 strip 버킷을 덧그리기만 한다 — 픽셀 제거 연산이 없으므로 세로 흰줄이 원천 불가.
+    // 없음) 그 위에 strip 버킷의 점을 다시 그리기만 한다 — 픽셀 제거 연산이 없으므로 세로 흰줄이 원천 불가.
+    // (경계 버킷은 시프트된 옛 점 위에 다시 그려져 opaque 면 멱등이지만 반투명이면 알파가 누적되므로,
+    //  반투명 series 는 evaluateBlitGate 의 opaqueFill 게이트가 막아 full redraw 로 보낸다.)
     const { gapCount, endIndex, length } = lastTick;
     // 최소 gapCount+1: 시프트로 비워진 strip(gapCount 버킷) + 경계 버킷(age gapCount) 1개.
     // 경계 버킷은 직전 틱 graphMax(=floor(maxX)) 초과로 그려지지 못한 점(x 가 초 경계 직전)이 이번 틱
@@ -534,9 +615,17 @@ const blit = {
       dirtyBuckets[k] = idx;
     }
 
-    // series 별 레이어이므로 cross-series dedupe 가 필요 없다 — 겹침에서 "어느 series 가 위"인지는
-    // 합성 순서(compositePointsLayer)가 full redraw 와 동일하게 결정한다. 각 series 는 자기 점만 자기
-    // 레이어에 그린다(intra-series 좌표 유일성은 push 단계 dedupe 가 보장).
+    // cross-series dedupe(#2011 coordinateDedupe 존중): 보이는 scatter 가 2개 이상이고 옵션이 켜져 있으면
+    // 같은 좌표는 owner series 만 그린다(full redraw 와 동일). series 별 레이어라 합성 z-order 가 "어느
+    // series 가 위"인지는 결정하지만, 반투명(alpha<1) fill·hollow 마커는 비-owner 점도 레이어에 남으면
+    // 합성 시 알파가 누적/비침 → owner 외 좌표는 레이어에 아예 그리지 않아야 full 과 일치한다.
+    // 단일 series 면 push 단계가 좌표 유일성을 보장하므로 duple 이 불필요(null → 전부 그림).
+    const dedupeOn = this.options.coordinateDedupe !== false && scatterList.length > 1;
+    const duple = dedupeOn ? new Map() : null;
+    if (dedupeOn) {
+      this.collectStripDuplicatePoints(duple, dirtyBuckets);
+    }
+
     const param = {
       chartRect: cr,
       labelOffset: lo,
@@ -545,8 +634,8 @@ const blit = {
       selectInfo: null,
       legendHitInfo: null,
       unSelectedOpacity: this.options.unSelectedOpacity,
-      duple: null,
-      coordinateDedupe: false,
+      duple,
+      coordinateDedupe: dedupeOn,
       // 시프트 후 잔차 carry. strip 신규 점도 시프트된 옛 점과 동일 위상으로 찍어 라스터 정합 유지.
       rtXOffsetCss: this._blitCarry,
     };
@@ -806,7 +895,16 @@ const blit = {
     }
 
     const pr = this.pixelRatio;
-    // series 별 레이어에 자기 점만 그린다 — cross-series dedupe 불필요(z-order 는 합성 순서가 담당).
+    // cross-series dedupe(#2011 coordinateDedupe 존중): baseline(full) 도 같은 좌표는 owner series 만
+    // 그린다 — strip 과 동일 규칙이라 fast-path 전환 시 정합. 반투명·hollow 마커에서 비-owner 점이
+    // 레이어에 남으면 합성 시 알파 누적/비침으로 full(직접 drawSeries)과 어긋난다. 전체 점 기준 owner.
+    const scatterIds = this.seriesInfo?.charts?.scatter ?? [];
+    const dedupeOn =
+      this.options.coordinateDedupe !== false && !this.canSkipRealtimeScatterDedupe(scatterIds);
+    const duple = dedupeOn ? new Map() : null;
+    if (dedupeOn) {
+      this.collectDuplicatePoints(duple, scatterIds);
+    }
     // 각 series 의 현재 유효 라스터(cur)에 직접 다시 그려 다음 fast-path 의 baseline 을 세운다.
     for (let i = 0; i < scatterList.length; i++) {
       const entry = scatterList[i];
@@ -827,8 +925,8 @@ const blit = {
         labelOffset: this.labelOffset,
         axesSteps: this.axesSteps,
         displayOverflow: this.options.displayOverflow,
-        duple: null,
-        coordinateDedupe: false,
+        duple,
+        coordinateDedupe: dedupeOn,
         selectInfo: null,
         legendHitInfo: null,
         unSelectedOpacity: this.options.unSelectedOpacity,

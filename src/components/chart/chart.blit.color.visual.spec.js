@@ -304,6 +304,84 @@ describe('EvChart realtime scatter blit 2-series color/hit-test', () => {
     window.__EVUI_BLIT_DEBUG__ = false;
     assertNoColorBleed(compare(golden, blit));
     assertNoWhiteLine(golden, blit);
+    // cross-series dedupe(owner-map) 복원으로 60k seed 워크로드가 무거워져 240s 로 상향(#2308 리뷰 후속).
+  }, 240000);
+
+  it('hollow 마커(cross/star) + cross-series 동일좌표: blit strip dedupe 가 owner 만 그려 full 과 일치', async () => {
+    // strip cross-series dedupe(collectStripDuplicatePoints)가 실효를 갖는 유일 케이스 가드.
+    // opaque solid 마커는 합성 z-order 가 owner-dedupe 와 같지만, hollow(stroke-only: cross/star)는
+    // 위 series 마커의 빈 곳으로 아래 series 가 비친다 → owner 외 series 를 안 그려야 full(dedupe)과 일치.
+    // 두 series 에 *동일 좌표* 점을 넣는다(coordinateDedupe on, seriesReverse → series1=red 가 owner).
+    // owner=red cross(작은 마커), 비-owner=blue star(큰 마커: cross + 대각선) — owner 가 비-owner 를
+    // 덮지 못하므로, dedupe 가 없으면 blue star 의 대각선이 새어 나온다. blit 라스터에 그 blue 누출이
+    // 없는지 검증한다(strip dedupe 를 빼면 실패 — 이 케이스가 strip dedupe 의 유일한 실효 지점).
+    const RANGE2 = 60;
+    const hollowOptions = { ...options, realTimeScatter: { use: true, range: RANGE2 } };
+    const genHollow = (toMs) => {
+      // 신규 점은 최신 ~1버킷에 집중(maxDirtyAge 작게 → late-arrival 가드 통과). 매 틱 시프트로 누적.
+      const pts = [{ x: toMs - 1, y: 50 }];
+      for (let i = 0; i < 24; i++) {
+        const h = (i * 2654435761) >>> 0;
+        const x = toMs - 2 - (h % 900);
+        const y = (6000 + ((i * 7919) % 88000)) / 1000;
+        pts.push({ x, y });
+      }
+      return {
+        series: {
+          series1: {
+            name: 'series1',
+            pointSize: 6,
+            pointStyle: 'cross',
+            color: '#DF6264',
+            pointFill: '#DF6264',
+            overflowColor: '#FF00FF',
+          },
+          series2: {
+            name: 'series2',
+            pointSize: 6,
+            pointStyle: 'star',
+            color: '#3CA0FF',
+            pointFill: '#3CA0FF',
+            overflowColor: '#A3D3FF',
+          },
+        },
+        data: { series1: [...pts], series2: [...pts] }, // 동일 좌표(coincident)
+      };
+    };
+
+    window.__EVUI_BLIT_REFRESH_INTERVAL__ = 100000;
+    window.__EVUI_BLIT_FORCE_OFF__ = false;
+    window.__EVUI_BLIT_DEBUG__ = true;
+    window.__EVUI_BLIT_DIAG__ = undefined;
+
+    const { container, rerender } = render(EvChart, {
+      props: { data: genHollow(BASE), options: hollowOptions },
+    });
+    await settle();
+    let now = BASE;
+    for (let t = 1; t <= 12; t++) {
+      now += 1000;
+      // eslint-disable-next-line no-await-in-loop
+      await rerender({ data: genHollow(now), options: hollowOptions });
+      // eslint-disable-next-line no-await-in-loop
+      await settle();
+    }
+    const blit = getDisplayImageData(container);
+    const diag = window.__EVUI_BLIT_DIAG__;
+    expect(diag?.blitted ?? 0, `blit 미실행: diag=${JSON.stringify(diag)}`).toBeGreaterThan(6);
+
+    window.__EVUI_BLIT_FORCE_OFF__ = true;
+    await rerender({ data: genHollow(now), options: hollowOptions });
+    await settle();
+    const golden = getDisplayImageData(container);
+    window.__EVUI_BLIT_DEBUG__ = false;
+
+    const m = compare(golden, blit);
+    // owner=series1(red cross, seriesReverse → 마지막 set). golden 은 owner-only 라 blue(series2 star)
+    // 거의 0. strip dedupe 가 빠지면 blit 에 blue star 대각선이 새어 blit blue율이 급증한다 →
+    // assertNoColorBleed(blit blue율 < golden×1.3, flip 총량 바운드)가 실패한다. owner red 렌더도 확인.
+    expect(m.gRed, `owner(red star) 미렌더(빈 비교 방지) — ${m.summary}`).toBeGreaterThan(50);
+    assertNoColorBleed(m);
   }, 120000);
 
   it('blit 누적으로 어긋난 hit-test 좌표(xp)가 지연 재계산으로 복구된다', async () => {

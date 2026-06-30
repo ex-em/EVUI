@@ -120,6 +120,44 @@ describe('EvChart.evaluateBlitGate — 진입 게이트', () => {
     expect(core.evaluateBlitGate(undefined).parts.deviceStable).toBe(false);
   });
 
+  it('★ 분수 pixelRatio(Windows 125%/150% = 1.25/1.5) → deviceIntegerRatio=false → full', () => {
+    const core = makeCore();
+    // prev 도 1.5 로 맞춰 deviceStable 은 통과시키고 deviceIntegerRatio 만 뒤집는다.
+    core.pixelRatio = 1.5;
+    core._blitPrev.pixelRatio = 1.5;
+    const gate = core.evaluateBlitGate(undefined);
+    expect(gate.parts.deviceStable).toBe(true);
+    expect(gate.parts.deviceIntegerRatio).toBe(false);
+    expect(gate.ok).toBe(false);
+  });
+
+  it('정수 pixelRatio(2, 레티나) → deviceIntegerRatio=true (분수 게이트 통과)', () => {
+    const core = makeCore();
+    core.pixelRatio = 2;
+    core._blitPrev.pixelRatio = 2;
+    const gate = core.evaluateBlitGate(undefined);
+    expect(gate.parts.deviceIntegerRatio).toBe(true);
+    expect(gate.ok).toBe(true);
+  });
+
+  it('★ 반투명 fill(rgba alpha<1) → opaqueFill=false → full (strip 알파 누적 회피)', () => {
+    const core = makeCore();
+    core.seriesList.s0.pointFill = 'rgba(223, 98, 100, 0.4)';
+    core.seriesList.s0.color = 'rgba(223, 98, 100, 0.4)';
+    const gate = core.evaluateBlitGate(undefined);
+    expect(gate.parts.opaqueFill).toBe(false);
+    expect(gate.ok).toBe(false);
+  });
+
+  it('불투명 fill(hex) → opaqueFill=true (반투명 게이트 통과)', () => {
+    const core = makeCore();
+    core.seriesList.s0.pointFill = '#DF6264';
+    core.seriesList.s0.color = '#DF6264';
+    const gate = core.evaluateBlitGate(undefined);
+    expect(gate.parts.opaqueFill).toBe(true);
+    expect(gate.ok).toBe(true);
+  });
+
   it('옵션 참조 교체(Chart.vue options watcher) → optionsStable=false → full', () => {
     const core = makeCore();
     core.options = { ...core.options };
