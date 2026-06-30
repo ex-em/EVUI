@@ -180,13 +180,16 @@ class Scatter {
   calcItem(item, param) {
     const { chartRect, labelOffset, axesSteps, displayOverflow } = param;
 
-    let aliasPixel;
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
-    const xsp = chartRect.x1 + labelOffset.left;
+    // realtime scatter blit: full redraw 가 blit 시프트(정수 CSS px)와 ceil 양자화를 일치시키도록
+    // startPoint 에 sub-pixel carry(rtXOffsetCss, [-0.5,0.5])를 더한다. blit 라스터에 베이크된 위상과
+    // 동일 위상으로 점을 찍어, full 전환(legend hover 등) 시 점이 한 점도 안 움직인다(chart.blit.js).
+    const rtXOffset = this.realTimeScatter ? (param.rtXOffsetCss ?? 0) : 0;
+    const xsp = chartRect.x1 + labelOffset.left + rtXOffset;
     const ysp = chartRect.y2 - labelOffset.bottom;
 
     let x = Canvas.calculateX(item.x, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp);
@@ -198,9 +201,11 @@ class Scatter {
       ysp,
     );
 
-    if (x !== null) {
-      aliasPixel = Util.aliasPixel(x);
-      x += aliasPixel;
+    // realtime scatter 는 aliasPixel(정수 x 의 홀/짝에 따라 +0.5)을 적용하지 않는다 — 패리티가
+    // 시프트(Σg 누적)로 바뀌어 시프트된 옛 점(생성시 패리티)과 fresh full-draw(현재 패리티)가
+    // 1px 어긋난다. aliasPixel 을 빼면 device x = pr·ceil(...) 로 시프트 불변이 되어 blit≡full.
+    if (x !== null && !this.realTimeScatter) {
+      x += Util.aliasPixel(x);
     }
 
     item.xp = x;
