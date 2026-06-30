@@ -392,8 +392,14 @@ const modules = {
         minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
         minMaxValues.minY = Math.min(minMaxValues.minY, tempMinMax.minY);
       }
-      minMaxValues.fromTime = dataset.fromTime;
-      minMaxValues.toTime = dataset.toTime;
+      // 렌더 X축 윈도우는 전역 우측단(= 모든 series 의 toTime 최댓값)을 따라야 prune 윈도우(globalToTime)와
+      // 일치한다. last-write-wins 로 마지막 처리 키의 toTime 을 쓰면, 신규 점이 끊긴 stale series 가 마지막
+      // 키일 때 살아있는 series 의 maxX 까지 그 옛 시각에 묶여 축이 prune 전까지 freeze 된다. fromTime 은
+      // 항상 toTime - length*1000 이므로 max 인 series 의 fromTime 을 함께 취한다.
+      if (dataset.toTime > minMaxValues.toTime) {
+        minMaxValues.toTime = dataset.toTime;
+        minMaxValues.fromTime = dataset.fromTime;
+      }
     }
 
     if (!Number.isFinite(minMaxValues.minY)) {
