@@ -1,3 +1,16 @@
+# [3.14.0](https://github.com/ex-em/EVUI/compare/3.13.0...3.14.0) (2026-06-30)
+
+
+### Bug Fixes
+
+* **chart:** 슬라이딩 윈도우 시간축 라벨 점프 현상 수정 ([12b10ae](https://github.com/ex-em/EVUI/commit/12b10aec9603cc0110c66a3d48644fefb93085c8))
+
+
+### Features
+
+* **chart:** plotLine/plotBand/plotLabel 옵션 확장 및 라벨 렌더링 개선 ([47d71c6](https://github.com/ex-em/EVUI/commit/47d71c6ab06d8fe022987080b5fa661c79955489))
+* **chart:** plotLines/plotBands z-order 옵션(plot.aboveSeries) 추가 ([501ff60](https://github.com/ex-em/EVUI/commit/501ff60b2a7b0b5eed12dddb9e27e2f76057b19e))
+
 # [3.13.0](https://github.com/ex-em/EVUI/compare/3.12.1...3.13.0) (2026-06-30)
 
 
