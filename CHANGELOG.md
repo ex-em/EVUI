@@ -1,3 +1,22 @@
+# [3.13.0](https://github.com/ex-em/EVUI/compare/3.12.1...3.13.0) (2026-06-30)
+
+
+### Bug Fixes
+
+* **chart:** keepDisplay 리사이즈 시 displayFromStartArea 사각형의 startArea 꼬리 드리프트 보정 ([9b82dc8](https://github.com/ex-em/EVUI/commit/9b82dc8a8d996aaa60878e53218b90e5069c0271))
+* **chart:** startArea 내에서 드래그 시 텍스트 선택이 되지 않도록 user-select 속성을 비활성화 ([5eb62d9](https://github.com/ex-em/EVUI/commit/5eb62d9de29101e39ff00d22612be859f57b834b))
+* clampOnStep, stepStrictly 스펙 충돌 수정 ([41a1525](https://github.com/ex-em/EVUI/commit/41a1525cf1c9d9ef0a8bd1ca07e8074fffb7514a))
+* disableEmpty 와 stepStrictly 충돌 해소 ([5c8945a](https://github.com/ex-em/EVUI/commit/5c8945afb866856c6917de483c87ad2a76774d59))
+* 화살표 버튼 값 조절 오류 수정, 테스트 코드 추가 ([4ccba2e](https://github.com/ex-em/EVUI/commit/4ccba2e3463985a16561eb6fe943eb290d01bb78))
+
+
+### Features
+
+* **chart:** dragSelection을 캔버스 바깥에서 시작할 수 있는 startArea 옵션 추가 ([746014e](https://github.com/ex-em/EVUI/commit/746014ebf43af38d9e036b6f6d2a172ea88a1c15))
+* **chart:** scatter 드래그 선택을 startArea 지점부터 표시하는 displayFromStartArea 옵션 추가 ([82a5fe4](https://github.com/ex-em/EVUI/commit/82a5fe4fc84a8f147c847958186a6a721de9d203))
+* disableEmpty 옵션 추가 ([3cedb1c](https://github.com/ex-em/EVUI/commit/3cedb1cc20d8b7b04856cd2e886c32630355c75a))
+* inputNumber clampOnStep 옵션 추가 ([d7ce684](https://github.com/ex-em/EVUI/commit/d7ce6843e5acb5738f20b692fd24613cb056fb5f))
+
 ## [3.12.1](https://github.com/ex-em/EVUI/compare/3.12.0...3.12.1) (2026-06-23)
 
 
