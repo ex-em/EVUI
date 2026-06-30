@@ -217,7 +217,10 @@ describe('EvChart.canRouteFallbackViaLayer — 폴백 렌더의 layer 합성 라
   const makeRouteCore = () => {
     const core = makeCore();
     core.bufferCanvas = { width: 580, height: 380 };
-    core.pointsLayerA = { width: 580, height: 380 };
+    // series 별 레이어(pointsLayersSized 가 bufferCanvas 치수와 일치하는지 검사) 모킹.
+    core.pointsLayers = new Map([
+      ['s0', { a: { width: 580, height: 380 }, b: { width: 580, height: 380 }, cur: 'A' }],
+    ]);
     return core;
   };
 

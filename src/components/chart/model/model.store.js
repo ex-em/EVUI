@@ -69,8 +69,8 @@ const modules = {
             if (series && series.show !== false) {
               const rawData = data?.[seriesID];
               const { passingValue, interpolation } = series;
-              const needsTransform = interpolation === 'zero'
-                || (passingValue != null && passingValue !== undefined);
+              const needsTransform =
+                interpolation === 'zero' || (passingValue != null && passingValue !== undefined);
 
               let hasPassingValueInData = false;
               let sData;
@@ -398,7 +398,10 @@ const modules = {
       const series = this.seriesList[seriesID];
       series.data = this.dataSet;
       series.minMax = {
-        minX: dayjs(minMaxValues.fromTime),
+        // X축 좌단은 "실제 보유한 가장 오래된 버킷"에 맞춘다. fromTime(= toTime - range*1000)은 링이
+        // 보유하는 가장 오래된 버킷(toTime - (range-1)*1000)보다 1버킷(=1초) 더 왼쪽이라, 그대로 쓰면
+        // 맨 왼쪽 1버킷이 항상 비어 좌단 결손(full redraw)·좌단 깜빡임(blit 고스트)이 생긴다.
+        minX: dayjs(minMaxValues.fromTime + 1000),
         minY: minMaxValues.minY,
         maxX: dayjs(minMaxValues.toTime),
         maxY: minMaxValues.maxY,
@@ -681,11 +684,32 @@ const modules = {
             reused.dataTextColor = null;
             sdata.push(reused);
           } else {
-            sdata.push(isHorizontal
-              ? { x: v, y: ldata, o, b: null, xp: null, yp: null,
-                  w: null, h: null, dataColor: null, dataTextColor: null }
-              : { x: ldata, y: v, o, b: null, xp: null, yp: null,
-                  w: null, h: null, dataColor: null, dataTextColor: null },
+            sdata.push(
+              isHorizontal
+                ? {
+                    x: v,
+                    y: ldata,
+                    o,
+                    b: null,
+                    xp: null,
+                    yp: null,
+                    w: null,
+                    h: null,
+                    dataColor: null,
+                    dataTextColor: null,
+                  }
+                : {
+                    x: ldata,
+                    y: v,
+                    o,
+                    b: null,
+                    xp: null,
+                    yp: null,
+                    w: null,
+                    h: null,
+                    dataColor: null,
+                    dataTextColor: null,
+                  },
             );
           }
         }
@@ -868,11 +892,7 @@ const modules = {
    *   (2) 윈도우 안에 유효한(finite) 값이 하나도 없음.
    */
   getVisibleWindowMaxSeries(minIndex, maxIndex) {
-    if (
-      !Number.isFinite(minIndex)
-      || !Number.isFinite(maxIndex)
-      || maxIndex < minIndex
-    ) {
+    if (!Number.isFinite(minIndex) || !Number.isFinite(maxIndex) || maxIndex < minIndex) {
       return null;
     }
 

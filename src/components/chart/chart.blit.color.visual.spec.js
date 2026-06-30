@@ -182,7 +182,7 @@ describe('EvChart realtime scatter blit 2-series color/hit-test', () => {
       `blit red=${bRed} blue=${bBlue} (blue율 ${bRatio.toFixed(4)}, colMax ${bColMax}) / ` +
       `red→blue ${redToBlue}px (${(redToBlue / Math.max(1, gRed)).toFixed(4)}) / ` +
       `blue→red ${blueToRed}px`;
-    return { gRatio, bRatio, redToBlue, blueToRed, gRed, gColMax, bColMax, summary };
+    return { gRatio, bRatio, redToBlue, blueToRed, gRed, gBlue, gColMax, bColMax, summary };
   };
 
   const assertNoColorBleed = (m) => {
@@ -193,15 +193,64 @@ describe('EvChart realtime scatter blit 2-series color/hit-test', () => {
     ).toBeLessThan(Math.max(m.gRatio * 1.3, 0.002));
     // ② 세로줄: blit 의 컬럼별 blue 최댓값이 golden 의 2배 + 5px 를 넘으면 strip 경계 줄무늬.
     expect(m.bColMax, `세로 blue 줄무늬 — ${m.summary}`).toBeLessThanOrEqual(m.gColMax * 2 + 5);
-    // ③ 픽셀 뒤집힘 비대칭: ±1px 재양자화 지터는 양방향 대칭으로 발생하며 비가시적(blit 설계
-    //    허용 오차). 절대량은 데이터 밀도에 비례하므로 임계로 쓰지 않고, 한쪽으로 쏠리면(비대칭)
-    //    실제 색 오염이므로 양방향 균형만 단언한다.
-    expect(m.redToBlue, `red→blue 가 blue→red 대비 과도(비대칭 오염) — ${m.summary}`).toBeLessThan(
-      Math.max(200, m.blueToRed * 1.6),
-    );
-    expect(m.blueToRed, `blue→red 가 red→blue 대비 과도(비대칭 오염) — ${m.summary}`).toBeLessThan(
-      Math.max(200, m.redToBlue * 1.6),
-    );
+    // ③ 픽셀 뒤집힘 총량 바운드. golden 을 blit 과 *동일 carry* 로 캡처하므로(아래 본문) 점 위치는
+    //    동일하고, 남는 flip 은 순수 겹침 z-order 차이다 — blit 은 누적(나중 틱이 위), full 은 단일
+    //    패스 seriesReverse(series1 이 위). 이 차이는 *단방향*(full 의 위 series 가 고정이라 한쪽으로만
+    //    뒤집힘, blue→red≈0)이라 예전의 양방향 대칭 가정은 더 이상 성립하지 않는다(append-only 의
+    //    구조적 특성 — legend hover 는 series 를 격리해 그려 겹침이 없으므로 사용자 시나리오엔 비가시).
+    //    gross 색 오염은 ①(blue율)·②(colMax)가 잡고, 여기선 전체 flip 이 데이터의 작은 비율인지만 본다.
+    const flips = m.redToBlue + m.blueToRed;
+    const flipBudget = Math.round((m.gRed + m.gBlue) * 0.015);
+    expect(
+      flips,
+      `색 flip 총량 과다(${flips}px / 데이터 ${m.gRed + m.gBlue}px) — ${m.summary}`,
+    ).toBeLessThanOrEqual(flipBudget);
+  };
+
+  // 세로 흰줄(comb) 직접 가드. 기존 가드(color bleed=과밀, occupancy cell=3)는 1px 흰줄을 못 잡는다
+  // — 원래 comb 가 그 스펙들을 통과하며 ship 된 이유다. 이 가드가 comb 회귀의 직접 방어선이다.
+  //
+  // 흰줄 = "고립된 빈 컬럼"(양옆은 밀집인데 자기만 결손). golden(full redraw)도 데이터/축 매핑 고유
+  // gap 이 약간 있으므로(절대 0 이 아님), blit 의 고립 gap 수가 golden 대비 늘지 않았는지로 본다.
+  // 이 검출은 blit 의 ±1px 전역 시프트 드리프트(설계 허용 오차 — 데이터는 다 있고 위치만 <1px 이동)에
+  // 불변이다: 밀도 프로파일이 통째로 1px 평행이동해도 고립 gap 형상은 보존된다. golden 과 컬럼을 1:1
+  // 비교하면 그 1px 드리프트가 거짓 결손으로 잡히므로, 반드시 각자 내부의 고립 gap 수로 비교한다.
+  const isolatedGapCount = (cls, w) => {
+    const x0 = Math.floor(PLOT_REGION.x0 * w);
+    const x1 = Math.ceil(PLOT_REGION.x1 * w);
+    const col = new Uint32Array(w);
+    for (let i = 0; i < cls.length; i++) {
+      if (cls[i]) col[i % w]++;
+    }
+    const vals = [];
+    for (let x = x0; x < x1; x++) {
+      if (col[x] > 0) vals.push(col[x]);
+    }
+    vals.sort((a, c) => a - c);
+    const med = vals.length ? vals[Math.floor(vals.length / 2)] : 0;
+    if (med <= 8) {
+      return { count: 0, med, cols: [] };
+    }
+    const gaps = [];
+    for (let x = x0 + 2; x < x1 - 2; x++) {
+      const left = Math.max(col[x - 1], col[x - 2]);
+      const right = Math.max(col[x + 1], col[x + 2]);
+      if (col[x] < med * 0.12 && left > med * 0.5 && right > med * 0.5) {
+        gaps.push(x);
+      }
+    }
+    return { count: gaps.length, med, cols: gaps };
+  };
+  const assertNoWhiteLine = (golden, blit) => {
+    const w = golden.w;
+    const g = isolatedGapCount(classify(golden, PLOT_REGION), w);
+    const b = isolatedGapCount(classify(blit, PLOT_REGION), w);
+    // blit 의 고립 gap 이 golden 대비 +2 이상 늘면 blit 특이 흰줄(comb) 회귀.
+    expect(
+      b.count,
+      `blit 세로 흰줄(comb) — golden gap=${g.count}(med ${g.med}) vs blit gap=${b.count}(med ${b.med}) ` +
+        `cols=${JSON.stringify(b.cols.slice(0, 12))}`,
+    ).toBeLessThanOrEqual(g.count + 2);
   };
 
   afterEach(() => {
@@ -220,33 +269,41 @@ describe('EvChart realtime scatter blit 2-series color/hit-test', () => {
         '<ev-chart :data="data" :options="options" /></div>',
     };
     const fluidOptions = { ...options, width: '100%', height: '100%' };
-    const runStress = async (forceOff) => {
-      window.__EVUI_BLIT_FORCE_OFF__ = forceOff;
-      const { container, rerender } = render(Host, {
-        props: { data: genData(BASE, 60000, FULL_SPAN, 57000), options: fluidOptions },
-      });
-      await settle();
-      let now = BASE;
-      for (let t = 1; t <= 24; t++) {
-        now += t % 2 ? 3000 : 4000; // gapCount 3/4 교차(실제 setTimeout 드리프트 모사)
-        // eslint-disable-next-line no-await-in-loop
-        await rerender({ data: genData(now, 6000, TICK_SPAN, 95000), options: fluidOptions });
-        // eslint-disable-next-line no-await-in-loop
-        await settle();
-      }
-      return getDisplayImageData(container);
-    };
-
+    // blit 으로 24틱 누적 → blit 라스터 캡처 → 같은 인스턴스를 force-off + 동일 데이터 재렌더해
+    // golden(full redraw) 캡처. golden 은 blit 과 *동일 carry 위상*에서 그려지므로 점 위치는 일치하고
+    // owner/z-order 색 합성만 차이날 수 있다 — 이 스펙의 본래 목적(색 오염). 독립 force-off 스트림
+    // (carry=0)과 비교하면 정수-CSS 시프트의 sub-pixel carry 만큼 경계 컬럼 위상이 달라 거짓 stripe 가
+    // 잡힌다(blit↔full 위치 동등은 chart.blit.equiv.visual.spec.js 가 exactDiff 로 직접 단언).
     window.__EVUI_BLIT_REFRESH_INTERVAL__ = 100000;
-    const golden = await runStress(true);
+    window.__EVUI_BLIT_FORCE_OFF__ = false;
     window.__EVUI_BLIT_DEBUG__ = true;
     window.__EVUI_BLIT_DIAG__ = undefined;
-    const blit = await runStress(false);
+    const { container, rerender } = render(Host, {
+      props: { data: genData(BASE, 60000, FULL_SPAN, 57000), options: fluidOptions },
+    });
+    await settle();
+    let now = BASE;
+    for (let t = 1; t <= 24; t++) {
+      now += t % 2 ? 3000 : 4000; // gapCount 3/4 교차(실제 setTimeout 드리프트 모사)
+      // eslint-disable-next-line no-await-in-loop
+      await rerender({ data: genData(now, 6000, TICK_SPAN, 95000), options: fluidOptions });
+      // eslint-disable-next-line no-await-in-loop
+      await settle();
+    }
+    const blit = getDisplayImageData(container);
     // blit 이 실제로 실행됐는지 확인 — 폴백만 하면 비교가 무의미하다.
     const diag = window.__EVUI_BLIT_DIAG__;
     expect(diag?.blitted ?? 0, `blit 미실행: diag=${JSON.stringify(diag)}`).toBeGreaterThan(15);
+
+    // golden: 동일 누적 상태(carry 보존)를 full redraw. 데이터 idempotent(toTime 불변, dataKeys dedupe).
+    window.__EVUI_BLIT_FORCE_OFF__ = true;
+    await rerender({ data: genData(now, 6000, TICK_SPAN, 95000), options: fluidOptions });
+    await settle();
+    const golden = getDisplayImageData(container);
+
     window.__EVUI_BLIT_DEBUG__ = false;
     assertNoColorBleed(compare(golden, blit));
+    assertNoWhiteLine(golden, blit);
   }, 120000);
 
   it('blit 누적으로 어긋난 hit-test 좌표(xp)가 지연 재계산으로 복구된다', async () => {
