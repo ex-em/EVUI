@@ -344,6 +344,13 @@ class Scatter {
               ctx.fillStyle = fillStyle;
               Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
             }
+            // blit 점 레이어 baseline 을 그리는 경우(rebuildPointsLayer)에만 raster 표식을 남긴다.
+            // 이후 strip 은 drawn=true 인 점을 건너뛰어 점당 1회 합성을 유지한다(반투명 알파 누적 차단).
+            // buffer 직접 그리기(drawSeriesLayer/legend hover)는 markDrawn 없이 호출돼 레이어 상태를
+            // 오염시키지 않는다 — 그 경로는 점 레이어가 아니라 buffer 에 그리기 때문이다.
+            if (param.markDrawn) {
+              item.drawn = true;
+            }
           }
         }
       }
@@ -400,6 +407,17 @@ class Scatter {
       for (let j = 0; j < group.data.length; j++) {
         const item = group.data[j];
 
+        // 이미 레이어에 raster 된 점은 무손실 시프트로 정위치에 살아 있다 — 다시 그리면 source-over 가
+        // 반투명에서 멱등이 아니라 알파를 누적(α→2α-α²)시켜 full(점당 1회)보다 진해진다. "점당 정확히
+        // 1회 raster" 불변식을 지키려 한 번이라도 그려진 점은 건너뛴다(calcItem 도 생략 — 좌표는
+        // hit-test 진입 시 ensureHitCoordsFresh 가 일괄 갱신). 아직 안 그려진 점(신규/지연)만 strip 이
+        // 그린다. drawn 은 실제 raster 시점에만 set 되므로, x>graphMax 로 미뤄졌던 deferred 점도
+        // 윈도우에 들어와 처음 그려지는 틱에 정확히 한 번 raster 된다(누락 없음).
+        if (item.drawn) {
+          // eslint-disable-next-line no-continue
+          continue;
+        }
+
         if (isDedupeOn && duple.get(item.k ?? Util.coordinateKey(item.x, item.y)) !== this.sId) {
           // 이 좌표의 owner 가 아니면 그리지 않는다(cross-series overdraw 방지).
           // eslint-disable-next-line no-continue
@@ -420,6 +438,7 @@ class Scatter {
           ctx.fillStyle = this.getCachedColor(baseFillColor, fillOpacity);
 
           Canvas.drawPoint(ctx, pointStyle, pointSize, item.xp, item.yp);
+          item.drawn = true; // 이제 이 점은 레이어에 있다 — 이후 틱은 시프트로만 이동(재그림 금지)
         }
       }
     }
