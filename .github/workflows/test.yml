@@ -1,0 +1,49 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [3.0, 3.4]
+
+jobs:
+  unit:
+    name: Unit (node)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:run
+
+  visual:
+    name: Visual (browser, blit 계약)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright chromium
+        run: npx playwright install --with-deps chromium
+
+      # blit≡full 픽셀 동등 가드(chart.blit.*·chart.realtime.*)만 돈다. 이들은 같은 실행 안에서
+      # blit 라스터 vs full redraw 를 getImageData 로 자기비교하므로 OS 독립적이다.
+      # Chart.visual.spec.js 는 커밋된 스크린샷 베이스라인이 macOS(chromium-darwin) 전용이라
+      # ubuntu 러너에서는 재현이 불가해 제외한다(별도 macOS job 이 필요하면 후속 과제).
+      - name: Run blit equivalence visual tests
+        run: npx vitest run --config vitest.config.browser.js chart.blit chart.realtime
