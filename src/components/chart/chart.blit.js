@@ -246,11 +246,6 @@ const blit = {
       selectionOk,
       // blit 은 realtime scatter 전용이다.
       scatterOnly: this.hasOnlyVisibleScatter(),
-      // 반투명(rgba alpha<1) fill 이 있으면 full redraw 로 폴백한다. strip 은 시프트된 옛 라스터 위에
-      // 경계 버킷 점을 다시 그리므로(픽셀 제거 없는 덧그림), 반투명 점은 source-over 로 알파가 누적돼
-      // (α→2α-α²) full(점당 1회)보다 진해진다 → blit≠full. opaque 면 source-over 가 멱등이라 무해.
-      // 폴백 경로(rebuild+composite)는 점당 1회 그리므로 반투명도 정확하다(가속만 양보).
-      opaqueFill: this.hasOnlyOpaqueScatterFill(),
       // 분수 pixelRatio(예: Windows 125%/150% = 1.25/1.5)에서는 정수 CSS px 시프트의 device 폭
       // (gCss·pr)이 비정수가 돼 drawImage 시프트가 bilinear 리샘플(블러)을 일으키고, strip 밖 라스터에
       // 매 틱 누적된다(blit≠full). 정수 pr 에서만 시프트가 bit-exact 하므로 분수면 full 폴백한다
@@ -319,7 +314,6 @@ const blit = {
       parts.seriesAligned &&
       parts.selectionOk &&
       parts.scatterOnly &&
-      parts.opaqueFill &&
       parts.deviceIntegerRatio &&
       parts.hasPrev &&
       parts.optionsStable &&
@@ -353,28 +347,6 @@ const blit = {
         if (this.seriesList[ids[j]]?.show) {
           return false;
         }
-      }
-    }
-    return true;
-  },
-
-  /**
-   * 보이는 scatter series 의 fill·stroke 가 전부 불투명(alpha=1)인가.
-   * 반투명(rgba alpha<1)이면 strip 의 경계 버킷 덧그림이 source-over 로 알파를 누적시켜 blit≠full 이
-   * 되므로 fast-path 를 막고 full redraw(점당 1회)로 폴백한다. Util.getOpacity 는 rgba 면 alpha 문자열,
-   * 그 외엔 '1' 을 돌려준다. 참고: series 단위 색만 검사한다 — point 별 rgba(item.color)까지는 보지
-   * 않는다(매 게이트 전수 스캔 비용 회피). 그런 경우엔 REFRESH_INTERVAL 강제 full 이 주기적으로 정정한다.
-   * @returns {boolean}
-   */
-  hasOnlyOpaqueScatterFill() {
-    const list = this.getBlitScatterSeriesList();
-    for (let i = 0; i < list.length; i++) {
-      const s = list[i].series;
-      if (
-        Number(Util.getOpacity(s.pointFill ?? s.color)) < 1 ||
-        Number(Util.getOpacity(s.color)) < 1
-      ) {
-        return false;
       }
     }
     return true;
@@ -480,8 +452,8 @@ const blit = {
    * 같은 좌표(=같은 ms=같은 버킷)는 strip 안에서 owner 가 닫히므로 전체 dedupe 없이 strip 만으로 정확하다
    * (#2011 coordinateDedupe 존중 — owner 외 series 는 그 좌표를 그리지 않아 반투명 겹침/hollow 비침이
    * full redraw 와 일치). 순서/owner 규칙은 collectDuplicatePoints 와 동일(seriesReverse 면 역순 순회 →
-   * 마지막 set 이 owner). blit 은 opaqueFill 게이트로 반투명 series 를 받지 않으므로 strip 의 cross-series
-   * 알파 누적 우려는 게이트가 차단한다(여기 dedupe 는 hollow 마커·z-order 정합을 보장).
+   * 마지막 set 이 owner). 반투명 cross-series 알파 누적은 drawn 플래그가 점당 1회 raster 를 보장해 막고
+   * (시프트된 옛 점은 재그리지 않음), 여기 dedupe 는 hollow 마커·z-order 정합을 보장한다.
    * @param {Map<string,string>} duple       owner 맵(coordKey → sId)
    * @param {number[]} dirtyBuckets           strip 으로 다시 그릴 ring 버킷 인덱스 목록
    * @returns {undefined}
@@ -598,9 +570,9 @@ const blit = {
     //
     // 흰줄(comb) 불가 보장: 흰줄은 "픽셀을 지웠는데 다시 안 그리는" 경우(clear + clip 의 결손 컬럼)에만
     // 생긴다. 아래 시프트는 OLD 픽셀을 비트단위 무손실로 옮긴 뒤(정수좌표·동일크기 drawImage → 재양자화
-    // 없음) 그 위에 strip 버킷의 점을 다시 그리기만 한다 — 픽셀 제거 연산이 없으므로 세로 흰줄이 원천 불가.
-    // (경계 버킷은 시프트된 옛 점 위에 다시 그려져 opaque 면 멱등이지만 반투명이면 알파가 누적되므로,
-    //  반투명 series 는 evaluateBlitGate 의 opaqueFill 게이트가 막아 full redraw 로 보낸다.)
+    // 없음) 그 위에 strip 버킷의 *아직 안 그려진* 점만 다시 그린다 — 픽셀 제거 연산이 없으므로 세로 흰줄이
+    // 원천 불가. 경계 버킷의 옛 점(이미 raster=drawn)은 시프트로 정위치에 살아 있어 strip 이 건너뛰므로
+    // (realTimeScatterDrawStrip 의 item.drawn 가드) 반투명에서도 점당 정확히 1회만 합성된다(알파 누적 0).
     const { gapCount, endIndex, length } = lastTick;
     // 최소 gapCount+1: 시프트로 비워진 strip(gapCount 버킷) + 경계 버킷(age gapCount) 1개.
     // 경계 버킷은 직전 틱 graphMax(=floor(maxX)) 초과로 그려지지 못한 점(x 가 초 경계 직전)이 이번 틱
@@ -932,6 +904,10 @@ const blit = {
         unSelectedOpacity: this.options.unSelectedOpacity,
         // baseline 도 현재 carry 위상으로 그린다 — 직전 blit 프레임과 위치 연속(REFRESH rebuild 무-스냅).
         rtXOffsetCss: this._blitCarry,
+        // 이 패스는 점 레이어 baseline 을 raster 한다 → 그린 점에 drawn 표식을 남겨 직후 strip 이
+        // 재그리지 않게 한다(REFRESH/legend 후 첫 strip 의 반투명 알파 스파이크 차단). 미raster 점
+        // (deferred xp=null·비-owner)은 표식이 없어 윈도우 진입 시 strip 이 처음 그린다.
+        markDrawn: true,
       };
 
       // 기하 패스를 먼저 돌려 item.xp/yp 를 채운다 — realTimeScatterDraw 는 좌표를 읽기만 하므로

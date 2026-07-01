@@ -140,21 +140,16 @@ describe('EvChart.evaluateBlitGate — 진입 게이트', () => {
     expect(gate.ok).toBe(true);
   });
 
-  it('★ 반투명 fill(rgba alpha<1) → opaqueFill=false → full (strip 알파 누적 회피)', () => {
+  it('★ 반투명 fill(rgba alpha<1) → blit 차단 안 함(over-darken 은 점당 1회 raster=drawn 플래그로 처리)', () => {
+    // 과거엔 opaqueFill 게이트가 반투명 series 의 blit 을 막았다(strip 의 경계 버킷 재그림이 알파를
+    // 누적). 지금은 strip 이 "아직 raster 안 된 점"만 그려(item.drawn 가드) 점당 1회 합성을 보장하므로
+    // 반투명도 blit 으로 정확히 그린다 — 게이트는 더는 색/투명도로 차단하지 않는다. 알파 누적 0 의
+    // 픽셀 검증은 chart.blit.equiv.visual.spec.js 가 담당한다.
     const core = makeCore();
     core.seriesList.s0.pointFill = 'rgba(223, 98, 100, 0.4)';
     core.seriesList.s0.color = 'rgba(223, 98, 100, 0.4)';
     const gate = core.evaluateBlitGate(undefined);
-    expect(gate.parts.opaqueFill).toBe(false);
-    expect(gate.ok).toBe(false);
-  });
-
-  it('불투명 fill(hex) → opaqueFill=true (반투명 게이트 통과)', () => {
-    const core = makeCore();
-    core.seriesList.s0.pointFill = '#DF6264';
-    core.seriesList.s0.color = '#DF6264';
-    const gate = core.evaluateBlitGate(undefined);
-    expect(gate.parts.opaqueFill).toBe(true);
+    expect(gate.parts.opaqueFill).toBeUndefined(); // opaqueFill 게이트 제거됨
     expect(gate.ok).toBe(true);
   });
 
