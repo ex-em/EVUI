@@ -487,4 +487,84 @@ describe('EvChart realtime scatter blit ↔ full redraw 픽셀 동등', () => {
       `멀티 반투명 blit 알파 누적 ${alphaOver}px / 겹침 ${both}px — per-series strip double-draw 회귀`,
     ).toBeLessThanOrEqual(Math.max(4, Math.round(both * 0.01)));
   }, 180000);
+
+  // 분수 DPR(Windows 디스플레이 배율 125%/150% = 5/4·3/2) 등가 가드.
+  // 과거엔 deviceIntegerRatio 게이트가 분수 pr 에서 blit 을 완전히 끄고 매 틱 full 로 폴백했다. 지금은
+  // 시프트를 q(=pr 기약분모)의 배수로 양자화해 device 시프트(gCss·pr)를 정수로 만들어 drawImage 를
+  // 무손실로 유지하면서 blit 을 켠다. 이 테스트는 실제 device 해상도가 1.25×/1.5× 인 canvas 에서
+  // ⑴ blit 이 실제로 실행되고(가속 유지) ⑵ 누적 라스터가 동일 데이터 full redraw 와 픽셀 위치가
+  // 정확히 일치하는지(=시프트 리샘플 블러 없음) 검증한다. 유닛(blitShiftDenominator)의 정수성만으로는
+  // 파이프라인 전체(drawImage 무손실·composite clip·carry)의 등가를 보장하지 못하므로 이 브라우저
+  // 케이스가 최종 판별자다.
+  [1.25, 1.5].forEach((dpr) => {
+    it(`분수 DPR(${dpr}배) 에서도 blit 이 실행되고 full redraw 와 픽셀 위치가 동일하다`, async () => {
+      const TICK = 3000;
+      const options = mkOptions(300);
+      const genData = (toMs) => {
+        const s1 = [{ x: toMs - 1, y: 50 }]; // toTime 앵커
+        for (let i = 0; i < 1500; i++) {
+          const hsh = (i * 2654435761) >>> 0;
+          const x = toMs - 2 - (hsh % (TICK - 2));
+          const y = (3000 + ((i * 7919) % (95000 - 3000 + 1))) / 1000;
+          s1.push({ x, y });
+        }
+        return {
+          series: {
+            series1: { name: 'series1', pointSize: 2, color: '#DF6264', pointFill: '#DF6264' },
+          },
+          data: { series1: s1 },
+        };
+      };
+
+      window.__EVUI_BLIT_REFRESH_INTERVAL__ = 100000;
+      window.__EVUI_BLIT_DEBUG__ = true;
+      window.__EVUI_BLIT_DIAG__ = undefined;
+      window.__EVUI_BLIT_FORCE_OFF__ = false;
+
+      const originalDpr = Object.getOwnPropertyDescriptor(window, 'devicePixelRatio');
+      Object.defineProperty(window, 'devicePixelRatio', { value: dpr, configurable: true });
+      try {
+        const { container, rerender } = render(EvChart, { props: { data: genData(BASE), options } });
+        await settle();
+
+        // canvas backing store 가 실제로 dpr 배로 커졌는지 확인(오버라이드가 먹혔다는 전제).
+        const canvas = container.querySelector('canvas:not(.overlay-canvas)');
+        expect(canvas.width, `DPR 오버라이드 미적용: width=${canvas.width}`).toBeGreaterThan(600);
+
+        let now = BASE;
+        for (let t = 1; t <= 12; t++) {
+          now += TICK;
+          // eslint-disable-next-line no-await-in-loop
+          await rerender({ data: genData(now), options });
+          // eslint-disable-next-line no-await-in-loop
+          await settle();
+        }
+        // 분수 DPR 에서도 blit 이 실제로 돌아야 한다(가속 유지 — 과거엔 여기서 blitted=0 이었다).
+        expect(
+          window.__EVUI_BLIT_DIAG__?.blitted ?? 0,
+          `분수 DPR(${dpr}) blit 미실행: ${JSON.stringify(window.__EVUI_BLIT_DIAG__)}`,
+        ).toBeGreaterThan(6);
+
+        const blitRaster = getImageData(container);
+
+        // force-off 로 동일 시각 데이터를 재렌더 → 현재 carry 그대로 full redraw(외형 불변).
+        window.__EVUI_BLIT_FORCE_OFF__ = true;
+        await rerender({ data: genData(now), options });
+        await settle();
+        const fullRaster = getImageData(container);
+
+        // 위치(onOff)가 정확히 0 이어야 한다 — 소수 dxInt 리샘플 블러가 있으면 시프트된 라스터가
+        // full 대비 어긋나 onOff>0 이 된다.
+        const { onOff, dataPx, reg, samples } = exactDiff(blitRaster, fullRaster);
+        expect(
+          onOff,
+          `분수 DPR(${dpr}) blit↔full 위치 불일치 ${onOff}px / 데이터 ${dataPx}px 좌=${reg[0]} 중=${reg[1]} 우=${reg[2]} samples=${samples.join(' ')}`,
+        ).toBe(0);
+      } finally {
+        if (originalDpr) {
+          Object.defineProperty(window, 'devicePixelRatio', originalDpr);
+        }
+      }
+    }, 120000);
+  });
 });
