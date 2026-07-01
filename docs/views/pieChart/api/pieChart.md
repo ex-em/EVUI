@@ -97,6 +97,7 @@ const chartData =
 | title            | Object          | ([상세](#title))                               | 차트 상단에 위치할 차트 제목 표시 여부 및 속성                  |                                 |
 | legend           | Object          | ([상세](#legend))                              | 차트의 범례 표시 여부 및 속성                                   |                                 |
 | doughnutHoleSize | number          | 0                                              | 내부 hole 사이즈                                                | 0 ~ 1                           |
+| doughnutHoleColor | Hex, RGB, RGBA Code(String) | null                              | 도넛 내부 hole 색상. 명시하지 않으면 차트 부모 요소의 `background-color`를 자동 탐색하며, `documentElement`/`body`의 class/style/data-theme 변경을 감시해 테마 토글 시 자동으로 hole 색을 갱신한다. 부모가 반투명/CSS 변수/그라데이션이거나 자동 감지로 안 잡히는 케이스에서는 명시 권장 (예: `computed(() => theme.value === 'dark' ? '#1e1e1e' : '#ffffff')`) | '#1e1e1e'                     |
 | pieStroke        | Object          | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션         |                                 |
 | tooltip          | Object          | ([상세](#tooltip))                             | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성                |                                 |
 | eventBehavior    | Object          | ([상세](#eventbehavior))                       | 이벤트별 동작 설정 | | 

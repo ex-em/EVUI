@@ -181,6 +181,8 @@ class EvChart {
 
     this.createEventFunctions?.();
     this.isInit = true;
+
+    this.setupDoughnutHoleThemeObserver?.();
   }
 
   _updateSeriesCount() {
@@ -2159,6 +2161,8 @@ class EvChart {
     if (!this.isInit) {
       return;
     }
+
+    this.teardownDoughnutHoleThemeObserver?.();
 
     const target = this.target;
 
