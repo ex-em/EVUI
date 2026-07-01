@@ -120,23 +120,42 @@ describe('EvChart.evaluateBlitGate — 진입 게이트', () => {
     expect(core.evaluateBlitGate(undefined).parts.deviceStable).toBe(false);
   });
 
-  it('★ 분수 pixelRatio(Windows 125%/150% = 1.25/1.5) → deviceIntegerRatio=false → full', () => {
+  it('★ 표준 분수 pixelRatio(Windows 150% = 3/2) → deviceRatioBlittable=true (blit 유지)', () => {
     const core = makeCore();
-    // prev 도 1.5 로 맞춰 deviceStable 은 통과시키고 deviceIntegerRatio 만 뒤집는다.
+    // prev 도 1.5 로 맞춰 deviceStable 은 통과. q=2 배수 시프트로 device 시프트가 정수가 돼 blit≡full.
     core.pixelRatio = 1.5;
     core._blitPrev.pixelRatio = 1.5;
     const gate = core.evaluateBlitGate(undefined);
     expect(gate.parts.deviceStable).toBe(true);
-    expect(gate.parts.deviceIntegerRatio).toBe(false);
+    expect(gate.parts.deviceRatioBlittable).toBe(true);
+    expect(gate.ok).toBe(true);
+  });
+
+  it('★ 표준 분수 pixelRatio(Windows 125% = 5/4) → deviceRatioBlittable=true (blit 유지)', () => {
+    const core = makeCore();
+    core.pixelRatio = 1.25;
+    core._blitPrev.pixelRatio = 1.25;
+    const gate = core.evaluateBlitGate(undefined);
+    expect(gate.parts.deviceRatioBlittable).toBe(true);
+    expect(gate.ok).toBe(true);
+  });
+
+  it('분모가 큰 pixelRatio(브라우저 임의 줌 1.1 = 11/10, q>4) → deviceRatioBlittable=false → full', () => {
+    const core = makeCore();
+    core.pixelRatio = 1.1;
+    core._blitPrev.pixelRatio = 1.1;
+    const gate = core.evaluateBlitGate(undefined);
+    expect(gate.parts.deviceStable).toBe(true);
+    expect(gate.parts.deviceRatioBlittable).toBe(false);
     expect(gate.ok).toBe(false);
   });
 
-  it('정수 pixelRatio(2, 레티나) → deviceIntegerRatio=true (분수 게이트 통과)', () => {
+  it('정수 pixelRatio(2, 레티나) → deviceRatioBlittable=true', () => {
     const core = makeCore();
     core.pixelRatio = 2;
     core._blitPrev.pixelRatio = 2;
     const gate = core.evaluateBlitGate(undefined);
-    expect(gate.parts.deviceIntegerRatio).toBe(true);
+    expect(gate.parts.deviceRatioBlittable).toBe(true);
     expect(gate.ok).toBe(true);
   });
 
@@ -191,6 +210,42 @@ describe('EvChart.evaluateBlitGate — 진입 게이트', () => {
     core.seriesInfo.charts.line = ['l0'];
     core.seriesList.l0 = { show: false };
     expect(core.evaluateBlitGate(undefined).parts.scatterOnly).toBe(true);
+  });
+});
+
+describe('EvChart.blitShiftDenominator — 분수 DPR 시프트 분모', () => {
+  const q = (pr) => Object.assign(Object.create(EvChart.prototype), { pixelRatio: pr }).blitShiftDenominator();
+
+  it('정수 pr 은 q=1 (매 정수 CSS px 시프트, 기존 동작)', () => {
+    expect(q(1)).toBe(1);
+    expect(q(2)).toBe(1);
+    expect(q(3)).toBe(1);
+  });
+
+  it('표준 디스플레이 배율은 q≤4 (125%/150%/175%/225%/250%)', () => {
+    expect(q(1.5)).toBe(2); // 3/2
+    expect(q(1.25)).toBe(4); // 5/4
+    expect(q(1.75)).toBe(4); // 7/4
+    expect(q(2.25)).toBe(4); // 9/4
+    expect(q(2.5)).toBe(2); // 5/2
+  });
+
+  it('분모가 큰 pr(브라우저 임의 줌)은 null → full 폴백', () => {
+    expect(q(1.1)).toBeNull(); // 11/10
+    expect(q(1.2)).toBeNull(); // 6/5 (q=5 > MAX_Q)
+    expect(q(0)).toBeNull();
+  });
+
+  it('q 배수 시프트는 device 시프트(gCss·pr)를 정수로 만든다 (drawImage 무손실 불변식)', () => {
+    // 이 정수성이 곧 "블러 없음"이다: drawImage 오프셋이 정수여야 bilinear 리샘플이 없다.
+    [1.25, 1.5, 1.75, 2.25, 2.5].forEach((pr) => {
+      const denom = q(pr);
+      for (let k = 1; k <= 5; k++) {
+        const gCss = k * denom; // q 배수 시프트
+        const dxDev = gCss * pr;
+        expect(Number.isInteger(Math.round(dxDev)) && Math.abs(dxDev - Math.round(dxDev)) < 1e-9).toBe(true);
+      }
+    });
   });
 });
 

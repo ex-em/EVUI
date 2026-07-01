@@ -206,6 +206,32 @@ const blit = {
   },
 
   /**
+   * pixelRatio 의 기약분수 분모 q(= q·pr 이 정수가 되는 최소 양의 정수)를 반환한다.
+   * 시프트를 정수 CSS px(gCss)로 하되 q 의 배수로 양자화하면 device 시프트(gCss·pr)가 정수가 돼
+   * drawImage 가 bilinear 리샘플(블러) 없이 비트 단위로 복사되고, 라스터가 pr 그리드에 정렬된 채로
+   * 남아 full redraw 와 픽셀이 일치한다(blit≡full). 정수 pr 은 q=1(기존 동작 그대로).
+   * 표준 디스플레이 배율은 분모가 작다: 125%/150%/175%/225%/250% = 5/4·3/2·7/4·9/4·5/2 → q≤4.
+   * q 를 못 찾는 pr(브라우저 임의 줌 등 분모가 큰 값)은 null → full 폴백(정확하지만 가속 없음).
+   * @returns {number|null}
+   */
+  blitShiftDenominator() {
+    const pr = this.pixelRatio;
+    if (!(pr > 0)) {
+      return null;
+    }
+    if (Number.isInteger(pr)) {
+      return 1;
+    }
+    const MAX_Q = 4;
+    for (let q = 2; q <= MAX_Q; q++) {
+      if (Math.abs(pr * q - Math.round(pr * q)) < 1e-6) {
+        return q;
+      }
+    }
+    return null;
+  },
+
+  /**
    * blit fast-path 진입 게이트. 하나라도 위반하면 ok=false → full redraw 폴백.
    * 진단(instrumentation) 목적으로 각 게이트 항목을 개별 boolean(parts)으로 분해해 반환한다.
    * 게이트는 drawChart 가 adjustXAndYAxisWidth 로 axesSteps/labelOffset/chartRect 를 확정한 뒤 평가한다.
@@ -246,11 +272,11 @@ const blit = {
       selectionOk,
       // blit 은 realtime scatter 전용이다.
       scatterOnly: this.hasOnlyVisibleScatter(),
-      // 분수 pixelRatio(예: Windows 125%/150% = 1.25/1.5)에서는 정수 CSS px 시프트의 device 폭
-      // (gCss·pr)이 비정수가 돼 drawImage 시프트가 bilinear 리샘플(블러)을 일으키고, strip 밖 라스터에
-      // 매 틱 누적된다(blit≠full). 정수 pr 에서만 시프트가 bit-exact 하므로 분수면 full 폴백한다
-      // (rebuild+composite 는 시프트가 없어 분수 pr 에서도 정확).
-      deviceIntegerRatio: Number.isInteger(this.pixelRatio),
+      // 분수 pixelRatio(예: Windows 125%/150% = 1.25/1.5)여도 정수 CSS px 시프트를 q(=pr 기약분모)의
+      // 배수로 양자화하면 device 시프트(gCss·pr)가 정수가 돼 drawImage 가 무손실(bilinear 블러 없음)이고
+      // 라스터가 pr 그리드에 정렬된 채로 남아 full 과 픽셀이 일치한다(blit≡full). q 를 못 찾는 pr
+      // (브라우저 임의 줌 등 분모가 큰 값)만 full 폴백한다. blitShiftDenominator 참조.
+      deviceRatioBlittable: this.blitShiftDenominator() !== null,
       hasPrev: !!prev,
       // 옵션 변화(색·스타일 등)는 레이어 픽셀을 바꿀 수 있다. Chart.vue options watcher 가
       // 변화 시 options 참조를 통째 교체하므로 참조 비교 1회로 보수적으로 차단한다.
@@ -314,7 +340,7 @@ const blit = {
       parts.seriesAligned &&
       parts.selectionOk &&
       parts.scatterOnly &&
-      parts.deviceIntegerRatio &&
+      parts.deviceRatioBlittable &&
       parts.hasPrev &&
       parts.optionsStable &&
       parts.yFixed &&
@@ -521,15 +547,19 @@ const blit = {
     // 시프트는 *정수 CSS px* 로만 한다(소수부는 _blitCarry 에 누산). calcItem 은 CSS px 에서 ceil 로
     // 양자화하므로, 정수 CSS px 시프트만이 ceil 과 교환돼 full redraw 와 픽셀이 일치한다(정수 device
     // px 시프트는 pr 그리드와 어긋나 점마다 ≤1px 스냅 발생 → legend hover 시 구름이 튐).
-    // device 시프트 = gCss·pr (항상 pr 배수). 잔차 carry(_blitCarry, [-0.5,0.5] CSS px)는 full
-    // redraw·strip 의 calcItem 이 startPoint 오프셋으로 그대로 반영한다(rtXOffsetCss).
+    // 나아가 gCss 를 q(=pr 기약분모)의 배수로 양자화하면 device 시프트(gCss·pr)까지 정수가 돼
+    // drawImage 가 무손실(bilinear 블러 없음)이면서도 pr 그리드 정렬이 유지된다(분수 pr 에서도 blit≡full).
+    // 정수 pr 은 q=1 이라 매 정수 px 시프트(기존 동작). 잔차 carry(_blitCarry, [-q/2,q/2] CSS px)는
+    // full redraw·strip 의 calcItem 이 startPoint 오프셋으로 그대로 반영한다(rtXOffsetCss).
+    const q = this.blitShiftDenominator() ?? 1;
     const dxCss = (xArea / wMs) * gate.shiftMs;
     const accCss = this._blitCarry + dxCss;
-    const gCss = Math.round(accCss);
+    const gCss = Math.round(accCss / q) * q;
     if (gCss < 1) {
-      return false; // sub-pixel 이동 → full redraw 가 안전(아주 넓은 윈도우 등 드문 경우)
+      return false; // sub-q 이동 → full redraw 가 안전(아주 넓은 윈도우/분수 pr 의 느린 시프트)
     }
-    const dxInt = gCss * pr;
+    // gCss 가 q 배수라 gCss·pr 은 정수(pr 은 유한 이진수) — Math.round 는 fp 오차만 제거한다.
+    const dxInt = Math.round(gCss * pr);
 
     // 신규 점이 우측단에서 떨어진 최대 버킷 거리(maxDirtyAge)까지 strip 으로 다시 그린다. 신규 점은
     // 보통 brand-new 슬롯(age 0..gapCount-1)에 떨어지지만, x 가 초 경계 직전(graphMax floor 초과)이라
@@ -667,12 +697,14 @@ const blit = {
     const clipLeft = (xsp - pointSize) * pr;
     const clipTop = (plotTop - pointSize) * pr;
     // 우측 경계는 정수 device px 로 올림 정렬하고 carry bump 만큼 넉넉히 넓힌다. realtime 점은
-    // startPoint 에 carry(rtXOffsetCss, |·|<1)가 더해져 graphMax 경계 마커 중심이 ceil(plotRight+carry)
-    // = 최대 ceil(plotRight)+1 까지, 반경 pointSize 만큼 더 우측을 칠한다. full redraw 는 clip 이 없어
-    // 그 픽셀을 온전히 그리므로, clip 이 소수 경계에서 그 컬럼을 반쪽(AA 반감)으로 자르면 blit≠full
-    // 이 된다. ceil + (pointSize+2) 로 정수 정렬·충분 마진을 줘 경계 마커를 온전히 합성한다(우측엔
-    // 신규 점만 있어 over-clip 마진이 노출하는 stale 픽셀이 없다).
-    const clipRight = (Math.ceil(plotRight) + pointSize + 2) * pr;
+    // startPoint 에 carry(rtXOffsetCss, |·|≤q/2)가 더해져 graphMax 경계 마커 중심이 ceil(plotRight+carry)
+    // = 최대 ceil(plotRight)+ceil(q/2) 까지, 반경 pointSize 만큼 더 우측을 칠한다. full redraw 는 clip 이
+    // 없어 그 픽셀을 온전히 그리므로, clip 이 소수 경계에서 그 컬럼을 반쪽(AA 반감)으로 자르면 blit≠full
+    // 이 된다. ceil + (pointSize + ceil(q/2) + 1) 로 정수 정렬·충분 마진을 줘 경계 마커를 온전히 합성한다
+    // (q=1·2 는 기존과 동일한 +2, 분수 pr 로 carry 가 커지는 q=4 는 +3; 우측엔 신규 점만 있어 over-clip
+    // 마진이 노출하는 stale 픽셀이 없다).
+    const q = this.blitShiftDenominator() ?? 1;
+    const clipRight = (Math.ceil(plotRight) + pointSize + Math.ceil(q / 2) + 1) * pr;
     const clipBottom = (plotBottom + pointSize) * pr;
 
     // full(drawSeriesLayer)의 scatter 그리기 순서와 동일하게: seriesReverse 면 show 목록을 뒤집어
