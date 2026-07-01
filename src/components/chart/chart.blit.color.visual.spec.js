@@ -258,9 +258,11 @@ describe('EvChart realtime scatter blit 2-series color/hit-test', () => {
     window.__EVUI_BLIT_REFRESH_INTERVAL__ = undefined;
   });
 
-  it('소수 폭 + gap 지터 + 실스케일(60k/6k) 장기(24틱)에서 blit 색 구성이 full(golden) 과 동급이다', async () => {
+  it('소수 폭 + gap 지터 + 실스케일(30k/3k) 장기(24틱)에서 blit 색 구성이 full(golden) 과 동급이다', async () => {
     // 실데모 조건 재현: resizable-wrapper 의 소수 CSS 폭, setTimeout 드리프트로 gapCount 3/4 교차,
-    // 100k/8k 급 밀도, 장기 누적. width '100%' 호스트로 소수 폭(590.5px)을 강제한다.
+    // 고밀도 장기 누적. width '100%' 호스트로 소수 폭(590.5px)을 강제한다. seed/tick 규모(30k/3k)는
+    // 컬럼당 수백 점이 쌓이는 밀도(med≫8, comb 가드 유효)를 유지하면서 CI(ubuntu) 런타임 여유를 확보한
+    // 값이다 — golden ring 은 tick 누적이 지배하므로 seed 뿐 아니라 per-tick 점 수도 함께 줄여야 한다.
     const Host = {
       components: { EvChart },
       props: ['data', 'options'],
@@ -279,14 +281,14 @@ describe('EvChart realtime scatter blit 2-series color/hit-test', () => {
     window.__EVUI_BLIT_DEBUG__ = true;
     window.__EVUI_BLIT_DIAG__ = undefined;
     const { container, rerender } = render(Host, {
-      props: { data: genData(BASE, 60000, FULL_SPAN, 57000), options: fluidOptions },
+      props: { data: genData(BASE, 30000, FULL_SPAN, 57000), options: fluidOptions },
     });
     await settle();
     let now = BASE;
     for (let t = 1; t <= 24; t++) {
       now += t % 2 ? 3000 : 4000; // gapCount 3/4 교차(실제 setTimeout 드리프트 모사)
       // eslint-disable-next-line no-await-in-loop
-      await rerender({ data: genData(now, 6000, TICK_SPAN, 95000), options: fluidOptions });
+      await rerender({ data: genData(now, 3000, TICK_SPAN, 95000), options: fluidOptions });
       // eslint-disable-next-line no-await-in-loop
       await settle();
     }
@@ -297,15 +299,17 @@ describe('EvChart realtime scatter blit 2-series color/hit-test', () => {
 
     // golden: 동일 누적 상태(carry 보존)를 full redraw. 데이터 idempotent(toTime 불변, dataKeys dedupe).
     window.__EVUI_BLIT_FORCE_OFF__ = true;
-    await rerender({ data: genData(now, 6000, TICK_SPAN, 95000), options: fluidOptions });
+    await rerender({ data: genData(now, 3000, TICK_SPAN, 95000), options: fluidOptions });
     await settle();
     const golden = getDisplayImageData(container);
 
     window.__EVUI_BLIT_DEBUG__ = false;
     assertNoColorBleed(compare(golden, blit));
     assertNoWhiteLine(golden, blit);
-    // cross-series dedupe(owner-map) 복원으로 60k seed 워크로드가 무거워져 240s 로 상향(#2308 리뷰 후속).
-  }, 240000);
+    // 워크로드 30k/3k(로컬 ~44s, med~143). 이전 60k/6k 는 dedupe 복원(owner-map)으로 full redraw 가
+    // 초선형이 돼 241s(240s 초과)로 flaky — golden·fallback full redraw 가 dominant 라 seed 뿐 아니라
+    // per-tick 점 수도 함께 줄였다. 상한 180s 는 CI(ubuntu) 여유를 두면서 워크로드 회귀 트립와이어로 둔다.
+  }, 180000);
 
   it('hollow 마커(cross/star) + cross-series 동일좌표: blit strip dedupe 가 owner 만 그려 full 과 일치', async () => {
     // strip cross-series dedupe(collectStripDuplicatePoints)가 실효를 갖는 유일 케이스 가드.
