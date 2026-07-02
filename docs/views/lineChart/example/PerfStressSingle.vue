@@ -1,11 +1,10 @@
 <template>
-  <div class="case" @pointermove="perf.onPointerMove">
+  <div class="case">
     <resizable-wrapper>
       <ev-chart
         :key="isShallowWatch ? 'shallow' : 'deep'"
         :data="boundData"
         :options="boundOptions"
-        @mouse-move="perf.onChartMouseMove"
       />
     </resizable-wrapper>
   </div>
@@ -29,7 +28,6 @@
 <script>
 import { watch, ref, computed, onBeforeUnmount, reactive, shallowRef } from 'vue';
 import dayjs from 'dayjs';
-import { usePerfHarness } from '../../perfHarness';
 
 // 측정 규모 조절용 상수 (Step 0a 선결 분류 ①: 시리즈당 포인트 수 vs 화면 가로 픽셀)
 const SERIES_COUNT = 10000;
@@ -37,7 +35,6 @@ const POINTS_PER_SERIES = 50;
 
 export default {
   setup() {
-    const perf = usePerfHarness();
     let labelCounter = 0;
     const base = dayjs();
 
@@ -173,13 +170,10 @@ export default {
       }
     };
 
-    // 갱신 1틱을 perf harness로 감싼다(drawChart = createDataSet+drawChart+commit 합산 근사).
-    const updateChartData = () => perf.measureTick(mutateChartData);
-
     watch(isLive, (newValue) => {
       if (newValue) {
-        updateChartData();
-        liveInterval.value = setInterval(updateChartData, 1000);
+        mutateChartData();
+        liveInterval.value = setInterval(mutateChartData, 1000);
       } else {
         clearInterval(liveInterval.value);
       }
@@ -197,7 +191,6 @@ export default {
       isLive,
       isAppendMode,
       isShallowWatch,
-      perf,
     };
   },
 };
