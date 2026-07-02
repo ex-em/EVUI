@@ -104,6 +104,9 @@ export default {
     for (let c = 0; c < CHART_COUNT; c++) {
       charts.push(buildChart());
     }
+    // buildChart가 T+1..T+POINTS_PER_SERIES 라벨을 미리 채우므로,
+    // mutate가 그 다음 시점부터 이어가도록 timeValue를 사전 라벨 끝으로 옮긴다.
+    timeValue = dayjs(timeValue).add(POINTS_PER_SERIES, 'second');
 
     const isLive = ref(false);
     const liveInterval = ref();
