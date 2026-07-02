@@ -156,8 +156,13 @@ export default {
         // shallow 모드: 항상 새 top-level 참조 할당(in-place 변경은 deep off 라 미감지).
         shallowChartData.value = buildSnapshot();
       } else if (isAppendMode.value) {
-        chartData.labels.shift();
-        chartData.labels.push(base.add(labelCounter++, 'second'));
+        // append는 chartData 자신의 마지막 라벨에서 1초씩 이어붙인다. 공유 labelCounter를 쓰면
+        // shallowChartData 초기화가 소비한 구간(base+50..99s)만큼 라벨이 건너뛰어 time축에서
+        // 큰 gap(왼쪽 옛 데이터 / 오른쪽 새 데이터)으로 보인다.
+        const { labels } = chartData;
+        const nextLabel = labels[labels.length - 1].add(1, 'second');
+        labels.shift();
+        labels.push(nextLabel);
         Object.values(chartData.data).forEach((seriesData) => {
           seriesData.shift();
           seriesData.push(randomValue());
