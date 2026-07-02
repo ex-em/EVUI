@@ -28,6 +28,7 @@
 
 <script>
 import { watch, ref, computed, onBeforeUnmount, reactive, shallowRef } from 'vue';
+import dayjs from 'dayjs';
 import { usePerfHarness } from '../../perfHarness';
 
 // 측정 규모 조절용 상수 (Step 0a 선결 분류 ①: 시리즈당 포인트 수 vs 화면 가로 픽셀)
@@ -38,6 +39,7 @@ export default {
   setup() {
     const perf = usePerfHarness();
     let labelCounter = 0;
+    const base = dayjs();
 
     const randomValue = () => Math.random() * 100;
 
@@ -52,7 +54,7 @@ export default {
     const buildLabels = () => {
       const labels = [];
       for (let p = 0; p < POINTS_PER_SERIES; p++) {
-        labels.push(String(labelCounter++));
+        labels.push(base.add(labelCounter++, 'second'));
       }
       return labels;
     };
@@ -94,7 +96,9 @@ export default {
       },
       axesX: [
         {
-          type: 'step',
+          type: 'time',
+          timeFormat: 'mm:ss',
+          interval: { time: 1, unit: 'second' },
           showGrid: false,
         },
       ],
@@ -106,6 +110,31 @@ export default {
           autoScaleRatio: 0.1,
         },
       ],
+      // 시리즈가 많으면 canvas tooltip은 전 시리즈를 한 캔버스에 그려 높이가 브라우저 한계를
+      // 넘고 화면 밖으로 밀려 안 보인다. html formatter를 쓰면 virtualScroll(use:'auto',
+      // 기본 threshold 50)이 자동 활성화되어 보이는 행만 DOM에 부착한다. 각 시리즈 행에
+      // data-evui-tooltip-row 마커를 달아 가상 스크롤 컨테이너가 인식하도록 한다.
+      tooltip: {
+        formatter: {
+          html: (seriesList) => {
+            const header = dayjs(seriesList?.[0]?.data?.x).format('mm:ss');
+            let html = '<div style="width: 220px">';
+            html += `<div style="padding: 4px 8px; font-weight: 600">${header}</div>`;
+            html += '<div>';
+            seriesList.forEach((series) => {
+              html += '<div data-evui-tooltip-row '
+                + 'style="display: flex; align-items: center; gap: 6px; padding: 2px 8px">';
+              html += '<span style="width: 8px; height: 8px; border-radius: 50%; '
+                + `background-color: ${series.color}"></span>`;
+              html += `<span style="flex: 1; white-space: nowrap">${series.name}</span>`;
+              html += `<span>${series.data?.y?.toFixed(2)}</span>`;
+              html += '</div>';
+            });
+            html += '</div></div>';
+            return html;
+          },
+        },
+      },
     });
 
     const isLive = ref(false);
@@ -128,7 +157,7 @@ export default {
         shallowChartData.value = buildSnapshot();
       } else if (isAppendMode.value) {
         chartData.labels.shift();
-        chartData.labels.push(String(labelCounter++));
+        chartData.labels.push(base.add(labelCounter++, 'second'));
         Object.values(chartData.data).forEach((seriesData) => {
           seriesData.shift();
           seriesData.push(randomValue());
