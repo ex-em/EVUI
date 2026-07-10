@@ -334,15 +334,27 @@ createApiDocsStore();
   .ad-example-link {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: 2px;
     padding: 7px 10px;
+    border: none;
     border-radius: 6px;
     color: var(--ad-text);
+    background: none;
     font-size: 13px;
+    text-align: left;
     text-decoration: none;
+    cursor: pointer;
 
     &:hover {
       background: var(--ad-bg-hover);
+
+      .ad-example-name {
+        color: var(--ad-primary);
+      }
+    }
+    &.is-active {
+      background: var(--ad-primary-soft);
 
       .ad-example-name {
         color: var(--ad-primary);
@@ -386,6 +398,45 @@ createApiDocsStore();
     margin-top: 6px;
     color: var(--ad-text-sub);
   }
+  .ad-example-intro {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .ad-example-group {
+    margin-bottom: 2px;
+    color: var(--ad-text-sub);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .ad-example-back {
+    flex: 0 0 auto;
+    padding: 6px 12px;
+    border: 1px solid var(--ad-border);
+    border-radius: 6px;
+    color: var(--ad-text-sub);
+    background: none;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--ad-primary);
+      color: var(--ad-primary);
+    }
+  }
+
+  /* 예제 뷰: 인트로 헤더에 제목이 이미 있으므로 Example 내부 제목/설명은 중복 숨김 */
+  .ad-detail .article-wrapper {
+    .article-title,
+    .article-description {
+      display: none;
+    }
+  }
+
   .ad-detail-section {
     margin: 28px 0 4px;
     color: var(--ad-text-sub);

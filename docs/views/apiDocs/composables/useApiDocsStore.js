@@ -1,6 +1,5 @@
-import { ref, computed, provide, inject } from 'vue';
+import { ref, computed, provide, inject, markRaw } from 'vue';
 import { useRouter } from 'vue-router';
-import { kebabCase } from 'lodash-es';
 import docRegistry from '../data';
 
 const STORE_KEY = Symbol('api-docs-store');
@@ -75,6 +74,8 @@ export function createApiDocsStore() {
   const tryItId = ref(null);
   // 트리 클릭 → 센터 패널 스크롤 요청 (ts로 동일 id 재요청 구분)
   const scrollRequest = ref(null);
+  // Examples 탭에서 선택한 예제 { path, name, label } — 선택 시 센터 패널이 예제 뷰로 전환
+  const selectedExampleKey = ref(null);
 
   // --- derived -------------------------------------------------------------
   const doc = computed(() => docRegistry[currentKey.value]);
@@ -164,7 +165,6 @@ export function createApiDocsStore() {
    * Examples 탭: JSON의 examples(관련 페이지)별로 해당 페이지에 실제로 있는
    * 예제 목록을 펼쳐서 보여준다. 목록의 SSOT는 각 페이지 라우트의
    * props(components) — docs/views/<component>/props.js 이다.
-   * 링크는 예제 페이지의 anchor(kebabCase(예제명)) 규칙을 따른다.
    */
   const exampleGroups = computed(() =>
     (doc.value.examples || []).map(({ label, route: path }) => {
@@ -176,10 +176,25 @@ export function createApiDocsStore() {
         items: Object.entries(components).map(([name, def]) => ({
           name,
           description: def.description || '',
-          to: `${path}#${kebabCase(name)}`,
         })),
       };
     }));
+
+  /** 선택된 예제의 렌더링 정보 (라우트 props에서 실시간 해석) */
+  const selectedExample = computed(() => {
+    if (!selectedExampleKey.value) return null;
+    const { path, name, label } = selectedExampleKey.value;
+    const record = router.getRoutes().find((r) => r.path === path);
+    const def = record?.props?.default?.components?.[name];
+    if (!def) return null;
+    return {
+      name,
+      label,
+      description: def.description || '',
+      component: markRaw(def.component),
+      parsedData: def.parsedData,
+    };
+  });
 
   // --- actions ---------------------------------------------------------------
   const getNode = (id) => nodeMap.value.get(id);
@@ -207,8 +222,17 @@ export function createApiDocsStore() {
     expandedIds.value = next;
   };
 
-  /** 트리에서 클릭: active 지정 + 센터 패널 스크롤 요청 */
+  /** Examples 탭에서 예제 선택: 센터 패널이 예제 뷰로 전환된다 */
+  const selectExample = (path, name, label) => {
+    selectedExampleKey.value = { path, name, label };
+  };
+  const clearExample = () => {
+    selectedExampleKey.value = null;
+  };
+
+  /** 트리에서 클릭: active 지정 + 센터 패널 스크롤 요청 (예제 뷰는 닫는다) */
   const selectNode = (id) => {
+    selectedExampleKey.value = null;
     activeId.value = id;
     expandAncestors(id);
     if (getNode(id)?.childIds.length && !expandedIds.value.has(id)) {
@@ -232,6 +256,7 @@ export function createApiDocsStore() {
     expandedIds.value = new Set();
     tryItId.value = null;
     scrollRequest.value = null;
+    selectedExampleKey.value = null;
   };
 
   const openTryIt = (id) => {
@@ -258,6 +283,8 @@ export function createApiDocsStore() {
     orderedVisibleIds,
     tryItNode,
     exampleGroups,
+    selectedExampleKey,
+    selectedExample,
     isSearching,
     // helpers & actions
     getNode,
@@ -265,6 +292,8 @@ export function createApiDocsStore() {
     isExpanded,
     toggleExpand,
     selectNode,
+    selectExample,
+    clearExample,
     setActiveFromScroll,
     setComponent,
     openTryIt,
