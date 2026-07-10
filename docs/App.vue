@@ -1,7 +1,6 @@
 <template>
-  <div class="evui-wrapper" :class="['evui-docs', docsTheme, { 'nav-collapsed': isNavCollapsed }]">
+  <div class="evui-wrapper" :class="['evui-docs', docsTheme]">
     <MainHeader v-model="docsTheme" />
-    <MainNav :collapsed="isNavCollapsed" @toggle-collapse="toggleNav" />
     <MainContent />
   </div>
 </template>
@@ -10,27 +9,18 @@
 import { ref } from 'vue';
 import MainHeader from './components/Header';
 import MainContent from './components/Content';
-import MainNav from './components/Menu';
 
 export default {
   name: 'Home',
   components: {
     MainHeader,
     MainContent,
-    MainNav,
   },
   setup() {
     const docsTheme = ref('light');
-    const isNavCollapsed = ref(false);
-
-    const toggleNav = () => {
-      isNavCollapsed.value = !isNavCollapsed.value;
-    };
 
     return {
       docsTheme,
-      isNavCollapsed,
-      toggleNav,
     };
   },
 };
@@ -68,13 +58,8 @@ $file-path: './assets/fonts/';
 }
 .evui-wrapper {
   position: relative;
-  padding: $header-height 0 0 $nav-width;
+  padding: $header-height 0 0;
   font-size: $font-size-base;
-  transition: padding-left $animate-base;
-
-  &.nav-collapsed {
-    padding-left: 0;
-  }
 }
 .dark {
   @import './style/lib/highlightjs.hybrid';

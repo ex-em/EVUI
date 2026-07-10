@@ -92,10 +92,14 @@ createApiDocsStore();
     background: var(--ad-bg-soft);
   }
   .ad-sidebar-head {
+    position: relative;
     padding: 12px;
     border-bottom: 1px solid var(--ad-border);
   }
-  .ad-component-select {
+  .ad-component-picker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     width: 100%;
     padding: 8px 10px;
     border: 1px solid var(--ad-border);
@@ -106,10 +110,84 @@ createApiDocsStore();
     font-weight: 600;
     cursor: pointer;
 
+    &:hover,
     &:focus {
       border-color: var(--ad-primary);
       outline: none;
     }
+  }
+  .ad-picker-caret {
+    width: 0;
+    height: 0;
+    border-top: 5px solid var(--ad-text-sub);
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    transition: transform 0.15s;
+
+    &.is-open {
+      transform: rotate(180deg);
+    }
+  }
+  .ad-picker-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 19;
+  }
+  .ad-picker-panel {
+    position: absolute;
+    top: calc(100% - 4px);
+    right: 12px;
+    left: 12px;
+    z-index: 20;
+    max-height: 62vh;
+    padding: 6px;
+    overflow-y: auto;
+    border: 1px solid var(--ad-border);
+    border-radius: 8px;
+    background: var(--ad-bg);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  }
+  .ad-picker-category {
+    padding: 10px 8px 4px;
+    color: var(--ad-text-sub);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .ad-picker-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 7px 10px;
+    border: none;
+    border-radius: 6px;
+    color: var(--ad-text);
+    background: none;
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: var(--ad-bg-hover);
+    }
+    &.is-active {
+      background: var(--ad-primary-soft);
+      color: var(--ad-primary);
+      font-weight: 600;
+    }
+    &:disabled {
+      color: var(--ad-text-sub);
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+  }
+  .ad-picker-soon {
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: var(--ad-code-bg);
+    font-size: 10px;
   }
 
   .ad-tabs {
