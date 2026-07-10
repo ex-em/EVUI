@@ -619,6 +619,17 @@ createApiDocsStore();
     font-size: 13px;
     font-weight: 700;
   }
+  /* 중첩 객체 행: 하위 속성들의 소제목 역할 */
+  .ad-group-row.is-object .ad-row-name {
+    font-size: 14px;
+
+    &::after {
+      content: ' { … }';
+      color: var(--ad-text-sub);
+      font-size: 12px;
+      font-weight: 400;
+    }
+  }
   .ad-row-desc {
     margin-top: 4px;
     color: var(--ad-text-sub);

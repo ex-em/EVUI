@@ -124,9 +124,9 @@ export function createApiDocsStore() {
 
   /**
    * 센터 패널용: 섹션별 그룹(블록) 목록.
-   * 자식을 가진 노드(객체형)와 최상위 leaf가 각각 블록의 head가 되고,
-   * head의 leaf 자식들은 블록 내부의 rows(컴팩트 행)로 묶인다.
-   * 자식이 있는 자식(중첩 객체)은 DFS 순서상 뒤이어 자기 블록으로 렌더된다.
+   * 카드(블록)는 최상위 노드와 depth-1 객체 그룹까지만 만들고,
+   * 그보다 깊은 중첩 객체(예: options.title.style)는 별도 카드로 분리하지 않고
+   * depth-1 카드 내부의 rows에 들여쓰기된 행으로 합쳐서 렌더링한다.
    */
   const visibleSections = computed(() =>
     doc.value.sections
@@ -134,13 +134,32 @@ export function createApiDocsStore() {
         const sectionNodes = flatNodes.value.filter(
           (n) => n.kind === section.kind && isVisible(n.id),
         );
+
+        /** head 하위의 모든 보이는 자손을 DFS 순서로 수집 (중첩 객체 포함) */
+        const collectDescendants = (head) => {
+          const rows = [];
+          const walk = (id) => {
+            const child = nodeMap.value.get(id);
+            if (!isVisible(child.id)) return;
+            rows.push(child);
+            child.childIds.forEach(walk);
+          };
+          head.childIds.forEach(walk);
+          return rows;
+        };
+
         const blocks = sectionNodes
-          .filter((n) => n.childIds.length || n.depth === 0)
+          .filter((n) => n.depth === 0 || (n.depth === 1 && n.childIds.length))
           .map((head) => ({
             head,
-            rows: head.childIds
-              .map((id) => nodeMap.value.get(id))
-              .filter((child) => !child.childIds.length && isVisible(child.id)),
+            rows:
+              head.depth === 0
+                ? // 최상위 카드: leaf 자식만 (객체 자식은 자기 카드를 가진다)
+                  head.childIds
+                    .map((id) => nodeMap.value.get(id))
+                    .filter((child) => !child.childIds.length && isVisible(child.id))
+                : // depth-1 카드: 중첩 객체를 포함한 전체 자손
+                  collectDescendants(head),
           }));
         return { kind: section.kind, label: section.label, blocks };
       })
