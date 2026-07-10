@@ -5,12 +5,14 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import dayjs from 'dayjs';
 
 export default {
   setup() {
     const time = dayjs().format('YYYY-MM-DD 00:00:00');
-    const chartData = {
+
+    const chartData = ref({
       series: {
         series1: { name: 'series#1', fill: { gradient: true }, point: false },
       },
@@ -26,9 +28,9 @@ export default {
       data: {
         series1: [50, 25, 36, 47, 50, 50, 50],
       },
-    };
+    });
 
-    const chartOptions = {
+    const chartOptions = ref({
       type: 'line',
       width: '100%',
       height: '100%',
@@ -65,11 +67,17 @@ export default {
           autoScaleRatio: 0.1,
         },
       ],
+    });
+
+    const onApply = ({ chartData: d, chartOptions: o }) => {
+      if (d) chartData.value = d;
+      if (o) chartOptions.value = o;
     };
 
     return {
       chartData,
       chartOptions,
+      onApply,
     };
   },
 };

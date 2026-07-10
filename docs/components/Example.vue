@@ -13,27 +13,84 @@
         :class="['view', { 'vertical-mode-item': verticalMode }]"
         :style="viewStyle"
       >
-        <component :is="component" />
+        <component :is="component" ref="exampleComp" />
       </div>
       <div v-show="canResize" ref="resizeHandle" class="resize-handle" @mousedown="startResize" />
       <div
         v-show="codeVisible"
-        v-highlight
-        :class="['code', { expend: codeExpend }, { 'vertical-mode-item': verticalMode }]"
+        :class="codeClasses"
         :style="codeStyle"
       >
-        <div ref="codeWrapper" class="code-wrapper" :style="{ height: `${viewAreaHeight}px` }">
-          <pre class="html">
-            {{ parsedData?.template?.content }}
-          </pre>
-          <pre class="javascript">
-            {{ parsedData?.script?.content }}
-          </pre>
+        <!-- 탭 바 -->
+        <div v-if="hasPlayground" class="code-tabs">
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            :class="['code-tab', { active: activeTab === tab.key }]"
+            @click="activeTab = tab.key"
+          >
+            {{ tab.label }}
+          </button>
         </div>
-        <div class="btn-show-more" @click="clickExpend">
-          <i class="ev-icon-document-vertically" />
-          {{ codeExpend ? 'Hide the code' : 'Show more code' }}
+
+        <div ref="codeWrapper" class="code-wrapper" :style="codeWrapperStyle">
+          <!-- Source 탭 -->
+          <div v-show="activeTab === 'source'" v-highlight>
+            <pre class="html">
+              {{ parsedData?.template?.content }}
+            </pre>
+            <pre class="javascript">
+              {{ parsedData?.script?.content }}
+            </pre>
+          </div>
+
+          <!-- chartData 탭 -->
+          <div
+            v-if="dataTabMounted"
+            v-show="activeTab === 'data'"
+            class="playground-tab"
+          >
+            <chart-playground-editor
+              :model-value="snapshotData"
+              @apply="onApplyData"
+            />
+          </div>
+
+          <!-- chartOptions 탭 -->
+          <div
+            v-if="optionsTabMounted"
+            v-show="activeTab === 'options'"
+            class="playground-tab"
+          >
+            <chart-playground-editor
+              :model-value="snapshotOptions"
+              @apply="onApplyOptions"
+            />
+          </div>
+
+          <!-- Options Guide 탭 -->
+          <div
+            v-if="guideTabMounted"
+            v-show="activeTab === 'guide'"
+            class="options-guide"
+          >
+            <p class="options-guide__desc">
+              클릭하면 하단 API 문서로 이동합니다.
+            </p>
+            <ul class="options-guide__list">
+              <li
+                v-for="key in optionKeys"
+                :key="key"
+                class="options-guide__item"
+              >
+                <a class="options-guide__link" @click="scrollToOption(key)">
+                  {{ key }}
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
+
       </div>
       <button
         :class="['btn-toggle-code', { 'is-narrow': isNarrow }]"
@@ -47,12 +104,16 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { kebabCase } from 'lodash-es';
 import highlight from 'docs/directives/highlight';
+import ChartPlaygroundEditor from 'docs/components/ChartPlaygroundEditor';
 
 export default {
   name: 'Example',
+  components: {
+    ChartPlaygroundEditor,
+  },
   directives: {
     highlight,
   },
@@ -79,31 +140,20 @@ export default {
     },
   },
   setup() {
-    const codeExpend = ref(false);
+    // --- 기존 코드 토글 / 리사이즈 ---
     const codeWrapper = ref(null);
-    const clickExpend = () => {
-      codeExpend.value = !codeExpend.value;
-      if (!codeExpend.value) {
-        codeWrapper.value.scrollTop = 0;
-      }
-    };
 
     const viewArea = ref();
     const viewAreaHeight = ref();
-    onMounted(() => {
-      viewAreaHeight.value = viewArea.value.offsetHeight;
-    });
 
-    // --- 반응형 감지 (1280px 기준) ---
     const NARROW_QUERY = '(max-width: 1280px)';
     const mql = window.matchMedia(NARROW_QUERY);
     const isNarrow = ref(mql.matches);
 
-    // --- code 토글 & 드래그 리사이즈 ---
     const codeVisible = ref(true);
     const resizeHandle = ref(null);
-    const viewRatio = ref(null); // wide 모드: 가로 비율 (%)
-    const narrowViewHeight = ref(null); // narrow 모드: view 높이 (px)
+    const viewRatio = ref(null);
+    const narrowViewHeight = ref(null);
 
     const onMediaChange = (e) => {
       isNarrow.value = e.matches;
@@ -119,49 +169,53 @@ export default {
       narrowViewHeight.value = null;
     };
 
-    // wide 모드: 가로 비율 스타일 / narrow 모드: 세로 높이 스타일
     const viewStyle = computed(() => {
       if (isNarrow.value) {
-        if (narrowViewHeight.value != null) return { height: `${narrowViewHeight.value}px` };
+        if (narrowViewHeight.value != null) {
+          return { height: `${narrowViewHeight.value}px` };
+        }
         return {};
       }
-      if (!codeVisible.value) return { width: '100%', borderRight: 'none' };
-      if (viewRatio.value != null) return { width: `${viewRatio.value}%` };
+      if (!codeVisible.value) {
+        return { width: '100%', borderRight: 'none' };
+      }
+      if (viewRatio.value != null) {
+        return { width: `${viewRatio.value}%` };
+      }
       return {};
     });
     const codeStyle = computed(() => {
       if (isNarrow.value) return {};
-      if (viewRatio.value != null) return { width: `${100 - viewRatio.value}%` };
+      if (viewRatio.value != null) {
+        return { width: `${100 - viewRatio.value}%` };
+      }
       return {};
     });
 
-    // 양쪽 모드 모두 리사이즈 가능
     const canResize = computed(() => codeVisible.value);
 
-    // narrow(상하 배치) → 상하 화살표, wide(좌우 배치) → 좌우 화살표
     const toggleIcon = computed(() => {
       if (isNarrow.value) {
-        return codeVisible.value ? 'ev-icon-arrow-down' : 'ev-icon-arrow-up';
+        return codeVisible.value
+          ? 'ev-icon-arrow-down'
+          : 'ev-icon-arrow-up';
       }
-      return codeVisible.value ? 'ev-icon-arrow-right' : 'ev-icon-arrow-left';
+      return codeVisible.value
+        ? 'ev-icon-arrow-right'
+        : 'ev-icon-arrow-left';
     });
 
     const startResize = (e) => {
       e.preventDefault();
       const narrow = isNarrow.value;
-      const cursorStyle = narrow ? 'row-resize' : 'col-resize';
-
-      document.body.style.cursor = cursorStyle;
+      document.body.style.cursor = narrow ? 'row-resize' : 'col-resize';
       document.body.style.userSelect = 'none';
 
       if (narrow) {
-        // --- narrow 모드: 세로 리사이즈 (view 높이 조절) ---
         const startY = e.clientY;
         const startHeight = viewArea.value.offsetHeight;
         const onMouseMove = (ev) => {
-          const delta = ev.clientY - startY;
-          const newHeight = Math.max(80, startHeight + delta);
-          narrowViewHeight.value = newHeight;
+          narrowViewHeight.value = Math.max(80, startHeight + ev.clientY - startY);
         };
         const onMouseUp = () => {
           document.removeEventListener('mousemove', onMouseMove);
@@ -172,13 +226,11 @@ export default {
         document.addEventListener('mousemove', onMouseMove);
         document.addEventListener('mouseup', onMouseUp);
       } else {
-        // --- wide 모드: 가로 리사이즈 (좌우 비율 조절) ---
         const container = viewArea.value.parentElement;
         const onMouseMove = (ev) => {
           const rect = container.getBoundingClientRect();
           let ratio = ((ev.clientX - rect.left) / rect.width) * 100;
-          ratio = Math.min(Math.max(ratio, 5), 95);
-          viewRatio.value = ratio;
+          viewRatio.value = Math.min(Math.max(ratio, 5), 95);
         };
         const onMouseUp = () => {
           document.removeEventListener('mousemove', onMouseMove);
@@ -191,11 +243,93 @@ export default {
       }
     };
 
+    // --- Playground 탭 ---
+    const exampleComp = ref(null);
+    const hasPlayground = ref(false);
+    const activeTab = ref('source');
+
+    const dataTabMounted = ref(false);
+    const optionsTabMounted = ref(false);
+    const guideTabMounted = ref(false);
+
+    const snapshotData = ref(null);
+    const snapshotOptions = ref(null);
+
+    const tabs = [
+      { key: 'source', label: 'Source' },
+      { key: 'data', label: 'chartData' },
+      { key: 'options', label: 'chartOptions' },
+      { key: 'guide', label: 'Options' },
+    ];
+
+    onMounted(() => {
+      viewAreaHeight.value = viewArea.value.offsetHeight;
+
+      const comp = exampleComp.value;
+      if (
+        comp
+        && comp.chartData !== undefined
+        && comp.chartOptions !== undefined
+        && typeof comp.onApply === 'function'
+      ) {
+        hasPlayground.value = true;
+      }
+    });
+
+    watch(activeTab, (tab) => {
+      const comp = exampleComp.value;
+      if (!comp) return;
+      if (tab === 'data' && !dataTabMounted.value) {
+        snapshotData.value = comp.chartData;
+        dataTabMounted.value = true;
+      }
+      if (tab === 'options' && !optionsTabMounted.value) {
+        snapshotOptions.value = comp.chartOptions;
+        optionsTabMounted.value = true;
+      }
+      if (tab === 'guide' && !guideTabMounted.value) {
+        guideTabMounted.value = true;
+      }
+    });
+
+    const isPlaygroundTab = computed(
+      () => hasPlayground.value && activeTab.value !== 'source',
+    );
+
+    const codeClasses = computed(() => [
+      'code',
+      { 'playground-active': isPlaygroundTab.value },
+    ]);
+
+    const codeWrapperStyle = computed(() => {
+      if (isPlaygroundTab.value) return {};
+      return { height: `${viewAreaHeight.value}px` };
+    });
+
+    const optionKeys = computed(() => {
+      if (!hasPlayground.value || !exampleComp.value) return [];
+      const opts = exampleComp.value.chartOptions;
+      return opts ? Object.keys(opts) : [];
+    });
+
+    const onApplyData = (newData) => {
+      exampleComp.value?.onApply?.({ chartData: newData });
+    };
+    const onApplyOptions = (newOptions) => {
+      exampleComp.value?.onApply?.({ chartOptions: newOptions });
+    };
+
+    const scrollToOption = (key) => {
+      const el = document.getElementById(kebabCase(key))
+        || document.getElementById(key.toLowerCase());
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    };
+
     return {
       kebabCase,
-      codeExpend,
       codeWrapper,
-      clickExpend,
       viewArea,
       viewAreaHeight,
       isNarrow,
@@ -209,6 +343,22 @@ export default {
       canResize,
       toggleIcon,
       startResize,
+      exampleComp,
+      hasPlayground,
+      activeTab,
+      tabs,
+      dataTabMounted,
+      optionsTabMounted,
+      guideTabMounted,
+      snapshotData,
+      snapshotOptions,
+      codeClasses,
+      codeWrapperStyle,
+      isPlaygroundTab,
+      optionKeys,
+      onApplyData,
+      onApplyOptions,
+      scrollToOption,
     };
   },
 };
@@ -358,42 +508,108 @@ export default {
       }
     }
   }
+
+  /* ── 탭 바 ── */
+  .code-tabs {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+
+    @include themify() {
+      background-color: themed('background-color-base');
+      border-bottom: 1px solid themed('border-color-base');
+    }
+  }
+  .code-tab {
+    padding: 7px 14px;
+    border: none;
+    background: none;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color $animate-fast;
+    border-bottom: 2px solid transparent;
+
+    @include themify() {
+      color: themed('font-color-nav');
+    }
+    &:hover {
+      color: $color-blue;
+    }
+    &.active {
+      color: $color-blue;
+      border-bottom-color: $color-blue;
+    }
+  }
+
+  /* ── Playground 탭 콘텐츠 ── */
+  .playground-tab {
+    height: 100%;
+  }
+
+  /* ── Options Guide ── */
+  .options-guide {
+    padding: 12px 16px;
+
+    &__desc {
+      margin: 0 0 10px;
+      font-size: 12px;
+
+      @include themify() {
+        color: themed('font-color-nav');
+      }
+    }
+    &__list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    &__item {
+      display: inline-flex;
+    }
+    &__link {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all $animate-fast;
+
+      @include themify() {
+        background-color: themed('background-color-description');
+        border: 1px solid themed('border-color-base');
+        color: themed('font-color-base');
+      }
+      &:hover {
+        color: $color-blue;
+        border-color: $color-blue;
+      }
+    }
+  }
+
+  /* ── 코드 영역 ── */
   .code {
     position: relative;
     width: 50%;
     overflow: hidden;
+
     .code-wrapper {
       height: 100px;
       min-height: 350px;
-      overflow: hidden;
+      overflow-y: auto;
     }
-    .btn-show-more {
-      display: flex;
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      justify-content: center;
-      align-items: center;
-      line-height: 45px;
-      background-color: rgba($color-yellow, 0.5);
-      backdrop-filter: blur(2px);
-      color: $color-black;
-      text-align: center;
-      cursor: pointer;
-      transition: all $animate-fast;
-      &:hover {
-        background-color: rgba($color-yellow, 0.8);
-      }
-    }
-    &.expend {
+    /* playground 탭 활성 시 */
+    &.playground-active {
       .code-wrapper {
-        padding-top: 40px;
-        overflow-y: auto;
-      }
-      .btn-show-more {
-        height: 40px;
+        height: auto !important;
+        min-height: 350px;
+        max-height: 600px;
       }
     }
   }
@@ -414,7 +630,6 @@ export default {
       border-bottom: 1px solid $color-yellow;
       overflow: auto;
     }
-    // narrow 모드: 리사이즈 핸들을 가로 바로 전환
     .resize-handle {
       width: 100% !important;
       height: 6px;
@@ -425,19 +640,10 @@ export default {
       max-width: none;
       width: 100% !important;
       .code-wrapper {
-        height: 40px !important;
+        height: 300px !important;
         transition: all $animate-fast;
       }
-      .btn-show-more {
-        height: 40px;
-      }
-      &.expend {
-        .code-wrapper {
-          height: 300px !important;
-        }
-      }
     }
-    // narrow 모드: 토글 버튼을 하단 중앙으로 이동
     .btn-toggle-code.is-narrow {
       top: auto;
       bottom: -14px;
