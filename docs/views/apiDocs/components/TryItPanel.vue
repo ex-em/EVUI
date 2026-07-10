@@ -89,8 +89,29 @@
 
 <script setup>
 import { ref, computed, watch, nextTick } from 'vue';
+import dayjs from 'dayjs';
 import ChartPlaygroundEditor from 'docs/components/ChartPlaygroundEditor';
 import { useApiDocsStore } from '../composables/useApiDocsStore';
+
+// --- 노드별 tryIt 스니펫 (부분 오버라이드) ------------------------------------
+// JSON의 tryIt.data / tryIt.options는 JS 리터럴 문자열 — 함수·dayjs 사용 가능
+const evaluateSnippet = (code) => {
+  // eslint-disable-next-line no-new-func
+  const fn = new Function('dayjs', `return (\n${code}\n)`);
+  return fn(dayjs);
+};
+
+const isPlainObject = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
+
+/** base 위에 override를 깊은 병합 (원본 불변, 배열/원시값은 교체) */
+const deepMerge = (base, override) => {
+  if (!isPlainObject(base) || !isPlainObject(override)) return override;
+  const result = { ...base };
+  Object.keys(override).forEach((key) => {
+    result[key] = deepMerge(base[key], override[key]);
+  });
+  return result;
+};
 
 const EDITOR_TABS = [
   { key: 'data', label: 'chartData' },
@@ -215,10 +236,32 @@ watch(
       seeded.value = true;
       await nextTick();
     }
-    snapshotData.value = liveData.value;
-    snapshotOptions.value = liveOptions.value;
+    // 노드에 tryIt 스니펫이 있으면 현재 상태 위에 병합한 코드를 에디터에 보여준다
+    // (차트에는 아직 미적용 — Apply를 눌러야 반영)
+    let mergedData = liveData.value;
+    let mergedOptions = liveOptions.value;
+    if (n.tryIt) {
+      try {
+        if (n.tryIt.data) {
+          mergedData = deepMerge(liveData.value, evaluateSnippet(n.tryIt.data));
+        }
+        if (n.tryIt.options) {
+          mergedOptions = deepMerge(liveOptions.value, evaluateSnippet(n.tryIt.options));
+        }
+      } catch (err) {
+        // 스니펫 오류 시 기본(현재 상태) 코드로 폴백
+        console.warn(`[api-docs] tryIt 스니펫 평가 실패 (${n.path}):`, err);
+      }
+    }
+    snapshotData.value = mergedData;
+    snapshotOptions.value = mergedOptions;
+
     if (n.kind === 'events') {
       editorTab.value = 'events';
+    } else if (n.tryIt?.data && !n.tryIt?.options) {
+      editorTab.value = 'data';
+    } else if (n.tryIt?.options) {
+      editorTab.value = 'options';
     } else {
       editorTab.value = n.path.startsWith('data') ? 'data' : 'options';
     }

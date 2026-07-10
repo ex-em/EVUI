@@ -45,7 +45,8 @@
                   "type": "Boolean",
                   "default": "false",
                   "version": "3.0.0",
-                  "description": "데이터 포인트(마커) 표시 여부입니다."
+                  "description": "데이터 포인트(마커) 표시 여부입니다.",
+                  "tryIt": { "data": "{ series: { series1: { point: true } } }" }
                 },
                 {
                   "name": "pointStyle",
@@ -59,7 +60,10 @@
                       "type": "Number",
                       "default": "3",
                       "version": "3.2.0",
-                      "description": "포인트 반지름(px)입니다."
+                      "description": "포인트 반지름(px)입니다.",
+                      "tryIt": {
+                        "data": "{ series: { series1: { point: true, pointStyle: { size: 6 } } } }"
+                      }
                     },
                     {
                       "name": "fillColor",
@@ -168,7 +172,10 @@
                   "type": "String",
                   "default": "''",
                   "version": "3.0.0",
-                  "description": "타이틀 문자열입니다."
+                  "description": "타이틀 문자열입니다.",
+                  "tryIt": {
+                    "options": "{ title: { show: true, text: 'Try It: 타이틀 변경' } }"
+                  }
                 },
                 {
                   "name": "style",
@@ -176,6 +183,9 @@
                   "default": "{}",
                   "version": "3.0.0",
                   "description": "타이틀 텍스트 스타일입니다.",
+                  "tryIt": {
+                    "options": "{ title: { show: true, style: { fontSize: 22, color: '#1a6afe', fontFamily: 'Roboto' } } }"
+                  },
                   "children": [
                     {
                       "name": "fontSize",
@@ -222,7 +232,10 @@
                   "default": "'right'",
                   "version": "3.0.0",
                   "values": ["'top'", "'right'", "'bottom'", "'left'"],
-                  "description": "범례 위치입니다."
+                  "description": "범례 위치입니다.",
+                  "tryIt": {
+                    "options": "{ legend: { show: true, position: 'bottom' } }"
+                  }
                 },
                 {
                   "name": "color",
@@ -344,7 +357,10 @@
                   "type": "Boolean",
                   "default": "false",
                   "version": "3.0.0",
-                  "description": "툴팁 사용 여부입니다."
+                  "description": "툴팁 사용 여부입니다.",
+                  "tryIt": {
+                    "options": "{ tooltip: { use: true, sortByValue: true } }"
+                  }
                 },
                 {
                   "name": "sortByValue",

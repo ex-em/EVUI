@@ -27,6 +27,8 @@ function flattenDoc(doc) {
       version: item.version,
       description: item.description,
       values: item.values || [],
+      // Try It 패널용 옵션별 코드 스니펫 { data?, options? } — JS 리터럴 문자열
+      tryIt: item.tryIt || null,
       childIds: [],
     };
     nodes.push(node);
