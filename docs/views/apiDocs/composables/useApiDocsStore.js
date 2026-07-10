@@ -1,5 +1,6 @@
 import { ref, computed, provide, inject } from 'vue';
 import { useRouter } from 'vue-router';
+import { kebabCase } from 'lodash-es';
 import docRegistry from '../data';
 
 const STORE_KEY = Symbol('api-docs-store');
@@ -159,6 +160,27 @@ export function createApiDocsStore() {
 
   const tryItNode = computed(() => (tryItId.value ? nodeMap.value.get(tryItId.value) : null));
 
+  /**
+   * Examples 탭: JSON의 examples(관련 페이지)별로 해당 페이지에 실제로 있는
+   * 예제 목록을 펼쳐서 보여준다. 목록의 SSOT는 각 페이지 라우트의
+   * props(components) — docs/views/<component>/props.js 이다.
+   * 링크는 예제 페이지의 anchor(kebabCase(예제명)) 규칙을 따른다.
+   */
+  const exampleGroups = computed(() =>
+    (doc.value.examples || []).map(({ label, route: path }) => {
+      const record = router.getRoutes().find((r) => r.path === path);
+      const components = record?.props?.default?.components || {};
+      return {
+        label,
+        path,
+        items: Object.entries(components).map(([name, def]) => ({
+          name,
+          description: def.description || '',
+          to: `${path}#${kebabCase(name)}`,
+        })),
+      };
+    }));
+
   // --- actions ---------------------------------------------------------------
   const getNode = (id) => nodeMap.value.get(id);
 
@@ -235,6 +257,7 @@ export function createApiDocsStore() {
     sectionRoots,
     orderedVisibleIds,
     tryItNode,
+    exampleGroups,
     isSearching,
     // helpers & actions
     getNode,

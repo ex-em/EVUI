@@ -328,11 +328,14 @@ createApiDocsStore();
     display: flex;
     flex-direction: column;
     gap: 2px;
-    padding: 10px;
+    padding: 0 10px 20px;
     overflow-y: auto;
   }
   .ad-example-link {
-    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 7px 10px;
     border-radius: 6px;
     color: var(--ad-text);
     font-size: 13px;
@@ -340,8 +343,23 @@ createApiDocsStore();
 
     &:hover {
       background: var(--ad-bg-hover);
-      color: var(--ad-primary);
+
+      .ad-example-name {
+        color: var(--ad-primary);
+      }
     }
+  }
+  .ad-example-name {
+    font-weight: 600;
+  }
+  .ad-example-desc {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--ad-text-sub);
+    font-size: 12px;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   /* --- [Center] Detail ----------------------------------------------------- */
