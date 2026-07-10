@@ -1,4 +1,5 @@
 import { ref, computed, provide, inject } from 'vue';
+import { useRouter } from 'vue-router';
 import docRegistry from '../data';
 
 const STORE_KEY = Symbol('api-docs-store');
@@ -42,6 +43,27 @@ function flattenDoc(doc) {
 
 export function createApiDocsStore() {
   const componentKeys = Object.keys(docRegistry);
+  const router = useRouter();
+
+  /**
+   * 컴포넌트 선택 트리. 기존 네비게이션 메뉴와 동일하게
+   * 라우트의 meta.category 기준으로 그룹핑한다. (라우터가 SSOT)
+   * 문서 JSON이 아직 없는 컴포넌트는 hasDoc: false 로 비활성 표시된다.
+   */
+  const componentTree = router
+    .getRoutes()
+    .filter((route) => route.meta?.category && route.meta.category !== 'Docs')
+    .reduce((acc, route) => {
+      const key = route.path.replace(/^\//, '');
+      const item = { key, label: route.name, hasDoc: !!docRegistry[key] };
+      const group = acc.find((g) => g.category === route.meta.category);
+      if (group) {
+        group.items.push(item);
+      } else {
+        acc.push({ category: route.meta.category, items: [item] });
+      }
+      return acc;
+    }, []);
 
   // --- state ---------------------------------------------------------------
   const currentKey = ref(componentKeys[0]);
@@ -55,8 +77,6 @@ export function createApiDocsStore() {
 
   // --- derived -------------------------------------------------------------
   const doc = computed(() => docRegistry[currentKey.value]);
-  const componentList = computed(() =>
-    componentKeys.map((key) => ({ key, label: docRegistry[key].component })));
 
   const flatNodes = computed(() => flattenDoc(doc.value));
   const nodeMap = computed(() => new Map(flatNodes.value.map((n) => [n.id, n])));
@@ -194,7 +214,7 @@ export function createApiDocsStore() {
     scrollRequest,
     // derived
     doc,
-    componentList,
+    componentTree,
     flatNodes,
     visibleSections,
     sectionRoots,

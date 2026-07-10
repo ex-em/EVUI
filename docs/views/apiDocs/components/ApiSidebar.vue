@@ -1,16 +1,31 @@
 <template>
   <aside class="ad-sidebar">
-    <!-- 컴포넌트 선택 -->
+    <!-- 컴포넌트 선택 (기존 네비게이션과 동일한 카테고리 트리) -->
     <div class="ad-sidebar-head">
-      <select
-        class="ad-component-select"
-        :value="store.currentKey.value"
-        @change="store.setComponent($event.target.value)"
-      >
-        <option v-for="item in store.componentList.value" :key="item.key" :value="item.key">
-          {{ item.label }}
-        </option>
-      </select>
+      <button class="ad-component-picker" @click="isPickerOpen = !isPickerOpen">
+        <span class="ad-picker-current">{{ store.doc.value.component }}</span>
+        <span class="ad-picker-caret" :class="{ 'is-open': isPickerOpen }" />
+      </button>
+
+      <template v-if="isPickerOpen">
+        <div class="ad-picker-backdrop" @click="isPickerOpen = false" />
+        <div class="ad-picker-panel">
+          <template v-for="group in store.componentTree" :key="group.category">
+            <p class="ad-picker-category">{{ group.category }}</p>
+            <button
+              v-for="item in group.items"
+              :key="item.key"
+              class="ad-picker-item"
+              :class="{ 'is-active': store.currentKey.value === item.key }"
+              :disabled="!item.hasDoc"
+              @click="pickComponent(item)"
+            >
+              {{ item.label }}
+              <span v-if="!item.hasDoc" class="ad-picker-soon">준비중</span>
+            </button>
+          </template>
+        </div>
+      </template>
     </div>
 
     <!-- Docs / Examples 탭 -->
@@ -73,6 +88,7 @@
 </template>
 
 <script setup>
+import { ref } from 'vue';
 import ApiTreeNode from './ApiTreeNode.vue';
 import { useApiDocsStore } from '../composables/useApiDocsStore';
 
@@ -82,4 +98,10 @@ const TABS = [
 ];
 
 const store = useApiDocsStore();
+const isPickerOpen = ref(false);
+
+const pickComponent = (item) => {
+  store.setComponent(item.key);
+  isPickerOpen.value = false;
+};
 </script>

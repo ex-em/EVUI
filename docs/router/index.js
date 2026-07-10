@@ -39,6 +39,10 @@ import heatMapProps from 'docs/views/heatMap/props';
 const routes = [
   {
     path: '/',
+    redirect: '/api-docs',
+  },
+  {
+    path: '/intro',
     name: 'Intro',
     component: Intro,
   },
