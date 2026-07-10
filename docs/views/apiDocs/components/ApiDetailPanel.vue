@@ -7,7 +7,12 @@
 
     <template v-for="section in store.visibleSections.value" :key="section.kind">
       <h2 class="ad-detail-section">{{ section.label }}</h2>
-      <ApiDetailItem v-for="node in section.nodes" :key="node.id" :node="node" />
+      <ApiDetailGroup
+        v-for="block in section.blocks"
+        :key="block.head.id"
+        :head="block.head"
+        :rows="block.rows"
+      />
     </template>
 
     <p v-if="!store.visibleSections.value.length" class="ad-empty">검색 결과가 없습니다.</p>
@@ -16,7 +21,7 @@
 
 <script setup>
 import { ref, watch, nextTick } from 'vue';
-import ApiDetailItem from './ApiDetailItem.vue';
+import ApiDetailGroup from './ApiDetailGroup.vue';
 import { useApiDocsStore } from '../composables/useApiDocsStore';
 
 const SPY_OFFSET = 60; // 스크롤 스파이 기준선(컨테이너 상단으로부터 px)
@@ -31,6 +36,14 @@ let suppressTimer = null;
 
 const itemEl = (id) => scrollRef.value?.querySelector(`[data-node-id="${CSS.escape(id)}"]`);
 
+/**
+ * 스크롤 콘텐츠 기준 요소의 top 좌표.
+ * offsetTop은 content-visibility(contain: layout)로 카드가 offsetParent가 되는 등
+ * 기준이 흔들릴 수 있어, 항상 rect 차이로 계산한다.
+ */
+const topInContent = (el, container) =>
+  el.getBoundingClientRect().top - container.getBoundingClientRect().top + container.scrollTop;
+
 // --- 트리 클릭 → 센터 스크롤 ------------------------------------------------
 watch(
   () => store.scrollRequest.value,
@@ -43,14 +56,14 @@ watch(
 
     suppressSpy = true;
     clearTimeout(suppressTimer);
-    container.scrollTo({ top: el.offsetTop - 12, behavior: 'smooth' });
+    container.scrollTo({ top: topInContent(el, container) - 12, behavior: 'smooth' });
     // 'scrollend' 미지원 브라우저를 위한 타임아웃 폴백
     suppressTimer = setTimeout(() => {
       // content-visibility 지연 렌더로 스크롤 중 위쪽 카드 높이가 바뀌면
       // 목표 위치가 어긋나 제목이 가려질 수 있어, 완료 시점에 한 번 보정한다.
       const target = itemEl(request.id);
       if (target) {
-        const top = target.offsetTop - 12;
+        const top = topInContent(target, container) - 12;
         if (Math.abs(container.scrollTop - top) > 4) {
           container.scrollTo({ top, behavior: 'instant' });
         }
@@ -75,7 +88,7 @@ const onScroll = () => {
     for (let i = 0; i < ids.length; i++) {
       const el = itemEl(ids[i]);
       if (!el) continue;
-      if (el.offsetTop <= baseline) {
+      if (topInContent(el, container) <= baseline) {
         currentId = ids[i];
       } else {
         break;
