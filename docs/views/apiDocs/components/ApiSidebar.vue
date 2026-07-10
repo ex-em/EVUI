@@ -36,7 +36,7 @@
         class="ad-tab"
         :class="{ 'is-active': store.activeTab.value === tab.key }"
         role="tab"
-        @click="store.activeTab.value = tab.key"
+        @click="changeTab(tab.key)"
       >
         {{ tab.label }}
       </button>
@@ -72,22 +72,20 @@
       </div>
     </template>
 
-    <!-- Examples 탭: 관련 페이지별 실제 예제 목록 -->
+    <!-- Examples 탭: 관련 페이지별 실제 예제 목록 (클릭 시 센터 패널에 렌더링) -->
     <div v-else class="ad-examples">
       <template v-for="group in store.exampleGroups.value" :key="group.path">
         <p class="ad-tree-section">{{ group.label }}</p>
-        <router-link
+        <button
           v-for="item in group.items"
           :key="item.name"
           class="ad-example-link"
-          :to="item.to"
+          :class="{ 'is-active': isExampleActive(group.path, item.name) }"
+          @click="store.selectExample(group.path, item.name, group.label)"
         >
           <span class="ad-example-name">{{ item.name }}</span>
           <span v-if="item.description" class="ad-example-desc">{{ item.description }}</span>
-        </router-link>
-        <router-link v-if="!group.items.length" class="ad-example-link" :to="group.path">
-          <span class="ad-example-name">{{ group.label }} 페이지로 이동</span>
-        </router-link>
+        </button>
       </template>
       <p v-if="!store.exampleGroups.value.length" class="ad-empty">등록된 예제가 없습니다.</p>
     </div>
@@ -110,5 +108,18 @@ const isPickerOpen = ref(false);
 const pickComponent = (item) => {
   store.setComponent(item.key);
   isPickerOpen.value = false;
+};
+
+const changeTab = (key) => {
+  store.activeTab.value = key;
+  // Docs 탭으로 돌아오면 센터 패널도 API 문서로 복귀
+  if (key === 'docs') {
+    store.clearExample();
+  }
+};
+
+const isExampleActive = (path, name) => {
+  const selected = store.selectedExampleKey.value;
+  return !!selected && selected.path === path && selected.name === name;
 };
 </script>

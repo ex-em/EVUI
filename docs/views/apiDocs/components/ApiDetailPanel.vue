@@ -1,21 +1,48 @@
 <template>
   <section ref="scrollRef" class="ad-detail" @scroll.passive="onScroll">
-    <header class="ad-detail-intro">
-      <h1 class="ad-detail-component">{{ store.doc.value.component }}</h1>
-      <p class="ad-detail-summary">{{ store.doc.value.description }}</p>
-    </header>
-
-    <template v-for="section in store.visibleSections.value" :key="section.kind">
-      <h2 class="ad-detail-section">{{ section.label }}</h2>
-      <ApiDetailGroup
-        v-for="block in section.blocks"
-        :key="block.head.id"
-        :head="block.head"
-        :rows="block.rows"
+    <!-- 예제 뷰: Examples 탭에서 예제 선택 시 -->
+    <template v-if="store.selectedExample.value">
+      <header class="ad-detail-intro ad-example-intro">
+        <div>
+          <p class="ad-example-group">{{ store.selectedExample.value.label }}</p>
+          <h1 class="ad-detail-component">{{ store.selectedExample.value.name }}</h1>
+          <!-- 예제 설명은 props.js에서 HTML을 포함할 수 있어 v-html로 렌더링 (Example.vue와 동일) -->
+          <p
+            v-if="store.selectedExample.value.description"
+            class="ad-detail-summary"
+            v-html="store.selectedExample.value.description"
+          />
+        </div>
+        <button class="ad-example-back" @click="store.clearExample()">← API 문서</button>
+      </header>
+      <Example
+        :key="`${store.currentKey.value}_${store.selectedExample.value.name}`"
+        :title="store.selectedExample.value.name"
+        :description="store.selectedExample.value.description"
+        :component="store.selectedExample.value.component"
+        :parsed-data="store.selectedExample.value.parsedData"
       />
     </template>
 
-    <p v-if="!store.visibleSections.value.length" class="ad-empty">검색 결과가 없습니다.</p>
+    <!-- API 문서 뷰 -->
+    <template v-else>
+      <header class="ad-detail-intro">
+        <h1 class="ad-detail-component">{{ store.doc.value.component }}</h1>
+        <p class="ad-detail-summary">{{ store.doc.value.description }}</p>
+      </header>
+
+      <template v-for="section in store.visibleSections.value" :key="section.kind">
+        <h2 class="ad-detail-section">{{ section.label }}</h2>
+        <ApiDetailGroup
+          v-for="block in section.blocks"
+          :key="block.head.id"
+          :head="block.head"
+          :rows="block.rows"
+        />
+      </template>
+
+      <p v-if="!store.visibleSections.value.length" class="ad-empty">검색 결과가 없습니다.</p>
+    </template>
   </section>
 </template>
 
@@ -76,6 +103,8 @@ watch(
 // --- 센터 스크롤 → 트리 하이라이트(스크롤 스파이) ---------------------------
 let spyTimer = null;
 const onScroll = () => {
+  // 예제 뷰에서는 문서 항목이 없으므로 스파이를 멈춘다
+  if (store.selectedExample.value) return;
   if (suppressSpy || spyTimer) return;
   spyTimer = setTimeout(() => {
     spyTimer = null;
@@ -99,9 +128,9 @@ const onScroll = () => {
   }, 80);
 };
 
-// 컴포넌트 전환 시 스크롤 위치 초기화
+// 컴포넌트/예제 전환 시 스크롤 위치 초기화
 watch(
-  () => store.currentKey.value,
+  [() => store.currentKey.value, () => store.selectedExampleKey.value],
   () => {
     scrollRef.value?.scrollTo({ top: 0 });
   },
