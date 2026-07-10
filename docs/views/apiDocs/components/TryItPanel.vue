@@ -1,6 +1,11 @@
 <template>
-  <aside class="ad-tryit" :class="{ 'is-open': !!node }">
+  <aside
+    class="ad-tryit"
+    :class="{ 'is-open': !!node, 'is-resizing': isResizing }"
+    :style="panelStyle"
+  >
     <template v-if="node">
+      <div class="ad-tryit-resize-handle" @mousedown="startResize" />
       <header class="ad-tryit-header">
         <div class="ad-tryit-title">
           <span class="ad-badge" :class="`ad-badge-kind-${node.kind}`">{{ node.kind }}</span>
@@ -108,5 +113,43 @@ const applyData = (value) => {
 };
 const applyOptions = (value) => {
   pgCompRef.value?.onApply?.({ chartOptions: value });
+};
+
+// --- 패널 너비 리사이즈 ------------------------------------------------------
+const WIDTH_STORAGE_KEY = 'evui-docs-tryit-width';
+const DEFAULT_WIDTH = 500;
+const MIN_WIDTH = 340;
+const maxWidth = () => Math.round(window.innerWidth * 0.7);
+const clampWidth = (width) => Math.min(Math.max(width, MIN_WIDTH), maxWidth());
+
+const panelWidth = ref(
+  clampWidth(Number(localStorage.getItem(WIDTH_STORAGE_KEY)) || DEFAULT_WIDTH),
+);
+const isResizing = ref(false);
+
+// width는 오버레이(absolute) 모드용, flex-basis는 3-column 플렉스 모드용
+const panelStyle = computed(() =>
+  (node.value ? { flexBasis: `${panelWidth.value}px`, width: `${panelWidth.value}px` } : null));
+
+const startResize = (e) => {
+  e.preventDefault();
+  isResizing.value = true;
+  document.body.style.cursor = 'col-resize';
+  document.body.style.userSelect = 'none';
+
+  const onMouseMove = (ev) => {
+    // 패널 오른쪽 끝은 뷰포트 오른쪽에 붙어 있으므로 너비 = 뷰포트 너비 - 커서 X
+    panelWidth.value = clampWidth(window.innerWidth - ev.clientX);
+  };
+  const onMouseUp = () => {
+    isResizing.value = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    localStorage.setItem(WIDTH_STORAGE_KEY, String(panelWidth.value));
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
 };
 </script>

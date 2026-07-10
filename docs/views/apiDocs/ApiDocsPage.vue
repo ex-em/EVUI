@@ -634,6 +634,7 @@ createApiDocsStore();
   /* --- [Right] Try It Panel ------------------------------------------------ */
   .ad-tryit {
     display: flex;
+    position: relative;
     flex-direction: column;
     flex: 0 0 0;
     overflow: hidden;
@@ -644,6 +645,25 @@ createApiDocsStore();
     &.is-open {
       flex-basis: 500px;
       border-left-color: var(--ad-border);
+    }
+    /* 드래그 중에는 커서를 즉각 따라가도록 애니메이션 해제 */
+    &.is-resizing {
+      transition: none;
+    }
+  }
+  .ad-tryit-resize-handle {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 5;
+    width: 6px;
+    cursor: col-resize;
+
+    &:hover,
+    &:active {
+      background: var(--ad-primary-soft);
+      box-shadow: inset 2px 0 0 var(--ad-primary);
     }
   }
   .ad-tryit-header {
