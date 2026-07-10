@@ -34,16 +34,6 @@
         </div>
 
         <div ref="codeWrapper" class="code-wrapper" :style="codeWrapperStyle">
-          <!-- Source 탭 -->
-          <div v-show="activeTab === 'source'" v-highlight>
-            <pre class="html">
-              {{ parsedData?.template?.content }}
-            </pre>
-            <pre class="javascript">
-              {{ parsedData?.script?.content }}
-            </pre>
-          </div>
-
           <!-- chartData 탭 -->
           <div
             v-if="dataTabMounted"
@@ -68,26 +58,14 @@
             />
           </div>
 
-          <!-- Options Guide 탭 -->
-          <div
-            v-if="guideTabMounted"
-            v-show="activeTab === 'guide'"
-            class="options-guide"
-          >
-            <p class="options-guide__desc">
-              클릭하면 하단 API 문서로 이동합니다.
-            </p>
-            <ul class="options-guide__list">
-              <li
-                v-for="key in optionKeys"
-                :key="key"
-                class="options-guide__item"
-              >
-                <a class="options-guide__link" @click="scrollToOption(key)">
-                  {{ key }}
-                </a>
-              </li>
-            </ul>
+          <!-- Full Code 탭 (플레이그라운드 미지원 예제는 이 뷰만 노출) -->
+          <div v-show="activeTab === 'source'" v-highlight>
+            <pre class="html">
+              {{ parsedData?.template?.content }}
+            </pre>
+            <pre class="javascript">
+              {{ parsedData?.script?.content }}
+            </pre>
           </div>
         </div>
 
@@ -250,31 +228,15 @@ export default {
 
     const dataTabMounted = ref(false);
     const optionsTabMounted = ref(false);
-    const guideTabMounted = ref(false);
 
     const snapshotData = ref(null);
     const snapshotOptions = ref(null);
 
     const tabs = [
-      { key: 'source', label: 'Source' },
       { key: 'data', label: 'chartData' },
       { key: 'options', label: 'chartOptions' },
-      { key: 'guide', label: 'Options' },
+      { key: 'source', label: 'Full Code' },
     ];
-
-    onMounted(() => {
-      viewAreaHeight.value = viewArea.value.offsetHeight;
-
-      const comp = exampleComp.value;
-      if (
-        comp
-        && comp.chartData !== undefined
-        && comp.chartOptions !== undefined
-        && typeof comp.onApply === 'function'
-      ) {
-        hasPlayground.value = true;
-      }
-    });
 
     watch(activeTab, (tab) => {
       const comp = exampleComp.value;
@@ -287,8 +249,21 @@ export default {
         snapshotOptions.value = comp.chartOptions;
         optionsTabMounted.value = true;
       }
-      if (tab === 'guide' && !guideTabMounted.value) {
-        guideTabMounted.value = true;
+    });
+
+    onMounted(() => {
+      viewAreaHeight.value = viewArea.value.offsetHeight;
+
+      const comp = exampleComp.value;
+      if (
+        comp
+        && comp.chartData !== undefined
+        && comp.chartOptions !== undefined
+        && typeof comp.onApply === 'function'
+      ) {
+        hasPlayground.value = true;
+        // 플레이그라운드 지원 예제는 첫 탭(chartData)을 기본 선택
+        activeTab.value = 'data';
       }
     });
 
@@ -306,25 +281,11 @@ export default {
       return { height: `${viewAreaHeight.value}px` };
     });
 
-    const optionKeys = computed(() => {
-      if (!hasPlayground.value || !exampleComp.value) return [];
-      const opts = exampleComp.value.chartOptions;
-      return opts ? Object.keys(opts) : [];
-    });
-
     const onApplyData = (newData) => {
       exampleComp.value?.onApply?.({ chartData: newData });
     };
     const onApplyOptions = (newOptions) => {
       exampleComp.value?.onApply?.({ chartOptions: newOptions });
-    };
-
-    const scrollToOption = (key) => {
-      const el = document.getElementById(kebabCase(key))
-        || document.getElementById(key.toLowerCase());
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
     };
 
     return {
@@ -349,16 +310,13 @@ export default {
       tabs,
       dataTabMounted,
       optionsTabMounted,
-      guideTabMounted,
       snapshotData,
       snapshotOptions,
       codeClasses,
       codeWrapperStyle,
       isPlaygroundTab,
-      optionKeys,
       onApplyData,
       onApplyOptions,
-      scrollToOption,
     };
   },
 };
@@ -547,50 +505,6 @@ export default {
   /* ── Playground 탭 콘텐츠 ── */
   .playground-tab {
     height: 100%;
-  }
-
-  /* ── Options Guide ── */
-  .options-guide {
-    padding: 12px 16px;
-
-    &__desc {
-      margin: 0 0 10px;
-      font-size: 12px;
-
-      @include themify() {
-        color: themed('font-color-nav');
-      }
-    }
-    &__list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    &__item {
-      display: inline-flex;
-    }
-    &__link {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all $animate-fast;
-
-      @include themify() {
-        background-color: themed('background-color-description');
-        border: 1px solid themed('border-color-base');
-        color: themed('font-color-base');
-      }
-      &:hover {
-        color: $color-blue;
-        border-color: $color-blue;
-      }
-    }
   }
 
   /* ── 코드 영역 ── */
