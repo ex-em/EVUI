@@ -72,17 +72,24 @@
       </div>
     </template>
 
-    <!-- Examples 탭 -->
+    <!-- Examples 탭: 관련 페이지별 실제 예제 목록 -->
     <div v-else class="ad-examples">
-      <router-link
-        v-for="example in store.doc.value.examples"
-        :key="example.route"
-        class="ad-example-link"
-        :to="example.route"
-      >
-        {{ example.label }}
-      </router-link>
-      <p v-if="!store.doc.value.examples?.length" class="ad-empty">등록된 예제가 없습니다.</p>
+      <template v-for="group in store.exampleGroups.value" :key="group.path">
+        <p class="ad-tree-section">{{ group.label }}</p>
+        <router-link
+          v-for="item in group.items"
+          :key="item.name"
+          class="ad-example-link"
+          :to="item.to"
+        >
+          <span class="ad-example-name">{{ item.name }}</span>
+          <span v-if="item.description" class="ad-example-desc">{{ item.description }}</span>
+        </router-link>
+        <router-link v-if="!group.items.length" class="ad-example-link" :to="group.path">
+          <span class="ad-example-name">{{ group.label }} 페이지로 이동</span>
+        </router-link>
+      </template>
+      <p v-if="!store.exampleGroups.value.length" class="ad-empty">등록된 예제가 없습니다.</p>
     </div>
   </aside>
 </template>
