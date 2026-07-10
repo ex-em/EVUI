@@ -507,6 +507,11 @@ createApiDocsStore();
     color: var(--ad-text);
     font-weight: 700;
   }
+  .ad-tryit-btn-row {
+    padding: 1px 8px;
+    margin-left: auto;
+    font-size: 11px;
+  }
   .ad-tryit-btn {
     flex: 0 0 auto;
     padding: 4px 10px;

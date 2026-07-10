@@ -54,6 +54,14 @@
             default: <code>{{ row.default }}</code>
           </span>
           <span v-if="row.version" class="ad-badge ad-badge-version">v{{ row.version }}+</span>
+          <!-- 전용 tryIt 스니펫이 있는 행에만 노출 -->
+          <button
+            v-if="row.tryIt"
+            class="ad-tryit-btn ad-tryit-btn-row"
+            @click.stop="store.openTryIt(row.id)"
+          >
+            Try It ▶
+          </button>
         </div>
         <p class="ad-row-desc">{{ row.description }}</p>
         <div v-if="row.values.length" class="ad-item-values">
