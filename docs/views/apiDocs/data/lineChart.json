@@ -8,6 +8,7 @@
     { "label": "줌 차트", "route": "/zoomChart" },
     { "label": "브러시 차트", "route": "/brushChart" }
   ],
+  "playground": { "route": "/lineChart", "example": "Fill" },
   "sections": [
     {
       "kind": "props",

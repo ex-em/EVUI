@@ -180,6 +180,20 @@ export function createApiDocsStore() {
       };
     }));
 
+  /**
+   * Try It 패널용 플레이그라운드 예제.
+   * JSON의 playground({ route, example })가 가리키는, chartData/chartOptions/
+   * onApply를 노출하는 예제 컴포넌트를 라우트 props에서 해석한다.
+   */
+  const playgroundExample = computed(() => {
+    const pg = doc.value.playground;
+    if (!pg) return null;
+    const record = router.getRoutes().find((r) => r.path === pg.route);
+    const def = record?.props?.default?.components?.[pg.example];
+    if (!def) return null;
+    return { name: pg.example, component: markRaw(def.component) };
+  });
+
   /** 선택된 예제의 렌더링 정보 (라우트 props에서 실시간 해석) */
   const selectedExample = computed(() => {
     if (!selectedExampleKey.value) return null;
@@ -282,6 +296,7 @@ export function createApiDocsStore() {
     sectionRoots,
     orderedVisibleIds,
     tryItNode,
+    playgroundExample,
     exampleGroups,
     selectedExampleKey,
     selectedExample,

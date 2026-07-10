@@ -642,7 +642,7 @@ createApiDocsStore();
     transition: flex-basis 0.25s ease-in-out;
 
     &.is-open {
-      flex-basis: 420px;
+      flex-basis: 500px;
       border-left-color: var(--ad-border);
     }
   }
@@ -682,44 +682,67 @@ createApiDocsStore();
     display: flex;
     flex: 1;
     flex-direction: column;
-    gap: 12px;
-    padding: 14px;
-    overflow-y: auto;
+    min-height: 0;
+    overflow: hidden;
   }
-  .ad-tryit-pane {
+  .ad-tryit-live {
+    flex: 0 0 300px;
+    padding: 10px 14px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--ad-border);
+    background: var(--ad-bg);
+
+    > * {
+      height: 100%;
+    }
+
+    /* 예제 루트가 ResizableWrapper인 경우: 인라인 높이(기본 300px)를
+       패널 영역에 맞게 강제하고, 자체 리사이즈 핸들은 숨긴다 */
+    .resizable-wrapper {
+      height: 100%;
+
+      .component-area {
+        height: calc(100% - 4px) !important;
+      }
+      .resize-handle {
+        display: none;
+      }
+    }
+  }
+  .ad-tryit-editor {
     display: flex;
     flex: 1;
     flex-direction: column;
-    min-height: 160px;
+    min-height: 0;
+
+    .playground-editor {
+      flex: 1;
+      min-height: 0;
+    }
   }
-  .ad-tryit-pane-label {
-    margin-bottom: 6px;
-    color: var(--ad-text-sub);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-  .ad-tryit-code {
-    flex: 1;
-    padding: 12px;
-    border: 1px solid var(--ad-border);
-    border-radius: 8px;
-    background: var(--ad-code-bg);
-    font-family: 'SF Mono', Menlo, Consolas, monospace;
-    font-size: 12px;
-    line-height: 1.7;
-    white-space: pre-wrap;
-  }
-  .ad-tryit-preview {
+  .ad-tryit-editor-tabs {
     display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-    border: 1px dashed var(--ad-border);
-    border-radius: 8px;
+    flex-shrink: 0;
+    border-bottom: 1px solid var(--ad-border);
+    background: var(--ad-bg);
+  }
+  .ad-tryit-editor-tab {
+    padding: 8px 14px;
+    border: none;
+    border-bottom: 2px solid transparent;
     color: var(--ad-text-sub);
+    background: none;
     font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--ad-text);
+    }
+    &.is-active {
+      border-bottom-color: var(--ad-primary);
+      color: var(--ad-primary);
+    }
   }
 
   /* --- 반응형 -------------------------------------------------------------- */
@@ -731,7 +754,7 @@ createApiDocsStore();
       bottom: 0;
       z-index: 10;
       flex-basis: auto;
-      width: min(420px, 90vw);
+      width: min(500px, 90vw);
       box-shadow: -8px 0 24px rgba(0, 0, 0, 0.15);
     }
   }
