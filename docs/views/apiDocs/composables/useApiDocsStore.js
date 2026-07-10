@@ -74,6 +74,10 @@ export function createApiDocsStore() {
   const tryItId = ref(null);
   // 트리 클릭 → 센터 패널 스크롤 요청 (ts로 동일 id 재요청 구분)
   const scrollRequest = ref(null);
+  // 트리 클릭 직후 센터 패널에서 잠깐(3초) 하이라이트할 노드
+  const flashId = ref(null);
+  let flashTimer = null;
+  const FLASH_MS = 3000;
   // Examples 탭에서 선택한 예제 { path, name, label } — 선택 시 센터 패널이 예제 뷰로 전환
   const selectedExampleKey = ref(null);
 
@@ -253,6 +257,12 @@ export function createApiDocsStore() {
       toggleExpand(id);
     }
     scrollRequest.value = { id, ts: Date.now() };
+    // 도착 위치 인지용 하이라이트 — 잠깐 보여주고 지운다
+    flashId.value = id;
+    clearTimeout(flashTimer);
+    flashTimer = setTimeout(() => {
+      flashId.value = null;
+    }, FLASH_MS);
   };
 
   /** 센터 패널 스크롤 스파이에서 호출: 트리 하이라이트만 갱신 */
@@ -271,6 +281,8 @@ export function createApiDocsStore() {
     tryItId.value = null;
     scrollRequest.value = null;
     selectedExampleKey.value = null;
+    flashId.value = null;
+    clearTimeout(flashTimer);
   };
 
   const openTryIt = (id) => {
@@ -286,6 +298,7 @@ export function createApiDocsStore() {
     activeTab,
     query,
     activeId,
+    flashId,
     tryItId,
     scrollRequest,
     // derived
