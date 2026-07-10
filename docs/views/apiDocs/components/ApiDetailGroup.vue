@@ -38,7 +38,11 @@
         v-for="row in rows"
         :key="row.id"
         class="ad-group-row"
-        :class="{ 'is-active': store.flashId.value === row.id }"
+        :class="{
+          'is-active': store.flashId.value === row.id,
+          'is-object': row.childIds.length > 0,
+        }"
+        :style="{ paddingLeft: `${14 + (row.depth - head.depth - 1) * 20}px` }"
         :data-node-id="row.id"
         @click.stop="store.setActiveFromScroll(row.id)"
       >
