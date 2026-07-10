@@ -1,5 +1,10 @@
 <template>
-  <section ref="scrollRef" class="ad-detail" @scroll.passive="onScroll">
+  <section
+    ref="scrollRef"
+    class="ad-detail"
+    :class="{ 'is-example': !!store.selectedExample.value }"
+    @scroll.passive="onScroll"
+  >
     <!-- 예제 뷰: Examples 탭에서 예제 선택 시 -->
     <template v-if="store.selectedExample.value">
       <header class="ad-detail-intro ad-example-intro">

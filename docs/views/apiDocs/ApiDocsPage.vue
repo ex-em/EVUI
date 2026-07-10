@@ -437,6 +437,29 @@ createApiDocsStore();
     }
   }
 
+  /* 예제 뷰: 남은 패널 영역을 예제(article-example)가 꽉 채운다 */
+  .ad-detail.is-example {
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 24px;
+
+    .ad-detail-intro {
+      flex-shrink: 0;
+    }
+    .article-wrapper {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      min-height: 0;
+      padding: 16px 0 0;
+    }
+    .article-example {
+      flex: 1;
+      height: auto;
+      min-height: 320px;
+    }
+  }
+
   .ad-detail-section {
     margin: 28px 0 4px;
     color: var(--ad-text-sub);
