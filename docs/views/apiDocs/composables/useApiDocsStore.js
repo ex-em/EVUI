@@ -1,0 +1,226 @@
+import { ref, computed, provide, inject } from 'vue';
+import docRegistry from '../data';
+
+const STORE_KEY = Symbol('api-docs-store');
+
+/**
+ * JSON 문서를 평탄화(flatten)한다.
+ * 모든 노드는 `kind:path` 형태의 고유 id를 갖고, DFS 순서로 배열에 담긴다.
+ * 이 순서가 곧 센터 패널의 렌더링/스크롤 스파이 순서가 된다.
+ */
+function flattenDoc(doc) {
+  const nodes = [];
+  const walk = (item, kind, parentId, depth, parentPath) => {
+    const path = parentPath ? `${parentPath}.${item.name}` : item.name;
+    const id = `${kind}:${path}`;
+    const node = {
+      id,
+      kind,
+      name: item.name,
+      path,
+      depth,
+      parentId,
+      type: item.type,
+      default: item.default,
+      required: item.required || false,
+      version: item.version,
+      description: item.description,
+      values: item.values || [],
+      childIds: [],
+    };
+    nodes.push(node);
+    (item.children || []).forEach((child) => {
+      node.childIds.push(walk(child, kind, id, depth + 1, path));
+    });
+    return id;
+  };
+  doc.sections.forEach((section) => {
+    section.items.forEach((item) => walk(item, section.kind, null, 0, ''));
+  });
+  return nodes;
+}
+
+export function createApiDocsStore() {
+  const componentKeys = Object.keys(docRegistry);
+
+  // --- state ---------------------------------------------------------------
+  const currentKey = ref(componentKeys[0]);
+  const activeTab = ref('docs'); // 'docs' | 'examples'
+  const query = ref('');
+  const activeId = ref(null);
+  const expandedIds = ref(new Set());
+  const tryItId = ref(null);
+  // 트리 클릭 → 센터 패널 스크롤 요청 (ts로 동일 id 재요청 구분)
+  const scrollRequest = ref(null);
+
+  // --- derived -------------------------------------------------------------
+  const doc = computed(() => docRegistry[currentKey.value]);
+  const componentList = computed(() =>
+    componentKeys.map((key) => ({ key, label: docRegistry[key].component })));
+
+  const flatNodes = computed(() => flattenDoc(doc.value));
+  const nodeMap = computed(() => new Map(flatNodes.value.map((n) => [n.id, n])));
+
+  /**
+   * 검색 필터. 매칭 노드의 [자기 자신 + 하위 전체 + 조상 경로]를 노출한다.
+   * null 이면 전체 노출.
+   */
+  const visibleIdSet = computed(() => {
+    const q = query.value.trim().toLowerCase();
+    if (!q) return null;
+
+    const map = nodeMap.value;
+    const visible = new Set();
+    const addSubtree = (id) => {
+      if (visible.has(id)) return;
+      visible.add(id);
+      map.get(id).childIds.forEach(addSubtree);
+    };
+
+    flatNodes.value.forEach((node) => {
+      const matched =
+        node.name.toLowerCase().includes(q) ||
+        node.path.toLowerCase().includes(q) ||
+        (node.description || '').toLowerCase().includes(q);
+      if (!matched) return;
+      addSubtree(node.id);
+      let pid = node.parentId;
+      while (pid && !visible.has(pid)) {
+        visible.add(pid);
+        pid = map.get(pid).parentId;
+      }
+    });
+    return visible;
+  });
+
+  const isVisible = (id) => !visibleIdSet.value || visibleIdSet.value.has(id);
+  const isSearching = computed(() => !!query.value.trim());
+
+  /** 센터 패널용: 섹션별 평탄화(DFS) 노드 목록 */
+  const visibleSections = computed(() =>
+    doc.value.sections
+      .map((section) => ({
+        kind: section.kind,
+        label: section.label,
+        nodes: flatNodes.value.filter((n) => n.kind === section.kind && isVisible(n.id)),
+      }))
+      .filter((section) => section.nodes.length));
+
+  /** 사이드바 트리용: 섹션별 루트 노드 id 목록 */
+  const sectionRoots = computed(() =>
+    doc.value.sections
+      .map((section) => ({
+        kind: section.kind,
+        label: section.label,
+        rootIds: flatNodes.value
+          .filter((n) => n.kind === section.kind && n.depth === 0 && isVisible(n.id))
+          .map((n) => n.id),
+      }))
+      .filter((section) => section.rootIds.length));
+
+  /** 스크롤 스파이 순서(= 센터 패널 렌더 순서) */
+  const orderedVisibleIds = computed(() =>
+    visibleSections.value.flatMap((section) => section.nodes.map((n) => n.id)));
+
+  const tryItNode = computed(() => (tryItId.value ? nodeMap.value.get(tryItId.value) : null));
+
+  // --- actions ---------------------------------------------------------------
+  const getNode = (id) => nodeMap.value.get(id);
+
+  // 검색 중에는 매칭 구조를 그대로 보여주기 위해 강제로 전체 펼침 처리
+  const isExpanded = (id) => isSearching.value || expandedIds.value.has(id);
+
+  const toggleExpand = (id) => {
+    const next = new Set(expandedIds.value);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    expandedIds.value = next;
+  };
+
+  const expandAncestors = (id) => {
+    const next = new Set(expandedIds.value);
+    let pid = getNode(id)?.parentId;
+    while (pid) {
+      next.add(pid);
+      pid = getNode(pid).parentId;
+    }
+    expandedIds.value = next;
+  };
+
+  /** 트리에서 클릭: active 지정 + 센터 패널 스크롤 요청 */
+  const selectNode = (id) => {
+    activeId.value = id;
+    expandAncestors(id);
+    if (getNode(id)?.childIds.length && !expandedIds.value.has(id)) {
+      toggleExpand(id);
+    }
+    scrollRequest.value = { id, ts: Date.now() };
+  };
+
+  /** 센터 패널 스크롤 스파이에서 호출: 트리 하이라이트만 갱신 */
+  const setActiveFromScroll = (id) => {
+    if (!id || activeId.value === id) return;
+    activeId.value = id;
+    expandAncestors(id);
+  };
+
+  const setComponent = (key) => {
+    if (!docRegistry[key] || key === currentKey.value) return;
+    currentKey.value = key;
+    query.value = '';
+    activeId.value = null;
+    expandedIds.value = new Set();
+    tryItId.value = null;
+    scrollRequest.value = null;
+  };
+
+  const openTryIt = (id) => {
+    tryItId.value = id;
+  };
+  const closeTryIt = () => {
+    tryItId.value = null;
+  };
+
+  const store = {
+    // state
+    currentKey,
+    activeTab,
+    query,
+    activeId,
+    tryItId,
+    scrollRequest,
+    // derived
+    doc,
+    componentList,
+    flatNodes,
+    visibleSections,
+    sectionRoots,
+    orderedVisibleIds,
+    tryItNode,
+    isSearching,
+    // helpers & actions
+    getNode,
+    isVisible,
+    isExpanded,
+    toggleExpand,
+    selectNode,
+    setActiveFromScroll,
+    setComponent,
+    openTryIt,
+    closeTryIt,
+  };
+
+  provide(STORE_KEY, store);
+  return store;
+}
+
+export function useApiDocsStore() {
+  const store = inject(STORE_KEY);
+  if (!store) {
+    throw new Error('useApiDocsStore()는 ApiDocsPage 하위에서만 사용할 수 있습니다.');
+  }
+  return store;
+}

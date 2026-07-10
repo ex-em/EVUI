@@ -1,0 +1,500 @@
+{
+  "component": "EvChart (Line)",
+  "route": "/lineChart",
+  "since": "3.0.0",
+  "description": "Canvas 기반 라인 차트 컴포넌트입니다. 시계열/카테고리 축, 다중 시리즈, 툴팁, 줌 등을 지원합니다.",
+  "examples": [
+    { "label": "기본 라인 차트", "route": "/lineChart" },
+    { "label": "줌 차트", "route": "/zoomChart" },
+    { "label": "브러시 차트", "route": "/brushChart" }
+  ],
+  "sections": [
+    {
+      "kind": "props",
+      "label": "Props",
+      "items": [
+        {
+          "name": "data",
+          "type": "Object",
+          "default": "{}",
+          "required": true,
+          "version": "3.0.0",
+          "description": "차트에 표현할 시리즈/데이터 정보입니다.",
+          "children": [
+            {
+              "name": "series",
+              "type": "Object",
+              "default": "{}",
+              "required": true,
+              "version": "3.0.0",
+              "description": "시리즈별 표현 방식을 정의합니다. key는 시리즈 ID로 사용됩니다.",
+              "children": [
+                {
+                  "name": "name",
+                  "type": "String",
+                  "default": "''",
+                  "version": "3.0.0",
+                  "description": "범례와 툴팁에 노출되는 시리즈 이름입니다."
+                },
+                {
+                  "name": "show",
+                  "type": "Boolean",
+                  "default": "true",
+                  "version": "3.0.0",
+                  "description": "시리즈 표시 여부입니다."
+                },
+                {
+                  "name": "point",
+                  "type": "Boolean",
+                  "default": "false",
+                  "version": "3.0.0",
+                  "description": "데이터 포인트(마커) 표시 여부입니다."
+                },
+                {
+                  "name": "pointStyle",
+                  "type": "Object",
+                  "default": "{}",
+                  "version": "3.2.0",
+                  "description": "데이터 포인트의 스타일을 지정합니다.",
+                  "children": [
+                    {
+                      "name": "size",
+                      "type": "Number",
+                      "default": "3",
+                      "version": "3.2.0",
+                      "description": "포인트 반지름(px)입니다."
+                    },
+                    {
+                      "name": "fillColor",
+                      "type": "String",
+                      "default": "''",
+                      "version": "3.2.0",
+                      "description": "포인트 채움 색상입니다. 미지정 시 시리즈 색상을 따릅니다."
+                    },
+                    {
+                      "name": "shape",
+                      "type": "String",
+                      "default": "'circle'",
+                      "version": "3.2.0",
+                      "values": ["'circle'", "'rect'", "'triangle'"],
+                      "description": "포인트 도형 모양입니다."
+                    }
+                  ]
+                },
+                {
+                  "name": "fill",
+                  "type": "Boolean | Object",
+                  "default": "false",
+                  "version": "3.0.0",
+                  "description": "라인 아래 영역을 채울지 여부 또는 채움 옵션입니다.",
+                  "children": [
+                    {
+                      "name": "gradient",
+                      "type": "Boolean",
+                      "default": "true",
+                      "version": "3.1.0",
+                      "description": "채움 영역에 그라데이션 적용 여부입니다."
+                    },
+                    {
+                      "name": "opacity",
+                      "type": "Number",
+                      "default": "0.4",
+                      "version": "3.1.0",
+                      "description": "채움 영역의 불투명도(0~1)입니다."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "labels",
+              "type": "Array",
+              "default": "[]",
+              "version": "3.0.0",
+              "description": "X축 라벨 목록입니다. time 축인 경우 Date 값 배열을 사용합니다."
+            },
+            {
+              "name": "groups",
+              "type": "Array",
+              "default": "[]",
+              "version": "3.0.0",
+              "description": "스택 표현 시 그룹으로 묶을 시리즈 ID 배열의 배열입니다."
+            }
+          ]
+        },
+        {
+          "name": "options",
+          "type": "Object",
+          "default": "{}",
+          "required": false,
+          "version": "3.0.0",
+          "description": "차트의 표현 방식을 정의하는 옵션 집합입니다.",
+          "children": [
+            {
+              "name": "type",
+              "type": "String",
+              "default": "'line'",
+              "version": "3.0.0",
+              "values": ["'line'", "'bar'", "'pie'", "'scatter'", "'heatMap'"],
+              "description": "차트 타입입니다."
+            },
+            {
+              "name": "width",
+              "type": "String | Number",
+              "default": "'100%'",
+              "version": "3.0.0",
+              "description": "차트 너비입니다. 픽셀 값 또는 백분율 문자열을 사용합니다."
+            },
+            {
+              "name": "height",
+              "type": "String | Number",
+              "default": "'100%'",
+              "version": "3.0.0",
+              "description": "차트 높이입니다. 픽셀 값 또는 백분율 문자열을 사용합니다."
+            },
+            {
+              "name": "title",
+              "type": "Object",
+              "default": "{}",
+              "version": "3.0.0",
+              "description": "차트 상단 타이틀 옵션입니다.",
+              "children": [
+                {
+                  "name": "show",
+                  "type": "Boolean",
+                  "default": "false",
+                  "version": "3.0.0",
+                  "description": "타이틀 표시 여부입니다."
+                },
+                {
+                  "name": "text",
+                  "type": "String",
+                  "default": "''",
+                  "version": "3.0.0",
+                  "description": "타이틀 문자열입니다."
+                },
+                {
+                  "name": "style",
+                  "type": "Object",
+                  "default": "{}",
+                  "version": "3.0.0",
+                  "description": "타이틀 텍스트 스타일입니다.",
+                  "children": [
+                    {
+                      "name": "fontSize",
+                      "type": "Number",
+                      "default": "15",
+                      "version": "3.0.0",
+                      "description": "폰트 크기(px)입니다."
+                    },
+                    {
+                      "name": "color",
+                      "type": "String",
+                      "default": "'#000'",
+                      "version": "3.0.0",
+                      "description": "폰트 색상입니다."
+                    },
+                    {
+                      "name": "fontFamily",
+                      "type": "String",
+                      "default": "'Roboto'",
+                      "version": "3.0.0",
+                      "description": "폰트 패밀리입니다."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "legend",
+              "type": "Object",
+              "default": "{}",
+              "version": "3.0.0",
+              "description": "범례 표시 옵션입니다.",
+              "children": [
+                {
+                  "name": "show",
+                  "type": "Boolean",
+                  "default": "true",
+                  "version": "3.0.0",
+                  "description": "범례 표시 여부입니다."
+                },
+                {
+                  "name": "position",
+                  "type": "String",
+                  "default": "'right'",
+                  "version": "3.0.0",
+                  "values": ["'top'", "'right'", "'bottom'", "'left'"],
+                  "description": "범례 위치입니다."
+                },
+                {
+                  "name": "color",
+                  "type": "String",
+                  "default": "'#353740'",
+                  "version": "3.0.0",
+                  "description": "범례 텍스트 색상입니다."
+                },
+                {
+                  "name": "allowResize",
+                  "type": "Boolean",
+                  "default": "false",
+                  "version": "3.4.0",
+                  "description": "범례 영역 크기 조절 허용 여부입니다."
+                }
+              ]
+            },
+            {
+              "name": "axesX",
+              "type": "Array<Object>",
+              "default": "[]",
+              "version": "3.0.0",
+              "description": "X축 정의 배열입니다. 다중 축을 지원합니다.",
+              "children": [
+                {
+                  "name": "type",
+                  "type": "String",
+                  "default": "'time'",
+                  "version": "3.0.0",
+                  "values": ["'time'", "'linear'", "'log'", "'step'"],
+                  "description": "축 스케일 타입입니다."
+                },
+                {
+                  "name": "showGrid",
+                  "type": "Boolean",
+                  "default": "true",
+                  "version": "3.0.0",
+                  "description": "그리드 라인 표시 여부입니다."
+                },
+                {
+                  "name": "timeFormat",
+                  "type": "String",
+                  "default": "'HH:mm:ss'",
+                  "version": "3.0.0",
+                  "description": "time 축에서 라벨 포맷입니다. (moment 포맷 문자열)"
+                },
+                {
+                  "name": "labelStyle",
+                  "type": "Object",
+                  "default": "{}",
+                  "version": "3.0.0",
+                  "description": "축 라벨 텍스트 스타일입니다.",
+                  "children": [
+                    {
+                      "name": "fontSize",
+                      "type": "Number",
+                      "default": "12",
+                      "version": "3.0.0",
+                      "description": "라벨 폰트 크기(px)입니다."
+                    },
+                    {
+                      "name": "color",
+                      "type": "String",
+                      "default": "'#7e8295'",
+                      "version": "3.0.0",
+                      "description": "라벨 폰트 색상입니다."
+                    },
+                    {
+                      "name": "fitWidth",
+                      "type": "Boolean",
+                      "default": "false",
+                      "version": "3.4.0",
+                      "description": "라벨이 길 경우 말줄임 처리 여부입니다."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "axesY",
+              "type": "Array<Object>",
+              "default": "[]",
+              "version": "3.0.0",
+              "description": "Y축 정의 배열입니다. 구조는 axesX와 동일합니다.",
+              "children": [
+                {
+                  "name": "type",
+                  "type": "String",
+                  "default": "'linear'",
+                  "version": "3.0.0",
+                  "values": ["'linear'", "'log'"],
+                  "description": "축 스케일 타입입니다."
+                },
+                {
+                  "name": "startToZero",
+                  "type": "Boolean",
+                  "default": "false",
+                  "version": "3.0.0",
+                  "description": "축 최소값을 0부터 시작할지 여부입니다."
+                },
+                {
+                  "name": "autoScaleRatio",
+                  "type": "Number",
+                  "default": "null",
+                  "version": "3.0.0",
+                  "description": "최대값 기준 여백 비율입니다. (예: 0.1 = 10%)"
+                }
+              ]
+            },
+            {
+              "name": "tooltip",
+              "type": "Object",
+              "default": "{}",
+              "version": "3.0.0",
+              "description": "마우스 오버 시 표시되는 툴팁 옵션입니다.",
+              "children": [
+                {
+                  "name": "use",
+                  "type": "Boolean",
+                  "default": "false",
+                  "version": "3.0.0",
+                  "description": "툴팁 사용 여부입니다."
+                },
+                {
+                  "name": "sortByValue",
+                  "type": "Boolean",
+                  "default": "true",
+                  "version": "3.0.0",
+                  "description": "툴팁 내 시리즈를 값 기준으로 정렬할지 여부입니다."
+                },
+                {
+                  "name": "formatter",
+                  "type": "Function | Object",
+                  "default": "null",
+                  "version": "3.2.0",
+                  "description": "툴팁 내용(title/value)을 가공하는 포맷터입니다."
+                }
+              ]
+            },
+            {
+              "name": "zoom",
+              "type": "Object",
+              "default": "{}",
+              "version": "3.3.0",
+              "description": "차트 줌 동작 옵션입니다. EvChartGroup과 함께 사용할 수 있습니다.",
+              "children": [
+                {
+                  "name": "toolbar",
+                  "type": "Object",
+                  "default": "{}",
+                  "version": "3.3.0",
+                  "description": "줌 툴바 옵션입니다.",
+                  "children": [
+                    {
+                      "name": "show",
+                      "type": "Boolean",
+                      "default": "false",
+                      "version": "3.3.0",
+                      "description": "툴바 표시 여부입니다."
+                    },
+                    {
+                      "name": "items",
+                      "type": "Object",
+                      "default": "{}",
+                      "version": "3.3.0",
+                      "description": "툴바 버튼별 표시 옵션입니다. (previous, latest, reset, dragZoom)"
+                    }
+                  ]
+                },
+                {
+                  "name": "bufferMemoryCnt",
+                  "type": "Number",
+                  "default": "100",
+                  "version": "3.3.0",
+                  "description": "줌 이력을 보관할 최대 개수입니다."
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "resizeTimeout",
+          "type": "Number",
+          "default": "0",
+          "required": false,
+          "version": "3.0.0",
+          "description": "리사이즈 이벤트 발생 시 다시 그리기까지의 지연 시간(ms)입니다."
+        }
+      ]
+    },
+    {
+      "kind": "events",
+      "label": "Events",
+      "items": [
+        {
+          "name": "click",
+          "type": "Function",
+          "version": "3.0.0",
+          "description": "차트(시리즈/라벨) 클릭 시 발생합니다. 선택된 항목 정보를 전달합니다.",
+          "children": [
+            {
+              "name": "e.label",
+              "type": "String | Date",
+              "version": "3.0.0",
+              "description": "클릭 지점의 X축 라벨 값입니다."
+            },
+            {
+              "name": "e.value",
+              "type": "Number | Array",
+              "version": "3.0.0",
+              "description": "클릭 지점의 시리즈 값입니다."
+            },
+            {
+              "name": "e.sId",
+              "type": "String",
+              "version": "3.0.0",
+              "description": "클릭된 시리즈 ID입니다."
+            }
+          ]
+        },
+        {
+          "name": "dbl-click",
+          "type": "Function",
+          "version": "3.0.0",
+          "description": "차트 더블 클릭 시 발생합니다. 전달 인자는 click과 동일합니다."
+        },
+        {
+          "name": "drag-select",
+          "type": "Function",
+          "version": "3.1.0",
+          "description": "드래그로 영역 선택 시 발생합니다. 선택 영역 내 데이터와 범위를 전달합니다.",
+          "children": [
+            {
+              "name": "e.data",
+              "type": "Array",
+              "version": "3.1.0",
+              "description": "선택 영역에 포함된 데이터 배열입니다."
+            },
+            {
+              "name": "e.range",
+              "type": "Object",
+              "version": "3.1.0",
+              "description": "선택 영역의 픽셀/축 범위 정보입니다."
+            }
+          ]
+        },
+        {
+          "name": "resize",
+          "type": "Function",
+          "version": "3.0.0",
+          "description": "차트 리사이즈 후 발생합니다."
+        }
+      ]
+    },
+    {
+      "kind": "slots",
+      "label": "Slots",
+      "items": [
+        {
+          "name": "toolbar",
+          "version": "3.3.0",
+          "description": "줌 툴바 우측에 사용자 정의 버튼을 추가하는 슬롯입니다."
+        },
+        {
+          "name": "noData",
+          "version": "3.4.0",
+          "description": "데이터가 없을 때 차트 영역에 표시할 내용을 정의하는 슬롯입니다."
+        }
+      ]
+    }
+  ]
+}
