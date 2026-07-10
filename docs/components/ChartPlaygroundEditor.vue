@@ -99,6 +99,11 @@ export default {
       type: Object,
       default: null,
     },
+    /** 마운트 시 커서를 이동할 키 경로 (예: ['legend', 'position']) */
+    focusPath: {
+      type: Array,
+      default: null,
+    },
   },
   emits: ['apply'],
   setup(props, { emit }) {
@@ -127,6 +132,29 @@ export default {
         }),
         parent: editorEl.value,
       });
+
+      // focusPath 순서대로 키를 찾아 해당 위치로 커서 이동 + 스크롤
+      if (props.focusPath?.length) {
+        let pos = 0;
+        let found = true;
+        props.focusPath.forEach((seg) => {
+          if (!found) return;
+          let idx = initialJS.indexOf(`${seg}:`, pos);
+          if (idx < 0) idx = initialJS.indexOf(`"${seg}":`, pos);
+          if (idx < 0) {
+            found = false;
+            return;
+          }
+          pos = idx;
+        });
+        if (found && pos > 0) {
+          const lastSeg = props.focusPath[props.focusPath.length - 1];
+          view.dispatch({
+            selection: { anchor: pos, head: pos + lastSeg.length },
+            effects: EditorView.scrollIntoView(pos, { y: 'center' }),
+          });
+        }
+      }
     });
 
     const applyChanges = () => {
