@@ -747,6 +747,9 @@ createApiDocsStore();
     background: var(--ad-bg);
   }
   .ad-tryit-editor-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     padding: 8px 14px;
     border: none;
     border-bottom: 2px solid transparent;
@@ -763,6 +766,88 @@ createApiDocsStore();
       border-bottom-color: var(--ad-primary);
       color: var(--ad-primary);
     }
+  }
+  .ad-tryit-event-count {
+    padding: 0 6px;
+    border-radius: 8px;
+    color: #fff;
+    background: var(--ad-primary);
+    font-size: 10px;
+    line-height: 1.6;
+  }
+
+  /* ── Events 콘솔 ── */
+  .ad-tryit-chart {
+    height: 100%;
+  }
+  .ad-tryit-console {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .ad-tryit-console-bar {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--ad-border);
+  }
+  .ad-tryit-console-info {
+    overflow: hidden;
+    color: var(--ad-text-sub);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .ad-tryit-console-clear {
+    flex-shrink: 0;
+    padding: 3px 10px;
+    border: 1px solid var(--ad-border);
+    border-radius: 4px;
+    color: var(--ad-text-sub);
+    background: none;
+    font-size: 11px;
+    cursor: pointer;
+
+    &:hover {
+      border-color: var(--ad-primary);
+      color: var(--ad-primary);
+    }
+  }
+  .ad-tryit-console-body {
+    flex: 1;
+    min-height: 0;
+    padding: 8px 10px;
+    overflow-y: auto;
+    background: #16181d;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 11.5px;
+    line-height: 1.7;
+  }
+  .ad-tryit-console-empty {
+    color: #6b7280;
+  }
+  .ad-tryit-console-line {
+    display: flex;
+    gap: 8px;
+    padding: 1px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    word-break: break-all;
+  }
+  .ad-tryit-console-time {
+    flex-shrink: 0;
+    color: #6b7280;
+  }
+  .ad-tryit-console-name {
+    flex-shrink: 0;
+    color: #7ee787;
+    font-weight: 700;
+  }
+  .ad-tryit-console-payload {
+    color: #c9d1d9;
   }
 
   /* --- 반응형 -------------------------------------------------------------- */
