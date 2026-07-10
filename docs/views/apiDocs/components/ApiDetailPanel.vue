@@ -46,6 +46,15 @@ watch(
     container.scrollTo({ top: el.offsetTop - 12, behavior: 'smooth' });
     // 'scrollend' 미지원 브라우저를 위한 타임아웃 폴백
     suppressTimer = setTimeout(() => {
+      // content-visibility 지연 렌더로 스크롤 중 위쪽 카드 높이가 바뀌면
+      // 목표 위치가 어긋나 제목이 가려질 수 있어, 완료 시점에 한 번 보정한다.
+      const target = itemEl(request.id);
+      if (target) {
+        const top = target.offsetTop - 12;
+        if (Math.abs(container.scrollTop - top) > 4) {
+          container.scrollTo({ top, behavior: 'instant' });
+        }
+      }
       suppressSpy = false;
     }, 800);
   },
