@@ -349,6 +349,14 @@ const routes = [
     },
   },
   {
+    path: '/api-docs',
+    name: 'API Docs',
+    component: () => import('../views/apiDocs/ApiDocsPage.vue'),
+    meta: {
+      category: 'Docs',
+    },
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'PageNotFound',
     component: () => import('../views/PageNotFound'),
