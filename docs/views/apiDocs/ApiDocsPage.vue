@@ -346,6 +346,9 @@ createApiDocsStore();
 
   /* --- [Center] Detail ----------------------------------------------------- */
   .ad-detail {
+    /* 스크롤 대상(offsetTop) 좌표 기준을 이 컨테이너로 고정한다.
+       static이면 offsetParent가 .evui-wrapper가 되어 헤더 높이만큼 어긋난다. */
+    position: relative;
     flex: 1;
     min-width: 0;
     padding: 24px 32px 60vh; /* 하단 여백: 마지막 항목도 스파이 기준선에 닿도록 */
