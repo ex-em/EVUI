@@ -480,10 +480,13 @@ createApiDocsStore();
     /* 대용량 문서 대응: 화면 밖 카드는 렌더링 생략 */
     content-visibility: auto;
     contain-intrinsic-size: auto 200px;
+    /* 플래시 하이라이트가 부드럽게 사라지도록 */
+    transition: border-color 0.8s ease, background-color 0.8s ease;
 
     &.is-active {
       border-left-color: var(--ad-primary);
       background: var(--ad-bg-soft);
+      transition: none; /* 나타날 때는 즉시 */
     }
   }
   .ad-item-header {
@@ -588,6 +591,8 @@ createApiDocsStore();
     border-bottom: 1px solid var(--ad-border);
     border-left: 2px solid transparent;
     cursor: pointer;
+    /* 플래시 하이라이트가 부드럽게 사라지도록 */
+    transition: border-color 0.8s ease, background-color 0.8s ease;
 
     &:last-child {
       border-bottom: none;
@@ -598,6 +603,7 @@ createApiDocsStore();
     &.is-active {
       border-left-color: var(--ad-primary);
       background: var(--ad-primary-soft);
+      transition: none; /* 나타날 때는 즉시 */
     }
   }
   .ad-row-head {

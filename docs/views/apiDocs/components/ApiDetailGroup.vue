@@ -38,7 +38,7 @@
         v-for="row in rows"
         :key="row.id"
         class="ad-group-row"
-        :class="{ 'is-active': store.activeId.value === row.id }"
+        :class="{ 'is-active': store.flashId.value === row.id }"
         :data-node-id="row.id"
         @click.stop="store.setActiveFromScroll(row.id)"
       >
@@ -80,7 +80,8 @@ const KIND_LABELS = { props: 'prop', events: 'event', slots: 'slot' };
 
 const store = useApiDocsStore();
 
-const isHeadActive = computed(() => store.activeId.value === props.head.id);
+// 트리 클릭 직후에만 잠깐 표시되는 플래시 하이라이트 (상시 하이라이트는 트리 담당)
+const isHeadActive = computed(() => store.flashId.value === props.head.id);
 const kindLabel = computed(() => KIND_LABELS[props.head.kind] || props.head.kind);
 const parentPath = computed(() => {
   const lastDot = props.head.path.lastIndexOf('.');
