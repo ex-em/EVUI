@@ -18,7 +18,7 @@
       <div v-show="canResize" ref="resizeHandle" class="resize-handle" @mousedown="startResize" />
       <div
         v-show="codeVisible"
-        :class="codeClasses"
+        :class="['code', { 'vertical-mode-item': verticalMode }]"
         :style="codeStyle"
       >
         <!-- 탭 바 -->
@@ -33,7 +33,7 @@
           </button>
         </div>
 
-        <div ref="codeWrapper" class="code-wrapper" :style="codeWrapperStyle">
+        <div ref="codeWrapper" class="code-wrapper">
           <!-- chartData 탭 -->
           <div
             v-if="dataTabMounted"
@@ -122,7 +122,6 @@ export default {
     const codeWrapper = ref(null);
 
     const viewArea = ref();
-    const viewAreaHeight = ref();
 
     const NARROW_QUERY = '(max-width: 1280px)';
     const mql = window.matchMedia(NARROW_QUERY);
@@ -252,8 +251,6 @@ export default {
     });
 
     onMounted(() => {
-      viewAreaHeight.value = viewArea.value.offsetHeight;
-
       const comp = exampleComp.value;
       if (
         comp
@@ -267,20 +264,6 @@ export default {
       }
     });
 
-    const isPlaygroundTab = computed(
-      () => hasPlayground.value && activeTab.value !== 'source',
-    );
-
-    const codeClasses = computed(() => [
-      'code',
-      { 'playground-active': isPlaygroundTab.value },
-    ]);
-
-    const codeWrapperStyle = computed(() => {
-      if (isPlaygroundTab.value) return {};
-      return { height: `${viewAreaHeight.value}px` };
-    });
-
     const onApplyData = (newData) => {
       exampleComp.value?.onApply?.({ chartData: newData });
     };
@@ -292,7 +275,6 @@ export default {
       kebabCase,
       codeWrapper,
       viewArea,
-      viewAreaHeight,
       isNarrow,
       codeVisible,
       toggleCode,
@@ -312,9 +294,6 @@ export default {
       optionsTabMounted,
       snapshotData,
       snapshotOptions,
-      codeClasses,
-      codeWrapperStyle,
-      isPlaygroundTab,
       onApplyData,
       onApplyOptions,
     };
@@ -365,11 +344,15 @@ export default {
 .article-example {
   display: flex;
   position: relative;
+  /* 컨테이너가 높이의 기준 — 모든 탭(view/code)이 동일한 높이를 공유한다 */
+  height: 480px;
   border: 1px solid $color-yellow;
   border-radius: 4px;
   .view {
     width: 50%;
+    height: 100%;
     padding: 15px 20px;
+    overflow: auto;
     border-right: 1px solid $color-yellow;
   }
   .resize-handle {
@@ -509,27 +492,23 @@ export default {
 
   /* ── 코드 영역 ── */
   .code {
+    display: flex;
     position: relative;
+    flex-direction: column;
     width: 50%;
+    min-height: 0;
     overflow: hidden;
 
     .code-wrapper {
-      height: 100px;
-      min-height: 350px;
+      flex: 1;
+      min-height: 0;
       overflow-y: auto;
-    }
-    /* playground 탭 활성 시 */
-    &.playground-active {
-      .code-wrapper {
-        height: auto !important;
-        min-height: 350px;
-        max-height: 600px;
-      }
     }
   }
 }
 .vertical-mode {
   display: block !important;
+  height: auto !important;
 }
 .vertical-mode-item {
   width: 100% !important;
@@ -538,8 +517,10 @@ export default {
 @media all and (max-width: 1280px) {
   .article-example {
     display: block;
+    height: auto;
     .view {
       width: 100% !important;
+      height: 300px;
       border-right: 0;
       border-bottom: 1px solid $color-yellow;
       overflow: auto;

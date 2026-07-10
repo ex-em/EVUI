@@ -118,9 +118,8 @@ export default {
             javascript(),
             EditorView.lineWrapping,
             EditorView.theme({
-              '&': { fontSize: '13px' },
+              '&': { fontSize: '13px', height: '100%' },
               '.cm-scroller': {
-                maxHeight: '500px',
                 overflow: 'auto',
               },
             }),
