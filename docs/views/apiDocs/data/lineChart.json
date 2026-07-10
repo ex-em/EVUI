@@ -2,12 +2,8 @@
   "component": "EvChart (Line)",
   "route": "/lineChart",
   "since": "3.0.0",
-  "description": "Canvas 기반 라인 차트 컴포넌트입니다. 시계열/카테고리 축, 다중 시리즈, 툴팁, 줌 등을 지원합니다.",
-  "examples": [
-    { "label": "기본 라인 차트", "route": "/lineChart" },
-    { "label": "줌 차트", "route": "/zoomChart" },
-    { "label": "브러시 차트", "route": "/brushChart" }
-  ],
+  "description": "Canvas 기반 라인 차트 컴포넌트입니다. 시계열/카테고리 축, 다중 시리즈, 툴팁 등을 지원합니다.",
+  "examples": [{ "label": "기본 라인 차트", "route": "/lineChart" }],
   "playground": { "route": "/lineChart", "example": "Fill" },
   "sections": [
     {
@@ -365,45 +361,6 @@
                   "description": "툴팁 내용(title/value)을 가공하는 포맷터입니다."
                 }
               ]
-            },
-            {
-              "name": "zoom",
-              "type": "Object",
-              "default": "{}",
-              "version": "3.3.0",
-              "description": "차트 줌 동작 옵션입니다. EvChartGroup과 함께 사용할 수 있습니다.",
-              "children": [
-                {
-                  "name": "toolbar",
-                  "type": "Object",
-                  "default": "{}",
-                  "version": "3.3.0",
-                  "description": "줌 툴바 옵션입니다.",
-                  "children": [
-                    {
-                      "name": "show",
-                      "type": "Boolean",
-                      "default": "false",
-                      "version": "3.3.0",
-                      "description": "툴바 표시 여부입니다."
-                    },
-                    {
-                      "name": "items",
-                      "type": "Object",
-                      "default": "{}",
-                      "version": "3.3.0",
-                      "description": "툴바 버튼별 표시 옵션입니다. (previous, latest, reset, dragZoom)"
-                    }
-                  ]
-                },
-                {
-                  "name": "bufferMemoryCnt",
-                  "type": "Number",
-                  "default": "100",
-                  "version": "3.3.0",
-                  "description": "줌 이력을 보관할 최대 개수입니다."
-                }
-              ]
             }
           ]
         },
@@ -485,11 +442,6 @@
       "kind": "slots",
       "label": "Slots",
       "items": [
-        {
-          "name": "toolbar",
-          "version": "3.3.0",
-          "description": "줌 툴바 우측에 사용자 정의 버튼을 추가하는 슬롯입니다."
-        },
         {
           "name": "noData",
           "version": "3.4.0",
