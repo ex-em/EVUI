@@ -387,7 +387,7 @@ createApiDocsStore();
     box-shadow: var(--ad-shadow);
     /* 대용량 문서 대응: 화면 밖 카드는 렌더링 생략 */
     content-visibility: auto;
-    contain-intrinsic-size: auto 120px;
+    contain-intrinsic-size: auto 200px;
 
     &.is-active {
       border-left-color: var(--ad-primary);
@@ -483,6 +483,49 @@ createApiDocsStore();
     margin-top: 8px;
     color: var(--ad-text);
     line-height: 1.65;
+  }
+
+  /* 그룹 내부 leaf 속성 행 */
+  .ad-group-rows {
+    margin-top: 14px;
+    border-top: 1px solid var(--ad-border);
+    list-style: none;
+  }
+  .ad-group-row {
+    padding: 10px 10px 10px 14px;
+    border-bottom: 1px solid var(--ad-border);
+    border-left: 2px solid transparent;
+    cursor: pointer;
+
+    &:last-child {
+      border-bottom: none;
+    }
+    &:hover {
+      background: var(--ad-bg-hover);
+    }
+    &.is-active {
+      border-left-color: var(--ad-primary);
+      background: var(--ad-primary-soft);
+    }
+  }
+  .ad-row-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+  }
+  .ad-row-name {
+    padding: 0;
+    background: none;
+    color: var(--ad-text);
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .ad-row-desc {
+    margin-top: 4px;
+    color: var(--ad-text-sub);
+    font-size: 13px;
+    line-height: 1.6;
   }
   .ad-item-values {
     display: flex;

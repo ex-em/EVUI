@@ -116,15 +116,29 @@ export function createApiDocsStore() {
   const isVisible = (id) => !visibleIdSet.value || visibleIdSet.value.has(id);
   const isSearching = computed(() => !!query.value.trim());
 
-  /** 센터 패널용: 섹션별 평탄화(DFS) 노드 목록 */
+  /**
+   * 센터 패널용: 섹션별 그룹(블록) 목록.
+   * 자식을 가진 노드(객체형)와 최상위 leaf가 각각 블록의 head가 되고,
+   * head의 leaf 자식들은 블록 내부의 rows(컴팩트 행)로 묶인다.
+   * 자식이 있는 자식(중첩 객체)은 DFS 순서상 뒤이어 자기 블록으로 렌더된다.
+   */
   const visibleSections = computed(() =>
     doc.value.sections
-      .map((section) => ({
-        kind: section.kind,
-        label: section.label,
-        nodes: flatNodes.value.filter((n) => n.kind === section.kind && isVisible(n.id)),
-      }))
-      .filter((section) => section.nodes.length));
+      .map((section) => {
+        const sectionNodes = flatNodes.value.filter(
+          (n) => n.kind === section.kind && isVisible(n.id),
+        );
+        const blocks = sectionNodes
+          .filter((n) => n.childIds.length || n.depth === 0)
+          .map((head) => ({
+            head,
+            rows: head.childIds
+              .map((id) => nodeMap.value.get(id))
+              .filter((child) => !child.childIds.length && isVisible(child.id)),
+          }));
+        return { kind: section.kind, label: section.label, blocks };
+      })
+      .filter((section) => section.blocks.length));
 
   /** 사이드바 트리용: 섹션별 루트 노드 id 목록 */
   const sectionRoots = computed(() =>
@@ -138,9 +152,10 @@ export function createApiDocsStore() {
       }))
       .filter((section) => section.rootIds.length));
 
-  /** 스크롤 스파이 순서(= 센터 패널 렌더 순서) */
+  /** 스크롤 스파이 순서(= 센터 패널 렌더 순서: 블록 head → 블록 rows) */
   const orderedVisibleIds = computed(() =>
-    visibleSections.value.flatMap((section) => section.nodes.map((n) => n.id)));
+    visibleSections.value.flatMap((section) =>
+      section.blocks.flatMap((block) => [block.head.id, ...block.rows.map((row) => row.id)])));
 
   const tryItNode = computed(() => (tryItId.value ? nodeMap.value.get(tryItId.value) : null));
 
