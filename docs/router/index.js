@@ -353,7 +353,7 @@ const routes = [
     },
   },
   {
-    path: '/api-docs',
+    path: '/api-docs/:component?',
     name: 'API Docs',
     component: () => import('../views/apiDocs/ApiDocsPage.vue'),
     meta: {

@@ -1,5 +1,5 @@
-import { ref, computed, provide, inject, markRaw } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, computed, provide, inject, markRaw, watch } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import docRegistry from '../data';
 
 const STORE_KEY = Symbol('api-docs-store');
@@ -312,6 +312,74 @@ export function createApiDocsStore() {
   const closeTryIt = () => {
     tryItId.value = null;
   };
+
+  // --- URL ↔ 상태 동기화 ------------------------------------------------------
+  // /api-docs/:component?example=<예제명>&exampleFrom=<예제 페이지 경로>
+  // 새로고침·딥링크·뒤로가기에서 현재 컴포넌트/예제 뷰를 복원한다.
+  const route = useRoute();
+
+  const sameExampleKey = (a, b) =>
+    (!a && !b) || (!!a && !!b && a.path === b.path && a.name === b.name);
+
+  /** URL → 상태 (초기 진입, 뒤로/앞으로 가기) */
+  const applyRoute = (to) => {
+    const key = to.params.component;
+    if (key && docRegistry[key]) {
+      setComponent(key);
+    }
+    const { example, exampleFrom } = to.query;
+    if (example && exampleFrom) {
+      const next = {
+        path: exampleFrom,
+        name: example,
+        label:
+          (doc.value.examples || []).find((e) => e.route === exampleFrom)?.label || '',
+      };
+      if (!sameExampleKey(selectedExampleKey.value, next)) {
+        selectedExampleKey.value = next;
+      }
+      activeTab.value = 'examples';
+    } else if (selectedExampleKey.value) {
+      selectedExampleKey.value = null;
+    }
+  };
+
+  /** 상태 → URL */
+  watch([currentKey, selectedExampleKey], ([key, exampleKey]) => {
+    const current = router.currentRoute.value;
+    if (current.name !== 'API Docs') return;
+    const sameComponent = current.params.component === key;
+    const sameExample =
+      (current.query.example || null) === (exampleKey?.name || null) &&
+      (current.query.exampleFrom || null) === (exampleKey?.path || null);
+    if (sameComponent && sameExample) return;
+    router.push({
+      name: 'API Docs',
+      params: { component: key },
+      query: exampleKey
+        ? { example: exampleKey.name, exampleFrom: exampleKey.path }
+        : {},
+    });
+  });
+
+  /** URL → 상태 (popstate 등 외부 내비게이션) */
+  watch(
+    () => route.fullPath,
+    () => {
+      if (route.name !== 'API Docs') return;
+      applyRoute(route);
+    },
+  );
+
+  // 초기 진입: URL 복원 후, 파라미터 없는 진입은 정식 URL로 정규화
+  applyRoute(route);
+  if (route.name === 'API Docs' && route.params.component !== currentKey.value) {
+    router.replace({
+      name: 'API Docs',
+      params: { component: currentKey.value },
+      query: route.query,
+    });
+  }
 
   const store = {
     // state
