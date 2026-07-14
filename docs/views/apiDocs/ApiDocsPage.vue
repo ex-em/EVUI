@@ -186,8 +186,21 @@ createApiDocsStore();
   .ad-picker-soon {
     padding: 1px 6px;
     border-radius: 8px;
+    color: var(--ad-text-sub);
     background: var(--ad-code-bg);
     font-size: 10px;
+  }
+
+  /* md 폴백 안내/뷰 */
+  .ad-md-notice {
+    padding: 16px 14px;
+    color: var(--ad-text-sub);
+    font-size: 12.5px;
+    line-height: 1.7;
+  }
+  .ad-md-fallback {
+    padding-top: 0;
+    overflow-x: auto;
   }
 
   .ad-tabs {

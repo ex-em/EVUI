@@ -29,6 +29,17 @@
       />
     </template>
 
+    <!-- md 폴백 뷰: JSON 문서가 없는 컴포넌트는 기존 md를 렌더링 -->
+    <template v-else-if="!store.doc.value">
+      <header class="ad-detail-intro">
+        <h1 class="ad-detail-component">{{ store.currentPage.value?.label }}</h1>
+        <p class="ad-detail-summary">
+          아직 대화형 문서가 준비되지 않아 기존 문서(md)를 표시합니다.
+        </p>
+      </header>
+      <MarkdownView class="ad-md-fallback" :source="store.currentPage.value?.page?.mdText || ''" />
+    </template>
+
     <!-- API 문서 뷰 -->
     <template v-else>
       <header class="ad-detail-intro">
@@ -53,6 +64,7 @@
 
 <script setup>
 import { ref, watch, nextTick } from 'vue';
+import MarkdownView from 'docs/components/MarkdownView';
 import ApiDetailGroup from './ApiDetailGroup.vue';
 import { useApiDocsStore } from '../composables/useApiDocsStore';
 

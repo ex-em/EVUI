@@ -19,9 +19,14 @@
         <div class="ad-tryit-live">
           <!-- 시딩 단계: 예제 컴포넌트를 잠시 렌더링해 초기 chartData/chartOptions 추출 -->
           <component :is="playground.component" v-if="!seeded" ref="pgCompRef" />
-          <!-- 시딩 후: 패널 소유 차트 — 문서의 Events 섹션 기반 리스너 연결 -->
+          <!-- 시딩 후: 패널 소유 컴포넌트(playground.tag) — 문서의 Events 섹션 기반 리스너 연결 -->
           <div v-else class="ad-tryit-chart">
-            <ev-chart :data="liveData" :options="liveOptions" v-on="chartListeners" />
+            <component
+              :is="playground.tag"
+              :data="liveData"
+              :options="liveOptions"
+              v-on="chartListeners"
+            />
           </div>
         </div>
 
