@@ -92,19 +92,23 @@ const legendItems = ref([]);
 | show         | Boolean                     | true             | 표시 여부                                                                                                                       |                                                                                   |
 | name         | String                      | series-\${index} | 특정 데이터에 대한 시리즈 옵션                                                                                                  |                                                                                   |
 | lineWidth    | Number                      | 2                | 선(line) 두께                                                                                                                   |                                                                                   |
-| color        | Hex, RGB, RGBA Code(String) | COLOR[index]     | Line 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용                                                      |                                                                                   |
+| color        | Hex, RGB, RGBA Code(String) | COLOR[index]     | Line 색상. 사전에 정의된 25개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용                                                      |                                                                                   |
 | fill         | Boolean / Object            | false            | 선(line) 아래 부분의 영역에 색상을 채울지의 여부. area chart 전환 여부,                                                         | false / { gradient: true }                                                        |
 | fillOpacity  | Number                      | 0.4              | fill 영역의 투명도                                                                                                              |                                                                                   |
-| fillColor    | Hex, RGB, RGBA Code(String) | COLOR[index]     | Fill 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용                                                      |                                                                                   |
+| fillColor    | Hex, RGB, RGBA Code(String) | COLOR[index]     | Fill 색상. 사전에 정의된 25개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용                                                      |                                                                                   |
 | point        | Boolean                     | true             | 선(line) 위에 값 위치 마다 점을 표시할지의 여부, 앞/뒤 값이 null인 경우 point 표시 여부에 상관없이 표시됨                       |                                                                                   |
 | pointHighlight        | Boolean                     | true             | hover시 선(line) 위에 값 위치 마다 점을 표시할지의 여부                       |                                                                                   |
 | pointSize    | Number                      | 3                | 점(Point)의 크기                                                                                                                |                                                                                   |
-| pointFill    | Hex, RGB, RGBA Code(String) | COLOR[index]     | 점(Point) 색상. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용                                                 |                                                                                   |
-| pointStyle   | String                      | 'circle'         | 점(Point) 모양                                                                                                                  | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
+| pointFill    | Hex, RGB, RGBA Code(String) | 시리즈 color     | 점(Point) 색상. 미지정 시 해당 시리즈의 color 값을 따름                                                                         |                                                                                   |
+| pointStyle   | String                      | ''(circle로 렌더링) | 점(Point) 모양                                                                                                               | 'triangle', 'rect', 'rectRounded', 'rectRot', 'cross', 'crossRot', 'star', 'line' |
 | showLegend   | Boolean                     | true             | legend 표시 여부                                                                                                                |                                                                                   |
 | passingValue | number \| null               | null             | data가 passingValue와 같을 경우 다음값으로 선을 이어가며 point도 그리지 않고 tooltip에 나오지 않음 |                                                                  |
 | segments | Array<number>                      | null             | dash 간격  | [6,2]                                                                                |
 | interpolation | 'linear' \| 'none' \| 'zero' | 'none' | 보간 사용유무 | |
+| type | String | options.type | 시리즈별 차트 타입 오버라이드(콤보 차트용). 미지정 시 options.type을 따름 | 'line', 'bar', 'scatter' |
+| xAxisIndex | Number | 0 | 다중 X축에서 이 시리즈가 참조할 축 인덱스 | |
+| yAxisIndex | Number | 0 | 다중 Y축에서 이 시리즈가 참조할 축 인덱스 | |
+| highlight | Object | { defaultSize: 4, maxSize: 6, maxShadowSize: 10, maxShadowOpacity: 0.4 } | hover 하이라이트 점 크기/그림자 조정 | |
 
 #### data example
 
@@ -151,6 +155,9 @@ const chartData =
 | syncHover  | boolean         | true                                      | options.syncHover가 true인 EvChartGroup으로 감싼경우, 해당 차트에서는 그룹으로 묶긴 차트들 사이의 syncHover선을 그리고싶지 않을 때 사용하는 속성 (time관련된 축을 가질때만 적용됩니다) |
 | eventBehavior | Object                    | ([상세](#eventbehavior))                  | 이벤트별 동작 설정 | | 
 | shallowDataWatch | Boolean                | false                                     | data prop의 deep watch를 끄는 opt-in(큰 데이터 갱신 성능 최적화) ([상세](#shallowdatawatch)) | |
+| shallowOptionsWatch | Boolean             | false                                     | options prop의 deep watch를 끄는 opt-in ([상세](#shallowoptionswatch)) | |
+| seriesReverse | Boolean                   | false                                     | 시리즈 그리기 순서 반전 여부 | |
+| workerRender | Boolean                    | false                                     | 웹 워커 기반 렌더링을 사용하는 성능 opt-in | |
 
 #### axesX axesY
 
@@ -166,7 +173,14 @@ const chartData =
 | axisLineWidth  | Number   | 1                     | 축의 선 굵기                                                  | 1 ~                                                     |
 | axisLineColor  | String   | '#C9CFDC'             | 축의 색상                                                     |                                                         |
 | gridLineColor  | String   | '#C9CFDC'             | 그리드의 색상                                                 |                                                         |
-| interval       | String   | null                  | 축에 표시되는 값의 간격 단위 (ex. 'day', 'hour', 'minute'...) |
+| interval       | String \| Number | null          | 축에 표시되는 값의 간격. time 축은 단위 문자열(ex. 'day', 'hour'), linear 축은 숫자 간격 |
+| min            | Number   | null                  | 축 최소값 고정                                                |                                                         |
+| max            | Number   | null                  | 축 최대값 고정                                                |                                                         |
+| range          | Array    | null                  | 축 표시 범위를 [최소, 최대]로 고정                            | [0, 100]                                                |
+| decimalPoint   | Number \| 'auto' | 'auto'        | 축 라벨 소수점 자릿수                                         |                                                         |
+| showLastLabel  | Boolean  | false                 | 축 마지막 라벨 항상 표시 여부                                 | true / false                                            |
+| showIndicator  | Boolean  | false                 | 마우스 위치의 축 인디케이터 표시 여부                         | true / false                                            |
+| scrollbar      | Object   | ([상세](#scrollbar))  | 축 스크롤바 설정                                              |                                                         |
 | labelStyle     | Object   | ([상세](#labelstyle)) | 라벨의 폰트 스타일을 설정                                     |                                                         |
 | firstLabelFontStyle | Object | null              | 첫 번째 라벨의 폰트 스타일을 설정                             |                                                         |
 | lastLabelFontStyle | Object  | null              | 마지막 라벨의 폰트 스타일을 설정                              |                                                         |
@@ -184,7 +198,7 @@ const chartData =
 
 - interval (Axis Label 표기를 위한 interval)
   - 'millisecond', 'second', 'minute', 'hour', 'day', 'week' ,'month', 'quarter', 'year'
-- timeFormat
+- timeFormat (디폴트: 'mm:ss')
   - dayjs의 timeFormat 이용 [참고URL](https://day.js.org/docs/en/parse/string-format)
 - categoryMode
   - 축에 표시할 시간 값을 `data`옵션의 `labels`속 값들로 표시할지의 여부
@@ -201,6 +215,19 @@ const chartData =
 | fitDir     | String                      | 'right'   | Ellipsis 방향                                                              | ( right => 'aaa...', left => '...aaa') |
 | padding    | Number                      | 0         | (X축, linear, time타입에만 해당) label의 좌우 여백                         | 0                                      |
 | fixWidth   | Number                      | undefined | 라벨 넓이를 강제로 고정합니다. (해당 사이즈보다 커질시 Ellipsis처리)               |                                             |
+| fontWeight | Number                      | 400       | 글자 굵기                                                                  | 100, 200, 300, ... 900                 |
+| alignToGridLine | Boolean                | false     | 라벨을 그리드 라인 위치에 정렬                                              | true / false                           |
+
+##### scrollbar
+
+| 이름       | 타입                        | 디폴트                                | 설명                     | 종류(예시) |
+| ---------- | --------------------------- | ------------------------------------- | ------------------------ | ---------- |
+| use        | Boolean                     | false                                 | 스크롤바 사용 여부       | true / false |
+| width      | Number                      | 14                                    | (세로 축) 스크롤바 너비  |            |
+| height     | Number                      | 14                                    | (가로 축) 스크롤바 높이  |            |
+| background | Hex, RGB, RGBA Code(String) | '#F2F2F2'                             | 트랙 배경 색상           |            |
+| showButton | Boolean                     | true                                  | 스크롤 버튼 표시 여부    | true / false |
+| thumbStyle | Object                      | { background: '#929292', radius: 0 } | 썸(thumb) 스타일         |            |
 
 ##### title
 
@@ -213,7 +240,7 @@ const chartData =
 | fontFamily | String                      | 'Roboto'  | 폰트                           |                           |
 | fontStyle  | String                      | 'normal'  | 폰트 스타일                    | 'normal', 'italic'        |
 | textAlign  | String                      | 'right'   | 텍스트 정렬                    | 'right', 'left', 'center' |
-| color      | Hex, RGB, RGBA Code(String) | '#25262E' | 글자 색상                      |                           |
+| color      | Hex, RGB, RGBA Code(String) | '#808080' | 글자 색상                      |                           |
 
 ##### plotLine
 
@@ -233,7 +260,7 @@ const chartData =
 | ------ | ---------------------------------- | --------- | ------------------------------------- | -------------------------------------------------------------------- |
 | from   | Number(value), Date, Number(Index) | null      | 박스를 표시할 시작 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
 | to     | Number(value), Date, Number(Index) | null      | 박스를 표시할 종료 위치에 해당하는 값 | 3000, <br> new Date(), <br> 1 (축의 타입이 'step'인 경우 1번째 요소) |
-| color  | Hex, RGB, RGBA Code(String)        | '#FF0000' | 박스(면) 배경 색상. `rgba(...)`로 투명도 지정 |                                                              |
+| color  | Hex, RGB, RGBA Code(String)        | '#FAE59D' | 박스(면) 배경 색상. `rgba(...)`로 투명도 지정 |                                                              |
 | border | Object \| null                     | null      | 밴드 start/end 모서리 stroke          | ([상세](#plotbandborder))                                            |
 | label  | Object                             | null      | 표시할 label의 스타일을 정의          | ([상세](#plotlabel))                                                 |
 
@@ -333,7 +360,7 @@ value-only 상태에서 alias(text)가 가려지므로 hover로 보완(데스크
 
 | 이름          | 타입                        | 디폴트                                   | 설명                                                  | 종류(예시)                       |
 | ------------- | --------------------------- | ---------------------------------------- | ----------------------------------------------------- | -------------------------------- |
-| show          | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
+| show          | Boolean                     | true                                     | Legend 표시 여부                                      | true /false                      |
 | position      | String                      | 'right'                                  | Legend 위치                                           | 'top', 'right', 'bottom', 'left' |
 | color         | Hex, RGB, RGBA Code(String) | '#353740'                                | 폰트 색상                                             |                                  |
 | inactive      | Hex, RGB, RGBA Code(String) | '#aaa'                                   | 비활성화 상태의 폰트 색상                             |                                  |
@@ -381,7 +408,7 @@ value-only 상태에서 alias(text)가 가려지므로 hover로 보완(데스크
 | maxWidth            | Number                      |                                            | 툴팁의 최대 너비                                        |                                                                     |
 | textOverflow        | String                      | 'wrap'                                     | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis                                                   |
 | fontFamily          | String                      | 'Roboto'                                   | 툴팁에 표시될 폰트                                      | 'Roboto', 'serif'                                                   |
-| fontColor           | Hex code (string), Object, Function   | '#000000'                                  | 툴팁에 표시될 폰트 컬러                                 | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
+| fontColor           | Hex code (string), Object, Function   | '#FFFFFF'                                  | 툴팁에 표시될 폰트 컬러                                 | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
 | fontSize            | Object                      | { title: 16, contents: 14 }                | 툴팁에 표시될 폰트 사이즈                               |                                                                     |
 | colorShape          | String                      | 'rect'                                     | 툴팁에 표시될 series color의 모양                       | 'rect', 'circle'                                                    |
 | rowPadding          | Object                      | { top: 0, bottom: 3, right: 20, left: 16 } | 툴팁에 표시될 series Row의 padding 값                   |                                                                     |
@@ -468,7 +495,7 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 
 | 이름           | 타입                        | 디폴트              | 설명                          | 종류(예시) |
 | -------------- | --------------------------- | ------------------- | ----------------------------- | ---------- |
-| use            | Boolean                     | true                | maxTip 표시 여부              |            |
+| use            | Boolean                     | false               | maxTip 표시 여부              |            |
 | fixedPosTop    | Boolean                     | false               | maxTip 위치를 최대값으로 고정 |            |
 | showIndicator  | Boolean                     | false               | indicator 표시 여부           |            |
 | indicatorColor | Hex, RGB, RGBA Code(String) | '#000000'           | indicator 색상                |            |
@@ -496,6 +523,10 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 | fixedPosTop         | Boolean                     | false               | indicator 및 tip의 위치를 최대값으로 고정                                  |                 |
 | useApproximateValue | Boolean                     | false               | 가까운 label을 선택                                                        |                 |
 | indicatorColor      | Hex, RGB, RGBA Code(String) | '#000000'           | indicator 색상                                                             |                 |
+| useSeriesOpacity    | Boolean                     | false               | 아이템 선택 시 시리즈 opacity 변경 여부 (selectLabel과 달리 기본 false)    |                 |
+| useDeselectItem     | Boolean                     | false               | 선택된 아이템 재클릭 시 선택 해제 여부                                     |                 |
+| showBorder          | Boolean                     | false               | 선택된 아이템에 테두리 표시 여부                                           |                 |
+| borderStyle         | Object                      | { color: '#FFFFFF', lineWidth: 1, opacity: 1, radius: 0 } | showBorder 사용 시 테두리 스타일             |                 |
 | tipStyle            | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정                                                          |
 
 ##### etc
@@ -597,6 +628,7 @@ chartOptions.value = {
 | tipText             | String                      | 'value'             | 선택한 위치에 TextTip을 생성한다면 어떤 값                                 | 'value', 'label |
 | showTextTip         | Boolean                     | false               | 선택한 위치의 TextTip(text 포함 화살표, 흡사 말풍선) 생성 여부             |                 |
 | showIndicator       | Boolean                     | false               | 선택한 label의 indicator 표시                                              |                 |
+| useBothAxis         | Boolean                     | false               | 가로/세로 양 축 기준의 라벨 선택 허용 여부                                 |                 |
 | tipStyle            | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정                                                          |
 
 ##### tipStyle
@@ -628,6 +660,8 @@ chartOptions.value = {
 | fillColor   | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상               |              |
 | opacity     | Number                      | 0.65      | 선택 영역 불투명도           | 0 ~ 1        |
 | startArea   | String (CSS Selector)       | ''        | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. 여러 차트를 사용할 때는 차트마다 고유한 셀렉터를 지정하세요(공통 조상을 지정하면 한 번의 드래그가 모든 차트의 selection을 트리거합니다). | '.chart-wrapper' |
+| size        | Number                      | 50        | 드래그 선택 영역으로 인정할 최소 크기(px)                    |              |
+| displayFromStartArea | Boolean            | false     | startArea 기준으로 선택 영역을 표시할지 여부                 | true / false |
 
 
 ### 7. resize-timeout
@@ -644,7 +678,7 @@ chartOptions.value = {
 | dbl-click   | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환                                                                                                                                                                                                                                                                                     |
 | mouse-move  |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환                                                                                                                                                                |
 | drag-select | data, range  | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
-| click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
+| click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 (external legend에서 toggleSeries()로 토글한 경우 미포함) <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 | axes-scale-change | | 차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 정보를 반환한다. 단, axes옵션에 scaleRange가 true이고 scale 정보가 변경될때만 이벤트를 발생시킨다. ex)<br><br> {<br> x: [{ minSteps, maxSteps }], <br>   y: [{ minSteps, maxSteps }]<br>} | |
 | axes-data-max-change | maxY | show 된 series 들의 **실제 데이터 y 최대값**(number)을 반환한다. axes-scale-change(라벨 스텝 개수)와 달리 데이터 값이다. 차트가 내부적으로 이미 계산한 series.minMax.maxY 를 재사용하므로 소비처가 동일 데이터를 따로 스캔해 max 를 구하지 않아도 된다. **차트 타입과 무관하게** 사용할 수 있으며, 이 이벤트를 바인딩한 경우에만 발생한다(바인딩 안 하면 집계 비용 0). 발생 시엔 렌더마다(같은 값이어도) 발생한다. 유효한(유한수) 데이터가 있는 show 된 series 가 하나도 없으면 — 보이는 series 가 없거나 모두 빈 데이터면 — null 을 emit 한다. 단, realTimeScatter 는 전 series 가 빈 데이터일 때 내부 minMax 가 0 으로 폴백되어 0 이 emit 된다. maxY 는 show 된 전 series 의 **통합 최대값(단일 y축·세로 차트 기준, 축 구분 없음)** 이라 다중 y축에서는 축별 구분이 되지 않는다. realTimeScatter autoScale 의 데이터 최대값 용도로 도입됐으나 line·bar 등 다른 차트에서도 동일하게 동작한다. |
 
