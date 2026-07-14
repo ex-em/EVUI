@@ -122,6 +122,38 @@
                   "description": "hover 시 선(line) 위에 값 위치마다 점을 표시할지 여부입니다."
                 },
                 {
+                  "name": "highlight",
+                  "type": "Object",
+                  "default": "{ defaultSize: 4, maxSize: 6, maxShadowSize: 10, maxShadowOpacity: 0.4 }",
+                  "description": "hover 하이라이트 시 점 크기와 그림자를 조정하는 옵션입니다.",
+                  "children": [
+                    {
+                      "name": "defaultSize",
+                      "type": "Number",
+                      "default": "4",
+                      "description": "하이라이트 점의 기본 크기(px)입니다."
+                    },
+                    {
+                      "name": "maxSize",
+                      "type": "Number",
+                      "default": "6",
+                      "description": "하이라이트 점의 최대 크기(px)입니다."
+                    },
+                    {
+                      "name": "maxShadowSize",
+                      "type": "Number",
+                      "default": "10",
+                      "description": "하이라이트 점 그림자의 최대 크기(px)입니다."
+                    },
+                    {
+                      "name": "maxShadowOpacity",
+                      "type": "Number",
+                      "default": "0.4",
+                      "description": "하이라이트 점 그림자의 불투명도(0~1)입니다."
+                    }
+                  ]
+                },
+                {
                   "name": "pointSize",
                   "type": "Number",
                   "default": "3",
@@ -1073,6 +1105,18 @@
                   "description": "보조 눈금 표시 여부입니다."
                 },
                 {
+                  "name": "showLastLabel",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "축의 마지막 라벨을 항상 표시할지 여부입니다."
+                },
+                {
+                  "name": "showIndicator",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "마우스 위치의 축 인디케이터 표시 여부입니다."
+                },
+                {
                   "name": "fixedSteps",
                   "type": "Boolean",
                   "default": "false",
@@ -1094,6 +1138,64 @@
                   "name": "categoryMode",
                   "type": "Boolean",
                   "description": "time 타입 축에 표시할 시간 값을 data 옵션의 labels 속 값들로 표시할지 여부입니다."
+                },
+                {
+                  "name": "scrollbar",
+                  "type": "Object",
+                  "default": "{ use: false, ... }",
+                  "description": "축 스크롤바 옵션입니다.",
+                  "children": [
+                    {
+                      "name": "use",
+                      "type": "Boolean",
+                      "default": "false",
+                      "description": "스크롤바 사용 여부입니다."
+                    },
+                    {
+                      "name": "width",
+                      "type": "Number",
+                      "default": "14",
+                      "description": "(세로 축) 스크롤바 너비(px)입니다."
+                    },
+                    {
+                      "name": "height",
+                      "type": "Number",
+                      "default": "14",
+                      "description": "(가로 축) 스크롤바 높이(px)입니다."
+                    },
+                    {
+                      "name": "background",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#F2F2F2'",
+                      "description": "스크롤바 트랙 배경 색상입니다."
+                    },
+                    {
+                      "name": "showButton",
+                      "type": "Boolean",
+                      "default": "true",
+                      "description": "스크롤 버튼 표시 여부입니다."
+                    },
+                    {
+                      "name": "thumbStyle",
+                      "type": "Object",
+                      "default": "{ background: '#929292', radius: 0 }",
+                      "description": "스크롤 썸(thumb) 스타일입니다.",
+                      "children": [
+                        {
+                          "name": "background",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#929292'",
+                          "description": "썸 배경 색상입니다."
+                        },
+                        {
+                          "name": "radius",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "썸 모서리 반경(px)입니다."
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -1916,6 +2018,18 @@
                   "description": "보조 눈금 표시 여부입니다."
                 },
                 {
+                  "name": "showLastLabel",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "축의 마지막 라벨을 항상 표시할지 여부입니다."
+                },
+                {
+                  "name": "showIndicator",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "마우스 위치의 축 인디케이터 표시 여부입니다."
+                },
+                {
                   "name": "fixedSteps",
                   "type": "Boolean",
                   "default": "false",
@@ -1926,6 +2040,64 @@
                   "type": "Boolean",
                   "default": "false",
                   "description": "scale 변경을 감지하여 emit을 발생시킬 때 사용합니다. true이면 scale이 변경될 때 axes-scale-change 이벤트가 발생합니다."
+                },
+                {
+                  "name": "scrollbar",
+                  "type": "Object",
+                  "default": "{ use: false, ... }",
+                  "description": "축 스크롤바 옵션입니다.",
+                  "children": [
+                    {
+                      "name": "use",
+                      "type": "Boolean",
+                      "default": "false",
+                      "description": "스크롤바 사용 여부입니다."
+                    },
+                    {
+                      "name": "width",
+                      "type": "Number",
+                      "default": "14",
+                      "description": "(세로 축) 스크롤바 너비(px)입니다."
+                    },
+                    {
+                      "name": "height",
+                      "type": "Number",
+                      "default": "14",
+                      "description": "(가로 축) 스크롤바 높이(px)입니다."
+                    },
+                    {
+                      "name": "background",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#F2F2F2'",
+                      "description": "스크롤바 트랙 배경 색상입니다."
+                    },
+                    {
+                      "name": "showButton",
+                      "type": "Boolean",
+                      "default": "true",
+                      "description": "스크롤 버튼 표시 여부입니다."
+                    },
+                    {
+                      "name": "thumbStyle",
+                      "type": "Object",
+                      "default": "{ background: '#929292', radius: 0 }",
+                      "description": "스크롤 썸(thumb) 스타일입니다.",
+                      "children": [
+                        {
+                          "name": "background",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#929292'",
+                          "description": "썸 배경 색상입니다."
+                        },
+                        {
+                          "name": "radius",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "썸 모서리 반경(px)입니다."
+                        }
+                      ]
+                    }
+                  ]
                 }
               ]
             },
@@ -2421,6 +2593,18 @@
               "type": "Boolean",
               "default": "false",
               "description": "값 축(Y)의 range로 제한한 범위를 초과한 데이터를 경계에 모아 표시할지 여부입니다. false면 range 밖 데이터는 숨겨집니다."
+            },
+            {
+              "name": "seriesReverse",
+              "type": "Boolean",
+              "default": "false",
+              "description": "시리즈 그리기 순서를 반전할지 여부입니다."
+            },
+            {
+              "name": "workerRender",
+              "type": "Boolean",
+              "default": "false",
+              "description": "웹 워커 기반 렌더링을 사용하는 성능 opt-in 옵션입니다."
             },
             {
               "name": "selectItem",
