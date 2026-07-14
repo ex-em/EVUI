@@ -3,7 +3,12 @@
   "route": "/button",
   "since": "3.0.0",
   "description": "클릭 동작을 수행하는 기본 버튼 컴포넌트입니다.",
-  "examples": [{ "label": "기본 버튼", "route": "/button" }],
+  "examples": [
+    {
+      "label": "기본 버튼",
+      "route": "/button"
+    }
+  ],
   "sections": [
     {
       "kind": "props",
@@ -13,52 +18,59 @@
           "name": "type",
           "type": "String",
           "default": "'default'",
-          "required": false,
-          "version": "3.0.0",
-          "values": ["'default'", "'primary'", "'info'", "'warning'", "'error'", "'ghost'"],
+          "values": [
+            "'default'",
+            "'primary'",
+            "'info'",
+            "'warning'",
+            "'error'",
+            "'ghost'"
+          ],
           "description": "버튼의 색상 타입입니다."
         },
         {
           "name": "size",
           "type": "String",
           "default": "'medium'",
-          "required": false,
-          "version": "3.0.0",
-          "values": ["'small'", "'medium'", "'large'"],
+          "values": [
+            "'small'",
+            "'medium'",
+            "'large'"
+          ],
           "description": "버튼의 크기입니다."
         },
         {
           "name": "shape",
           "type": "String",
           "default": "'square'",
-          "required": false,
-          "version": "3.0.0",
-          "values": ["'square'", "'radius'", "'circle'"],
+          "values": [
+            "'square'",
+            "'radius'",
+            "'circle'"
+          ],
           "description": "버튼의 모양입니다."
         },
         {
           "name": "disabled",
           "type": "Boolean",
           "default": "false",
-          "required": false,
-          "version": "3.0.0",
           "description": "버튼 비활성화 여부입니다."
         },
         {
           "name": "autofocus",
           "type": "Boolean",
           "default": "false",
-          "required": false,
-          "version": "3.0.0",
           "description": "마운트 시 자동 포커스 여부입니다."
         },
         {
           "name": "htmlType",
           "type": "String",
           "default": "'button'",
-          "required": false,
-          "version": "3.0.0",
-          "values": ["'button'", "'submit'", "'reset'"],
+          "values": [
+            "'button'",
+            "'submit'",
+            "'reset'"
+          ],
           "description": "네이티브 button 요소의 type 속성입니다."
         }
       ]
@@ -70,7 +82,6 @@
         {
           "name": "click",
           "type": "Function",
-          "version": "3.0.0",
           "description": "버튼 클릭 시 발생합니다. 네이티브 MouseEvent를 전달합니다."
         }
       ]
@@ -81,7 +92,6 @@
       "items": [
         {
           "name": "default",
-          "version": "3.0.0",
           "description": "버튼 내부에 표시할 콘텐츠(텍스트, 아이콘 등)입니다."
         }
       ]
