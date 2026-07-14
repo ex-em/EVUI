@@ -1,6 +1,7 @@
 import { ref, computed, provide, inject, markRaw, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import docRegistry from '../data';
+import { PAGES, pageByKey, pageByRoute } from '../pages';
 
 const STORE_KEY = Symbol('api-docs-store');
 
@@ -44,31 +45,26 @@ function flattenDoc(doc) {
 }
 
 export function createApiDocsStore() {
-  const componentKeys = Object.keys(docRegistry);
   const router = useRouter();
 
   /**
-   * 컴포넌트 선택 트리. 기존 네비게이션 메뉴와 동일하게
-   * 라우트의 meta.category 기준으로 그룹핑한다. (라우터가 SSOT)
-   * 문서 JSON이 아직 없는 컴포넌트는 hasDoc: false 로 비활성 표시된다.
+   * 컴포넌트 선택 트리. 페이지 레지스트리(PAGES) 기준으로 카테고리 그룹핑한다.
+   * 문서 JSON이 있는 컴포넌트는 대화형 문서를, 없는 컴포넌트는 기존 md를
+   * 센터 패널에 표시한다(hasDoc으로 구분, 전 항목 선택 가능).
    */
-  const componentTree = router
-    .getRoutes()
-    .filter((route) => route.meta?.category && route.meta.category !== 'Docs')
-    .reduce((acc, route) => {
-      const key = route.path.replace(/^\//, '');
-      const item = { key, label: route.name, hasDoc: !!docRegistry[key] };
-      const group = acc.find((g) => g.category === route.meta.category);
-      if (group) {
-        group.items.push(item);
-      } else {
-        acc.push({ category: route.meta.category, items: [item] });
-      }
-      return acc;
-    }, []);
+  const componentTree = PAGES.reduce((acc, entry) => {
+    const item = { key: entry.key, label: entry.label, hasDoc: !!docRegistry[entry.key] };
+    const group = acc.find((g) => g.category === entry.category);
+    if (group) {
+      group.items.push(item);
+    } else {
+      acc.push({ category: entry.category, items: [item] });
+    }
+    return acc;
+  }, []);
 
   // --- state ---------------------------------------------------------------
-  const currentKey = ref(componentKeys[0]);
+  const currentKey = ref('lineChart');
   const activeTab = ref('docs'); // 'docs' | 'examples'
   const query = ref('');
   const activeId = ref(null);
@@ -84,9 +80,12 @@ export function createApiDocsStore() {
   const selectedExampleKey = ref(null);
 
   // --- derived -------------------------------------------------------------
-  const doc = computed(() => docRegistry[currentKey.value]);
+  /** JSON 문서 (없으면 null → 센터 패널이 기존 md 폴백을 렌더링) */
+  const doc = computed(() => docRegistry[currentKey.value] || null);
+  /** 페이지 레지스트리 항목 (md/예제/라벨의 소스) */
+  const currentPage = computed(() => pageByKey[currentKey.value]);
 
-  const flatNodes = computed(() => flattenDoc(doc.value));
+  const flatNodes = computed(() => (doc.value ? flattenDoc(doc.value) : []));
   const nodeMap = computed(() => new Map(flatNodes.value.map((n) => [n.id, n])));
 
   /**
@@ -131,7 +130,7 @@ export function createApiDocsStore() {
    * depth-1 카드 내부의 rows에 들여쓰기된 행으로 합쳐서 렌더링한다.
    */
   const visibleSections = computed(() =>
-    doc.value.sections
+    (doc.value?.sections || [])
       .map((section) => {
         const sectionNodes = flatNodes.value.filter(
           (n) => n.kind === section.kind && isVisible(n.id),
@@ -169,7 +168,7 @@ export function createApiDocsStore() {
 
   /** 사이드바 트리용: 섹션별 루트 노드 id 목록 */
   const sectionRoots = computed(() =>
-    doc.value.sections
+    (doc.value?.sections || [])
       .map((section) => ({
         kind: section.kind,
         label: section.label,
@@ -187,14 +186,17 @@ export function createApiDocsStore() {
   const tryItNode = computed(() => (tryItId.value ? nodeMap.value.get(tryItId.value) : null));
 
   /**
-   * Examples 탭: JSON의 examples(관련 페이지)별로 해당 페이지에 실제로 있는
-   * 예제 목록을 펼쳐서 보여준다. 목록의 SSOT는 각 페이지 라우트의
-   * props(components) — docs/views/<component>/props.js 이다.
+   * Examples 탭: 관련 페이지별로 해당 페이지에 실제로 있는 예제 목록을 보여준다.
+   * 관련 페이지는 JSON의 examples가 정의하고, JSON이 없는(md 폴백) 컴포넌트는
+   * 자기 페이지 하나가 그룹이 된다. 예제 데이터의 SSOT는 페이지 레지스트리
+   * (docs/views/<component>/props.js의 components)이다.
    */
-  const exampleGroups = computed(() =>
-    (doc.value.examples || []).map(({ label, route: path }) => {
-      const record = router.getRoutes().find((r) => r.path === path);
-      const components = record?.props?.default?.components || {};
+  const exampleGroups = computed(() => {
+    const page = currentPage.value;
+    const groups =
+      doc.value?.examples || (page ? [{ label: page.label, route: page.route }] : []);
+    return groups.map(({ label, route: path }) => {
+      const components = pageByRoute[path]?.page?.components || {};
       return {
         label,
         path,
@@ -203,28 +205,28 @@ export function createApiDocsStore() {
           description: def.description || '',
         })),
       };
-    }));
+    });
+  });
 
   /**
    * Try It 패널용 플레이그라운드 예제.
-   * JSON의 playground({ route, example })가 가리키는, chartData/chartOptions/
-   * onApply를 노출하는 예제 컴포넌트를 라우트 props에서 해석한다.
+   * JSON의 playground({ route, example, tag? })가 가리키는, chartData/chartOptions/
+   * onApply를 노출하는 예제 컴포넌트를 페이지 레지스트리에서 해석한다.
+   * tag는 패널이 직접 렌더링할 컴포넌트 태그(기본 'ev-chart')이다.
    */
   const playgroundExample = computed(() => {
-    const pg = doc.value.playground;
+    const pg = doc.value?.playground;
     if (!pg) return null;
-    const record = router.getRoutes().find((r) => r.path === pg.route);
-    const def = record?.props?.default?.components?.[pg.example];
+    const def = pageByRoute[pg.route]?.page?.components?.[pg.example];
     if (!def) return null;
-    return { name: pg.example, component: markRaw(def.component) };
+    return { name: pg.example, component: markRaw(def.component), tag: pg.tag || 'ev-chart' };
   });
 
-  /** 선택된 예제의 렌더링 정보 (라우트 props에서 실시간 해석) */
+  /** 선택된 예제의 렌더링 정보 (페이지 레지스트리에서 실시간 해석) */
   const selectedExample = computed(() => {
     if (!selectedExampleKey.value) return null;
     const { path, name, label } = selectedExampleKey.value;
-    const record = router.getRoutes().find((r) => r.path === path);
-    const def = record?.props?.default?.components?.[name];
+    const def = pageByRoute[path]?.page?.components?.[name];
     if (!def) return null;
     return {
       name,
@@ -294,7 +296,7 @@ export function createApiDocsStore() {
   };
 
   const setComponent = (key) => {
-    if (!docRegistry[key] || key === currentKey.value) return;
+    if (!pageByKey[key] || key === currentKey.value) return;
     currentKey.value = key;
     query.value = '';
     activeId.value = null;
@@ -324,7 +326,7 @@ export function createApiDocsStore() {
   /** URL → 상태 (초기 진입, 뒤로/앞으로 가기) */
   const applyRoute = (to) => {
     const key = to.params.component;
-    if (key && docRegistry[key]) {
+    if (key && pageByKey[key]) {
       setComponent(key);
     }
     const { example, exampleFrom } = to.query;
@@ -333,7 +335,9 @@ export function createApiDocsStore() {
         path: exampleFrom,
         name: example,
         label:
-          (doc.value.examples || []).find((e) => e.route === exampleFrom)?.label || '',
+          (doc.value?.examples || []).find((e) => e.route === exampleFrom)?.label ||
+          pageByRoute[exampleFrom]?.label ||
+          '',
       };
       if (!sameExampleKey(selectedExampleKey.value, next)) {
         selectedExampleKey.value = next;
@@ -392,6 +396,7 @@ export function createApiDocsStore() {
     scrollRequest,
     // derived
     doc,
+    currentPage,
     componentTree,
     flatNodes,
     visibleSections,

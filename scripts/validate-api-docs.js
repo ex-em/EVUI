@@ -151,7 +151,10 @@ function validateDoc(file, doc) {
   if ('playground' in doc) {
     const pg = doc.playground;
     if (!isNonEmptyString(pg?.route) || !isNonEmptyString(pg?.example)) {
-      err(file, 'playground', '{ route, example } 형태여야 합니다.');
+      err(file, 'playground', '{ route, example, tag? } 형태여야 합니다.');
+    }
+    if (pg && 'tag' in pg && !isNonEmptyString(pg.tag)) {
+      err(file, 'playground.tag', '컴포넌트 태그 문자열이어야 합니다 (생략 시 ev-chart).');
     }
   }
 
