@@ -187,6 +187,12 @@ export const PAGES = [
   },
 ];
 
+/** 피커에 표시되는 카테고리 순서 */
+const CATEGORY_ORDER = ['Chart', 'Form', 'Table', 'Layout', 'Notice'];
+PAGES.sort(
+  (a, b) => CATEGORY_ORDER.indexOf(a.category) - CATEGORY_ORDER.indexOf(b.category),
+);
+
 export const pageByKey = Object.fromEntries(PAGES.map((entry) => [entry.key, entry]));
 export const pageByRoute = Object.fromEntries(PAGES.map((entry) => [entry.route, entry]));
 
