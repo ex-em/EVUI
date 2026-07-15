@@ -1,5 +1,8 @@
 <template>
-  <div class="evui-wrapper" :class="['evui-docs', docsTheme]">
+  <div
+    class="evui-wrapper"
+    :class="['evui-docs', docsTheme, { 'internal-docs': isInternalDocs }]"
+  >
     <MainHeader v-model="docsTheme" />
     <MainContent />
   </div>
@@ -9,6 +12,7 @@
 import { ref } from 'vue';
 import MainHeader from './components/Header';
 import MainContent from './components/Content';
+import { IS_INTERNAL_DOCS } from 'docs/views/apiDocs/pages';
 
 export default {
   name: 'Home',
@@ -21,6 +25,7 @@ export default {
 
     return {
       docsTheme,
+      isInternalDocs: IS_INTERNAL_DOCS,
     };
   },
 };
@@ -60,6 +65,18 @@ $file-path: './assets/fonts/';
   position: relative;
   padding: $header-height 0 0;
   font-size: $font-size-base;
+}
+
+/* 개발자용 모드(npm run dev_docs): 대외용과 즉시 구분되도록 primary를 앰버로 교체 */
+.evui-wrapper.internal-docs {
+  .evui-header {
+    background-color: #d97706;
+  }
+
+  .api-docs {
+    --ad-primary: #d97706;
+    --ad-primary-soft: rgba(217, 119, 6, 0.12);
+  }
 }
 .dark {
   @import './style/lib/highlightjs.hybrid';
