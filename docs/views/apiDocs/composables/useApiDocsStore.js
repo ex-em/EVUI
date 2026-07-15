@@ -269,6 +269,8 @@ export function createApiDocsStore() {
   };
   const clearExample = () => {
     selectedExampleKey.value = null;
+    // 예제 뷰를 닫으면 센터는 API 문서로 돌아가므로 사이드바 탭도 함께 맞춘다
+    activeTab.value = 'docs';
   };
 
   /** 트리에서 클릭: active 지정 + 센터 패널 스크롤 요청 (예제 뷰는 닫는다) */
@@ -344,7 +346,9 @@ export function createApiDocsStore() {
       }
       activeTab.value = 'examples';
     } else if (selectedExampleKey.value) {
+      // URL에서 예제가 사라짐(뒤로가기 등) → 예제 뷰 닫힘과 함께 탭도 문서로
       selectedExampleKey.value = null;
+      activeTab.value = 'docs';
     }
   };
 
