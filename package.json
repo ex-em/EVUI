@@ -90,6 +90,7 @@
     "vue": "*"
   },
   "lint-staged": {
-    "*.{js,vue}": "eslint --fix"
+    "*.{js,vue}": "eslint --fix",
+    "docs/views/apiDocs/data/*.json": "node scripts/validate-api-docs.js"
   }
 }
