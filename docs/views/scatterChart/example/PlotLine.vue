@@ -5,13 +5,14 @@
 </template>
 
 <script>
+import { ref } from 'vue';
 import dayjs from 'dayjs';
 
 export default {
   setup() {
     const currentTime = dayjs().millisecond(0);
 
-    const chartData = {
+    const chartData = ref({
       series: {
         series1: { name: 'series#1' },
         series2: { name: 'series#2' },
@@ -38,9 +39,9 @@ export default {
           { x: currentTime.subtract(6, 'second'), y: 20 },
         ],
       },
-    };
+    });
 
-    const chartOptions = {
+    const chartOptions = ref({
       type: 'scatter',
       width: '100%',
       padding: {
@@ -122,11 +123,17 @@ export default {
           ],
         },
       ],
+    });
+
+    const onApply = ({ chartData: d, chartOptions: o }) => {
+      if (d) chartData.value = d;
+      if (o) chartOptions.value = o;
     };
 
     return {
       chartData,
       chartOptions,
+      onApply,
     };
   },
 };

@@ -144,6 +144,10 @@ const snapshotOptions = ref(null);
 const eventLog = ref([]);
 const consoleRef = ref(null);
 let logSeq = 0;
+// 고빈도 이벤트는 콘솔 도배 방지를 위해 스로틀링해 기록한다
+const HIGH_FREQ_EVENTS = new Set(['mouse-move']);
+const HIGH_FREQ_THROTTLE_MS = 400;
+const lastLogAt = {};
 
 /** 문서 Events 섹션의 최상위 이벤트명 → 차트 리스너 자동 연결 대상 */
 const eventNames = computed(() =>
@@ -179,6 +183,11 @@ const formatPayload = (args) => {
 };
 
 const logEvent = (name, args) => {
+  if (HIGH_FREQ_EVENTS.has(name)) {
+    const now = Date.now();
+    if (lastLogAt[name] && now - lastLogAt[name] < HIGH_FREQ_THROTTLE_MS) return;
+    lastLogAt[name] = now;
+  }
   logSeq += 1;
   eventLog.value.push({
     seq: logSeq,

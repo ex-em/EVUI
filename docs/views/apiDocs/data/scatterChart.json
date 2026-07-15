@@ -9,6 +9,10 @@
       "route": "/scatterChart"
     }
   ],
+  "playground": {
+    "route": "/scatterChart",
+    "example": "Plot line & Plot band"
+  },
   "sections": [
     {
       "kind": "props",
@@ -79,7 +83,10 @@
                   "name": "pointSize",
                   "type": "Number",
                   "default": "3",
-                  "description": "차트에 표시될 점의 사이즈입니다."
+                  "description": "차트에 표시될 점의 사이즈입니다.",
+                  "tryIt": {
+                    "data": "{ series: { series1: { pointSize: 8 } } }"
+                  }
                 },
                 {
                   "name": "pointStyle",
@@ -96,7 +103,10 @@
                     "'star'",
                     "'line'"
                   ],
-                  "description": "차트에 표시될 점의 모양입니다. 미지정('') 시 circle로 렌더링됩니다."
+                  "description": "차트에 표시될 점의 모양입니다. 미지정('') 시 circle로 렌더링됩니다.",
+                  "tryIt": {
+                    "data": "{ series: { series1: { pointStyle: 'triangle', pointSize: 6 } } }"
+                  }
                 },
                 {
                   "name": "overflowColor",
@@ -1954,7 +1964,10 @@
                     "'bottom'",
                     "'left'"
                   ],
-                  "description": "Legend 위치입니다."
+                  "description": "Legend 위치입니다.",
+                  "tryIt": {
+                    "options": "{ legend: { show: true, position: 'bottom' } }"
+                  }
                 },
                 {
                   "name": "color",
