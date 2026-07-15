@@ -12,7 +12,14 @@
         <span v-if="parentPath" class="ad-item-parent-path">{{ parentPath }}.</span
         ><span class="ad-item-name">{{ head.name }}</span>
       </h3>
-      <button class="ad-tryit-btn" @click.stop="store.openTryIt(head.id)">Try It ▶</button>
+      <!-- tryIt: false 지정 시 버튼 숨김 -->
+      <button
+        v-if="head.tryIt !== false"
+        class="ad-tryit-btn"
+        @click.stop="store.openTryIt(head.id)"
+      >
+        Try It ▶
+      </button>
     </header>
 
     <div class="ad-item-badges">

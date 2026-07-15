@@ -86,10 +86,10 @@ function validateNode(file, node, jsonPath) {
     }
   }
 
-  if ('tryIt' in node) {
+  if ('tryIt' in node && node.tryIt !== false) {
     const tryIt = node.tryIt;
     if (typeof tryIt !== 'object' || tryIt === null || Array.isArray(tryIt)) {
-      err(file, jsonPath, "'tryIt'은 { data?, options? } 객체여야 합니다.");
+      err(file, jsonPath, "'tryIt'은 false(버튼 숨김) 또는 { data?, options? } 객체여야 합니다.");
     } else {
       const keys = Object.keys(tryIt);
       if (!keys.length) err(file, jsonPath, "'tryIt'이 비어 있습니다.");

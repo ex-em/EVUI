@@ -28,8 +28,8 @@ function flattenDoc(doc) {
       version: item.version,
       description: item.description,
       values: item.values || [],
-      // Try It 패널용 옵션별 코드 스니펫 { data?, options? } — JS 리터럴 문자열
-      tryIt: item.tryIt || null,
+      // Try It 설정: { data?, options? } 스니펫(행에 버튼 노출) | false(버튼 숨김) | null(기본)
+      tryIt: item.tryIt === undefined ? null : item.tryIt,
       childIds: [],
     };
     nodes.push(node);
