@@ -37,6 +37,12 @@
               "description": "특정 데이터에 대한 시리즈 옵션입니다. key가 시리즈 ID로 사용됩니다.",
               "children": [
                 {
+                  "name": "show",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "시리즈 표시 여부입니다."
+                },
+                {
                   "name": "name",
                   "type": "String",
                   "default": "series-${index}",
@@ -45,26 +51,25 @@
                 {
                   "name": "type",
                   "type": "String",
-                  "default": "'bar'",
                   "values": [
-                    "'bar'",
                     "'pie'",
+                    "'bar'",
                     "'line'",
                     "'scatter'"
                   ],
-                  "description": "시리즈에 해당하는 데이터 표현 방식입니다."
+                  "description": "시리즈에 해당하는 데이터 표현 방식입니다. 미지정 시 options.type을 따릅니다."
                 },
                 {
                   "name": "color",
                   "type": "Hex, RGB, RGBA Code(String)",
                   "default": "COLOR[index]",
-                  "description": "시리즈 색상입니다. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264')을 순차적으로 적용합니다."
+                  "description": "시리즈 색상입니다. 사전에 정의된 25개 색상('#2b99f0' ~ '#df6264')을 순차적으로 적용합니다."
                 },
                 {
-                  "name": "stroke",
-                  "type": "Object",
-                  "default": "{ use: true, color: '#FFFFFF', lineWidth: 2 }",
-                  "description": "차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션입니다."
+                  "name": "showLegend",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "범례에 시리즈를 표시할지 여부입니다."
                 },
                 {
                   "name": "showValue",
@@ -137,6 +142,18 @@
               "description": "차트의 높이입니다. 예: '100%', '150px', 150"
             },
             {
+              "name": "padding",
+              "type": "Object",
+              "default": "{ top: 2, right: 2, left: 2, bottom: 4 }",
+              "description": "차트 영역의 안쪽 여백입니다. 파이 반지름 계산에 사용되며, pie 타입에서 미지정 시 위 기본값이 적용됩니다."
+            },
+            {
+              "name": "unSelectedOpacity",
+              "type": "Number",
+              "default": "0.3",
+              "description": "범례 hover 등으로 특정 시리즈 강조 시 나머지 조각에 적용되는 투명도입니다."
+            },
+            {
               "name": "title",
               "type": "Object",
               "description": "차트 상단에 위치할 차트 제목의 표시 여부 및 속성입니다.",
@@ -194,7 +211,7 @@
                 {
                   "name": "show",
                   "type": "Boolean",
-                  "default": "false",
+                  "default": "true",
                   "description": "Legend 표시 여부입니다."
                 },
                 {
@@ -360,8 +377,39 @@
             {
               "name": "pieStroke",
               "type": "Object",
-              "default": "{ show: true, color: '#FFFFFF', lineWidth: 2 }",
-              "description": "차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션입니다."
+              "default": "{ use: true, color: '#FFFFFF', lineWidth: 2 }",
+              "description": "조각 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션입니다.",
+              "children": [
+                {
+                  "name": "use",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "테두리선 표시 여부입니다."
+                },
+                {
+                  "name": "color",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'#FFFFFF'",
+                  "description": "테두리선 색상입니다."
+                },
+                {
+                  "name": "lineWidth",
+                  "type": "Number",
+                  "default": "2",
+                  "description": "테두리선 두께입니다."
+                }
+              ]
+            },
+            {
+              "name": "sunburst",
+              "type": "Boolean",
+              "description": "다계층(선버스트) 파이 차트 모드입니다. true이면 data.data를 { id, value, children } 객체의 배열로 전달하며, children 배열로 하위 계층을 중첩합니다. 미지정 시 일반 파이로 렌더링됩니다."
+            },
+            {
+              "name": "reverse",
+              "type": "Boolean",
+              "default": "false",
+              "description": "sunburst 모드에서 계층 렌더링 순서를 반전할지 여부입니다."
             },
             {
               "name": "tooltip",
@@ -456,7 +504,7 @@
                 {
                   "name": "fontColor",
                   "type": "Hex code (string), Object",
-                  "default": "'#000000'",
+                  "default": "'#FFFFFF'",
                   "description": "툴팁에 표시될 폰트 컬러입니다. { label, value, title } 형태로 영역별 지정도 가능합니다."
                 },
                 {
@@ -482,12 +530,6 @@
                   "description": "툴팁에 표시될 series Row의 padding 값입니다."
                 },
                 {
-                  "name": "showAllValueInRange",
-                  "type": "Boolean",
-                  "default": "false",
-                  "description": "동일한 axes 값을 가진 전체 series를 툴팁에 표시할지 여부입니다."
-                },
-                {
                   "name": "showHeader",
                   "type": "Boolean",
                   "default": "true",
@@ -497,7 +539,7 @@
                   "name": "formatter",
                   "type": "function / Object",
                   "default": "null",
-                  "description": "데이터가 표시되기 전에 형식을 지정합니다. 함수형(({ name, value, seriesId }) => string), { value: ({ name, value, percentage, seriesId }) => string } 객체형, { html } 커스텀 HTML형 3가지 형태를 지원합니다."
+                  "description": "데이터가 표시되기 전에 형식을 지정합니다. 함수형(({ name, value, percentage, seriesId }) => string), { title, value } 객체형(value: ({ name, value, percentage, seriesId }) => string), { html } 커스텀 HTML형 3가지 형태를 지원합니다."
                 },
                 {
                   "name": "returnValue",
@@ -560,13 +602,25 @@
             {
               "name": "selectItem",
               "type": "Object",
-              "description": "차트 아이템 선택 기능의 활성화 여부 및 속성입니다.",
+              "description": "차트 아이템(조각) 선택 기능의 활성화 여부 및 속성입니다. 선택된 조각은 반지름이 커져 강조됩니다.",
               "children": [
                 {
                   "name": "use",
                   "type": "Boolean",
                   "default": "false",
                   "description": "차트 아이템 선택 기능 사용 여부입니다."
+                },
+                {
+                  "name": "useClick",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "클릭으로 아이템을 선택할지 여부입니다. false이면 v-model:selectedItem으로만 선택할 수 있습니다."
+                },
+                {
+                  "name": "useDeselectItem",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "선택된 아이템을 다시 클릭했을 때 선택을 해제할지 여부입니다."
                 }
               ]
             },
@@ -608,6 +662,10 @@
         {
           "name": "dbl-click",
           "description": "차트 더블 클릭 시 발생하며, 더블 클릭된 series의 value, seriesID 값을 selectedItem으로 반환합니다. selectItem 옵션의 use가 true여야 selectedItem 객체를 반환하며, false이면 빈 객체를 반환합니다."
+        },
+        {
+          "name": "mouse-move",
+          "description": "차트 위에서 마우스를 움직일 때 발생합니다. 이벤트 객체(e)와 hoveredLabel을 전달하며, pie 차트는 축이 없어 축 기반 정보(curMouseTargetVal)는 제공되지 않습니다."
         },
         {
           "name": "click-legend",

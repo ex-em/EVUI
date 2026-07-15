@@ -55,20 +55,23 @@ const legendItems = ref([]);
 
 #### series
 
-| 이름      | 타입                        | 디폴트                                        | 설명                                                            | 종류(예시)                      |
-| --------- | --------------------------- | --------------------------------------------- | --------------------------------------------------------------- | ------------------------------- |
-| name      | String                      | series-\${index}                              | 특정 데이터에 대한 시리즈 옵션                                  |                                 |
-| type      | String                      | 'bar'                                         | 시리즈에 해당하는 데이터 표현 방식                              | 'bar', 'pie', 'line', 'scatter' |
-| color     | Hex, RGB, RGBA Code(String) | COLOR[index]                                  | 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264)을 순차적으로 적용 |                                 |
-| stroke    | Object                      | { use: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션         |                                 |
-| showValue | Object                      | ([상세](#showvalue))                          | 조각 위에 값 표시 여부 및 속성                                  |                                 |
+| 이름       | 타입                        | 디폴트                                        | 설명                                                            | 종류(예시)                      |
+| ---------- | --------------------------- | --------------------------------------------- | --------------------------------------------------------------- | ------------------------------- |
+| show       | Boolean                     | true                                          | 시리즈 표시 여부                                                | true /false                     |
+| name       | String                      | series-\${index}                              | 시리즈의 이름                                                   |                                 |
+| type       | String                      | (options.type)                                | 시리즈에 해당하는 데이터 표현 방식. 미지정 시 options.type을 따름 | 'pie', 'bar', 'line', 'scatter' |
+| color      | Hex, RGB, RGBA Code(String) | COLOR[index]                                  | 사전에 정의된 25개 색상('#2b99f0' ~ '#df6264')을 순차적으로 적용 |                                 |
+| showLegend | Boolean                     | true                                          | 범례에 시리즈를 표시할지 여부                                   | true /false                     |
+| showValue  | Object                      | ([상세](#showvalue))                          | 조각 위에 값 표시 여부 및 속성                                  |                                 |
+
+- 조각 테두리선은 시리즈 옵션이 아닌 전역 옵션 `pieStroke`로 설정합니다.
 
 #### data example
 
 ```
 const chartData =
   series: {
-    series1: { name: 'series1', color: '#FF00FF },
+    series1: { name: 'series1', color: '#FF00FF' },
     series2: { name: 'series2' },
   },
   data: {
@@ -89,18 +92,23 @@ const chartData =
 
 ### 4. options
 
-| 이름             | 타입            | 디폴트                                         | 설명                                                            | 종류(예시)                      |
-| ---------------- | --------------- | ---------------------------------------------- | --------------------------------------------------------------- | ------------------------------- |
-| type             | String          | ''                                             | series 별로 type값을 지정하지 않을 경우 일괄 적용될 차트의 타입 | 'bar', 'pie', 'line', 'scatter' |
-| width            | String / Number | '100%'                                         | 차트의 너비                                                     | '100%', '150px', 150            |
-| height           | String / Number | '100%'                                         | 차트의 높이                                                     | '100%', '150px', 150            |
-| title            | Object          | ([상세](#title))                               | 차트 상단에 위치할 차트 제목 표시 여부 및 속성                  |                                 |
-| legend           | Object          | ([상세](#legend))                              | 차트의 범례 표시 여부 및 속성                                   |                                 |
-| annotations | Array | ([상세](#annotation)) | 차트 위에 표시할 어노테이션/뱃지 목록 | |
-| doughnutHoleSize | number          | 0                                              | 내부 hole 사이즈                                                | 0 ~ 1                           |
-| pieStroke        | Object          | { show: true, color: '#FFFFFF', lineWidth: 2 } | 차트의 테두리선 표시 여부 및 색상, 두께를 설정하는 옵션         |                                 |
-| tooltip          | Object          | ([상세](#tooltip))                             | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성                |                                 |
-| eventBehavior    | Object          | ([상세](#eventbehavior))                       | 이벤트별 동작 설정 | | 
+| 이름              | 타입            | 디폴트                                         | 설명                                                            | 종류(예시)                      |
+| ----------------- | --------------- | ---------------------------------------------- | --------------------------------------------------------------- | ------------------------------- |
+| type              | String          | ''                                             | series 별로 type값을 지정하지 않을 경우 일괄 적용될 차트의 타입 | 'bar', 'pie', 'line', 'scatter' |
+| width             | String / Number | '100%'                                         | 차트의 너비                                                     | '100%', '150px', 150            |
+| height            | String / Number | '100%'                                         | 차트의 높이                                                     | '100%', '150px', 150            |
+| padding           | Object          | { top: 2, right: 2, left: 2, bottom: 4 }       | 차트 영역의 안쪽 여백. 파이 반지름 계산에 사용                  |                                 |
+| unSelectedOpacity | Number          | 0.3                                            | 범례 hover 등으로 특정 시리즈 강조 시 나머지 조각의 투명도      | 0 ~ 1                           |
+| title             | Object          | ([상세](#title))                               | 차트 상단에 위치할 차트 제목 표시 여부 및 속성                  |                                 |
+| legend            | Object          | ([상세](#legend))                              | 차트의 범례 표시 여부 및 속성                                   |                                 |
+| annotations       | Array           | ([상세](#annotation))                          | 차트 위에 표시할 어노테이션/뱃지 목록                           |                                 |
+| doughnutHoleSize  | number          | 0                                              | 내부 hole 사이즈                                                | 0 ~ 1                           |
+| pieStroke         | Object          | { use: true, color: '#FFFFFF', lineWidth: 2 }  | 조각 테두리선 표시 여부(use) 및 색상(color), 두께(lineWidth)    |                                 |
+| sunburst          | Boolean         |                                                | 다계층(선버스트) 파이 차트 모드. true이면 data.data를 { id, value, children } 객체의 배열로 전달하며, children으로 하위 계층을 중첩 | true /false |
+| reverse           | Boolean         | false                                          | sunburst 모드에서 계층 렌더링 순서를 반전할지 여부              | true /false                     |
+| tooltip           | Object          | ([상세](#tooltip))                             | 차트에 마우스를 올릴 경우 툴팁 표시 여부 및 속성                |                                 |
+| selectItem        | Object          | ([상세](#selectitem))                          | 차트 아이템(조각) 선택 기능 활성화 여부 및 속성                 |                                 |
+| eventBehavior     | Object          | ([상세](#eventbehavior))                       | 이벤트별 동작 설정 | | 
 
 #### title
 
@@ -118,7 +126,7 @@ const chartData =
 
 | 이름          | 타입                        | 디폴트                                   | 설명                                                  | 종류(예시)                       |
 | ------------- | --------------------------- | ---------------------------------------- | ----------------------------------------------------- | -------------------------------- |
-| show          | Boolean                     | false                                    | Legend 표시 여부                                      | true /false                      |
+| show          | Boolean                     | true                                     | Legend 표시 여부                                      | true /false                      |
 | position      | String                      | 'right'                                  | Legend 위치                                           | 'top', 'right', 'bottom', 'left' |
 | color         | Hex, RGB, RGBA Code(String) | '#353740'                                | 폰트 색상                                             |                                  |
 | inactive      | Hex, RGB, RGBA Code(String) | '#aaa'                                   | 비활성화 상태의 폰트 색상                             |                                  |
@@ -166,11 +174,10 @@ const chartData =
 | maxWidth            | Number                      |                                            | 툴팁의 최대 너비                                        |                                                                     |
 | textOverflow        | String                      | 'wrap'                                     | 툴팁에 표시될 텍스트가 maxWidth 값을 넘길 경우 의 처리  | 'wrap', 'ellipsis                                                   |
 | fontFamily          | String                      | 'Roboto'                                   | 툴팁에 표시될 폰트                                      | 'Roboto', 'serif                                                    |
-| fontColor           | Hex code (string), Object   | '#000000'                                  | 툴팁에 표시될 폰트 컬러                                 | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
+| fontColor           | Hex code (string), Object   | '#FFFFFF'                                  | 툴팁에 표시될 폰트 컬러                                 | '#FFFFFF', { label: '#FFFFFF', value: '#FFFFFF', 'title: #FFFFFF' } |
 | fontSize            | Object                      | { title: 16, contents: 14 }                | 툴팁에 표시될 폰트 사이즈                               |                                                                     |
 | colorShape          | String                      | 'rect'                                     | 툴팁에 표시될 series color의 모양                       | 'rect', 'circle'                                                    |
 | rowPadding          | Object                      | { top: 0, bottom: 3, right: 20, left: 16 } | 툴팁에 표시될 series Row의 padding 값                   |                                                                     |
-| showAllValueInRange | Boolean                     | false                                      | 동일한 axes값을 가진 전체 series를 Tooltip에 표시       |
 | showHeader          | Boolean                     | true                                       | Tooltip의 Header 영역 표시 여부                         |
 | formatter           | function / Object           | null                                       | 데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용 | (아래 코드 참고)                                                    |
 | returnValue         | function                    | null                                       | 외부 컴포넌트 커스텀 툴팁을 구현할 때 사용하는 함수                 | (아래 코드 참고)                                                    |
@@ -181,7 +188,7 @@ const chartOptions = {
     tooltip: {
         // 이전 버전 호환용으로 valueFormatter를 이전버전과 같이 사용 가능
         // return type : string
-        formatter: ({ name, value, seriesId }) => ... ,
+        formatter: ({ name, value, percentage, seriesId }) => ... ,
 
         // 새로운 버전
         // return type : string
@@ -231,9 +238,13 @@ const chartOptions = {
 
 #### selectItem
 
-| 이름 | 타입    | 디폴트 | 설명                  | 종류(예시) |
-| ---- | ------- | ------ | --------------------- | ---------- |
-| use  | Boolean | false  | 차트 아이템 선택 기능 |            |
+선택된 조각은 반지름이 커져 강조됩니다.
+
+| 이름            | 타입    | 디폴트 | 설명                                                              | 종류(예시)  |
+| --------------- | ------- | ------ | ----------------------------------------------------------------- | ----------- |
+| use             | Boolean | false  | 차트 아이템 선택 기능                                             | true /false |
+| useClick        | Boolean | true   | 클릭으로 아이템을 선택할지 여부. false이면 v-model:selectedItem으로만 선택 | true /false |
+| useDeselectItem | Boolean | false  | 선택된 아이템을 다시 클릭했을 때 선택을 해제할지 여부             | true /false |
 
 #### eventBehavior
 
@@ -254,6 +265,7 @@ const chartOptions = {
 | --------- | ------------ | ---------------------------------------------- |
 | click     | selectedItem | 클릭된 series의 value, seriesID 값을 반환      |
 | dbl-click | selectedItem | 더블 클릭된 series의 value, seriesID 값을 반환 |
+| mouse-move | e, hoveredLabel | 차트 위에서 마우스를 움직일 때 발생. pie 차트는 축이 없어 축 기반 정보(curMouseTargetVal)는 제공되지 않음 |
 | click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 
 - 단, `selectedItem` 옵션의 `use`값이 `true` 이어야 `selectedItem` 객체를 반환하며 false일 경우 빈 객체를 반환

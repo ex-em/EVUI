@@ -15,6 +15,16 @@
       "label": "Props",
       "items": [
         {
+          "name": "v-model:selectedItem",
+          "type": "Object",
+          "description": "options의 selectItem 옵션을 사용할 경우 유효한 바인딩으로, 현재 선택된 셀 정보(seriesID, dataIndex)를 담습니다."
+        },
+        {
+          "name": "v-model:selectedLabel",
+          "type": "Object",
+          "description": "options의 selectLabel 옵션을 사용할 경우 유효한 바인딩으로, 선택된 라벨의 인덱스 배열(dataIndex)로 차트를 컨트롤할 수 있습니다. selectLabel.useBothAxis가 true이면 선택된 축 정보(targetAxis: 'xAxis' | 'yAxis')가 함께 담깁니다."
+        },
+        {
           "name": "v-model:legend-data",
           "type": "Array",
           "description": "legend.external이 true일 때 유효한 바인딩으로, 차트가 갱신될 때마다 { sId, name, color, type, show } 형태의 범례 아이템 배열로 갱신되어 외부에서 범례를 렌더링할 수 있습니다. 외부 범례에서 클릭/호버 시 ref로 노출되는 toggleSeries(sId), highlightSeries(sId), unhighlightSeries() 메서드를 사용합니다."
@@ -32,10 +42,34 @@
               "description": "특정 데이터에 대한 시리즈 옵션입니다. key가 시리즈 ID로 사용됩니다.",
               "children": [
                 {
+                  "name": "show",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "시리즈 표시 여부입니다."
+                },
+                {
                   "name": "name",
                   "type": "String",
                   "default": "series-${index}",
                   "description": "시리즈의 이름입니다."
+                },
+                {
+                  "name": "showLegend",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "범례에 시리즈를 표시할지 여부입니다."
+                },
+                {
+                  "name": "xAxisIndex",
+                  "type": "Number",
+                  "default": "0",
+                  "description": "시리즈가 사용할 X축 인덱스입니다(다중 축 사용 시)."
+                },
+                {
+                  "name": "yAxisIndex",
+                  "type": "Number",
+                  "default": "0",
+                  "description": "시리즈가 사용할 Y축 인덱스입니다(다중 축 사용 시)."
                 },
                 {
                   "name": "showValue",
@@ -167,7 +201,7 @@
               "name": "data",
               "type": "Object",
               "default": "{}",
-              "description": "차트에 표시할 시리즈별 데이터입니다. 각 항목은 { x, y, value } 형태입니다."
+              "description": "차트에 표시할 시리즈별 데이터입니다. 각 항목은 { x, y, value } 형태이며, color를 함께 지정하면({ x, y, value, color }) 해당 셀의 색상을 개별 지정할 수 있습니다."
             },
             {
               "name": "labels",
@@ -187,12 +221,13 @@
               "type": "String",
               "default": "''",
               "values": [
+                "'heatMap'",
                 "'bar'",
                 "'pie'",
                 "'line'",
                 "'scatter'"
               ],
-              "description": "series별로 type 값을 지정하지 않을 경우 일괄 적용될 차트의 타입입니다."
+              "description": "차트의 타입입니다. heatMap 차트를 사용하려면 'heatMap'으로 지정해야 합니다."
             },
             {
               "name": "width",
@@ -208,7 +243,7 @@
             },
             {
               "name": "axesX",
-              "type": "Object",
+              "type": "Array<Object>",
               "description": "X축에 대한 속성입니다.",
               "children": [
                 {
@@ -239,6 +274,18 @@
                   "description": "축의 Max Buffer를 위한 속성입니다(0.1 ~ 0.9)."
                 },
                 {
+                  "name": "min",
+                  "type": "Number",
+                  "default": "null",
+                  "description": "축 최소값을 고정합니다."
+                },
+                {
+                  "name": "max",
+                  "type": "Number",
+                  "default": "null",
+                  "description": "축 최대값을 고정합니다."
+                },
+                {
                   "name": "showGrid",
                   "type": "Boolean",
                   "default": "true",
@@ -269,6 +316,12 @@
                   "description": "축에 표시할 값의 min, max입니다(autoScaleRatio = null, startToZero = false여야 정상 표현됩니다). time 타입은 [min, max], step 타입은 라벨의 [minIndex, maxIndex]를 넘겨줍니다."
                 },
                 {
+                  "name": "decimalPoint",
+                  "type": "Number | 'auto'",
+                  "default": "'auto'",
+                  "description": "축 라벨 소수점 자릿수입니다. 'auto'면 자동 결정됩니다."
+                },
+                {
                   "name": "interval",
                   "type": "String / Number",
                   "description": "축에 표시되는 값의 간격 단위입니다(time: string / linear: number). time 타입에서는 'millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'를 사용합니다."
@@ -276,7 +329,8 @@
                 {
                   "name": "timeFormat",
                   "type": "String",
-                  "description": "time 타입 축 라벨의 시간 포맷입니다. dayjs의 timeFormat을 이용합니다."
+                  "description": "time 타입 축 라벨의 시간 포맷입니다. dayjs의 timeFormat을 이용합니다.",
+                  "default": "'mm:ss'"
                 },
                 {
                   "name": "categoryMode",
@@ -335,6 +389,24 @@
                       "description": "Ellipsis 방향입니다(right => 'aaa...', left => '...aaa')."
                     },
                     {
+                      "name": "padding",
+                      "type": "Number",
+                      "default": "0",
+                      "description": "label의 좌우 여백입니다(X축, linear/time 타입에만 해당)."
+                    },
+                    {
+                      "name": "fixWidth",
+                      "type": "Number",
+                      "default": "undefined",
+                      "description": "라벨 넓이를 강제로 고정합니다. 해당 사이즈보다 커질 시 Ellipsis 처리됩니다."
+                    },
+                    {
+                      "name": "fontWeight",
+                      "type": "Number",
+                      "default": "400",
+                      "description": "라벨 폰트 굵기입니다."
+                    },
+                    {
                       "name": "alignToGridLine",
                       "type": "Boolean",
                       "default": "false",
@@ -353,6 +425,577 @@
                   "type": "Object",
                   "default": "null",
                   "description": "마지막 라벨의 폰트 스타일을 설정합니다."
+                },
+                {
+                  "name": "plotLines",
+                  "type": "Array<Object>",
+                  "description": "plot line(임계선 표시 용도)을 설정합니다.",
+                  "children": [
+                    {
+                      "name": "value",
+                      "type": "Number(value), Date, Number(Index)",
+                      "default": "null",
+                      "description": "선을 표시할 위치에 해당하는 값입니다. 값이 0이어도 선·라벨이 표시됩니다."
+                    },
+                    {
+                      "name": "color",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#FF0000'",
+                      "description": "선 색상입니다."
+                    },
+                    {
+                      "name": "segments",
+                      "type": "Array<number>",
+                      "default": "null",
+                      "description": "선의 dash 간격입니다. 예: [6, 2]"
+                    },
+                    {
+                      "name": "lineWidth",
+                      "type": "Number",
+                      "default": "1",
+                      "description": "선 굵기입니다."
+                    },
+                    {
+                      "name": "label",
+                      "type": "Object",
+                      "default": "null",
+                      "description": "표시할 label의 스타일을 정의합니다.",
+                      "children": [
+                        {
+                          "name": "show",
+                          "type": "Boolean",
+                          "default": "false",
+                          "description": "label 표시 여부입니다."
+                        },
+                        {
+                          "name": "text",
+                          "type": "String | null",
+                          "default": "null",
+                          "description": "라벨 텍스트(alias)입니다. showValue가 false면 이 값을 그대로 표시합니다."
+                        },
+                        {
+                          "name": "showValue",
+                          "type": "Boolean",
+                          "default": "false",
+                          "description": "true이면 '{text} {value}' 형태로 합성해 표시합니다(value는 해당 축 formatter 적용)."
+                        },
+                        {
+                          "name": "fontSize",
+                          "type": "Number",
+                          "default": "12",
+                          "description": "폰트 크기입니다."
+                        },
+                        {
+                          "name": "fontColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FF0000'",
+                          "description": "폰트 색상입니다."
+                        },
+                        {
+                          "name": "fillColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FFFFFF'",
+                          "description": "박스 배경 색상입니다. rgba(...)로 투명도 지정이 가능합니다."
+                        },
+                        {
+                          "name": "lineColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FF0000'",
+                          "description": "박스 테두리 선 색상입니다."
+                        },
+                        {
+                          "name": "lineWidth",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "테두리 선 굵기입니다."
+                        },
+                        {
+                          "name": "fontWeight",
+                          "type": "Number",
+                          "default": "400",
+                          "description": "폰트 굵기입니다."
+                        },
+                        {
+                          "name": "fontFamily",
+                          "type": "String",
+                          "default": "'Roboto'",
+                          "description": "폰트 스타일입니다."
+                        },
+                        {
+                          "name": "position",
+                          "type": "String",
+                          "default": "'outside'",
+                          "values": [
+                            "'outside'",
+                            "'innerStart'",
+                            "'innerEnd'"
+                          ],
+                          "description": "(Y축) 가로 배치입니다. plot 밖 우측 또는 안쪽 좌·우에 배치합니다. X축 라벨은 항상 plot 상단에 고정됩니다."
+                        },
+                        {
+                          "name": "textAlign",
+                          "type": "String",
+                          "default": "'center'",
+                          "values": [
+                            "'left'",
+                            "'center'",
+                            "'right'"
+                          ],
+                          "description": "수평 정렬입니다."
+                        },
+                        {
+                          "name": "verticalAlign",
+                          "type": "String",
+                          "default": "'middle'",
+                          "values": [
+                            "'top'",
+                            "'middle'",
+                            "'bottom'"
+                          ],
+                          "description": "수직 정렬입니다."
+                        },
+                        {
+                          "name": "borderRadius",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "라벨 박스의 모서리 반경(px)입니다."
+                        },
+                        {
+                          "name": "gap",
+                          "type": "Number | null",
+                          "default": "null",
+                          "description": "임계선/임계영역과 라벨 박스 사이 간격(px)입니다. null이면 fontSize 기준으로 자동 계산됩니다."
+                        },
+                        {
+                          "name": "padding",
+                          "type": "Number | Object",
+                          "default": "null",
+                          "description": "박스 안쪽 여백입니다. 숫자 또는 { top, right, bottom, left } 형태이며, null이면 fontSize/4가 적용됩니다."
+                        },
+                        {
+                          "name": "pointer",
+                          "type": "Object",
+                          "description": "말풍선 꼬리를 설정합니다.",
+                          "children": [
+                            {
+                              "name": "show",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "말풍선 꼬리 표시 여부입니다(방향은 배치 기준 자동)."
+                            },
+                            {
+                              "name": "color",
+                              "type": "Hex, RGB, RGBA Code(String) | null",
+                              "default": "null",
+                              "description": "꼬리 색상입니다. null이면 박스 배경색(fillColor)을 따릅니다."
+                            }
+                          ]
+                        },
+                        {
+                          "name": "responsive",
+                          "type": "Object",
+                          "description": "plot 너비 기준 단계 축약 설정입니다. 둘 다 null이면 항상 풀(text+value) 표시입니다.",
+                          "children": [
+                            {
+                              "name": "valueOnlyBelow",
+                              "type": "Number | null",
+                              "default": "null",
+                              "description": "plot 너비가 이 값보다 작으면 value만 표시합니다. 예: 400"
+                            },
+                            {
+                              "name": "hideBelow",
+                              "type": "Number | null",
+                              "default": "null",
+                              "description": "plot 너비가 이 값보다 작으면 라벨을 노출하지 않습니다(본체는 유지). 예: 200"
+                            }
+                          ]
+                        },
+                        {
+                          "name": "showTextOnHover",
+                          "type": "Object",
+                          "description": "value-only 상태에서 hover 시 text tooltip을 표시하는 설정입니다(데스크탑 전용).",
+                          "children": [
+                            {
+                              "name": "use",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "활성 여부입니다."
+                            },
+                            {
+                              "name": "backgroundColor",
+                              "type": "String",
+                              "default": "'#4C4C4C'",
+                              "description": "배경 색상입니다."
+                            },
+                            {
+                              "name": "fontColor",
+                              "type": "String",
+                              "default": "'#FFFFFF'",
+                              "description": "폰트 색상입니다."
+                            },
+                            {
+                              "name": "borderColor",
+                              "type": "String | null",
+                              "default": "null",
+                              "description": "테두리 색상입니다. null이면 backgroundColor와 동일해 테두리가 표시되지 않습니다."
+                            },
+                            {
+                              "name": "borderRadius",
+                              "type": "Number",
+                              "default": "4",
+                              "description": "모서리 반경입니다."
+                            },
+                            {
+                              "name": "fontSize",
+                              "type": "Number",
+                              "default": "12",
+                              "description": "폰트 크기입니다."
+                            },
+                            {
+                              "name": "fontWeight",
+                              "type": "Number",
+                              "default": "400",
+                              "description": "폰트 굵기입니다."
+                            },
+                            {
+                              "name": "fontFamily",
+                              "type": "String",
+                              "default": "'Roboto'",
+                              "description": "폰트 패밀리입니다."
+                            },
+                            {
+                              "name": "useShadow",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "그림자 사용 여부입니다."
+                            },
+                            {
+                              "name": "shadowOpacity",
+                              "type": "Number",
+                              "default": "0.25",
+                              "description": "그림자 투명도입니다."
+                            },
+                            {
+                              "name": "padding",
+                              "type": "Object",
+                              "default": "{ top: 4, right: 8, bottom: 4, left: 8 }",
+                              "description": "안쪽 여백입니다."
+                            }
+                          ]
+                        },
+                        {
+                          "name": "textOverflow",
+                          "type": "String",
+                          "default": "'none'",
+                          "values": [
+                            "'none'",
+                            "'ellipsis'"
+                          ],
+                          "description": "라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리 방안입니다."
+                        },
+                        {
+                          "name": "maxWidth",
+                          "type": "Number",
+                          "default": "null",
+                          "description": "라벨의 최대 너비입니다."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "plotBands",
+                  "type": "Array<Object>",
+                  "description": "plot band(임계영역 표시 용도)를 설정합니다.",
+                  "children": [
+                    {
+                      "name": "from",
+                      "type": "Number(value), Date, Number(Index)",
+                      "default": "null",
+                      "description": "박스를 표시할 시작 위치에 해당하는 값입니다. 값이 0이어도 표시됩니다."
+                    },
+                    {
+                      "name": "to",
+                      "type": "Number(value), Date, Number(Index)",
+                      "default": "null",
+                      "description": "박스를 표시할 종료 위치에 해당하는 값입니다. 값이 0이어도 표시됩니다."
+                    },
+                    {
+                      "name": "color",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#FAE59D'",
+                      "description": "박스(면) 배경 색상입니다. rgba(...)로 투명도를 지정할 수 있습니다."
+                    },
+                    {
+                      "name": "border",
+                      "type": "Object | null",
+                      "default": "null",
+                      "description": "밴드 start/end 모서리의 stroke를 설정합니다.",
+                      "children": [
+                        {
+                          "name": "color",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "description": "모서리 선 색상입니다."
+                        },
+                        {
+                          "name": "width",
+                          "type": "Number",
+                          "description": "모서리 선 굵기입니다."
+                        },
+                        {
+                          "name": "segments",
+                          "type": "Array<number>",
+                          "description": "dash 간격(점선)입니다. 예: [2, 2]"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "label",
+                      "type": "Object",
+                      "default": "null",
+                      "description": "표시할 label의 스타일을 정의합니다. showValue가 true이면 from·to 양 끝에 각각 값 라벨이 표시됩니다.",
+                      "children": [
+                        {
+                          "name": "show",
+                          "type": "Boolean",
+                          "default": "false",
+                          "description": "label 표시 여부입니다."
+                        },
+                        {
+                          "name": "text",
+                          "type": "String | null",
+                          "default": "null",
+                          "description": "라벨 텍스트(alias)입니다. showValue가 false면 이 값을 그대로 표시합니다."
+                        },
+                        {
+                          "name": "showValue",
+                          "type": "Boolean",
+                          "default": "false",
+                          "description": "true이면 '{text} {value}' 형태로 합성해 표시합니다(value는 해당 축 formatter 적용)."
+                        },
+                        {
+                          "name": "fontSize",
+                          "type": "Number",
+                          "default": "12",
+                          "description": "폰트 크기입니다."
+                        },
+                        {
+                          "name": "fontColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FF0000'",
+                          "description": "폰트 색상입니다."
+                        },
+                        {
+                          "name": "fillColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FFFFFF'",
+                          "description": "박스 배경 색상입니다. rgba(...)로 투명도 지정이 가능합니다."
+                        },
+                        {
+                          "name": "lineColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FF0000'",
+                          "description": "박스 테두리 선 색상입니다."
+                        },
+                        {
+                          "name": "lineWidth",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "테두리 선 굵기입니다."
+                        },
+                        {
+                          "name": "fontWeight",
+                          "type": "Number",
+                          "default": "400",
+                          "description": "폰트 굵기입니다."
+                        },
+                        {
+                          "name": "fontFamily",
+                          "type": "String",
+                          "default": "'Roboto'",
+                          "description": "폰트 스타일입니다."
+                        },
+                        {
+                          "name": "position",
+                          "type": "String",
+                          "default": "'outside'",
+                          "values": [
+                            "'outside'",
+                            "'innerStart'",
+                            "'innerEnd'"
+                          ],
+                          "description": "(Y축) 가로 배치입니다. plot 밖 우측 또는 안쪽 좌·우에 배치합니다. X축 라벨은 항상 plot 상단에 고정됩니다."
+                        },
+                        {
+                          "name": "textAlign",
+                          "type": "String",
+                          "default": "'center'",
+                          "values": [
+                            "'left'",
+                            "'center'",
+                            "'right'"
+                          ],
+                          "description": "수평 정렬입니다."
+                        },
+                        {
+                          "name": "verticalAlign",
+                          "type": "String",
+                          "default": "'middle'",
+                          "values": [
+                            "'top'",
+                            "'middle'",
+                            "'bottom'"
+                          ],
+                          "description": "수직 정렬입니다."
+                        },
+                        {
+                          "name": "borderRadius",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "라벨 박스의 모서리 반경(px)입니다."
+                        },
+                        {
+                          "name": "gap",
+                          "type": "Number | null",
+                          "default": "null",
+                          "description": "임계선/임계영역과 라벨 박스 사이 간격(px)입니다. null이면 fontSize 기준으로 자동 계산됩니다."
+                        },
+                        {
+                          "name": "padding",
+                          "type": "Number | Object",
+                          "default": "null",
+                          "description": "박스 안쪽 여백입니다. 숫자 또는 { top, right, bottom, left } 형태이며, null이면 fontSize/4가 적용됩니다."
+                        },
+                        {
+                          "name": "pointer",
+                          "type": "Object",
+                          "description": "말풍선 꼬리를 설정합니다.",
+                          "children": [
+                            {
+                              "name": "show",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "말풍선 꼬리 표시 여부입니다(방향은 배치 기준 자동)."
+                            },
+                            {
+                              "name": "color",
+                              "type": "Hex, RGB, RGBA Code(String) | null",
+                              "default": "null",
+                              "description": "꼬리 색상입니다. null이면 박스 배경색(fillColor)을 따릅니다."
+                            }
+                          ]
+                        },
+                        {
+                          "name": "responsive",
+                          "type": "Object",
+                          "description": "plot 너비 기준 단계 축약 설정입니다. 둘 다 null이면 항상 풀(text+value) 표시입니다.",
+                          "children": [
+                            {
+                              "name": "valueOnlyBelow",
+                              "type": "Number | null",
+                              "default": "null",
+                              "description": "plot 너비가 이 값보다 작으면 value만 표시합니다. 예: 400"
+                            },
+                            {
+                              "name": "hideBelow",
+                              "type": "Number | null",
+                              "default": "null",
+                              "description": "plot 너비가 이 값보다 작으면 라벨을 노출하지 않습니다(본체는 유지). 예: 200"
+                            }
+                          ]
+                        },
+                        {
+                          "name": "showTextOnHover",
+                          "type": "Object",
+                          "description": "value-only 상태에서 hover 시 text tooltip을 표시하는 설정입니다(데스크탑 전용).",
+                          "children": [
+                            {
+                              "name": "use",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "활성 여부입니다."
+                            },
+                            {
+                              "name": "backgroundColor",
+                              "type": "String",
+                              "default": "'#4C4C4C'",
+                              "description": "배경 색상입니다."
+                            },
+                            {
+                              "name": "fontColor",
+                              "type": "String",
+                              "default": "'#FFFFFF'",
+                              "description": "폰트 색상입니다."
+                            },
+                            {
+                              "name": "borderColor",
+                              "type": "String | null",
+                              "default": "null",
+                              "description": "테두리 색상입니다. null이면 backgroundColor와 동일해 테두리가 표시되지 않습니다."
+                            },
+                            {
+                              "name": "borderRadius",
+                              "type": "Number",
+                              "default": "4",
+                              "description": "모서리 반경입니다."
+                            },
+                            {
+                              "name": "fontSize",
+                              "type": "Number",
+                              "default": "12",
+                              "description": "폰트 크기입니다."
+                            },
+                            {
+                              "name": "fontWeight",
+                              "type": "Number",
+                              "default": "400",
+                              "description": "폰트 굵기입니다."
+                            },
+                            {
+                              "name": "fontFamily",
+                              "type": "String",
+                              "default": "'Roboto'",
+                              "description": "폰트 패밀리입니다."
+                            },
+                            {
+                              "name": "useShadow",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "그림자 사용 여부입니다."
+                            },
+                            {
+                              "name": "shadowOpacity",
+                              "type": "Number",
+                              "default": "0.25",
+                              "description": "그림자 투명도입니다."
+                            },
+                            {
+                              "name": "padding",
+                              "type": "Object",
+                              "default": "{ top: 4, right: 8, bottom: 4, left: 8 }",
+                              "description": "안쪽 여백입니다."
+                            }
+                          ]
+                        },
+                        {
+                          "name": "textOverflow",
+                          "type": "String",
+                          "default": "'none'",
+                          "values": [
+                            "'none'",
+                            "'ellipsis'"
+                          ],
+                          "description": "라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리 방안입니다."
+                        },
+                        {
+                          "name": "maxWidth",
+                          "type": "Number",
+                          "default": "null",
+                          "description": "라벨의 최대 너비입니다."
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
                   "name": "formatter",
@@ -419,7 +1062,7 @@
                     {
                       "name": "color",
                       "type": "Hex, RGB, RGBA Code(String)",
-                      "default": "'#25262E'",
+                      "default": "'#808080'",
                       "description": "글자 색상입니다."
                     }
                   ]
@@ -456,7 +1099,7 @@
                     {
                       "name": "showButton",
                       "type": "Boolean",
-                      "default": "false",
+                      "default": "true",
                       "description": "스크롤 버튼 표시 여부입니다."
                     },
                     {
@@ -492,12 +1135,36 @@
                   "type": "Boolean",
                   "default": "true",
                   "description": "보조 눈금 표시 여부입니다."
+                },
+                {
+                  "name": "showLastLabel",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "축의 마지막 라벨을 항상 표시할지 여부입니다."
+                },
+                {
+                  "name": "showIndicator",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "마우스 위치의 축 인디케이터 표시 여부입니다."
+                },
+                {
+                  "name": "fixedSteps",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "range와 interval로 설정한 값을 그대로 사용하여 step을 고정합니다. 자동 스케일 조정을 비활성화하며, 원하는 간격으로 축을 표시할 때 사용합니다."
+                },
+                {
+                  "name": "scaleChange",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "scale 변경을 감지하여 emit을 발생시킬 때 사용합니다. true이면 scale이 변경될 때 axes-scale-change 이벤트가 발생합니다."
                 }
               ]
             },
             {
               "name": "axesY",
-              "type": "Object",
+              "type": "Array<Object>",
               "description": "Y축에 대한 속성입니다. 구조는 axesX와 동일합니다.",
               "children": [
                 {
@@ -528,6 +1195,18 @@
                   "description": "축의 Max Buffer를 위한 속성입니다(0.1 ~ 0.9)."
                 },
                 {
+                  "name": "min",
+                  "type": "Number",
+                  "default": "null",
+                  "description": "축 최소값을 고정합니다."
+                },
+                {
+                  "name": "max",
+                  "type": "Number",
+                  "default": "null",
+                  "description": "축 최대값을 고정합니다."
+                },
+                {
                   "name": "showGrid",
                   "type": "Boolean",
                   "default": "true",
@@ -558,6 +1237,12 @@
                   "description": "축에 표시할 값의 min, max입니다(autoScaleRatio = null, startToZero = false여야 정상 표현됩니다). time 타입은 [min, max], step 타입은 라벨의 [minIndex, maxIndex]를 넘겨줍니다."
                 },
                 {
+                  "name": "decimalPoint",
+                  "type": "Number | 'auto'",
+                  "default": "'auto'",
+                  "description": "축 라벨 소수점 자릿수입니다. 'auto'면 자동 결정됩니다."
+                },
+                {
                   "name": "interval",
                   "type": "String / Number",
                   "description": "축에 표시되는 값의 간격 단위입니다(time: string / linear: number). time 타입에서는 'millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'를 사용합니다."
@@ -565,7 +1250,8 @@
                 {
                   "name": "timeFormat",
                   "type": "String",
-                  "description": "time 타입 축 라벨의 시간 포맷입니다. dayjs의 timeFormat을 이용합니다."
+                  "description": "time 타입 축 라벨의 시간 포맷입니다. dayjs의 timeFormat을 이용합니다.",
+                  "default": "'mm:ss'"
                 },
                 {
                   "name": "categoryMode",
@@ -624,6 +1310,24 @@
                       "description": "Ellipsis 방향입니다(right => 'aaa...', left => '...aaa')."
                     },
                     {
+                      "name": "padding",
+                      "type": "Number",
+                      "default": "0",
+                      "description": "label의 좌우 여백입니다(X축, linear/time 타입에만 해당)."
+                    },
+                    {
+                      "name": "fixWidth",
+                      "type": "Number",
+                      "default": "undefined",
+                      "description": "라벨 넓이를 강제로 고정합니다. 해당 사이즈보다 커질 시 Ellipsis 처리됩니다."
+                    },
+                    {
+                      "name": "fontWeight",
+                      "type": "Number",
+                      "default": "400",
+                      "description": "라벨 폰트 굵기입니다."
+                    },
+                    {
                       "name": "alignToGridLine",
                       "type": "Boolean",
                       "default": "false",
@@ -642,6 +1346,577 @@
                   "type": "Object",
                   "default": "null",
                   "description": "마지막 라벨의 폰트 스타일을 설정합니다."
+                },
+                {
+                  "name": "plotLines",
+                  "type": "Array<Object>",
+                  "description": "plot line(임계선 표시 용도)을 설정합니다.",
+                  "children": [
+                    {
+                      "name": "value",
+                      "type": "Number(value), Date, Number(Index)",
+                      "default": "null",
+                      "description": "선을 표시할 위치에 해당하는 값입니다. 값이 0이어도 선·라벨이 표시됩니다."
+                    },
+                    {
+                      "name": "color",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#FF0000'",
+                      "description": "선 색상입니다."
+                    },
+                    {
+                      "name": "segments",
+                      "type": "Array<number>",
+                      "default": "null",
+                      "description": "선의 dash 간격입니다. 예: [6, 2]"
+                    },
+                    {
+                      "name": "lineWidth",
+                      "type": "Number",
+                      "default": "1",
+                      "description": "선 굵기입니다."
+                    },
+                    {
+                      "name": "label",
+                      "type": "Object",
+                      "default": "null",
+                      "description": "표시할 label의 스타일을 정의합니다.",
+                      "children": [
+                        {
+                          "name": "show",
+                          "type": "Boolean",
+                          "default": "false",
+                          "description": "label 표시 여부입니다."
+                        },
+                        {
+                          "name": "text",
+                          "type": "String | null",
+                          "default": "null",
+                          "description": "라벨 텍스트(alias)입니다. showValue가 false면 이 값을 그대로 표시합니다."
+                        },
+                        {
+                          "name": "showValue",
+                          "type": "Boolean",
+                          "default": "false",
+                          "description": "true이면 '{text} {value}' 형태로 합성해 표시합니다(value는 해당 축 formatter 적용)."
+                        },
+                        {
+                          "name": "fontSize",
+                          "type": "Number",
+                          "default": "12",
+                          "description": "폰트 크기입니다."
+                        },
+                        {
+                          "name": "fontColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FF0000'",
+                          "description": "폰트 색상입니다."
+                        },
+                        {
+                          "name": "fillColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FFFFFF'",
+                          "description": "박스 배경 색상입니다. rgba(...)로 투명도 지정이 가능합니다."
+                        },
+                        {
+                          "name": "lineColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FF0000'",
+                          "description": "박스 테두리 선 색상입니다."
+                        },
+                        {
+                          "name": "lineWidth",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "테두리 선 굵기입니다."
+                        },
+                        {
+                          "name": "fontWeight",
+                          "type": "Number",
+                          "default": "400",
+                          "description": "폰트 굵기입니다."
+                        },
+                        {
+                          "name": "fontFamily",
+                          "type": "String",
+                          "default": "'Roboto'",
+                          "description": "폰트 스타일입니다."
+                        },
+                        {
+                          "name": "position",
+                          "type": "String",
+                          "default": "'outside'",
+                          "values": [
+                            "'outside'",
+                            "'innerStart'",
+                            "'innerEnd'"
+                          ],
+                          "description": "(Y축) 가로 배치입니다. plot 밖 우측 또는 안쪽 좌·우에 배치합니다. X축 라벨은 항상 plot 상단에 고정됩니다."
+                        },
+                        {
+                          "name": "textAlign",
+                          "type": "String",
+                          "default": "'center'",
+                          "values": [
+                            "'left'",
+                            "'center'",
+                            "'right'"
+                          ],
+                          "description": "수평 정렬입니다."
+                        },
+                        {
+                          "name": "verticalAlign",
+                          "type": "String",
+                          "default": "'middle'",
+                          "values": [
+                            "'top'",
+                            "'middle'",
+                            "'bottom'"
+                          ],
+                          "description": "수직 정렬입니다."
+                        },
+                        {
+                          "name": "borderRadius",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "라벨 박스의 모서리 반경(px)입니다."
+                        },
+                        {
+                          "name": "gap",
+                          "type": "Number | null",
+                          "default": "null",
+                          "description": "임계선/임계영역과 라벨 박스 사이 간격(px)입니다. null이면 fontSize 기준으로 자동 계산됩니다."
+                        },
+                        {
+                          "name": "padding",
+                          "type": "Number | Object",
+                          "default": "null",
+                          "description": "박스 안쪽 여백입니다. 숫자 또는 { top, right, bottom, left } 형태이며, null이면 fontSize/4가 적용됩니다."
+                        },
+                        {
+                          "name": "pointer",
+                          "type": "Object",
+                          "description": "말풍선 꼬리를 설정합니다.",
+                          "children": [
+                            {
+                              "name": "show",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "말풍선 꼬리 표시 여부입니다(방향은 배치 기준 자동)."
+                            },
+                            {
+                              "name": "color",
+                              "type": "Hex, RGB, RGBA Code(String) | null",
+                              "default": "null",
+                              "description": "꼬리 색상입니다. null이면 박스 배경색(fillColor)을 따릅니다."
+                            }
+                          ]
+                        },
+                        {
+                          "name": "responsive",
+                          "type": "Object",
+                          "description": "plot 너비 기준 단계 축약 설정입니다. 둘 다 null이면 항상 풀(text+value) 표시입니다.",
+                          "children": [
+                            {
+                              "name": "valueOnlyBelow",
+                              "type": "Number | null",
+                              "default": "null",
+                              "description": "plot 너비가 이 값보다 작으면 value만 표시합니다. 예: 400"
+                            },
+                            {
+                              "name": "hideBelow",
+                              "type": "Number | null",
+                              "default": "null",
+                              "description": "plot 너비가 이 값보다 작으면 라벨을 노출하지 않습니다(본체는 유지). 예: 200"
+                            }
+                          ]
+                        },
+                        {
+                          "name": "showTextOnHover",
+                          "type": "Object",
+                          "description": "value-only 상태에서 hover 시 text tooltip을 표시하는 설정입니다(데스크탑 전용).",
+                          "children": [
+                            {
+                              "name": "use",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "활성 여부입니다."
+                            },
+                            {
+                              "name": "backgroundColor",
+                              "type": "String",
+                              "default": "'#4C4C4C'",
+                              "description": "배경 색상입니다."
+                            },
+                            {
+                              "name": "fontColor",
+                              "type": "String",
+                              "default": "'#FFFFFF'",
+                              "description": "폰트 색상입니다."
+                            },
+                            {
+                              "name": "borderColor",
+                              "type": "String | null",
+                              "default": "null",
+                              "description": "테두리 색상입니다. null이면 backgroundColor와 동일해 테두리가 표시되지 않습니다."
+                            },
+                            {
+                              "name": "borderRadius",
+                              "type": "Number",
+                              "default": "4",
+                              "description": "모서리 반경입니다."
+                            },
+                            {
+                              "name": "fontSize",
+                              "type": "Number",
+                              "default": "12",
+                              "description": "폰트 크기입니다."
+                            },
+                            {
+                              "name": "fontWeight",
+                              "type": "Number",
+                              "default": "400",
+                              "description": "폰트 굵기입니다."
+                            },
+                            {
+                              "name": "fontFamily",
+                              "type": "String",
+                              "default": "'Roboto'",
+                              "description": "폰트 패밀리입니다."
+                            },
+                            {
+                              "name": "useShadow",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "그림자 사용 여부입니다."
+                            },
+                            {
+                              "name": "shadowOpacity",
+                              "type": "Number",
+                              "default": "0.25",
+                              "description": "그림자 투명도입니다."
+                            },
+                            {
+                              "name": "padding",
+                              "type": "Object",
+                              "default": "{ top: 4, right: 8, bottom: 4, left: 8 }",
+                              "description": "안쪽 여백입니다."
+                            }
+                          ]
+                        },
+                        {
+                          "name": "textOverflow",
+                          "type": "String",
+                          "default": "'none'",
+                          "values": [
+                            "'none'",
+                            "'ellipsis'"
+                          ],
+                          "description": "라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리 방안입니다."
+                        },
+                        {
+                          "name": "maxWidth",
+                          "type": "Number",
+                          "default": "null",
+                          "description": "라벨의 최대 너비입니다."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "plotBands",
+                  "type": "Array<Object>",
+                  "description": "plot band(임계영역 표시 용도)를 설정합니다.",
+                  "children": [
+                    {
+                      "name": "from",
+                      "type": "Number(value), Date, Number(Index)",
+                      "default": "null",
+                      "description": "박스를 표시할 시작 위치에 해당하는 값입니다. 값이 0이어도 표시됩니다."
+                    },
+                    {
+                      "name": "to",
+                      "type": "Number(value), Date, Number(Index)",
+                      "default": "null",
+                      "description": "박스를 표시할 종료 위치에 해당하는 값입니다. 값이 0이어도 표시됩니다."
+                    },
+                    {
+                      "name": "color",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#FAE59D'",
+                      "description": "박스(면) 배경 색상입니다. rgba(...)로 투명도를 지정할 수 있습니다."
+                    },
+                    {
+                      "name": "border",
+                      "type": "Object | null",
+                      "default": "null",
+                      "description": "밴드 start/end 모서리의 stroke를 설정합니다.",
+                      "children": [
+                        {
+                          "name": "color",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "description": "모서리 선 색상입니다."
+                        },
+                        {
+                          "name": "width",
+                          "type": "Number",
+                          "description": "모서리 선 굵기입니다."
+                        },
+                        {
+                          "name": "segments",
+                          "type": "Array<number>",
+                          "description": "dash 간격(점선)입니다. 예: [2, 2]"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "label",
+                      "type": "Object",
+                      "default": "null",
+                      "description": "표시할 label의 스타일을 정의합니다. showValue가 true이면 from·to 양 끝에 각각 값 라벨이 표시됩니다.",
+                      "children": [
+                        {
+                          "name": "show",
+                          "type": "Boolean",
+                          "default": "false",
+                          "description": "label 표시 여부입니다."
+                        },
+                        {
+                          "name": "text",
+                          "type": "String | null",
+                          "default": "null",
+                          "description": "라벨 텍스트(alias)입니다. showValue가 false면 이 값을 그대로 표시합니다."
+                        },
+                        {
+                          "name": "showValue",
+                          "type": "Boolean",
+                          "default": "false",
+                          "description": "true이면 '{text} {value}' 형태로 합성해 표시합니다(value는 해당 축 formatter 적용)."
+                        },
+                        {
+                          "name": "fontSize",
+                          "type": "Number",
+                          "default": "12",
+                          "description": "폰트 크기입니다."
+                        },
+                        {
+                          "name": "fontColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FF0000'",
+                          "description": "폰트 색상입니다."
+                        },
+                        {
+                          "name": "fillColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FFFFFF'",
+                          "description": "박스 배경 색상입니다. rgba(...)로 투명도 지정이 가능합니다."
+                        },
+                        {
+                          "name": "lineColor",
+                          "type": "Hex, RGB, RGBA Code(String)",
+                          "default": "'#FF0000'",
+                          "description": "박스 테두리 선 색상입니다."
+                        },
+                        {
+                          "name": "lineWidth",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "테두리 선 굵기입니다."
+                        },
+                        {
+                          "name": "fontWeight",
+                          "type": "Number",
+                          "default": "400",
+                          "description": "폰트 굵기입니다."
+                        },
+                        {
+                          "name": "fontFamily",
+                          "type": "String",
+                          "default": "'Roboto'",
+                          "description": "폰트 스타일입니다."
+                        },
+                        {
+                          "name": "position",
+                          "type": "String",
+                          "default": "'outside'",
+                          "values": [
+                            "'outside'",
+                            "'innerStart'",
+                            "'innerEnd'"
+                          ],
+                          "description": "(Y축) 가로 배치입니다. plot 밖 우측 또는 안쪽 좌·우에 배치합니다. X축 라벨은 항상 plot 상단에 고정됩니다."
+                        },
+                        {
+                          "name": "textAlign",
+                          "type": "String",
+                          "default": "'center'",
+                          "values": [
+                            "'left'",
+                            "'center'",
+                            "'right'"
+                          ],
+                          "description": "수평 정렬입니다."
+                        },
+                        {
+                          "name": "verticalAlign",
+                          "type": "String",
+                          "default": "'middle'",
+                          "values": [
+                            "'top'",
+                            "'middle'",
+                            "'bottom'"
+                          ],
+                          "description": "수직 정렬입니다."
+                        },
+                        {
+                          "name": "borderRadius",
+                          "type": "Number",
+                          "default": "0",
+                          "description": "라벨 박스의 모서리 반경(px)입니다."
+                        },
+                        {
+                          "name": "gap",
+                          "type": "Number | null",
+                          "default": "null",
+                          "description": "임계선/임계영역과 라벨 박스 사이 간격(px)입니다. null이면 fontSize 기준으로 자동 계산됩니다."
+                        },
+                        {
+                          "name": "padding",
+                          "type": "Number | Object",
+                          "default": "null",
+                          "description": "박스 안쪽 여백입니다. 숫자 또는 { top, right, bottom, left } 형태이며, null이면 fontSize/4가 적용됩니다."
+                        },
+                        {
+                          "name": "pointer",
+                          "type": "Object",
+                          "description": "말풍선 꼬리를 설정합니다.",
+                          "children": [
+                            {
+                              "name": "show",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "말풍선 꼬리 표시 여부입니다(방향은 배치 기준 자동)."
+                            },
+                            {
+                              "name": "color",
+                              "type": "Hex, RGB, RGBA Code(String) | null",
+                              "default": "null",
+                              "description": "꼬리 색상입니다. null이면 박스 배경색(fillColor)을 따릅니다."
+                            }
+                          ]
+                        },
+                        {
+                          "name": "responsive",
+                          "type": "Object",
+                          "description": "plot 너비 기준 단계 축약 설정입니다. 둘 다 null이면 항상 풀(text+value) 표시입니다.",
+                          "children": [
+                            {
+                              "name": "valueOnlyBelow",
+                              "type": "Number | null",
+                              "default": "null",
+                              "description": "plot 너비가 이 값보다 작으면 value만 표시합니다. 예: 400"
+                            },
+                            {
+                              "name": "hideBelow",
+                              "type": "Number | null",
+                              "default": "null",
+                              "description": "plot 너비가 이 값보다 작으면 라벨을 노출하지 않습니다(본체는 유지). 예: 200"
+                            }
+                          ]
+                        },
+                        {
+                          "name": "showTextOnHover",
+                          "type": "Object",
+                          "description": "value-only 상태에서 hover 시 text tooltip을 표시하는 설정입니다(데스크탑 전용).",
+                          "children": [
+                            {
+                              "name": "use",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "활성 여부입니다."
+                            },
+                            {
+                              "name": "backgroundColor",
+                              "type": "String",
+                              "default": "'#4C4C4C'",
+                              "description": "배경 색상입니다."
+                            },
+                            {
+                              "name": "fontColor",
+                              "type": "String",
+                              "default": "'#FFFFFF'",
+                              "description": "폰트 색상입니다."
+                            },
+                            {
+                              "name": "borderColor",
+                              "type": "String | null",
+                              "default": "null",
+                              "description": "테두리 색상입니다. null이면 backgroundColor와 동일해 테두리가 표시되지 않습니다."
+                            },
+                            {
+                              "name": "borderRadius",
+                              "type": "Number",
+                              "default": "4",
+                              "description": "모서리 반경입니다."
+                            },
+                            {
+                              "name": "fontSize",
+                              "type": "Number",
+                              "default": "12",
+                              "description": "폰트 크기입니다."
+                            },
+                            {
+                              "name": "fontWeight",
+                              "type": "Number",
+                              "default": "400",
+                              "description": "폰트 굵기입니다."
+                            },
+                            {
+                              "name": "fontFamily",
+                              "type": "String",
+                              "default": "'Roboto'",
+                              "description": "폰트 패밀리입니다."
+                            },
+                            {
+                              "name": "useShadow",
+                              "type": "Boolean",
+                              "default": "false",
+                              "description": "그림자 사용 여부입니다."
+                            },
+                            {
+                              "name": "shadowOpacity",
+                              "type": "Number",
+                              "default": "0.25",
+                              "description": "그림자 투명도입니다."
+                            },
+                            {
+                              "name": "padding",
+                              "type": "Object",
+                              "default": "{ top: 4, right: 8, bottom: 4, left: 8 }",
+                              "description": "안쪽 여백입니다."
+                            }
+                          ]
+                        },
+                        {
+                          "name": "textOverflow",
+                          "type": "String",
+                          "default": "'none'",
+                          "values": [
+                            "'none'",
+                            "'ellipsis'"
+                          ],
+                          "description": "라벨을 넣을 수 있는 여백 혹은 maxWidth 값을 넘었을 경우의 처리 방안입니다."
+                        },
+                        {
+                          "name": "maxWidth",
+                          "type": "Number",
+                          "default": "null",
+                          "description": "라벨의 최대 너비입니다."
+                        }
+                      ]
+                    }
+                  ]
                 },
                 {
                   "name": "formatter",
@@ -708,7 +1983,7 @@
                     {
                       "name": "color",
                       "type": "Hex, RGB, RGBA Code(String)",
-                      "default": "'#25262E'",
+                      "default": "'#808080'",
                       "description": "글자 색상입니다."
                     }
                   ]
@@ -745,7 +2020,7 @@
                     {
                       "name": "showButton",
                       "type": "Boolean",
-                      "default": "false",
+                      "default": "true",
                       "description": "스크롤 버튼 표시 여부입니다."
                     },
                     {
@@ -781,6 +2056,30 @@
                   "type": "Boolean",
                   "default": "true",
                   "description": "보조 눈금 표시 여부입니다."
+                },
+                {
+                  "name": "showLastLabel",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "축의 마지막 라벨을 항상 표시할지 여부입니다."
+                },
+                {
+                  "name": "showIndicator",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "마우스 위치의 축 인디케이터 표시 여부입니다."
+                },
+                {
+                  "name": "fixedSteps",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "range와 interval로 설정한 값을 그대로 사용하여 step을 고정합니다. 자동 스케일 조정을 비활성화하며, 원하는 간격으로 축을 표시할 때 사용합니다."
+                },
+                {
+                  "name": "scaleChange",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "scale 변경을 감지하여 emit을 발생시킬 때 사용합니다. true이면 scale이 변경될 때 axes-scale-change 이벤트가 발생합니다."
                 }
               ]
             },
@@ -842,7 +2141,7 @@
                 {
                   "name": "show",
                   "type": "Boolean",
-                  "default": "false",
+                  "default": "true",
                   "description": "Legend 표시 여부입니다."
                 },
                 {
@@ -985,7 +2284,7 @@
                   "name": "use",
                   "type": "Boolean",
                   "default": "false",
-                  "description": "tooltip 표시 여부입니다."
+                  "description": "tooltip 표시 여부입니다. heatMap은 options에 tooltip 객체를 지정하지 않으면 false로 동작하며, tooltip 옵션 객체를 지정하면 use의 기본값이 true가 됩니다."
                 },
                 {
                   "name": "backgroundColor",
@@ -1069,7 +2368,7 @@
                 {
                   "name": "fontColor",
                   "type": "Hex code (string), Object, Function",
-                  "default": "'#000000'",
+                  "default": "'#FFFFFF'",
                   "description": "툴팁에 표시될 폰트 컬러입니다. 예: '#FFFFFF' 또는 { label: '#FFFFFF', value: '#FFFFFF', title: '#FFFFFF' }"
                 },
                 {
@@ -1101,10 +2400,16 @@
                   "description": "동일한 axes 값을 가진 전체 series를 Tooltip에 표시합니다."
                 },
                 {
+                  "name": "showHeader",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "툴팁의 Header 영역 표시 여부입니다."
+                },
+                {
                   "name": "formatter",
                   "type": "function / Object",
                   "default": "null",
-                  "description": "데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용합니다. 함수 형태(({ x, y, value, seriesId }) => string), { title, value } 객체 형태, 또는 { html: ([item]) => string } 커스텀 HTML 형태를 지원합니다. html 사용 시 루트 element는 1개여야 하며 위치/크기 계산 기준이 됩니다. ev-chart-tooltip-custom(및 __header, __body) 클래스는 선택이며, 사용하면 EVUI 기본 스타일과 휠 스크롤 기본 타겟이 자동 적용됩니다. 직접 마크업을 사용하고 스크롤이 필요하면 htmlScrollTarget을 지정하세요."
+                  "description": "데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용합니다. 함수 형태(({ x, y, value, seriesId, dataId }) => string — error 셀(value < 0)은 value로 'error' 문자열 전달), { title, value } 객체 형태, 또는 { html: ([item]) => string } 커스텀 HTML 형태를 지원합니다. html 사용 시 루트 element는 1개여야 하며 위치/크기 계산 기준이 됩니다. ev-chart-tooltip-custom(및 __header, __body) 클래스는 선택이며, 사용하면 EVUI 기본 스타일과 휠 스크롤 기본 타겟이 자동 적용됩니다. 직접 마크업을 사용하고 스크롤이 필요하면 htmlScrollTarget을 지정하세요."
                 },
                 {
                   "name": "returnValue",
@@ -1183,13 +2488,13 @@
                 {
                   "name": "max",
                   "type": "Hex, RGB, RGBA Code(String)",
-                  "default": "'#5586EB'",
+                  "default": "'#0052FF'",
                   "description": "max color입니다."
                 },
                 {
                   "name": "rangeCount",
                   "type": "number",
-                  "default": "5",
+                  "default": "1",
                   "description": "color min - max 그라데이션 범위 개수입니다."
                 },
                 {
@@ -1238,7 +2543,7 @@
                 {
                   "name": "error",
                   "type": "Hex, RGB, RGBA Code(String)",
-                  "default": "'#FFFFFF'",
+                  "default": "'#FF0000'",
                   "description": "series error color입니다(value가 -1인 경우 error로 인식)."
                 },
                 {
@@ -1267,7 +2572,7 @@
                   "description": "클릭 이벤트 사용 여부입니다(v-model에 바인딩한 변수로만 컨트롤하려 할 때 false)."
                 },
                 {
-                  "name": "useBorder",
+                  "name": "showBorder",
                   "type": "Boolean",
                   "default": "false",
                   "description": "선택한 항목의 border 표시 여부입니다."
@@ -1385,6 +2690,30 @@
               ]
             },
             {
+              "name": "seriesReverse",
+              "type": "Boolean",
+              "default": "false",
+              "description": "시리즈 그리기 순서를 반전할지 여부입니다."
+            },
+            {
+              "name": "workerRender",
+              "type": "Boolean",
+              "default": "false",
+              "description": "시리즈 렌더링을 웹 워커(OffscreenCanvas)로 오프로드하는 성능 opt-in 옵션입니다. heatMap 차트를 지원하며, 미지원 환경에서는 자동으로 메인 스레드 렌더링으로 동작합니다."
+            },
+            {
+              "name": "shallowDataWatch",
+              "type": "Boolean",
+              "default": "false",
+              "description": "data prop의 deep watch를 끄는 성능 최적화 opt-in입니다. true이면 data의 top-level 참조가 바뀔 때만 차트가 갱신되며(in-place 변경은 감지되지 않음), 차트 생성(mount) 시점에 1회만 평가됩니다."
+            },
+            {
+              "name": "shallowOptionsWatch",
+              "type": "Boolean",
+              "default": "false",
+              "description": "options prop의 deep watch를 끄는 성능 최적화 opt-in입니다. true이면 options의 top-level 참조가 바뀔 때만 차트가 갱신되며(in-place 변경은 감지되지 않음), 차트 생성(mount) 시점에 1회만 평가됩니다. shallowDataWatch와 동일한 계약입니다."
+            },
+            {
               "name": "eventBehavior",
               "type": "Object",
               "description": "이벤트별 동작을 설정하는 옵션 객체입니다.",
@@ -1416,6 +2745,14 @@
       "label": "Events",
       "items": [
         {
+          "name": "click",
+          "description": "차트 클릭 시 발생하며, 클릭된 셀의 label, value, seriesID 값을 반환합니다. selectItem 옵션의 use가 true여야 selected 정보가 채워집니다."
+        },
+        {
+          "name": "dbl-click",
+          "description": "차트 더블 클릭 시 발생하며, 더블 클릭된 셀의 label, value, seriesID 값을 반환합니다. selectItem 옵션의 use가 true여야 selected 정보가 채워집니다."
+        },
+        {
           "name": "drag-select",
           "description": "그래프에서 드래그로 영역을 선택했을 때 발생하며, 선택 영역 안의 데이터(data)와 선택 영역에 대한 범위 값(range)을 반환합니다. dragSelection 옵션의 use 값이 true일 때 발생하며, 그래프에 표시된 데이터의 중앙이 선택 영역에 포함되어야 선택 영역 내 데이터로 인식합니다.",
           "children": [
@@ -1437,7 +2774,7 @@
         },
         {
           "name": "click-legend",
-          "description": "범례를 클릭했을 때 발생하는 이벤트로, 클릭 후 활성화된 시리즈 Index 목록과 모두 활성 여부를 반환합니다.",
+          "description": "범례를 클릭했을 때 발생하는 이벤트로, 클릭 후 활성화된 항목의 Index 목록과 모두 활성 여부를 반환합니다. heatMap의 범례 항목은 시리즈가 아닌 색상 범주(colorState) 단위이므로, seriesIndices는 활성화된 색상 범주의 인덱스 배열입니다.",
           "children": [
             {
               "name": "e",
@@ -1447,9 +2784,17 @@
             {
               "name": "data",
               "type": "Object",
-              "description": "{ seriesIndices: [0, 1, ...], isActiveAll: false } 형태입니다. seriesIndices는 현재 활성화(highlight: true)된 시리즈의 Index 배열이며, 시리즈가 모두 활성화된 경우 빈 배열([])로 반환합니다."
+              "description": "{ seriesIndices: [0, 1, ...], isActiveAll: false } 형태입니다. seriesIndices는 현재 활성화된 색상 범주(colorState)의 Index 배열이며, 모두 활성화된 경우 빈 배열([])로 반환합니다."
             }
           ]
+        },
+        {
+          "name": "axes-scale-change",
+          "description": "차트 사이즈 변경 시 재계산된 minSteps, maxSteps 정보를 { x: [{ minSteps, maxSteps }], y: [{ minSteps, maxSteps }] } 형태로 반환합니다. 축 옵션의 scaleChange가 true이고 scale 정보가 변경될 때만 발생합니다."
+        },
+        {
+          "name": "axes-data-max-change",
+          "description": "show된 series들의 실제 데이터 y 최대값(maxY, number)을 반환합니다. 이 이벤트를 바인딩한 경우에만 발생하며(미바인딩 시 집계 비용 0), 발생 시엔 같은 값이어도 렌더마다 발생합니다. 유효한 데이터가 있는 show된 series가 하나도 없으면 null을 emit합니다. maxY는 show된 전체 series의 통합 최대값이라 다중 y축에서는 축별 구분이 되지 않으며, 차트 타입과 무관하게 사용할 수 있습니다."
         }
       ]
     }

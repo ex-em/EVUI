@@ -167,6 +167,7 @@ const chartData =
 | -------------- | -------- | --------------------- | ------------------------------------------------------------- | ------------------------------------------------------- |
 | type           | String   |                       | 축의 유형                                                     | [time](#time-type)                                      |
 | showAxis       | Boolean  | true                  | 축 표시 여부                                                  | true / false                                            |
+| position       | String   | X: 'bottom', Y: 'left' | 축의 표시 위치 (다중 축 배치용)                              | X: 'bottom'/'top', Y: 'left'/'right'                    |
 | startToZero    | Boolean  | false                 | 축의 시작을 0 부터 시작할지의 여부                            | true / false                                            |
 | autoScaleRatio | Number   | null                  | Axis의 Max Buffer를 위한 속성                                 | 0.1 ~ 0.9                                               |
 | showGrid       | Boolean  | true                  | 차트 내부 그리드 표시 여부                                    | true / false                                            |
