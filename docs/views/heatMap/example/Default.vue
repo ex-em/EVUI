@@ -5,11 +5,11 @@
 </template>
 
 <script>
-import { reactive } from 'vue';
+import { ref } from 'vue';
 
 export default {
   setup() {
-    const chartData = reactive({
+    const chartData = ref({
       series: {
         series1: {
           name: 'series#1',
@@ -37,7 +37,7 @@ export default {
       },
     });
 
-    const chartOptions = {
+    const chartOptions = ref({
       type: 'heatMap',
       axesX: [
         {
@@ -57,11 +57,17 @@ export default {
       tooltip: {
         use: true,
       },
+    });
+
+    const onApply = ({ chartData: d, chartOptions: o }) => {
+      if (d) chartData.value = d;
+      if (o) chartOptions.value = o;
     };
 
     return {
       chartData,
       chartOptions,
+      onApply,
     };
   },
 };

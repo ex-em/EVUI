@@ -9,6 +9,10 @@
       "route": "/heatMap"
     }
   ],
+  "playground": {
+    "route": "/heatMap",
+    "example": "Default"
+  },
   "sections": [
     {
       "kind": "props",
@@ -118,7 +122,10 @@
                       "default": "0",
                       "description": "소수점 자릿수입니다."
                     }
-                  ]
+                  ],
+                  "tryIt": {
+                    "data": "{ series: { series1: { showValue: { use: true } } } }"
+                  }
                 },
                 {
                   "name": "highlight",
@@ -2552,7 +2559,10 @@
                   "default": "0",
                   "description": "범주 표현 소숫값 처리입니다."
                 }
-              ]
+              ],
+              "tryIt": {
+                "options": "{ heatMapColor: { min: '#FFFFFF', max: '#0052FF', rangeCount: 8 } }"
+              }
             },
             {
               "name": "selectItem",

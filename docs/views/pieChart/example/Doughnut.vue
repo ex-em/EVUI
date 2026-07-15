@@ -7,6 +7,8 @@
 </template>
 
 <script>
+import { ref } from 'vue';
+
 export default {
   setup() {
     const commonSeries = {
@@ -15,16 +17,16 @@ export default {
       series3: { name: 'series#3' },
     };
 
-    const chartData = {
+    const chartData = ref({
       series: commonSeries,
       data: {
         series1: [10],
         series2: [20],
         series3: [70],
       },
-    };
+    });
 
-    const chartOptions = {
+    const chartOptions = ref({
       type: 'pie',
       width: '100%',
       title: {
@@ -36,11 +38,17 @@ export default {
         position: 'right',
       },
       doughnutHoleSize: 0.4,
+    });
+
+    const onApply = ({ chartData: d, chartOptions: o }) => {
+      if (d) chartData.value = d;
+      if (o) chartOptions.value = o;
     };
 
     return {
       chartData,
       chartOptions,
+      onApply,
     };
   },
 };

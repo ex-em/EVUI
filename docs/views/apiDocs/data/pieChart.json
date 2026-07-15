@@ -9,6 +9,10 @@
       "route": "/pieChart"
     }
   ],
+  "playground": {
+    "route": "/pieChart",
+    "example": "Doughnut"
+  },
   "sections": [
     {
       "kind": "props",
@@ -100,7 +104,10 @@
                       "default": "null",
                       "description": "데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용합니다. 예: ({ value, percentage }) => percentage + '%' + '(' + value + ')'"
                     }
-                  ]
+                  ],
+                  "tryIt": {
+                    "data": "{ series: { series1: { showValue: { use: true } }, series2: { showValue: { use: true } }, series3: { showValue: { use: true } } } }"
+                  }
                 }
               ]
             },
@@ -224,7 +231,10 @@
                     "'bottom'",
                     "'left'"
                   ],
-                  "description": "Legend 위치입니다."
+                  "description": "Legend 위치입니다.",
+                  "tryIt": {
+                    "options": "{ legend: { show: true, position: 'bottom' } }"
+                  }
                 },
                 {
                   "name": "color",
@@ -372,7 +382,10 @@
               "name": "doughnutHoleSize",
               "type": "Number",
               "default": "0",
-              "description": "내부 hole 사이즈입니다(0 ~ 1)."
+              "description": "내부 hole 사이즈입니다(0 ~ 1).",
+              "tryIt": {
+                "options": "{ doughnutHoleSize: 0.7 }"
+              }
             },
             {
               "name": "pieStroke",

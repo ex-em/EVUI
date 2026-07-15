@@ -9,6 +9,10 @@
       "route": "/barChart"
     }
   ],
+  "playground": {
+    "route": "/barChart",
+    "example": "Column"
+  },
   "sections": [
     {
       "kind": "props",
@@ -116,7 +120,10 @@
                       "default": "null",
                       "description": "소수점 자릿수입니다. null이면 자릿수를 고정하지 않고 값 그대로(나누어떨어지지 않으면 소수점 1자리) 표시합니다."
                     }
-                  ]
+                  ],
+                  "tryIt": {
+                    "data": "{ series: { series1: { showValue: { use: true, decimalPoint: 2 } } } }"
+                  }
                 },
                 {
                   "name": "showLegend",
@@ -191,7 +198,10 @@
               "name": "thickness",
               "type": "Number | '${number}px'",
               "default": "1",
-              "description": "차트 막대의 너비이며, 최대치를 넘지 않습니다. 예: 0.1 ~ 1 또는 '10px'"
+              "description": "차트 막대의 너비이며, 최대치를 넘지 않습니다. 예: 0.1 ~ 1 또는 '10px'",
+              "tryIt": {
+                "options": "{ thickness: 0.5 }"
+              }
             },
             {
               "name": "unSelectedOpacity",
@@ -2187,7 +2197,10 @@
                     "'bottom'",
                     "'left'"
                   ],
-                  "description": "Legend 위치입니다."
+                  "description": "Legend 위치입니다.",
+                  "tryIt": {
+                    "options": "{ legend: { show: true, position: 'bottom' } }"
+                  }
                 },
                 {
                   "name": "color",
@@ -2559,7 +2572,10 @@
                   "name": "use",
                   "type": "Boolean",
                   "default": "false",
-                  "description": "maxTip 표시 여부입니다."
+                  "description": "maxTip 표시 여부입니다.",
+                  "tryIt": {
+                    "options": "{ maxTip: { use: true, showIndicator: true } }"
+                  }
                 },
                 {
                   "name": "fixedPosTop",
