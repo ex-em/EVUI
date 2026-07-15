@@ -109,7 +109,7 @@ export default {
       parsedData: parse(PlotLineRaw).descriptor,
     },
     HoverWithGroup: {
-      description: '',
+      description: 'n개의 차트를 묶어 Indicator를 동기화하여 표시할 수 있습니다.',
       component: HoverWithGroup,
       parsedData: parse(HoverWithGroupRaw).descriptor,
     },
@@ -117,14 +117,16 @@ export default {
       description: 'axis control',
       component: AxisControl,
       parsedData: parse(AxisControlRaw).descriptor,
+      devOnly: true,
     },
-    Scrollbar: {
+    DevOnlyScrollbar: {
       description: '차트에 스크롤바를 추가할 수 있습니다.',
       component: Scrollbar,
       parsedData: parse(ScrollbarRaw).descriptor,
+      devOnly: true,
     },
-    LargeScrollbar: {
-      description: '대용량 데이터 차트에 스크롤바를 추가할 수 있습니다',
+    Scrollbar: {
+      description: '차트에 스크롤바를 추가할 수 있습니다.',
       component: LargeScrollbar,
       parsedData: parse(LargeScrollbarRaw).descriptor,
     },
@@ -132,29 +134,34 @@ export default {
       description: 'Legend Click Mode',
       component: LegendClickMode,
       parsedData: parse(LegendClickModeRaw).descriptor,
+      devOnly: true,
     },
     UnSelectedOpacity: {
       description: 'unSelectedOpacity 옵션으로 비선택 요소의 opacity를 설정할 수 있습니다',
       component: UnSelectedOpacity,
       parsedData: parse(UnSelectedOpacityRaw).descriptor,
+      devOnly: true,
     },
     AxesScaleChange: {
       description:
         '차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 확인할 수 있습니다.',
       component: AxesScaleChange,
       parsedData: parse(AxesScaleChangeRaw).descriptor,
+      devOnly: true,
     },
     ShowValue: {
       description:
         'showValue 옵션의 align(start/center/out/end)과 horizontal 조합을 인터랙티브하게 테스트할 수 있습니다.',
       component: ShowValue,
       parsedData: parse(ShowValueRaw).descriptor,
+      devOnly: true,
     },
     DisplayOverflow: {
       description:
         'displayOverflow 옵션으로 값 축(세로=Y, 가로=X) range를 초과한 막대를 경계까지 기본 시리즈 색으로 표시할 수 있습니다(false 기본값이면 숨김). 가로 모드 토글로 값 축 전환 동작을 확인할 수 있습니다.',
       component: DisplayOverflow,
       parsedData: parse(DisplayOverflowRaw).descriptor,
+      devOnly: true,
     },
     Annotations: {
       description:

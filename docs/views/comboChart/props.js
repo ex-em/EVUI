@@ -65,6 +65,7 @@ export default {
         '차트 수·시리즈 수·포인트 수는 상수로 조절하며, heavy render job이 같은 window에 pile-up 되는 상황을 재현합니다.',
       component: PerfStressDashboard,
       parsedData: parse(PerfStressDashboardRaw).descriptor,
+      devOnly: true,
     },
   },
 };
