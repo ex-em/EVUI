@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.{js,vue,scss,css,json}\" \"docs/**/*.{js,vue,scss,css,json}\" \"*.{js,cjs,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{js,vue,scss,css,json}\" \"docs/**/*.{js,vue,scss,css,json}\" \"*.{js,cjs,json,md}\"",
     "docs": "vite serve --config vite.config.js --port 9999 --host",
+    "dev_docs": "vite serve --config vite.config.js --port 9999 --host --mode internal",
     "docs:validate": "node scripts/validate-api-docs.js",
     "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html",
     "build:docs": "vite build --config vite.config.js --mode production",

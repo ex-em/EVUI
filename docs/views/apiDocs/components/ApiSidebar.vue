@@ -92,7 +92,11 @@
           :class="{ 'is-active': isExampleActive(group.path, item.name) }"
           @click="store.selectExample(group.path, item.name, group.label)"
         >
-          <span class="ad-example-name">{{ item.name }}</span>
+          <span class="ad-example-name">
+            {{ item.name }}
+            <!-- dev_docs 모드에서만 노출되는 개발자용 예제 표시 -->
+            <span v-if="item.devOnly" class="ad-example-dev">dev</span>
+          </span>
           <span v-if="item.description" class="ad-example-desc">{{ item.description }}</span>
         </button>
       </template>

@@ -189,3 +189,13 @@ export const PAGES = [
 
 export const pageByKey = Object.fromEntries(PAGES.map((entry) => [entry.key, entry]));
 export const pageByRoute = Object.fromEntries(PAGES.map((entry) => [entry.route, entry]));
+
+/**
+ * 문서 실행 모드.
+ * - `npm run docs` / `build:docs` = 대외용 → 예제 정의의 devOnly: true 항목 숨김
+ * - `npm run dev_docs`(--mode internal) = 개발자용 → 전부 표시
+ */
+export const IS_INTERNAL_DOCS = import.meta.env.MODE === 'internal';
+
+/** 현재 모드에서 노출 가능한 예제인지 */
+export const isExampleVisible = (def) => IS_INTERNAL_DOCS || !def?.devOnly;

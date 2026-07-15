@@ -71,6 +71,7 @@ export default {
         'Area(fill) 시리즈 2개 중 한쪽에 null 값이 섞여 있을 때, 해당 라벨의 빈 영역을 클릭하면 null 시리즈가 아닌 값이 존재하는 시리즈가 선택되는지 검증하는 예제입니다.',
       component: FillWithNull,
       parsedData: parse(FillWithNullRaw).descriptor,
+      devOnly: true,
     },
     Stack: {
       description:
@@ -148,6 +149,7 @@ export default {
       description: '',
       component: HoverWithGroup,
       parsedData: parse(HoverWithGroupRaw).descriptor,
+      devOnly: true,
     },
     LegendVirtualScroll: {
       description: 'Legend Virtual Scroll',
@@ -187,6 +189,7 @@ export default {
         '시리즈 수·포인트 수는 상수로 조절하며, append(슬라이딩 윈도우)/full-replace 갱신을 토글할 수 있습니다.',
       component: PerfStressSingle,
       parsedData: parse(PerfStressSingleRaw).descriptor,
+      devOnly: true,
     },
     Annotations: {
       description:

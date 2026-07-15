@@ -377,6 +377,16 @@ createApiDocsStore();
   .ad-example-name {
     font-weight: 600;
   }
+  .ad-example-dev {
+    padding: 0 5px;
+    margin-left: 4px;
+    border-radius: 8px;
+    color: #fff;
+    background: var(--ad-badge-event);
+    font-size: 10px;
+    font-weight: 700;
+    vertical-align: 1px;
+  }
   .ad-example-desc {
     display: -webkit-box;
     overflow: hidden;
