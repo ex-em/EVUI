@@ -98,6 +98,7 @@ export default {
       description: 'unSelectedOpacity 옵션으로 비선택 요소의 opacity를 설정할 수 있습니다',
       component: UnSelectedOpacity,
       parsedData: parse(UnSelectedOpacityRaw).descriptor,
+      devOnly: true,
     },
     DragSelection: {
       description: 'Drag Select 이벤트 등록이 가능 합니다',
@@ -139,6 +140,7 @@ export default {
         'passingValue를 설정하여 특정 시점에 line을 끊지 않고 자연스럽게 이을 수 있습니다.',
       component: PassingValue,
       parsedData: parse(PassingValueRaw).descriptor,
+      devOnly: true,
     },
     Interpolation: {
       description: 'Interpolation 옵션을 설정하여 null Data를 보간하여 선을 그릴 수 있습니다.',
@@ -155,6 +157,7 @@ export default {
       description: 'Legend Virtual Scroll',
       component: LegendVirtualScroll,
       parsedData: parse(LegendVirtualScrollRaw).descriptor,
+      devOnly: true,
     },
     ExternalLegend: {
       description: 'External Legend를 사용하여 차트 외부에서 범례를 커스터마이징할 수 있습니다.',
@@ -165,23 +168,27 @@ export default {
       description: 'Segments',
       component: Segments,
       parsedData: parse(SegmentsRaw).descriptor,
+      devOnly: true,
     },
     LegendClickMode: {
       description: 'Legend Click Mode',
       component: LegendClickMode,
       parsedData: parse(LegendClickModeRaw).descriptor,
+      devOnly: true,
     },
     AxesScaleChange: {
       description:
         '차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 확인할 수 있습니다.',
       component: AxesScaleChange,
       parsedData: parse(AxesScaleChangeRaw).descriptor,
+      devOnly: true,
     },
     DisplayOverflow: {
       description:
         'displayOverflow 옵션으로 값 축(Y) range를 초과한 데이터를 상단 경계에 기본 시리즈 색으로 모아 표시할 수 있습니다. false(기본값)면 range 밖 데이터는 숨겨집니다.',
       component: DisplayOverflow,
       parsedData: parse(DisplayOverflowRaw).descriptor,
+      devOnly: true,
     },
     PerfStressSingle: {
       description:

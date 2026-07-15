@@ -89,6 +89,7 @@ export default {
       description: 'Legend Click Mode',
       component: LegendClickMode,
       parsedData: parse(LegendClickModeRaw).descriptor,
+      devOnly: true,
     },
     Annotations: {
       description:
