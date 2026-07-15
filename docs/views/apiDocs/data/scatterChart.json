@@ -5,7 +5,7 @@
   "description": "Canvas 기반 스캐터 차트 컴포넌트입니다. 시간/선형 축, 다중 시리즈, 드래그 선택, 실시간 데이터 처리(realTimeScatter) 등을 지원합니다.",
   "examples": [
     {
-      "label": "기본 스캐터 차트",
+      "label": "ScatterChart",
       "route": "/scatterChart"
     }
   ],
