@@ -68,6 +68,25 @@
 - 병합은 객체만 깊게 합치고 **배열은 통째로 교체**되므로, `axesX: [...]`처럼
   배열을 포함한 스니펫은 축 설정 전체를 스니펫에 담아야 합니다.
 
+## 예제 노출 범위 (대외용 / 개발자용)
+
+예제 정의(`docs/views/<component>/props.js`의 `components` 항목)에 `devOnly: true`를
+지정하면 **개발자용 예제**가 됩니다:
+
+```js
+PerfStressSingle: {
+  description: '성능 stress 예제 ...',
+  component: PerfStressSingle,
+  parsedData: parse(PerfStressSingleRaw).descriptor,
+  devOnly: true, // 대외용 문서에서 숨김
+},
+```
+
+| 실행 명령 | 모드 | devOnly 예제 |
+| --- | --- | --- |
+| `npm run docs` / `npm run build:docs` | **대외용** | 숨김 (딥링크 접근도 차단) |
+| `npm run dev_docs` | 개발자용 | 표시 (`dev` 배지 부착) |
+
 ## playground 기반 예제의 조건
 
 `playground.example`이 가리키는 예제 컴포넌트는 setup에서 다음을 노출해야 합니다:

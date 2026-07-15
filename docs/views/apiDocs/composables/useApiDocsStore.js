@@ -1,7 +1,7 @@
 import { ref, computed, provide, inject, markRaw, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import docRegistry from '../data';
-import { PAGES, pageByKey, pageByRoute } from '../pages';
+import { PAGES, pageByKey, pageByRoute, isExampleVisible } from '../pages';
 
 const STORE_KEY = Symbol('api-docs-store');
 
@@ -200,10 +200,14 @@ export function createApiDocsStore() {
       return {
         label,
         path,
-        items: Object.entries(components).map(([name, def]) => ({
-          name,
-          description: def.description || '',
-        })),
+        items: Object.entries(components)
+          // 대외용 모드에서는 devOnly 예제 숨김 (dev_docs 모드에서만 노출)
+          .filter(([, def]) => isExampleVisible(def))
+          .map(([name, def]) => ({
+            name,
+            description: def.description || '',
+            devOnly: !!def.devOnly,
+          })),
       };
     });
   });
@@ -227,7 +231,8 @@ export function createApiDocsStore() {
     if (!selectedExampleKey.value) return null;
     const { path, name, label } = selectedExampleKey.value;
     const def = pageByRoute[path]?.page?.components?.[name];
-    if (!def) return null;
+    // 대외용 모드에서 devOnly 예제는 딥링크로도 열리지 않게 차단
+    if (!def || !isExampleVisible(def)) return null;
     return {
       name,
       label,
