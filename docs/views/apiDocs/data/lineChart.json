@@ -5,7 +5,7 @@
   "description": "Canvas 기반 라인 차트 컴포넌트입니다. 시계열/카테고리 축, 다중 시리즈, 툴팁 등을 지원합니다.",
   "examples": [
     {
-      "label": "기본 라인 차트",
+      "label": "LineChart",
       "route": "/lineChart"
     }
   ],

@@ -5,7 +5,7 @@
   "description": "Canvas 기반 히트맵 차트 컴포넌트입니다. X/Y축 라벨별 셀에 값을 색상으로 표현하며, 범위별 색상 지정과 gradient 범례, 툴팁 등을 지원합니다.",
   "examples": [
     {
-      "label": "기본 히트맵",
+      "label": "HeatMap",
       "route": "/heatMap"
     }
   ],

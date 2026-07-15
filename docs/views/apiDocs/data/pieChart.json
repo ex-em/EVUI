@@ -5,7 +5,7 @@
   "description": "Canvas 기반 파이 차트 컴포넌트입니다. 도넛 홀, 범례, 툴팁, 조각 위 값 표시 등을 지원합니다.",
   "examples": [
     {
-      "label": "기본 파이 차트",
+      "label": "PieChart",
       "route": "/pieChart"
     }
   ],
