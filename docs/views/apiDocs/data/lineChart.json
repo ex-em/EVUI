@@ -303,6 +303,16 @@
                   "description": "축 표시 여부입니다."
                 },
                 {
+                  "name": "position",
+                  "type": "String",
+                  "default": "'bottom'",
+                  "values": [
+                    "'bottom'",
+                    "'top'"
+                  ],
+                  "description": "축의 표시 위치입니다. 다중 축 사용 시 축별로 지정합니다."
+                },
+                {
                   "name": "startToZero",
                   "type": "Boolean",
                   "default": "false",
@@ -1214,6 +1224,16 @@
                   "type": "Boolean",
                   "default": "true",
                   "description": "축 표시 여부입니다."
+                },
+                {
+                  "name": "position",
+                  "type": "String",
+                  "default": "'left'",
+                  "values": [
+                    "'left'",
+                    "'right'"
+                  ],
+                  "description": "축의 표시 위치입니다. 다중 축 사용 시 축별로 지정합니다."
                 },
                 {
                   "name": "startToZero",

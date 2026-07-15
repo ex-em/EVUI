@@ -42,6 +42,12 @@
               "description": "특정 데이터에 대한 시리즈 옵션입니다. key가 시리즈 ID로 사용됩니다.",
               "children": [
                 {
+                  "name": "show",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "시리즈 표시 여부입니다."
+                },
+                {
                   "name": "name",
                   "type": "String",
                   "default": "series-${index}",
@@ -50,26 +56,24 @@
                 {
                   "name": "type",
                   "type": "String",
-                  "default": "'bar'",
                   "values": [
-                    "'bar'",
-                    "'pie'",
                     "'line'",
+                    "'bar'",
                     "'scatter'"
                   ],
-                  "description": "시리즈에 해당하는 데이터 표현 방식입니다."
+                  "description": "시리즈별 차트 타입 오버라이드입니다(콤보 차트용). 미지정 시 options.type을 따릅니다."
                 },
                 {
                   "name": "color",
                   "type": "Hex, RGB, RGBA Code(String)",
                   "default": "COLOR[index]",
-                  "description": "점(Point) 바깥쪽 색상입니다. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264')을 순차적으로 적용합니다."
+                  "description": "점(Point) 바깥쪽 색상입니다. 사전에 정의된 25개 색상('#2b99f0' ~ '#df6264')을 순차적으로 적용합니다."
                 },
                 {
                   "name": "pointFill",
                   "type": "Hex, RGB, RGBA Code(String)",
                   "default": "COLOR[index]",
-                  "description": "점(Point) 안쪽 색상입니다. 사전에 정의된 16개 색상('#2b99f0' ~ '#df6264')을 순차적으로 적용합니다."
+                  "description": "점(Point) 안쪽 색상입니다. 사전에 정의된 25개 색상('#2b99f0' ~ '#df6264')을 순차적으로 적용합니다."
                 },
                 {
                   "name": "pointSize",
@@ -80,7 +84,7 @@
                 {
                   "name": "pointStyle",
                   "type": "String",
-                  "default": "'circle'",
+                  "default": "''",
                   "values": [
                     "'circle'",
                     "'triangle'",
@@ -92,7 +96,69 @@
                     "'star'",
                     "'line'"
                   ],
-                  "description": "차트에 표시될 점의 모양입니다."
+                  "description": "차트에 표시될 점의 모양입니다. 미지정('') 시 circle로 렌더링됩니다."
+                },
+                {
+                  "name": "overflowColor",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "COLOR[index]",
+                  "description": "y값이 축 최대값(graphMax)을 초과한 점에 적용할 색상입니다. displayOverflow 옵션과 함께 사용하며, 미지정 시 팔레트 색상을 따릅니다."
+                },
+                {
+                  "name": "highlight",
+                  "type": "Object",
+                  "default": "{ defaultSize: 4, maxSize: 6, maxShadowSize: 10, maxShadowOpacity: 0.4 }",
+                  "description": "hover 하이라이트 시 점 크기와 그림자를 조정하는 옵션입니다.",
+                  "children": [
+                    {
+                      "name": "defaultSize",
+                      "type": "Number",
+                      "default": "4",
+                      "description": "하이라이트 점의 기본 크기(px)입니다."
+                    },
+                    {
+                      "name": "maxSize",
+                      "type": "Number",
+                      "default": "6",
+                      "description": "하이라이트 점의 최대 크기(px)입니다."
+                    },
+                    {
+                      "name": "maxShadowSize",
+                      "type": "Number",
+                      "default": "10",
+                      "description": "하이라이트 점 그림자의 최대 크기(px)입니다."
+                    },
+                    {
+                      "name": "maxShadowOpacity",
+                      "type": "Number",
+                      "default": "0.4",
+                      "description": "하이라이트 점 그림자의 불투명도(0~1)입니다."
+                    }
+                  ]
+                },
+                {
+                  "name": "showLegend",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "legend 표시 여부입니다."
+                },
+                {
+                  "name": "passingValue",
+                  "type": "number | null",
+                  "default": "null",
+                  "description": "data가 passingValue와 같을 경우 축 min/max 계산에서 제외합니다."
+                },
+                {
+                  "name": "xAxisIndex",
+                  "type": "Number",
+                  "default": "0",
+                  "description": "다중 X축 사용 시 이 시리즈가 참조할 축의 인덱스입니다."
+                },
+                {
+                  "name": "yAxisIndex",
+                  "type": "Number",
+                  "default": "0",
+                  "description": "다중 Y축 사용 시 이 시리즈가 참조할 축의 인덱스입니다."
                 }
               ]
             },
@@ -134,6 +200,12 @@
               "description": "차트의 높이입니다. 예: '100%', '150px', 150"
             },
             {
+              "name": "unSelectedOpacity",
+              "type": "Number",
+              "default": "0.3",
+              "description": "차트 하이라이트 시 비선택 항목의 opacity입니다(0 ~ 1)."
+            },
+            {
               "name": "axesX",
               "type": "Object",
               "description": "X축에 대한 속성입니다.",
@@ -166,6 +238,30 @@
                   "description": "축의 Max Buffer를 위한 속성입니다(0.1 ~ 0.9)."
                 },
                 {
+                  "name": "min",
+                  "type": "Number",
+                  "default": "null",
+                  "description": "축 최소값을 고정합니다."
+                },
+                {
+                  "name": "max",
+                  "type": "Number",
+                  "default": "null",
+                  "description": "축 최대값을 고정합니다."
+                },
+                {
+                  "name": "range",
+                  "type": "Array",
+                  "default": "null",
+                  "description": "축 표시 범위를 [최소, 최대]로 고정합니다."
+                },
+                {
+                  "name": "decimalPoint",
+                  "type": "Number | 'auto'",
+                  "default": "'auto'",
+                  "description": "축 라벨 소수점 자릿수입니다. 'auto'면 자동 결정됩니다."
+                },
+                {
                   "name": "showGrid",
                   "type": "Boolean",
                   "default": "true",
@@ -191,14 +287,15 @@
                 },
                 {
                   "name": "interval",
-                  "type": "String",
+                  "type": "String | Number",
                   "default": "null",
-                  "description": "축에 표시되는 값의 간격 단위입니다. time 타입은 'millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'를 사용하며, linear 타입은 미지정 시 해당 축 데이터의 max/min 값을 기반으로 자동 계산됩니다."
+                  "description": "축에 표시되는 값의 간격입니다. time 타입은 'millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'quarter', 'year' 단위 문자열을, linear 타입은 숫자 간격을 사용하며 미지정 시 해당 축 데이터의 max/min 값을 기반으로 자동 계산됩니다."
                 },
                 {
                   "name": "timeFormat",
                   "type": "String",
-                  "description": "time 타입 축의 라벨 시간 포맷입니다. dayjs의 포맷 문자열을 사용합니다."
+                  "description": "time 타입 축의 라벨 시간 포맷입니다. dayjs의 포맷 문자열을 사용합니다.",
+                  "default": "'mm:ss'"
                 },
                 {
                   "name": "labelStyle",
@@ -230,6 +327,12 @@
                       "description": "폰트입니다."
                     },
                     {
+                      "name": "fontWeight",
+                      "type": "Number",
+                      "default": "400",
+                      "description": "라벨 폰트 굵기입니다."
+                    },
+                    {
                       "name": "fitWidth",
                       "type": "Boolean",
                       "default": "false",
@@ -250,6 +353,12 @@
                       "type": "Number",
                       "default": "0",
                       "description": "label의 좌우 여백입니다(X축, linear/time 타입에만 해당)."
+                    },
+                    {
+                      "name": "fixWidth",
+                      "type": "Number",
+                      "default": "undefined",
+                      "description": "라벨 넓이를 강제로 고정합니다. 해당 사이즈보다 커질 시 Ellipsis 처리됩니다."
                     }
                   ]
                 },
@@ -562,7 +671,7 @@
                     {
                       "name": "color",
                       "type": "Hex, RGB, RGBA Code(String)",
-                      "default": "'#FF0000'",
+                      "default": "'#FAE59D'",
                       "description": "박스(면) 배경 색상입니다. rgba(...)로 투명도를 지정할 수 있습니다."
                     },
                     {
@@ -901,7 +1010,7 @@
                     {
                       "name": "color",
                       "type": "Hex, RGB, RGBA Code(String)",
-                      "default": "'#25262E'",
+                      "default": "'#808080'",
                       "description": "글자 색상입니다."
                     }
                   ]
@@ -911,6 +1020,12 @@
                   "type": "Boolean",
                   "default": "true",
                   "description": "보조 눈금 표시 여부입니다."
+                },
+                {
+                  "name": "showIndicator",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "마우스 위치의 축 인디케이터 표시 여부입니다."
                 },
                 {
                   "name": "fixedSteps",
@@ -965,6 +1080,30 @@
                   "description": "축의 Max Buffer를 위한 속성입니다(0.1 ~ 0.9)."
                 },
                 {
+                  "name": "min",
+                  "type": "Number",
+                  "default": "null",
+                  "description": "축 최소값을 고정합니다."
+                },
+                {
+                  "name": "max",
+                  "type": "Number",
+                  "default": "null",
+                  "description": "축 최대값을 고정합니다."
+                },
+                {
+                  "name": "range",
+                  "type": "Array",
+                  "default": "null",
+                  "description": "축 표시 범위를 [최소, 최대]로 고정합니다."
+                },
+                {
+                  "name": "decimalPoint",
+                  "type": "Number | 'auto'",
+                  "default": "'auto'",
+                  "description": "축 라벨 소수점 자릿수입니다. 'auto'면 자동 결정됩니다."
+                },
+                {
                   "name": "showGrid",
                   "type": "Boolean",
                   "default": "true",
@@ -990,14 +1129,15 @@
                 },
                 {
                   "name": "interval",
-                  "type": "String",
+                  "type": "String | Number",
                   "default": "null",
-                  "description": "축에 표시되는 값의 간격 단위입니다. time 타입은 'millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'quarter', 'year'를 사용하며, linear 타입은 미지정 시 해당 축 데이터의 max/min 값을 기반으로 자동 계산됩니다."
+                  "description": "축에 표시되는 값의 간격입니다. time 타입은 'millisecond', 'second', 'minute', 'hour', 'day', 'week', 'month', 'quarter', 'year' 단위 문자열을, linear 타입은 숫자 간격을 사용하며 미지정 시 해당 축 데이터의 max/min 값을 기반으로 자동 계산됩니다."
                 },
                 {
                   "name": "timeFormat",
                   "type": "String",
-                  "description": "time 타입 축의 라벨 시간 포맷입니다. dayjs의 포맷 문자열을 사용합니다."
+                  "description": "time 타입 축의 라벨 시간 포맷입니다. dayjs의 포맷 문자열을 사용합니다.",
+                  "default": "'mm:ss'"
                 },
                 {
                   "name": "labelStyle",
@@ -1029,6 +1169,12 @@
                       "description": "폰트입니다."
                     },
                     {
+                      "name": "fontWeight",
+                      "type": "Number",
+                      "default": "400",
+                      "description": "라벨 폰트 굵기입니다."
+                    },
+                    {
                       "name": "fitWidth",
                       "type": "Boolean",
                       "default": "false",
@@ -1049,6 +1195,12 @@
                       "type": "Number",
                       "default": "0",
                       "description": "label의 좌우 여백입니다(X축, linear/time 타입에만 해당)."
+                    },
+                    {
+                      "name": "fixWidth",
+                      "type": "Number",
+                      "default": "undefined",
+                      "description": "라벨 넓이를 강제로 고정합니다. 해당 사이즈보다 커질 시 Ellipsis 처리됩니다."
                     }
                   ]
                 },
@@ -1361,7 +1513,7 @@
                     {
                       "name": "color",
                       "type": "Hex, RGB, RGBA Code(String)",
-                      "default": "'#FF0000'",
+                      "default": "'#FAE59D'",
                       "description": "박스(면) 배경 색상입니다. rgba(...)로 투명도를 지정할 수 있습니다."
                     },
                     {
@@ -1700,7 +1852,7 @@
                     {
                       "name": "color",
                       "type": "Hex, RGB, RGBA Code(String)",
-                      "default": "'#25262E'",
+                      "default": "'#808080'",
                       "description": "글자 색상입니다."
                     }
                   ]
@@ -1710,6 +1862,12 @@
                   "type": "Boolean",
                   "default": "true",
                   "description": "보조 눈금 표시 여부입니다."
+                },
+                {
+                  "name": "showIndicator",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "마우스 위치의 축 인디케이터 표시 여부입니다."
                 },
                 {
                   "name": "fixedSteps",
@@ -1783,7 +1941,7 @@
                 {
                   "name": "show",
                   "type": "Boolean",
-                  "default": "false",
+                  "default": "true",
                   "description": "Legend 표시 여부입니다."
                 },
                 {
@@ -1927,7 +2085,7 @@
                 {
                   "name": "use",
                   "type": "Boolean",
-                  "default": "false",
+                  "default": "true",
                   "description": "tooltip 표시 여부입니다."
                 },
                 {
@@ -2012,7 +2170,7 @@
                 {
                   "name": "fontColor",
                   "type": "Hex code (string), Object, Function",
-                  "default": "'#000000'",
+                  "default": "'#FFFFFF'",
                   "description": "툴팁에 표시될 폰트 컬러입니다. { label, value, title } 형태로 영역별 지정도 가능합니다."
                 },
                 {
@@ -2032,10 +2190,22 @@
                   "description": "툴팁에 표시될 series color의 모양입니다."
                 },
                 {
+                  "name": "rowPadding",
+                  "type": "Object",
+                  "default": "{ top: 0, bottom: 3, right: 20, left: 16 }",
+                  "description": "툴팁에 표시될 series Row의 padding 값입니다."
+                },
+                {
                   "name": "showAllValueInRange",
                   "type": "Boolean",
                   "default": "false",
                   "description": "동일한 axes 값을 가진 전체 series를 툴팁에 표시할지 여부입니다."
+                },
+                {
+                  "name": "showHeader",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "툴팁의 Header 영역 표시 여부입니다."
                 },
                 {
                   "name": "formatter",
@@ -2115,6 +2285,92 @@
               ]
             },
             {
+              "name": "maxTip",
+              "type": "Object",
+              "description": "최대값에 tip(값 표시)을 표시할지 여부 및 속성입니다.",
+              "children": [
+                {
+                  "name": "use",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "maxTip 표시 여부입니다."
+                },
+                {
+                  "name": "fixedPosTop",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "maxTip 위치를 최대값으로 고정할지 여부입니다."
+                },
+                {
+                  "name": "showIndicator",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "indicator 표시 여부입니다."
+                },
+                {
+                  "name": "indicatorColor",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'#000000'",
+                  "description": "indicator 색상입니다."
+                },
+                {
+                  "name": "tipStyle",
+                  "type": "Object",
+                  "description": "tip 스타일을 설정합니다.",
+                  "children": [
+                    {
+                      "name": "height",
+                      "type": "Number",
+                      "default": "20",
+                      "description": "tip 높이입니다."
+                    },
+                    {
+                      "name": "background",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#000000'",
+                      "description": "tip 배경 색상입니다."
+                    },
+                    {
+                      "name": "textColor",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#FFFFFF'",
+                      "description": "tip 글자 색상입니다."
+                    },
+                    {
+                      "name": "fontSize",
+                      "type": "Number",
+                      "default": "14",
+                      "description": "tip 폰트 크기입니다."
+                    },
+                    {
+                      "name": "fontFamily",
+                      "type": "String",
+                      "default": "'Roboto'",
+                      "description": "tip 폰트입니다."
+                    },
+                    {
+                      "name": "fontWeight",
+                      "type": "Number",
+                      "default": "400",
+                      "description": "tip 폰트 굵기입니다(100, 200, 300, ... 900)."
+                    }
+                  ]
+                },
+                {
+                  "name": "tipBackground",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'#000000'",
+                  "description": "maxTip 배경 색상입니다. (3.4부터 제거 예정)"
+                },
+                {
+                  "name": "tipTextColor",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'#FFFFFF'",
+                  "description": "maxTip 글자 색상입니다. (3.4부터 제거 예정)"
+                }
+              ]
+            },
+            {
               "name": "selectItem",
               "type": "Object",
               "description": "차트 아이템 선택 기능의 활성화 여부 및 속성입니다.",
@@ -2124,6 +2380,12 @@
                   "type": "Boolean",
                   "default": "false",
                   "description": "차트 아이템 선택 기능 사용 여부입니다."
+                },
+                {
+                  "name": "useClick",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "클릭 이벤트 사용 여부입니다. v-model에 바인딩한 변수로만 컨트롤하려 할 때 false로 설정합니다."
                 },
                 {
                   "name": "showTextTip",
@@ -2215,10 +2477,28 @@
                   ]
                 },
                 {
+                  "name": "tipBackground",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'#000000'",
+                  "description": "tip 배경 색상입니다. (3.4부터 제거 예정)"
+                },
+                {
+                  "name": "tipTextColor",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'#FFFFFF'",
+                  "description": "tip 글자 색상입니다. (3.4부터 제거 예정)"
+                },
+                {
                   "name": "useSeriesOpacity",
                   "type": "Boolean",
                   "default": "false",
                   "description": "선택한 항목을 제외한 나머지 항목들에 반투명 효과를 적용할지 여부입니다."
+                },
+                {
+                  "name": "useDeselectItem",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "선택된 아이템을 다시 클릭했을 때 선택 해제할지 여부입니다."
                 }
               ]
             },
@@ -2244,18 +2524,6 @@
                   "type": "Number",
                   "default": "300",
                   "description": "현재 시간을 기점으로 초 단위로 범위를 설정합니다. 300일 경우 -5분 ~ 현재입니다."
-                },
-                {
-                  "name": "tipBackground",
-                  "type": "Hex, RGB, RGBA Code(String)",
-                  "default": "'#000000'",
-                  "description": "maxTip 배경 색상입니다."
-                },
-                {
-                  "name": "tipTextColor",
-                  "type": "Hex, RGB, RGBA Code(String)",
-                  "default": "'#FFFFFF'",
-                  "description": "maxTip 글자 색상입니다."
                 }
               ]
             },
@@ -2269,7 +2537,13 @@
               "name": "coordinateDedupe",
               "type": "Boolean",
               "default": "true",
-              "description": "좌표 중복 제거 여부입니다."
+              "description": "동일 (x, y) 좌표의 중복 렌더링을 제거할지 여부입니다(scatter 전용). 여러 시리즈가 같은 좌표를 가지면 owner 시리즈의 점만 그려 overdraw를 방지합니다."
+            },
+            {
+              "name": "syncHover",
+              "type": "boolean",
+              "default": "true",
+              "description": "options.syncHover가 true인 EvChartGroup으로 감싼 경우, 해당 차트에서 그룹으로 묶인 차트들 사이의 syncHover 선을 그리고 싶지 않을 때 사용하는 속성입니다(time 관련 축을 가질 때만 적용)."
             },
             {
               "name": "eventBehavior",
@@ -2287,6 +2561,18 @@
                   "description": "범례 클릭 시 동작입니다. 'update'는 차트 즉시 갱신, 'emitOnly'는 click-legend만 emit하여 이중 렌더를 방지합니다. (3.4부터 제거 예정)"
                 }
               ]
+            },
+            {
+              "name": "shallowDataWatch",
+              "type": "Boolean",
+              "default": "false",
+              "description": "data prop의 deep watch를 끄는 성능 최적화 opt-in입니다. true이면 data의 top-level 참조가 바뀔 때만 차트가 갱신되며(in-place 변경은 감지되지 않음), 차트 생성(mount) 시점에 1회만 평가됩니다. realTimeScatter 사용 시 권장되는 shallowRef/shallowReactive 선언과 함께 사용할 수 있습니다."
+            },
+            {
+              "name": "shallowOptionsWatch",
+              "type": "Boolean",
+              "default": "false",
+              "description": "options prop의 deep watch를 끄는 성능 최적화 opt-in입니다. true이면 options의 top-level 참조가 바뀔 때만 차트가 갱신되며(in-place 변경은 감지되지 않음), 차트 생성(mount) 시점에 1회만 평가됩니다. shallowDataWatch와 동일한 계약입니다."
             }
           ]
         },
@@ -2302,6 +2588,14 @@
       "kind": "events",
       "label": "Events",
       "items": [
+        {
+          "name": "click",
+          "description": "차트 클릭 시 발생하며, 클릭된 series의 label, value, seriesID 값을 selectedItem으로 반환합니다. selectItem 옵션의 use가 true여야 selectedItem 객체를 반환하며, false이면 빈 객체를 반환합니다."
+        },
+        {
+          "name": "dbl-click",
+          "description": "차트 더블 클릭 시 발생하며, 더블 클릭된 series의 label, value, seriesID 값을 selectedItem으로 반환합니다. selectItem 옵션의 use가 true여야 selectedItem 객체를 반환하며, false이면 빈 객체를 반환합니다."
+        },
         {
           "name": "mouse-move",
           "description": "커서의 현재 location과 함께, axes 위에 있을 경우 labelIdx·labelVal을, 데이터 영역에 있을 경우 dataIdx·maxDataVal을, 그리고 labelVal 또는 maxDataVal을 가공하기 전의 originVal 값을 반환합니다."
