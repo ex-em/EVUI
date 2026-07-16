@@ -11,28 +11,36 @@ import {
 } from './annotation.constant';
 
 /**
- * padding 입력을 내부 표준인 [top, right, bottom, left] 4-튜플로 정규화한다.
+ * padding 입력을 내부 표준인 [top, right, bottom, left] 4-튜플로 정규화한다(CSS shorthand 규칙).
  *  - number n        -> [n, n, n, n]
+ *  - [a]             -> [a, a, a, a]
  *  - [v, h]          -> [v, h, v, h]
+ *  - [t, h, b]       -> [t, h, b, h]
  *  - [t, r, b, l]    -> 그대로
  *  - 그 외/누락       -> [0, 0, 0, 0]
+ * 음수는 0 으로 클램프한다(박스 크기가 content 보다 작아지는 것을 방지).
  * @param {number|number[]} padding
  * @returns {number[]} [top, right, bottom, left]
  */
 export function normalizePadding(padding) {
-  if (typeof padding === 'number' && Number.isFinite(padding)) {
-    return [padding, padding, padding, padding];
+  const clamp = p => (Number.isFinite(p) && p > 0 ? p : 0);
+  if (typeof padding === 'number') {
+    const n = clamp(padding);
+    return [n, n, n, n];
   }
   if (Array.isArray(padding)) {
-    const nums = padding.map(p => (Number.isFinite(p) ? p : 0));
+    const nums = padding.map(clamp);
+    if (nums.length === 1) {
+      return [nums[0], nums[0], nums[0], nums[0]];
+    }
     if (nums.length === 2) {
       return [nums[0], nums[1], nums[0], nums[1]];
     }
+    if (nums.length === 3) {
+      return [nums[0], nums[1], nums[2], nums[1]];
+    }
     if (nums.length >= 4) {
       return [nums[0], nums[1], nums[2], nums[3]];
-    }
-    if (nums.length === 1) {
-      return [nums[0], nums[0], nums[0], nums[0]];
     }
   }
   return [0, 0, 0, 0];
@@ -51,8 +59,10 @@ function validatePosition(position, id, warnings) {
   }
 
   if (position.type === 'axis') {
-    if (position.xValue == null && position.yValue == null) {
-      warnings.push(`[annotation:${id}] position.type "axis" requires xValue and/or yValue.`);
+    // 점 어노테이션(text/badge/callout/circle)은 선 타입이 없어 xValue·yValue 둘 다 있어야 좌표가 정해진다.
+    // 하나만 주면 resolveAnchor 가 조용히 숨기므로(silent failure), 여기서 경고한다.
+    if (position.xValue == null || position.yValue == null) {
+      warnings.push(`[annotation:${id}] position.type "axis" requires both xValue and yValue.`);
     }
   } else if (position.type === 'series') {
     if (position.seriesId == null) {
@@ -84,9 +94,18 @@ function normalizeOne(raw, index, warnings) {
   }
 
   // 1) style: type 별 Default Config 와 deepMerge
-  const style = defaultsDeep({}, cloneDeep(raw.style) || {}, ANNOTATION_DEFAULT[type].style);
+  const rawStyle = cloneDeep(raw.style) || {};
+  const style = defaultsDeep({}, rawStyle, ANNOTATION_DEFAULT[type].style);
+  // padding 은 배열이라 defaultsDeep 의 인덱스 단위 병합이 짧은 사용자 배열을 기본값으로 오염시킨다
+  // (예: 사용자 [5] + 기본 [6,10] → [5,10]). 병합 결과 대신 "사용자 원본 우선"으로 다시 정규화한다.
   if ('padding' in style) {
-    style.padding = normalizePadding(style.padding);
+    const rawPadding = 'padding' in rawStyle ? rawStyle.padding : ANNOTATION_DEFAULT[type].style.padding;
+    style.padding = normalizePadding(rawPadding);
+  }
+  // circle radius 음수 방어: ctx.arc 는 음수 반지름에 IndexSizeError 를 던지므로 0 으로 클램프한다.
+  if (type === 'circle' && typeof style.radius === 'number' && style.radius < 0) {
+    warnings.push(`[annotation:${id}] style.radius must be >= 0 — clamped to 0.`);
+    style.radius = 0;
   }
   if (type === 'callout' && !CALLOUT_ANCHORS.includes(style.anchor)) {
     warnings.push(`[annotation:${id}] invalid style.anchor "${style.anchor}" — fallback to "auto".`);

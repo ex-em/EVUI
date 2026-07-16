@@ -6,11 +6,21 @@ describe('annotation.normalize', () => {
     it('number -> 4-tuple', () => {
       expect(normalizePadding(5)).toEqual([5, 5, 5, 5]);
     });
+    it('[a] -> [a, a, a, a]', () => {
+      expect(normalizePadding([5])).toEqual([5, 5, 5, 5]);
+    });
     it('[v, h] -> [v, h, v, h]', () => {
       expect(normalizePadding([6, 10])).toEqual([6, 10, 6, 10]);
     });
+    it('[t, h, b] -> [t, h, b, h]', () => {
+      expect(normalizePadding([12, 8, 20])).toEqual([12, 8, 20, 8]);
+    });
     it('[t, r, b, l] -> as-is', () => {
       expect(normalizePadding([1, 2, 3, 4])).toEqual([1, 2, 3, 4]);
+    });
+    it('clamps negative values to 0', () => {
+      expect(normalizePadding(-5)).toEqual([0, 0, 0, 0]);
+      expect(normalizePadding([-1, 4])).toEqual([0, 4, 0, 4]);
     });
     it('invalid -> zeros', () => {
       expect(normalizePadding(undefined)).toEqual([0, 0, 0, 0]);
@@ -38,6 +48,27 @@ describe('annotation.normalize', () => {
       ]);
       expect(annotations[0].style.backgroundColor).toBe('#000');
       expect(annotations[0].style.borderColor).toBe('#B24C4C'); // default kept
+    });
+
+    it('user padding is not contaminated by default via array index merge', () => {
+      // 사용자 [5](균일 의도) + badge 기본 [6,10] → 예전엔 [5,10,5,10] 로 오염됐다. 이제 [5,5,5,5].
+      const { annotations } = normalizeAnnotations([
+        { type: 'badge', content: 'Hi', style: { padding: [5] } },
+      ]);
+      expect(annotations[0].style.padding).toEqual([5, 5, 5, 5]);
+    });
+
+    it('user 3-value padding is preserved (not dropped to zeros)', () => {
+      const { annotations } = normalizeAnnotations([
+        { type: 'badge', content: 'Hi', style: { padding: [12, 8, 20] } },
+      ]);
+      expect(annotations[0].style.padding).toEqual([12, 8, 20, 8]);
+    });
+
+    it('clamps negative circle radius to 0 with warning', () => {
+      const { annotations, warnings } = normalizeAnnotations([{ type: 'circle', style: { radius: -5 } }]);
+      expect(annotations[0].style.radius).toBe(0);
+      expect(warnings.some(w => w.includes('radius must be'))).toBe(true);
     });
 
     it('generates id when missing, preserves provided id', () => {
@@ -80,7 +111,21 @@ describe('annotation.normalize', () => {
 
     it('warns on axis position without xValue/yValue', () => {
       const { warnings } = normalizeAnnotations([{ type: 'text', position: { type: 'axis' } }]);
-      expect(warnings.some(w => w.includes('requires xValue'))).toBe(true);
+      expect(warnings.some(w => w.includes('requires both xValue and yValue'))).toBe(true);
+    });
+
+    it('warns on axis position with only one of xValue/yValue (single-axis unsupported)', () => {
+      const onlyX = normalizeAnnotations([{ type: 'text', position: { type: 'axis', xValue: 50 } }]);
+      expect(onlyX.warnings.some(w => w.includes('requires both xValue and yValue'))).toBe(true);
+      const onlyY = normalizeAnnotations([{ type: 'text', position: { type: 'axis', yValue: 50 } }]);
+      expect(onlyY.warnings.some(w => w.includes('requires both xValue and yValue'))).toBe(true);
+    });
+
+    it('no axis warning when both xValue and yValue are given', () => {
+      const { warnings } = normalizeAnnotations([
+        { type: 'text', position: { type: 'axis', xValue: 10, yValue: 20 } },
+      ]);
+      expect(warnings.some(w => w.includes('requires both xValue and yValue'))).toBe(false);
     });
 
     it('warns on series position without seriesId and invalid location', () => {

@@ -91,6 +91,15 @@ describe('annotation.renderer', () => {
       expect(arc.args.slice(0, 3)).toEqual([5, 5, 10]);
       expect(names(ctx)).toContain('fill');
     });
+    it('restores canvas state even when a draw call throws (balanced save/restore)', () => {
+      const ctx = createMockCtx();
+      // 실제 캔버스는 음수 반지름 arc 에 IndexSizeError 를 던진다. throw 를 흉내낸다.
+      ctx.arc = () => { throw new Error('IndexSizeError'); };
+      expect(() => drawCircle(ctx, { cx: 0, cy: 0, r: -5 }, { backgroundColor: '#f00' })).toThrow();
+      const saves = ctx.calls.filter(c => c.name === 'save').length;
+      const restores = ctx.calls.filter(c => c.name === 'restore').length;
+      expect(saves).toBe(restores); // finally 로 restore 가 보장되어 save 스택이 불균형해지지 않는다
+    });
   });
 
   describe('drawText', () => {
@@ -100,6 +109,34 @@ describe('annotation.renderer', () => {
       drawText(ctx, { x: 0, y: 0, w: 40, h: 24 }, content, { color: '#000', fontSize: '11px' });
       expect(ctx.calls.filter(c => c.name === 'fillText')).toHaveLength(2);
       expect(ctx.textAlign).toBe('center');
+    });
+    it('defaults to center anchor (box center) when textAlign is absent', () => {
+      const ctx = createMockCtx();
+      const content = { lines: [{ text: 'a' }], lineHeight: 12 };
+      drawText(ctx, { x: 0, y: 0, w: 40, h: 24 }, content, {});
+      expect(ctx.textAlign).toBe('center');
+      expect(ctx.calls.find(c => c.name === 'fillText').args[1]).toBe(20); // box.x + w/2
+    });
+    it('respects textAlign:left (anchors to left padding edge)', () => {
+      const ctx = createMockCtx();
+      const content = { lines: [{ text: 'a' }], lineHeight: 12 };
+      drawText(ctx, { x: 0, y: 0, w: 40, h: 24 }, content, { textAlign: 'left', padding: [4, 8, 4, 6] });
+      expect(ctx.textAlign).toBe('left');
+      expect(ctx.calls.find(c => c.name === 'fillText').args[1]).toBe(6); // box.x + paddingLeft
+    });
+    it('respects textAlign:right (anchors to right padding edge)', () => {
+      const ctx = createMockCtx();
+      const content = { lines: [{ text: 'a' }], lineHeight: 12 };
+      drawText(ctx, { x: 0, y: 0, w: 40, h: 24 }, content, { textAlign: 'right', padding: [4, 8, 4, 6] });
+      expect(ctx.textAlign).toBe('right');
+      expect(ctx.calls.find(c => c.name === 'fillText').args[1]).toBe(32); // box.x + w - paddingRight
+    });
+    it('falls back to center for an invalid textAlign value', () => {
+      const ctx = createMockCtx();
+      const content = { lines: [{ text: 'a' }], lineHeight: 12 };
+      drawText(ctx, { x: 0, y: 0, w: 40, h: 24 }, content, { textAlign: 'justify' });
+      expect(ctx.textAlign).toBe('center');
+      expect(ctx.calls.find(c => c.name === 'fillText').args[1]).toBe(20);
     });
     it('skips empty content', () => {
       const ctx = createMockCtx();

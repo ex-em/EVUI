@@ -542,7 +542,7 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 | location | series | String \| Number | 'end' | 추적 위치. 'start' \| 'end' \| 데이터 인덱스('start'/'end'는 데이터 있는 non-null 첫/마지막). 파이는 무시 |
 
 - **이 차트의 `series` 기준점**: 데이터 포인트 중심
-- **`axis` 위치**: 지원 (linear/time/step 축 값으로 지정)
+- **`axis` 위치**: 지원 (linear/time/step 축 값으로 지정). `xValue`와 `yValue`를 **모두** 지정해야 하며, 하나만 지정하면 표시되지 않습니다.
 - 기준점이 축 범위/줌 영역 밖이거나, 추적 `series`가 숨김 상태(`show: false`, 범례 토글 포함)이면 그리지 않습니다. `pixel`은 항상 표시됩니다.
 
 ##### annotation content
