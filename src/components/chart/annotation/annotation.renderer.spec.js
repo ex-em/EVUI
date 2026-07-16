@@ -152,7 +152,7 @@ describe('annotation.draw orchestrator', () => {
     const annotations = [
       { id: 'a', type: 'badge', content: 'hidden', position: { type: 'axis', xValue: 999, yValue: 50 }, style: { backgroundColor: '#fff', borderWidth: 0 } },
     ];
-    drawAnnotations(ctx, annotations, viewportCtx, null, fakeMeasure);
+    drawAnnotations(ctx, annotations, viewportCtx, fakeMeasure);
     expect(ctx.calls).toHaveLength(0);
   });
 
@@ -165,7 +165,7 @@ describe('annotation.draw orchestrator', () => {
       position: { type: 'pixel', x: 100, y: 100 },
       style: { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1, borderRadius: 4, padding: [4, 4, 4, 4], fontSize: '11px' },
     }];
-    drawAnnotations(ctx, annotations, viewportCtx, null, fakeMeasure);
+    drawAnnotations(ctx, annotations, viewportCtx, fakeMeasure);
     const text = ctx.calls.find(c => c.name === 'fillText');
     // pixel position has no xValue token source -> token kept verbatim
     expect(text.args[0]).toBe('x={xValue}');
@@ -173,9 +173,9 @@ describe('annotation.draw orchestrator', () => {
 
   it('no-ops on empty/invalid input', () => {
     const ctx = createMockCtx();
-    drawAnnotations(ctx, [], viewportCtx, null, fakeMeasure);
-    drawAnnotations(ctx, null, viewportCtx, null, fakeMeasure);
-    drawAnnotations(null, [{}], viewportCtx, null, fakeMeasure);
+    drawAnnotations(ctx, [], viewportCtx, fakeMeasure);
+    drawAnnotations(ctx, null, viewportCtx, fakeMeasure);
+    drawAnnotations(null, [{}], viewportCtx, fakeMeasure);
     expect(ctx.calls).toHaveLength(0);
   });
 
@@ -192,7 +192,7 @@ describe('annotation.draw orchestrator', () => {
         style: { backgroundColor: '#fff', borderColor: '#000', borderWidth: 1, borderRadius: 4, padding: [4, 4, 4, 4], fontSize: '11px' },
       },
     ];
-    drawAnnotations(ctx, annotations, viewportCtx, null, fakeMeasure);
+    drawAnnotations(ctx, annotations, viewportCtx, fakeMeasure);
     // 두 번째(정상) 어노테이션은 그려진다
     const text = ctx.calls.find(c => c.name === 'fillText');
     expect(text && text.args[0]).toBe('OK');

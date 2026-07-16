@@ -6,7 +6,6 @@ import {
   resolveCalloutSide,
   computeTail,
   computeLayout,
-  computeOverflow,
 } from './annotation.layout';
 
 // 결정론적 측정기: 글자당 폭 10, 줄 높이 12
@@ -109,7 +108,7 @@ describe('annotation.layout', () => {
     it('badge centers box on anchor', () => {
       const ann = { type: 'badge', style: { padding: [0, 0, 0, 0] } };
       const anchor = { x: 100, y: 100, anchorX: 100, anchorY: 100 };
-      const l = computeLayout(ann, anchor, 'ab', null, fakeMeasure);
+      const l = computeLayout(ann, anchor, 'ab', fakeMeasure);
       // size 20x12, centered
       expect(l.box).toMatchObject({ x: 90, y: 94, w: 20, h: 12 });
       expect(l.tail).toBeNull();
@@ -119,7 +118,7 @@ describe('annotation.layout', () => {
       const ann = { type: 'callout', style: { padding: [0, 0, 0, 0], anchor: 'auto', arrowSize: 8 } };
       // box centered at offset target (100,70); data point at (100,100) below -> side bottom
       const anchor = { x: 100, y: 70, anchorX: 100, anchorY: 100 };
-      const l = computeLayout(ann, anchor, 'ab', null, fakeMeasure);
+      const l = computeLayout(ann, anchor, 'ab', fakeMeasure);
       expect(l.tail.side).toBe('bottom');
       expect(l.tail).toMatchObject({ tipX: 100, tipY: 100 });
     });
@@ -127,27 +126,9 @@ describe('annotation.layout', () => {
     it('circle returns shape', () => {
       const ann = { type: 'circle', style: { radius: 10 } };
       const anchor = { x: 50, y: 50, anchorX: 50, anchorY: 50 };
-      const l = computeLayout(ann, anchor, '', null, fakeMeasure);
+      const l = computeLayout(ann, anchor, '', fakeMeasure);
       expect(l.shape).toMatchObject({ cx: 50, cy: 50, r: 10 });
       expect(l.box).toMatchObject({ x: 40, y: 40, w: 20, h: 20 });
-    });
-  });
-
-  describe('computeOverflow', () => {
-    const bounds = { x1: 0, y1: 0, x2: 200, y2: 200 };
-    it('no bounds -> none', () => {
-      expect(computeOverflow({ x: -10, y: 0, w: 10, h: 10 }, null).any).toBe(false);
-    });
-    it('detects left/top overflow', () => {
-      const o = computeOverflow({ x: -5, y: -5, w: 10, h: 10 }, bounds);
-      expect(o).toMatchObject({ left: true, top: true, any: true });
-    });
-    it('detects right/bottom overflow', () => {
-      const o = computeOverflow({ x: 195, y: 195, w: 20, h: 20 }, bounds);
-      expect(o).toMatchObject({ right: true, bottom: true, any: true });
-    });
-    it('inside -> none', () => {
-      expect(computeOverflow({ x: 50, y: 50, w: 10, h: 10 }, bounds).any).toBe(false);
     });
   });
 });
