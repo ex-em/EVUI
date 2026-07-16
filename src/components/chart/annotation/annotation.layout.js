@@ -132,39 +132,19 @@ export function computeTail(box, tip, side, arrowSize) {
 }
 
 /**
- * 박스가 plot 경계를 벗어나는지 방향별 플래그를 계산한다.
- * @param {object} box { x, y, w, h }
- * @param {object} [plotBounds] { x1, y1, x2, y2 }
- * @returns {{ left:boolean, right:boolean, top:boolean, bottom:boolean, any:boolean }}
- */
-export function computeOverflow(box, plotBounds) {
-  const none = { left: false, right: false, top: false, bottom: false, any: false };
-  if (!plotBounds) {
-    return none;
-  }
-  const left = box.x < plotBounds.x1;
-  const right = box.x + box.w > plotBounds.x2;
-  const top = box.y < plotBounds.y1;
-  const bottom = box.y + box.h > plotBounds.y2;
-  return { left, right, top, bottom, any: left || right || top || bottom };
-}
-
-/**
  * 해석된 anchor + 박스 크기로 최종 렌더 레이아웃을 만든다. 순수 함수.
  * 박스는 anchor(offset 적용 좌표)에 중심 정렬한다.
  *  - text/badge : box 만
  *  - callout    : box + tail(데이터 포인트 anchorX/anchorY 를 가리킴)
  *  - circle     : shape(cx,cy,r)
- * plotBounds 가 주어지면 박스가 plot 영역을 벗어나는지 overflow 플래그를 계산한다(자르기/넛지는 렌더 단계 책임).
  *
  * @param {object} annotation 정규화된 어노테이션
  * @param {object} anchor resolveAnchor 결과 { x, y, anchorX, anchorY, isVisible }
  * @param {string} contentStr 해석된 content
- * @param {object} [plotBounds] { x1, y1, x2, y2 }
  * @param {Function} [measureFn]
- * @returns {object} 레이아웃 { type, box, content, shape, tail, overflow }
+ * @returns {object} 레이아웃 { type, box, content, shape, tail }
  */
-export function computeLayout(annotation, anchor, contentStr, plotBounds, measureFn = Util.calcTextSizeCanvas) {
+export function computeLayout(annotation, anchor, contentStr, measureFn = Util.calcTextSizeCanvas) {
   const { type, style } = annotation;
   const size = computeBoxSize(annotation, contentStr, measureFn);
 
@@ -172,7 +152,7 @@ export function computeLayout(annotation, anchor, contentStr, plotBounds, measur
     const r = style.radius || 0;
     const shape = { cx: anchor.x, cy: anchor.y, r };
     const box = { x: anchor.x - r, y: anchor.y - r, w: r * 2, h: r * 2 };
-    return { type, box, shape, content: null, tail: null, overflow: computeOverflow(box, plotBounds) };
+    return { type, box, shape, content: null, tail: null };
   }
 
   const box = {
@@ -190,5 +170,5 @@ export function computeLayout(annotation, anchor, contentStr, plotBounds, measur
     tail = computeTail(box, tip, side, style.arrowSize || 8);
   }
 
-  return { type, box, content: size.content, shape: null, tail, overflow: computeOverflow(box, plotBounds) };
+  return { type, box, content: size.content, shape: null, tail };
 }

@@ -3,7 +3,7 @@
  *
  * 사용 흐름:
  *   1) 옵션 변경 시 1회: const { annotations, warnings } = normalizeAnnotations(options.annotations)
- *   2) 매 렌더 프레임: drawAnnotations(ctx, annotations, viewportCtx, plotBounds)
+ *   2) 매 렌더 프레임: drawAnnotations(ctx, annotations, viewportCtx)
  *
  * viewportCtx 계약:
  *   { chartRect: {x1,x2,y1,y2,chartWidth,chartHeight},

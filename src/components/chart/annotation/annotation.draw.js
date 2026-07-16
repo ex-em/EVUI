@@ -12,10 +12,9 @@ import { renderAnnotation } from './annotation.renderer';
  * @param {object} ctx canvas 2d context (보통 series overlay/ buffer ctx)
  * @param {object[]} annotations normalizeAnnotations 로 정규화된 배열
  * @param {object} viewportCtx resolveAnchor 의 ctx — { chartRect, labelOffset, axes|axesSteps, seriesList }
- * @param {object} [plotBounds] { x1, y1, x2, y2 } 박스 overflow 판정용(선택)
  * @param {Function} [measureFn] 텍스트 측정 함수(테스트 주입용, 기본 Util.calcTextSizeCanvas)
  */
-export function drawAnnotations(ctx, annotations, viewportCtx, plotBounds, measureFn = Util.calcTextSizeCanvas) {
+export function drawAnnotations(ctx, annotations, viewportCtx, measureFn = Util.calcTextSizeCanvas) {
   if (!ctx || !Array.isArray(annotations) || !annotations.length) {
     return;
   }
@@ -30,7 +29,7 @@ export function drawAnnotations(ctx, annotations, viewportCtx, plotBounds, measu
       }
       const evalCtx = buildContentContext(ann, viewportCtx);
       const contentStr = ann.type === 'circle' ? '' : resolveContent(ann.content, evalCtx);
-      const layout = computeLayout(ann, anchor, contentStr, plotBounds, measureFn);
+      const layout = computeLayout(ann, anchor, contentStr, measureFn);
       renderAnnotation(ctx, ann, layout, anchor);
     } catch (e) {
       Console.warn(`[EvChart] annotation render failed (id: ${ann && ann.id}):`, e);
