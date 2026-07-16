@@ -34,20 +34,25 @@ export function drawConnector(ctx, from, box, connector) {
   const end = nearestBoxPoint(box, from);
   const style = connector.style || {};
   ctx.save();
-  ctx.beginPath();
-  ctx.strokeStyle = style.stroke || '#9E9E9E';
-  ctx.lineWidth = style.strokeWidth || 1;
-  ctx.setLineDash(DASH_MAP[style.dashStyle] || DASH_MAP.solid);
-  ctx.moveTo(from.x, from.y);
-  if (connector.type === 'elbow') {
-    // 수평 먼저 → 수직(L자). 결정론적.
-    ctx.lineTo(end.x, from.y);
-    ctx.lineTo(end.x, end.y);
-  } else {
-    ctx.lineTo(end.x, end.y);
+  // save() 와 restore() 를 try/finally 로 짝지어, 본문에서 throw 가 나도 캔버스 save 스택이
+  // 불균형해지지 않게 한다(drawAnnotations 의 항목별 격리 catch 는 상태를 복원하지 않으므로).
+  try {
+    ctx.beginPath();
+    ctx.strokeStyle = style.stroke || '#9E9E9E';
+    ctx.lineWidth = style.strokeWidth || 1;
+    ctx.setLineDash(DASH_MAP[style.dashStyle] || DASH_MAP.solid);
+    ctx.moveTo(from.x, from.y);
+    if (connector.type === 'elbow') {
+      // 수평 먼저 → 수직(L자). 결정론적.
+      ctx.lineTo(end.x, from.y);
+      ctx.lineTo(end.x, end.y);
+    } else {
+      ctx.lineTo(end.x, end.y);
+    }
+    ctx.stroke();
+  } finally {
+    ctx.restore();
   }
-  ctx.stroke();
-  ctx.restore();
 }
 
 /**
@@ -63,18 +68,21 @@ export function drawBox(ctx, box, style) {
     return;
   }
   ctx.save();
-  ctx.beginPath();
-  Canvas.roundedRect(ctx, box.x, box.y, box.w, box.h, style.borderRadius || 0);
-  if (hasFill) {
-    ctx.fillStyle = style.backgroundColor;
-    ctx.fill();
+  try {
+    ctx.beginPath();
+    Canvas.roundedRect(ctx, box.x, box.y, box.w, box.h, style.borderRadius || 0);
+    if (hasFill) {
+      ctx.fillStyle = style.backgroundColor;
+      ctx.fill();
+    }
+    if (hasBorder) {
+      ctx.lineWidth = style.borderWidth;
+      ctx.strokeStyle = style.borderColor;
+      ctx.stroke();
+    }
+  } finally {
+    ctx.restore();
   }
-  if (hasBorder) {
-    ctx.lineWidth = style.borderWidth;
-    ctx.strokeStyle = style.borderColor;
-    ctx.stroke();
-  }
-  ctx.restore();
 }
 
 /**
@@ -96,56 +104,59 @@ export function drawCallout(ctx, box, tail, style) {
   const side = tail?.side;
 
   ctx.save();
-  ctx.beginPath();
-  ctx.moveTo(left + r, top);
+  try {
+    ctx.beginPath();
+    ctx.moveTo(left + r, top);
 
-  // TOP edge (L→R)
-  if (side === 'top') {
-    ctx.lineTo(Math.min(tail.baseAX, tail.baseBX), top);
-    ctx.lineTo(tail.tipX, tail.tipY);
-    ctx.lineTo(Math.max(tail.baseAX, tail.baseBX), top);
-  }
-  ctx.lineTo(right - r, top);
-  ctx.quadraticCurveTo(right, top, right, top + r);
+    // TOP edge (L→R)
+    if (side === 'top') {
+      ctx.lineTo(Math.min(tail.baseAX, tail.baseBX), top);
+      ctx.lineTo(tail.tipX, tail.tipY);
+      ctx.lineTo(Math.max(tail.baseAX, tail.baseBX), top);
+    }
+    ctx.lineTo(right - r, top);
+    ctx.quadraticCurveTo(right, top, right, top + r);
 
-  // RIGHT edge (T→B)
-  if (side === 'right') {
-    ctx.lineTo(right, Math.min(tail.baseAY, tail.baseBY));
-    ctx.lineTo(tail.tipX, tail.tipY);
-    ctx.lineTo(right, Math.max(tail.baseAY, tail.baseBY));
-  }
-  ctx.lineTo(right, bottom - r);
-  ctx.quadraticCurveTo(right, bottom, right - r, bottom);
+    // RIGHT edge (T→B)
+    if (side === 'right') {
+      ctx.lineTo(right, Math.min(tail.baseAY, tail.baseBY));
+      ctx.lineTo(tail.tipX, tail.tipY);
+      ctx.lineTo(right, Math.max(tail.baseAY, tail.baseBY));
+    }
+    ctx.lineTo(right, bottom - r);
+    ctx.quadraticCurveTo(right, bottom, right - r, bottom);
 
-  // BOTTOM edge (R→L)
-  if (side === 'bottom') {
-    ctx.lineTo(Math.max(tail.baseAX, tail.baseBX), bottom);
-    ctx.lineTo(tail.tipX, tail.tipY);
-    ctx.lineTo(Math.min(tail.baseAX, tail.baseBX), bottom);
-  }
-  ctx.lineTo(left + r, bottom);
-  ctx.quadraticCurveTo(left, bottom, left, bottom - r);
+    // BOTTOM edge (R→L)
+    if (side === 'bottom') {
+      ctx.lineTo(Math.max(tail.baseAX, tail.baseBX), bottom);
+      ctx.lineTo(tail.tipX, tail.tipY);
+      ctx.lineTo(Math.min(tail.baseAX, tail.baseBX), bottom);
+    }
+    ctx.lineTo(left + r, bottom);
+    ctx.quadraticCurveTo(left, bottom, left, bottom - r);
 
-  // LEFT edge (B→T)
-  if (side === 'left') {
-    ctx.lineTo(left, Math.max(tail.baseAY, tail.baseBY));
-    ctx.lineTo(tail.tipX, tail.tipY);
-    ctx.lineTo(left, Math.min(tail.baseAY, tail.baseBY));
-  }
-  ctx.lineTo(left, top + r);
-  ctx.quadraticCurveTo(left, top, left + r, top);
-  ctx.closePath();
+    // LEFT edge (B→T)
+    if (side === 'left') {
+      ctx.lineTo(left, Math.max(tail.baseAY, tail.baseBY));
+      ctx.lineTo(tail.tipX, tail.tipY);
+      ctx.lineTo(left, Math.min(tail.baseAY, tail.baseBY));
+    }
+    ctx.lineTo(left, top + r);
+    ctx.quadraticCurveTo(left, top, left + r, top);
+    ctx.closePath();
 
-  if (style.backgroundColor && style.backgroundColor !== 'transparent') {
-    ctx.fillStyle = style.backgroundColor;
-    ctx.fill();
+    if (style.backgroundColor && style.backgroundColor !== 'transparent') {
+      ctx.fillStyle = style.backgroundColor;
+      ctx.fill();
+    }
+    if (style.borderWidth > 0 && style.borderColor && style.borderColor !== 'transparent') {
+      ctx.lineWidth = style.borderWidth;
+      ctx.strokeStyle = style.borderColor;
+      ctx.stroke();
+    }
+  } finally {
+    ctx.restore();
   }
-  if (style.borderWidth > 0 && style.borderColor && style.borderColor !== 'transparent') {
-    ctx.lineWidth = style.borderWidth;
-    ctx.strokeStyle = style.borderColor;
-    ctx.stroke();
-  }
-  ctx.restore();
 }
 
 /**
@@ -156,22 +167,25 @@ export function drawCallout(ctx, box, tail, style) {
  */
 export function drawCircle(ctx, shape, style) {
   ctx.save();
-  ctx.beginPath();
-  ctx.arc(shape.cx, shape.cy, shape.r, 0, Math.PI * 2);
-  if (style.backgroundColor && style.backgroundColor !== 'transparent') {
-    ctx.fillStyle = style.backgroundColor;
-    ctx.fill();
+  try {
+    ctx.beginPath();
+    ctx.arc(shape.cx, shape.cy, shape.r, 0, Math.PI * 2);
+    if (style.backgroundColor && style.backgroundColor !== 'transparent') {
+      ctx.fillStyle = style.backgroundColor;
+      ctx.fill();
+    }
+    if (style.borderWidth > 0 && style.borderColor && style.borderColor !== 'transparent') {
+      ctx.lineWidth = style.borderWidth;
+      ctx.strokeStyle = style.borderColor;
+      ctx.stroke();
+    }
+  } finally {
+    ctx.restore();
   }
-  if (style.borderWidth > 0 && style.borderColor && style.borderColor !== 'transparent') {
-    ctx.lineWidth = style.borderWidth;
-    ctx.strokeStyle = style.borderColor;
-    ctx.stroke();
-  }
-  ctx.restore();
 }
 
 /**
- * 박스 안에 멀티라인 텍스트를 그린다(가로 중앙, 세로 중앙 정렬).
+ * 박스 안에 멀티라인 텍스트를 그린다(style.textAlign 존중: left/right/center, 기본 center. 세로는 항상 중앙).
  * @param {object} ctx
  * @param {object} box  { x, y, w, h }
  * @param {object} content measureContent 결과 { lines, lineHeight }
@@ -182,18 +196,32 @@ export function drawText(ctx, box, content, style) {
     return;
   }
   ctx.save();
-  ctx.fillStyle = style.color || '#212121';
-  ctx.font = buildFontStyle(style);
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  const cx = box.x + box.w / 2;
-  const { lineHeight } = content;
-  const totalH = lineHeight * content.lines.length;
-  const startY = box.y + box.h / 2 - totalH / 2 + lineHeight / 2;
-  content.lines.forEach((line, i) => {
-    ctx.fillText(line.text, cx, startY + i * lineHeight);
-  });
-  ctx.restore();
+  try {
+    ctx.fillStyle = style.color || '#212121';
+    ctx.font = buildFontStyle(style);
+    // style.textAlign 존중(left/right/center). 유효하지 않은 값은 center 로 폴백.
+    const align = ['left', 'right'].includes(style.textAlign) ? style.textAlign : 'center';
+    ctx.textAlign = align;
+    ctx.textBaseline = 'middle';
+    // 정렬에 맞춰 x 앵커를 박스의 해당 변(padding 안쪽)으로 옮긴다. padding = [top, right, bottom, left].
+    const [, pr, , pl] = style.padding || [0, 0, 0, 0];
+    let cx;
+    if (align === 'left') {
+      cx = box.x + pl;
+    } else if (align === 'right') {
+      cx = box.x + box.w - pr;
+    } else {
+      cx = box.x + box.w / 2;
+    }
+    const { lineHeight } = content;
+    const totalH = lineHeight * content.lines.length;
+    const startY = box.y + box.h / 2 - totalH / 2 + lineHeight / 2;
+    content.lines.forEach((line, i) => {
+      ctx.fillText(line.text, cx, startY + i * lineHeight);
+    });
+  } finally {
+    ctx.restore();
+  }
 }
 
 /**

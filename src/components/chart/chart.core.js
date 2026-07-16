@@ -2365,6 +2365,13 @@ class EvChart {
     this.displayCanvas = null;
     this.bufferCanvas = null;
     this.overlayCanvas = null;
+    // 어노테이션 전용 캔버스/캐시도 형제 캔버스와 대칭으로 정리한다. 그래야 향후 destroy()→init()
+    // 재사용 시 ensureAnnotationCanvas 의 stale-ctx 단락(보이지 않는 캔버스에 그리기)이 발생하지 않는다.
+    this.annotationCanvas = null;
+    this.annotationCtx = null;
+    this._normalizedAnnotations = null;
+    this._annotationSource = null;
+    this._hadAnnotations = false;
 
     while (target.hasChildNodes()) {
       target.removeChild(target.firstChild);
