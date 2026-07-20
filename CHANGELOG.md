@@ -1,3 +1,23 @@
+# [3.15.0](https://github.com/ex-em/EVUI/compare/3.14.0...3.15.0) (2026-07-20)
+
+
+### Bug Fixes
+
+* **chart:** realtime scatter 만료 전 stale series가 마지막 키일 때 X축 freeze 수정 ([d038670](https://github.com/ex-em/EVUI/commit/d0386701bea819c97e845bc72d421c6f7191fcd8))
+* **chart:** 어노테이션 코드리뷰 지적 수정 (padding/격리/axis/textAlign/teardown) ([66e57b5](https://github.com/ex-em/EVUI/commit/66e57b54bd7d1df4f8e3a56238e368976fd98b8c)), closes [#2306](https://github.com/ex-em/EVUI/issues/2306)
+* color visual spec 워크로드 축소로 timeout 해소 ([6fe405b](https://github.com/ex-em/EVUI/commit/6fe405b508e671bf6d4445588f912c5ea5766545))
+* realtime scatter blit fast-path를 full redraw와 픽셀 동등하게 수정 ([5ffcb0a](https://github.com/ex-em/EVUI/commit/5ffcb0a1b7ac98a068433ecce5fd9ad8d7a88142))
+* realtime scatter blit 반투명·분수 DPR 폴백 + cross-series dedupe 복원 ([dfe62b0](https://github.com/ex-em/EVUI/commit/dfe62b0f5b0c27b0b97c018d2b8a485afbffff27))
+* realtime scatter blit 반투명(opacity) 지원 — opaqueFill gate 제거, per-point drawn 플래그 ([d181b45](https://github.com/ex-em/EVUI/commit/d181b45beb220ff3792df2cdcd3aef1516b4361c))
+* realtime scatter blit 분수 DPR 지원 — q배수 시프트로 device px 정수화 ([d4407ae](https://github.com/ex-em/EVUI/commit/d4407ae07e4322a5522ed69dcc1cb670ffd8473a))
+* realTimeScatter 만료된 개별 series 자동 제거 ([3ea2ce9](https://github.com/ex-em/EVUI/commit/3ea2ce98000bff0cfb7562bf57cea756768bd7ba))
+
+
+### Features
+
+* **chart:** 어노테이션 series location 의 start/end 를 non-null 첫/마지막으로 변경 ([d42da46](https://github.com/ex-em/EVUI/commit/d42da46c16585ac2bbf242f7fa890e11b1dc1fd3))
+* **chart:** 어노테이션/뱃지 모듈 추가 ([5be02a2](https://github.com/ex-em/EVUI/commit/5be02a2927ccf0278429b2b0ce8a90937d1048f0))
+
 # [3.14.0](https://github.com/ex-em/EVUI/compare/3.13.0...3.14.0) (2026-06-30)
 
 
