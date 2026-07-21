@@ -4,6 +4,8 @@
 
 입력 필드 + 드롭다운 달력으로 날짜/날짜시간/범위를 선택하는 컴포넌트. `EvCalendar` 의 날짜 로직을 재사용하며, 텍스트 직접 입력·바로가기(shortcuts)·초기화를 지원한다.
 
+> **공식 API**: [docs/views/datePicker/api/datePicker.md](../../../docs/views/datePicker/api/datePicker.md)
+
 ## Features
 
 - **날짜 선택**: `modelValue`(v-model, [String, Array]) — date 정규식(10자)·dateTime 정규식(19자) validator. `update:modelValue` emit.

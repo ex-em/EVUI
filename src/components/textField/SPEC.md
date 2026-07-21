@@ -4,6 +4,8 @@
 
 텍스트 입력 필드. 일반/비밀번호/검색 타입, 초기화, 비밀번호 표시 토글, 최대 길이 카운터, 에러 메시지, 자동완성을 지원한다.
 
+> **공식 API**: [docs/views/textField/api/textField.md](../../../docs/views/textField/api/textField.md)
+
 ## Features
 
 - **값 입력**: `modelValue`(v-model). `input`/`change`/`focus`/`blur` emit. `modelModifiers` 지원.

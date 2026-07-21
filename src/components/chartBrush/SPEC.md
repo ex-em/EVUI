@@ -4,6 +4,8 @@
 
 EvChartGroup 내부에서 사용하는 차트 브러시 컴포넌트. 그룹에 묶인 차트 중 하나(`chartIdx`)의 원본(전체 구간) 데이터를 경량 미니 차트로 렌더링하고, 그 위에 캔버스 기반 선택 영역(브러시 렉트)을 그려 메인 차트의 줌 구간을 표시·조작한다. 브러시 조작(좌/우 버튼 드래그, grab 이동, 휠 스크롤, 외부 클릭 텔레포트)은 그룹이 provide 한 반응형 `brushIdx` 를 갱신해 EvChartZoom 의 줌 실행으로 이어지고, 반대로 툴바/드래그셀렉션 줌도 `brushIdx` 를 통해 브러시 렉트에 반영된다(양방향 동기화).
 
+> **공식 API**: [docs/views/brushChart/api/brushChart.md](../../../docs/views/brushChart/api/brushChart.md) — brushChart 문서
+
 ## Features
 
 - **브러시 미니 차트 렌더링**: `injectEvChartClone.data[chartIdx]`(줌 전 원본 클론)를 데이터로 자체 EvChart 인스턴스를 생성한다. 차트 옵션은 대상 차트 옵션(`injectEvChartInfo.props.options[chartIdx]`)을 복사하되 `brush: { use: true, ...옵션 }` 을 주입하고 zoom·dragSelection·title·tooltip·legend·selectLabel·selectSeries·축 title 을 모두 비활성화한다 (`ChartBrush.vue` `evChartOption` computed).

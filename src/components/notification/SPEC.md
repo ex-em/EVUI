@@ -4,6 +4,8 @@
 
 화면 모서리에 잠시 나타났다 사라지는 토스트 알림. 프로그램적 호출로 렌더되며, 위치·자동 사라짐(duration)·유형별 아이콘·클릭/닫힘 콜백을 지원한다.
 
+> **공식 API**: [docs/views/notification/api/notification.md](../../../docs/views/notification/api/notification.md)
+
 ## Features
 
 - **내용/유형**: `type`(정보/성공/경고/에러 등)·`title`·`message`·`iconClass`. `useHTML` 시 message 를 HTML 렌더.

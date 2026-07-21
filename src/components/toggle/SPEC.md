@@ -4,6 +4,8 @@
 
 on/off 토글 스위치. 활성/비활성 색상, 너비, 비활성/읽기전용을 지원한다.
 
+> **공식 API**: [docs/views/toggle/api/toggle.md](../../../docs/views/toggle/api/toggle.md)
+
 ## Features
 
 - **토글 상태**: `modelValue`(v-model). `update:modelValue`·`change` emit.

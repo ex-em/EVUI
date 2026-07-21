@@ -6,6 +6,8 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 
 이 문서는 차트 **루트 파일**(Chart.vue, ChartToolbar.vue, chart.core.js, chart.blit.js, chart.selection.js, chartZoom.core.js, uses.js, index.js)과 helpers/ 를 다룬다. plugins/element/scale/model/annotation 의 상세는 각 하위 SPEC( [./plugins/SPEC.md](./plugins/SPEC.md), [./element/SPEC.md](./element/SPEC.md), [./scale/SPEC.md](./scale/SPEC.md), [./model/SPEC.md](./model/SPEC.md), [./annotation/SPEC.md](./annotation/SPEC.md) )에 위임한다.
 
+> **공식 API**: docs/views/{lineChart,barChart,pieChart,scatterChart,comboChart,heatMap,zoomChart}/api/*.md (차트 타입별 문서)
+
 ## Features
 
 - **차트 타입**: `options.type` 으로 line/bar/pie(doughnut·sunburst 포함)/scatter/heatMap 렌더. `seriesInfo.charts` 는 pie/bar/line/scatter/heatMap 5종 인덱스를 유지하며 combo(`options.combo`)는 타입 혼합으로 표현된다.
@@ -136,7 +138,6 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 | @/directives/resize | 차트 wrapper 리사이즈 감지(v-resize) |
 | EvChartGroup / EvChartBrush | provide/inject 계약의 공급자(isChartGroup, brushSeries, groupSelectedLabel/HoveredLabel, brushIdx, evChartPropsInGroup, groupInteraction.deferUntil) — 본 컴포넌트는 소비자 |
 | OffscreenCanvas / Web Worker | workerRender 경로(feature-detect, 미지원 시 main 폴백) |
-| docs/views/*/api/*.md | 공식 API 문서(lineChart/barChart/pieChart/scatterChart/comboChart/heatMap/zoomChart) |
 
 ## Glossary
 

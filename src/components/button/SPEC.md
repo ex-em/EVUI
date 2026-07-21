@@ -4,6 +4,8 @@
 
 기본 버튼. 유형(색상)·모양·크기·비활성·자동포커스를 지원하고, 네이티브 버튼 타입(htmlType)을 지정할 수 있다.
 
+> **공식 API**: [docs/views/button/api/button.md](../../../docs/views/button/api/button.md)
+
 ## Features
 
 - **유형**: `type`(default/primary/info/warning/error/ghost/dashed/text) — 색상/스타일.

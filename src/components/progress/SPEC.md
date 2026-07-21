@@ -4,6 +4,8 @@
 
 진행률(0~100)을 막대로 표시하는 컴포넌트. 색상·두께·내부 텍스트를 지정할 수 있다.
 
+> **공식 API**: [docs/views/progress/api/progress.md](../../../docs/views/progress/api/progress.md)
+
 ## Features
 
 - **진행률**: `modelValue` — 진행 값.

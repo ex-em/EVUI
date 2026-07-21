@@ -4,6 +4,8 @@
 
 값 또는 값 범위를 드래그로 선택하는 슬라이더. 단일값·범위(range) 모드, 스텝, 눈금(mark), 툴팁, 인라인 입력창, 색상 범위 표시를 지원한다.
 
+> **공식 API**: [docs/views/slider/api/slider.md](../../../docs/views/slider/api/slider.md)
+
 ## Features
 
 - **값 선택**: `modelValue`(v-model, [Number, Array]) — `range=false` 단일, `range=true` 범위(배열). `change` emit.

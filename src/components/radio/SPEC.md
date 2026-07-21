@@ -4,6 +4,8 @@
 
 단일 라디오 버튼. 단독 또는 `EvRadioGroup` 안에서 그룹 선택의 일원으로 동작(provide/inject)한다.
 
+> **공식 API**: [docs/views/radio/api/radio.md](../../../docs/views/radio/api/radio.md)
+
 ## Features
 
 - **선택**: `modelValue`(v-model)·`label`(이 라디오의 값). `update:modelValue`·`change` emit.

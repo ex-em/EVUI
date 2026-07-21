@@ -4,6 +4,8 @@
 
 대량 행 데이터를 가상 스크롤로 렌더링하는 데이터 그리드. 정렬·필터·페이지네이션·컬럼 리사이즈/순서변경/표시설정·행 선택·체크박스·행 확장(expand)·요약(summary)·컨텍스트 메뉴를 제공한다. 이벤트별 관심사를 `uses.js` 의 컴포저블 팩토리로 분해해 `Grid.vue` `setup` 에서 조합한다.
 
+> **공식 API**: [docs/views/grid/api/grid.md](../../../docs/views/grid/api/grid.md)
+
 ## Features
 
 - **가상 스크롤**: 세로/가로 가상 스크롤(`scrollEvent` — `updateVScrollBase`/`updateVScroll`/`updateHScroll`/`onScroll`)로 보이는 행만 렌더.

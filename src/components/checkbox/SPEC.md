@@ -4,6 +4,8 @@
 
 단일 체크박스. 단독 사용 또는 `EvCheckboxGroup` 안에서 그룹의 일원으로 동작(provide/inject)한다. indeterminate(부분 선택), 툴팁, 비활성/읽기전용을 지원한다.
 
+> **공식 API**: [docs/views/checkbox/api/checkbox.md](../../../docs/views/checkbox/api/checkbox.md)
+
 ## Features
 
 - **체크 상태**: `modelValue`(v-model). `update:modelValue` emit.

@@ -4,6 +4,8 @@
 
 시각(HH:mm:ss 등)을 선택하는 입력 컴포넌트. 단일 시각 또는 시각 범위(range)를 지원하며 초기화·비활성·읽기전용 상태를 갖는다.
 
+> **공식 API**: [docs/views/timePicker/api/timePicker.md](../../../docs/views/timePicker/api/timePicker.md)
+
 ## Features
 
 - **시각 선택**: `modelValue`(v-model) — `type='range'` 이면 [startTime, endTime] 배열, 아니면 단일 시각. `update:modelValue` emit.

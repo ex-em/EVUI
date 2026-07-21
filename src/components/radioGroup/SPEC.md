@@ -4,6 +4,8 @@
 
 여러 `EvRadio` 를 묶어 배타적 단일 선택을 관리하는 그룹. 그룹 값과 변경 핸들러를 provide 하여 자식 라디오가 참여하게 한다.
 
+> **공식 API**: [docs/views/radio/api/radio.md](../../../docs/views/radio/api/radio.md) — EvRadio 문서
+
 ## Features
 
 - **그룹 값**: `modelValue`(v-model) — 선택된 라디오 값. `update:modelValue`·`change` emit.
