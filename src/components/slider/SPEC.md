@@ -43,7 +43,6 @@ EvSlider
 |------|------|
 | Slider.vue | EvSlider SFC — props/emits, 드래그/스텝/툴팁/입력 로직 |
 | index.js | Vue 플러그인 등록 |
-| style/ | 스타일 |
 
 ## Dependencies
 

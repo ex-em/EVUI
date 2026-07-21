@@ -43,7 +43,7 @@ EvMessageBox (프로그램적 마운트)
 
 | 대상 | 용도 |
 |------|------|
-| 해당 없음 | — (message/notification 과 독립) |
+| `@/components/button` (EvButton) | confirm/cancel 버튼 렌더 (message/notification 과는 독립) |
 
 ## Glossary
 

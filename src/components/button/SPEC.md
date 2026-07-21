@@ -6,14 +6,14 @@
 
 ## Features
 
-- **유형**: `type`(default/primary/info/warning/error/ghost) — 색상/스타일.
+- **유형**: `type`(default/primary/info/warning/error/ghost/dashed/text) — 색상/스타일.
 - **모양/크기**: `shape`·`size`.
 - **네이티브 타입**: `htmlType`(button/submit/reset).
 - **상태**: `disabled`·`autoFocus`.
 
 ## Business Rules
 
-- `type` 은 default/primary/info/warning/error/ghost 중 하나.
+- `type` 은 default/primary/info/warning/error/ghost/dashed/text 중 하나(prop validator 없음, SCSS 로 8종 스타일 정의).
 - 슬롯으로 버튼 라벨/아이콘을 받는다.
 
 ## Acceptance Criteria

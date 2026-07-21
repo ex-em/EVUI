@@ -10,7 +10,7 @@
 - **행 선택**: `selected`(v-model) 단일/다중 행 선택. `clickEvent.onRowClick`(좌/우클릭 구분), `onRowDblClick`.
 - **체크박스**: `checked`(v-model)·`uncheckable`. `checkEvent.onCheck`/`onCheckAll`/`unCheckedRow`.
 - **행 확장**: `expanded`(v-model). `expandEvent.onExpanded`.
-- **정렬**: `sortEvent` — 다중 컬럼 정렬(`OrderQueue`), init/asc/desc 순환, `setSort`/`onSort`.
+- **정렬**: `sortEvent` — 단일 컬럼 정렬(`OrderQueue` 로 asc/desc/init 순환), `setSort`/`onSort`. 다른 컬럼 정렬 시 나머지 컬럼은 init 으로 초기화.
 - **필터**: `filterEvent` — 문자열/숫자/불리언 필터(`stringFilter`/`numberFilter`/`booleanFilter`), `findLike`, `onSearch` 검색.
 - **페이지네이션**: `pagingEvent` + `GridPagination`.
 - **컬럼 리사이즈/순서/표시설정**: `resizeEvent.onColumnResize`/`calculatedColumn`/`onResize`, `GridColumnSetting`. `resize-column`/`change-column-order`/`change-column-status`/`change-column-info` emit.
@@ -21,7 +21,7 @@
 ## Business Rules
 
 - 행 데이터는 내부적으로 인덱스 슬롯 구조로 관리된다: ROW_CHECK_INDEX=1, ROW_DATA_INDEX=2, ROW_SELECT_INDEX=3, ROW_EXPAND_INDEX=4, ROW_DISABLED_INDEX=6.
-- 정렬은 `OrderQueue` 로 다중 컬럼 순서를 유지하며 init 타입은 정렬 해제를 의미한다.
+- 정렬은 `OrderQueue`(asc/desc/init 순환)로 처리하며, 어느 시점에도 정렬 상태를 갖는 컬럼은 하나다(다른 컬럼 정렬 시 나머지는 init). init 타입은 정렬 해제를 의미한다.
 - 컬럼 표시설정(`getUpdatedColumns`)은 stores 기준으로 baseColumns 를 필터링해 재구성한다.
 - `option.adjust` 시 컬럼 너비를 그리드 너비에 맞춰 조정한다.
 - 가상 스크롤로 대량 행에서도 DOM 노드를 보이는 영역으로 제한한다.
@@ -75,7 +75,7 @@ uses.js: commonFunctions · scrollEvent · resizeEvent · clickEvent · checkEve
 
 | 용어 | 정의 |
 |------|------|
-| OrderQueue | 다중 컬럼 정렬 순서를 유지하는 큐 |
+| OrderQueue | 단일 컬럼의 정렬 방향(asc/desc/init)을 순환시키는 큐 |
 | renderer | `column.render.use` 로 지정하는 셀 커스텀 컴포넌트 |
 | vScroll/hScroll | 세로/가로 가상 스크롤 상태 |
 

@@ -8,13 +8,13 @@
 
 - **표시 제어**: `modelValue`(v-model). `update:modelValue` emit.
 - **범위**: `fullscreen` — 전체화면 오버레이 여부.
-- **외부 클릭**: `clickOutside` — 오버레이 클릭 처리. `click` emit.
+- **외부 클릭**: `clickOutside` — true면 오버레이에 클릭 리스너를 바인딩하고, 클릭 시 `update:modelValue`(false) 를 emit(닫기).
 - **아이콘**: `iconClass`·`iconStyle`.
 
 ## Business Rules
 
 - `fullscreen=true` 면 뷰포트 전체를 덮고, false 면 부모 영역에 국한된다.
-- 오버레이 클릭 시 `click` 을 emit 한다(`clickOutside` 정책).
+- `clickOutside` 가 true면 오버레이 클릭 시 `update:modelValue`(false) 를 emit 한다(닫기). 별도 `click` 이벤트는 emit 하지 않는다.
 
 ## Acceptance Criteria
 
@@ -41,4 +41,4 @@
 
 ## Data Flow
 
-`modelValue` → 표시 토글. 오버레이 클릭 → `click` emit.
+`modelValue` → 표시 토글. 오버레이 클릭(clickOutside=true) → `update:modelValue`(false) emit.

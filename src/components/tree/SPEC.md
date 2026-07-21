@@ -39,7 +39,6 @@ EvTree (allNodeInfo 평탄화 + contextMenu)
 |------|------|
 | Tree.vue | EvTree SFC — props/emits, allNodeInfo 관리, updateTreeUp, 컨텍스트 메뉴 |
 | index.js | Vue 플러그인 등록 |
-| style/ | 스타일 |
 
 ## Dependencies
 

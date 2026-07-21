@@ -65,11 +65,12 @@ uses.js(독립): commonFunctions · getUpdatedColumns · scrollEvent · resizeEv
 | `../grid/GridSummary` | 요약 행 재사용 |
 | `../grid/GridColumnSetting.vue` | 컬럼 설정 패널 재사용 |
 | `../grid/icon/icon-sort-button` | 정렬 버튼 아이콘 재사용 |
+| `../grid/uses` (columnSettingEvent) | 컬럼 설정 이벤트 컴포저블 재사용 |
 | `@/directives/resize` | 리사이즈 감지 |
 | vue3-observe-visibility | 가시성 관찰(가상 스크롤) |
 | lodash-es `cloneDeep` | 트리 데이터 복제 |
 
-> uses.js(이벤트 로직)는 grid 와 별개의 독립 구현이다 — grid/uses.js 를 import 하지 않고, 트리 계층 처리를 위해 자체 작성됨. UI 하위 컴포넌트만 grid 것을 재사용한다.
+> uses.js(이벤트 로직)는 grid/uses.js 를 import 하지 않는 독립 구현이다(트리 계층 처리를 위해 자체 작성). 단 TreeGrid.vue 는 grid 의 UI 하위 컴포넌트에 더해 grid/uses 의 `columnSettingEvent` 컴포저블도 재사용한다.
 
 ## Glossary
 

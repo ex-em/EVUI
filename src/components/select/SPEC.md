@@ -41,7 +41,6 @@ EvSelect (useModel + 드롭박스 로직)
 |------|------|
 | Select.vue | EvSelect SFC — props/emits, useModel(선택값), 드롭박스 위치/토글 |
 | index.js | Vue 플러그인 등록 |
-| style/ | 스타일 |
 
 ## Dependencies
 
