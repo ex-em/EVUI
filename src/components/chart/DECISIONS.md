@@ -18,6 +18,8 @@
 | 2026-06-01 | TimeCategoryScale 에 index window(minIndex/maxIndex, sentinel {0,-1}) 산출(`calculateScaleRange`) 추가 | axis range 로 일부만 보일 때 그릴 인덱스 범위를 스케일이 확정해 소비자 재계산·오설정을 차단 | 소비자마다 라벨 배열 재탐색, undefined=전체 관례(빈 윈도우와 모호) |
 | 2026-06-04 | 스크롤바 range 에 `anchorEdge`(start/end/null) 도입 — 가장자리 부착 의도 보존 | 리사이즈/데이터 갱신 시 사용자가 붙여둔 가장자리를 유지, minMax 미확정(null) 시 range 불변으로 `+null` 오염 방지 | 매번 옵션 range 로 리셋(사용자 위치 상실) |
 | 2026-06-10 | realtime scatter blit fast-path 도입 — 이전 점 라스터를 drawImage 로 좌측 시프트 + 신규 strip 만 재래스터 | 슬라이딩 윈도우 실시간 scatter 에서 틱당 전체 재래스터 비용 제거 | 매 틱 full redraw |
+| 2026-07-20 | 어노테이션/뱃지 모듈(annotation/) 추가 — `options.annotations` 선언형 API + 순수 함수 파이프라인(normalize→resolve→layout→render) + 전용 `annotation-canvas` 지연 생성 레이어 | 차트 위 라벨/뱃지/말풍선/강조를 선언형으로 얹되, 순수 함수로 테스트 용이성을 확보하고 전용 레이어로 series 재래스터와 분리(격리·미사용 시 비용 0) | series 버퍼에 직접 그리기(재래스터 결합·격리 불가), DOM 오버레이 컴포넌트(좌표 동기화 비용) |
+| 2026-07-20 | series 추적 어노테이션 `location` 의 `start`/`end` 를 데이터 있는(non-null) 첫/마지막 포인트로 정의 | 앞뒤 null 구간이 있는 시계열에서 빈 영역이 아니라 실제 데이터 경계에 어노테이션을 붙이기 위함 | 배열 물리 첫/마지막(0/length-1) 고정(null 구간에 표시됨) |
 | 2026-06-11 | 데이터 파이프라인에서 cloneDeep/반응성 제거 (`toRaw` unwrap + normalize 비-변형) | 매 틱 깊은 복제·proxy trap 비용 제거, 원본 불변 유지 | 매 갱신 cloneDeep, reactive 값 직접 소비 |
 | 2026-06-11 | 점 마커를 색상/그룹별 배치 렌더(`drawPointBatch`)로 전환, path-per-point 제거 | 다수 시리즈×다수 포인트에서 rasterizer flush 를 상수 회로 억제 | 포인트마다 beginPath/fill/stroke |
 | 2026-06-11 | blit fast-path 를 `chart.blit.js` 프로토타입 모듈로 추출 | 코어에서 fast-path 를 격리해 유지보수성 확보, 테스트가 `Object.create(prototype)` 로 호출 가능 | chart.core.js 인라인 유지 |
