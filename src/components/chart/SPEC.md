@@ -4,7 +4,7 @@
 
 EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. line/bar/pie/scatter/heatMap(+combo) 타입을 더블 버퍼(buffer→display) 렌더 파이프라인으로 그리고, 대량·실시간 워크로드를 위한 세 가지 성능 경로 — realtime scatter blit fast-path(이전 라스터 시프트 + 신규 strip만 재그림), worker(OffscreenCanvas) series 래스터 오프로드(opt-in), deep-watch opt-out(shallowDataWatch/shallowOptionsWatch) — 를 조건부로 제공한다. 줌(툴바/드래그/휠), 선택(selectItem/selectLabel/selectSeries), 툴팁/인디케이터/plotLine·plotBand, 내·외부 범례, EvChartGroup/EvChartBrush 연동(provide/inject)을 포함한다.
 
-이 문서는 차트 **루트 파일**(Chart.vue, ChartToolbar.vue, chart.core.js, chart.blit.js, chart.selection.js, chartZoom.core.js, uses.js, index.js)과 helpers/ 를 다룬다. plugins/element/scale/model 의 상세는 각 하위 SPEC( [./plugins/SPEC.md](./plugins/SPEC.md), [./element/SPEC.md](./element/SPEC.md), [./scale/SPEC.md](./scale/SPEC.md), [./model/SPEC.md](./model/SPEC.md) )에 위임한다.
+이 문서는 차트 **루트 파일**(Chart.vue, ChartToolbar.vue, chart.core.js, chart.blit.js, chart.selection.js, chartZoom.core.js, uses.js, index.js)과 helpers/ 를 다룬다. plugins/element/scale/model/annotation 의 상세는 각 하위 SPEC( [./plugins/SPEC.md](./plugins/SPEC.md), [./element/SPEC.md](./element/SPEC.md), [./scale/SPEC.md](./scale/SPEC.md), [./model/SPEC.md](./model/SPEC.md), [./annotation/SPEC.md](./annotation/SPEC.md) )에 위임한다.
 
 ## Features
 
@@ -17,6 +17,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - **선택**: `v-model:selectedItem`/`v-model:selectedLabel`/`v-model:selectedSeries`. selectSeries 활성 시 full redraw 직후 선택 line 을 한 번 더 덧그려 dimmed 시리즈 위 최상위로 통일(chart.selection.js).
 - **범례**: 내부 legend(icon/table/gradient) 및 external legend(`legend.external`) — `update:legendData` emit 과 템플릿 ref 메서드 `toggleSeries`/`highlightSeries`/`unhighlightSeries`/`redraw` 로 외부 범례 UI를 구성할 수 있다.
 - **부가 표시**: tooltip(html formatter 가상 스크롤 포함), indicator, maxTip, plotLine/plotBand/plotLabel(`plot.aboveSeries` 로 series 위/아래 결정), dragSelection(`drag-select` 이벤트), displayOverflow.
+- **어노테이션/뱃지**: `options.annotations` 선언으로 차트 위에 text/badge/callout/circle 을 pixel/axis/series 좌표로 표시. 전용 오버레이 캔버스(옵션 사용 시 지연 생성)에 순수 함수 파이프라인으로 렌더하며, series 추적 항목은 매 프레임 좌표를 재해석한다. 상세는 [./annotation/SPEC.md](./annotation/SPEC.md).
 - **축 스케일**: linear/time/time+categoryMode/log/step 5종 스케일 인스턴스를 `createAxes` 가 축 옵션 type 으로 생성. 상세는 [./scale/SPEC.md](./scale/SPEC.md).
 - **이벤트**: click(200ms 지연으로 dbl-click 과 구분), dbl-click, drag-select, mouse-move, click-legend, axes-scale-change(옵션 `scaleChange` 축만), axes-data-max-change(바인딩 시에만 집계·emit).
 - **차트 그룹 연동**: inject `isChartGroup`/`brushSeries`/`groupSelectedLabel`/`groupHoveredLabel`/`brushIdx`/`evChartPropsInGroup`/`groupInteraction` 으로 EvChartGroup/EvChartBrush 와 선택·hover 동기화(`drawSyncedIndicator`, `syncHover` 옵션), brush 인덱스 시프트 보정을 수행한다. 그룹 내 차트는 toolbar/zoom 모델을 만들지 않는다(그룹이 소유).
@@ -91,7 +92,8 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 │   ├─ workerRender ready → tryDrawSeriesOnWorker → render.worker.gate → worker         │
 │   └─ 기본 main full redraw                                                            │
 │ canvas 3장: displayCanvas / bufferCanvas / overlayCanvas(+brush 는 overlay 없음)       │
-│ element/(series 래스터) · scale/(축) — 각 하위 SPEC 참조                               │
+│  (+ annotation-canvas: options.annotations 사용 시 지연 생성하는 z-index 3 오버레이)   │
+│ element/(series 래스터) · scale/(축) · annotation/(어노테이션) — 각 하위 SPEC 참조     │
 └────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -106,7 +108,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 | Chart.vue | EvChart 컴포넌트 셸 — props/emits, deep/shallow watch, scheduleUpdate coalesce(+deferUntil), 그룹 inject, 라이프사이클(mount 시 EvChart 생성·init, unmount 시 destroy), 템플릿 ref 공개 메서드(redraw/toggleSeries/highlightSeries/unhighlightSeries/onResize) |
 | ChartToolbar.vue | 줌 툴바 아이콘 목록 렌더, 클릭 시 `onClickToolbar(e, iconType)` emit |
 | index.js | Vue plugin 등록(`EvChart.install`) |
-| chart.core.js | EvChart 클래스 — canvas 3장 생성, mixin 합성, init/update/render/resize/destroy, drawChart 오케스트레이션(ChartShell/RenderCore), worker 게이트 연동(commitWorkerFrame/drawSeriesLayerFallback), 축 생성·스케일 계산, external legend API, `_scaleVersion`/`renderEpoch` 관리 |
+| chart.core.js | EvChart 클래스 — canvas 3장 생성, mixin 합성, init/update/render/resize/destroy, drawChart 오케스트레이션(ChartShell/RenderCore), worker 게이트 연동(commitWorkerFrame/drawSeriesLayerFallback), 축 생성·스케일 계산, external legend API, annotation 레이어(ensureAnnotationCanvas/drawAnnotationLayer/buildAnnotationViewport, `_annotationSource` 참조 캐시), `_scaleVersion`/`renderEpoch` 관리 |
 | chart.blit.js | realtime scatter blit fast-path 프로토타입 모듈 — 게이트(evaluateBlitGate), ping-pong 레이어 관리(createPointsLayers/resizePointsLayers), 시프트+strip 본체(drawChartBlitFastPath), 합성(compositePointsLayer), baseline(rebuildPointsLayer/maybeRebuildPointsLayer, 스탬프), strip dedupe, hit-test 지연 재계산(ensureHitCoordsFresh), 진단(recordBlitDiag) |
 | chart.selection.js | selectSeries 선택 line 최상위 덧그리기 프로토타입 모듈 — line-safe 판정(selectedSeriesAllLineSafe/shouldDrawSelectedOnTop)과 부분 렌더(drawSelectedSeriesOnly) |
 | chartZoom.core.js | EvChartZoom 클래스 — executeZoom(index filter), dragZoom(time축), 휠 이동, 줌 이력(zoomAreaMemory previous/current/latest), 줌 애니메이션 canvas, 툴바 아이콘 상태 |
@@ -118,6 +120,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 | plugins/ | interaction/legend(+gradient)/tooltip(+virtualScroll)/title/scrollbar/pie 인스턴스 mixin — 상세는 [./plugins/SPEC.md](./plugins/SPEC.md) |
 | scale/ | linear/time/time.category/logarithmic/step 축 스케일 — 상세는 [./scale/SPEC.md](./scale/SPEC.md) |
 | model/ | 데이터셋/시리즈 모델(createSeriesSet·reconcileSeriesSet·createDataSet·createRealTimeScatterDataSet·getStoreMinMax 등 Model mixin) — 상세는 [./model/SPEC.md](./model/SPEC.md) |
+| annotation/ | `options.annotations` 선언형 어노테이션/뱃지 렌더(정규화→해석→레이아웃→렌더 순수 파이프라인, 전용 캔버스 레이어) — 상세는 [./annotation/SPEC.md](./annotation/SPEC.md) |
 | render/ | worker 렌더 인프라 — render.worker.gate.js(WorkerRenderGate 상태기계·frame/error handler), render.snapshot.js(toRenderSnapshot/packSeries), render.unpack.js, render.worker.js(worker entry) |
 | style/chart.scss | 차트 wrapper/legend/tooltip 등 스타일 |
 
