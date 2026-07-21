@@ -647,6 +647,11 @@ createApiDocsStore();
     font-size: 13px;
     font-weight: 700;
   }
+  /* full path 프리픽스: 이름은 굵게, 부모 경로는 muted */
+  .ad-row-path {
+    color: var(--ad-text-sub);
+    font-weight: 400;
+  }
   /* 중첩 객체 행: 하위 속성들의 소제목 역할 */
   .ad-group-row.is-object .ad-row-name {
     font-size: 14px;

@@ -54,7 +54,9 @@
         @click.stop="store.setActiveFromScroll(row.id)"
       >
         <div class="ad-row-head">
-          <code class="ad-row-name">{{ row.name }}</code>
+          <code class="ad-row-name">
+            <span class="ad-row-path">{{ rowParentPath(row) }}.</span>{{ row.name }}
+          </code>
           <span v-if="row.type" class="ad-badge ad-badge-type">{{ row.type }}</span>
           <span v-if="row.required" class="ad-badge ad-badge-required">required</span>
           <span v-if="row.default !== undefined" class="ad-badge ad-badge-default">
@@ -106,4 +108,10 @@ const parentPath = computed(() => {
   const lastDot = props.head.path.lastIndexOf('.');
   return lastDot < 0 ? '' : props.head.path.slice(0, lastDot);
 });
+
+// 행(leaf)의 부모 경로 — 헤더가 스크롤로 사라져도 full path를 알 수 있도록 프리픽스로 표시
+const rowParentPath = (row) => {
+  const lastDot = row.path.lastIndexOf('.');
+  return lastDot < 0 ? '' : row.path.slice(0, lastDot);
+};
 </script>
