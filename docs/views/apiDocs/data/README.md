@@ -87,6 +87,11 @@ PerfStressSingle: {
 | `npm run docs` / `npm run build:docs` | **대외용** | 숨김 (딥링크 접근도 차단) |
 | `npm run dev_docs` | 개발자용 | 표시 (`dev` 배지 부착) |
 
+**배포 환경에서 임시로 dev 예제 보기**: URL에 `?internal`을 붙이면(예:
+`https://.../api-docs/lineChart?internal`) 대외용 빌드에서도 개발자용 모드로
+전환됩니다. 모드는 진입 시 1회 평가되어 세션 동안 유지되고(네비게이션 시 URL에
+파라미터 보존), 끄려면 파라미터 없이 다시 진입하면 됩니다.
+
 ## playground 기반 예제의 조건
 
 `playground.example`이 가리키는 예제 컴포넌트는 setup에서 다음을 노출해야 합니다:

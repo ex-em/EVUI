@@ -366,12 +366,16 @@ export function createApiDocsStore() {
       (current.query.example || null) === (exampleKey?.name || null) &&
       (current.query.exampleFrom || null) === (exampleKey?.path || null);
     if (sameComponent && sameExample) return;
+    // 개발자용 모드 토글(?internal)은 네비게이션 간에도 URL에 보존해 공유 가능하게 한다
+    const preserved = current.query.internal !== undefined
+      ? { internal: current.query.internal }
+      : {};
     router.push({
       name: 'API Docs',
       params: { component: key },
       query: exampleKey
-        ? { example: exampleKey.name, exampleFrom: exampleKey.path }
-        : {},
+        ? { ...preserved, example: exampleKey.name, exampleFrom: exampleKey.path }
+        : preserved,
     });
   });
 
