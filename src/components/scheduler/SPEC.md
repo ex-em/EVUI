@@ -4,6 +4,8 @@
 
 행/열 라벨로 구성된 격자(예: 요일 × 시간대)에서 셀을 드래그 선택하는 스케줄러. 각 셀의 선택 여부를 행×열 2D 불리언 매트릭스 `modelValue` 로 관리한다.
 
+> **공식 API**: [docs/views/scheduler/api/scheduler.md](../../../docs/views/scheduler/api/scheduler.md)
+
 ## Features
 
 - **격자 선택**: `modelValue`(v-model, `boolean[][]`) — 행×열 셀 선택 여부 매트릭스. `update:modelValue` emit.

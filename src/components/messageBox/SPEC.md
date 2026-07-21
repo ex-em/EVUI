@@ -4,6 +4,8 @@
 
 확인(confirm)/경고/알림용 모달 다이얼로그. 제목·메시지·확인/취소 버튼을 갖추며, 프로그램적 호출(서비스)로 렌더되고 `unmount`/`onClose` 로 생명주기를 관리한다.
 
+> **공식 API**: [docs/views/messageBox/api/messageBox.md](../../../docs/views/messageBox/api/messageBox.md)
+
 ## Features
 
 - **유형**: `type` — 다이얼로그 종류(정보/경고/에러 등)에 따른 `iconClass`.

@@ -4,6 +4,8 @@
 
 여러 `EvButton` 을 시각적으로 묶어 배치하는 경량 래퍼. 슬롯으로 받은 버튼들을 하나의 그룹 스타일(인접 버튼 결합)로 렌더한다.
 
+> **공식 API**: [docs/views/button/api/button.md](../../../docs/views/button/api/button.md) — EvButton 문서(buttonGroup 예제 포함)
+
 ## Features
 
 - **버튼 묶음**: `<slot/>` 으로 받은 EvButton 들을 그룹 스타일로 배치.

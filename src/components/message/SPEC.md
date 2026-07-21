@@ -4,6 +4,8 @@
 
 짧은 상태 메시지를 잠깐 표시하는 컴포넌트. 프로그램적 호출로 렌더되며 유형·자동 사라짐(duration)·닫기 콜백을 지원한다. notification 보다 단순한 인라인/상단 메시지.
 
+> **공식 API**: [docs/views/message/api/message.md](../../../docs/views/message/api/message.md)
+
 ## Features
 
 - **내용/유형**: `type`·`message`·`iconClass`. `useHTML` 시 HTML 렌더.

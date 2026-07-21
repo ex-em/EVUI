@@ -4,6 +4,8 @@
 
 항목 목록(`items`)을 표시하는 네비게이션 메뉴. 선택 항목을 `modelValue`(v-model)로 관리하고 확장(expandable)·비활성을 지원한다.
 
+> **공식 API**: [docs/views/menu/api/menu.md](../../../docs/views/menu/api/menu.md)
+
 ## Features
 
 - **항목**: `items`(Array) 메뉴 항목.

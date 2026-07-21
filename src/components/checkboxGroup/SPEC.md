@@ -4,6 +4,8 @@
 
 여러 `EvCheckbox` 를 묶어 선택 값을 배열로 관리하는 그룹. 그룹 값과 변경 핸들러를 provide 하여 자식 체크박스가 참여하게 한다.
 
+> **공식 API**: [docs/views/checkbox/api/checkbox.md](../../../docs/views/checkbox/api/checkbox.md) — EvCheckbox 문서
+
 ## Features
 
 - **그룹 값**: `modelValue`(v-model) — 선택된 체크박스 값 배열. `update:modelValue`·`change` emit.

@@ -4,6 +4,8 @@
 
 계층(트리) 구조 데이터를 가상 스크롤로 렌더링하는 그리드. `EvGrid` 의 하위 UI 컴포넌트(페이지네이션·요약·컬럼설정·정렬버튼)를 **재사용**하되, 트리 특화 로직(노드 확장/접기, 부모-자식 연동 체크, 트리 필터)은 **독립 구현(`uses.js`)** 한다. 정렬·필터·페이지네이션·컬럼 리사이즈/표시설정·행 선택/체크·컨텍스트 메뉴를 제공한다.
 
+> **공식 API**: [docs/views/treeGrid/api/treeGrid.md](../../../docs/views/treeGrid/api/treeGrid.md)
+
 ## Features
 
 - **트리 노드 렌더**: `TreeGridNode` 로 계층 행을 렌더. `expandIcon`/`collapseIcon` prop 으로 토글 아이콘 지정.

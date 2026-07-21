@@ -4,6 +4,8 @@
 
 여러 개의 `EvChart` 를 하나의 그룹으로 묶어 **줌 범위·브러시·hover·선택 라벨을 동기화**하는 래퍼 컴포넌트. `provide/inject` 로 그룹 상태를 자식 차트에 내려보내, 자식들이 공통 zoom 인덱스와 상호작용 상태를 공유하게 한다. 그룹 전용 줌 툴바(previous/latest/reset/dragZoom)를 옵션으로 제공한다.
 
+> **공식 API**: [docs/views/zoomChart/api/zoomChart.md](../../../docs/views/zoomChart/api/zoomChart.md) — zoomChart 예제 페이지(EvChartGroup)
+
 ## Features
 
 - **그룹 줌 동기화**: `zoomStartIdx`/`zoomEndIdx`(v-model) 로 그룹 전체 차트의 표시 인덱스 범위를 일괄 제어. `chart/uses` 의 `useZoomModel` 에 위임한다.

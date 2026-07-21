@@ -4,6 +4,8 @@
 
 계층 데이터를 트리로 표시하는 컴포넌트. 노드 확장/접기, 체크박스(부모-자식 연동), 검색, 컨텍스트 메뉴, 클릭/더블클릭 선택을 지원한다. 그리드가 아닌 순수 트리 뷰이며, 노드 상태를 `allNodeInfo` 로 평탄화해 관리한다.
 
+> **공식 API**: [docs/views/tree/api/tree.md](../../../docs/views/tree/api/tree.md)
+
 ## Features
 
 - **트리 렌더**: `data`(Array) 를 재귀 노드(`TreeNode`)로 렌더. 빈 데이터는 `emptyText`("No Data").

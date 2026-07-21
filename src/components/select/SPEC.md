@@ -4,6 +4,8 @@
 
 단일/다중 선택 드롭다운 컴포넌트. 검색(필터), 체크박스 다중선택, 전체선택, 선택 태그 접기(collapseTags), 초기화(clearable)를 지원한다. `modelValue`(v-model) 는 선택 형태에 따라 boolean/string/number/array/object 를 모두 허용한다.
 
+> **공식 API**: [docs/views/select/api/select.md](../../../docs/views/select/api/select.md)
+
 ## Features
 
 - **선택**: `modelValue`(v-model) — 단일 또는 다중(`multiple`). `change` emit.

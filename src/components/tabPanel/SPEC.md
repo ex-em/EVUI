@@ -4,6 +4,8 @@
 
 `EvTabs` 의 개별 탭 컨텐츠를 담는 패널. 부모 Tabs 를 inject(`evTabs`) 하여 활성 여부에 따라 컨텐츠를 표시한다. 지연 렌더(lazy)를 지원한다.
 
+> **공식 API**: [docs/views/tab/api/tabs.md](../../../docs/views/tab/api/tabs.md) — EvTabs 문서(tabPanel 포함)
+
 ## Features
 
 - **패널 식별**: `value`(탭 식별자)·`text`(탭 라벨).

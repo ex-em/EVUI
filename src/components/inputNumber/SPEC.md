@@ -4,6 +4,8 @@
 
 숫자 전용 입력 컴포넌트. 최소/최대 제한, 스텝 증감, 소수 자릿수(precision), 후행 0 제거, 빈값 방지 등 숫자 입력 규칙을 강제한다.
 
+> **공식 API**: [docs/views/inputNumber/api/inputNumber.md](../../../docs/views/inputNumber/api/inputNumber.md)
+
 ## Features
 
 - **값 입력**: `modelValue`(v-model, [String, Number]). `input`/`change`/`focus`/`blur` emit.

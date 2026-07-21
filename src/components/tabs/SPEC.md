@@ -4,6 +4,8 @@
 
 탭 네비게이션 컴포넌트. 활성 탭을 `modelValue`(v-model) 로 제어하고, 탭 목록(`panels`)을 관리한다. 탭 닫기(closable), 너비 채움(stretch), 드래그 순서변경(draggable)을 지원한다. 탭 컨텐츠는 `EvTabPanel` 로 구성한다.
 
+> **공식 API**: [docs/views/tab/api/tabs.md](../../../docs/views/tab/api/tabs.md) — tab 문서
+
 ## Features
 
 - **활성 탭**: `modelValue`(v-model, [String, Number]) — 현재 탭. `change` emit.

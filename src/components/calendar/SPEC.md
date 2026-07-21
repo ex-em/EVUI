@@ -4,6 +4,8 @@
 
 날짜·날짜시간·다중/범위 선택을 지원하는 달력 컴포넌트. 날짜(date), 날짜시간(dateTime), 다중일(dateMulti), 날짜범위(dateRange), 날짜시간범위(dateTimeRange) 모드를 제공하고, 연/월/일/시각 테이블을 각각 구성한다. 날짜 문자열 포맷(`YYYY-MM-DD`, `YYYY-MM-DD HH:mm:ss`)을 검증한다.
 
+> **공식 API**: [docs/views/calendar/api/calendar.md](../../../docs/views/calendar/api/calendar.md)
+
 ## Features
 
 - **선택 모드**: `mode` = date/dateTime/dateMulti/dateRange/dateTimeRange. 모드별 단일값·배열값 처리.

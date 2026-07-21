@@ -4,6 +4,8 @@
 
 우클릭(또는 클릭)으로 표시되는 컨텍스트 메뉴. 메뉴 항목(`items`)을 받아 위치에 팝업으로 렌더한다. grid/treeGrid/tree 등에서 우클릭 메뉴로 소비된다.
 
+> **공식 API**: [docs/views/contextMenu/api/contextMenu.md](../../../docs/views/contextMenu/api/contextMenu.md)
+
 ## Features
 
 - **메뉴 항목**: `items`(Array) — 메뉴 항목 정의(라벨/클릭 핸들러/서브메뉴 등).

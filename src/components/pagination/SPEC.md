@@ -4,6 +4,8 @@
 
 페이지 이동 컨트롤. 전체 개수·페이지당 개수로 페이지 수를 계산하고, 표시 페이지 버튼 수·점프 단위·페이지 정보 표시·정렬(정렬 방향)을 지원한다.
 
+> **공식 API**: [docs/views/pagination/api/pagination.md](../../../docs/views/pagination/api/pagination.md)
+
 ## Features
 
 - **현재 페이지**: `modelValue`(v-model) — 현재 페이지. `update:modelValue`·`change` emit.

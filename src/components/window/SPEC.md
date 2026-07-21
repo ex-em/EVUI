@@ -4,6 +4,8 @@
 
 드래그·리사이즈·최대화·전체화면·모달을 지원하는 플로팅 윈도우(다이얼로그) 컴포넌트. `visible`(v-model) 로 표시를 제어하고, 헤더 드래그 이동·모서리 리사이즈·최대화 토글·ESC 닫기 등 데스크톱 윈도우 상호작용을 제공한다.
 
+> **공식 API**: [docs/views/window/api/window.md](../../../docs/views/window/api/window.md)
+
 ## Features
 
 - **표시 제어**: `visible`(v-model, `update:visible`) 로 열기/닫기.

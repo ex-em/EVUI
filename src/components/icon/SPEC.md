@@ -4,6 +4,8 @@
 
 아이콘을 표시하는 경량 컴포넌트. 아이콘 이름·크기·색상을 받고, 클릭/더블클릭/컨텍스트메뉴 이벤트를 전달한다.
 
+> **공식 API**: [docs/views/icon/api/icon.md](../../../docs/views/icon/api/icon.md)
+
 ## Features
 
 - **아이콘**: `icon`(아이콘 이름/클래스)·`size`·`color`.
