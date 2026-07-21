@@ -8,8 +8,8 @@
 
 - **표시 제어**: `visible`(v-model, `update:visible`) 로 열기/닫기.
 - **크기/위치**: `width`(기본 50vw)·`height`(기본 50vh)·`minWidth`/`minHeight`(기본 150).
-- **드래그 이동**: `draggable`(기본 true) — 헤더 드래그로 이동. `mousedown`/`mousedown-mousemove`/`mousedown-mouseup` emit.
-- **리사이즈**: `resizable`(기본 true) — 모서리 드래그. `resize` emit.
+- **드래그 이동**: `draggable`(기본 false) — 헤더 드래그로 이동. `mousedown`/`mousedown-mousemove`/`mousedown-mouseup` emit.
+- **리사이즈**: `resizable`(기본 false) — 모서리 드래그. `resize` emit.
 - **최대화/전체화면**: `maximizable`·`fullscreen`. `expand` emit.
 - **모달**: `isModal`·`closeOnClickModal` — 배경 오버레이 및 배경 클릭 닫기.
 - **닫기 옵션**: `escClose`(ESC 키), `focusable`, `hideScroll`.
@@ -17,7 +17,7 @@
 
 ## Business Rules
 
-- `draggable`·`resizable` 는 기본 활성(true), `isModal`·`fullscreen`·`maximizable`·`escClose`·`focusable`·`hideScroll` 는 기본 비활성.
+- `isModal`·`hideScroll` 는 기본 활성(true), `draggable`·`resizable`·`fullscreen`·`maximizable`·`escClose`·`focusable` 는 기본 비활성(false).
 - 크기 단위는 문자열(vw/vh/px) 또는 숫자를 허용한다.
 - 최대화/복원 아이콘(`maximizableIcon`)은 현재 확장 상태(`isFullExpandWindow`)에 따라 토글된다.
 
@@ -42,7 +42,6 @@ EvWindow
 |------|------|
 | Window.vue | EvWindow SFC — props/emits, 드래그/리사이즈/최대화 로직 |
 | index.js | Vue 플러그인 등록 |
-| style/ | 윈도우 스타일 |
 
 ## Dependencies
 

@@ -2,17 +2,17 @@
 
 ## Purpose
 
-행/열 라벨로 구성된 격자(예: 요일 × 시간대)에서 셀을 드래그 선택하는 스케줄러. 선택된 셀 좌표를 `modelValue`(배열)로 관리한다.
+행/열 라벨로 구성된 격자(예: 요일 × 시간대)에서 셀을 드래그 선택하는 스케줄러. 각 셀의 선택 여부를 행×열 2D 불리언 매트릭스 `modelValue` 로 관리한다.
 
 ## Features
 
-- **격자 선택**: `modelValue`(v-model, Array) — 선택된 셀 목록. `update:modelValue`(Array) emit.
+- **격자 선택**: `modelValue`(v-model, `boolean[][]`) — 행×열 셀 선택 여부 매트릭스. `update:modelValue` emit.
 - **축 라벨**: `colLabels`(열, 예: 시간대)·`rowLabels`(행, 예: 요일).
 - **드래그 선택**: 셀 드래그로 다중 선택/해제.
 
 ## Business Rules
 
-- `modelValue` 는 선택된 셀 좌표의 배열이다.
+- `modelValue` 는 rowLabels×colLabels 크기의 2D 불리언 매트릭스이며 `mv[행][열]` 가 해당 셀의 선택 여부다. 크기가 라벨과 불일치하면 전체 false 매트릭스로 초기화된다.
 - 행/열 라벨 배열의 크기가 격자 차원을 결정한다.
 
 ## Acceptance Criteria

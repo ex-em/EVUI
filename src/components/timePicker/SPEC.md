@@ -28,7 +28,7 @@
 ```
 EvTimePicker
 ├── 입력 필드(들) (single 또는 range 2개)
-└── 시각 선택 드롭다운 (시/분/초)
+└── 시각 입력 `<input>` (HH:mm 텍스트, ev-icon prefix)
 ```
 
 ## File Structure
@@ -42,7 +42,7 @@ EvTimePicker
 
 | 대상 | 용도 |
 |------|------|
-| 해당 없음 | — |
+| EvIcon (`<ev-icon>` 전역 컴포넌트) | 입력 prefix 시계 아이콘 |
 
 ## Glossary
 

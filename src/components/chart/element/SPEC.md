@@ -79,7 +79,7 @@ EvChart의 시리즈(그래프 본체)를 캔버스에 그리는 타입별 렌�
 - **combo 차트 히트 우선순위**: line 포인트 중심 직격(`directHit`)은 같은 좌표의 bar 박스 히트보다 우선한다. bar는 박스 내부 히트 시 `directHit = true`로 대항 표시한다(판정 자체는 plugins.interaction의 findHitItem).
 - **scatter dedupe 불변식**: dedupe on이면 한 좌표는 owner 시리즈만 그린다. blit 점 레이어에서는 "점당 정확히 1회 래스터"가 불변식이며, `drawn` 플래그는 실제 래스터 시점에만 set된다(`markDrawn` 전달 경로 한정 — buffer 직접 그리기는 레이어 상태를 오염시키지 않음).
 - **(렌더 성능 — 배칭)**: 다수 시리즈 × 다수 포인트에서 점당 beginPath/fill/stroke를 호출하지 않는다. line circle 포인트는 단일 path, 비-circle과 scatter는 색/그룹별 `drawPointBatch`로 rasterizer flush를 상수 회로 억제한다.
-- **(mousemove 핫패스 — 할당 억제)**: line의 valid 데이터 필터는 `(data 참조, length)` 키로 메모이즈(`_getValidGDataCache`), 히트 탐색은 이진 탐색, 색 변환은 인스턴스 캐시(line `_rgbaCache` 슬롯형 / scatter `_colorCache` 100개 FIFO)로 프레임당 반복 계산·할당을 제거한다.
+- **(mousemove 핫패스 — 할당 억제)**: line의 valid 데이터 필터는 `(data 참조, length)` 키로 메모이즈(`_getValidGData` 메서드 / `_validGDataCache` 캐시 필드), 히트 탐색은 이진 탐색, 색 변환은 인스턴스 캐시(line `_rgbaCache` 슬롯형 / scatter `_colorCache` 100개 FIFO)로 프레임당 반복 계산·할당을 제거한다.
 - **(기하 재계산 억제)**: line/bar는 `(dataEpoch, scaleVersion[, showIndex, showSeriesCount])` + data 참조 메모이즈로 hover 재렌더의 기하 재계산을 skip한다. 메모 키는 문자열이 아닌 숫자 필드 비교(수만 시리즈에서 키 문자열 할당 방지). TimeBar/Scatter/HeatMap은 메모이즈 없음.
 
 ## Acceptance Criteria

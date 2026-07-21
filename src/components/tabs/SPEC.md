@@ -38,7 +38,6 @@ EvTabs
 |------|------|
 | Tabs.vue | EvTabs SFC — props/emits, 활성 탭 v-model, 드래그 순서변경 |
 | index.js | Vue 플러그인 등록 |
-| style/ | 스타일 |
 
 ## Dependencies
 

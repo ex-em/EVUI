@@ -21,7 +21,7 @@
 - range 모드(dateRange/dateTimeRange)가 아니면 `mainValue` 는 단일값 경로로 처리한다.
 - `options.multiType` 은 weekday/week/date 중 하나, `multiDayLimit` 은 양수여야 유효.
 - `disabledDate` 는 함수 또는 날짜 배열로 비활성 날짜를 지정.
-- 시각 포맷은 `(HH|시)(mm|분)(ss|초)` 정규식으로 검증.
+- 시각 포맷은 `(HH|2[0-3]|[01][0-9]):(mm|[0-5][0-9]):(ss|[0-5][0-9])` 정규식으로 검증한다(리터럴 `HH`/`mm`/`ss` 또는 숫자 범위 허용).
 
 ## Acceptance Criteria
 

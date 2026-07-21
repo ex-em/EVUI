@@ -41,13 +41,13 @@ EvInputNumber
 |------|------|
 | InputNumber.vue | EvInputNumber SFC — props/emits, 숫자 검증/클램프/스텝/정밀도 |
 | index.js | Vue 플러그인 등록 |
-| style/ | 스타일 |
+| uses.js | 숫자 검증/클램프/스텝/정밀도 컴포저블 |
 
 ## Dependencies
 
 | 대상 | 용도 |
 |------|------|
-| 해당 없음 | — |
+| `@/common/utils` (getPrecision) | step/min 소수 자리(정밀도) 계산 |
 
 ## Glossary
 

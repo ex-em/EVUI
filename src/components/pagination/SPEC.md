@@ -45,7 +45,7 @@ EvPagination
 
 | 대상 | 용도 |
 |------|------|
-| 해당 없음 | — (grid/treeGrid 는 별도 GridPagination 사용) |
+| `@/components/icon` (EvIcon), `./pageButton` | 이전/다음/점프 아이콘·페이지 버튼 렌더 (grid/treeGrid 는 별도 GridPagination 사용) |
 
 ## Glossary
 
