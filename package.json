@@ -44,7 +44,7 @@
     "dayjs": "^1.11.19",
     "korean-regexp": "^1.0.10",
     "lodash-es": "^4.17.15",
-    "vue": "*",
+    "vue": "^3.5.8",
     "vue3-observe-visibility": "^1.0.1"
   },
   "devDependencies": {
