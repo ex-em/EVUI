@@ -33,7 +33,7 @@ EvChart 코어에 mixin되는 데이터 모델 계층이다. 사용자가 넘긴
 ### 조회 (model.store.js)
 
 - **시리즈 min/max**: `getSeriesMinMax(data, passingValue)`가 점객체 배열에서 minX/minY/maxX/maxY와 maxDomain(값 축 max 지점의 도메인 축 값)·maxDomainIndex를 계산한다. passingValue와 일치하는 `o`는 제외한다.
-- **스토어 min/max**: `getStoreMinMax()`가 show series의 `series.minMax`를 축 인덱스(xAxisIndex/yAxisIndex)별로 합산해 `{x[], y[]}` (min/max/maxSID)를 만든다. 스택 그룹 + 기존 max가 음수면 새 max로 무조건 교체하는 분기가 있다.
+- **스토어 min/max**: `getStoreMinMax()`가 show series의 `series.minMax`를 축 인덱스(xAxisIndex/yAxisIndex)별로 비교 기반 극값 선택으로 집계해 `{x[], y[]}` (min/max/maxSID)를 만든다(값을 더하는 게 아니라 축별 최소/최대를 취함). 스택 그룹 + 기존 max가 음수면 새 max로 무조건 교체하는 분기가 있다.
 - **가시 윈도우 max**: `getVisibleWindowMaxSeries(minIndex, maxIndex)`가 윈도우 안 visible series를 스캔해 최댓값 점 `{sId, value, index, domain}`을 반환한다(axis range로 일부만 보일 때 maxTip이 윈도우 밖 전역 max를 가리키지 않게). NaN/Infinity는 후보에서 제외, 윈도우가 비유한·역전이거나 유효값이 없으면 null.
 - **좌표 hit test**: `getHitItemByPosition(offset, useApproximate, dataIndex, useSelectLabelOrItem, disableNullLabelSnap)`이 선택 우선순위 (1) directHit(bar 박스 내부) 중 최근접 → (2) hit(line 근접 등) 중 최근접 → (3) 값 있는 series 중 박스 거리(`Util.calcBoxDistance`) 최근접 fallback으로 `{type, label, pos, value, sId, acc, useStack, dataIndex}`를 반환한다. dataIndex 미지정 시 유효 데이터가 있는 최근접 라벨로 스냅하며, `disableNullLabelSnap=true`(click/dblclick)면 all-null 라벨도 그대로 반환한다(sId='').
 - **라벨/아이템 조회**: `getItemByLabelIndex(labelIndex)`는 해당 라벨의 show series 중 최댓값 아이템을, `getItem(selectedInfo)`은 seriesID+dataIndex(또는 dataIndex 배열)로 selectLabel/selectItem indicator용 위치 정보를 반환한다(all-null 라벨은 첫 visible series로 sId/label 보정). `getLabelInfoByPosition(offset, targetAxis)`은 스크롤바 range·라벨 배열·hit test 세 경로로 클릭 라벨 인덱스를 계산하고, `getCurMouseLabelVal`은 마우스 위치의 라벨 값을 라벨 배열 또는 축 steps 역산으로 구한다.

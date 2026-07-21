@@ -88,4 +88,4 @@ SPEC.md / DECISIONS.md 는 해당 도메인의 진실의 원천(SSOT)이다 — 
 - 작업 전: 관련 SPEC.md 탐색 (하위 → 상위 순: `src/components/<도메인>/SPEC.md` → `src/components/SPEC.md`) → 없으면 생성 제안
 - 작업 중: Business Rules·Dependencies·Architecture 를 참조하여 코드 일관성 유지
 - 작업 후: 기능/규칙 변경 시 SPEC.md 업데이트 + DECISIONS.md 에 결정 행 추가 제안 (내부 리팩토링/버그 수정은 불필요)
-- chart 는 루트 `src/components/chart/SPEC.md` 외에 `plugins/`·`element/`·`scale/`·`model/` 하위 SPEC 으로 분할되어 있다 — 작업 위치에 가장 가까운 SPEC 이 우선
+- chart 는 루트 `src/components/chart/SPEC.md` 외에 `plugins/`·`element/`·`scale/`·`model/`·`annotation/` 하위 SPEC 으로 분할되어 있다 — 작업 위치에 가장 가까운 SPEC 이 우선
