@@ -2336,6 +2336,245 @@
               ]
             },
             {
+              "name": "annotations",
+              "type": "Array<Object>",
+              "default": "[]",
+              "description": "차트 위에 표시할 어노테이션/뱃지 목록입니다. 배열 순서가 그리는 순서(z-order, 뒤 항목이 위)이며, hover 하이라이트 위 전용 레이어에 그려집니다.",
+              "tryIt": {
+                "options": "{ annotations: [{ type: 'badge', content: 'Try It 뱃지', position: { type: 'pixel', x: 120, y: 60 } }] }"
+              },
+              "children": [
+                {
+                  "name": "id",
+                  "type": "String",
+                  "default": "'annotation-${index}'",
+                  "description": "식별/key 용도입니다. 중복 시 콘솔 경고가 표시됩니다."
+                },
+                {
+                  "name": "type",
+                  "type": "String",
+                  "default": "'text'",
+                  "values": [
+                    "'text'",
+                    "'badge'",
+                    "'callout'",
+                    "'circle'"
+                  ],
+                  "description": "어노테이션 외형 종류입니다. text=순수 텍스트, badge=배경 박스, callout=꼬리 말풍선, circle=강조 원형."
+                },
+                {
+                  "name": "content",
+                  "type": "String | Function",
+                  "default": "''",
+                  "description": "표시 텍스트입니다. 토큰({xValue}/{yValue}/{seriesId}/{seriesName}/{dataIndex}/{percentage})과 콜백(ctx=>string)을 지원하며 circle은 무시합니다."
+                },
+                {
+                  "name": "position",
+                  "type": "Object",
+                  "description": "위치 지정 방식입니다.",
+                  "children": [
+                    {
+                      "name": "type",
+                      "type": "String",
+                      "default": "'pixel'",
+                      "values": [
+                        "'axis'",
+                        "'pixel'",
+                        "'series'"
+                      ],
+                      "description": "위치 기준입니다. axis=축 값, pixel=캔버스 절대좌표, series=시리즈 데이터 포인트 추적."
+                    },
+                    {
+                      "name": "offsetX",
+                      "type": "Number",
+                      "default": "0",
+                      "description": "기준점으로부터 X 오프셋(px)입니다."
+                    },
+                    {
+                      "name": "offsetY",
+                      "type": "Number",
+                      "default": "0",
+                      "description": "기준점으로부터 Y 오프셋(px)입니다."
+                    },
+                    {
+                      "name": "x",
+                      "type": "Number",
+                      "default": "0",
+                      "description": "(pixel) 캔버스 좌상단(0,0) 기준 절대 X 좌표입니다."
+                    },
+                    {
+                      "name": "y",
+                      "type": "Number",
+                      "default": "0",
+                      "description": "(pixel) 캔버스 좌상단(0,0) 기준 절대 Y 좌표입니다."
+                    },
+                    {
+                      "name": "xAxisIndex",
+                      "type": "Number",
+                      "default": "0",
+                      "description": "(axis) 기준 X축 인덱스입니다."
+                    },
+                    {
+                      "name": "yAxisIndex",
+                      "type": "Number",
+                      "default": "0",
+                      "description": "(axis) 기준 Y축 인덱스입니다."
+                    },
+                    {
+                      "name": "xValue",
+                      "type": "Number | String",
+                      "default": "null",
+                      "description": "(axis) X축 값입니다. xValue/yValue를 모두 지정해야 표시됩니다."
+                    },
+                    {
+                      "name": "yValue",
+                      "type": "Number | String",
+                      "default": "null",
+                      "description": "(axis) Y축 값입니다."
+                    },
+                    {
+                      "name": "seriesId",
+                      "type": "String",
+                      "default": "null",
+                      "description": "(series) 추적할 시리즈 id입니다."
+                    },
+                    {
+                      "name": "location",
+                      "type": "String | Number",
+                      "default": "'end'",
+                      "description": "(series) 추적 위치입니다. 'start'/'end'(데이터 있는 non-null 첫/마지막) 또는 데이터 인덱스. 파이는 무시합니다."
+                    }
+                  ]
+                },
+                {
+                  "name": "connector",
+                  "type": "Object",
+                  "description": "데이터 지점과 박스를 잇는 연결선입니다(기본 비활성). callout은 꼬리가 대신하므로 무시합니다.",
+                  "children": [
+                    {
+                      "name": "enabled",
+                      "type": "Boolean",
+                      "default": "false",
+                      "description": "연결선 사용 여부입니다."
+                    },
+                    {
+                      "name": "type",
+                      "type": "String",
+                      "default": "'straight'",
+                      "values": [
+                        "'straight'",
+                        "'elbow'"
+                      ],
+                      "description": "선 모양입니다."
+                    },
+                    {
+                      "name": "style",
+                      "type": "Object",
+                      "description": "연결선 스타일입니다.",
+                      "children": [
+                        {
+                          "name": "stroke",
+                          "type": "String",
+                          "default": "'#9E9E9E'",
+                          "description": "선 색상입니다."
+                        },
+                        {
+                          "name": "strokeWidth",
+                          "type": "Number",
+                          "default": "1",
+                          "description": "선 두께입니다."
+                        },
+                        {
+                          "name": "dashStyle",
+                          "type": "String",
+                          "default": "'solid'",
+                          "values": [
+                            "'solid'",
+                            "'dash'",
+                            "'dot'"
+                          ],
+                          "description": "점선 스타일입니다."
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "style",
+                  "type": "Object",
+                  "default": "type별 기본값",
+                  "description": "외형/말풍선/도형 속성입니다. type별 기본값이 적용됩니다.",
+                  "children": [
+                    {
+                      "name": "color",
+                      "type": "String",
+                      "description": "글자 색입니다. (text/badge/callout)"
+                    },
+                    {
+                      "name": "backgroundColor",
+                      "type": "String",
+                      "description": "배경 색입니다('transparent' 가능)."
+                    },
+                    {
+                      "name": "borderColor",
+                      "type": "String",
+                      "description": "테두리 색입니다."
+                    },
+                    {
+                      "name": "borderWidth",
+                      "type": "Number",
+                      "description": "테두리 두께입니다."
+                    },
+                    {
+                      "name": "borderRadius",
+                      "type": "Number",
+                      "description": "모서리 둥글기입니다. (text/badge/callout)"
+                    },
+                    {
+                      "name": "padding",
+                      "type": "Number | Array",
+                      "description": "안쪽 여백입니다. n / [상하,좌우] / [상,우,하,좌]. (text/badge/callout)"
+                    },
+                    {
+                      "name": "fontSize",
+                      "type": "String",
+                      "description": "글자 크기입니다(예: '11px'). (text/badge/callout)"
+                    },
+                    {
+                      "name": "fontWeight",
+                      "type": "String",
+                      "description": "글자 굵기입니다. (text/badge/callout)"
+                    },
+                    {
+                      "name": "fontFamily",
+                      "type": "String",
+                      "description": "글꼴입니다. (text/badge/callout)"
+                    },
+                    {
+                      "name": "textAlign",
+                      "type": "String",
+                      "description": "정렬입니다. (text/badge/callout)"
+                    },
+                    {
+                      "name": "anchor",
+                      "type": "String",
+                      "description": "꼬리 방향입니다('auto'는 offset 방향으로 결정). (callout)"
+                    },
+                    {
+                      "name": "arrowSize",
+                      "type": "Number",
+                      "description": "꼬리 크기입니다. (callout)"
+                    },
+                    {
+                      "name": "radius",
+                      "type": "Number",
+                      "description": "원 반지름입니다. (circle)"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "name": "tooltip",
               "type": "Object",
               "description": "차트에 마우스를 올릴 경우 표시되는 툴팁의 표시 여부 및 속성입니다.",
