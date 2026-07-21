@@ -197,11 +197,17 @@ export const pageByKey = Object.fromEntries(PAGES.map((entry) => [entry.key, ent
 export const pageByRoute = Object.fromEntries(PAGES.map((entry) => [entry.route, entry]));
 
 /**
- * 문서 실행 모드.
- * - `npm run docs` / `build:docs` = 대외용 → 예제 정의의 devOnly: true 항목 숨김
- * - `npm run dev_docs`(--mode internal) = 개발자용 → 전부 표시
+ * 문서 실행 모드(개발자용 여부).
+ * - `npm run dev_docs`(--mode internal) = 빌드 시점부터 개발자용
+ * - `npm run docs` / `build:docs`(대외용) 이더라도 URL에 `?internal`이 있으면
+ *   런타임에 개발자용으로 전환 → 배포 환경에서도 dev 예제 확인 가능
+ * 모듈 로드 시 1회 평가되며, 세션 동안 유지된다(끄려면 파라미터 없이 재진입).
  */
-export const IS_INTERNAL_DOCS = import.meta.env.MODE === 'internal';
+const hasInternalQuery = () => {
+  if (typeof window === 'undefined') return false;
+  return new URLSearchParams(window.location.search).has('internal');
+};
+export const IS_INTERNAL_DOCS = import.meta.env.MODE === 'internal' || hasInternalQuery();
 
 /** 현재 모드에서 노출 가능한 예제인지 */
 export const isExampleVisible = (def) => IS_INTERNAL_DOCS || !def?.devOnly;
