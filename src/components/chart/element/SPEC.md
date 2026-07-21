@@ -10,7 +10,7 @@ EvChart의 시리즈(그래프 본체)를 캔버스에 그리는 타입별 렌�
 
 ### 공통 계약 (duck-typed 인터페이스)
 
-- **시리즈 생성**: 생성자 `(sId, opt, sIdx, ...)` — 타입별 기본 옵션(`LINE_OPTION`/`BAR_OPTION`/`PIE_OPTION`/`HEAT_MAP_OPTION`, `helpers.constant`)을 사용자 옵션과 병합해 인스턴스 프로퍼티로 평탄화한다(사용자 옵션 우선). `name` 미지정 시 `series-${sIdx}`, `color` 미지정 시 `COLOR[sIdx % COLOR.length]` 순환 배정.
+- **시리즈 생성**: 생성자 `(sId, opt, sIdx, ...)` — 타입별 기본 옵션(`LINE_OPTION`/`BAR_OPTION`/`PIE_OPTION`, `helpers.constant`)을 사용자 옵션과 병합해 인스턴스 프로퍼티로 평탄화한다(사용자 옵션 우선). `name` 미지정 시 `series-${sIdx}`, `color` 미지정 시 `COLOR[sIdx % COLOR.length]` 순환 배정. **HeatMap만 예외** — 생성자가 `(sId, opt, colorOpt, isHorizontal, isGradient)`로 3번째 인자가 `sIdx`가 아니라 `colorOpt`이며(`sIdx` 파라미터 없음, `HEAT_MAP_OPTION` 병합), name/color 기본값을 배정하지 않고 `createColorState(colorOpt)`로 색상 상태를 만든다(`COLOR` import 없음).
 - **래스터 패스 `draw(param)`**: `param = { ctx, chartRect, labelOffset, axesSteps, legendHitInfo, selectLabel, selectItem, selectSeries, isBrush, unSelectedOpacity, displayOverflow, ... }`. `this.show === false`면 즉시 반환. Pie만 시그니처가 다르다(`draw(context, strokeOptions, unSelectedOpacity)`).
 - **기하 패스 `computeGeometry(param)`**: 캔버스 그리기 없이 각 데이터 아이템의 픽셀 기하(`item.xp/yp[/w/h]`)를 main 모델에 채운다. 히트 테스트가 이 값을 소비한다. draw는 내부에서 computeGeometry를 먼저 호출한 뒤 그 값을 읽기만 하고 mutate하지 않는다(worker offload 시 main 기하 유지 목적). **Pie는 computeGeometry가 없다** — 각도 기하(centerX/centerY/radius/startAngle/endAngle)를 `plugins/plugins.pie.js`가 계산해 인스턴스에 저장한다.
 - **히트 테스트 `findGraphData(offset, ...)`**: 마우스 좌표로 그래프 아이템을 찾아 `{ data, hit, color, index, directHit? }`를 반환. Line/Bar는 `(offset, isHorizontal, dataIndex, useSelectLabelOrItem)` 4-인자, Scatter/Pie/HeatMap은 `offset`만 사용.

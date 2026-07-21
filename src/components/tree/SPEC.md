@@ -18,6 +18,7 @@
 ## Business Rules
 
 - 노드 상태는 `allNodeInfo` 배열에 평탄화되어 각 노드의 parent 키로 상위 탐색(`updateTreeUp`)이 가능하다.
+- **[NEEDS CLARIFICATION]** `data` 는 배열이고 템플릿은 `v-for` 로 모든 루트를 렌더하지만, `allNodeInfo` 는 첫 루트(`treeNodeData[0]`)의 서브트리만 평탄화한다(Tree.vue:150-151, watch 재구성도 동일). 다중 루트 데이터에서 두 번째 이후 루트는 `allNodeInfo` 기반 상향 탐색·체크 전파·검색 대상에서 빠진다 — 다중 루트 공식 지원 여부 확인 필요.
 - 체크박스 사용 시 자식 체크 변화가 부모로 전파된다(`updateTreeUp`).
 - `searchIncludeChildren=true` 면 검색 매칭 노드의 자식도 표시에 포함한다.
 - 내부적으로 `TreeNode` 컴포넌트를 재귀 사용한다.
@@ -55,13 +56,13 @@ EvTree (allNodeInfo 평탄화 + contextMenu)
 
 | 용어 | 정의 |
 |------|------|
-| allNodeInfo | 모든 노드를 평탄화해 parent/node 를 담는 배열 |
+| allNodeInfo | 첫 루트(`treeNodeData[0]`)의 서브트리를 평탄화해 parent/node 를 담는 배열 (다중 루트 미포함 — Business Rules 참조) |
 | updateTreeUp | 자식 상태 변화를 부모로 전파하는 상향 갱신 |
 
 ## Data Flow
 
 ```
-props.data ──> treeNodeData ──> allNodeInfo(평탄화)
+props.data ──> treeNodeData ──> allNodeInfo(첫 루트 서브트리 평탄화)
 노드 토글/체크 ──updateTreeUp──> 부모 상태 갱신 ──emit(check)
 클릭 ──emit(click-node/dblclick-node)
 검색(searchWord) ──> 매칭 노드(+자식) 표시
