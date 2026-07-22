@@ -1,22 +1,22 @@
 <template>
-  <li v-if="store.isVisible(node.id)" class="ad-tree-node">
+  <li v-if="store.isVisible(node.id)" class="apidoc-tree-node">
     <div
       ref="rowRef"
-      class="ad-tree-row"
+      class="apidoc-tree-row"
       :class="{ 'is-active': isActive }"
       :style="{ paddingLeft: `${10 + node.depth * 14}px` }"
       @click="store.selectNode(node.id)"
     >
       <span
-        class="ad-tree-caret"
+        class="apidoc-tree-caret"
         :class="{ 'is-open': hasChildren && store.isExpanded(node.id), 'is-leaf': !hasChildren }"
         @click.stop="hasChildren && store.toggleExpand(node.id)"
       />
-      <span class="ad-tree-label">{{ node.name }}</span>
-      <span v-if="node.required" class="ad-tree-required">*</span>
-      <span v-if="hasChildren" class="ad-tree-count">{{ node.childIds.length }}</span>
+      <span class="apidoc-tree-label">{{ node.name }}</span>
+      <span v-if="node.required" class="apidoc-tree-required">*</span>
+      <span v-if="hasChildren" class="apidoc-tree-count">{{ node.childIds.length }}</span>
     </div>
-    <ul v-if="hasChildren && store.isExpanded(node.id)" class="ad-tree-children">
+    <ul v-if="hasChildren && store.isExpanded(node.id)" class="apidoc-tree-children">
       <ApiTreeNode v-for="childId in node.childIds" :key="childId" :node="store.getNode(childId)" />
     </ul>
   </li>

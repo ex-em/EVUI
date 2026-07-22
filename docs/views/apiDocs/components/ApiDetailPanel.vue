@@ -1,24 +1,24 @@
 <template>
   <section
     ref="scrollRef"
-    class="ad-detail"
+    class="apidoc-detail"
     :class="{ 'is-example': !!store.selectedExample.value }"
     @scroll.passive="onScroll"
   >
     <!-- 예제 뷰: Examples 탭에서 예제 선택 시 -->
     <template v-if="store.selectedExample.value">
-      <header class="ad-detail-intro ad-example-intro">
+      <header class="apidoc-detail-intro apidoc-example-intro">
         <div>
-          <p class="ad-example-group">{{ store.selectedExample.value.label }}</p>
-          <h1 class="ad-detail-component">{{ store.selectedExample.value.name }}</h1>
+          <p class="apidoc-example-group">{{ store.selectedExample.value.label }}</p>
+          <h1 class="apidoc-detail-component">{{ store.selectedExample.value.name }}</h1>
           <!-- 예제 설명은 props.js에서 HTML을 포함할 수 있어 v-html로 렌더링 (Example.vue와 동일) -->
           <p
             v-if="store.selectedExample.value.description"
-            class="ad-detail-summary"
+            class="apidoc-detail-summary"
             v-html="store.selectedExample.value.description"
           />
         </div>
-        <button class="ad-example-back" @click="store.clearExample()">← API 문서</button>
+        <button class="apidoc-example-back" @click="store.clearExample()">← API 문서</button>
       </header>
       <Example
         :key="`${store.currentKey.value}_${store.selectedExample.value.name}`"
@@ -31,24 +31,24 @@
 
     <!-- md 폴백 뷰: JSON 문서가 없는 컴포넌트는 기존 md를 렌더링 -->
     <template v-else-if="!store.doc.value">
-      <header class="ad-detail-intro">
-        <h1 class="ad-detail-component">{{ store.currentPage.value?.label }}</h1>
-        <p class="ad-detail-summary">
+      <header class="apidoc-detail-intro">
+        <h1 class="apidoc-detail-component">{{ store.currentPage.value?.label }}</h1>
+        <p class="apidoc-detail-summary">
           아직 대화형 문서가 준비되지 않아 기존 문서(md)를 표시합니다.
         </p>
       </header>
-      <MarkdownView class="ad-md-fallback" :source="store.currentPage.value?.page?.mdText || ''" />
+      <MarkdownView class="apidoc-md-fallback" :source="store.currentPage.value?.page?.mdText || ''" />
     </template>
 
     <!-- API 문서 뷰 -->
     <template v-else>
-      <header class="ad-detail-intro">
-        <h1 class="ad-detail-component">{{ store.doc.value.component }}</h1>
-        <p class="ad-detail-summary">{{ store.doc.value.description }}</p>
+      <header class="apidoc-detail-intro">
+        <h1 class="apidoc-detail-component">{{ store.doc.value.component }}</h1>
+        <p class="apidoc-detail-summary">{{ store.doc.value.description }}</p>
       </header>
 
       <template v-for="section in store.visibleSections.value" :key="section.kind">
-        <h2 class="ad-detail-section">{{ section.label }}</h2>
+        <h2 class="apidoc-detail-section">{{ section.label }}</h2>
         <ApiDetailGroup
           v-for="block in section.blocks"
           :key="block.head.id"
@@ -57,7 +57,7 @@
         />
       </template>
 
-      <p v-if="!store.visibleSections.value.length" class="ad-empty">검색 결과가 없습니다.</p>
+      <p v-if="!store.visibleSections.value.length" class="apidoc-empty">검색 결과가 없습니다.</p>
     </template>
   </section>
 </template>

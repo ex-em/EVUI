@@ -1,26 +1,26 @@
 <template>
   <aside
-    class="ad-tryit"
+    class="apidoc-tryit"
     :class="{ 'is-open': !!node, 'is-resizing': isResizing }"
     :style="panelStyle"
   >
     <template v-if="node">
-      <div class="ad-tryit-resize-handle" @mousedown="startResize" />
-      <header class="ad-tryit-header">
-        <div class="ad-tryit-title">
-          <span class="ad-badge" :class="`ad-badge-kind-${node.kind}`">{{ node.kind }}</span>
-          <code class="ad-tryit-path">{{ node.path }}</code>
+      <div class="apidoc-tryit-resize-handle" @mousedown="startResize" />
+      <header class="apidoc-tryit-header">
+        <div class="apidoc-tryit-title">
+          <span class="apidoc-badge" :class="`apidoc-badge-kind-${node.kind}`">{{ node.kind }}</span>
+          <code class="apidoc-tryit-path">{{ node.path }}</code>
         </div>
-        <button class="ad-tryit-close" title="닫기" @click="store.closeTryIt()">✕</button>
+        <button class="apidoc-tryit-close" title="닫기" @click="store.closeTryIt()">✕</button>
       </header>
 
-      <div v-if="playground" class="ad-tryit-body">
+      <div v-if="playground" class="apidoc-tryit-body">
         <!-- 라이브 미리보기 -->
-        <div class="ad-tryit-live">
+        <div class="apidoc-tryit-live">
           <!-- 시딩 단계: 예제 컴포넌트를 잠시 렌더링해 초기 chartData/chartOptions 추출 -->
           <component :is="playground.component" v-if="!seeded" ref="pgCompRef" />
           <!-- 시딩 후: 패널 소유 컴포넌트(playground.tag) — 문서의 Events 섹션 기반 리스너 연결 -->
-          <div v-else class="ad-tryit-chart">
+          <div v-else class="apidoc-tryit-chart">
             <component
               :is="playground.tag"
               :data="liveData"
@@ -31,17 +31,17 @@
         </div>
 
         <!-- 에디터/이벤트 영역 -->
-        <div class="ad-tryit-editor">
-          <div class="ad-tryit-editor-tabs">
+        <div class="apidoc-tryit-editor">
+          <div class="apidoc-tryit-editor-tabs">
             <button
               v-for="tab in EDITOR_TABS"
               :key="tab.key"
-              class="ad-tryit-editor-tab"
+              class="apidoc-tryit-editor-tab"
               :class="{ 'is-active': editorTab === tab.key }"
               @click="editorTab = tab.key"
             >
               {{ tab.label }}
-              <span v-if="tab.key === 'events' && eventLog.length" class="ad-tryit-event-count">
+              <span v-if="tab.key === 'events' && eventLog.length" class="apidoc-tryit-event-count">
                 {{ eventLog.length }}
               </span>
             </button>
@@ -63,28 +63,28 @@
           />
 
           <!-- Events 콘솔 -->
-          <div v-show="editorTab === 'events'" class="ad-tryit-console">
-            <div class="ad-tryit-console-bar">
-              <span class="ad-tryit-console-info">
+          <div v-show="editorTab === 'events'" class="apidoc-tryit-console">
+            <div class="apidoc-tryit-console-bar">
+              <span class="apidoc-tryit-console-info">
                 connected: <code>{{ eventNames.join(', ') || '없음' }}</code>
               </span>
-              <button class="ad-tryit-console-clear" @click="clearLog">Clear</button>
+              <button class="apidoc-tryit-console-clear" @click="clearLog">Clear</button>
             </div>
-            <div ref="consoleRef" class="ad-tryit-console-body">
-              <p v-if="!eventLog.length" class="ad-tryit-console-empty">
+            <div ref="consoleRef" class="apidoc-tryit-console-body">
+              <p v-if="!eventLog.length" class="apidoc-tryit-console-empty">
                 차트를 클릭·드래그하면 이벤트 로그가 여기에 출력됩니다.
               </p>
-              <div v-for="entry in eventLog" :key="entry.seq" class="ad-tryit-console-line">
-                <span class="ad-tryit-console-time">{{ entry.time }}</span>
-                <span class="ad-tryit-console-name">{{ entry.name }}</span>
-                <span class="ad-tryit-console-payload">{{ entry.payload }}</span>
+              <div v-for="entry in eventLog" :key="entry.seq" class="apidoc-tryit-console-line">
+                <span class="apidoc-tryit-console-time">{{ entry.time }}</span>
+                <span class="apidoc-tryit-console-name">{{ entry.name }}</span>
+                <span class="apidoc-tryit-console-payload">{{ entry.payload }}</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <p v-else class="ad-empty">
+      <p v-else class="apidoc-empty">
         이 컴포넌트는 아직 플레이그라운드 예제가 등록되지 않았습니다.<br />
         (JSON 문서의 playground 필드로 지정합니다)
       </p>
