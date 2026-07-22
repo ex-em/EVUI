@@ -74,6 +74,31 @@
       <button class="btn" @click="toggleComp4">Toggle Component 4</button>
     </div>
   </div>
+  <div class="case">
+    <p class="case-title">Scroll To Active Tab (has-scroll)</p>
+    <div class="tab-wrapper scroll-tab-wrapper">
+      <ev-tabs v-model="selectedValue3" v-model:panels="tabPanels3">
+        <ev-tab-panel
+          v-for="(item, idx) in tabPanels3"
+          :key="`${item.value}_${idx}`"
+          :text="item.text"
+          :value="item.value"
+        >
+          <div class="scroll-tab-content">{{ item.content }}</div>
+        </ev-tab-panel>
+      </ev-tabs>
+    </div>
+    <div class="description">
+      선택된 탭:
+      <b>{{ selectedValue3 }}</b>
+      <br />
+      <button class="btn" @click="selectValue3('tab1')">첫 탭 선택</button>
+      &nbsp;&nbsp;&nbsp;
+      <button class="btn" @click="selectValue3('tab8')">중간 탭 선택</button>
+      &nbsp;&nbsp;&nbsp;
+      <button class="btn" @click="selectValue3('tab15')">마지막 탭 선택</button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -158,6 +183,19 @@ export default {
       },
     ]);
 
+    // has-scroll 상태에서 선택 탭 자동 스크롤 데모 (초기값을 마지막 탭으로 지정)
+    const selectedValue3 = ref('tab15');
+    const tabPanels3 = ref(
+      Array.from({ length: 15 }, (_, i) => ({
+        text: `LABEL${i + 1}`,
+        value: `tab${i + 1}`,
+        content: `content${i + 1}`,
+      })),
+    );
+    const selectValue3 = (val) => {
+      selectedValue3.value = val;
+    };
+
     const toggleComp4 = () => {
       const comp4Idx = tabPanels2.value.findIndex((v) => v.value === 'comp4');
       if (comp4Idx < 0) {
@@ -183,6 +221,10 @@ export default {
       selectedValue2,
       tabPanels2,
       toggleComp4,
+
+      selectedValue3,
+      tabPanels3,
+      selectValue3,
     };
   },
 };
@@ -209,5 +251,15 @@ export default {
   .ev-tabs-title {
     width: 150px;
   }
+}
+
+// 탭 15개가 폭을 넘겨 has-scroll 이 확실히 발생하도록 래퍼 폭 제한
+.scroll-tab-wrapper {
+  width: 500px;
+  max-width: 100%;
+}
+
+.scroll-tab-content {
+  padding: 20px;
 }
 </style>

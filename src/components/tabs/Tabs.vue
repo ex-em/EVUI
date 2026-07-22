@@ -27,7 +27,10 @@
           </span>
         </template>
         <div ref="listWrapperRef" class="ev-tabs-list-wrapper">
-          <ul ref="listRef" class="ev-tabs-list" :style="listRefStyle">
+          <!-- ul 폭(탭 개수·라벨·아이콘 변화) 자체를 감시해 has-scroll 을 재계산한다.
+               섹션 v-resize 는 뷰포트(섹션) 폭만 잡으므로 리스트 콘텐츠 폭 변화는 여기서 담당.
+               (부수효과로 resize 디렉티브가 position:relative 를 걸어 li 의 offsetParent 가 ul 로 확정됨) -->
+          <ul ref="listRef" v-resize="onResize" class="ev-tabs-list" :style="listRefStyle">
             <li
               v-for="(item, idx) in computedTabList"
               :key="`${item.value}_${idx}`"
@@ -63,7 +66,16 @@
 </template>
 
 <script>
-import { ref, reactive, computed, provide, triggerRef, onBeforeUpdate, nextTick } from 'vue';
+import {
+  ref,
+  reactive,
+  computed,
+  provide,
+  triggerRef,
+  onBeforeUpdate,
+  nextTick,
+  watch,
+} from 'vue';
 import { ObserveVisibility as vObserveVisibility } from 'vue3-observe-visibility';
 import { resize } from '@/directives/resize';
 
@@ -156,6 +168,47 @@ export default {
     }));
 
     /**
+     * 선택된(active) 탭이 헤더 뷰포트 밖에 있으면 뷰포트 안으로 들어오도록 스크롤한다.
+     * modelValue 변경 및 최초 렌더/리사이즈 시점에 호출된다.
+     */
+    const scrollToActiveTab = () => {
+      if (!hasScroll.value || !listRef.value || !listWrapperRef.value) {
+        return;
+      }
+      const activeIdx = computedTabList.value.findIndex((v) => v.value === mv.value);
+      if (activeIdx < 0) {
+        return;
+      }
+      const activeEl = listRef.value.children[activeIdx];
+      if (!activeEl) {
+        return;
+      }
+      const listWrapperWidth = listWrapperRef.value.offsetWidth;
+      const listWidth = listRef.value.offsetWidth;
+      const widthLimit = listWrapperWidth - listWidth;
+      // ul(listRef)에는 transform 이 걸려 있어 offsetParent 가 ul 이 되므로,
+      // li 의 offsetLeft 는 이미 ul(=translateX 가 슬라이드하는 좌표계) 기준이다.
+      const activeLeft = activeEl.offsetLeft;
+      const activeRight = activeLeft + activeEl.offsetWidth;
+      const viewLeft = -translateScroll.x;
+      const viewRight = viewLeft + listWrapperWidth;
+
+      const lastIdx = computedTabList.value.length - 1;
+      let nextX = translateScroll.x;
+      if (activeLeft < viewLeft) {
+        // 선택 탭이 뷰포트 왼쪽 밖 → 왼쪽 끝을 뷰포트 시작에 맞춤
+        // 첫 탭이면 0 으로 스냅해 리스트(ul) 좌측 border 까지 노출
+        nextX = activeIdx === 0 ? 0 : -activeLeft;
+      } else if (activeRight > viewRight) {
+        // 선택 탭이 뷰포트 오른쪽 밖 → 오른쪽 끝을 뷰포트 끝에 맞춤
+        // 마지막 탭이면 widthLimit(절대 끝)으로 스냅해 리스트(ul) 우측 border 까지 노출
+        nextX = activeIdx === lastIdx ? widthLimit : listWrapperWidth - activeRight;
+      }
+      // 스크롤 가능 범위 [widthLimit, 0] 로 클램프
+      translateScroll.x = Math.min(0, Math.max(widthLimit, nextX));
+    };
+
+    /**
      * 상단 탭 nav의 element 길이를 감시 및 계산하여 스크롤 여부 확인
      * UL의 길이가 긴 경우 양쪽에 버튼 노출
      */
@@ -169,10 +222,18 @@ export default {
         if (widthLimit > translateScroll.x) {
           translateScroll.x = widthLimit;
         }
+        // has-scroll 전환 시 화살표 padding(좌우 40px)이 적용되어 뷰포트 폭이 바뀌므로,
+        // DOM 갱신 이후의 폭을 기준으로 스크롤 위치를 계산한다.
+        nextTick(scrollToActiveTab);
       } else {
         translateScroll.x = 0;
       }
     };
+
+    // modelValue(선택 탭) 변경 시 헤더가 선택 탭을 따라 스크롤되도록 함
+    watch(mv, () => {
+      nextTick(scrollToActiveTab);
+    });
 
     onBeforeUpdate(() => {
       // 삭제된 탭이 선택된 경우 탭선택 인덱스를 변경하는 로직
