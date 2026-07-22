@@ -21,39 +21,39 @@ createApiDocsStore();
  * 라이브러리 톤앤매너에 맞춰 이 블록만 오버라이드하면 테마 확장이 가능하다.
  * ------------------------------------------------------------------------- */
 .api-docs {
-  --ad-bg: #ffffff;
-  --ad-bg-soft: #f7f8fa;
-  --ad-bg-hover: rgba(26, 106, 254, 0.06);
-  --ad-border: #e4e7ed;
-  --ad-text: #1f2329;
-  --ad-text-sub: #6b7280;
-  --ad-primary: #1a6afe;
-  --ad-primary-soft: rgba(26, 106, 254, 0.1);
-  --ad-code-bg: #f1f3f6;
-  --ad-badge-prop: #1a6afe;
-  --ad-badge-event: #d97706;
-  --ad-badge-slot: #059669;
-  --ad-badge-type: #7c3aed;
-  --ad-badge-required: #dc2626;
-  --ad-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --apidoc-bg: #ffffff;
+  --apidoc-bg-soft: #f7f8fa;
+  --apidoc-bg-hover: rgba(26, 106, 254, 0.06);
+  --apidoc-border: #e4e7ed;
+  --apidoc-text: #1f2329;
+  --apidoc-text-sub: #6b7280;
+  --apidoc-primary: #1a6afe;
+  --apidoc-primary-soft: rgba(26, 106, 254, 0.1);
+  --apidoc-code-bg: #f1f3f6;
+  --apidoc-badge-prop: #1a6afe;
+  --apidoc-badge-event: #d97706;
+  --apidoc-badge-slot: #059669;
+  --apidoc-badge-type: #7c3aed;
+  --apidoc-badge-required: #dc2626;
+  --apidoc-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .dark .api-docs {
-  --ad-bg: #0d0d0d;
-  --ad-bg-soft: #17181c;
-  --ad-bg-hover: rgba(0, 122, 255, 0.14);
-  --ad-border: #2a2c33;
-  --ad-text: #eceef2;
-  --ad-text-sub: #9aa1ad;
-  --ad-primary: #4c92ff;
-  --ad-primary-soft: rgba(0, 122, 255, 0.18);
-  --ad-code-bg: #23252c;
-  --ad-badge-prop: #4c92ff;
-  --ad-badge-event: #fbbf24;
-  --ad-badge-slot: #34d399;
-  --ad-badge-type: #a78bfa;
-  --ad-badge-required: #f87171;
-  --ad-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --apidoc-bg: #0d0d0d;
+  --apidoc-bg-soft: #17181c;
+  --apidoc-bg-hover: rgba(0, 122, 255, 0.14);
+  --apidoc-border: #2a2c33;
+  --apidoc-text: #eceef2;
+  --apidoc-text-sub: #9aa1ad;
+  --apidoc-primary: #4c92ff;
+  --apidoc-primary-soft: rgba(0, 122, 255, 0.18);
+  --apidoc-code-bg: #23252c;
+  --apidoc-badge-prop: #4c92ff;
+  --apidoc-badge-event: #fbbf24;
+  --apidoc-badge-slot: #34d399;
+  --apidoc-badge-type: #a78bfa;
+  --apidoc-badge-required: #f87171;
+  --apidoc-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 /* ---------------------------------------------------------------------------
@@ -64,62 +64,62 @@ createApiDocsStore();
   height: calc(100vh - 60px);
   margin: -30px -40px; /* .evui-content 패딩 상쇄 → 풀블리드 */
   overflow: hidden;
-  color: var(--ad-text);
-  background: var(--ad-bg);
+  color: var(--apidoc-text);
+  background: var(--apidoc-bg);
   font-size: 14px;
 
-  .ad-empty {
+  .apidoc-empty {
     padding: 24px 16px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     text-align: center;
   }
 
   code {
     padding: 1px 5px;
     border-radius: 4px;
-    background: var(--ad-code-bg);
+    background: var(--apidoc-code-bg);
     font-family: 'SF Mono', Menlo, Consolas, monospace;
     font-size: 0.85em;
   }
 
   /* --- [Left] Sidebar ----------------------------------------------------- */
-  .ad-sidebar {
+  .apidoc-sidebar {
     display: flex;
     flex-direction: column;
     flex: 0 0 300px;
     min-width: 0;
-    border-right: 1px solid var(--ad-border);
-    background: var(--ad-bg-soft);
+    border-right: 1px solid var(--apidoc-border);
+    background: var(--apidoc-bg-soft);
   }
-  .ad-sidebar-head {
+  .apidoc-sidebar-head {
     position: relative;
     padding: 12px;
-    border-bottom: 1px solid var(--ad-border);
+    border-bottom: 1px solid var(--apidoc-border);
   }
-  .ad-component-picker {
+  .apidoc-component-picker {
     display: flex;
     align-items: center;
     justify-content: space-between;
     width: 100%;
     padding: 8px 10px;
-    border: 1px solid var(--ad-border);
+    border: 1px solid var(--apidoc-border);
     border-radius: 6px;
-    color: var(--ad-text);
-    background: var(--ad-bg);
+    color: var(--apidoc-text);
+    background: var(--apidoc-bg);
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
 
     &:hover,
     &:focus {
-      border-color: var(--ad-primary);
+      border-color: var(--apidoc-primary);
       outline: none;
     }
   }
-  .ad-picker-caret {
+  .apidoc-picker-caret {
     width: 0;
     height: 0;
-    border-top: 5px solid var(--ad-text-sub);
+    border-top: 5px solid var(--apidoc-text-sub);
     border-right: 4px solid transparent;
     border-left: 4px solid transparent;
     transition: transform 0.15s;
@@ -128,12 +128,12 @@ createApiDocsStore();
       transform: rotate(180deg);
     }
   }
-  .ad-picker-backdrop {
+  .apidoc-picker-backdrop {
     position: fixed;
     inset: 0;
     z-index: 19;
   }
-  .ad-picker-panel {
+  .apidoc-picker-panel {
     position: absolute;
     top: calc(100% - 4px);
     right: 12px;
@@ -142,20 +142,20 @@ createApiDocsStore();
     max-height: 62vh;
     padding: 6px;
     overflow-y: auto;
-    border: 1px solid var(--ad-border);
+    border: 1px solid var(--apidoc-border);
     border-radius: 8px;
-    background: var(--ad-bg);
+    background: var(--apidoc-bg);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
   }
-  .ad-picker-category {
+  .apidoc-picker-category {
     padding: 10px 8px 4px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .ad-picker-item {
+  .apidoc-picker-item {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -163,56 +163,56 @@ createApiDocsStore();
     padding: 7px 10px;
     border: none;
     border-radius: 6px;
-    color: var(--ad-text);
+    color: var(--apidoc-text);
     background: none;
     font-size: 13px;
     text-align: left;
     cursor: pointer;
 
     &:hover:not(:disabled) {
-      background: var(--ad-bg-hover);
+      background: var(--apidoc-bg-hover);
     }
     &.is-active {
-      background: var(--ad-primary-soft);
-      color: var(--ad-primary);
+      background: var(--apidoc-primary-soft);
+      color: var(--apidoc-primary);
       font-weight: 600;
     }
     &:disabled {
-      color: var(--ad-text-sub);
+      color: var(--apidoc-text-sub);
       cursor: not-allowed;
       opacity: 0.55;
     }
   }
-  .ad-picker-soon {
+  .apidoc-picker-soon {
     padding: 1px 6px;
     border-radius: 8px;
-    color: var(--ad-text-sub);
-    background: var(--ad-code-bg);
+    color: var(--apidoc-text-sub);
+    background: var(--apidoc-code-bg);
     font-size: 10px;
   }
 
   /* md 폴백 안내/뷰 */
-  .ad-md-notice {
+  .apidoc-md-notice {
     padding: 16px 14px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     font-size: 12.5px;
     line-height: 1.7;
   }
-  .ad-md-fallback {
+  .apidoc-md-fallback {
     padding-top: 0;
     overflow-x: auto;
   }
 
-  .ad-tabs {
+  .apidoc-tabs {
     display: flex;
-    border-bottom: 1px solid var(--ad-border);
+    border-bottom: 1px solid var(--apidoc-border);
   }
-  .ad-tab {
+  .apidoc-tab {
     flex: 1;
     padding: 10px 0;
     border: none;
     border-bottom: 2px solid transparent;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     background: none;
     font-size: 13px;
     font-weight: 600;
@@ -220,65 +220,65 @@ createApiDocsStore();
     transition: color 0.2s;
 
     &:hover {
-      color: var(--ad-text);
+      color: var(--apidoc-text);
     }
     &.is-active {
-      border-bottom-color: var(--ad-primary);
-      color: var(--ad-primary);
+      border-bottom-color: var(--apidoc-primary);
+      color: var(--apidoc-primary);
     }
   }
 
-  .ad-search {
+  .apidoc-search {
     position: relative;
     padding: 10px 12px;
   }
-  .ad-search-input {
+  .apidoc-search-input {
     width: 100%;
     padding: 7px 28px 7px 10px;
-    border: 1px solid var(--ad-border);
+    border: 1px solid var(--apidoc-border);
     border-radius: 6px;
-    color: var(--ad-text);
-    background: var(--ad-bg);
+    color: var(--apidoc-text);
+    background: var(--apidoc-bg);
     font-size: 13px;
 
     &::placeholder {
-      color: var(--ad-text-sub);
+      color: var(--apidoc-text-sub);
     }
     &:focus {
-      border-color: var(--ad-primary);
+      border-color: var(--apidoc-primary);
       outline: none;
     }
   }
-  .ad-search-clear {
+  .apidoc-search-clear {
     position: absolute;
     top: 50%;
     right: 20px;
     padding: 2px;
     border: none;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     background: none;
     cursor: pointer;
     transform: translateY(-50%);
   }
 
-  .ad-tree-scroll {
+  .apidoc-tree-scroll {
     flex: 1;
     padding-bottom: 20px;
     overflow-y: auto;
   }
-  .ad-tree-section {
+  .apidoc-tree-section {
     padding: 14px 12px 6px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .ad-tree,
-  .ad-tree-children {
+  .apidoc-tree,
+  .apidoc-tree-children {
     list-style: none;
   }
-  .ad-tree-row {
+  .apidoc-tree-row {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -288,15 +288,15 @@ createApiDocsStore();
     white-space: nowrap;
 
     &:hover {
-      background: var(--ad-bg-hover);
+      background: var(--apidoc-bg-hover);
     }
     &.is-active {
-      background: var(--ad-primary-soft);
-      color: var(--ad-primary);
+      background: var(--apidoc-primary-soft);
+      color: var(--apidoc-primary);
       font-weight: 600;
     }
   }
-  .ad-tree-caret {
+  .apidoc-tree-caret {
     flex: 0 0 14px;
     width: 14px;
     height: 14px;
@@ -309,7 +309,7 @@ createApiDocsStore();
       left: 5px;
       border-top: 4px solid transparent;
       border-bottom: 4px solid transparent;
-      border-left: 5px solid var(--ad-text-sub);
+      border-left: 5px solid var(--apidoc-text-sub);
       transition: transform 0.15s;
     }
     &.is-open::before {
@@ -319,32 +319,32 @@ createApiDocsStore();
       display: none;
     }
   }
-  .ad-tree-label {
+  .apidoc-tree-label {
     overflow: hidden;
     text-overflow: ellipsis;
     font-size: 13px;
   }
-  .ad-tree-required {
-    color: var(--ad-badge-required);
+  .apidoc-tree-required {
+    color: var(--apidoc-badge-required);
     font-weight: 700;
   }
-  .ad-tree-count {
+  .apidoc-tree-count {
     margin-left: auto;
     padding: 0 6px;
     border-radius: 8px;
-    color: var(--ad-text-sub);
-    background: var(--ad-code-bg);
+    color: var(--apidoc-text-sub);
+    background: var(--apidoc-code-bg);
     font-size: 11px;
   }
 
-  .ad-examples {
+  .apidoc-examples {
     display: flex;
     flex-direction: column;
     gap: 2px;
     padding: 0 10px 20px;
     overflow-y: auto;
   }
-  .ad-example-link {
+  .apidoc-example-link {
     display: flex;
     flex-direction: column;
     align-items: stretch;
@@ -352,7 +352,7 @@ createApiDocsStore();
     padding: 7px 10px;
     border: none;
     border-radius: 6px;
-    color: var(--ad-text);
+    color: var(--apidoc-text);
     background: none;
     font-size: 13px;
     text-align: left;
@@ -360,37 +360,37 @@ createApiDocsStore();
     cursor: pointer;
 
     &:hover {
-      background: var(--ad-bg-hover);
+      background: var(--apidoc-bg-hover);
 
-      .ad-example-name {
-        color: var(--ad-primary);
+      .apidoc-example-name {
+        color: var(--apidoc-primary);
       }
     }
     &.is-active {
-      background: var(--ad-primary-soft);
+      background: var(--apidoc-primary-soft);
 
-      .ad-example-name {
-        color: var(--ad-primary);
+      .apidoc-example-name {
+        color: var(--apidoc-primary);
       }
     }
   }
-  .ad-example-name {
+  .apidoc-example-name {
     font-weight: 600;
   }
-  .ad-example-dev {
+  .apidoc-example-dev {
     padding: 0 5px;
     margin-left: 4px;
     border-radius: 8px;
     color: #fff;
-    background: var(--ad-badge-event);
+    background: var(--apidoc-badge-event);
     font-size: 10px;
     font-weight: 700;
     vertical-align: 1px;
   }
-  .ad-example-desc {
+  .apidoc-example-desc {
     display: -webkit-box;
     overflow: hidden;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     font-size: 12px;
     line-height: 1.5;
     -webkit-box-orient: vertical;
@@ -398,7 +398,7 @@ createApiDocsStore();
   }
 
   /* --- [Center] Detail ----------------------------------------------------- */
-  .ad-detail {
+  .apidoc-detail {
     /* 스크롤 대상(offsetTop) 좌표 기준을 이 컨테이너로 고정한다.
        static이면 offsetParent가 .evui-wrapper가 되어 헤더 높이만큼 어긋난다. */
     position: relative;
@@ -408,52 +408,52 @@ createApiDocsStore();
     overflow-y: auto;
     scroll-behavior: smooth;
   }
-  .ad-detail-intro {
+  .apidoc-detail-intro {
     padding-bottom: 16px;
     margin-bottom: 8px;
-    border-bottom: 1px solid var(--ad-border);
+    border-bottom: 1px solid var(--apidoc-border);
   }
-  .ad-detail-component {
+  .apidoc-detail-component {
     font-size: 24px;
     font-weight: 700;
   }
-  .ad-detail-summary {
+  .apidoc-detail-summary {
     margin-top: 6px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
   }
-  .ad-example-intro {
+  .apidoc-example-intro {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
     gap: 12px;
   }
-  .ad-example-group {
+  .apidoc-example-group {
     margin-bottom: 2px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
-  .ad-example-back {
+  .apidoc-example-back {
     flex: 0 0 auto;
     padding: 6px 12px;
-    border: 1px solid var(--ad-border);
+    border: 1px solid var(--apidoc-border);
     border-radius: 6px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     background: none;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
 
     &:hover {
-      border-color: var(--ad-primary);
-      color: var(--ad-primary);
+      border-color: var(--apidoc-primary);
+      color: var(--apidoc-primary);
     }
   }
 
   /* 예제 뷰: 인트로 헤더에 제목이 이미 있으므로 Example 내부 제목/설명은 중복 숨김 */
-  .ad-detail .article-wrapper {
+  .apidoc-detail .article-wrapper {
     .article-title,
     .article-description {
       display: none;
@@ -461,12 +461,12 @@ createApiDocsStore();
   }
 
   /* 예제 뷰: 남은 패널 영역을 예제(article-example)가 꽉 채운다 */
-  .ad-detail.is-example {
+  .apidoc-detail.is-example {
     display: flex;
     flex-direction: column;
     padding-bottom: 24px;
 
-    .ad-detail-intro {
+    .apidoc-detail-intro {
       flex-shrink: 0;
     }
     .article-wrapper {
@@ -483,23 +483,23 @@ createApiDocsStore();
     }
   }
 
-  .ad-detail-section {
+  .apidoc-detail-section {
     margin: 28px 0 4px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  .ad-item {
+  .apidoc-item {
     padding: 14px 16px;
     margin-top: 10px;
-    border: 1px solid var(--ad-border);
+    border: 1px solid var(--apidoc-border);
     border-left: 3px solid transparent;
     border-radius: 8px;
-    background: var(--ad-bg);
-    box-shadow: var(--ad-shadow);
+    background: var(--apidoc-bg);
+    box-shadow: var(--apidoc-shadow);
     /* 대용량 문서 대응: 화면 밖 카드는 렌더링 생략 */
     content-visibility: auto;
     contain-intrinsic-size: auto 200px;
@@ -507,40 +507,40 @@ createApiDocsStore();
     transition: border-color 0.8s ease, background-color 0.8s ease;
 
     &.is-active {
-      border-left-color: var(--ad-primary);
-      background: var(--ad-bg-soft);
+      border-left-color: var(--apidoc-primary);
+      background: var(--apidoc-bg-soft);
       transition: none; /* 나타날 때는 즉시 */
     }
   }
-  .ad-item-header {
+  .apidoc-item-header {
     display: flex;
     align-items: baseline;
     justify-content: space-between;
     gap: 12px;
   }
-  .ad-item-title {
+  .apidoc-item-title {
     font-family: 'SF Mono', Menlo, Consolas, monospace;
     font-size: 15px;
     font-weight: 400;
   }
-  .ad-item-parent-path {
-    color: var(--ad-text-sub);
+  .apidoc-item-parent-path {
+    color: var(--apidoc-text-sub);
   }
-  .ad-item-name {
-    color: var(--ad-text);
+  .apidoc-item-name {
+    color: var(--apidoc-text);
     font-weight: 700;
   }
-  .ad-tryit-btn-row {
+  .apidoc-tryit-btn-row {
     padding: 1px 8px;
     margin-left: auto;
     font-size: 11px;
   }
-  .ad-tryit-btn {
+  .apidoc-tryit-btn {
     flex: 0 0 auto;
     padding: 4px 10px;
-    border: 1px solid var(--ad-primary);
+    border: 1px solid var(--apidoc-primary);
     border-radius: 6px;
-    color: var(--ad-primary);
+    color: var(--apidoc-primary);
     background: none;
     font-size: 12px;
     font-weight: 600;
@@ -549,18 +549,18 @@ createApiDocsStore();
 
     &:hover {
       color: #fff;
-      background: var(--ad-primary);
+      background: var(--apidoc-primary);
     }
   }
 
-  .ad-item-badges {
+  .apidoc-item-badges {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
     margin-top: 8px;
   }
-  .ad-badge {
+  .apidoc-badge {
     padding: 2px 8px;
     border-radius: 10px;
     font-size: 11px;
@@ -574,49 +574,49 @@ createApiDocsStore();
       background: none;
     }
   }
-  .ad-badge-kind-props {
-    background: var(--ad-badge-prop);
+  .apidoc-badge-kind-props {
+    background: var(--apidoc-badge-prop);
   }
-  .ad-badge-kind-events {
-    background: var(--ad-badge-event);
+  .apidoc-badge-kind-events {
+    background: var(--apidoc-badge-event);
   }
-  .ad-badge-kind-slots {
-    background: var(--ad-badge-slot);
+  .apidoc-badge-kind-slots {
+    background: var(--apidoc-badge-slot);
   }
-  .ad-badge-type {
-    color: var(--ad-badge-type);
-    background: var(--ad-primary-soft);
+  .apidoc-badge-type {
+    color: var(--apidoc-badge-type);
+    background: var(--apidoc-primary-soft);
     font-family: 'SF Mono', Menlo, Consolas, monospace;
     font-weight: 700;
   }
-  .ad-badge-required {
-    color: var(--ad-badge-required);
+  .apidoc-badge-required {
+    color: var(--apidoc-badge-required);
     background: rgba(220, 38, 38, 0.1);
   }
-  .ad-badge-default {
-    color: var(--ad-text-sub);
-    background: var(--ad-code-bg);
+  .apidoc-badge-default {
+    color: var(--apidoc-text-sub);
+    background: var(--apidoc-code-bg);
   }
-  .ad-badge-version {
-    color: var(--ad-badge-slot);
+  .apidoc-badge-version {
+    color: var(--apidoc-badge-slot);
     background: rgba(5, 150, 105, 0.1);
   }
 
-  .ad-item-desc {
+  .apidoc-item-desc {
     margin-top: 8px;
-    color: var(--ad-text);
+    color: var(--apidoc-text);
     line-height: 1.65;
   }
 
   /* 그룹 내부 leaf 속성 행 */
-  .ad-group-rows {
+  .apidoc-group-rows {
     margin-top: 14px;
-    border-top: 1px solid var(--ad-border);
+    border-top: 1px solid var(--apidoc-border);
     list-style: none;
   }
-  .ad-group-row {
+  .apidoc-group-row {
     padding: 10px 10px 10px 14px;
-    border-bottom: 1px solid var(--ad-border);
+    border-bottom: 1px solid var(--apidoc-border);
     border-left: 2px solid transparent;
     cursor: pointer;
     /* 플래시 하이라이트가 부드럽게 사라지도록 */
@@ -626,82 +626,82 @@ createApiDocsStore();
       border-bottom: none;
     }
     &:hover {
-      background: var(--ad-bg-hover);
+      background: var(--apidoc-bg-hover);
     }
     &.is-active {
-      border-left-color: var(--ad-primary);
-      background: var(--ad-primary-soft);
+      border-left-color: var(--apidoc-primary);
+      background: var(--apidoc-primary-soft);
       transition: none; /* 나타날 때는 즉시 */
     }
   }
-  .ad-row-head {
+  .apidoc-row-head {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
   }
-  .ad-row-name {
+  .apidoc-row-name {
     padding: 0;
     background: none;
-    color: var(--ad-text);
+    color: var(--apidoc-text);
     font-size: 13px;
     font-weight: 700;
   }
   /* full path 프리픽스: 이름은 굵게, 부모 경로는 muted */
-  .ad-row-path {
-    color: var(--ad-text-sub);
+  .apidoc-row-path {
+    color: var(--apidoc-text-sub);
     font-weight: 400;
   }
   /* 중첩 객체 행: 하위 속성들의 소제목 역할 */
-  .ad-group-row.is-object .ad-row-name {
+  .apidoc-group-row.is-object .apidoc-row-name {
     font-size: 14px;
 
     &::after {
       content: ' { … }';
-      color: var(--ad-text-sub);
+      color: var(--apidoc-text-sub);
       font-size: 12px;
       font-weight: 400;
     }
   }
-  .ad-row-desc {
+  .apidoc-row-desc {
     margin-top: 4px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     font-size: 13px;
     line-height: 1.6;
   }
-  .ad-item-values {
+  .apidoc-item-values {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
     margin-top: 8px;
   }
-  .ad-item-values-label {
-    color: var(--ad-text-sub);
+  .apidoc-item-values-label {
+    color: var(--apidoc-text-sub);
     font-size: 12px;
   }
 
   /* --- [Right] Try It Panel ------------------------------------------------ */
-  .ad-tryit {
+  .apidoc-tryit {
     display: flex;
     position: relative;
     flex-direction: column;
     flex: 0 0 0;
     overflow: hidden;
     border-left: 1px solid transparent;
-    background: var(--ad-bg-soft);
+    background: var(--apidoc-bg-soft);
     transition: flex-basis 0.25s ease-in-out;
 
     &.is-open {
       flex-basis: 500px;
-      border-left-color: var(--ad-border);
+      border-left-color: var(--apidoc-border);
     }
     /* 드래그 중에는 커서를 즉각 따라가도록 애니메이션 해제 */
     &.is-resizing {
       transition: none;
     }
   }
-  .ad-tryit-resize-handle {
+  .apidoc-tryit-resize-handle {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -712,55 +712,55 @@ createApiDocsStore();
 
     &:hover,
     &:active {
-      background: var(--ad-primary-soft);
-      box-shadow: inset 2px 0 0 var(--ad-primary);
+      background: var(--apidoc-primary-soft);
+      box-shadow: inset 2px 0 0 var(--apidoc-primary);
     }
   }
-  .ad-tryit-header {
+  .apidoc-tryit-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
     padding: 12px 14px;
-    border-bottom: 1px solid var(--ad-border);
+    border-bottom: 1px solid var(--apidoc-border);
   }
-  .ad-tryit-title {
+  .apidoc-tryit-title {
     display: flex;
     align-items: center;
     gap: 8px;
     min-width: 0;
   }
-  .ad-tryit-path {
+  .apidoc-tryit-path {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .ad-tryit-close {
+  .apidoc-tryit-close {
     padding: 4px 8px;
     border: none;
     border-radius: 4px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     background: none;
     cursor: pointer;
 
     &:hover {
-      background: var(--ad-bg-hover);
-      color: var(--ad-text);
+      background: var(--apidoc-bg-hover);
+      color: var(--apidoc-text);
     }
   }
-  .ad-tryit-body {
+  .apidoc-tryit-body {
     display: flex;
     flex: 1;
     flex-direction: column;
     min-height: 0;
     overflow: hidden;
   }
-  .ad-tryit-live {
+  .apidoc-tryit-live {
     flex: 0 0 300px;
     padding: 10px 14px;
     overflow: hidden;
-    border-bottom: 1px solid var(--ad-border);
-    background: var(--ad-bg);
+    border-bottom: 1px solid var(--apidoc-border);
+    background: var(--apidoc-bg);
 
     > * {
       height: 100%;
@@ -779,7 +779,7 @@ createApiDocsStore();
       }
     }
   }
-  .ad-tryit-editor {
+  .apidoc-tryit-editor {
     display: flex;
     flex: 1;
     flex-direction: column;
@@ -790,84 +790,84 @@ createApiDocsStore();
       min-height: 0;
     }
   }
-  .ad-tryit-editor-tabs {
+  .apidoc-tryit-editor-tabs {
     display: flex;
     flex-shrink: 0;
-    border-bottom: 1px solid var(--ad-border);
-    background: var(--ad-bg);
+    border-bottom: 1px solid var(--apidoc-border);
+    background: var(--apidoc-bg);
   }
-  .ad-tryit-editor-tab {
+  .apidoc-tryit-editor-tab {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 8px 14px;
     border: none;
     border-bottom: 2px solid transparent;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     background: none;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
 
     &:hover {
-      color: var(--ad-text);
+      color: var(--apidoc-text);
     }
     &.is-active {
-      border-bottom-color: var(--ad-primary);
-      color: var(--ad-primary);
+      border-bottom-color: var(--apidoc-primary);
+      color: var(--apidoc-primary);
     }
   }
-  .ad-tryit-event-count {
+  .apidoc-tryit-event-count {
     padding: 0 6px;
     border-radius: 8px;
     color: #fff;
-    background: var(--ad-primary);
+    background: var(--apidoc-primary);
     font-size: 10px;
     line-height: 1.6;
   }
 
   /* ── Events 콘솔 ── */
-  .ad-tryit-chart {
+  .apidoc-tryit-chart {
     height: 100%;
   }
-  .ad-tryit-console {
+  .apidoc-tryit-console {
     display: flex;
     flex: 1;
     flex-direction: column;
     min-height: 0;
   }
-  .ad-tryit-console-bar {
+  .apidoc-tryit-console-bar {
     display: flex;
     flex-shrink: 0;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
     padding: 6px 10px;
-    border-bottom: 1px solid var(--ad-border);
+    border-bottom: 1px solid var(--apidoc-border);
   }
-  .ad-tryit-console-info {
+  .apidoc-tryit-console-info {
     overflow: hidden;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     font-size: 11px;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .ad-tryit-console-clear {
+  .apidoc-tryit-console-clear {
     flex-shrink: 0;
     padding: 3px 10px;
-    border: 1px solid var(--ad-border);
+    border: 1px solid var(--apidoc-border);
     border-radius: 4px;
-    color: var(--ad-text-sub);
+    color: var(--apidoc-text-sub);
     background: none;
     font-size: 11px;
     cursor: pointer;
 
     &:hover {
-      border-color: var(--ad-primary);
-      color: var(--ad-primary);
+      border-color: var(--apidoc-primary);
+      color: var(--apidoc-primary);
     }
   }
-  .ad-tryit-console-body {
+  .apidoc-tryit-console-body {
     flex: 1;
     min-height: 0;
     padding: 8px 10px;
@@ -877,32 +877,32 @@ createApiDocsStore();
     font-size: 11.5px;
     line-height: 1.7;
   }
-  .ad-tryit-console-empty {
+  .apidoc-tryit-console-empty {
     color: #6b7280;
   }
-  .ad-tryit-console-line {
+  .apidoc-tryit-console-line {
     display: flex;
     gap: 8px;
     padding: 1px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     word-break: break-all;
   }
-  .ad-tryit-console-time {
+  .apidoc-tryit-console-time {
     flex-shrink: 0;
     color: #6b7280;
   }
-  .ad-tryit-console-name {
+  .apidoc-tryit-console-name {
     flex-shrink: 0;
     color: #7ee787;
     font-weight: 700;
   }
-  .ad-tryit-console-payload {
+  .apidoc-tryit-console-payload {
     color: #c9d1d9;
   }
 
   /* --- 반응형 -------------------------------------------------------------- */
   @media (max-width: 1280px) {
-    .ad-tryit.is-open {
+    .apidoc-tryit.is-open {
       position: absolute;
       top: 60px;
       right: 0;
@@ -914,10 +914,10 @@ createApiDocsStore();
     }
   }
   @media (max-width: 900px) {
-    .ad-sidebar {
+    .apidoc-sidebar {
       flex-basis: 240px;
     }
-    .ad-detail {
+    .apidoc-detail {
       padding: 16px 16px 60vh;
     }
   }

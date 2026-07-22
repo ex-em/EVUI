@@ -74,8 +74,8 @@ $file-path: './assets/fonts/';
   }
 
   .api-docs {
-    --ad-primary: #d97706;
-    --ad-primary-soft: rgba(217, 119, 6, 0.12);
+    --apidoc-primary: #d97706;
+    --apidoc-primary-soft: rgba(217, 119, 6, 0.12);
   }
 }
 .dark {

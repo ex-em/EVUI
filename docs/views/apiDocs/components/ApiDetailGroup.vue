@@ -1,50 +1,50 @@
 <template>
   <article
-    class="ad-item"
+    class="apidoc-item"
     :class="{ 'is-active': isHeadActive }"
     :style="{ marginLeft: `${head.depth * 12}px` }"
     :data-node-id="head.id"
     @click="store.setActiveFromScroll(head.id)"
   >
     <!-- 그룹 헤더: Try It은 그룹당 하나 -->
-    <header class="ad-item-header">
-      <h3 class="ad-item-title">
-        <span v-if="parentPath" class="ad-item-parent-path">{{ parentPath }}.</span
-        ><span class="ad-item-name">{{ head.name }}</span>
+    <header class="apidoc-item-header">
+      <h3 class="apidoc-item-title">
+        <span v-if="parentPath" class="apidoc-item-parent-path">{{ parentPath }}.</span
+        ><span class="apidoc-item-name">{{ head.name }}</span>
       </h3>
       <!-- tryIt: false 지정 시 버튼 숨김 -->
       <button
         v-if="head.tryIt !== false"
-        class="ad-tryit-btn"
+        class="apidoc-tryit-btn"
         @click.stop="store.openTryIt(head.id)"
       >
         Try It ▶
       </button>
     </header>
 
-    <div class="ad-item-badges">
-      <span class="ad-badge" :class="`ad-badge-kind-${head.kind}`">{{ kindLabel }}</span>
-      <span v-if="head.type" class="ad-badge ad-badge-type">{{ head.type }}</span>
-      <span v-if="head.required" class="ad-badge ad-badge-required">required</span>
-      <span v-if="head.default !== undefined" class="ad-badge ad-badge-default">
+    <div class="apidoc-item-badges">
+      <span class="apidoc-badge" :class="`apidoc-badge-kind-${head.kind}`">{{ kindLabel }}</span>
+      <span v-if="head.type" class="apidoc-badge apidoc-badge-type">{{ head.type }}</span>
+      <span v-if="head.required" class="apidoc-badge apidoc-badge-required">required</span>
+      <span v-if="head.default !== undefined" class="apidoc-badge apidoc-badge-default">
         default: <code>{{ head.default }}</code>
       </span>
-      <span v-if="head.version" class="ad-badge ad-badge-version">v{{ head.version }}+</span>
+      <span v-if="head.version" class="apidoc-badge apidoc-badge-version">v{{ head.version }}+</span>
     </div>
 
-    <p class="ad-item-desc">{{ head.description }}</p>
+    <p class="apidoc-item-desc">{{ head.description }}</p>
 
-    <div v-if="head.values.length" class="ad-item-values">
-      <span class="ad-item-values-label">가능한 값</span>
-      <code v-for="value in head.values" :key="value" class="ad-item-value">{{ value }}</code>
+    <div v-if="head.values.length" class="apidoc-item-values">
+      <span class="apidoc-item-values-label">가능한 값</span>
+      <code v-for="value in head.values" :key="value" class="apidoc-item-value">{{ value }}</code>
     </div>
 
     <!-- leaf 하위 속성: 컴팩트 행 (개별 Try It 없음) -->
-    <ul v-if="rows.length" class="ad-group-rows">
+    <ul v-if="rows.length" class="apidoc-group-rows">
       <li
         v-for="row in rows"
         :key="row.id"
-        class="ad-group-row"
+        class="apidoc-group-row"
         :class="{
           'is-active': store.flashId.value === row.id,
           'is-object': row.childIds.length > 0,
@@ -53,29 +53,29 @@
         :data-node-id="row.id"
         @click.stop="store.setActiveFromScroll(row.id)"
       >
-        <div class="ad-row-head">
-          <code class="ad-row-name">
-            <span class="ad-row-path">{{ rowParentPath(row) }}.</span>{{ row.name }}
+        <div class="apidoc-row-head">
+          <code class="apidoc-row-name">
+            <span class="apidoc-row-path">{{ rowParentPath(row) }}.</span>{{ row.name }}
           </code>
-          <span v-if="row.type" class="ad-badge ad-badge-type">{{ row.type }}</span>
-          <span v-if="row.required" class="ad-badge ad-badge-required">required</span>
-          <span v-if="row.default !== undefined" class="ad-badge ad-badge-default">
+          <span v-if="row.type" class="apidoc-badge apidoc-badge-type">{{ row.type }}</span>
+          <span v-if="row.required" class="apidoc-badge apidoc-badge-required">required</span>
+          <span v-if="row.default !== undefined" class="apidoc-badge apidoc-badge-default">
             default: <code>{{ row.default }}</code>
           </span>
-          <span v-if="row.version" class="ad-badge ad-badge-version">v{{ row.version }}+</span>
+          <span v-if="row.version" class="apidoc-badge apidoc-badge-version">v{{ row.version }}+</span>
           <!-- 전용 tryIt 스니펫이 있는 행에만 노출 -->
           <button
             v-if="row.tryIt"
-            class="ad-tryit-btn ad-tryit-btn-row"
+            class="apidoc-tryit-btn apidoc-tryit-btn-row"
             @click.stop="store.openTryIt(row.id)"
           >
             Try It ▶
           </button>
         </div>
-        <p class="ad-row-desc">{{ row.description }}</p>
-        <div v-if="row.values.length" class="ad-item-values">
-          <span class="ad-item-values-label">가능한 값</span>
-          <code v-for="value in row.values" :key="value" class="ad-item-value">{{ value }}</code>
+        <p class="apidoc-row-desc">{{ row.description }}</p>
+        <div v-if="row.values.length" class="apidoc-item-values">
+          <span class="apidoc-item-values-label">가능한 값</span>
+          <code v-for="value in row.values" :key="value" class="apidoc-item-value">{{ value }}</code>
         </div>
       </li>
     </ul>
