@@ -186,8 +186,9 @@ export default {
       const listWrapperWidth = listWrapperRef.value.offsetWidth;
       const listWidth = listRef.value.offsetWidth;
       const widthLimit = listWrapperWidth - listWidth;
-      // ul(listRef)에는 transform 이 걸려 있어 offsetParent 가 ul 이 되므로,
-      // li 의 offsetLeft 는 이미 ul(=translateX 가 슬라이드하는 좌표계) 기준이다.
+      // ul(listRef)은 v-resize 디렉티브가 position:relative 를 걸어 li 의 offsetParent 가 되므로,
+      // li 의 offsetLeft 는 ul(=translateX 가 슬라이드하는 좌표계) 기준이다.
+      // (transform 은 이 좌표계를 시각적으로 슬라이드할 뿐 offsetLeft 값 자체는 바꾸지 않는다.)
       const activeLeft = activeEl.offsetLeft;
       const activeRight = activeLeft + activeEl.offsetWidth;
       const viewLeft = -translateScroll.x;
