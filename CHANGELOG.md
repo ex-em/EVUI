@@ -1,3 +1,10 @@
+# [3.16.0](https://github.com/ex-em/EVUI/compare/3.15.0...3.16.0) (2026-07-23)
+
+
+### Features
+
+* **tabs:** 오버플로우/선택 상태 변화에 헤더 스크롤이 반응하도록 개선 ([780e21b](https://github.com/ex-em/EVUI/commit/780e21b33cc8e2786c3b7f33bc49f19ef9f1c726))
+
 # [3.15.0](https://github.com/ex-em/EVUI/compare/3.14.0...3.15.0) (2026-07-20)
 
 
