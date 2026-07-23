@@ -104,4 +104,58 @@ describe('Scale', () => {
       });
     });
   });
+
+  describe('getNormalizedLabelOptions - 값 포맷', () => {
+    const setupScale = () => {
+      const scale = createScale();
+      scale.type = 'y';
+      scale.ctx = {
+        save() {},
+        restore() {},
+        measureText: (text) => ({ width: text.length * 6 }),
+        font: '',
+      };
+      // 축 기본 formatter (valueFormatter 미지정 시 사용)
+      scale.getLabelFormat = (value) => `axis:${value}`;
+      return scale;
+    };
+
+    it('valueFormatter 가 없으면 축 formatter(getLabelFormat)로 값을 합성한다', () => {
+      const scale = setupScale();
+      const opts = scale.getNormalizedLabelOptions(
+        { chartWidth: 400, width: 500 },
+        { show: true, showValue: true, text: '임계치' },
+        82,
+      );
+      expect(opts.label).toBe('임계치 axis:82');
+    });
+
+    it('valueFormatter 가 있으면 축 formatter 대신 그 결과로 값을 합성한다', () => {
+      const scale = setupScale();
+      const opts = scale.getNormalizedLabelOptions(
+        { chartWidth: 400, width: 500 },
+        { show: true, showValue: true, text: '임계치', valueFormatter: (value) => `${value}%` },
+        81.9999,
+      );
+      // 축 formatter(반올림) 대신 원본 값 그대로
+      expect(opts.label).toBe('임계치 81.9999%');
+    });
+
+    it('value-only 상태에서도 valueFormatter 결과(값)만 표시한다', () => {
+      const scale = setupScale();
+      const opts = scale.getNormalizedLabelOptions(
+        { chartWidth: 300, width: 500 }, // valueOnlyBelow(320) 미만 → value-only
+        {
+          show: true,
+          showValue: true,
+          text: '임계치',
+          valueFormatter: (value) => `${value}%`,
+          responsive: { valueOnlyBelow: 320, hideBelow: 205 },
+        },
+        81.9999,
+      );
+      expect(opts.valueOnly).toBe(true);
+      expect(opts.label).toBe('81.9999%');
+    });
+  });
 });

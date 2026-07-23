@@ -811,10 +811,17 @@ class Scale {
     const valueOnly =
       !hidden && !Util.isNullOrUndefined(valueOnlyBelow) && plotWidth < valueOnlyBelow;
 
-    // 텍스트 결정 (alias=text, value=축 formatter)
+    // 텍스트 결정 (alias=text, value=라벨 valueFormatter 우선, 없으면 축 formatter)
     const aliasText = merged.text != null ? String(merged.text) : '';
     const hasValue = !Util.isNullOrUndefined(value) && Number.isFinite(+value);
-    const formattedValue = merged.showValue && hasValue ? String(this.getLabelFormat(value)) : '';
+    const formattedValue =
+      merged.showValue && hasValue
+        ? String(
+            typeof merged.valueFormatter === 'function'
+              ? merged.valueFormatter(value)
+              : this.getLabelFormat(value),
+          )
+        : '';
 
     let label;
     if (merged.showValue) {
