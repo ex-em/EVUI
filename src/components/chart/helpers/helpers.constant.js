@@ -197,6 +197,7 @@ export const PLOT_LINE_LABEL_OPTION = {
   },
   position: 'outside', // 'outside'(plot 밖 우측 여백) | 'innerStart'(plot 안 좌측) | 'innerEnd'(plot 안 우측)
   showValue: false, // true → "text value" 합성 (value = 축 formatter)
+  valueFormatter: null, // showValue=true 일 때 값 포맷 override. (value) => string. null 이면 축 formatter 사용
   responsive: {
     valueOnlyBelow: null, // plot 너비 < 이 값 → value만
     hideBelow: null, // plot 너비 < 이 값 → 라벨 미노출

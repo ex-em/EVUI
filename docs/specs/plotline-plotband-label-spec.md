@@ -71,6 +71,8 @@ label: {
                              // | 'innerStart'(plot 안 좌측 끝)
                              // | 'innerEnd'(plot 안 우측 끝)
   showValue: false,          // true → "text value" 합성 (value = 축 formatter)
+  valueFormatter: null,      // showValue=true 시 value 포맷 override. (value) => string.
+                             //   null이면 축 formatter 사용. 축과 다른 정밀도/단위로 값을 표시할 때 사용
   responsive: {              // 차트(plot) 너비 기준 3단계 축약. 둘 다 null이면 항상 풀 표시
     valueOnlyBelow: null,    //   너비 < 이 값 → value만 표시
     hideBelow: null,         //   너비 < 이 값 → 라벨 미노출(선/밴드 본체는 유지)
@@ -112,8 +114,10 @@ plotBands: [{
 
 ### 4.1 라벨 텍스트 결정
 
-1. `showValue: true` → `"{text} {value}"` 합성 (`text`가 null이면 value만). value는 축 formatter 적용.
+1. `showValue: true` → `"{text} {value}"` 합성 (`text`가 null이면 value만). value는 `valueFormatter`가 있으면 그것으로, 없으면 축 formatter로 포맷.
 2. `showValue: false` → 기존처럼 **`text` 그대로** (완전 하위호환).
+
+> `valueFormatter`는 라벨 값만 축과 다르게 포맷할 때 쓴다(예: 축은 소수점 2자리, 임계선 라벨은 원본 정밀도). value-only/hover 등 반응형 동작은 `showValue: true` 경로에서 그대로 유지된다.
 
 ### 4.2 반응형 3단계 (`responsive`)
 
