@@ -1,3 +1,15 @@
+# [3.17.0](https://github.com/ex-em/EVUI/compare/3.16.0...3.17.0) (2026-07-24)
+
+
+### Bug Fixes
+
+* **chart:** 라벨 valueFormatter 가 null/undefined 반환 시 축 formatter 로 폴백 ([211bd9c](https://github.com/ex-em/EVUI/commit/211bd9c918c123edc6a7d2f4b92bb69b28bbb409))
+
+
+### Features
+
+* **chart:** plotLine/plotBand 라벨에 valueFormatter 옵션 추가 ([29eb1fe](https://github.com/ex-em/EVUI/commit/29eb1fe64e8aef902e05b4fb54c41baa3b0cb753))
+
 # [3.16.0](https://github.com/ex-em/EVUI/compare/3.15.0...3.16.0) (2026-07-23)
 
 
