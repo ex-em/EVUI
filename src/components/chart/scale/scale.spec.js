@@ -157,5 +157,33 @@ describe('Scale', () => {
       expect(opts.valueOnly).toBe(true);
       expect(opts.label).toBe('81.9999%');
     });
+
+    it('valueFormatter 가 null/undefined 를 반환하면 축 formatter 로 폴백한다', () => {
+      const scale = setupScale();
+      // return 누락 등으로 undefined 반환 → 리터럴 "undefined" 대신 축 formatter 사용
+      const undefResult = scale.getNormalizedLabelOptions(
+        { chartWidth: 400, width: 500 },
+        { show: true, showValue: true, text: '임계치', valueFormatter: () => undefined },
+        82,
+      );
+      expect(undefResult.label).toBe('임계치 axis:82');
+
+      const nullResult = scale.getNormalizedLabelOptions(
+        { chartWidth: 400, width: 500 },
+        { show: true, showValue: true, text: '임계치', valueFormatter: () => null },
+        82,
+      );
+      expect(nullResult.label).toBe('임계치 axis:82');
+    });
+
+    it('valueFormatter 가 숫자를 반환하면 문자열로 변환해 사용한다(폴백 아님)', () => {
+      const scale = setupScale();
+      const opts = scale.getNormalizedLabelOptions(
+        { chartWidth: 400, width: 500 },
+        { show: true, showValue: true, text: '임계치', valueFormatter: (value) => value * 2 },
+        82,
+      );
+      expect(opts.label).toBe('임계치 164');
+    });
   });
 });

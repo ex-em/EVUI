@@ -118,6 +118,8 @@ plotBands: [{
 2. `showValue: false` → 기존처럼 **`text` 그대로** (완전 하위호환).
 
 > `valueFormatter`는 라벨 값만 축과 다르게 포맷할 때 쓴다(예: 축은 소수점 2자리, 임계선 라벨은 원본 정밀도). value-only/hover 등 반응형 동작은 `showValue: true` 경로에서 그대로 유지된다.
+>
+> 계약은 `(value) => string`. `valueFormatter`가 `null`/`undefined`를 반환하면(예: `return` 누락) 리터럴 `"null"`/`"undefined"` 노출을 막기 위해 **축 formatter로 폴백**한다. `number` 등 그 외 반환값은 문자열로 변환해 사용한다(폴백 아님).
 
 ### 4.2 반응형 3단계 (`responsive`)
 
