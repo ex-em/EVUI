@@ -814,14 +814,18 @@ class Scale {
     // 텍스트 결정 (alias=text, value=라벨 valueFormatter 우선, 없으면 축 formatter)
     const aliasText = merged.text != null ? String(merged.text) : '';
     const hasValue = !Util.isNullOrUndefined(value) && Number.isFinite(+value);
-    const formattedValue =
-      merged.showValue && hasValue
-        ? String(
-            typeof merged.valueFormatter === 'function'
-              ? merged.valueFormatter(value)
-              : this.getLabelFormat(value),
-          )
-        : '';
+    // valueFormatter 계약은 (value) => string. 단, return 누락 등으로 null/undefined 를 반환하면
+    // 리터럴 "null"/"undefined" 가 라벨에 그려지므로 축 formatter 로 폴백한다.
+    // (number 등 그 외 반환값은 String() 으로 변환해 계산 결과를 살린다 — 축 formatter 폴백 아님)
+    let formattedValue = '';
+    if (merged.showValue && hasValue) {
+      if (typeof merged.valueFormatter === 'function') {
+        const custom = merged.valueFormatter(value);
+        formattedValue = custom == null ? String(this.getLabelFormat(value)) : String(custom);
+      } else {
+        formattedValue = String(this.getLabelFormat(value));
+      }
+    }
 
     let label;
     if (merged.showValue) {
