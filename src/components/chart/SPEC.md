@@ -6,7 +6,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 
 이 문서는 차트 **루트 파일**(Chart.vue, ChartToolbar.vue, chart.core.js, chart.blit.js, chart.selection.js, chartZoom.core.js, uses.js, index.js)과 helpers/ 를 다룬다. plugins/element/scale/model/annotation 의 상세는 각 하위 SPEC( [./plugins/SPEC.md](./plugins/SPEC.md), [./element/SPEC.md](./element/SPEC.md), [./scale/SPEC.md](./scale/SPEC.md), [./model/SPEC.md](./model/SPEC.md), [./annotation/SPEC.md](./annotation/SPEC.md) )에 위임한다.
 
-> **공식 API**: docs/views/{lineChart,barChart,pieChart,scatterChart,comboChart,heatMap,zoomChart}/api/*.md (차트 타입별 문서)
+> **공식 API**: line/bar/pie/scatter/heatMap 은 `/api-docs` 페이지가 렌더링하는 [docs/views/apiDocs/data/](../../../docs/views/apiDocs/data/)`{lineChart,barChart,pieChart,scatterChart,heatMap}.json` 이 SSOT 다([작성 가이드](../../../docs/views/apiDocs/data/README.md), 수정 후 `npm run docs:validate` 필수). 아직 JSON 으로 옮기지 않은 comboChart·zoomChart 는 `docs/views/{comboChart,zoomChart}/api/*.md`.
 
 ## Features
 
