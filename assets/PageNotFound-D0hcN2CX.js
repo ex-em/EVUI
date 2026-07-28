@@ -1,0 +1,1 @@
+import{_ as o,o as e,c as t}from"./index-DTdUblIv.js";const n={name:"PageNotFound",components:{},setup(){}};function a(c,s,r,p,u,_){return e(),t("div",null,"PageNotFound")}const f=o(n,[["render",a]]);export{f as default};
