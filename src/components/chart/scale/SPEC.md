@@ -41,7 +41,8 @@ axis 옵션의 `type`(`linear`/`time`/`log`/`step`)과 `categoryMode` 로 구현
   위치 변환은 `Canvas.calculateX/Y`.
 - **plot 라벨 박스**: `PLOT_LINE_LABEL_OPTION` 병합 후 계산.
   반응형 3단계(`responsive.hideBelow` 미만이면 숨김 → `valueOnlyBelow` 미만이면 value 만 표시),
-  `showValue`(text 와 축 formatter 적용 value 합성; plotBand 는 from/to 양끝에 각각 자동
+  `showValue`(text 와 value 합성; value 포맷은 `valueFormatter`(`(value) => string`) 가 있으면
+  그 결과, 없으면 축 formatter. plotBand 는 from/to 양끝에 각각 자동
   바깥 배치), `position`(`outside`=plot 밖 우측 여백 / `innerStart` / `innerEnd`),
   X축 라벨은 position/verticalAlign 무시하고 항상 plot 상단(`computeTopLabelBox`),
   말풍선 꼬리(`pointer.show`, 높이 4·밑변 절반 4 고정, maxTip 과 동일 크기),
@@ -186,6 +187,10 @@ axis 옵션의 `type`(`linear`/`time`/`log`/`step`)과 `categoryMode` 로 구현
 - TimeCategoryScale 은 labels 가 오름차순(시간순) 정렬돼 있다고 가정한다. 소비자는
   `maxIndex ≥ minIndex` 를 확인한 뒤에만 minIndex 를 시작 인덱스로 사용해야 한다
   (sentinel `{0, -1}` = 빈 윈도우).
+- plot 라벨의 `valueFormatter` 는 축 `formatter` 와 폴백 규칙이 다르다: 반환이
+  null/undefined 일 때만 축 formatter 로 폴백하고, 그 외(number 등)는 `String()` 으로
+  변환해 그대로 채택한다(계산 결과를 살리기 위함). 축 `formatter` 는 문자열이 아닌
+  모든 반환값을 폴백 처리한다.
 - plot(line/band/label)은 back 패스(`draw`)가 아닌 front 패스(`drawPlots`)에서 그려진다.
   `draw()` 는 geometry 캐시(`_plotGeom`)만 남기며, ctx 는 호출부가 주입한다
   (main=buffer, worker=display).
@@ -228,6 +233,9 @@ axis 옵션의 `type`(`linear`/`time`/`log`/`step`)과 `categoryMode` 로 구현
   적용하고 좁은 캔버스에서도 maxSteps ≥ 1 을 보장한다.
 - 데이터 min/max 가 없고 range override 도 없으면 LinearScale 은 0~1 기본 축,
   TimeScale 은 null 축(빈 라벨)을 반환한다.
+- plot 라벨 `showValue: true` 에서 `valueFormatter` 가 없으면 축 formatter 결과가,
+  있으면 그 반환값이 value 로 합성된다(value-only 상태 포함). 반환이 null/undefined 면
+  축 formatter 로 폴백하고, 숫자 반환은 문자열로 변환해 그대로 쓴다.
 
 ## Architecture
 

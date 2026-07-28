@@ -34,3 +34,4 @@
 | 2026-06-30 | plotLine/plotBand z-order 옵션(`plot.aboveSeries`) 추가 | plot 오버레이를 시리즈 위/아래 중 선택 가능하게 | 항상 시리즈 위(또는 아래) 고정 |
 | 2026-06-30 | realTimeScatter 만료 series 즉시 자동 제거((a) 가시 윈도우 밖 + (b) 신규 점 없음, grace 없음) | pod 소멸 등으로 데이터가 끊긴 series 를 축 freeze 없이 정리, 부활 가드(`prunedRealTimeScatterSeries`)로 재추가 방지 | "series 키 부재"로 판정(실시간 배치와 불일치), grace 기간 유지 |
 | 2026-06-30 | blit 경로를 full redraw 와 픽셀 동등(blit≡full)하게 확정 — 반투명(per-point `drawn` 플래그)·분수 DPR(q배수 시프트로 device px 정수화)·cross-series dedupe 복원 | fast-path 가 알파 누적·sub-pixel drift·overdraw 로 full 과 달라지는 회귀를 제거, 조건 미달 시 full 폴백 유지 | 불투명·정수 DPR 로 fast-path 적용 범위 제한 |
+| 2026-07-24 | plot 라벨 `valueFormatter` 의 폴백을 null/undefined 반환에만 적용하고, 그 외 반환값은 `String()` 변환 | return 누락 등으로 null/undefined 가 오면 라벨에 리터럴 "null"/"undefined" 가 그려지므로 막아야 한다. 반면 숫자 반환은 사용자가 계산한 결과이므로 폴백하면 의도가 사라진다 — 축 `formatter`(문자열 아닌 모든 반환값을 폴백)와 규칙이 다른 이유 | 축 formatter 와 동일하게 문자열 외 전부 폴백(계산 결과 유실), 무조건 `String()`(리터럴 "null" 노출) |
