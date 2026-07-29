@@ -25,7 +25,7 @@ EVUI(EXEM Vue 3 컴포넌트 라이브러리)의 33개 컴포넌트가 공유하
 - **index.js의 책임**: 등록(install 부여)만 담당한다. 로직·스타일은 SFC와 uses.js에 둔다(예외: icon의 css import).
 - **신규 컴포넌트 노출 절차**: `src/main.js`의 import, `components` 배열, named export 3곳에 모두 추가해야 라이브러리에 노출된다.
 - **테스트 배치**: `*.spec.js`를 소스 파일과 동일 위치에 둔다(vitest). 비주얼 테스트는 `vitest.config.browser.js`(`npm run test:visual`, Playwright 브라우저 모드)로 분리.
-- **유틸리티**: 공용 유틸은 `src/common/`(utils, emitter 등)에 두고, 범용 함수는 lodash-es를 우선 사용한다.
+- **유틸리티**: 공용 유틸은 `src/common/`(utils, bignumber, debounce/throttle)에 두고, 범용 함수는 lodash-es를 우선 사용한다.
 - **(번들 격리)**: 라이브러리 빌드에서 `vue`는 external — 번들에 포함되지 않으며 peerDependency(`vue: *`)로 소비자가 제공한다.
 - **(빌드 산출물)**: Vite lib 모드(entry `src/main.js`, name `evui`)로 ESM(`dist/index.js`) + UMD(`dist/index.umd.cjs`) 단일 번들과 `dist/style.css`를 생성한다. package.json `exports`에 `.`(js)과 `./style`(css)을 분리 노출한다.
 - **(코드 스타일)**: ESLint(`eslint-config-exem`) + Prettier + stylelint. 커밋은 commitlint(conventional) + husky/lint-staged로 강제된다.
@@ -59,7 +59,7 @@ src/components/<name>/index.js ─── Component.install(app)
         └─ <style lang="scss"> ── @use '@/style/index.scss' (또는 style/*.scss 분리)
         │
 공용 레이어
-  src/common/      utils · emitter · bignumber/debounce/throttle/table/tree 유틸
+  src/common/      utils · bignumber/debounce/throttle 유틸
   src/directives/  clickoutside · resize (로컬 import)
   src/style/       index.scss(@forward functions/mixins/variables/themes) · lib · components
 ```
@@ -99,7 +99,7 @@ src/components/<name>/index.js ─── Component.install(app)
 | bignumber.js | 정밀 수치 연산 (`src/common/utils.bignumber.js`) |
 | korean-regexp | select 등의 한글 검색 매칭 |
 | vue3-observe-visibility | Grid / TreeGrid / Tabs 가시성 감지 디렉티브 (로컬 import) |
-| src/common/ | 공용 유틸·emitter |
+| src/common/ | 공용 유틸(숫자·크기 파싱, bignumber, debounce/throttle) |
 | src/directives/ | clickoutside · resize 디렉티브 |
 | src/style/ | 전역 SCSS (variables/mixins/themes/functions) |
 | @vue/compiler-sfc (dev) | docs `props.js`의 예제 소스 파싱 |
