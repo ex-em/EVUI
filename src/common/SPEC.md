@@ -37,11 +37,12 @@ EVUI 컴포넌트(차트·그리드·트리그리드·슬라이더·인풋넘버
 
 ## Acceptance Criteria
 
-- `src/common/*.spec.js`(utils, bignumber, debounce, throttle 4종) vitest가 전부 통과한다.
+- `src/common/*.spec.js`(utils, bignumber, debounce, debounce.worker, throttle 5종) vitest가 전부 통과한다.
 - `bnPlus(0.1, 0.2) === 0.3`, `bnFloor(3.999, 2) === 3.99`(내림, 반올림 아님)를 만족한다 (utils.bignumber.spec.js).
 - debounce는 wait 내 연속 호출 시 1회만(trailing) 실행되고 마지막 인자를 사용하며, `cancel()` 후 미실행·`flush()` 즉시 실행·`pending()` 상태 보고가 동작한다. func이 함수가 아니면 TypeError (utils.debounce.spec.js).
 - `debounce(fn)`을 wait 없이 호출해도 예외 없이 생성되고 다음 프레임에 1회 실행되며 `cancel()`로 그 프레임이 취소된다. `debounce(fn, 0)`은 rAF를 호출하지 않는다 (utils.debounce.spec.js — `requestAnimationFrame path`).
 - throttle은 기본 leading 즉시 실행 + wait당 최대 1회이며, `{ leading: false }`/`{ trailing: false }` 옵션이 동작한다. `throttle(fn)`을 wait 없이 호출하면 3회 호출이 3회 실행된다(빈도 제한 없음 — lodash 원본 동등) (utils.throttle.spec.js).
+- `window`가 없는 컨텍스트에서도 `debounce(fn)`의 rAF 경로가 동작하고, rAF 자체가 없으면 setTimeout 경로로 내려간다 (utils.debounce.worker.spec.js — node 환경).
 - `getQuantity('invalid')`는 null을 반환한다 (utils.spec.js).
 
 ## Architecture
