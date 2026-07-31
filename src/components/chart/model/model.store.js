@@ -183,6 +183,7 @@ const modules = {
           length: 0,
           fromTime: 0,
           toTime: 0,
+          lastValueTime: 0,
         };
 
         this.dataSet[key] = {
@@ -201,15 +202,24 @@ const modules = {
       const length = dataset.length;
 
       // 3) 이번 배치의 lastTime(초 단위) 계산
+      // lastValueTime 은 값이 있는(finite y) 점만 본다. y=null 경계점만 매 틱 보내 축을 흐르게 하는
+      // 소비자가 있어(윈도우 우측단 유지용), lastTime 으로 만료를 판정하면 영구 잔존한다.
       let lastTime = 0;
+      let lastValueTime = 0;
       for (let i = 0; i < storeLength; i++) {
         const item = data[i];
         if (item && lastTime < item.x) {
           lastTime = item.x;
         }
+        if (item && Number.isFinite(item.y) && lastValueTime < item.x) {
+          lastValueTime = item.x;
+        }
       }
 
       lastTime = lastTime ? Math.floor(lastTime / 1000) * 1000 : 0;
+      if (lastValueTime) {
+        dataset.lastValueTime = Math.floor(lastValueTime / 1000) * 1000;
+      }
 
       const dataGroupLastTime = dataGroup.at(-1)?.data?.at(-1)?.x || Date.now();
       const fallbackTime = Math.floor(dataGroupLastTime / 1000) * 1000;
@@ -432,12 +442,14 @@ const modules = {
    * realTimeScatter 의 기본 동작이다(별도 옵션 없이 항상 동작). 가시 범위 밖으로 완전히 밀려나고
    * 신규 점도 끊긴 series 가 누적 저장소·범례에 무한정 남지 않도록 자동 정리한다.
    * 제거 조건(AND)을 만족하면 즉시 제거한다(grace 없음):
-   *  - (a) 렌더되는 가시 윈도우 안에 점이 하나도 없음. 좌단은 `windowStart` 가 아니라
-   *        `windowStart + 1000` 이다 — 링이 보유하는 가장 오래된 버킷이 `toTime - (range-1)*1000` 이고
-   *        series minMax.minX 도 `fromTime + 1000` 으로 잡기 때문. 그래서 점이 이미 안 보이는 틱에
-   *        제거되지 않고 한 틱(정확히는 1버킷) 뒤에 제거되는 드리프트가 생겼다.
-   *  - (b) 이번 수신 틱에 그 series 의 신규 점이 없음(`!datas[sId]?.length`).
-   *        이번 틱에 점을 보낸 series 는 (오래된 점이라도) 활성으로 보고 보존한다.
+   *  - (a) 렌더되는 가시 윈도우 안에 값 있는 점이 하나도 없음.
+   *        좌단은 `windowStart` 가 아니라 `windowStart + 1000` 이다 — 링이 보유하는 가장 오래된
+   *        버킷이 `toTime - (range-1)*1000` 이고 series minMax.minX 도 `fromTime + 1000` 으로
+   *        잡기 때문. 그래서 `lastValueTime < windowStart + 1000` 이 (a)와 등가다.
+   *  - (b) 이번 수신 틱에 그 series 의 "값 있는" 신규 점이 없음.
+   *        이번 틱에 값을 보낸 series 는 (오래된 점이라도) 활성으로 보고 보존한다.
+   *        y=null 경계점만 오는 틱은 활성 신호가 아니다 — 축 우측단 유지용 패딩이라 이를 활성으로
+   *        보면 만료 판정이 영구히 성립하지 않는다.
    * "series 키 부재"로는 판정하지 않는다 — 죽은 키가 data.series/data.data 에 남아 있을 수 있어서다.
    *
    * @param {object} datas  이번 틱 수신 데이터(createRealTimeScatterDataSet 인자)
@@ -467,8 +479,10 @@ const modules = {
     for (let i = 0; i < keys.length; i++) {
       const sId = keys[i];
       const ds = dataSet[sId];
-      const hasNoVisiblePoint = ds.toTime < visibleStart; // (a)
-      const hasNoNewData = !datas[sId]?.length; // (b)
+      // 값을 한 번도 받지 못한 series 는 lastValueTime 이 0 이라 항상 (a) 를 만족한다 — 축 패딩만
+      // 오는 series 가 그대로다. toTime 으로 폴백하면 그 series 가 영구 보존되므로 폴백하지 않는다.
+      const hasNoVisiblePoint = (ds.lastValueTime || 0) < visibleStart; // (a)
+      const hasNoNewData = !Util.hasRealTimeScatterValue(datas[sId]); // (b)
 
       // (a)+(b)면 가시 범위 밖으로 완전히 밀려났고 신규 점도 없으므로 즉시 제거한다(grace 없음).
       if (hasNoVisiblePoint && hasNoNewData) {

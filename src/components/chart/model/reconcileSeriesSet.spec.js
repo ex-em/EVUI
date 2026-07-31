@@ -212,4 +212,17 @@ describe('reconcileSeriesSet — realTimeScatter 만료 series 부활 가드 해
     expect(ctx.seriesList.dead).toBeUndefined(); // 재생성 제외
     expect(ctx.seriesList.active).toBeDefined();
   });
+
+  // 회귀: 부활 판정이 length 기준이면 y=null 축 패딩만 오는 소비자에서 prune 직후 매 틱 되살아나
+  // 범례가 깜빡인다. 만료 판정과 같은 "값 있는 점" 기준을 써야 한다.
+  it('y=null 경계 패딩만 오는 pruned 키는 부활하지 않는다', () => {
+    const ctx = makeCtx();
+    ctx.prunedRealTimeScatterSeries = new Set(['dead']);
+    ctx.data = { data: { active: [{ x: 1, y: 1 }], dead: [{ x: 2, y: null }] } };
+
+    reconcile(ctx, series);
+
+    expect(ctx.prunedRealTimeScatterSeries.has('dead')).toBe(true);
+    expect(ctx.seriesList.dead).toBeUndefined();
+  });
 });
