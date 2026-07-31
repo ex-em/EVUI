@@ -1,4 +1,5 @@
 import { isEqual } from 'lodash-es';
+import Util from '../helpers/helpers.util';
 import Line from '../element/element.line';
 import Scatter from '../element/element.scatter';
 import Bar from '../element/element.bar';
@@ -72,14 +73,16 @@ const modules = {
     const newSeriesList = {};
 
     // 만료 제거(expire)된 realTimeScatter series 부활 일원화(재추가 방지 가드의 단일 해제 지점):
-    //  - 신규 점이 들어온 pruned 키는 가드에서 빼고 일반 경로로 재생성한다(부활).
-    //  - 신규 점이 없는 pruned 키는 data.series 에 키가 남아 있어도 재생성 대상에서 제외한다.
+    //  - "값 있는" 신규 점이 들어온 pruned 키는 가드에서 빼고 일반 경로로 재생성한다(부활).
+    //  - 값이 없는 pruned 키는 data.series 에 키가 남아 있어도 재생성 대상에서 제외한다.
+    //    y=null 경계 패딩까지 부활 신호로 보면 prune 직후 매 틱 되살아나 범례가 깜빡인다 —
+    //    만료 판정(pruneExpiredRealTimeScatterSeries)과 같은 기준을 쓴다.
     // (createRealTimeScatterDataSet 의 키 필터는 skip 만 하고 Set 에서 빼지 않으므로 해제는 여기서만.)
     const prunedSet = this.prunedRealTimeScatterSeries;
     if (prunedSet?.size) {
       for (let i = 0; i < seriesKeys.length; i++) {
         const key = seriesKeys[i];
-        if (prunedSet.has(key) && this.data?.data?.[key]?.length) {
+        if (prunedSet.has(key) && Util.hasRealTimeScatterValue(this.data?.data?.[key])) {
           prunedSet.delete(key);
         }
       }

@@ -178,6 +178,19 @@ export default {
   },
 
   /**
+   * realTimeScatter 배치에 "값 있는" 점이 하나라도 있는지.
+   *
+   * y=null 점은 축 우측단(윈도우 흐름)을 유지하려고 매 틱 보내는 경계 패딩이라 활성 신호가 아니다.
+   * 만료 판정(pruneExpiredRealTimeScatterSeries)과 부활 판정(reconcileSeriesSet)이 같은 기준을
+   * 써야 prune 직후 패딩만으로 되살아나는 왕복이 생기지 않는다.
+   * @param {Array<{x: number, y: number|null}>} points  이번 틱 배치
+   * @returns {boolean}
+   */
+  hasRealTimeScatterValue(points) {
+    return !!points?.some((point) => Number.isFinite(point?.y));
+  },
+
+  /**
    * Create string for canvas font style
    * @param {object} style    style object by user
    *
