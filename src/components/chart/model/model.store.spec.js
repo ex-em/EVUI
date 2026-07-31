@@ -958,6 +958,30 @@ describe('model.store createRealTimeScatterDataSet 개별 series 만료 제거',
     expect(store.seriesInfo.charts.scatter).toEqual(['a', 'b']);
   });
 
+  // (b)는 "이번 틱에 점을 보냈는가"만 본다 — y 값 유무는 보지 않는다. 축 우측단 유지용으로 y=null 만
+  // 보내는 소비자가 있어서다(SPEC.md "y=null 경계 패딩은 활성 신호다").
+  // 회귀: 만료 판정을 "값 있는 점(finite y)" 기준(lastValueTime)으로 되돌리면 패딩 series 가 제거된다.
+  it('y=null 축 패딩만 보내는 series 는 range 를 넘겨도 보존된다', () => {
+    const store = buildStore({ range: 5, scatterIds: ['a', 'pad'] });
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      pad: [{ x: t0, y: 2 }],
+    });
+
+    // pad 는 이후 값 없이 축 패딩만 보낸다 → range(5s) 를 넘겨도 (b) 가 false 라 보존.
+    for (let s = 1; s <= 8; s++) {
+      store.createRealTimeScatterDataSet({
+        a: [{ x: t0 + s * SECOND, y: 1 }],
+        pad: [{ x: t0 + s * SECOND, y: null }],
+      });
+    }
+
+    expect(store.dataSet.pad).toBeDefined();
+    expect(store.seriesInfo.charts.scatter).toContain('pad');
+  });
+
   // 렌더 윈도우(series.minMax.maxX)는 prune 윈도우(globalToTime = max toTime)와 같은 기준이어야 한다.
   // 회귀: minMaxValues.toTime 이 마지막 처리 키의 toTime 으로 덮어써지면(last-write-wins), 죽은(stale)
   // series 가 마지막 키이고 아직 prune 전이면, 살아있는 series 의 maxX 가 그 stale 시각에 묶여 축이 freeze 된다.
