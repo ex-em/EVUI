@@ -22,7 +22,6 @@ import { isEqual, debounce } from 'lodash-es';
 import { resize } from '@/directives/resize';
 import EvChart from './chart.core';
 import EvChartToolbar from './ChartToolbar';
-import Util from './helpers/helpers.util';
 import { useModel, useWrapper, useZoomModel, cloneChartData } from './uses';
 
 export default {
@@ -260,17 +259,15 @@ export default {
         const isUpdateSeriesData = !isEqual(newData.series, evChart.data.series);
         const isUpdateGroups = !isEqual(newData.groups, evChart.data.groups);
 
-        // 만료 제거된 realTimeScatter series 가 "값 있는" 신규 점과 함께 돌아오면(부활) updateSeries 를
-        // 강제한다. 그래야 reconcileSeriesSet 이 돌아 seriesList/seriesInfo.charts.scatter 에 인스턴스를
-        // 복구하고 (이 경로에서 prunedRealTimeScatterSeries 에서도 제거), pointsLayer baseline 도
-        // 무효화돼 부활 series 가 다시 그려지고 범례에도 표시된다.
-        // y=null 경계 패딩은 부활 신호가 아니다 — 매 틱 패딩만 보내는 소비자에서 이를 신호로 보면
-        // 만료 → 즉시 updateSeries 강제가 매 틱 반복돼 full redraw 가 상시화된다(만료·부활 판정 통일).
+        // 만료 제거된 realTimeScatter series 가 신규 점과 함께 돌아오면(부활) updateSeries 를 강제한다.
+        // 그래야 reconcileSeriesSet 이 돌아 seriesList/seriesInfo.charts.scatter 에 인스턴스를 복구하고
+        // (이 경로에서 prunedRealTimeScatterSeries 에서도 제거), pointsLayer baseline 도 무효화돼
+        // 부활 series 가 다시 그려지고 범례에도 표시된다.
         const prunedSet = evChart.prunedRealTimeScatterSeries;
         const isRevived =
           !!prunedSet?.size &&
           Object.keys(newData.data ?? {}).some(
-            (key) => prunedSet.has(key) && Util.hasRealTimeScatterValue(newData.data[key]),
+            (key) => prunedSet.has(key) && newData.data[key]?.length,
           );
 
         const isUpdateSeries =
