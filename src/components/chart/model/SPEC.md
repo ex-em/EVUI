@@ -59,7 +59,7 @@ EvChart 코어에 mixin되는 데이터 모델 계층이다. 사용자가 넘긴
 - `prevData` 풀 전달 시 점객체 참조가 재사용되고 값은 새 데이터로 갱신되며, 풀 유무와 무관하게 출력이 동일하다. 새 데이터가 짧으면 새 길이만 반환한다. (addSeriesStackDS.spec.js)
 - 같은 series 집합을 reconcile하면 전 인스턴스 참조가 재사용되고, opt/type 변경 series만 recreate되며, index만 바뀐 색 명시 series는 재사용된다. 재사용 인스턴스의 show는 `_freshShow`로, group/stack 메타는 기본값으로 리셋된다. (reconcileSeriesSet.spec.js)
 - realTimeScatter: 동일 (x,y)는 배치 내 1회만 push되고(`coordinateDedupe=false`면 전부 push), (a)+(b) 조건 충족 series는 즉시 제거되며, 제거된 series는 신규 점이 오기 전까지 데이터 레이어에서 재생성되지 않고 신규 점이 오면 reconcile에서 부활한다. 생존 series의 maxX는 전역 max toTime을 따른다. (model.store.spec.js, reconcileSeriesSet.spec.js)
-- realTimeScatter 만료 경계: 마지막 값이 렌더 좌단(`fromTime + 1000`) 밖으로 밀려난 **그 틱**에 제거된다(한 틱 지연 없음). y=null 경계 패딩만 오는 series·값을 한 번도 못 받은 series도 제거되고, 패딩과 값이 함께 오면 보존되며, 패딩만으로는 부활하지 않는다. (model.store.spec.js, reconcileSeriesSet.spec.js)
+- realTimeScatter 만료 경계: 마지막 값이 렌더 좌단(`fromTime + 1000`) 밖으로 밀려난 **그 틱**에 제거된다(한 틱 지연 없음). (model.store.spec.js)
 - hit test: directHit > hit > 거리 기반 fallback 우선순위를 지키고, 값(o)이 null인 series는 좌표가 더 가까워도 fallback에서 제외되며(0은 포함), all-null 라벨은 `disableNullLabelSnap` 여부에 따라 이웃 스냅 또는 그대로 반환한다. (model.store.spec.js)
 - `getVisibleWindowMaxSeries`는 윈도우 내 유한값 max만 반환하고 show=false·NaN/Infinity를 제외하며, 윈도우가 data 길이 밖이어도 안전하게 clamp한다. (model.store.spec.js)
 
