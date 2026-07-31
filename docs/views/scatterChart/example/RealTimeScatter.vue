@@ -217,14 +217,14 @@ export default {
 
     const tick = () => {
       setDataHandler();
-      timeoutId = setTimeout(tick, 3000);
+      timeoutId = setTimeout(tick, 1000);
     };
 
     watch(
       () => isRealTime.value,
       () => {
         if (isRealTime.value) {
-          timeoutId = setTimeout(tick, 3000);
+          timeoutId = setTimeout(tick, 1000);
         } else {
           clearTimeout(timeoutId);
         }
