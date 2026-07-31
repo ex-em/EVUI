@@ -1,3 +1,21 @@
+## [3.17.1](https://github.com/ex-em/EVUI/compare/3.17.0...3.17.1) (2026-07-31)
+
+
+### Bug Fixes
+
+* api-docs 클래스 프리픽스 ad- → apidoc- 변경 (광고 차단기 회피) ([73d579a](https://github.com/ex-em/EVUI/commit/73d579a8ad64fa09a886dbdcb9cd29f354b14a96))
+* **chart:** realTimeScatter 만료 좌단을 렌더 좌단에 맞춤 ([#2329](https://github.com/ex-em/EVUI/issues/2329)) ([2f99845](https://github.com/ex-em/EVUI/commit/2f9984528dd4b7bdbea11ace476ba56f6804f8f6))
+* **chart:** realTimeScatter 만료·부활 판정을 값 있는 점 기준으로 통일 ([#2329](https://github.com/ex-em/EVUI/issues/2329)) ([fd9f713](https://github.com/ex-em/EVUI/commit/fd9f71333f89ca8d171529f1bcfc1c361f88e512))
+* dependencies.vue 를 ^3.5.8 로 복구 ([deda18e](https://github.com/ex-em/EVUI/commit/deda18e7d6a8f23571384e183c0a27510403ed4e))
+* **docs:** perf-stress single append 모드 time축 gap 제거 ([56c3b76](https://github.com/ex-em/EVUI/commit/56c3b7670c8e82ac6c6ca1b4ad1f0a6df01e2868))
+* **docs:** perf-stress single 차트 x축 타입과 대량 시리즈 tooltip 수정 ([0f5791c](https://github.com/ex-em/EVUI/commit/0f5791cb06b5235ea4421bd2e148eeeda7989121))
+* **docs:** perf-stress 대시보드 라이브 갱신 시 시간축 창이 60초간 얼어붙는 문제 수정 ([eeff6ca](https://github.com/ex-em/EVUI/commit/eeff6caf2de0b2dfc9a8d4a3bdd769951e9f9a47))
+
+
+### Reverts
+
+* **chart:** 만료·부활 판정의 값 있는 점(finite y) 기준 철회 ([#2329](https://github.com/ex-em/EVUI/issues/2329)) ([474427d](https://github.com/ex-em/EVUI/commit/474427d752d1a36a0261b9e405ec45dcb3411ae1))
+
 # [3.17.0](https://github.com/ex-em/EVUI/compare/3.16.0...3.17.0) (2026-07-24)
 
 
