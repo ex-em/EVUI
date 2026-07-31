@@ -1,1 +1,0 @@
-import{_ as o,o as e,h as t}from"./index-Cl5z2fRX.js";const n={name:"PageNotFound",components:{},setup(){}};function a(s,c,r,p,u,_){return e(),t("div",null,"PageNotFound")}const f=o(n,[["render",a]]);export{f as default};
