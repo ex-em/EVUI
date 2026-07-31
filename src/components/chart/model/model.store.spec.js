@@ -925,6 +925,39 @@ describe('model.store createRealTimeScatterDataSet 개별 series 만료 제거',
     expect(store.dataSet.c).toBeDefined();
   });
 
+  // 렌더 좌단은 fromTime + 1000(= 링이 보유하는 가장 오래된 버킷)이다. 가시 점이 0개가 된 그 틱에
+  // 제거해야 외부 범례(대시보드 범례 등)와 차트 범례가 같은 틱에 비워진다.
+  // 회귀: 조건이 `ds.toTime < windowStart` 면 마지막 점이 좌단 왼쪽으로 나간 뒤에도 한 틱 더 남는다.
+  it('마지막 값이 렌더 좌단 밖으로 밀려난 그 틱에 제거된다(경계, 한 틱 지연 없음)', () => {
+    const store = buildStore({ range: 10 });
+    const t0 = Math.floor(Date.now() / SECOND) * SECOND;
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0, y: 1 }],
+      b: [{ x: t0, y: 2 }],
+      c: [{ x: t0, y: 3 }],
+    });
+
+    // +9s: 좌단이 t0 라 c 의 점이 아직 가시 → 보존
+    for (let s = 1; s <= 9; s++) {
+      store.createRealTimeScatterDataSet({
+        a: [{ x: t0 + s * SECOND, y: 1 }],
+        b: [{ x: t0 + s * SECOND, y: 2 }],
+        c: [],
+      });
+    }
+    expect(store.dataSet.c).toBeDefined();
+
+    // +10s: 좌단이 t0+1s 로 이동해 c 의 점이 밖 → 같은 틱에 제거
+    store.createRealTimeScatterDataSet({
+      a: [{ x: t0 + 10 * SECOND, y: 1 }],
+      b: [{ x: t0 + 10 * SECOND, y: 2 }],
+      c: [],
+    });
+    expect(store.dataSet.c).toBeUndefined();
+    expect(store.seriesInfo.charts.scatter).toEqual(['a', 'b']);
+  });
+
   // 렌더 윈도우(series.minMax.maxX)는 prune 윈도우(globalToTime = max toTime)와 같은 기준이어야 한다.
   // 회귀: minMaxValues.toTime 이 마지막 처리 키의 toTime 으로 덮어써지면(last-write-wins), 죽은(stale)
   // series 가 마지막 키이고 아직 prune 전이면, 살아있는 series 의 maxX 가 그 stale 시각에 묶여 축이 freeze 된다.

@@ -432,9 +432,10 @@ const modules = {
    * realTimeScatter 의 기본 동작이다(별도 옵션 없이 항상 동작). 가시 범위 밖으로 완전히 밀려나고
    * 신규 점도 끊긴 series 가 누적 저장소·범례에 무한정 남지 않도록 자동 정리한다.
    * 제거 조건(AND)을 만족하면 즉시 제거한다(grace 없음):
-   *  - (a) 가시 윈도우 `[globalToTime - range, globalToTime]` 안에 점이 하나도 없음.
-   *        ring 버퍼는 윈도우 밖 점을 비우고 점은 항상 `<= toTime` 에 존재하므로,
-   *        `ds.toTime < windowStart` 가 (a)와 정확히 등가다(series 별 최신 누적 x 로 O(1) short-circuit).
+   *  - (a) 렌더되는 가시 윈도우 안에 점이 하나도 없음. 좌단은 `windowStart` 가 아니라
+   *        `windowStart + 1000` 이다 — 링이 보유하는 가장 오래된 버킷이 `toTime - (range-1)*1000` 이고
+   *        series minMax.minX 도 `fromTime + 1000` 으로 잡기 때문. 그래서 점이 이미 안 보이는 틱에
+   *        제거되지 않고 한 틱(정확히는 1버킷) 뒤에 제거되는 드리프트가 생겼다.
    *  - (b) 이번 수신 틱에 그 series 의 신규 점이 없음(`!datas[sId]?.length`).
    *        이번 틱에 점을 보낸 series 는 (오래된 점이라도) 활성으로 보고 보존한다.
    * "series 키 부재"로는 판정하지 않는다 — 죽은 키가 data.series/data.data 에 남아 있을 수 있어서다.
@@ -459,13 +460,14 @@ const modules = {
     }
 
     const range = this.options.realTimeScatter?.range || 300;
-    const windowStart = globalToTime - range * 1000;
+    // 렌더 좌단(= series minMax.minX = fromTime + 1000)까지 포함해야 "가시 점 0개"와 일치한다.
+    const visibleStart = globalToTime - (range - 1) * 1000;
 
     const pruned = [];
     for (let i = 0; i < keys.length; i++) {
       const sId = keys[i];
       const ds = dataSet[sId];
-      const hasNoVisiblePoint = ds.toTime < windowStart; // (a)
+      const hasNoVisiblePoint = ds.toTime < visibleStart; // (a)
       const hasNoNewData = !datas[sId]?.length; // (b)
 
       // (a)+(b)면 가시 범위 밖으로 완전히 밀려났고 신규 점도 없으므로 즉시 제거한다(grace 없음).
