@@ -155,7 +155,7 @@ export default {
         let randomX = 0;
         let randomY = 0;
         if (!isInit) {
-          randomX = Math.round((Date.now() + getRandomInt(-3000, 0)) / 1000) * 1000; // 1초 격자
+          randomX = Math.round((Date.now() + getRandomInt(-1000, 0)) / 1000) * 1000; // 1초 격자
           randomY = getRandomInt(3, 15) * 1000;
         } else {
           randomX = Math.round((Date.now() + getRandomInt(-300000, 0)) / 1000) * 1000; // 1초 격자
