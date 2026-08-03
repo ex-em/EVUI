@@ -42,6 +42,8 @@
           >
             <chart-playground-editor
               :model-value="snapshotData"
+              :raw-script="parsedData?.script?.content"
+              source-var="chartData"
               @apply="onApplyData"
             />
           </div>
@@ -54,6 +56,8 @@
           >
             <chart-playground-editor
               :model-value="snapshotOptions"
+              :raw-script="parsedData?.script?.content"
+              source-var="chartOptions"
               @apply="onApplyOptions"
             />
           </div>
