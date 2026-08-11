@@ -1,3 +1,20 @@
+# [3.18.0](https://github.com/ex-em/EVUI/compare/3.17.1...3.18.0) (2026-08-11)
+
+
+### Bug Fixes
+
+* **select:** clip 경계 ancestor 인식 + 양쪽 부족 시 dropDown 으로 통일 ([d77b179](https://github.com/ex-em/EVUI/commit/d77b179a6176bb0752bf9acc6264f4c67da4be35))
+* **select:** ev-window 등 스크롤 ancestor 안에서 dropbox flip이 잘리는 문제 수정 ([34a77f3](https://github.com/ex-em/EVUI/commit/34a77f355384f2520664b35cde6573baf0e6f138))
+* **select:** multiple+teleport tag wrap 시 dropbox가 닫히는 문제 수정 ([adc3628](https://github.com/ex-em/EVUI/commit/adc3628246e5e4abe3262efea7211528afcae56d))
+* **select:** wrapper 축소 후 dropbox width가 줄어들지 않는 회귀 수정 ([e256605](https://github.com/ex-em/EVUI/commit/e256605c19134350b597812a5a415eb78b7c2080)), closes [#2267](https://github.com/ex-em/EVUI/issues/2267)
+
+
+### Features
+
+* **select:** dropbox teleport 옵션 추가 ([57c6987](https://github.com/ex-em/EVUI/commit/57c698704f1fc5d10dc216eeb8b472cec399552d))
+* **select:** tagMaxRows prop 추가 및 multiple flip 방향 open-time 잠금 ([c082d5b](https://github.com/ex-em/EVUI/commit/c082d5b389ab52d529ab0c8bafacaf173aece628))
+* **select:** teleport 모드 ancestor scroll/resize 시 dropbox 자동 close ([f15fd8a](https://github.com/ex-em/EVUI/commit/f15fd8a8828034e3e6f5afbde91119bb5c638d99))
+
 ## [3.17.1](https://github.com/ex-em/EVUI/compare/3.17.0...3.17.1) (2026-07-31)
 
 
