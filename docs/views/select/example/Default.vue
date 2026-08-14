@@ -40,6 +40,28 @@
     <ev-select v-model="selectVal4" :items="items4" placeholder="Please Select Item." filterable />
   </div>
   <div class="case">
+    <p class="case-title">Filterable + Highlight Match</p>
+    <ev-select
+      v-model="selectVal4"
+      :items="items4"
+      placeholder="Please Select Item."
+      filterable
+      :highlight="{ match: true }"
+    />
+    <div class="description">검색 시 매칭 구간이 기본색(테마 primary)으로 강조됩니다.</div>
+  </div>
+  <div class="case">
+    <p class="case-title">Filterable + Highlight Color</p>
+    <ev-select
+      v-model="selectVal4"
+      :items="items4"
+      placeholder="Please Select Item."
+      filterable
+      :highlight="{ match: true, color: '#409eff' }"
+    />
+    <div class="description">highlight.color 로 강조 색상을 지정할 수 있습니다.</div>
+  </div>
+  <div class="case">
     <p class="case-title">Icon</p>
     <ev-select
       v-model="selectVal5"

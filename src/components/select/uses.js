@@ -134,28 +134,126 @@ export const useDropdown = (param) => {
   const teleportTarget = ref('body');
 
   /**
+   * 검색어 하나로 매처 목록을 만든다.
+   * 원문 / 영→한 / 한→영 세 가지를 모두 시도해야 초성·자판 변환 검색이 걸린다 (PR #1405).
+   * 필터와 하이라이트가 이 매처를 공유해야 필터에 걸린 이유가 그대로 강조된다.
+   * @param {string} trimText - 공백 제거된 검색어
+   * @returns {RegExp[]} - 매처 목록 (빈 검색어면 [])
+   */
+  const getMatchers = (trimText) => {
+    if (!trimText) {
+      return [];
+    }
+    return [trimText, engToKor(trimText), korToEng(trimText)]
+      .filter(Boolean)
+      .map((text) => getRegExp(text));
+  };
+
+  /**
    * filterable 모드 시 인풋박스에 입력된 텍스트가 포함된 목록 가져오기
    * @param val - filterable 모드 시 인풋박스에 입력된 텍스트
    * @returns [] - 필터링 결과의 목록
    */
   const filteredItems = computed(() => {
-    if (!filterTextRef.value || !props.filterable) {
+    // trim 전 값으로 가드하면 공백만 입력된 '   ' 가 통과해 매처가 비고 결과가 전멸한다.
+    const trimText = filterTextRef.value?.trim();
+    if (!trimText || !props.filterable) {
       return props.items;
     }
-    const trimText = filterTextRef.value?.trim();
-    const korean = engToKor(trimText);
-    const eng = korToEng(trimText);
+    const matchers = getMatchers(trimText);
 
-    return props.items.filter(
-      ({ name }) =>
-        name.search(getRegExp(trimText)) > -1 ||
-        name.search(getRegExp(korean)) > -1 ||
-        name.search(getRegExp(eng)) > -1,
-    );
+    return props.items.filter(({ name }) => matchers.some((re) => name.search(re) > -1));
   });
 
   /**
-   * filterable 에서 text input 이벤트 핸들러
+   * 강조 활성 여부. 비활성이면 splitByMatch 가 단일 plain 조각만 반환해
+   * highlight 미지정 사용처의 렌더링이 기존과 동일하게 유지된다.
+   */
+  const isHighlightMatch = computed(
+    () => !!props.highlight?.match && props.filterable && !!filterTextRef.value?.trim(),
+  );
+
+  /**
+   * 강조 구간 탐색용 global 매처.
+   * getRegExp 는 i 플래그만 반환해 exec 를 반복해도 첫 매칭만 나오므로 global 사본이 필요하다.
+   * splitByMatch 가 항목마다 호출되는 탓에 여기서 만들지 않으면 항목 수만큼 재컴파일된다
+   * (항목 300개 기준 키 입력 1회당 900회 → 3회).
+   */
+  const globalMatchers = computed(() =>
+    getMatchers(filterTextRef.value?.trim()).map((re) => new RegExp(re.source, `${re.flags}g`)),
+  );
+
+  /**
+   * 항목 이름을 강조/비강조 조각으로 분해한다.
+   * 세 매처의 매칭 구간을 모두 모아 병합하므로 이름 안에 여러 번 등장해도 전부 강조된다.
+   * @param {string} name - 항목 이름
+   * @returns {{ text: string, matched: boolean }[]} - 순서가 보존된 조각 목록
+   */
+  const splitByMatch = (name) => {
+    const plain = [{ text: name, matched: false }];
+    if (!isHighlightMatch.value || typeof name !== 'string' || !name) {
+      return plain;
+    }
+
+    const ranges = [];
+    globalMatchers.value.forEach((globalRe) => {
+      // 항목마다 같은 인스턴스를 공유하므로 리셋하지 않으면 다음 항목의 강조가 누락된다.
+      globalRe.lastIndex = 0;
+      let matched = globalRe.exec(name);
+      while (matched) {
+        if (matched[0].length) {
+          ranges.push([matched.index, matched.index + matched[0].length]);
+        } else {
+          // zero-length 매칭은 lastIndex 가 전진하지 않아 무한 루프가 된다.
+          globalRe.lastIndex += 1;
+        }
+        matched = globalRe.exec(name);
+      }
+    });
+
+    if (!ranges.length) {
+      return plain;
+    }
+
+    // 시작 위치 기준 정렬 후 겹치거나 맞닿은 구간을 병합한다.
+    ranges.sort((a, b) => a[0] - b[0]);
+    const merged = [ranges[0]];
+    ranges.slice(1).forEach(([start, end]) => {
+      const last = merged[merged.length - 1];
+      if (start <= last[1]) {
+        last[1] = Math.max(last[1], end);
+      } else {
+        merged.push([start, end]);
+      }
+    });
+
+    const chunks = [];
+    let cursor = 0;
+    merged.forEach(([start, end]) => {
+      if (start > cursor) {
+        chunks.push({ text: name.slice(cursor, start), matched: false });
+      }
+      chunks.push({ text: name.slice(start, end), matched: true });
+      cursor = end;
+    });
+    if (cursor < name.length) {
+      chunks.push({ text: name.slice(cursor), matched: false });
+    }
+    return chunks;
+  };
+
+  /**
+   * 매칭 구간 inline 색상. 미지정 시 null 을 반환해 SCSS 의 테마 primary 기본값이 적용된다.
+   */
+  const highlightStyle = computed(() =>
+    props.highlight?.color ? { color: props.highlight.color } : null,
+  );
+
+  /**
+   * filterable 에서 text input 이벤트 핸들러.
+   * IME(한글) 조합 중에도 그대로 갱신한다 — 조합 중 갱신을 보류하면 입력창 글자와
+   * 목록/강조가 어긋난다. Vue 는 바인딩 값이 DOM 값과 같으면 :value 를 다시 쓰지 않아
+   * 조합 버퍼는 끊기지 않는다.
    */
   const changeFilterText = (e) => {
     filterTextRef.value = e?.target?.value;
@@ -525,6 +623,9 @@ export const useDropdown = (param) => {
     dropboxPosition,
     filterTextRef,
     filteredItems,
+    isHighlightMatch,
+    splitByMatch,
+    highlightStyle,
     clickSelectInput,
     clickOutsideDropbox,
     changeFilterText,

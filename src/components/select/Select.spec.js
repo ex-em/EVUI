@@ -1074,4 +1074,253 @@ describe('EvSelect Component', () => {
       wrapper.unmount();
     });
   });
+
+  describe('Highlight', () => {
+    const highlightProps = {
+      items: [
+        { name: 'apple pie apple', value: 'a' },
+        { name: '바나나', value: 'b' },
+      ],
+      filterable: true,
+    };
+
+    /** 드롭박스를 열고 검색어를 입력한다. */
+    const openAndSearch = async (wrapper, text) => {
+      await wrapper.find('.ev-input').trigger('click');
+      await wrapper.find('.ev-input-query').setValue(text);
+      await nextTick();
+      return wrapper;
+    };
+
+    it('highlight 미지정 시 항목이 기존과 동일한 plain 텍스트로 렌더된다 (하위 호환)', async () => {
+      const wrapper = mount(EvSelect, { props: highlightProps, ...globalConfig });
+      await openAndSearch(wrapper, 'apple');
+
+      const item = wrapper.find('.ev-select-dropbox-item');
+      expect(item.text()).toBe('apple pie apple');
+      expect(wrapper.find('.ev-select-item-highlight').exists()).toBe(false);
+    });
+
+    it('공백만 입력하면 필터를 적용하지 않고 전체 목록을 유지한다 (회귀 가드)', async () => {
+      // trim 전 값으로 가드하면 '   ' 가 통과해 매처가 비고 결과가 전멸한다.
+      const wrapper = mount(EvSelect, { props: highlightProps, ...globalConfig });
+      await openAndSearch(wrapper, '   ');
+
+      const items = wrapper.findAll('.ev-select-dropbox-item');
+      expect(items.map((i) => i.text())).toEqual(['apple pie apple', '바나나']);
+    });
+
+    it('highlight.match=true 에서도 공백만 입력하면 전체 목록 + 강조 없음', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, '   ');
+
+      const items = wrapper.findAll('.ev-select-dropbox-item');
+      expect(items.map((i) => i.text())).toEqual(['apple pie apple', '바나나']);
+      expect(wrapper.find('.ev-select-item-highlight').exists()).toBe(false);
+    });
+
+    it('여러 항목을 연속 렌더해도 매처 lastIndex 오염 없이 강조된다 (공유 인스턴스 가드)', async () => {
+      // globalMatchers 의 정규식을 모든 항목이 공유하므로,
+      // lastIndex 를 리셋하지 않으면 두 번째 이후 항목의 강조가 누락된다.
+      const wrapper = mount(EvSelect, {
+        props: {
+          items: [
+            { name: 'apple one', value: '1' },
+            { name: 'apple two', value: '2' },
+            { name: 'apple three', value: '3' },
+          ],
+          filterable: true,
+          highlight: { match: true },
+        },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'apple');
+
+      // 세 항목 모두 각각 강조되어야 한다 (첫 항목만 강조되면 lastIndex 오염).
+      expect(wrapper.findAll('.ev-select-item-highlight').map((m) => m.text())).toEqual([
+        'apple',
+        'apple',
+        'apple',
+      ]);
+    });
+
+    it('highlight.match=false 이면 강조하지 않는다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: false } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'apple');
+
+      expect(wrapper.find('.ev-select-item-highlight').exists()).toBe(false);
+    });
+
+    it('highlight.match=true + 검색 시 매칭된 모든 구간이 강조된다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'apple');
+
+      const marks = wrapper.findAll('.ev-select-item-highlight');
+      expect(marks.length).toBe(2);
+      marks.forEach((mark) => expect(mark.text()).toBe('apple'));
+      // 강조 여부와 무관하게 표시 텍스트는 원본과 동일해야 한다.
+      expect(wrapper.find('.ev-select-dropbox-item').text()).toBe('apple pie apple');
+    });
+
+    it('강조 구간을 제외한 나머지 텍스트는 강조되지 않는다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'pie');
+
+      const marks = wrapper.findAll('.ev-select-item-highlight');
+      expect(marks.length).toBe(1);
+      expect(marks[0].text()).toBe('pie');
+    });
+
+    it('highlight.color 지정 시 매칭 구간에만 해당 색상이 inline 적용된다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true, color: 'rgb(64, 158, 255)' } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'pie');
+
+      const mark = wrapper.find('.ev-select-item-highlight');
+      expect(mark.attributes('style')).toContain('rgb(64, 158, 255)');
+    });
+
+    it('검색어가 비면 강조가 사라진다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'apple');
+      expect(wrapper.find('.ev-select-item-highlight').exists()).toBe(true);
+
+      await wrapper.find('.ev-input-query').setValue('');
+      await nextTick();
+      expect(wrapper.find('.ev-select-item-highlight').exists()).toBe(false);
+    });
+
+    it('filterable=false 이면 highlight.match=true 여도 강조하지 않는다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, filterable: false, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await wrapper.find('.ev-input').trigger('click');
+      await nextTick();
+
+      expect(wrapper.find('.ev-select-item-highlight').exists()).toBe(false);
+    });
+
+    it('checkable 모드에서도 매칭 구간이 강조된다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, checkable: true, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'pie');
+
+      expect(wrapper.find('.ev-select-item-highlight').text()).toBe('pie');
+    });
+
+    it('multiple + checkable 모드에서도 매칭 구간이 강조된다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: {
+          ...highlightProps,
+          multiple: true,
+          checkable: true,
+          modelValue: [],
+          highlight: { match: true },
+        },
+        ...globalConfig,
+      });
+      await wrapper.find('.ev-input.multiple').trigger('click');
+      await wrapper.find('.ev-input-query').setValue('pie');
+      await nextTick();
+
+      expect(wrapper.find('.ev-select-item-highlight').text()).toBe('pie');
+    });
+
+    it('IME 조합 중에도 입력창 표시값과 강조가 어긋나지 않는다 (회귀 가드)', async () => {
+      // 조합 중 갱신을 보류하면 입력창 글자와 목록/강조가 어긋난다.
+      // (실제 버그: 입력창엔 'ㅗ률'인데 항목엔 'name'이 강조된 상태)
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await wrapper.find('.ev-input').trigger('click');
+      const query = wrapper.find('.ev-input-query');
+
+      await query.setValue('apple');
+      await nextTick();
+      expect(wrapper.findAll('.ev-select-item-highlight').length).toBe(2);
+
+      // 한글 조합 시작 → 입력창이 'ㅗ'로 바뀌면 이전 검색어(apple) 강조는 남으면 안 된다.
+      await query.trigger('compositionstart');
+      query.element.value = 'ㅗ';
+      await query.trigger('input');
+      await nextTick();
+
+      expect(query.element.value).toBe('ㅗ');
+      // 'ㅗ'는 어떤 항목과도 매칭되지 않으므로 강조가 남아 있으면 안 된다.
+      expect(wrapper.findAll('.ev-select-item-highlight').length).toBe(0);
+      expect(wrapper.find('.ev-select-dropbox-item').text()).toBe('NO MATCHING DATA');
+    });
+
+    it('IME 조합 중 입력이 곧바로 필터·강조에 반영된다', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await wrapper.find('.ev-input').trigger('click');
+      const query = wrapper.find('.ev-input-query');
+
+      // 조합 중(compositionend 이전)이라도 목록이 즉시 좁혀져야 한다.
+      await query.trigger('compositionstart');
+      query.element.value = '바나';
+      await query.trigger('input');
+      await nextTick();
+
+      const items = wrapper.findAll('.ev-select-dropbox-item');
+      expect(items.length).toBe(1);
+      expect(items[0].text()).toBe('바나나');
+      expect(wrapper.find('.ev-select-item-highlight').text()).toBe('바나');
+    });
+
+    it('자판 변환 없이 입력한 영문도 한글 항목을 찾고 강조한다 (편의 검색, PR #1405)', async () => {
+      // PR #1405 [#1404] "한/영 변환을 하지 않고 입력하는 text 도 검색이 되도록" 이 의도한 동작.
+      // 'sk'는 두벌식 자판에서 '나'이므로 '바나나'가 걸리고, 그 구간이 강조되어야 한다.
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'sk');
+
+      const items = wrapper.findAll('.ev-select-dropbox-item');
+      expect(items.length).toBe(1);
+      expect(items[0].text()).toBe('바나나');
+      // '바나나'의 두 '나'는 맞닿아 있어 하나의 구간('나나')으로 병합된다.
+      expect(wrapper.findAll('.ev-select-item-highlight').map((m) => m.text())).toEqual(['나나']);
+    });
+
+    it('한↔영 자판 변환으로 필터된 항목도 같은 매처로 강조된다 (필터-강조 일관성)', async () => {
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      // 'qksk' 는 engToKor 로 '바나' 가 되어 '바나나' 가 필터에 걸린다.
+      await openAndSearch(wrapper, 'qksk');
+
+      const items = wrapper.findAll('.ev-select-dropbox-item');
+      expect(items.length).toBe(1);
+      expect(items[0].text()).toBe('바나나');
+      // 원문 'qksk' 매처는 안 걸리므로, 변환 매처를 공유하지 않으면 강조가 사라진다.
+      expect(wrapper.find('.ev-select-item-highlight').text()).toBe('바나');
+    });
+  });
 });
