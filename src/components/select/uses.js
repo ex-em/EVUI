@@ -138,15 +138,16 @@ export const useDropdown = (param) => {
    * 원문 / 영→한 / 한→영 세 가지를 모두 시도해야 초성·자판 변환 검색이 걸린다 (PR #1405).
    * 필터와 하이라이트가 이 매처를 공유해야 필터에 걸린 이유가 그대로 강조된다.
    * @param {string} trimText - 공백 제거된 검색어
+   * @param {{ global?: boolean }} [options] - getRegExp 에 그대로 전달할 옵션
    * @returns {RegExp[]} - 매처 목록 (빈 검색어면 [])
    */
-  const getMatchers = (trimText) => {
+  const getMatchers = (trimText, options) => {
     if (!trimText) {
       return [];
     }
     return [trimText, engToKor(trimText), korToEng(trimText)]
       .filter(Boolean)
-      .map((text) => getRegExp(text));
+      .map((text) => getRegExp(text, options));
   };
 
   /**
@@ -175,12 +176,12 @@ export const useDropdown = (param) => {
 
   /**
    * 강조 구간 탐색용 global 매처.
-   * getRegExp 는 i 플래그만 반환해 exec 를 반복해도 첫 매칭만 나오므로 global 사본이 필요하다.
+   * getRegExp 는 기본값이 i 플래그뿐이라 exec 를 반복해도 첫 매칭만 나오므로 global 로 컴파일한다.
    * splitByMatch 가 항목마다 호출되는 탓에 여기서 만들지 않으면 항목 수만큼 재컴파일된다
-   * (항목 300개 기준 키 입력 1회당 900회 → 3회).
+   * (항목 300개 기준 키 입력 1회당 900개 → 3개).
    */
   const globalMatchers = computed(() =>
-    getMatchers(filterTextRef.value?.trim()).map((re) => new RegExp(re.source, `${re.flags}g`)),
+    getMatchers(filterTextRef.value?.trim(), { global: true }),
   );
 
   /**
@@ -191,7 +192,7 @@ export const useDropdown = (param) => {
    */
   const splitByMatch = (name) => {
     const plain = [{ text: name, matched: false }];
-    if (!isHighlightMatch.value || typeof name !== 'string' || !name) {
+    if (typeof name !== 'string' || !name) {
       return plain;
     }
 
@@ -241,6 +242,20 @@ export const useDropdown = (param) => {
     }
     return chunks;
   };
+
+  /**
+   * filteredItems 와 인덱스가 1:1로 대응하는 강조 조각 목록.
+   * 템플릿에서 splitByMatch 를 직접 호출하면 검색어가 그대로여도 리스트가 리렌더될 때마다
+   * 전 항목이 다시 분해되므로, computed 로 올려 filteredItems/검색어가 바뀔 때만 계산한다.
+   * 강조 비활성 시 빈 배열 — v-if="isHighlightMatch" 가드 하위에서만 참조되므로 분해 비용이 없다.
+   * @type {import('vue').ComputedRef<{ text: string, matched: boolean }[][]>}
+   */
+  const itemChunks = computed(() => {
+    if (!isHighlightMatch.value) {
+      return [];
+    }
+    return filteredItems.value.map(({ name }) => splitByMatch(name));
+  });
 
   /**
    * 매칭 구간 inline 색상. 미지정 시 null 을 반환해 SCSS 의 테마 primary 기본값이 적용된다.
@@ -624,7 +639,7 @@ export const useDropdown = (param) => {
     filterTextRef,
     filteredItems,
     isHighlightMatch,
-    splitByMatch,
+    itemChunks,
     highlightStyle,
     clickSelectInput,
     clickOutsideDropbox,

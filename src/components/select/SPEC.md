@@ -69,13 +69,13 @@ EvSelect (useModel + 드롭박스 로직)
 | collapseTags | 다중 선택 태그를 접어 요약 표시 |
 | dropboxPosition | 드롭다운이 열리는 위치/방향 |
 | 매처(matcher) | 검색어 하나로 만든 정규식. 원문·영→한·한→영 세 종류를 함께 쓴다 |
-| 강조 조각(chunk) | 항목명을 매칭/비매칭 구간으로 분해한 단위 (`splitByMatch` 결과) |
+| 강조 조각(chunk) | 항목명을 매칭/비매칭 구간으로 분해한 단위 (`splitByMatch` 결과). `itemChunks` 가 `filteredItems` 와 같은 인덱스로 보관한다 |
 
 ## Data Flow
 
 ```
 props.modelValue ──useModel──> selectedModel
-검색 ──filterText──> getMatchers ──> 아이템 필터
-                              └──> splitByMatch ──> 항목명 강조 조각(highlight.match)
+검색 ──filterText──> getMatchers ──> filteredItems(아이템 필터)
+                              └──> globalMatchers ──> itemChunks(splitByMatch) ──> 항목명 강조 조각(highlight.match)
 선택/해제 ──changeMv/removeMv/removeAllMv──> emit(update:modelValue, change)
 ```

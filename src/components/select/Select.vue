@@ -164,9 +164,9 @@
                           <i v-if="item.iconClass" :class="item.iconClass" />
                           <template v-if="isHighlightMatch">
                             <span
-                              v-for="(chunk, chunkIdx) in splitByMatch(item.name)"
+                              v-for="(chunk, chunkIdx) in itemChunks[idx]"
                               :key="chunkIdx"
-                              :class="{ 'ev-select-item-highlight': chunk.matched }"
+                              :class="chunk.matched ? 'ev-select-item-highlight' : null"
                               :style="chunk.matched ? highlightStyle : null"
                               >{{ chunk.text }}</span
                             >
@@ -203,9 +203,9 @@
                         <i v-if="item.iconClass" :class="item.iconClass" />
                         <template v-if="isHighlightMatch">
                           <span
-                            v-for="(chunk, chunkIdx) in splitByMatch(item.name)"
+                            v-for="(chunk, chunkIdx) in itemChunks[idx]"
                             :key="chunkIdx"
-                            :class="{ 'ev-select-item-highlight': chunk.matched }"
+                            :class="chunk.matched ? 'ev-select-item-highlight' : null"
                             :style="chunk.matched ? highlightStyle : null"
                             >{{ chunk.text }}</span
                           >
@@ -238,9 +238,9 @@
                     <i v-if="item.iconClass" :class="item.iconClass" />
                     <template v-if="isHighlightMatch">
                       <span
-                        v-for="(chunk, chunkIdx) in splitByMatch(item.name)"
+                        v-for="(chunk, chunkIdx) in itemChunks[idx]"
                         :key="chunkIdx"
-                        :class="{ 'ev-select-item-highlight': chunk.matched }"
+                        :class="chunk.matched ? 'ev-select-item-highlight' : null"
                         :style="chunk.matched ? highlightStyle : null"
                         >{{ chunk.text }}</span
                       >
@@ -387,7 +387,7 @@ export default {
       filterTextRef,
       filteredItems,
       isHighlightMatch,
-      splitByMatch,
+      itemChunks,
       highlightStyle,
       clickSelectInput,
       clickOutsideDropbox,
@@ -421,7 +421,7 @@ export default {
       filterTextRef,
       filteredItems,
       isHighlightMatch,
-      splitByMatch,
+      itemChunks,
       highlightStyle,
       clickSelectInput,
       clickOutsideDropbox,
