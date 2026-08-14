@@ -162,7 +162,18 @@
                       >
                         <ev-checkbox :label="item.value" :disabled="item.disabled">
                           <i v-if="item.iconClass" :class="item.iconClass" />
-                          {{ item.name }}
+                          <template v-if="isHighlightMatch">
+                            <span
+                              v-for="(chunk, chunkIdx) in splitByMatch(item.name)"
+                              :key="chunkIdx"
+                              :class="{ 'ev-select-item-highlight': chunk.matched }"
+                              :style="chunk.matched ? highlightStyle : null"
+                              >{{ chunk.text }}</span
+                            >
+                          </template>
+                          <template v-else>
+                            {{ item.name }}
+                          </template>
                         </ev-checkbox>
                       </li>
                     </ul>
@@ -190,7 +201,18 @@
                     >
                       <ev-checkbox :model-value="mv === item.value" :disabled="item.disabled">
                         <i v-if="item.iconClass" :class="item.iconClass" />
-                        {{ item.name }}
+                        <template v-if="isHighlightMatch">
+                          <span
+                            v-for="(chunk, chunkIdx) in splitByMatch(item.name)"
+                            :key="chunkIdx"
+                            :class="{ 'ev-select-item-highlight': chunk.matched }"
+                            :style="chunk.matched ? highlightStyle : null"
+                            >{{ chunk.text }}</span
+                          >
+                        </template>
+                        <template v-else>
+                          {{ item.name }}
+                        </template>
                       </ev-checkbox>
                     </li>
                   </ul>
@@ -214,7 +236,18 @@
                     "
                   >
                     <i v-if="item.iconClass" :class="item.iconClass" />
-                    {{ item.name }}
+                    <template v-if="isHighlightMatch">
+                      <span
+                        v-for="(chunk, chunkIdx) in splitByMatch(item.name)"
+                        :key="chunkIdx"
+                        :class="{ 'ev-select-item-highlight': chunk.matched }"
+                        :style="chunk.matched ? highlightStyle : null"
+                        >{{ chunk.text }}</span
+                      >
+                    </template>
+                    <template v-else>
+                      {{ item.name }}
+                    </template>
                   </li>
                 </ul>
                 <ul v-else>
@@ -314,6 +347,18 @@ export default {
       default: 0,
       validator: (v) => Number.isInteger(v) && v >= 0,
     },
+    // filterable 검색 시 항목명의 매칭 구간을 강조하는 설정.
+    // match(Boolean, 기본 false) — 강조 여부, color(String, 기본 '') — 강조 색상(미지정 시 테마 primary).
+    // 목적이 같은 두 값이라 개별 prop 대신 단일 객체로 묶는다.
+    // 오타({ mach: true })가 조용히 무시되지 않도록 알 수 없는 키도 validator 에서 거른다.
+    highlight: {
+      type: Object,
+      default: () => ({}),
+      validator: (v) =>
+        (v.match === undefined || typeof v.match === 'boolean') &&
+        (v.color === undefined || typeof v.color === 'string') &&
+        Object.keys(v).every((key) => ['match', 'color'].includes(key)),
+    },
   },
   emits: {
     'update:modelValue': null,
@@ -341,6 +386,9 @@ export default {
       dropboxPosition,
       filterTextRef,
       filteredItems,
+      isHighlightMatch,
+      splitByMatch,
+      highlightStyle,
       clickSelectInput,
       clickOutsideDropbox,
       changeFilterText,
@@ -372,6 +420,9 @@ export default {
       dropboxPosition,
       filterTextRef,
       filteredItems,
+      isHighlightMatch,
+      splitByMatch,
+      highlightStyle,
       clickSelectInput,
       clickOutsideDropbox,
       changeFilterText,
@@ -584,6 +635,15 @@ export default {
     opacity: 1;
     color: #c0c4cc;
     cursor: not-allowed;
+  }
+}
+
+// 검색어 매칭 구간에만 붙는다. highlight.color 지정 시 inline style 이 이 색을 덮어쓴다.
+.ev-select-item-highlight {
+  font-weight: 700;
+
+  @include evThemify() {
+    color: evThemed('primary');
   }
 }
 
