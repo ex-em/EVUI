@@ -163,13 +163,15 @@
                         <ev-checkbox :label="item.value" :disabled="item.disabled">
                           <i v-if="item.iconClass" :class="item.iconClass" />
                           <template v-if="isHighlightMatch">
-                            <span
-                              v-for="(chunk, chunkIdx) in itemChunks[idx]"
-                              :key="chunkIdx"
-                              :class="chunk.matched ? 'ev-select-item-highlight' : null"
-                              :style="chunk.matched ? highlightStyle : null"
-                              >{{ chunk.text }}</span
-                            >
+                            <template v-for="(chunk, chunkIdx) in itemChunks[idx]" :key="chunkIdx">
+                              <span
+                                v-if="chunk.matched"
+                                class="ev-select-item-highlight"
+                                :style="item.disabled ? null : highlightStyle"
+                                >{{ chunk.text }}</span
+                              >
+                              <template v-else>{{ chunk.text }}</template>
+                            </template>
                           </template>
                           <template v-else>
                             {{ item.name }}
@@ -202,13 +204,15 @@
                       <ev-checkbox :model-value="mv === item.value" :disabled="item.disabled">
                         <i v-if="item.iconClass" :class="item.iconClass" />
                         <template v-if="isHighlightMatch">
-                          <span
-                            v-for="(chunk, chunkIdx) in itemChunks[idx]"
-                            :key="chunkIdx"
-                            :class="chunk.matched ? 'ev-select-item-highlight' : null"
-                            :style="chunk.matched ? highlightStyle : null"
-                            >{{ chunk.text }}</span
-                          >
+                          <template v-for="(chunk, chunkIdx) in itemChunks[idx]" :key="chunkIdx">
+                            <span
+                              v-if="chunk.matched"
+                              class="ev-select-item-highlight"
+                              :style="item.disabled ? null : highlightStyle"
+                              >{{ chunk.text }}</span
+                            >
+                            <template v-else>{{ chunk.text }}</template>
+                          </template>
                         </template>
                         <template v-else>
                           {{ item.name }}
@@ -237,13 +241,15 @@
                   >
                     <i v-if="item.iconClass" :class="item.iconClass" />
                     <template v-if="isHighlightMatch">
-                      <span
-                        v-for="(chunk, chunkIdx) in itemChunks[idx]"
-                        :key="chunkIdx"
-                        :class="chunk.matched ? 'ev-select-item-highlight' : null"
-                        :style="chunk.matched ? highlightStyle : null"
-                        >{{ chunk.text }}</span
-                      >
+                      <template v-for="(chunk, chunkIdx) in itemChunks[idx]" :key="chunkIdx">
+                        <span
+                          v-if="chunk.matched"
+                          class="ev-select-item-highlight"
+                          :style="item.disabled ? null : highlightStyle"
+                          >{{ chunk.text }}</span
+                        >
+                        <template v-else>{{ chunk.text }}</template>
+                      </template>
                     </template>
                     <template v-else>
                       {{ item.name }}
@@ -638,13 +644,20 @@ export default {
   }
 }
 
-// 검색어 매칭 구간에만 붙는다. highlight.color 지정 시 inline style 이 이 색을 덮어쓴다.
+// 검색어 매칭 구간에만 붙는다. 강조는 색상으로만 표현한다(굵기 변화 없음) — 굵어지면
+// 글자 폭이 변해 항목명이 미세하게 흔들린다. highlight.color 지정 시 inline style 이 이 색을 덮어쓴다.
 .ev-select-item-highlight {
-  font-weight: 700;
-
   @include evThemify() {
     color: evThemed('primary');
   }
+}
+
+// disabled 항목은 강조색을 입히지 않는다. 항목명 전체가 검색어와 일치하면 강조색이 이름을
+// 전부 덮어 "선택 불가" 를 알리는 회색이 사라지기 때문 — 상태 표시가 강조보다 우선이다.
+// 강조 수단이 색상뿐이므로 disabled 항목에는 강조가 보이지 않는다(의도된 동작).
+// (inline color 는 template 에서 disabled 일 때 아예 바인딩하지 않는다.)
+.ev-select-dropbox-item.disabled .ev-select-item-highlight {
+  color: inherit;
 }
 
 .all-check {
