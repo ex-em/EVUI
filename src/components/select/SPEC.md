@@ -30,6 +30,8 @@
 - 항목명 안 매칭 구간이 여럿이면 모두 강조하며, 겹치는 구간은 병합한다.
 - 강조 대상은 드롭박스 항목명뿐이다 — 선택 태그(`ev-tag-name`)는 강조하지 않는다.
 - `highlight.color` 미지정 시 테마 `primary` 색이 적용된다.
+- 강조는 **색상으로만** 표현한다 — 굵기(`font-weight`)는 바꾸지 않는다. 굵어지면 글자 폭이 변해 항목명이 흔들린다.
+- `disabled` 항목은 필터 결과에 그대로 노출하되 강조색을 적용하지 않는다 — 항목명 전체가 검색어와 일치할 때 강조색이 disabled 색을 덮어 상태를 알 수 없게 되는 것을 막는다. 강조 수단이 색상뿐이므로 disabled 항목에는 강조가 시각적으로 나타나지 않는다.
 
 ## Acceptance Criteria
 
@@ -39,6 +41,7 @@
 - `highlight.match=true` + `filterable` 에서 검색 시 매칭 구간만 강조된다.
 - `highlight.color` 지정 시 해당 색상이 매칭 구간에 적용된다.
 - `highlight` 미지정 시 기존 렌더링과 동일하다.
+- `disabled` 항목이 검색어와 완전히 일치해도 disabled 색상이 유지된다.
 
 ## Architecture
 

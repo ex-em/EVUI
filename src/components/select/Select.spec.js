@@ -1122,6 +1122,48 @@ describe('EvSelect Component', () => {
       expect(wrapper.find('.ev-select-item-highlight').exists()).toBe(false);
     });
 
+    it('비매칭 조각에 빈 class 속성이 남지 않는다', async () => {
+      // normalizeClass(null) 은 '' 을 반환해 :class 삼항으로는 속성이 제거되지 않는다.
+      // 매칭 조각만 span(정적 class)으로 내고 비매칭은 텍스트 노드로 렌더해야 빈 속성이 사라진다.
+      const wrapper = mount(EvSelect, {
+        props: { ...highlightProps, highlight: { match: true } },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'pie');
+
+      const item = wrapper.find('.ev-select-dropbox-item');
+      expect(item.text()).toBe('apple pie apple');
+      expect(item.findAll('span[class=""]').length).toBe(0);
+      expect(item.find('.ev-select-item-highlight').text()).toBe('pie');
+    });
+
+    it('disabled 항목은 항목명 전체가 일치해도 강조색 inline style 이 붙지 않는다', async () => {
+      // 이름 전체가 매칭되면 강조색이 disabled 회색을 전부 덮어 "선택 불가"를 알 수 없게 된다.
+      const wrapper = mount(EvSelect, {
+        props: {
+          items: [
+            { name: 'apple', value: 'a' },
+            { name: 'apple', value: 'b', disabled: true },
+          ],
+          filterable: true,
+          highlight: { match: true, color: 'rgb(64, 158, 255)' },
+        },
+        ...globalConfig,
+      });
+      await openAndSearch(wrapper, 'apple');
+
+      const items = wrapper.findAll('.ev-select-dropbox-item');
+      const enabledMark = items[0].find('.ev-select-item-highlight');
+      const disabledMark = items[1].find('.ev-select-item-highlight');
+
+      // 매칭 구간 표시(굵기) 자체는 disabled 에서도 유지된다.
+      expect(disabledMark.exists()).toBe(true);
+      expect(disabledMark.text()).toBe('apple');
+      // 색상만 빠진다 — inline style 이 없어야 SCSS 의 color:inherit 가 회색을 지킨다.
+      expect(enabledMark.attributes('style')).toContain('rgb(64, 158, 255)');
+      expect(disabledMark.attributes('style')).toBeUndefined();
+    });
+
     it('여러 항목을 연속 렌더해도 매처 lastIndex 오염 없이 강조된다 (공유 인스턴스 가드)', async () => {
       // globalMatchers 의 정규식을 모든 항목이 공유하므로,
       // lastIndex 를 리셋하지 않으면 두 번째 이후 항목의 강조가 누락된다.
