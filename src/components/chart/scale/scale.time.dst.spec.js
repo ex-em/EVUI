@@ -26,6 +26,8 @@ const createScale = (overrides = {}) => {
 const ts = (str) => dayjs(str).valueOf();
 const times = (ticks) => ticks.map((tick) => dayjs(tick).format('HH:mm'));
 const dates = (ticks) => ticks.map((tick) => dayjs(tick).format('YYYY-MM-DD'));
+const stamps = (ticks) => ticks.map((tick) => dayjs(tick).format('MM-DD HH:mm'));
+const isAscending = (ticks) => ticks.every((tick, i) => i === 0 || tick > ticks[i - 1]);
 
 const useTZ = (tz) => {
   beforeAll(() => {
@@ -117,8 +119,83 @@ describe('TimeScale day tick — DST 관측 타임존', () => {
     });
   });
 
+  describe('America/Santiago — 자정이 없는 전환일', () => {
+    useTZ('America/Santiago');
+
+    it('TZ 주입이 실제로 적용됐다', () => {
+      expect(new Date(2026, 0, 1).getTimezoneOffset()).toBe(180); // -03 (DST)
+      expect(new Date(2026, 6, 1).getTimezoneOffset()).toBe(240); // -04 (표준시)
+    });
+
+    it('전환일(2026-09-06)만 01:00 이고 다음 날부터 자정으로 복귀한다', () => {
+      const scale = createScale({ interval: 'day' });
+
+      const result = scale.calculateSteps({
+        minValue: ts('2026-09-04 00:00:00'),
+        maxValue: ts('2026-09-08 00:00:00'),
+        maxSteps: 10,
+      });
+
+      // 09-06 은 그 존에 자정이 존재하지 않아 01:00 이 불가피하다.
+      expect(stamps(result.ticks)).toEqual([
+        '09-04 00:00',
+        '09-05 00:00',
+        '09-06 01:00',
+        '09-07 00:00',
+        '09-08 00:00',
+      ]);
+    });
+
+    it('전환일을 지나도 tick 이 단조 증가한다', () => {
+      const scale = createScale({ interval: 'day' });
+
+      // 증가하지 않으면 generateVisibleTicks 가 MAX_TICKS 까지 도는 것으로만 드러난다.
+      const result = scale.calculateSteps({
+        minValue: ts('2026-09-01 00:00:00'),
+        maxValue: ts('2026-09-30 00:00:00'),
+        maxSteps: 40,
+      });
+
+      expect(isAscending(result.ticks)).toBe(true);
+      expect(result.ticks.length).toBe(30);
+    });
+  });
+
+  describe('America/Havana — 자정이 두 번 오는 전환일', () => {
+    useTZ('America/Havana');
+
+    it('TZ 주입이 실제로 적용됐다', () => {
+      expect(new Date(2026, 0, 1).getTimezoneOffset()).toBe(300); // CST (UTC-5)
+      expect(new Date(2026, 6, 1).getTimezoneOffset()).toBe(240); // CDT (UTC-4)
+    });
+
+    it('중복 자정 구간에서도 tick 이 자정에 정렬되고 날짜가 중복되지 않는다', () => {
+      const scale = createScale({ interval: 'day' });
+
+      const result = scale.calculateSteps({
+        minValue: ts('2026-10-30 00:00:00'),
+        maxValue: ts('2026-11-03 00:00:00'),
+        maxSteps: 10,
+      });
+
+      expect(stamps(result.ticks)).toEqual([
+        '10-30 00:00',
+        '10-31 00:00',
+        '11-01 00:00',
+        '11-02 00:00',
+        '11-03 00:00',
+      ]);
+    });
+  });
+
   describe('Australia/Sydney — 남반구(연초가 DST 구간)', () => {
     useTZ('Australia/Sydney');
+
+    it('TZ 주입이 실제로 적용됐다', () => {
+      // 이 블록의 단정은 DST 미관측 호스트에서도 만족되므로 주입 실패 시 위양성 통과한다.
+      expect(new Date(2026, 0, 1).getTimezoneOffset()).toBe(-660); // AEDT (UTC+11)
+      expect(new Date(2026, 6, 1).getTimezoneOffset()).toBe(-600); // AEST (UTC+10)
+    });
 
     it('표준시 구간 조회 시 tick 이 전날 23시로 밀리지 않는다', () => {
       const scale = createScale({ interval: 'day' });
