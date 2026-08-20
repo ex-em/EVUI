@@ -36,6 +36,8 @@ import ExternalLegend from './example/ExternalLegend';
 import ExternalLegendRaw from './example/ExternalLegend?raw';
 import Segments from './example/Segments';
 import SegmentsRaw from './example/Segments?raw';
+import DstDayTick from './example/DstDayTick';
+import DstDayTickRaw from './example/DstDayTick?raw';
 import Interpolation from './example/Interpolation';
 import InterpolationRaw from './example/Interpolation?raw';
 import LegendClickMode from './example/LegendClickMode';
@@ -140,6 +142,13 @@ export default {
         'passingValue를 설정하여 특정 시점에 line을 끊지 않고 자연스럽게 이을 수 있습니다.',
       component: PassingValue,
       parsedData: parse(PassingValueRaw).descriptor,
+      devOnly: true,
+    },
+    DstDayTick: {
+      description:
+        '[임시 · ex-em/EVUI#2334] time 축 day 틱의 DST 앵커 결함 재현용. 브라우저 타임존이 DST 관측 존일 때 tick 이 자정에서 벗어난다.',
+      component: DstDayTick,
+      parsedData: parse(DstDayTickRaw).descriptor,
       devOnly: true,
     },
     Interpolation: {
