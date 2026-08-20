@@ -73,7 +73,9 @@ function addIntervalDayjs(d, meta) {
     case 'week':
       return d.add(t * 7, 'day');
     case 'day':
-      return d.add(t, 'day');
+      // 자정이 없는 DST 전환일(00:00 → 01:00)을 지나면 wall-clock 이 01:00 으로 고정되므로
+      // 매 가산마다 그날의 자정으로 되돌린다. 전환일 당일은 자정이 없어 01:00 이 유지된다.
+      return d.add(t, 'day').startOf('day');
     default:
       return dayjs(d.valueOf() + meta.ms);
   }
