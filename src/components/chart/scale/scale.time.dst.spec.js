@@ -3,7 +3,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import TimeScale from './scale.time';
 
 /**
- * DST 관측 타임존에서 day 단위 tick 이 자정에 정렬되는지 검증한다.
+ * DST 관측 타임존에서 day/week 단위 tick 이 자정에 정렬되는지 검증한다.
  * 프로세스 TZ 를 바꿔야만 재현되므로 다른 spec 과 파일을 분리했다.
  */
 
@@ -38,7 +38,7 @@ const useTZ = (tz) => {
   });
 };
 
-describe('TimeScale day tick — DST 관측 타임존', () => {
+describe('TimeScale day/week tick — DST 관측 타임존', () => {
   describe('America/Los_Angeles', () => {
     useTZ('America/Los_Angeles');
 
@@ -117,6 +117,35 @@ describe('TimeScale day tick — DST 관측 타임존', () => {
         expect(dayjs(tick).diff(dayjs(result.ticks[i]).add(8, 'day'))).toBe(0);
       });
     });
+
+    it('week interval: 봄 전환을 포함해도 월요일 자정에 정렬된다', () => {
+      const scale = createScale({ interval: 'week' });
+
+      const result = scale.calculateSteps({
+        minValue: ts('2026-02-20 00:00:00'),
+        maxValue: ts('2026-04-20 00:00:00'),
+        maxSteps: 40,
+      });
+
+      expect(new Set(times(result.ticks))).toEqual(new Set(['00:00']));
+      expect(new Set(result.ticks.map((tick) => dayjs(tick).day()))).toEqual(new Set([1]));
+      expect(dates(result.ticks)[0]).toBe('2026-02-23');
+    });
+
+    it('{ time: 2, unit: week }: 2주 간격도 월요일 자정에 정렬된다', () => {
+      const scale = createScale({ interval: { time: 2, unit: 'week' } });
+
+      const result = scale.calculateSteps({
+        minValue: ts('2026-02-20 00:00:00'),
+        maxValue: ts('2026-04-20 00:00:00'),
+        maxSteps: 10,
+      });
+
+      expect(new Set(times(result.ticks))).toEqual(new Set(['00:00']));
+      result.ticks.slice(1).forEach((tick, i) => {
+        expect(dayjs(tick).diff(dayjs(result.ticks[i]).add(14, 'day'))).toBe(0);
+      });
+    });
   });
 
   describe('America/Santiago — 자정이 없는 전환일', () => {
@@ -158,6 +187,25 @@ describe('TimeScale day tick — DST 관측 타임존', () => {
 
       expect(isAscending(result.ticks)).toBe(true);
       expect(result.ticks.length).toBe(30);
+    });
+
+    it('week interval: 전환일이 주 안에 있어도 월요일 자정에 정렬된다', () => {
+      const scale = createScale({ interval: 'week' });
+
+      const result = scale.calculateSteps({
+        minValue: ts('2026-08-24 00:00:00'),
+        maxValue: ts('2026-09-28 00:00:00'),
+        maxSteps: 40,
+      });
+
+      expect(stamps(result.ticks)).toEqual([
+        '08-24 00:00',
+        '08-31 00:00',
+        '09-07 00:00',
+        '09-14 00:00',
+        '09-21 00:00',
+        '09-28 00:00',
+      ]);
     });
   });
 
@@ -208,6 +256,20 @@ describe('TimeScale day tick — DST 관측 타임존', () => {
 
       expect(new Set(times(result.ticks))).toEqual(new Set(['00:00']));
       expect(dates(result.ticks)[0]).toBe('2026-06-01');
+    });
+
+    it('week interval: 표준시 구간에서도 tick 이 전날 23시로 밀리지 않는다', () => {
+      const scale = createScale({ interval: 'week' });
+
+      const result = scale.calculateSteps({
+        minValue: ts('2026-06-01 00:00:00'),
+        maxValue: ts('2026-07-06 00:00:00'),
+        maxSteps: 20,
+      });
+
+      expect(new Set(times(result.ticks))).toEqual(new Set(['00:00']));
+      expect(dates(result.ticks)[0]).toBe('2026-06-01');
+      expect(dates(result.ticks).at(-1)).toBe('2026-07-06');
     });
   });
 

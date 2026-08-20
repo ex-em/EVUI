@@ -114,7 +114,8 @@ axis 옵션의 `type`(`linear`/`time`/`log`/`step`)과 `categoryMode` 로 구현
   `{ steps: ticks.length−1, interval, baseInterval, graphMin, graphMax, ticks }`.
 - **boundary anchor 규칙** (`ceilToBoundary`): sub-day(ms/s/m/h) → 해당일
   `startOf('day')`, day → 연초 기준 캘린더 일수(`startOf('year').add(n, 'day')`),
-  week → 연초 기준 월요일, month/quarter → 달력 기반 연초, year → epoch 2000년.
+  week → 연초 기준 월요일에서 캘린더 주수, month/quarter → 달력 기반 연초,
+  year → epoch 2000년.
   number interval → `Math.ceil(ts/ms)*ms` (epoch 0 기준). `time > 1` 도 정확한 배수
   boundary 에 맞춘다(예: 10분 → :00/:10/:20…).
 - **maxSteps 확장** (`expandIntervalMeta`): `fixedSteps` 면 확장하지 않는다.
@@ -186,19 +187,18 @@ axis 옵션의 `type`(`linear`/`time`/`log`/`step`)과 `categoryMode` 로 구현
   수용된 예외로 명시): DST 전환일(23h/25h)의 **sub-day** 격자와 연말(day 이상 단위의 다일
   확장 시 anchor 교체) 경계에서 라벨이 일회성으로 점프할 수 있다. KST 는 DST 미시행이라
   영향 없음.
-- TimeScale 의 day 단위 tick 은 DST 관측 타임존에서도 자정에 정렬된다. 정렬(연초 기준
-  캘린더 일수)과 가산(`add(t, 'day').startOf('day')`) 모두 달력 연산이다. wall-clock 자정을
-  유지하는 대가로 DST 전환일의 실제 tick 간격은 23h/25h 가 되어 `ms` 로 보고되는 `interval`
-  과 불일치한다. 검증: `scale.time.dst.spec.js`.
-- 위 불변의 예외: 그 존에 자정이 존재하지 않는 전환일(00:00 → 01:00 로 점프)은 그날 tick 만
-  `01:00` 이고 다음 tick 부터 자정으로 복귀한다. 2026 기준 해당 존은 `America/Santiago`(9/6)·
-  `America/Havana`(3/8)·`Asia/Beirut`(3/29)·`Africa/Cairo`(4/24)·`Atlantic/Azores`(3/29) 다.
+- TimeScale 의 day·week 단위 tick 은 DST 관측 타임존에서도 자정에 정렬된다. 정렬(연초 기준
+  캘린더 일수/주수)과 가산(`add(n, 'day').startOf('day')`) 모두 달력 연산이다. wall-clock
+  자정을 유지하는 대가로 DST 전환일이 낀 tick 간격은 23h/25h 만큼 어긋나 `ms` 로 보고되는
+  `interval` 과 불일치한다. 검증: `scale.time.dst.spec.js`.
+- 위 불변의 예외: 그 존에 자정이 존재하지 않는 전환일(00:00 → 01:00 로 점프)이 tick 에
+  걸리면 그 tick 만 `01:00` 이고 다음 tick 부터 자정으로 복귀한다. 2026 기준 해당 존은
+  `America/Santiago`(9/6)·`America/Havana`(3/8)·`Asia/Beirut`(3/29)·`Africa/Cairo`(4/24)·
+  `Atlantic/Azores`(3/29) 다.
 - day 단위의 maxSteps 확장 판정(`expandIntervalMeta` 의 `floor(span / ms) + 1`)은 ms 산술이라
   봄 전환을 포함한 구간에서 tick 수를 1 적게 본다. 확장 없이 통과한 뒤 실제 tick 이
   maxSteps + 1 개가 될 수 있다(수용된 한계 — `steps` 는 maxSteps 와 같아 소비자 off-by-one 은
   없고 x축 라벨 밀도만 영향).
-- TimeScale 의 week 단위 tick 정렬은 아직 고정 ms 산술이라 DST 관측 타임존에서 자정을
-  벗어난다(day 와 동일 원인, 미해결 — ex-em/EVUI#2336).
 - TimeCategoryScale 은 labels 가 오름차순(시간순) 정렬돼 있다고 가정한다. 소비자는
   `maxIndex ≥ minIndex` 를 확인한 뒤에만 minIndex 를 시작 인덱스로 사용해야 한다
   (sentinel `{0, -1}` = 빈 윈도우).

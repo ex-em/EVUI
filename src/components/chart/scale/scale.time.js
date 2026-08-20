@@ -70,11 +70,11 @@ function addIntervalDayjs(d, meta) {
       return d.add(t * 3, 'month');
     case 'year':
       return d.add(t, 'year');
+    // day/week: 자정이 없는 DST 전환일(00:00 → 01:00)을 지나면 wall-clock 이 01:00 으로
+    // 고정되므로 매 가산마다 그날의 자정으로 되돌린다. 전환일 당일은 자정이 없어 01:00 이 유지된다.
     case 'week':
-      return d.add(t * 7, 'day');
+      return d.add(t * 7, 'day').startOf('day');
     case 'day':
-      // 자정이 없는 DST 전환일(00:00 → 01:00)을 지나면 wall-clock 이 01:00 으로 고정되므로
-      // 매 가산마다 그날의 자정으로 되돌린다. 전환일 당일은 자정이 없어 01:00 이 유지된다.
       return d.add(t, 'day').startOf('day');
     default:
       return dayjs(d.valueOf() + meta.ms);
@@ -143,15 +143,18 @@ function ceilToBoundary(timestamp, meta) {
     return yearStart.add(aligned, 'day').valueOf();
   }
 
-  // --- week: start of year 기준 Monday에서 ms 연산 ---
+  // --- week: start of year 기준 Monday에서 캘린더 주수 연산 ---
   if (meta.unit === 'week') {
-    let anchor = d.startOf('year');
-    const dow = anchor.day();
-    anchor = anchor.subtract((dow + 6) % 7, 'day');
-    const anchorMs = anchor.valueOf();
-    const intervalMs = TIME_INTERVALS.week.size * time;
-    const elapsed = timestamp - anchorMs;
-    return anchorMs + Math.ceil(elapsed / intervalMs) * intervalMs;
+    const yearStart = d.startOf('year');
+    const anchor = yearStart.subtract((yearStart.day() + 6) % 7, 'day');
+    const weekStart = d.subtract((d.day() + 6) % 7, 'day').startOf('day');
+    // DST 로 주 경계 간 간격이 ±1h 흔들려도 반 주를 넘지 않아 round 가 정확한 주수를 준다
+    const weekIndex = Math.round(
+      (weekStart.valueOf() - anchor.valueOf()) / TIME_INTERVALS.week.size,
+    );
+    const offset = weekStart.valueOf() >= timestamp ? weekIndex : weekIndex + 1;
+    const aligned = Math.ceil(offset / time) * time;
+    return anchor.add(aligned * 7, 'day').valueOf();
   }
 
   // --- month: 달력 기반 ---
