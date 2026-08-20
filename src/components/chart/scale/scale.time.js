@@ -51,7 +51,7 @@ function getIntervalMeta(interval) {
 
 /**
  * dayjs 객체에 interval 한 단위를 더한다.
- * month/quarter/year는 dayjs를 사용하여 달력 기반으로 증가한다.
+ * day/week/month/quarter/year는 dayjs를 사용하여 달력 기반으로 증가한다.
  *
  * @param {dayjs.Dayjs} d dayjs 객체
  * @param {{ unit: string|null, time: number|null, ms: number }} meta interval 메타 정보
@@ -72,6 +72,8 @@ function addIntervalDayjs(d, meta) {
       return d.add(t, 'year');
     case 'week':
       return d.add(t * 7, 'day');
+    case 'day':
+      return d.add(t, 'day');
     default:
       return dayjs(d.valueOf() + meta.ms);
   }
@@ -126,12 +128,17 @@ function ceilToBoundary(timestamp, meta) {
     return anchor + Math.ceil(elapsed / intervalMs) * intervalMs;
   }
 
-  // --- day: start of year 기준 ms 연산 ---
+  // --- day: start of year 기준 캘린더 일수 연산 ---
   if (meta.unit === 'day') {
-    const anchor = d.startOf('year').valueOf();
-    const intervalMs = TIME_INTERVALS.day.size * time;
-    const elapsed = timestamp - anchor;
-    return anchor + Math.ceil(elapsed / intervalMs) * intervalMs;
+    const yearStart = d.startOf('year');
+    const dayStart = d.startOf('day');
+    // DST 로 자정 간 간격이 23h/25h 가 되어도 12h 를 넘게 벌어지지 않아 round 가 정확한 일수를 준다
+    const dayIndex = Math.round(
+      (dayStart.valueOf() - yearStart.valueOf()) / TIME_INTERVALS.day.size,
+    );
+    const offset = dayStart.valueOf() >= timestamp ? dayIndex : dayIndex + 1;
+    const aligned = Math.ceil(offset / time) * time;
+    return yearStart.add(aligned, 'day').valueOf();
   }
 
   // --- week: start of year 기준 Monday에서 ms 연산 ---
