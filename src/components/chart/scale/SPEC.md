@@ -113,9 +113,10 @@ axis 옵션의 `type`(`linear`/`time`/`log`/`step`)과 `categoryMode` 로 구현
   만든다(상한 MAX_TICKS 10000). min/max 가 null 이거나 min ≥ max 면 빈 ticks. 반환:
   `{ steps: ticks.length−1, interval, baseInterval, graphMin, graphMax, ticks }`.
 - **boundary anchor 규칙** (`ceilToBoundary`): sub-day(ms/s/m/h) → 해당일
-  `startOf('day')`, day → `startOf('year')`, week → 연초 기준 월요일, month/quarter →
-  달력 기반 연초, year → epoch 2000년. number interval → `Math.ceil(ts/ms)*ms`
-  (epoch 0 기준). `time > 1` 도 정확한 배수 boundary 에 맞춘다(예: 10분 → :00/:10/:20…).
+  `startOf('day')`, day → 연초 기준 캘린더 일수(`startOf('year').add(n, 'day')`),
+  week → 연초 기준 월요일, month/quarter → 달력 기반 연초, year → epoch 2000년.
+  number interval → `Math.ceil(ts/ms)*ms` (epoch 0 기준). `time > 1` 도 정확한 배수
+  boundary 에 맞춘다(예: 10분 → :00/:10/:20…).
 - **maxSteps 확장** (`expandIntervalMeta`): `fixedSteps` 면 확장하지 않는다.
   sub-day 단위이고 base interval 이 하루(86,400,000ms)를 나누어떨어지면 확장 후보를
   "하루의 약수가 되는 base 의 배수"로 제한해(divisor 캐시 사용) 자정 경계에서 격자가
@@ -182,8 +183,15 @@ axis 옵션의 `type`(`linear`/`time`/`log`/`step`)과 `categoryMode` 로 구현
 - TimeScale 은 tick 만 boundary 로 정렬할 뿐 graphMin/graphMax 를 절대 변경하지 않는다
   (실시간 슬라이딩 윈도우에서 plot 영역이 흔들리지 않게 하는 전제).
 - TimeScale 의 sub-day interval 확장은 "하루의 약수"로 제한된다. 알려진 한계(코드 주석에
-  수용된 예외로 명시): DST 전환일(23h/25h)과 연말(day 이상 단위의 다일 확장 시 anchor 교체)
-  경계에서 라벨이 일회성으로 점프할 수 있다. KST 는 DST 미시행이라 영향 없음.
+  수용된 예외로 명시): DST 전환일(23h/25h)의 **sub-day** 격자와 연말(day 이상 단위의 다일
+  확장 시 anchor 교체) 경계에서 라벨이 일회성으로 점프할 수 있다. KST 는 DST 미시행이라
+  영향 없음.
+- TimeScale 의 day 단위 tick 은 DST 관측 타임존에서도 자정에 정렬된다. 정렬(연초 기준
+  캘린더 일수)과 가산(`add(t, 'day')`) 모두 달력 연산이므로, wall-clock 자정을 유지하는
+  대가로 DST 전환일의 실제 tick 간격만 23h/25h 가 된다(`ms` 로 보고되는 `interval` 과
+  불일치). 검증: `scale.time.dst.spec.js`.
+- TimeScale 의 week 단위 tick 정렬은 아직 고정 ms 산술이라 DST 관측 타임존에서 자정을
+  벗어날 수 있다(day 와 동일 원인, 미해결).
 - TimeCategoryScale 은 labels 가 오름차순(시간순) 정렬돼 있다고 가정한다. 소비자는
   `maxIndex ≥ minIndex` 를 확인한 뒤에만 minIndex 를 시작 인덱스로 사용해야 한다
   (sentinel `{0, -1}` = 빈 윈도우).
