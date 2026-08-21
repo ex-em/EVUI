@@ -19,10 +19,17 @@
     <br />
     <div class="badge yellow">선택 영역 내 데이터</div>
     <br /><br />
-    <p>
-      바 시리즈는 <i>data</i> 에 담기지 않는다({{ selectionItems.length }}건). 범위는 위 range 로
-      판단한다.
-    </p>
+    <p>드래그 구간에 걸친 막대가 담긴다({{ selectionItems.length }} 시리즈).</p>
+    <div v-for="series in selectionItems" :key="series.seriesId">
+      <b>{{ series.seriesName }}</b> — {{ series.items.length }}건
+      <span v-if="series.items.length">
+        ({{ convertToDateString(series.items[0].x) }} ~
+        {{ convertToDateString(series.items[series.items.length - 1].x) }})
+      </span>
+      <p v-if="useStack && series.items.length">
+        누적 합 y : {{ series.items[0].y }} / 자기 값 o : {{ series.items[0].o }}
+      </p>
+    </div>
   </div>
 </template>
 
