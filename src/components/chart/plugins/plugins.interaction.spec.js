@@ -775,3 +775,126 @@ describe('plugins.interaction onMouseDown 드래그 진입 게이트', () => {
     expect(ctx.dragStart).not.toHaveBeenCalled();
   });
 });
+
+describe('dragEnd', () => {
+  // dragEnd 는 dragStart 내부 클로저라 window mouseup 이 유일한 진입점이다.
+  // getMousePosition 을 커서 객체로 스텁해 드래그 좌표를 주입한다.
+  const createDragEndCtx = ({
+    type = 'bar',
+    listeners = {},
+    zoom,
+    seriesList = {},
+    chartRect = { x1: 0, x2: 100, y1: 0, y2: 60 },
+  } = {}) => {
+    const cursor = { x: 0, y: 0 };
+
+    const ctx = Object.assign(Object.create(modules), {
+      options: {
+        type,
+        horizontal: false,
+        title: { text: 'chart' },
+        tooltip: {},
+        dragSelection: { use: true, keepDisplay: true },
+        ...(zoom ? { zoom } : {}),
+      },
+      listeners,
+      seriesList,
+      chartRect,
+      labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      axesSteps: {
+        x: [{ graphMin: 0, graphMax: 4 }],
+        y: [{ graphMin: 0, graphMax: 50 }],
+      },
+      getMousePosition: () => [cursor.x, cursor.y, chartRect.x2, chartRect.y2],
+      overlayClear: vi.fn(),
+      drawSelectionArea: vi.fn(),
+      removeSelectionArea: vi.fn(),
+    });
+
+    ctx.cursor = cursor;
+
+    return ctx;
+  };
+
+  const dragTo = (ctx, [xFrom, yFrom], [xTo, yTo]) => {
+    const handlers = {};
+    const addSpy = vi.spyOn(window, 'addEventListener').mockImplementation((name, fn) => {
+      handlers[name] = fn;
+    });
+
+    ctx.cursor.x = xFrom;
+    ctx.cursor.y = yFrom;
+    ctx.dragStart({}, ctx.options.type);
+    addSpy.mockRestore();
+
+    ctx.cursor.x = xTo;
+    ctx.cursor.y = yTo;
+    // dispatchEvent 는 리스너가 던진 예외를 삼켜 not.toThrow 검증이 무의미해지므로 직접 호출한다.
+    handlers.mousemove(new MouseEvent('mousemove'));
+    handlers.mouseup(new MouseEvent('mouseup'));
+  };
+
+  const barSeries = (items) => ({ series1: { name: 'series#1', findItems: () => items } });
+
+  it('bar 는 y축 전체 높이를 밴드로 잡고 리스너에 { data, range } 를 넘긴다', () => {
+    const items = [{ x: 1, y: 20, o: 20 }];
+    const dragSelect = vi.fn();
+    const ctx = createDragEndCtx({
+      listeners: { 'drag-select': dragSelect },
+      seriesList: barSeries(items),
+    });
+
+    dragTo(ctx, [20, 5], [60, 50]);
+
+    const [args] = dragSelect.mock.calls[0];
+    expect(args.data).toEqual([{ seriesName: 'series#1', seriesId: 'series1', items }]);
+    expect(args.range).toEqual({ xMin: 0.8, xMax: 2.4, yMin: 0, yMax: 50 });
+    // 세로 드래그 폭과 무관하게 y 밴드는 차트 전체 높이다.
+    expect(ctx.dragInfoBackup.ysp).toBe(ctx.dragInfoBackup.range.y1);
+    expect(ctx.dragInfoBackup.height).toBe(
+      ctx.dragInfoBackup.range.y2 - ctx.dragInfoBackup.range.y1,
+    );
+  });
+
+  it('range 값은 소수 3자리로 고정된다', () => {
+    const dragSelect = vi.fn();
+    const ctx = createDragEndCtx({
+      type: 'scatter',
+      listeners: { 'drag-select': dragSelect },
+      seriesList: barSeries([{ x: 1, y: 20 }]),
+      chartRect: { x1: 0, x2: 30, y1: 0, y2: 60 },
+    });
+
+    dragTo(ctx, [0, 5], [10, 50]);
+
+    // xMax = 4 * (10/30) = 1.3333...
+    expect(dragSelect.mock.calls[0][0].range.xMax).toBe(1.333);
+  });
+
+  it('zoom.use 면 리스너 대신 zoom.getRangeInfo 가 호출된다', () => {
+    const dragSelect = vi.fn();
+    const getRangeInfo = vi.fn();
+    const ctx = createDragEndCtx({
+      listeners: { 'drag-select': dragSelect },
+      zoom: { use: true, getRangeInfo },
+      seriesList: barSeries([{ x: 1, y: 20 }]),
+    });
+
+    dragTo(ctx, [20, 5], [60, 50]);
+
+    expect(dragSelect).not.toHaveBeenCalled();
+    expect(getRangeInfo).toHaveBeenCalledTimes(1);
+    // dragZoom 이 줌 창을 계산하는 데 쓰는 좌표 메타가 실려야 한다.
+    expect(getRangeInfo.mock.calls[0][0].range.dragSelectionInfo).toMatchObject({
+      dragXsp: 20,
+      dragXep: 60,
+    });
+  });
+
+  // zoom 옵션에는 getRangeInfo 가 없고(DEFAULT_OPTIONS.zoom), 리스너도 없으면 이 분기로 떨어진다.
+  it.each(['bar', 'scatter'])('%s: 리스너도 zoom 도 없으면 mouseup 이 터지지 않는다', (type) => {
+    const ctx = createDragEndCtx({ type, seriesList: barSeries([{ x: 1, y: 20 }]) });
+
+    expect(() => dragTo(ctx, [20, 5], [60, 50])).not.toThrow();
+  });
+});
