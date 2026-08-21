@@ -50,6 +50,22 @@ function getIntervalMeta(interval) {
 }
 
 /**
+ * dayjs 객체를 그날의 자정으로 되돌린다. 이미 자정이면 그대로 반환한다.
+ * 정렬된 tick 을 누적하는 경로에서는 대부분 이미 자정이라, 매번 재정규화하면
+ * tick 하나당 dayjs 객체를 하나 더 만든다.
+ *
+ * @param {dayjs.Dayjs} d dayjs 객체
+ * @returns {dayjs.Dayjs} 자정으로 정렬된 dayjs 객체
+ */
+function toStartOfDay(d) {
+  const isMidnight = d.hour() === 0
+    && d.minute() === 0
+    && d.second() === 0
+    && d.millisecond() === 0;
+  return isMidnight ? d : d.startOf('day');
+}
+
+/**
  * dayjs 객체에 interval 한 단위를 더한다.
  * day/week/month/quarter/year는 dayjs를 사용하여 달력 기반으로 증가한다.
  *
@@ -73,9 +89,9 @@ function addIntervalDayjs(d, meta) {
     // day/week: 자정이 없는 DST 전환일(00:00 → 01:00)을 지나면 wall-clock 이 01:00 으로
     // 고정되므로 매 가산마다 그날의 자정으로 되돌린다. 전환일 당일은 자정이 없어 01:00 이 유지된다.
     case 'week':
-      return d.add(t * 7, 'day').startOf('day');
+      return toStartOfDay(d.add(t * 7, 'day'));
     case 'day':
-      return d.add(t, 'day').startOf('day');
+      return toStartOfDay(d.add(t, 'day'));
     default:
       return dayjs(d.valueOf() + meta.ms);
   }
