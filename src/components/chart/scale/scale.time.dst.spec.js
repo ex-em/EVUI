@@ -292,5 +292,23 @@ describe('TimeScale day/week tick — DST 관측 타임존', () => {
         expect(tick - result.ticks[i]).toBe(DAY);
       });
     });
+
+    it('week interval 출력도 월요일 자정으로 동일하게 유지된다', () => {
+      const scale = createScale({ interval: 'week' });
+
+      const result = scale.calculateSteps({
+        minValue: ts('2026-01-01 00:00:00'),
+        maxValue: ts('2026-04-01 00:00:00'),
+        maxSteps: 20,
+      });
+
+      expect(result.ticks.length).toBe(13);
+      expect(new Set(times(result.ticks))).toEqual(new Set(['00:00']));
+      expect(result.ticks.every((tick) => dayjs(tick).day() === 1)).toBe(true);
+      const WEEK = 7 * 24 * 60 * 60 * 1000;
+      result.ticks.slice(1).forEach((tick, i) => {
+        expect(tick - result.ticks[i]).toBe(WEEK);
+      });
+    });
   });
 });
