@@ -5,6 +5,9 @@
     </resizable-wrapper>
   </div>
   <div class="description">
+    <div class="badge yellow">누적(stack)</div>
+    <ev-toggle v-model="useStack" />
+    <br /><br />
     <div class="badge yellow">범위 값</div>
     <br /><br />
     <div v-if="selectionRange.xMin">
@@ -24,7 +27,7 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { reactive, ref, watch } from 'vue';
 import dayjs from 'dayjs';
 
 export default {
@@ -40,17 +43,24 @@ export default {
       series2.push(Math.floor(Math.random() * 100) + 10);
     }
 
-    const chartData = {
+    const chartData = reactive({
       series: {
         series1: { name: 'series#1' },
         series2: { name: 'series#2' },
       },
+      groups: [],
       labels,
       data: {
         series1,
         series2,
       },
-    };
+    });
+
+    // 누적은 차트 타입이 아니라 groups 로 표현되므로, 드래그 진입 조건은 일반 막대와 같다.
+    const useStack = ref(false);
+    watch(useStack, (use) => {
+      chartData.groups = use ? [['series1', 'series2']] : [];
+    });
 
     const chartOptions = {
       type: 'bar',
@@ -100,6 +110,7 @@ export default {
     return {
       chartData,
       chartOptions,
+      useStack,
       selectionItems,
       selectionRange,
       onDragSelect,

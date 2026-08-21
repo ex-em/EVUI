@@ -711,7 +711,7 @@ describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', (
 });
 
 describe('plugins.interaction onMouseDown 드래그 진입 게이트', () => {
-  const createDragCtx = (options) => {
+  const createDragCtx = (options, data = { groups: [] }) => {
     const ctx = Object.assign(Object.create(modules), {
       options: {
         horizontal: false,
@@ -719,6 +719,7 @@ describe('plugins.interaction onMouseDown 드래그 진입 게이트', () => {
         dragSelection: { use: true },
         ...options,
       },
+      data,
       overlayCanvas: { addEventListener: vi.fn() },
       target: { closest: () => null },
       dragStart: vi.fn(),
@@ -748,6 +749,26 @@ describe('plugins.interaction onMouseDown 드래그 진입 게이트', () => {
 
   it('dragSelection.use 가 false 면 bar 도 드래그가 시작되지 않는다', () => {
     const ctx = createDragCtx({ type: 'bar', dragSelection: { use: false } });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+
+  // 누적은 차트 타입이 아니라 data.groups 로 표현된다. 게이트에 groups 조건이 끼어들면 red.
+  it('누적(groups) 수직 bar 도 드래그가 시작된다', () => {
+    const ctx = createDragCtx({ type: 'bar' }, { groups: [['series1', 'series2']] });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).toHaveBeenCalledWith({}, 'bar');
+  });
+
+  it('누적 bar 가 horizontal 이면 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx(
+      { type: 'bar', horizontal: true },
+      { groups: [['series1', 'series2']] },
+    );
 
     ctx.onMouseDown({});
 
