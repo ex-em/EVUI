@@ -823,7 +823,9 @@ const modules = {
             chartTitle: this.options.title.text,
           };
 
-          this.options.zoom.getRangeInfo(args);
+          // getRangeInfo 는 zoom 모드에서만 주입된다. 리스너 없이 dragSelection 만 켠
+          // 차트도 이 분기로 들어오므로 옵셔널 호출로 둔다.
+          this.options.zoom?.getRangeInfo?.(args);
         }
 
         if (!this.options.dragSelection.keepDisplay) {
