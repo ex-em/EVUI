@@ -3198,7 +3198,7 @@
             {
               "name": "dragSelection",
               "type": "Object",
-              "description": "드래그로 영역을 선택하는 기능의 활성화 여부 및 속성입니다. 수직 막대에서만 동작하며, horizontal: true 인 경우 드래그가 시작되지 않습니다. range.xMin/xMax는 x축 최소·최대값 사이의 선형 보간이라 값이 숫자인 축(linear, time)에서만 유효하며, 문자 라벨을 쓰는 step 축에서는 NaN이 됩니다.",
+              "description": "드래그로 영역을 선택하는 기능의 활성화 여부 및 속성입니다. 수직 막대에서만 동작하며, horizontal: true 인 경우 드래그가 시작되지 않습니다. 누적 막대(data.groups)도 동일하게 동작합니다. range.xMin/xMax는 x축 최소·최대값 사이의 선형 보간이라 값이 숫자인 축(linear, time)에서만 유효하며, 문자 라벨을 쓰는 step 축에서는 NaN이 됩니다.",
               "children": [
                 {
                   "name": "use",
@@ -3324,7 +3324,7 @@
             {
               "name": "range",
               "type": "Object",
-              "description": "선택 영역의 범위 값입니다. { xMin, xMax, yMin, yMax } 형태입니다. 범주형 x축(categoryMode)에서는 막대의 슬롯 위치가 아니라 축 범위 위 선형 보간으로 계산되므로, 최대 약 1 막대 폭의 오차가 있을 수 있습니다."
+              "description": "선택 영역의 범위 값입니다. { xMin, xMax, yMin, yMax } 형태입니다. 범주형 x축(categoryMode)에서는 막대의 슬롯 위치가 아니라 축 범위 위 선형 보간으로 계산되므로, 최대 약 1 막대 폭의 오차가 있을 수 있습니다. 누적 막대에서는 y축이 스택 총합 범위이므로 yMin/yMax도 스택 총합 기준입니다."
             }
           ]
         },

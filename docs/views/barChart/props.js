@@ -102,7 +102,7 @@ export default {
     },
     'Drag Selection': {
       description:
-        '드래그한 x 구간을 drag-select 이벤트로 받는 기능입니다. 수직 막대에서만 동작하며 horizontal: true면 드래그가 시작되지 않습니다.',
+        '드래그한 x 구간을 drag-select 이벤트로 받는 기능입니다. 수직 막대에서만 동작하며 horizontal: true면 드래그가 시작되지 않습니다. 누적 토글로 누적 막대도 같은 조건으로 동작함을 확인할 수 있습니다.',
       component: DragSelection,
       parsedData: parse(DragSelectionRaw).descriptor,
     },
