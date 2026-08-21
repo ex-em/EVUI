@@ -928,6 +928,27 @@ class Bar {
     ctx.fill();
     ctx.closePath();
   }
+
+  /**
+   * Returns items in range
+   * 막대는 점이 아니라 폭을 가지므로 드래그 구간에 걸치기만 해도 포함한다(부분 겹침 허용).
+   * 누적 막대는 `.y`가 누적 합, `.o`가 자기 값이다 — Line 과 같은 포인트 객체를 그대로 반환한다.
+   * @param {object} params  range values
+   *
+   * @returns {array}
+   */
+  findItems({ xsp, width }) {
+    if (!this.show || this.isHorizontal) {
+      return [];
+    }
+
+    const xep = xsp + width;
+
+    // 스크롤바·zoom 윈도우 밖 포인트는 computeGeometry 가 좌표를 세우지 않아 xp 가 없다.
+    return this.data.filter(
+      ({ xp, w }) => xp !== null && xp !== undefined && xp <= xep && xp + w >= xsp,
+    );
+  }
 }
 
 export default Bar;
