@@ -709,3 +709,48 @@ describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', (
     expect(chart._tooltipValueCache).toBeUndefined();
   });
 });
+
+describe('plugins.interaction onMouseDown 드래그 진입 게이트', () => {
+  const createDragCtx = (options) => {
+    const ctx = Object.assign(Object.create(modules), {
+      options: {
+        horizontal: false,
+        tooltip: {},
+        dragSelection: { use: true },
+        ...options,
+      },
+      overlayCanvas: { addEventListener: vi.fn() },
+      target: { closest: () => null },
+      dragStart: vi.fn(),
+      removeSelectionArea: vi.fn(),
+    });
+
+    ctx.createEventFunctions();
+
+    return ctx;
+  };
+
+  it.each(['scatter', 'line', 'heatMap', 'bar'])('%s 는 드래그가 시작된다', (type) => {
+    const ctx = createDragCtx({ type });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).toHaveBeenCalledWith({}, type);
+  });
+
+  it('horizontal bar 는 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx({ type: 'bar', horizontal: true });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+
+  it('dragSelection.use 가 false 면 bar 도 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx({ type: 'bar', dragSelection: { use: false } });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+});
