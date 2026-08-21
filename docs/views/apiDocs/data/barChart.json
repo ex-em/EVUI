@@ -3198,7 +3198,7 @@
             {
               "name": "dragSelection",
               "type": "Object",
-              "description": "드래그로 영역을 선택하는 기능의 활성화 여부 및 속성입니다. 수직 막대에서만 동작하며, horizontal: true 인 경우 드래그가 시작되지 않습니다. 누적 막대(data.groups)도 동일하게 동작합니다. range.xMin/xMax는 x축 최소·최대값 사이의 선형 보간이라 값이 숫자인 축(linear, time)에서만 유효하며, 문자 라벨을 쓰는 step 축에서는 NaN이 됩니다.",
+              "description": "드래그로 영역을 선택하는 기능의 활성화 여부 및 속성입니다. 수직 막대에서만 동작하며, horizontal: true 인 경우 드래그가 시작되지 않습니다. 누적 막대(data.groups)도 동일하게 동작합니다. range.xMin/xMax는 x축 최소·최대값 사이의 선형 보간이라 값이 숫자인 축(linear, time)에서만 유효하며, 문자 라벨을 쓰는 step 축에서는 NaN이 됩니다. zoom 모드에서는 drag-select 리스너 대신 줌이 실행되며, 드래그 줌은 time 축에서만 동작합니다.",
               "children": [
                 {
                   "name": "use",
