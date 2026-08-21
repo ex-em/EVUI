@@ -156,6 +156,7 @@ const chartData = {
 | displayOverflow | Boolean                | false                                     | 값 축(세로 모드=Y, 가로 모드=X)의 range로 제한한 범위를 초과한 막대를 경계까지 표시할지 여부. false면 range 밖 데이터는 숨겨집니다.                                                     | true, false                     |
 | selectItem   | Object                    | ([상세](#selectitem))                     | 차트 아이템 선택 기능 활성화 여부 및 속성                                                                                                                                              |                                 |
 | selectLabel  | Object                    | ([상세](#selectlabel))                    | 차트 라벨 선택 기능 활성화 여부 및 속성                                                                                                                                                |                                 |
+| dragSelection | Object                   | ([상세](#dragselection))                  | 드래그로 영역을 선택하는 기능 활성화 여부 및 속성. 수직 막대에서만 동작하며 `horizontal: true`면 드래그가 시작되지 않습니다.                                                            |                                 |
 | padding      | Object                    | { top: 20, right: 2, left: 2, bottom: 4 } | 차트 내부 padding 값                                                                                                                                                                   |                                 |
 | syncHover    | boolean                   | true                                      | options.syncHover가 true인 EvChartGroup으로 감싼경우, 해당 차트에서는 그룹으로 묶긴 차트들 사이의 syncHover선을 그리고싶지 않을 때 사용하는 속성 (time관련된 축을 가질때만 적용됩니다) |                                 |
 | seriesReverse | Boolean                  | false                                     | 시리즈 그리기 순서를 반전할지 여부                                                                                                                                                     | true, false                     |
@@ -630,6 +631,20 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 | indicatorColor      | Hex, RGB, RGBA Code(String) | '#000000' | indicator 색상                                                             |            |
 | tipStyle            | Object                      | ([상세](#tipstyle)) | tip 스타일을 설정                                                |            |
 
+#### dragSelection
+
+수직 막대(`horizontal: false`)에서만 동작합니다. 드래그 영역은 y축 전체 높이로 고정됩니다.
+
+`drag-select`의 `range.xMin`/`xMax`는 x축의 최소·최대값 사이를 선형 보간해 계산합니다. 따라서 값이 숫자인 축(`linear`, `time`)에서만 유효하며, 문자 라벨을 쓰는 `step` 축에서는 `NaN`이 됩니다(차트 타입 공통 동작). 시계열 막대에서 구간을 받으려면 `time` 축을 사용하세요.
+
+| 이름        | 타입                        | 디폴트    | 설명                         | 종류(예시)   |
+| ----------- | --------------------------- | --------- | ---------------------------- | ------------ |
+| use         | Boolean                     | false     | drag-select 사용 여부        | true / false |
+| keepDisplay | Boolean                     | true      | 드래그 후 선택영역 유지 여부 | true / false |
+| fillColor   | Hex, RGB, RGBA Code(String) | '#38ACEC' | 선택 영역 색상               |              |
+| opacity     | Number                      | 0.65      | 선택 영역 불투명도           | 0 ~ 1        |
+| startArea   | String (CSS Selector)       | ''        | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. 여러 차트를 사용할 때는 차트마다 고유한 셀렉터를 지정하세요(공통 조상을 지정하면 한 번의 드래그가 모든 차트의 selection을 트리거합니다). | '.chart-wrapper' |
+
 ### 5. resize-timeout
 
 - Default : 0
@@ -642,6 +657,7 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 | click      | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환                                                                                                                           |
 | dbl-click  | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환                                                                                                                      |
 | mouse-move |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환 |
+| drag-select | data, range | 드래그로 영역을 선택했을 때 발생. `range`는 선택 영역의 `{ xMin, xMax, yMin, yMax }`다. `data`에는 바 시리즈가 담기지 않는다 — 같은 차트에 섞인 라인 시리즈 등만 수집되고, 바 시리즈만 있으면 빈 배열이다. 범주형 x축에서 `range`는 막대의 슬롯 위치가 아니라 축 범위 위 선형 보간으로 계산되므로 최대 약 1 막대 폭의 오차가 있을 수 있다. `dragSelection.use`가 true이고 `horizontal`이 false일 때만 발생한다. |
 | click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 | axes-scale-change | | 차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 정보를 반환한다. 단, axes옵션에 scaleChange가 true이고 scale 정보가 변경될때만 이벤트를 발생시킨다. ex)<br><br> {<br> x: [{ minSteps, maxSteps }], <br>   y: [{ minSteps, maxSteps }]<br>} | |
 | axes-data-max-change | maxY | show 된 series 들의 **실제 데이터 y 최대값**(number)을 반환한다. axes-scale-change(라벨 스텝 개수)와 달리 데이터 값이다. 차트가 내부적으로 이미 계산한 series.minMax.maxY 를 재사용하므로 소비처가 동일 데이터를 따로 스캔해 max 를 구하지 않아도 된다. **차트 타입과 무관하게** 사용할 수 있으며, 이 이벤트를 바인딩한 경우에만 발생한다(바인딩 안 하면 집계 비용 0). 발생 시엔 렌더마다(같은 값이어도) 발생한다. 유효한(유한수) 데이터가 있는 show 된 series 가 하나도 없으면 — 보이는 series 가 없거나 모두 빈 데이터면 — null 을 emit 한다. 단, realTimeScatter 는 전 series 가 빈 데이터일 때 내부 minMax 가 0 으로 폴백되어 0 이 emit 된다. maxY 는 show 된 전 series 의 **통합 최대값(단일 y축·세로 차트 기준, 축 구분 없음)** 이라 다중 y축에서는 축별 구분이 되지 않는다. realTimeScatter autoScale 의 데이터 최대값 용도로 도입됐으나 line·bar 등 다른 차트에서도 동일하게 동작한다. |
