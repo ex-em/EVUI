@@ -397,7 +397,8 @@ describe('Bar Element', () => {
         { x: 4, y: 50, o: 50 },
       ]);
 
-      const [item] = bar.findItems({ xsp: 0, width: 10 });
+      // [0,20] 은 첫 막대([2,18])를 온전히 덮는다 — 겹침 규칙과 무관하게 값 계약만 검증한다.
+      const [item] = bar.findItems({ xsp: 0, width: 20 });
 
       expect(item.y).toBe(30);
       expect(item.o).toBe(10);
