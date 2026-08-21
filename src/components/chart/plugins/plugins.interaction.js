@@ -539,14 +539,20 @@ const modules = {
     };
 
     /**
-     * Start drag-select when dragSelection use option is True and graph type is 'scatter'
+     * Start drag-select when dragSelection use option is True and graph type is
+     * 'scatter' | 'line' | 'heatMap' | vertical 'bar'
      *
      * @returns {undefined}
      */
     this.onMouseDown = (e) => {
-      const { dragSelection, type } = this.options;
+      const { dragSelection, type, horizontal } = this.options;
+      // 가로 막대는 x축이 값 축이라 x 방향 드래그 범위가 범주·시간 범위가 아니다.
+      const isDraggableBar = type === 'bar' && !horizontal;
 
-      if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
+      if (
+        dragSelection.use &&
+        (type === 'scatter' || type === 'line' || type === 'heatMap' || isDraggableBar)
+      ) {
         this.removeSelectionArea();
         this.dragStart(e, type);
       }
