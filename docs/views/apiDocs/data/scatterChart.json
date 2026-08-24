@@ -2280,7 +2280,7 @@
             {
               "name": "dragSelection",
               "type": "Object",
-              "description": "드래그로 영역을 선택하는 기능(drag-select)의 사용 여부 및 속성입니다. PC에서는 drag, 모바일에서는 touch로 선택 영역을 지정할 수 있습니다. 시리즈 type을 'bar'로 지정한 콤보 구성에서는 그 막대도 data에 담기며, 막대는 드래그 구간에 걸치기만 해도 포함됩니다.",
+              "description": "드래그로 영역을 선택하는 기능(drag-select)의 사용 여부 및 속성입니다. PC에서는 drag, 모바일에서는 touch로 선택 영역을 지정할 수 있습니다. 시리즈 type을 'bar'로 지정한 콤보 구성에서는 그 막대도 data에 담기며, 막대는 x 구간이 걸치기만 해도 포함되고 드래그 영역의 y 범위는 보지 않습니다.",
               "children": [
                 {
                   "name": "use",
