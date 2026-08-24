@@ -3191,7 +3191,7 @@
             {
               "name": "dragSelection",
               "type": "Object",
-              "description": "드래그로 영역을 선택하는 기능의 활성화 여부 및 속성입니다. 시리즈 type을 'bar'로 지정한 콤보 구성에서는 그 막대도 data에 담기며, 막대는 드래그 구간에 걸치기만 해도 포함됩니다.",
+              "description": "드래그로 영역을 선택하는 기능의 활성화 여부 및 속성입니다. 시리즈 type을 'bar'로 지정한 콤보 구성에서는 그 막대도 data에 담기며, 막대는 드래그 구간에 걸치기만 해도 포함됩니다. options.type 을 두지 않고 시리즈가 각자 type 을 선언하는 구성은 Combo chart 문서를 참고하세요.",
               "children": [
                 {
                   "name": "use",
