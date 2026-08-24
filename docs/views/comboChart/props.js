@@ -14,6 +14,8 @@ import LineBarSelectLabel from './example/LineBarSelectLabel';
 import LineBarSelectLabelRaw from './example/LineBarSelectLabel?raw';
 import AreaLine from './example/AreaLine';
 import AreaLineRaw from './example/AreaLine?raw';
+import DragSelection from './example/DragSelection';
+import DragSelectionRaw from './example/DragSelection?raw';
 import PerfStressDashboard from './example/PerfStressDashboard';
 import PerfStressDashboardRaw from './example/PerfStressDashboard?raw';
 
@@ -58,6 +60,13 @@ export default {
       description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
       component: LineBarSelectLabel,
       parsedData: parse(LineBarSelectLabelRaw).descriptor,
+    },
+    DragSelection: {
+      description:
+        '드래그로 x 구간을 선택하면 bar 와 line 이 한 페이로드에 담깁니다. bar 는 x 구간이 걸치기만 해도 담기고 ' +
+        'line 은 점이 구간 안에 들어야 담기므로 같은 드래그에서 건수가 다를 수 있습니다.',
+      component: DragSelection,
+      parsedData: parse(DragSelectionRaw).descriptor,
     },
     PerfStressDashboard: {
       description:

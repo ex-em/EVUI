@@ -10,7 +10,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 
 ## Features
 
-- **차트 타입**: `options.type` 으로 line/bar/pie(doughnut·sunburst 포함)/scatter/heatMap 렌더. `seriesInfo.charts` 는 pie/bar/line/scatter/heatMap 5종 인덱스를 유지하며 combo(`options.combo`)는 타입 혼합으로 표현된다.
+- **차트 타입**: `options.type` 으로 line/bar/pie(doughnut·sunburst 포함)/scatter/heatMap 렌더. `seriesInfo.charts` 는 pie/bar/line/scatter/heatMap 5종 인덱스를 유지한다. combo 는 `options.type` 을 두지 않고 시리즈가 각자 `type` 을 선언해 표현한다(시리즈 `combo: true` 는 line 을 막대 슬롯 중앙으로 반 칸 밀어주는 별개 플래그다). `DEFAULT_OPTIONS.combo` 는 읽히지 않는다.
 - **렌더 파이프라인**: `drawChart` 가 initScale → prepareScale(축 range/labelOffset/steps 계산 + scale-change payload) → scrollbar 배치 → `axes-scale-change`/`emitDataMaxChange` → 경로 분기(blit/worker/main) → static layer(축·grid) → series layer → 선택 line 덧그리기 → overlay → foreground(plot/tip) → `commitToDisplay`(buffer→display blit) 순서로 오케스트레이션한다.
 - **업데이트 스케줄링**: Chart.vue 의 `scheduleUpdate` 가 data/options watcher 의 `evChart.update` 호출을 setTimeout 으로 coalesce 한다. 보류 중 도착한 갱신 플래그(updateSeries/updateData/updateLegend/updateTooltip/updateSelTip.update)는 OR-병합되고, 그룹 인터랙션의 `deferUntil`(inject `groupInteraction`)이 미래면 fire 시점에 재검사해 남은 시간만큼 재예약한다.
 - **realtime scatter blit fast-path**: `realTimeScatter.use` 차트에서 게이트(evaluateBlitGate) 통과 시 series별 ping-pong 오프스크린 레이어를 정수 CSS px(×q 양자화)만큼 왼쪽 시프트하고 신규 시간대(strip)만 재raster 한다. 게이트 미충족·`BLIT_REFRESH_INTERVAL`(300프레임) 도달 시 full redraw 폴백. 디버그 플래그: `window.__EVUI_BLIT_DEBUG__`(진단 집계 → `__EVUI_BLIT_DIAG__`), `__EVUI_BLIT_FORCE_OFF__`, `__EVUI_BLIT_REFRESH_INTERVAL__`.

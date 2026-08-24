@@ -774,18 +774,45 @@ describe('plugins.interaction onMouseDown 드래그 진입 게이트', () => {
 
     expect(ctx.dragStart).not.toHaveBeenCalled();
   });
+
+  // 콤보는 options.type 이 없고 시리즈가 각자 type 을 선언한다.
+  it('콤보(options.type 미지정)도 드래그가 시작된다', () => {
+    const ctx = createDragCtx({});
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).toHaveBeenCalledWith({}, undefined);
+  });
+
+  it('콤보가 horizontal 이면 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx({ horizontal: true });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+
+  it('pie 는 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx({ type: 'pie' });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
 });
 
 describe('dragEnd', () => {
   // dragEnd 는 dragStart 내부 클로저라 window mouseup 이 유일한 진입점이다.
   // getMousePosition 을 커서 객체로 스텁해 드래그 좌표를 주입한다.
   const createDragEndCtx = ({
-    type = 'bar',
     listeners = {},
     zoom,
     seriesList = {},
     chartRect = { x1: 0, x2: 100, y1: 0, y2: 60 },
+    ...rest
   } = {}) => {
+    // 콤보의 options.type 은 undefined 다 — 구조분해 기본값이 그걸 덮지 않게 키 존재로 판정한다.
+    const type = 'type' in rest ? rest.type : 'bar';
     const cursor = { x: 0, y: 0 };
 
     const ctx = Object.assign(Object.create(modules), {
@@ -850,6 +877,37 @@ describe('dragEnd', () => {
     expect(args.data).toEqual([{ seriesName: 'series#1', seriesId: 'series1', items }]);
     expect(args.range).toEqual({ xMin: 0.8, xMax: 2.4, yMin: 0, yMax: 50 });
     // 세로 드래그 폭과 무관하게 y 밴드는 차트 전체 높이다.
+    expect(ctx.dragInfoBackup.ysp).toBe(ctx.dragInfoBackup.range.y1);
+    expect(ctx.dragInfoBackup.height).toBe(
+      ctx.dragInfoBackup.range.y2 - ctx.dragInfoBackup.range.y1,
+    );
+  });
+
+  // 콤보는 options.type 이 undefined 라 dragStart/dragEnd 의 scatter·heatMap 분기를 모두 비껴간다
+  // — line·bar 와 같은 y 밴드·range 경로를 탄다.
+  it('콤보는 line·bar 와 같은 y 밴드를 잡고 두 시리즈를 모두 담는다', () => {
+    const lineItems = [{ x: 1, y: 20 }];
+    const barItems = [{ x: 1, y: 30, o: 30 }];
+    const dragSelect = vi.fn();
+    const ctx = createDragEndCtx({
+      type: undefined,
+      listeners: { 'drag-select': dragSelect },
+      seriesList: {
+        line1: { name: 'line#1', findItems: () => lineItems },
+        bar1: { name: 'bar#1', findItems: () => barItems },
+      },
+    });
+
+    expect(ctx.options.type).toBeUndefined();
+
+    dragTo(ctx, [20, 5], [60, 50]);
+
+    const [args] = dragSelect.mock.calls[0];
+    expect(args.data).toEqual([
+      { seriesName: 'line#1', seriesId: 'line1', items: lineItems },
+      { seriesName: 'bar#1', seriesId: 'bar1', items: barItems },
+    ]);
+    expect(args.range).toEqual({ xMin: 0.8, xMax: 2.4, yMin: 0, yMax: 50 });
     expect(ctx.dragInfoBackup.ysp).toBe(ctx.dragInfoBackup.range.y1);
     expect(ctx.dragInfoBackup.height).toBe(
       ctx.dragInfoBackup.range.y2 - ctx.dragInfoBackup.range.y1,
