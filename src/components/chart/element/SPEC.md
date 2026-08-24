@@ -14,7 +14,7 @@ EvChart의 시리즈(그래프 본체)를 캔버스에 그리는 타입별 렌�
 - **래스터 패스 `draw(param)`**: `param = { ctx, chartRect, labelOffset, axesSteps, legendHitInfo, selectLabel, selectItem, selectSeries, isBrush, unSelectedOpacity, displayOverflow, ... }`. `this.show === false`면 즉시 반환. Pie만 시그니처가 다르다(`draw(context, strokeOptions, unSelectedOpacity)`).
 - **기하 패스 `computeGeometry(param)`**: 캔버스 그리기 없이 각 데이터 아이템의 픽셀 기하(`item.xp/yp[/w/h]`)를 main 모델에 채운다. 히트 테스트가 이 값을 소비한다. draw는 내부에서 computeGeometry를 먼저 호출한 뒤 그 값을 읽기만 하고 mutate하지 않는다(worker offload 시 main 기하 유지 목적). **Pie는 computeGeometry가 없다** — 각도 기하(centerX/centerY/radius/startAngle/endAngle)를 `plugins/plugins.pie.js`가 계산해 인스턴스에 저장한다.
 - **히트 테스트 `findGraphData(offset, ...)`**: 마우스 좌표로 그래프 아이템을 찾아 `{ data, hit, color, index, directHit? }`를 반환. Line/Bar는 `(offset, isHorizontal, dataIndex, useSelectLabelOrItem)` 4-인자, Scatter/Pie/HeatMap은 `offset`만 사용.
-- **범위 탐색 `findItems(params)`**: 드래그 선택 범위 내 아이템 배열 반환. Line은 X 범위만(±1px 여유), Scatter는 X·Y 박스(±1px 여유), HeatMap은 부동소수점 보정(`PRECISION=100`) 후 셀 완전 포함 판정. Bar/Pie는 미구현.
+- **범위 탐색 `findItems(params)`**: 드래그 선택 범위 내 아이템 배열 반환. Line은 X 범위만(±1px 여유), Scatter는 X·Y 박스(±1px 여유), HeatMap은 부동소수점 보정(`PRECISION=100`) 후 셀 완전 포함 판정. Bar는 막대 폭이 걸치기만 해도 담고(부분 겹침) 가시 윈도우 범위만 훑는다. Pie는 미구현.
 - **하이라이트 `itemHighlight(item, ctx)`**: hover된 아이템 강조 렌더. Line/Scatter는 3중 포인트(그림자→색상→흰 중심), Bar는 shadowBlur 4 박스, Pie는 슬라이스 재그림, HeatMap은 stroke/shadow 옵션 반영 셀 확대(±0.5px).
 
 ### Line (element.line.js)
@@ -34,6 +34,7 @@ EvChart의 시리즈(그래프 본체)를 캔버스에 그리는 타입별 렌�
 - **값 라벨 `drawValueLabels`**: align start/center/out/end(기본). 스택 바에서 `out`은 미지원(console.warn 후 미표시). 텍스트가 막대 안에 들어가지 않으면 그리지 않음.
 - **borderRadius**: 라운드 사각형(차트 영역 clip 적용). 예외 발생 시 `fillRect` 폴백. 스택 바는 라운드 미적용.
 - **히트 테스트**: 가시 윈도우 범위에서 이진 탐색(`binarySearchBar`), 박스 내부 판정 `isPointInBar`. 박스 안이면 `hit`이자 `directHit`. `useIndicatorOnLabel` 경로는 dataIndex를 가시 윈도우로 clamp해 stale 기하 참조 방지.
+- **범위 탐색 `findItems`**: 히트 테스트와 같은 가시 윈도우 산술(`visibleStartIndex` ~ `filteredCount`)로 좁힌 뒤 x 구간 겹침을 본다. 좌표 존재 여부만으로는 걸러지지 않는다 — 스크롤바 이동은 `lightUpdate`로 `createDataSet`을 건너뛰어 윈도우 밖 항목이 직전 렌더의 `xp`를 들고 있다. 빈 윈도우 sentinel에서도 이 산술이 빈 배열을 보장한다.
 - **기하 메모이즈**: Line 키에 `showIndex`, `showSeriesCount` 추가(가시성 토글이 막대 폭/위치를 바꾸므로).
 
 ### TimeBar (element.bar.time.js)

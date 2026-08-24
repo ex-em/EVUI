@@ -944,10 +944,16 @@ class Bar {
 
     const xep = xsp + width;
 
-    // 스크롤바·zoom 윈도우 밖 포인트는 computeGeometry 가 좌표를 세우지 않아 xp 가 없다.
-    return this.data.filter(
-      ({ xp, w }) => xp !== null && xp !== undefined && xp <= xep && xp + w >= xsp,
-    );
+    // 스크롤바 이동은 lightUpdate 라 xp 를 null 로 되돌리는 경로를 건너뛴다 — 윈도우 밖 항목이
+    // 직전 렌더의 좌표를 들고 있어 xp 가 있는지만 보면 걸러지지 않는다. binarySearchBar 와 같은
+    // 산술로 가시 구간만 훑는다. 구간 안에도 값이 null 인 항목은 좌표가 없어 가드가 남는다.
+    const startIdx = this.visibleStartIndex ?? 0;
+    const totalCount = this.filteredCount ?? this.data.length;
+    const endIdx = Math.min(startIdx + totalCount - 1, this.data.length - 1);
+
+    return this.data
+      .slice(startIdx, endIdx + 1)
+      .filter(({ xp, w }) => xp !== null && xp !== undefined && xp <= xep && xp + w >= xsp);
   }
 }
 
