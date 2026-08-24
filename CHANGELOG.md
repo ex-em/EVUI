@@ -1,3 +1,23 @@
+# [3.19.0](https://github.com/ex-em/EVUI/compare/3.18.0...3.19.0) (2026-08-24)
+
+
+### Bug Fixes
+
+* **chart:** time 축 day 틱을 DST 관측 타임존에서 자정에 정렬 ([0d4f24e](https://github.com/ex-em/EVUI/commit/0d4f24ee94f84b79200e192c452d038f253b11ef)), closes [#2334](https://github.com/ex-em/EVUI/issues/2334)
+* **chart:** time 축 week 틱을 DST 관측 타임존에서 자정에 정렬 ([5d5715a](https://github.com/ex-em/EVUI/commit/5d5715adf22b95304bafda11d314bfac4a9d7059)), closes [#2336](https://github.com/ex-em/EVUI/issues/2336)
+* **chart:** 자정 없는 DST 전환일 이후 day 틱이 01:00 에 고정되던 문제 수정 ([3c34a0a](https://github.com/ex-em/EVUI/commit/3c34a0a7d8f6b08f6b5cc3320e11f00dad9837fb)), closes [ex-em/EVUI#2336](https://github.com/ex-em/EVUI/issues/2336) [#2334](https://github.com/ex-em/EVUI/issues/2334)
+* ev-select 검색어 하이라이트 disabled 항목 색상 유지 및 강조 스타일 정리 ([e285655](https://github.com/ex-em/EVUI/commit/e285655703d3ee8c367be436956c0508ab5c268b))
+
+
+### Features
+
+* ev-select 검색어 하이라이트 옵션 추가 ([a8b0165](https://github.com/ex-em/EVUI/commit/a8b0165c0b969543284a0d9f07cf0317d22ec748))
+
+
+### Performance Improvements
+
+* **chart:** time 축 day/week 틱 가산에서 불필요한 자정 재정규화 제거 ([5fc6495](https://github.com/ex-em/EVUI/commit/5fc6495837253c391d88e684e3208070f8364c6d))
+
 # [3.18.0](https://github.com/ex-em/EVUI/compare/3.17.1...3.18.0) (2026-08-11)
 
 
