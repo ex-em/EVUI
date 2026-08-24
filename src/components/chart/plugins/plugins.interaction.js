@@ -540,7 +540,7 @@ const modules = {
 
     /**
      * Start drag-select when dragSelection use option is True and graph type is
-     * 'scatter' | 'line' | 'heatMap' | vertical 'bar'
+     * 'scatter' | 'line' | 'heatMap' | vertical 'bar' | combo(no options.type)
      *
      * @returns {undefined}
      */
@@ -549,7 +549,9 @@ const modules = {
       // 가로 막대는 x축이 값 축이라 x 방향 드래그 범위가 범주·시간 범위가 아니다.
       const isDraggableBar = type === 'bar' && !horizontal;
       // 콤보는 options.type 이 없고 시리즈가 각자 type 을 선언한다 — 막대를 포함할 수 있어
-      // 가로 조건은 bar 와 같이 둔다. pie 는 options.type: 'pie' 라 여기 걸리지 않는다.
+      // 가로 조건은 bar 와 같이 둔다. type 이 없으면 시리즈 레벨 type 으로 pie·heatMap 도
+      // 만들어지지만 둘 다 온전한 구성이 못 된다 — heatMap 은 2D 라벨을 options.type 에서만
+      // 받고, pie 는 축이 없어 getSelectionRange 가 null 이다(그 null 은 가드되지 않았다).
       const isDraggableCombo = !type && !horizontal;
 
       if (
