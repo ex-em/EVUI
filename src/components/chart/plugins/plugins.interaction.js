@@ -550,8 +550,8 @@ const modules = {
       const isDraggableBar = type === 'bar' && !horizontal;
       // 콤보는 options.type 이 없고 시리즈가 각자 type 을 선언한다 — 막대를 포함할 수 있어
       // 가로 조건은 bar 와 같이 둔다. type 이 없으면 시리즈 레벨 type 으로 pie·heatMap 도
-      // 만들어지지만 둘 다 온전한 구성이 못 된다 — heatMap 은 2D 라벨을 options.type 에서만
-      // 받고, pie 는 축이 없어 getSelectionRange 가 null 이다(그 null 은 가드되지 않았다).
+      // 만들어지지만 둘 다 온전한 구성이 못 된다 — heatMap 은 data.labels 가 { x, y } 형태여야
+      // 하고, pie 는 축이 없어 getSelectionRange 가 null 이다(그 null 은 가드되지 않았다).
       const isDraggableCombo = !type && !horizontal;
 
       if (
