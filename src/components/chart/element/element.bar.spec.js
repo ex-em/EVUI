@@ -426,5 +426,42 @@ describe('Bar Element', () => {
 
       expect(items).toHaveLength(5);
     });
+
+    /**
+     * 스크롤바 이동은 lightUpdate 라 xp 를 null 로 되돌리는 createDataSet 을 건너뛴다 —
+     * 윈도우 밖 항목이 직전 렌더의 좌표를 들고 있어도 담기지 않아야 한다.
+     */
+    describe('윈도우 이동 후 잔여 좌표', () => {
+      const windowParam = (minIndex, maxIndex) => ({
+        ...baseParam(null),
+        axesSteps: {
+          x: [{ graphMin: 0, graphMax: 9, minIndex, maxIndex }],
+          y: [{ graphMin: 0, graphMax: 100 }],
+        },
+      });
+
+      const makeTenBars = () =>
+        makeBar(
+          Array.from({ length: 10 }, (_, ix) => ({ x: ix, y: 10 * (ix + 1), o: 10 * (ix + 1) })),
+        );
+
+      it('윈도우를 옮기면 이전 윈도우의 막대는 담지 않는다', () => {
+        const bar = makeTenBars();
+        bar.computeGeometry(windowParam(0, 4));
+        bar.computeGeometry(windowParam(5, 9));
+
+        const items = bar.findItems({ xsp: 0, width: 100 });
+
+        expect(items.map((item) => item.index)).toEqual([5, 6, 7, 8, 9]);
+      });
+
+      it('아무것도 그리지 않는 (0, -1) 에서는 빈 배열을 반환한다', () => {
+        const bar = makeTenBars();
+        bar.computeGeometry(windowParam(0, 4));
+        bar.computeGeometry(windowParam(0, -1));
+
+        expect(bar.findItems({ xsp: 0, width: 100 })).toEqual([]);
+      });
+    });
   });
 });
