@@ -891,6 +891,27 @@ describe('dragEnd', () => {
     });
   });
 
+  // findSelectedItems 는 options.type 을 읽지 않는다 — line 차트에 시리즈 type 오버라이드로 섞은
+  // bar 도 findItems 를 가지면 페이로드에 실린다. 아이템이 없는 시리즈는 제외된다.
+  it('페이로드는 차트 타입을 가리지 않고 findItems 를 가진 시리즈를 담는다', () => {
+    const items = [{ x: 1, y: 20, o: 20 }];
+    const dragSelect = vi.fn();
+    const ctx = createDragEndCtx({
+      type: 'line',
+      listeners: { 'drag-select': dragSelect },
+      seriesList: {
+        line1: { name: 'line#1', findItems: () => [] },
+        bar1: { name: 'bar#1', findItems: () => items },
+      },
+    });
+
+    dragTo(ctx, [20, 5], [60, 50]);
+
+    expect(dragSelect.mock.calls[0][0].data).toEqual([
+      { seriesName: 'bar#1', seriesId: 'bar1', items },
+    ]);
+  });
+
   // zoom 옵션에는 getRangeInfo 가 없고(DEFAULT_OPTIONS.zoom), 리스너도 없으면 이 분기로 떨어진다.
   it.each(['bar', 'scatter'])('%s: 리스너도 zoom 도 없으면 mouseup 이 터지지 않는다', (type) => {
     const ctx = createDragEndCtx({ type, seriesList: barSeries([{ x: 1, y: 20 }]) });

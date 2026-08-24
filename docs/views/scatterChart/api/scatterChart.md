@@ -331,6 +331,8 @@ value-only 상태에서 alias(text)가 가려지므로 hover로 보완(데스크
 
 #### dragSelection
 
+시리즈 `type`을 `'bar'`로 지정한 콤보 구성에서는 그 막대도 `data`에 담깁니다 — 막대는 폭이 있어 드래그 구간에 걸치기만 해도 포함되므로, 점 포함(±1px)인 line·scatter 시리즈보다 넓게 잡힙니다.
+
 | 이름 | 타입 | 디폴트 | 설명 | 종류(예시) |
 | --- | ---- | ----- | --- | ----------|
 | use | Boolean | false | drag-select 사용 여부 | true / false |
