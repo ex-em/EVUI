@@ -548,10 +548,17 @@ const modules = {
       const { dragSelection, type, horizontal } = this.options;
       // 가로 막대는 x축이 값 축이라 x 방향 드래그 범위가 범주·시간 범위가 아니다.
       const isDraggableBar = type === 'bar' && !horizontal;
+      // 콤보는 options.type 이 없고 시리즈가 각자 type 을 선언한다 — 막대를 포함할 수 있어
+      // 가로 조건은 bar 와 같이 둔다. pie 는 options.type: 'pie' 라 여기 걸리지 않는다.
+      const isDraggableCombo = !type && !horizontal;
 
       if (
         dragSelection.use &&
-        (type === 'scatter' || type === 'line' || type === 'heatMap' || isDraggableBar)
+        (type === 'scatter' ||
+          type === 'line' ||
+          type === 'heatMap' ||
+          isDraggableBar ||
+          isDraggableCombo)
       ) {
         this.removeSelectionArea();
         this.dragStart(e, type);
