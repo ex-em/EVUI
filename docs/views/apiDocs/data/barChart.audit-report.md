@@ -69,7 +69,7 @@
 | 이벤트/emit | JSON 문서화 | 판정 |
 | --- | --- | --- |
 | click / dbl-click / mouse-move / click-legend / axes-scale-change / axes-data-max-change | events 섹션 6종 모두 존재 | ✅ payload 설명 코드와 일치 (`plugins.interaction.js:416-424` bar 분기, `chart.core.js:2098-2107`, `uses.js:490-496`) |
-| drag-select (+ options.dragSelection) | 미문서화 | ✅ 제외 타당 — dragSelection 시작 게이트가 `type === 'scatter' \|\| 'line' \|\| 'heatMap'`로 **bar 미지원** (`plugins/plugins.interaction.js:547-549`) |
+| drag-select (+ options.dragSelection) | events 섹션 + options.dragSelection 으로 문서화 | ✅ #2337 로 수직 막대(`horizontal: false`) 드래그 진입 허용 후 문서 추가. `Bar.findItems` 는 드래그 구간에 걸친 막대를 담고(부분 겹침 허용), 범주형 축에서 `range` 에 최대 약 1 막대 폭 오차가 있어 설명에 명시 (`plugins/plugins.interaction.js` onMouseDown) |
 | update:selectedItem / selectedLabel / legendData | props의 `v-model:*` 3종으로 문서화 | ✅ (`uses.js:405-483`) |
 | update:selectedSeries (+ options.selectSeries) | 미문서화 | ✅ 제외 타당 — "selectSeries 강조를 실제로 소비하는 element는 line 뿐"(`chart.selection.js:12`), `element/element.bar.js` draw는 selectSeries 미소비, interaction의 `case 'bar'`도 selectItem/selectLabel만 처리(`plugins.interaction.js:416-424`) |
 | update:zoomStartIdx / update:zoomEndIdx | 미문서화 | ✅ 의도적 제외 (EvChart(Zoom) 문서로 분리 예정 — 지시서 명시) |

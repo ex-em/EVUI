@@ -709,3 +709,294 @@ describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', (
     expect(chart._tooltipValueCache).toBeUndefined();
   });
 });
+
+describe('plugins.interaction onMouseDown 드래그 진입 게이트', () => {
+  const createDragCtx = (options, data = { groups: [] }) => {
+    const ctx = Object.assign(Object.create(modules), {
+      options: {
+        horizontal: false,
+        tooltip: {},
+        dragSelection: { use: true },
+        ...options,
+      },
+      data,
+      overlayCanvas: { addEventListener: vi.fn() },
+      target: { closest: () => null },
+      dragStart: vi.fn(),
+      removeSelectionArea: vi.fn(),
+    });
+
+    ctx.createEventFunctions();
+
+    return ctx;
+  };
+
+  it.each(['scatter', 'line', 'heatMap', 'bar'])('%s 는 드래그가 시작된다', (type) => {
+    const ctx = createDragCtx({ type });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).toHaveBeenCalledWith({}, type);
+  });
+
+  it('horizontal bar 는 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx({ type: 'bar', horizontal: true });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+
+  it('dragSelection.use 가 false 면 bar 도 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx({ type: 'bar', dragSelection: { use: false } });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+
+  // 누적은 차트 타입이 아니라 data.groups 로 표현된다. 게이트에 groups 조건이 끼어들면 red.
+  it('누적(groups) 수직 bar 도 드래그가 시작된다', () => {
+    const ctx = createDragCtx({ type: 'bar' }, { groups: [['series1', 'series2']] });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).toHaveBeenCalledWith({}, 'bar');
+  });
+
+  it('누적 bar 가 horizontal 이면 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx(
+      { type: 'bar', horizontal: true },
+      { groups: [['series1', 'series2']] },
+    );
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+
+  // 콤보는 options.type 이 없고 시리즈가 각자 type 을 선언한다.
+  it('콤보(options.type 미지정)도 드래그가 시작된다', () => {
+    const ctx = createDragCtx({});
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).toHaveBeenCalledWith({}, undefined);
+  });
+
+  it('콤보가 horizontal 이면 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx({ horizontal: true });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+
+  it('pie 는 드래그가 시작되지 않는다', () => {
+    const ctx = createDragCtx({ type: 'pie' });
+
+    ctx.onMouseDown({});
+
+    expect(ctx.dragStart).not.toHaveBeenCalled();
+  });
+});
+
+describe('dragEnd', () => {
+  // dragEnd 는 dragStart 내부 클로저라 window mouseup 이 유일한 진입점이다.
+  // getMousePosition 을 커서 객체로 스텁해 드래그 좌표를 주입한다.
+  const createDragEndCtx = ({
+    listeners = {},
+    zoom,
+    seriesList = {},
+    chartRect = { x1: 0, x2: 100, y1: 0, y2: 60 },
+    ...rest
+  } = {}) => {
+    // 콤보의 options.type 은 undefined 다 — 구조분해 기본값이 그걸 덮지 않게 키 존재로 판정한다.
+    const type = 'type' in rest ? rest.type : 'bar';
+    const cursor = { x: 0, y: 0 };
+
+    const ctx = Object.assign(Object.create(modules), {
+      options: {
+        type,
+        horizontal: false,
+        title: { text: 'chart' },
+        tooltip: {},
+        dragSelection: { use: true, keepDisplay: true },
+        ...(zoom ? { zoom } : {}),
+      },
+      listeners,
+      seriesList,
+      chartRect,
+      labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      axesSteps: {
+        x: [{ graphMin: 0, graphMax: 4 }],
+        y: [{ graphMin: 0, graphMax: 50 }],
+      },
+      getMousePosition: () => [cursor.x, cursor.y, chartRect.x2, chartRect.y2],
+      overlayClear: vi.fn(),
+      drawSelectionArea: vi.fn(),
+      removeSelectionArea: vi.fn(),
+    });
+
+    ctx.cursor = cursor;
+
+    return ctx;
+  };
+
+  const dragTo = (ctx, [xFrom, yFrom], [xTo, yTo]) => {
+    const handlers = {};
+    const addSpy = vi.spyOn(window, 'addEventListener').mockImplementation((name, fn) => {
+      handlers[name] = fn;
+    });
+
+    ctx.cursor.x = xFrom;
+    ctx.cursor.y = yFrom;
+    ctx.dragStart({}, ctx.options.type);
+    addSpy.mockRestore();
+
+    ctx.cursor.x = xTo;
+    ctx.cursor.y = yTo;
+    // dispatchEvent 는 리스너가 던진 예외를 삼켜 not.toThrow 검증이 무의미해지므로 직접 호출한다.
+    handlers.mousemove(new MouseEvent('mousemove'));
+    handlers.mouseup(new MouseEvent('mouseup'));
+  };
+
+  const barSeries = (items) => ({ series1: { name: 'series#1', findItems: () => items } });
+
+  it('bar 는 y축 전체 높이를 밴드로 잡고 리스너에 { data, range } 를 넘긴다', () => {
+    const items = [{ x: 1, y: 20, o: 20 }];
+    const dragSelect = vi.fn();
+    const ctx = createDragEndCtx({
+      listeners: { 'drag-select': dragSelect },
+      seriesList: barSeries(items),
+    });
+
+    dragTo(ctx, [20, 5], [60, 50]);
+
+    const [args] = dragSelect.mock.calls[0];
+    expect(args.data).toEqual([{ seriesName: 'series#1', seriesId: 'series1', items }]);
+    expect(args.range).toEqual({ xMin: 0.8, xMax: 2.4, yMin: 0, yMax: 50 });
+    // 세로 드래그 폭과 무관하게 y 밴드는 차트 전체 높이다.
+    expect(ctx.dragInfoBackup.ysp).toBe(ctx.dragInfoBackup.range.y1);
+    expect(ctx.dragInfoBackup.height).toBe(
+      ctx.dragInfoBackup.range.y2 - ctx.dragInfoBackup.range.y1,
+    );
+  });
+
+  // 콤보는 options.type 이 undefined 라 dragStart/dragEnd 의 scatter·heatMap 분기를 모두 비껴간다
+  // — line·bar 와 같은 y 밴드·range 경로를 탄다.
+  it('콤보는 line·bar 와 같은 y 밴드를 잡고 두 시리즈를 모두 담는다', () => {
+    const lineItems = [{ x: 1, y: 20 }];
+    const barItems = [{ x: 1, y: 30, o: 30 }];
+    const dragSelect = vi.fn();
+    const ctx = createDragEndCtx({
+      type: undefined,
+      listeners: { 'drag-select': dragSelect },
+      seriesList: {
+        line1: { name: 'line#1', findItems: () => lineItems },
+        bar1: { name: 'bar#1', findItems: () => barItems },
+      },
+    });
+
+    expect(ctx.options.type).toBeUndefined();
+
+    dragTo(ctx, [20, 5], [60, 50]);
+
+    const [args] = dragSelect.mock.calls[0];
+    expect(args.data).toEqual([
+      { seriesName: 'line#1', seriesId: 'line1', items: lineItems },
+      { seriesName: 'bar#1', seriesId: 'bar1', items: barItems },
+    ]);
+    expect(args.range).toEqual({ xMin: 0.8, xMax: 2.4, yMin: 0, yMax: 50 });
+    expect(ctx.dragInfoBackup.ysp).toBe(ctx.dragInfoBackup.range.y1);
+    expect(ctx.dragInfoBackup.height).toBe(
+      ctx.dragInfoBackup.range.y2 - ctx.dragInfoBackup.range.y1,
+    );
+  });
+
+  it('range 값은 소수 3자리로 고정된다', () => {
+    const dragSelect = vi.fn();
+    const ctx = createDragEndCtx({
+      type: 'scatter',
+      listeners: { 'drag-select': dragSelect },
+      seriesList: barSeries([{ x: 1, y: 20 }]),
+      chartRect: { x1: 0, x2: 30, y1: 0, y2: 60 },
+    });
+
+    dragTo(ctx, [0, 5], [10, 50]);
+
+    // xMax = 4 * (10/30) = 1.3333...
+    expect(dragSelect.mock.calls[0][0].range.xMax).toBe(1.333);
+  });
+
+  it('zoom.use 면 리스너 대신 zoom.getRangeInfo 가 호출된다', () => {
+    const dragSelect = vi.fn();
+    const getRangeInfo = vi.fn();
+    const ctx = createDragEndCtx({
+      listeners: { 'drag-select': dragSelect },
+      zoom: { use: true, getRangeInfo },
+      seriesList: barSeries([{ x: 1, y: 20 }]),
+    });
+
+    dragTo(ctx, [20, 5], [60, 50]);
+
+    expect(dragSelect).not.toHaveBeenCalled();
+    expect(getRangeInfo).toHaveBeenCalledTimes(1);
+    // dragZoom 이 줌 창을 계산하는 데 쓰는 좌표 메타가 실려야 한다.
+    expect(getRangeInfo.mock.calls[0][0].range.dragSelectionInfo).toMatchObject({
+      dragXsp: 20,
+      dragXep: 60,
+    });
+  });
+
+  // findSelectedItems 는 options.type 을 읽지 않는다 — line 차트에 시리즈 type 오버라이드로 섞은
+  // bar 도 findItems 를 가지면 페이로드에 실린다. 아이템이 없는 시리즈는 제외된다.
+  it('페이로드는 차트 타입을 가리지 않고 findItems 를 가진 시리즈를 담는다', () => {
+    const items = [{ x: 1, y: 20, o: 20 }];
+    const dragSelect = vi.fn();
+    const ctx = createDragEndCtx({
+      type: 'line',
+      listeners: { 'drag-select': dragSelect },
+      seriesList: {
+        line1: { name: 'line#1', findItems: () => [] },
+        bar1: { name: 'bar#1', findItems: () => items },
+      },
+    });
+
+    dragTo(ctx, [20, 5], [60, 50]);
+
+    expect(dragSelect.mock.calls[0][0].data).toEqual([
+      { seriesName: 'bar#1', seriesId: 'bar1', items },
+    ]);
+  });
+
+  // zoom 옵션에는 getRangeInfo 가 없고(DEFAULT_OPTIONS.zoom), 리스너도 없으면 이 분기로 떨어진다.
+  it.each(['bar', 'scatter'])('%s: 리스너도 zoom 도 없으면 mouseup 이 터지지 않는다', (type) => {
+    const ctx = createDragEndCtx({ type, seriesList: barSeries([{ x: 1, y: 20 }]) });
+
+    expect(() => dragTo(ctx, [20, 5], [60, 50])).not.toThrow();
+  });
+
+  // 축을 선언하지 않은 구성(콤보에 시리즈 레벨 type: 'pie' 만 둔 경우 등)은 axesSteps 가 비어
+  // getSelectionRange 가 null 을 돌려준다 — else 분기가 그 null 에 대입하면 mouseup 에서 터졌다.
+  it('축이 없어 range 가 null 이면 리스너·zoom 없이도 mouseup 이 터지지 않는다', () => {
+    const ctx = createDragEndCtx({ seriesList: barSeries([{ x: 1, y: 20 }]) });
+    ctx.axesSteps = { x: [], y: [] };
+
+    expect(() => dragTo(ctx, [20, 5], [60, 50])).not.toThrow();
+  });
+
+  it('range 가 null 이면 zoom 위임 경로도 터지지 않고 getRangeInfo 를 호출하지 않는다', () => {
+    const getRangeInfo = vi.fn();
+    const ctx = createDragEndCtx({
+      listeners: { 'drag-select': vi.fn() },
+      zoom: { use: true, getRangeInfo },
+      seriesList: barSeries([{ x: 1, y: 20 }]),
+    });
+    ctx.axesSteps = { x: [], y: [] };
+
+    expect(() => dragTo(ctx, [20, 5], [60, 50])).not.toThrow();
+    // dragZoom 은 range 를 구조분해하므로 null 을 넘기지 않는다.
+    expect(getRangeInfo).not.toHaveBeenCalled();
+  });
+});

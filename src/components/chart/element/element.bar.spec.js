@@ -345,4 +345,123 @@ describe('Bar Element', () => {
       expect(Math.abs(data[0].h)).toBeGreaterThan(Math.abs(before));
     });
   });
+
+  describe('findItems', () => {
+    // baseParam 기하에서 막대 5개의 x 구간은 [2,18] [22,38] [42,58] [62,78] [82,98] 이다.
+    const makeGeometry = (data) => {
+      const bar = makeBar(data);
+      bar.computeGeometry(baseParam(null));
+      return bar;
+    };
+
+    const linearData = () => [
+      { x: 0, y: 10, o: 10 },
+      { x: 1, y: 20, o: 20 },
+      { x: 2, y: 30, o: 30 },
+      { x: 3, y: 40, o: 40 },
+      { x: 4, y: 50, o: 50 },
+    ];
+
+    it('드래그 구간에 걸치기만 한 막대도 담는다', () => {
+      const bar = makeGeometry(linearData());
+
+      // [30,50] 은 [22,38]·[42,58] 을 각각 일부만 덮는다 — 완전히 든 막대는 하나도 없다.
+      const items = bar.findItems({ xsp: 30, width: 20 });
+
+      expect(items.map((item) => item.index)).toEqual([1, 2]);
+    });
+
+    it('구간 밖 막대는 담지 않는다', () => {
+      const bar = makeGeometry(linearData());
+
+      const items = bar.findItems({ xsp: 60, width: 20 });
+
+      expect(items.map((item) => item.index)).toEqual([3]);
+    });
+
+    it('경계에 닿기만 해도 담는다', () => {
+      const bar = makeGeometry(linearData());
+
+      // [17,18] 은 첫 막대의 우측 경계(18)에만 닿는다.
+      const items = bar.findItems({ xsp: 17, width: 1 });
+
+      expect(items.map((item) => item.index)).toEqual([0]);
+    });
+
+    it('누적 막대는 누적 합(y)과 자기 값(o)을 함께 담는다', () => {
+      const bar = makeGeometry([
+        { x: 0, y: 30, o: 10, b: 20 },
+        { x: 1, y: 20, o: 20 },
+        { x: 2, y: 30, o: 30 },
+        { x: 3, y: 40, o: 40 },
+        { x: 4, y: 50, o: 50 },
+      ]);
+
+      // [0,20] 은 첫 막대([2,18])를 온전히 덮는다 — 겹침 규칙과 무관하게 값 계약만 검증한다.
+      const [item] = bar.findItems({ xsp: 0, width: 20 });
+
+      expect(item.y).toBe(30);
+      expect(item.o).toBe(10);
+    });
+
+    it('숨긴 시리즈는 빈 배열을 반환한다', () => {
+      const bar = makeGeometry(linearData());
+      bar.show = false;
+
+      expect(bar.findItems({ xsp: 0, width: 100 })).toEqual([]);
+    });
+
+    it('가로 막대는 빈 배열을 반환한다', () => {
+      const bar = makeGeometry(linearData());
+      bar.isHorizontal = true;
+
+      expect(bar.findItems({ xsp: 0, width: 100 })).toEqual([]);
+    });
+
+    it('좌표가 없는(윈도우 밖) 포인트는 담지 않는다', () => {
+      const bar = makeGeometry(linearData());
+      bar.data.push({ x: 5, y: 60, o: 60 });
+
+      const items = bar.findItems({ xsp: 0, width: 100 });
+
+      expect(items).toHaveLength(5);
+    });
+
+    /**
+     * 스크롤바 이동은 lightUpdate 라 xp 를 null 로 되돌리는 createDataSet 을 건너뛴다 —
+     * 윈도우 밖 항목이 직전 렌더의 좌표를 들고 있어도 담기지 않아야 한다.
+     */
+    describe('윈도우 이동 후 잔여 좌표', () => {
+      const windowParam = (minIndex, maxIndex) => ({
+        ...baseParam(null),
+        axesSteps: {
+          x: [{ graphMin: 0, graphMax: 9, minIndex, maxIndex }],
+          y: [{ graphMin: 0, graphMax: 100 }],
+        },
+      });
+
+      const makeTenBars = () =>
+        makeBar(
+          Array.from({ length: 10 }, (_, ix) => ({ x: ix, y: 10 * (ix + 1), o: 10 * (ix + 1) })),
+        );
+
+      it('윈도우를 옮기면 이전 윈도우의 막대는 담지 않는다', () => {
+        const bar = makeTenBars();
+        bar.computeGeometry(windowParam(0, 4));
+        bar.computeGeometry(windowParam(5, 9));
+
+        const items = bar.findItems({ xsp: 0, width: 100 });
+
+        expect(items.map((item) => item.index)).toEqual([5, 6, 7, 8, 9]);
+      });
+
+      it('아무것도 그리지 않는 (0, -1) 에서는 빈 배열을 반환한다', () => {
+        const bar = makeTenBars();
+        bar.computeGeometry(windowParam(0, 4));
+        bar.computeGeometry(windowParam(0, -1));
+
+        expect(bar.findItems({ xsp: 0, width: 100 })).toEqual([]);
+      });
+    });
+  });
 });

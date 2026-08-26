@@ -3196,6 +3196,43 @@
               ]
             },
             {
+              "name": "dragSelection",
+              "type": "Object",
+              "description": "드래그로 영역을 선택하는 기능의 활성화 여부 및 속성입니다. 수직 막대에서만 동작하며, horizontal: true 인 경우 드래그가 시작되지 않습니다. 누적 막대(data.groups)도 동일하게 동작합니다. range.xMin/xMax는 x축 최소·최대값 사이의 선형 보간이라 값이 숫자인 축(linear, time)에서만 유효하며, 문자 라벨을 쓰는 step 축에서는 NaN이 됩니다. zoom 모드에서는 drag-select 리스너 대신 줌이 실행되며, 드래그 줌은 time 축에서만 동작합니다.",
+              "children": [
+                {
+                  "name": "use",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "drag-select 사용 여부입니다."
+                },
+                {
+                  "name": "keepDisplay",
+                  "type": "Boolean",
+                  "default": "true",
+                  "description": "드래그 후 선택 영역 유지 여부입니다."
+                },
+                {
+                  "name": "fillColor",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'#38ACEC'",
+                  "description": "선택 영역 색상입니다."
+                },
+                {
+                  "name": "opacity",
+                  "type": "Number",
+                  "default": "0.65",
+                  "description": "선택 영역 불투명도입니다(0 ~ 1)."
+                },
+                {
+                  "name": "startArea",
+                  "type": "String (CSS Selector)",
+                  "default": "''",
+                  "description": "drag-select를 시작할 수 있는 영역의 CSS 셀렉터입니다. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. 여러 차트를 사용할 때는 차트마다 고유한 셀렉터를 지정하세요(공통 조상을 지정하면 한 번의 드래그가 모든 차트의 selection을 트리거합니다)."
+                }
+              ]
+            },
+            {
               "name": "padding",
               "type": "Object",
               "default": "{ top: 20, right: 2, left: 2, bottom: 4 }",
@@ -3274,6 +3311,22 @@
         {
           "name": "mouse-move",
           "description": "커서의 현재 location과 함께, axes 위에 있을 경우 labelIdx·labelVal을, 데이터 영역에 있을 경우 dataIdx·maxDataVal을, 그리고 labelVal 또는 maxDataVal을 가공하기 전의 originVal 값을 반환합니다."
+        },
+        {
+          "name": "drag-select",
+          "description": "그래프에서 드래그로 영역을 선택했을 때 발생하며, 선택 영역의 범위 값(range)을 반환합니다. 선택 영역은 y축 전체 높이로 고정됩니다.",
+          "children": [
+            {
+              "name": "data",
+              "type": "Array",
+              "description": "선택 영역 안의 시리즈별 데이터 배열입니다. [{ seriesName, seriesId, items }] 형태입니다. 막대는 폭이 있으므로 드래그 구간에 완전히 들어가지 않고 일부만 걸쳐도 포함됩니다. 누적 막대는 각 포인트가 y(누적 합)와 o(자기 값)를 함께 갖습니다. 값이 null이거나 축 범위를 넘은 포인트도 담깁니다 — 수직 막대의 x 좌표는 라벨 기준이라 값과 무관하게 정해집니다(line과 동일 계약). 숨긴 시리즈와 가로 막대는 포함되지 않습니다."
+            },
+            {
+              "name": "range",
+              "type": "Object",
+              "description": "선택 영역의 범위 값입니다. { xMin, xMax, yMin, yMax } 형태입니다. 범주형 x축(categoryMode)에서는 막대의 슬롯 위치가 아니라 축 범위 위 선형 보간으로 계산되므로, 최대 약 1 막대 폭의 오차가 있을 수 있습니다. 누적 막대에서는 y축이 스택 총합 범위이므로 yMin/yMax도 스택 총합 기준입니다."
+            }
+          ]
         },
         {
           "name": "click-legend",

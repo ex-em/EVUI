@@ -539,14 +539,29 @@ const modules = {
     };
 
     /**
-     * Start drag-select when dragSelection use option is True and graph type is 'scatter'
+     * Start drag-select when dragSelection use option is True and graph type is
+     * 'scatter' | 'line' | 'heatMap' | vertical 'bar' | combo(no options.type)
      *
      * @returns {undefined}
      */
     this.onMouseDown = (e) => {
-      const { dragSelection, type } = this.options;
+      const { dragSelection, type, horizontal } = this.options;
+      // 가로 막대는 x축이 값 축이라 x 방향 드래그 범위가 범주·시간 범위가 아니다.
+      const isDraggableBar = type === 'bar' && !horizontal;
+      // 콤보는 options.type 이 없고 시리즈가 각자 type 을 선언한다 — 막대를 포함할 수 있어
+      // 가로 조건은 bar 와 같이 둔다. type 이 없으면 시리즈 레벨 type 으로 pie·heatMap 도
+      // 만들어지지만 둘 다 온전한 구성이 못 된다 — heatMap 은 data.labels 가 { x, y } 형태여야
+      // 하고, pie 는 축이 없어 getSelectionRange 가 null 이다 — zoom 위임 분기가 그 null 을 건너뛴다.
+      const isDraggableCombo = !type && !horizontal;
 
-      if (dragSelection.use && (type === 'scatter' || type === 'line' || type === 'heatMap')) {
+      if (
+        dragSelection.use &&
+        (type === 'scatter' ||
+          type === 'line' ||
+          type === 'heatMap' ||
+          isDraggableBar ||
+          isDraggableCombo)
+      ) {
         this.removeSelectionArea();
         this.dragStart(e, type);
       }
@@ -804,7 +819,9 @@ const modules = {
 
         if (typeof this.listeners['drag-select'] === 'function' && !this.options?.zoom?.use) {
           this.listeners['drag-select'](args);
-        } else {
+        } else if (args.range) {
+          // 축을 선언하지 않은 구성(시리즈 레벨 type: 'pie' 만 둔 콤보 등)은 getSelectionRange 가
+          // null 이라 위임할 범위가 없다 — dragZoom 은 range 를 구조분해한다.
           const { xsp, range: chartRange, width: dragWidth } = dragInfo;
           const dragXsp = xsp - chartRange.x1;
 
@@ -817,7 +834,9 @@ const modules = {
             chartTitle: this.options.title.text,
           };
 
-          this.options.zoom.getRangeInfo(args);
+          // getRangeInfo 는 zoom 모드에서만 주입된다. 리스너 없이 dragSelection 만 켠
+          // 차트도 이 분기로 들어오므로 옵셔널 호출로 둔다.
+          this.options.zoom?.getRangeInfo?.(args);
         }
 
         if (!this.options.dragSelection.keepDisplay) {

@@ -16,6 +16,8 @@ import SelectItem from './example/SelectItem';
 import SelectItemRaw from './example/SelectItem?raw';
 import SelectLabel from './example/SelectLabel';
 import SelectLabelRaw from './example/SelectLabel?raw';
+import DragSelection from './example/DragSelection';
+import DragSelectionRaw from './example/DragSelection?raw';
 import Gradient from './example/Gradient';
 import GradientRaw from './example/Gradient?raw';
 import PlotLine from './example/PlotLine';
@@ -97,6 +99,12 @@ export default {
       description: '차트 전체에서 선택한 라벨 내 모든 아이템이 하이라이트 되는 기능입니다.',
       component: SelectLabel,
       parsedData: parse(SelectLabelRaw).descriptor,
+    },
+    'Drag Selection': {
+      description:
+        '드래그한 x 구간을 drag-select 이벤트로 받는 기능입니다. 수직 막대에서만 동작하며 horizontal: true면 드래그가 시작되지 않습니다. 누적 토글로 누적 막대도 같은 조건으로 동작함을 확인할 수 있습니다.',
+      component: DragSelection,
+      parsedData: parse(DragSelectionRaw).descriptor,
     },
     Gradient: {
       description: '막대에 그라데이션 효과를 줄 수 있습니다.',

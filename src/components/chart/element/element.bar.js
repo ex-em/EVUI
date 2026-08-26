@@ -928,6 +928,34 @@ class Bar {
     ctx.fill();
     ctx.closePath();
   }
+
+  /**
+   * Returns items in range
+   * 막대는 점이 아니라 폭을 가지므로 드래그 구간에 걸치기만 해도 포함한다(부분 겹침 허용).
+   * 누적 막대는 `.y`가 누적 합, `.o`가 자기 값이다 — Line 과 같은 포인트 객체를 그대로 반환한다.
+   * @param {object} params  range values
+   *
+   * @returns {array}
+   */
+  findItems({ xsp, width }) {
+    if (!this.show || this.isHorizontal) {
+      return [];
+    }
+
+    const xep = xsp + width;
+
+    // 스크롤바 이동은 lightUpdate 라 xp 를 null 로 되돌리는 경로를 건너뛴다 — 윈도우 밖 항목이
+    // 직전 렌더의 좌표를 들고 있어 xp 가 있는지만 보면 걸러지지 않는다. binarySearchBar 와 같은
+    // 산술로 가시 구간만 훑는다. 값이 null 이거나 축 범위를 넘은 항목도 담긴다 — 수직 막대의
+    // xp 는 라벨 기준이라 값과 무관하게 채워지고 그 신호는 h 에만 실린다(Line 과 같은 계약).
+    const startIdx = this.visibleStartIndex ?? 0;
+    const totalCount = this.filteredCount ?? this.data.length;
+    const endIdx = Math.min(startIdx + totalCount - 1, this.data.length - 1);
+
+    return this.data
+      .slice(startIdx, endIdx + 1)
+      .filter(({ xp, w }) => xp !== null && xp !== undefined && xp <= xep && xp + w >= xsp);
+  }
 }
 
 export default Bar;
