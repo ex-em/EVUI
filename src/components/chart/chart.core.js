@@ -1832,9 +1832,13 @@ class EvChart {
       return;
     }
 
-    // 데이터 갱신 시 hover fast-path 시그니처를 무효화한다.
+    // 데이터 갱신 시 hover fast-path 시그니처와 툴팁 값 포맷 캐시를 무효화한다.
+    // 값 포맷 캐시는 point 객체를 키로 하는 WeakMap 인데, createDataSet 이 점객체 풀을
+    // 재사용(addData 의 target in-place 덮어쓰기)하므로 "새 객체 → 자동 GC" 가정이 성립하지
+    // 않는다 — 명시적으로 비우지 않으면 갱신 전 값의 포맷 결과가 계속 반환된다.
     if (updateData || updateSeries) {
       this._lastHoverSig = '';
+      this._tooltipValueCache = null;
     }
 
     this.updateScrollbar(updateData, updateByScrollbar);
