@@ -593,3 +593,68 @@ describe('plugins.interaction 전용 드래그 캔버스 라이프사이클', ()
     expect(chart.dragDisplayCanvas).toBeUndefined();
   });
 });
+
+describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', () => {
+  const createFormatterChart = (valueFormatter) =>
+    Object.assign(Object.create(modules), {
+      options: {
+        horizontal: false,
+        type: 'line',
+        tooltip: { formatter: { value: valueFormatter } },
+      },
+    });
+
+  const callArgs = (point, value) => ({
+    dataId: 'd1',
+    seriesId: 's1',
+    seriesName: 's1',
+    value,
+    itemData: point,
+  });
+
+  it('같은 point 객체를 재-hover 하면 formatter 를 재호출하지 않고 캐시를 반환한다', () => {
+    const formatter = vi.fn(({ y }) => `fmt:${y}`);
+    const chart = createFormatterChart(formatter);
+    const point = { x: 'a', y: 1, o: 1 };
+
+    expect(chart.getFormattedTooltipValue(callArgs(point, 1))).toBe('fmt:1');
+    expect(chart.getFormattedTooltipValue(callArgs(point, 1))).toBe('fmt:1');
+    expect(formatter).toHaveBeenCalledTimes(1);
+  });
+
+  it('점객체 풀 재사용(in-place 갱신) 뒤 캐시 무효화 없이는 stale 값이 반환된다 — update() 무효화로 복구(회귀)', () => {
+    // 회귀 배경: addData(target)가 점객체 풀을 재사용해 데이터 갱신 시 같은 객체의 값만
+    // 덮어쓰므로, WeakMap 키가 살아남아 갱신 전 포맷 결과가 반환되고 사용자 formatter 에
+    // 진입하지 않는 버그가 있었다. chart.core update() 가 updateData/updateSeries 시
+    // _tooltipValueCache 를 비워 이를 복구한다.
+    const formatter = vi.fn(({ y }) => `fmt:${y}`);
+    const chart = createFormatterChart(formatter);
+    const point = { x: 'a', y: 1, o: 1 };
+
+    expect(chart.getFormattedTooltipValue(callArgs(point, 1))).toBe('fmt:1');
+
+    // 데이터 갱신: createDataSet 이 풀의 같은 객체를 새 값으로 덮어쓴 상황
+    point.y = 2;
+    point.o = 2;
+
+    // 무효화 전에는 객체 키가 살아 있어 stale 값이 그대로 반환된다(버그의 발생 기전 고정)
+    expect(chart.getFormattedTooltipValue(callArgs(point, 2))).toBe('fmt:1');
+    expect(formatter).toHaveBeenCalledTimes(1);
+
+    // chart.core update(updateData/updateSeries)와 동일한 명시적 무효화
+    chart._tooltipValueCache = null;
+
+    expect(chart.getFormattedTooltipValue(callArgs(point, 2))).toBe('fmt:2');
+    expect(formatter).toHaveBeenCalledTimes(2);
+  });
+
+  it('value formatter 가 없으면 캐시를 만들지 않는다(기본 numberWithComma 경로 우회)', () => {
+    const chart = Object.assign(Object.create(modules), {
+      options: { horizontal: false, type: 'line', tooltip: {} },
+    });
+    const point = { x: 'a', y: 1000, o: 1000 };
+
+    expect(chart.getFormattedTooltipValue(callArgs(point, 1000))).toBe('1,000');
+    expect(chart._tooltipValueCache).toBeUndefined();
+  });
+});
