@@ -1,3 +1,11 @@
+## [3.19.1](https://github.com/ex-em/EVUI/compare/3.19.0...3.19.1) (2026-08-26)
+
+
+### Bug Fixes
+
+* **chart:** _dataEpoch 미유지 경로(realTimeScatter)에서 툴팁 값 포맷 캐시 비활성화 ([28ea1de](https://github.com/ex-em/EVUI/commit/28ea1def2fb4688c1cb4d107b10ad79c23c2edf8))
+* **chart:** 데이터 갱신 시 툴팁 값 포맷 WeakMap 캐시 명시 무효화 ([5c28273](https://github.com/ex-em/EVUI/commit/5c28273acd9ea34cf168bb2cbb06851f05966650)), closes [#2282](https://github.com/ex-em/EVUI/issues/2282) [#2292](https://github.com/ex-em/EVUI/issues/2292)
+
 # [3.19.0](https://github.com/ex-em/EVUI/compare/3.18.0...3.19.0) (2026-08-24)
 
 
