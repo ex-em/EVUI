@@ -40,38 +40,6 @@ export function getSize(size) {
   return sizeValue;
 }
 
-export function getMatchedComponentsDownward(context, componentName) {
-  const children = context.$children;
-  const result = [];
-  if (!children) {
-    return result;
-  }
-  for (let i = 0; i < children.length; i++) {
-    const v = children[i];
-    const name = v.$options.name;
-    if (name === componentName) {
-      result.push(v);
-    } else {
-      result.concat(getMatchedComponentsDownward(v, componentName));
-    }
-  }
-  return result;
-}
-
-export function getMatchedComponentUpward(context, componentName) {
-  let parent = context.$parent;
-  let name = parent.$options.name;
-
-  while (parent && (!name || componentName !== name)) {
-    parent = parent.$parent;
-    if (parent) {
-      name = parent.$options.name;
-    }
-  }
-
-  return parent;
-}
-
 export function truthyNumber(v) {
   return typeof v === 'number' && !Number.isNaN(v);
 }

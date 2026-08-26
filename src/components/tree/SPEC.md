@@ -50,7 +50,7 @@ EvTree (allNodeInfo 평탄화 + contextMenu)
 | TreeNode (내부) | 재귀 노드 렌더 |
 | contextMenu | 우클릭 메뉴(contextMenuItems) |
 
-> `src/common/utils.tree.js` 는 사용하지 않는다 — 트리 상태를 자체 `allNodeInfo` 로 관리한다.
+> 공용 트리 탐색 유틸에 의존하지 않는다 — 트리 상태를 자체 `allNodeInfo` 로 관리한다.
 
 ## Glossary
 
