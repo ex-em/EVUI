@@ -661,6 +661,35 @@ describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', (
     expect(chart._tooltipValueCacheEpoch).toBe(chart._dataEpoch);
   });
 
+  it('_dataEpoch 미정의 경로(realTimeScatter 등)에서는 캐시를 만들지 않아 formatter 교체가 즉시 반영된다', () => {
+    // realTimeScatter 는 createRealTimeScatterDataSet 별도 경로라 _dataEpoch 가 undefined 로
+    // 남는다. 이때 캐시가 만들어지면 epoch 비교(undefined !== undefined === false)로 영구히
+    // 무효화되지 않아, formatter 런타임 교체 후에도 이전 formatter 결과가 반환된다 — 캐시
+    // 자체를 만들지 않는 것으로 방어한다(computeGeometry 의 canMemo 가드와 동일 취지).
+    const oldFormatter = vi.fn(({ y }) => `OLD:${y}`);
+    const chart = Object.assign(Object.create(modules), {
+      options: {
+        horizontal: false,
+        type: 'scatter',
+        tooltip: { formatter: { value: oldFormatter } },
+      },
+    });
+    const point = { x: 1, y: 5, o: 5 };
+
+    expect(chart.getFormattedTooltipValue(callArgs(point, 5))).toBe('OLD:5');
+    expect(chart._tooltipValueCache).toBeUndefined();
+
+    // 사용자가 tooltip.formatter.value 를 런타임 교체 (단위 토글, 로케일 변경 등)
+    const newFormatter = vi.fn(({ y }) => `NEW:${y}`);
+    chart.options = {
+      ...chart.options,
+      tooltip: { formatter: { value: newFormatter } },
+    };
+
+    expect(chart.getFormattedTooltipValue(callArgs(point, 5))).toBe('NEW:5');
+    expect(newFormatter).toHaveBeenCalledTimes(1);
+  });
+
   it('value formatter 가 없으면 캐시를 만들지 않는다(기본 numberWithComma 경로 우회)', () => {
     const chart = Object.assign(Object.create(modules), {
       _dataEpoch: 1,

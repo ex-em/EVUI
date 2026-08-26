@@ -1631,16 +1631,22 @@ const modules = {
 
     // 동일 itemData 객체에 대한 포맷 결과를 캐시한다.
     // 같은 mousemove 윈도우 안에서 hover 중 큰 비용(고객 value formatter; big.js 등)을 1회만 부담.
+    // _dataEpoch 를 받지 못하는 경로에선 캐시하지 않는다(computeGeometry 의 canMemo 가드와
+    // 동일 취지) — realTimeScatter 는 createRealTimeScatterDataSet 별도 경로라 epoch 가
+    // undefined 로 남는데, 점객체 값은 불변이지만 formatter 런타임 교체를 무효화할 방법이
+    // 없으므로 캐시를 끈다(scatter hover hit 은 mousemove 당 점 1개라 비용 미미).
     const useCache =
-      itemData !== null && typeof itemData === 'object' && tooltipValueFormatter;
+      itemData !== null &&
+      typeof itemData === 'object' &&
+      tooltipValueFormatter &&
+      this._dataEpoch != null;
     if (useCache) {
       // 무효화: point 객체는 풀링되어 createDataSet 마다 같은 객체가 in-place 로 덮어써진다
       // (model.store addData 의 target 재사용, identity 유지) — WeakMap 자동 GC 로는
       // 무효화되지 않으므로, 풀을 덮어쓰는 사건 자체에 걸린 _dataEpoch(createDataSet 진입 시
       // +1)와 어긋나면 캐시 전체를 폐기한다(computeGeometry 메모이즈와 동일 패턴).
       // formatter 옵션 런타임 교체(updateTooltip)도 update()→createDataSet 재실행을 거치므로
-      // 함께 커버된다. realTimeScatter 는 createRealTimeScatterDataSet 별도 경로라 epoch 가
-      // 오르지 않지만, 그 경로의 점객체는 추가만 되고 기존 객체 값이 변하지 않아 정합이 유지된다.
+      // 함께 커버된다.
       if (this._tooltipValueCacheEpoch !== this._dataEpoch) {
         this._tooltipValueCache = null;
         this._tooltipValueCacheEpoch = this._dataEpoch;
