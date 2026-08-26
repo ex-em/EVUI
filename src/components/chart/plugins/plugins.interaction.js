@@ -551,7 +551,7 @@ const modules = {
       // 콤보는 options.type 이 없고 시리즈가 각자 type 을 선언한다 — 막대를 포함할 수 있어
       // 가로 조건은 bar 와 같이 둔다. type 이 없으면 시리즈 레벨 type 으로 pie·heatMap 도
       // 만들어지지만 둘 다 온전한 구성이 못 된다 — heatMap 은 data.labels 가 { x, y } 형태여야
-      // 하고, pie 는 축이 없어 getSelectionRange 가 null 이다(그 null 은 가드되지 않았다).
+      // 하고, pie 는 축이 없어 getSelectionRange 가 null 이다 — zoom 위임 분기가 그 null 을 건너뛴다.
       const isDraggableCombo = !type && !horizontal;
 
       if (
@@ -819,7 +819,9 @@ const modules = {
 
         if (typeof this.listeners['drag-select'] === 'function' && !this.options?.zoom?.use) {
           this.listeners['drag-select'](args);
-        } else {
+        } else if (args.range) {
+          // 축을 선언하지 않은 구성(시리즈 레벨 type: 'pie' 만 둔 콤보 등)은 getSelectionRange 가
+          // null 이라 위임할 범위가 없다 — dragZoom 은 range 를 구조분해한다.
           const { xsp, range: chartRange, width: dragWidth } = dragInfo;
           const dragXsp = xsp - chartRange.x1;
 

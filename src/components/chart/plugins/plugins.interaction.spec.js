@@ -976,4 +976,27 @@ describe('dragEnd', () => {
 
     expect(() => dragTo(ctx, [20, 5], [60, 50])).not.toThrow();
   });
+
+  // 축을 선언하지 않은 구성(콤보에 시리즈 레벨 type: 'pie' 만 둔 경우 등)은 axesSteps 가 비어
+  // getSelectionRange 가 null 을 돌려준다 — else 분기가 그 null 에 대입하면 mouseup 에서 터졌다.
+  it('축이 없어 range 가 null 이면 리스너·zoom 없이도 mouseup 이 터지지 않는다', () => {
+    const ctx = createDragEndCtx({ seriesList: barSeries([{ x: 1, y: 20 }]) });
+    ctx.axesSteps = { x: [], y: [] };
+
+    expect(() => dragTo(ctx, [20, 5], [60, 50])).not.toThrow();
+  });
+
+  it('range 가 null 이면 zoom 위임 경로도 터지지 않고 getRangeInfo 를 호출하지 않는다', () => {
+    const getRangeInfo = vi.fn();
+    const ctx = createDragEndCtx({
+      listeners: { 'drag-select': vi.fn() },
+      zoom: { use: true, getRangeInfo },
+      seriesList: barSeries([{ x: 1, y: 20 }]),
+    });
+    ctx.axesSteps = { x: [], y: [] };
+
+    expect(() => dragTo(ctx, [20, 5], [60, 50])).not.toThrow();
+    // dragZoom 은 range 를 구조분해하므로 null 을 넘기지 않는다.
+    expect(getRangeInfo).not.toHaveBeenCalled();
+  });
 });
