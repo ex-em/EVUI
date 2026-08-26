@@ -595,8 +595,9 @@ describe('plugins.interaction 전용 드래그 캔버스 라이프사이클', ()
 });
 
 describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', () => {
-  const createFormatterChart = (valueFormatter) =>
+  const createFormatterChart = (valueFormatter, dataEpoch = 1) =>
     Object.assign(Object.create(modules), {
+      _dataEpoch: dataEpoch,
       options: {
         horizontal: false,
         type: 'line',
@@ -612,7 +613,7 @@ describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', (
     itemData: point,
   });
 
-  it('같은 point 객체를 재-hover 하면 formatter 를 재호출하지 않고 캐시를 반환한다', () => {
+  it('같은 epoch 에서 같은 point 객체를 재-hover 하면 formatter 를 재호출하지 않는다(캐시 히트)', () => {
     const formatter = vi.fn(({ y }) => `fmt:${y}`);
     const chart = createFormatterChart(formatter);
     const point = { x: 'a', y: 1, o: 1 };
@@ -622,11 +623,11 @@ describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', (
     expect(formatter).toHaveBeenCalledTimes(1);
   });
 
-  it('점객체 풀 재사용(in-place 갱신) 뒤 캐시 무효화 없이는 stale 값이 반환된다 — update() 무효화로 복구(회귀)', () => {
+  it('점객체 풀 재사용(in-place 갱신) 후 _dataEpoch 증가로 캐시가 폐기되고 새 값으로 재계산된다(회귀)', () => {
     // 회귀 배경: addData(target)가 점객체 풀을 재사용해 데이터 갱신 시 같은 객체의 값만
-    // 덮어쓰므로, WeakMap 키가 살아남아 갱신 전 포맷 결과가 반환되고 사용자 formatter 에
-    // 진입하지 않는 버그가 있었다. chart.core update() 가 updateData/updateSeries 시
-    // _tooltipValueCache 를 비워 이를 복구한다.
+    // 덮어쓰므로, WeakMap 자동 GC 가정이 깨져 갱신 전 포맷 결과가 반환되고 사용자
+    // formatter 에 진입하지 않는 버그가 있었다. createDataSet 진입 시 +1 되는 _dataEpoch
+    // 와 캐시 epoch 비교로 무효화한다.
     const formatter = vi.fn(({ y }) => `fmt:${y}`);
     const chart = createFormatterChart(formatter);
     const point = { x: 'a', y: 1, o: 1 };
@@ -637,24 +638,45 @@ describe('plugins.interaction getFormattedTooltipValue — 값 포맷 캐시', (
     point.y = 2;
     point.o = 2;
 
-    // 무효화 전에는 객체 키가 살아 있어 stale 값이 그대로 반환된다(버그의 발생 기전 고정)
+    // 계약이 아니라 현재 기전의 스냅샷: identity 키 WeakMap 은 값 변화를 알 수 없다
+    // (값/epoch 기반 키로 캐시를 개선하면 이 단언은 지워도 된다 — epoch 무효화가 필요한 이유의 기록)
     expect(chart.getFormattedTooltipValue(callArgs(point, 2))).toBe('fmt:1');
-    expect(formatter).toHaveBeenCalledTimes(1);
 
-    // chart.core update(updateData/updateSeries)와 동일한 명시적 무효화
-    chart._tooltipValueCache = null;
+    // createDataSet 재실행에 해당하는 epoch 증가 → 캐시 폐기 → 재계산
+    chart._dataEpoch += 1;
 
     expect(chart.getFormattedTooltipValue(callArgs(point, 2))).toBe('fmt:2');
     expect(formatter).toHaveBeenCalledTimes(2);
   });
 
+  it('epoch 가 그대로면(createDataSet 미실행 — scrollbar lightUpdate 등) 캐시가 유지된다', () => {
+    const formatter = vi.fn(({ y }) => `fmt:${y}`);
+    const chart = createFormatterChart(formatter);
+    const point = { x: 'a', y: 1, o: 1 };
+
+    chart.getFormattedTooltipValue(callArgs(point, 1));
+    chart.getFormattedTooltipValue(callArgs(point, 1));
+
+    expect(formatter).toHaveBeenCalledTimes(1);
+    expect(chart._tooltipValueCacheEpoch).toBe(chart._dataEpoch);
+  });
+
   it('value formatter 가 없으면 캐시를 만들지 않는다(기본 numberWithComma 경로 우회)', () => {
     const chart = Object.assign(Object.create(modules), {
+      _dataEpoch: 1,
       options: { horizontal: false, type: 'line', tooltip: {} },
     });
     const point = { x: 'a', y: 1000, o: 1000 };
 
-    expect(chart.getFormattedTooltipValue(callArgs(point, 1000))).toBe('1,000');
+    expect(
+      chart.getFormattedTooltipValue({
+        dataId: 'd1',
+        seriesId: 's1',
+        seriesName: 's1',
+        value: 1000,
+        itemData: point,
+      }),
+    ).toBe('1,000');
     expect(chart._tooltipValueCache).toBeUndefined();
   });
 });
