@@ -946,7 +946,8 @@ class Bar {
 
     // 스크롤바 이동은 lightUpdate 라 xp 를 null 로 되돌리는 경로를 건너뛴다 — 윈도우 밖 항목이
     // 직전 렌더의 좌표를 들고 있어 xp 가 있는지만 보면 걸러지지 않는다. binarySearchBar 와 같은
-    // 산술로 가시 구간만 훑는다. 구간 안에도 값이 null 인 항목은 좌표가 없어 가드가 남는다.
+    // 산술로 가시 구간만 훑는다. 값이 null 이거나 축 범위를 넘은 항목도 담긴다 — 수직 막대의
+    // xp 는 라벨 기준이라 값과 무관하게 채워지고 그 신호는 h 에만 실린다(Line 과 같은 계약).
     const startIdx = this.visibleStartIndex ?? 0;
     const totalCount = this.filteredCount ?? this.data.length;
     const endIdx = Math.min(startIdx + totalCount - 1, this.data.length - 1);
