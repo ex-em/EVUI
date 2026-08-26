@@ -916,6 +916,9 @@ const modules = {
     }
 
     // target 이 주어지면 그 객체를 재사용(점객체 풀)해 매 틱 N개 객체 할당(GC 압력)을 줄인다.
+    // 주의: 객체 identity 가 유지되므로 점객체를 키로 하는 외부 캐시(WeakMap 등)나 외부 모듈이
+    // 붙인 파생 필드(예: tooltip 의 data.formatted — 아래 리셋 필드에 없음)는 여기서 자동
+    // 무효화되지 않는다. 소비자는 _dataEpoch(createDataSet 진입 시 +1)로 무효화해야 한다.
     const data = target || {};
     if (this.options.horizontal) {
       data.x = gdataValue;

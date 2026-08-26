@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import modules from './plugins/plugins.interaction';
+import storeModules from './model/model.store';
 
 /**
  * Tooltip 값 정확성(기능 회귀) 테스트 — 시각 회귀(Chart.visual.spec.js)와 분리된 별도 축.
@@ -146,5 +147,80 @@ describe('findHitItem 시리즈별 값이 raw 원본과 일치', () => {
     expect(result.items.s1).toBeUndefined();
     expect(result.items.s2.index).toBe(3);
     expect(result.items.s2.data.o).toBe(raw2[3]);
+  });
+});
+
+/**
+ * 폴링 갱신 시나리오 통합 회귀 — model.store(실물 createDataSet 의 점객체 풀 재사용)와
+ * interaction(실물 getFormattedTooltipValue 의 WeakMap 캐시 + _dataEpoch 무효화)을 한
+ * 컨텍스트에 mixin 해서, "hover 포맷 → 데이터 갱신 → 재포맷 시 새 값" 의 실제 체인을 검증한다.
+ * (각 모듈 단위 spec 은 반쪽씩만 보므로, 필드명 오타·호출 순서 변경은 여기서 잡힌다.)
+ */
+describe('툴팁 값 포맷 캐시 — 점객체 풀 재사용과 _dataEpoch 무효화 (store↔interaction 통합)', () => {
+  const buildChart = (formatter) => {
+    const seriesList = {
+      s1: {
+        show: true,
+        xAxisIndex: 0,
+        yAxisIndex: 0,
+        isExistGrp: false,
+        interpolation: 'linear',
+      },
+    };
+
+    const chart = Object.assign(Object.create(Object.assign({}, storeModules, modules)), {
+      seriesList,
+      seriesInfo: { charts: { line: ['s1'] } },
+      options: {
+        horizontal: false,
+        sunburst: false,
+        type: 'line',
+        tooltip: { formatter: { value: formatter } },
+      },
+    });
+
+    return chart;
+  };
+
+  const callArgs = (point) => ({
+    dataId: 's1',
+    seriesId: 's1',
+    seriesName: 's1',
+    value: point.o,
+    itemData: point,
+  });
+
+  it('hover 포맷 → 데이터 갱신(createDataSet 풀 덮어쓰기) → 재포맷 시 새 값이 반환된다(회귀)', () => {
+    const formatter = vi.fn(({ y }) => `fmt:${y}`);
+    const chart = buildChart(formatter);
+
+    chart.createDataSet({ s1: [10, 20, 30] }, ['L0', 'L1', 'L2']);
+    const point = chart.seriesList.s1.data[1];
+
+    expect(chart.getFormattedTooltipValue(callArgs(point))).toBe('fmt:20');
+    expect(formatter).toHaveBeenCalledTimes(1);
+
+    // 폴링 갱신: createDataSet 재실행 — 풀 재사용으로 같은 point 객체가 새 값으로 덮어써진다
+    chart.createDataSet({ s1: [10, 99, 30] }, ['L0', 'L1', 'L2']);
+
+    // 이 테스트가 의미 있으려면 풀 재사용(identity 유지)이 실제로 일어나야 한다 — 전제 고정.
+    // (풀링이 제거되면 이 단언이 깨지며, 그때는 epoch 무효화와 이 테스트를 함께 단순화하면 된다)
+    expect(chart.seriesList.s1.data[1]).toBe(point);
+    expect(point.o).toBe(99);
+
+    expect(chart.getFormattedTooltipValue(callArgs(point))).toBe('fmt:99');
+    expect(formatter).toHaveBeenCalledTimes(2);
+  });
+
+  it('createDataSet 재실행이 없으면(scrollbar lightUpdate 등) 캐시가 유지된다', () => {
+    const formatter = vi.fn(({ y }) => `fmt:${y}`);
+    const chart = buildChart(formatter);
+
+    chart.createDataSet({ s1: [10, 20, 30] }, ['L0', 'L1', 'L2']);
+    const point = chart.seriesList.s1.data[1];
+
+    expect(chart.getFormattedTooltipValue(callArgs(point))).toBe('fmt:20');
+    expect(chart.getFormattedTooltipValue(callArgs(point))).toBe('fmt:20');
+    expect(formatter).toHaveBeenCalledTimes(1);
   });
 });

@@ -45,7 +45,7 @@ EvChart 코어에 mixin되는 데이터 모델 계층이다. 사용자가 넘긴
 - passingValue 치환은 두 단계다: `createDataSet`이 raw 값 중 passingValue를 `null`로 치환하고, `addSeriesDS`는 base series(`isBase=true`)에 한해 첫 series의 passingValue(`basePassingValue`)와 일치하는 값을 0으로 치환한다. `basePassingValue`는 "시리즈마다 동일한 값"이라는 전제로 루프 밖 1회만 계산한다.
 - `interpolation: 'zero'`는 falsy 항목(null/undefined/0 포함 판정은 `!item`)을 0으로 치환한다.
 - 스택 base 조회 규칙: "가장 최근에 갱신된, 보이는 동일 부호의 유효 base"가 누적 top이다. show=false series·position null·passingValue 포인트는 top에 기여하지 않는다(기존 `bsIds` 역방향 탐색과 동치).
-- 점객체 풀 재사용은 "모든 점객체가 동일 10필드 형태 + 전 필드 덮어쓰기"를 전제로 하므로 stale 값 위험이 없다.
+- 점객체 풀 재사용은 `addData`가 덮어쓰는 필드(x/y/o/b/xp/yp/w/h/dataColor/dataTextColor)에 한해 stale이 없다. 객체 identity가 유지되므로 점객체를 키로 하는 외부 캐시(WeakMap 등)나 외부 모듈이 붙인 파생 필드(예: tooltip의 `data.formatted`)는 자동 무효화되지 않는다 — 풀을 덮어쓰는 사건에 걸린 `_dataEpoch`(createDataSet 진입 시 +1)로 무효화할 것(툴팁 값 포맷 캐시와 `computeGeometry` 메모이즈가 이 방식).
 - `reconcileSeriesSet`은 기존 `seriesList`를 mutate하지 않고 항상 새 객체를 만든다 — `Object.keys` 순서에 의존하는 draw/hit/legend/worker 경로 보호.
 - realTimeScatter 만료 제거는 별도 옵션 없는 기본 동작이며, 재추가 방지 가드의 해제(부활)는 `reconcileSeriesSet` 단일 지점에서만 수행한다.
 - pie/sunburst는 show series만 데이터셋에 포함하고 각 depth를 값 내림차순 정렬한다. sunburst의 dummy slice는 부모 각도 범위를 유지하기 위한 placeholder다.
