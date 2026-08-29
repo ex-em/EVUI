@@ -465,6 +465,10 @@ class EvChart {
 
     this.emitDataMaxChange();
 
+    if (!this.isNotUseIndicator?.() && this.options?.indicator?.use !== false) {
+      this.updateIndicatorHitBounds?.();
+    }
+
     // worker 분기: ready 이고 in-flight 여유가 있을 때만 series 를 worker 로.
     // 기본 off(start() 미호출)면 항상 false → 아래 main 경로로 fall through(기존 동작 불변).
     // forceMainSeries: resize 처럼 캔버스가 막 리사이즈(=자동 clear)된 프레임은 worker 의 비동기 합성을

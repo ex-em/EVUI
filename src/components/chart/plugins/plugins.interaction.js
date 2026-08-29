@@ -42,6 +42,9 @@ const modules = {
       const ctx = this.overlayCtx;
       const itemKeys = Object.keys(hitInfo.items);
       const hasItems = itemKeys.length > 0;
+      const hasLineSeries = Object.values(this.seriesList || {}).some(
+        (series) => series.type === 'line',
+      );
 
       // hover 시그니처: hitId + 시리즈/dataIndex 집합이 동일하면 같은 데이터 포인트 위.
       // formatter.html 경로에서 비용 가장 큰 drawCustomTooltip(고객 formatter + htmlToElement +
@@ -104,9 +107,6 @@ const modules = {
         }
 
         // tooltip이 표시될 때 indicator를 해당 라벨 위치로 이동 (line 차트이거나 line series가 포함된 경우)
-        const hasLineSeries = Object.values(this.seriesList || {}).some(
-          (series) => series.type === 'line',
-        );
         if (tooltip.use && (type === 'line' || hasLineSeries)) {
           // indicator를 그리고 실제 위치한 라벨 정보를 받음
           const indicatorInfo = this.drawIndicatorForTooltip(hitInfo, indicator.color);
@@ -146,9 +146,6 @@ const modules = {
       // tooltip 기반 indicator가 아직 설정되지 않은 경우에만 일반 indicator 처리
       if (!args.hoveredLabel && !this.isNotUseIndicator()) {
         // line 차트가 아니고 line series가 없거나, tooltip이 없을 때는 일반 indicator 표시
-        const hasLineSeries = Object.values(this.seriesList || {}).some(
-          (series) => series.type === 'line',
-        );
         if (
           (type !== 'line' && !hasLineSeries) ||
           !tooltip.use ||

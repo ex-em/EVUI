@@ -4,10 +4,34 @@ import debounce from '@/common/utils.debounce';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
+const clampRatio = r => (Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : 1);
+
+/**
+ * 스케일 범위(step) 대비 데이터 범위(range)의 픽셀 경계를 계산한다.
+ * @param {object} step   axesSteps 항목 ({ graphMin, graphMax })
+ * @param {object} range  axesRange 항목 ({ min, max })
+ * @param {number} start  축 시작 픽셀 (X: graphPos.x1 / Y(반전): graphPos.y2)
+ * @param {number} size   축 픽셀 크기 (graphPos.x2 - x1 또는 y2 - y1)
+ * @param {boolean} inverted Y축처럼 값이 커질수록 픽셀이 감소하는 경우 true
+ * @returns {[number, number] | null} [boundMin, boundMax] 또는 계산 불가 시 null
+ */
+const calcDomainBounds = (step, range, start, size, inverted) => {
+  const span = step?.graphMax - step?.graphMin;
+  if (!range || !Number.isFinite(span) || span <= 0) return null;
+  const r0 = clampRatio((range.min - step.graphMin) / span);
+  const r1 = clampRatio((range.max - step.graphMin) / span);
+  const minRatio = Math.min(r0, r1);
+  const maxRatio = Math.max(r0, r1);
+  return inverted
+    ? [Math.floor(start - size * maxRatio), Math.ceil(start - size * minRatio)]
+    : [Math.floor(start + size * minRatio), Math.ceil(start + size * maxRatio)];
+};
+
 const LINE_SPACING = 8;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
 const BODY_PADDING = 8;
+const EDGE_TOLERANCE = 15; // mouse interpolation 더 넓은 범위에서 감지
 
 const modules = {
   /**
@@ -896,6 +920,76 @@ const modules = {
     });
   },
 
+  updateIndicatorHitBounds() {
+    const options = this.options;
+    const x1 = this.chartRect.x1 + this.labelOffset.left;
+    const x2 = this.chartRect.x2 - this.labelOffset.right;
+    const y1 = this.chartRect.y1 + this.labelOffset.top;
+    const y2 = this.chartRect.y2 - this.labelOffset.bottom;
+
+    // 데이터가 존재하는 픽셀 구간(여러 축의 합집합)을 집계한다.
+    // Infinity로 시작해야 Math.min/Math.max가 calcDomainBounds 결과를 실제로 반영한다.
+    // (x1/x2로 시작하면 bounds가 항상 [x1,x2] 내부라 집계가 차트 경계로 되돌아가 빈 구간 좁히기가 무효화된다)
+    let xMin = Infinity;
+    let xMax = -Infinity;
+    let yMin = Infinity;
+    let yMax = -Infinity;
+
+    if (options.horizontal) {
+      const ySteps = this.axesSteps?.y || [];
+      for (let i = 0; i < ySteps.length; i += 1) {
+        const bounds = calcDomainBounds(
+          ySteps[i],
+          this.axesRange?.y?.[i],
+          y2,
+          y2 - y1,
+          true,
+        );
+        if (bounds) {
+          yMin = Math.min(yMin, bounds[0]);
+          yMax = Math.max(yMax, bounds[1]);
+        }
+      }
+      // 도메인 bounds를 하나도 못 구한 경우(category/문자열 축 등) 차트 경계로 fallback
+      if (!Number.isFinite(yMin)) {
+        yMin = y1;
+        yMax = y2;
+      }
+    } else {
+      const xSteps = this.axesSteps?.x || [];
+      for (let i = 0; i < xSteps.length; i += 1) {
+        const bounds = calcDomainBounds(
+          xSteps[i],
+          this.axesRange?.x?.[i],
+          x1,
+          x2 - x1,
+          false,
+        );
+        if (bounds) {
+          xMin = Math.min(xMin, bounds[0]);
+          xMax = Math.max(xMax, bounds[1]);
+        }
+      }
+      // 도메인 bounds를 하나도 못 구한 경우(category/문자열 축 등) 차트 경계로 fallback
+      if (!Number.isFinite(xMin)) {
+        xMin = x1;
+        xMax = x2;
+      }
+    }
+
+    this._indicatorHitBounds = {
+      horizontal: !!options.horizontal,
+      x1,
+      x2,
+      y1,
+      y2,
+      hitXMin: options.horizontal ? x1 - EDGE_TOLERANCE : xMin,
+      hitXMax: options.horizontal ? x2 + EDGE_TOLERANCE : xMax,
+      hitYMin: options.horizontal ? yMin : y1 - EDGE_TOLERANCE,
+      hitYMax: options.horizontal ? yMax : y2 + EDGE_TOLERANCE,
+    };
+  },
+
   /**
    * Draw chart indicator with mousemove
    * @param {object} offset    mousemove callback
@@ -906,21 +1000,19 @@ const modules = {
   drawIndicator(offset, color) {
     const ctx = this.overlayCtx;
     const [offsetX, offsetY] = offset;
-    const graphPos = {
-      x1: this.chartRect.x1 + this.labelOffset.left,
-      x2: this.chartRect.x2 - this.labelOffset.right,
-      y1: this.chartRect.y1 + this.labelOffset.top,
-      y2: this.chartRect.y2 - this.labelOffset.bottom,
-    };
-    const mouseXIp = 15; // mouseInterpolation - 더 넓은 범위에서 감지
-    const mouseYIp = 15; // Y축도 동일하게 증가
     const options = this.options;
+    let bounds = this._indicatorHitBounds;
+
+    if (!bounds || bounds.horizontal !== !!options.horizontal) {
+      this.updateIndicatorHitBounds();
+      bounds = this._indicatorHitBounds;
+    }
 
     if (
-      offsetX >= graphPos.x1 - mouseXIp &&
-      offsetX <= graphPos.x2 + mouseXIp &&
-      offsetY >= graphPos.y1 - mouseYIp &&
-      offsetY <= graphPos.y2 + mouseYIp
+      offsetX >= bounds.hitXMin &&
+      offsetX <= bounds.hitXMax &&
+      offsetY >= bounds.hitYMin &&
+      offsetY <= bounds.hitYMax
     ) {
       ctx.beginPath();
       ctx.save();
@@ -932,11 +1024,11 @@ const modules = {
       }
 
       if (options.horizontal) {
-        ctx.moveTo(graphPos.x1, offsetY + 0.5);
-        ctx.lineTo(graphPos.x2, offsetY + 0.5);
+        ctx.moveTo(bounds.x1, offsetY + 0.5);
+        ctx.lineTo(bounds.x2, offsetY + 0.5);
       } else {
-        ctx.moveTo(offsetX + 0.5, graphPos.y1);
-        ctx.lineTo(offsetX + 0.5, graphPos.y2);
+        ctx.moveTo(offsetX + 0.5, bounds.y1);
+        ctx.lineTo(offsetX + 0.5, bounds.y2);
       }
 
       ctx.stroke();
@@ -1226,7 +1318,9 @@ const modules = {
       this.plotLabelTooltipDOM = null;
     }
     this.isInitTooltip = false;
+    this._indicatorHitBounds = null;
   },
 };
 
+export { calcDomainBounds };
 export default modules;
