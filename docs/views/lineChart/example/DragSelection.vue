@@ -33,26 +33,21 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const time = dayjs().format('YYYY-MM-DD');
+    const time = dayjs().startOf('hour');
+    const labels = Array.from({ length: 25 }, (_, i) => time.add(i * 10, 'minute'));
     const chartData = {
       series: {
         series1: { name: 'series#1' },
         series2: { name: 'series#2' },
       },
-      labels: [
-        dayjs(time),
-        dayjs(time).add(1, 'day'),
-        dayjs(time).add(2, 'day'),
-        dayjs(time).add(3, 'day'),
-        dayjs(time).add(4, 'day'),
-        dayjs(time).add(5, 'day'),
-        dayjs(time).add(6, 'day'),
-      ],
+      labels,
       data: {
-        series1: [100, 25, 36, 47, 0, 50, 80],
-        series2: [80, 36, 25, 47, 15, 100, 0],
+        series1: labels.map((_, i) => Math.round(50 + Math.sin(i / 2) * 40)),
+        series2: labels.map((_, i) => Math.round(50 + Math.cos(i / 3) * 30)),
       },
     };
+
+    const convertToDateString = (value) => dayjs(value).format('MM/DD HH:mm');
 
     const chartOptions = {
       type: 'line',
@@ -69,8 +64,8 @@ export default {
         {
           type: 'time',
           showGrid: true,
-          timeFormat: 'MM/DD',
-          interval: 'day',
+          timeFormat: 'HH:mm',
+          interval: { time: 30, unit: 'minute' },
         },
       ],
       axesY: [
@@ -85,6 +80,31 @@ export default {
         use: true,
         keepDisplay: true,
       },
+      tooltip: {
+        use: true,
+        formatter: {
+          // 드래그 중에만 2번째 인자로 { dragRange } 가 전달된다.
+          html: (seriesList, meta) => {
+            const header = meta?.dragRange
+              ? `${convertToDateString(meta.dragRange.fromLabel)} ~ ` +
+                `${convertToDateString(meta.dragRange.toLabel)}`
+              : convertToDateString(seriesList[0]?.data?.x);
+            const rows = seriesList
+              .map(
+                ({ name, color, data }) =>
+                  `<div data-evui-tooltip-row>
+                     <span style="color:${color}">■</span> ${name} : ${data.y}
+                   </div>`,
+              )
+              .join('');
+
+            return `<div class="ev-chart-tooltip-custom">
+                      <div class="ev-chart-tooltip-custom__header">${header}</div>
+                      <div class="ev-chart-tooltip-custom__body">${rows}</div>
+                    </div>`;
+          },
+        },
+      },
     };
 
     const selectionItems = ref([]);
@@ -93,8 +113,6 @@ export default {
       selectionItems.value = data;
       selectionRange.value = range;
     };
-
-    const convertToDateString = (value) => dayjs(value).format('MM/DD');
 
     return {
       chartData,
