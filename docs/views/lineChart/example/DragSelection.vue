@@ -34,7 +34,7 @@ import dayjs from 'dayjs';
 export default {
   setup() {
     const time = dayjs().startOf('hour');
-    const labels = Array.from({ length: 25 }, (_, i) => time.add(i * 10, 'minute'));
+    const labels = Array.from({ length: 25 }, (_, i) => time.add(i * 10, 'second'));
     const chartData = {
       series: {
         series1: { name: 'series#1' },
@@ -64,8 +64,8 @@ export default {
         {
           type: 'time',
           showGrid: true,
-          timeFormat: 'HH:mm',
-          interval: { time: 30, unit: 'minute' },
+          timeFormat: 'mm:ss',
+          interval: { time: 30, unit: 'second' },
         },
       ],
       axesY: [
