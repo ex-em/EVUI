@@ -2658,7 +2658,7 @@
                   "name": "formatter",
                   "type": "function / Object",
                   "default": "null",
-                  "description": "데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용합니다. 함수 형태(({ x, y, value, seriesId, dataId }) => string — error 셀(value < 0)은 value로 'error' 문자열 전달), { title, value } 객체 형태, 또는 { html: ([item]) => string } 커스텀 HTML 형태를 지원합니다. html 사용 시 루트 element는 1개여야 하며 위치/크기 계산 기준이 됩니다. ev-chart-tooltip-custom(및 __header, __body) 클래스는 선택이며, 사용하면 EVUI 기본 스타일과 휠 스크롤 기본 타겟이 자동 적용됩니다. 직접 마크업을 사용하고 스크롤이 필요하면 htmlScrollTarget을 지정하세요. dragSelection.use 차트에서 드래그하는 동안에는 html formatter 가 2번째 인자로 { dragRange: { fromLabel, toLabel } } 을 함께 받습니다 (드래그 중이 아니면 전달되지 않아 기존 formatter 는 그대로 동작)."
+                  "description": "데이터가 표시되기 전에 데이터의 형식을 지정하는 데 사용합니다. 함수 형태(({ x, y, value, seriesId, dataId }) => string — error 셀(value < 0)은 value로 'error' 문자열 전달), { title, value } 객체 형태, 또는 { html: ([item]) => string } 커스텀 HTML 형태를 지원합니다. html 사용 시 루트 element는 1개여야 하며 위치/크기 계산 기준이 됩니다. ev-chart-tooltip-custom(및 __header, __body) 클래스는 선택이며, 사용하면 EVUI 기본 스타일과 휠 스크롤 기본 타겟이 자동 적용됩니다. 직접 마크업을 사용하고 스크롤이 필요하면 htmlScrollTarget을 지정하세요. dragSelection.use 차트에서 드래그하는 동안에는 html formatter 가 2번째 인자로 { dragRange: { from, to } } 을 함께 받습니다. from/to 는 mouseup 때 drag-select 가 주는 range.xMin/xMax 와 정확히 같은 값이며, 드래그 중이 아니면 전달되지 않아 기존 formatter 는 그대로 동작합니다."
                 },
                 {
                   "name": "returnValue",
