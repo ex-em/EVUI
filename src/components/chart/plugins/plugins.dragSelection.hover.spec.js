@@ -11,8 +11,22 @@ import tooltipModules from './plugins.tooltip';
 
 const LABELS = ['L0', 'L1', 'L2', 'L3', 'L4'];
 
-// 라벨 100px 간격. 드래그 시작 x=100 → L1, 이동 x=300 → L3.
-const closestIndexByX = (x) => Math.min(Math.max(Math.round(x / 100), 0), LABELS.length - 1);
+// plot 영역 x 50~490 이 축 값 0~1000 에 대응. 픽셀 하나가 라벨 격자보다 잘게 값에 반영되는지 본다.
+const AXES_STEPS = { x: [{ graphMin: 0, graphMax: 1000 }], y: [{ graphMin: 0, graphMax: 100 }] };
+const axisValueAt = (posX) => +(((posX - 50) / 440) * 1000).toFixed(3);
+const DRAG_RANGE = { x1: 50, x2: 490, y1: 10, y2: 270 };
+
+/** dragMove 가 세우는 것과 같은 모양의 dragInfo (line: y 는 plot 전체 높이 고정) */
+const dragInfoAt = (xcp, cursorX) => ({
+  xcp,
+  ycp: 100,
+  range: DRAG_RANGE,
+  isMove: true,
+  xsp: Math.min(xcp, cursorX),
+  ysp: DRAG_RANGE.y1,
+  width: Math.ceil(Math.abs(cursorX - xcp)),
+  height: DRAG_RANGE.y2 - DRAG_RANGE.y1,
+});
 
 const HIT_ITEMS = {
   s1: { index: 2, data: { x: 'L2', y: 10 }, color: '#f00', name: 's1', id: 'd1' },
@@ -31,6 +45,7 @@ const createChart = (opts = {}) => {
     seriesList: { s1: { type: 'line', show: true } },
     listeners: {},
     data: { labels: LABELS },
+    axesSteps: AXES_STEPS,
     chartRect: { x1: 0, y1: 0, x2: 500, y2: 300 },
     labelOffset: { left: 50, right: 10, top: 10, bottom: 30 },
     overlayCtx: {},
@@ -55,7 +70,7 @@ const createChart = (opts = {}) => {
     },
 
     getMousePosition: (e) => e.__pos,
-    findClosestDataIndex: ([x]) => closestIndexByX(x),
+    findClosestDataIndex: () => 2,
     findHitItem: () => ({ items: { ...HIT_ITEMS }, hitId: 's1' }),
     findPlotLabelHitRegion: () => null,
     handlePlotLabelHover: vi.fn(),
@@ -65,7 +80,7 @@ const createChart = (opts = {}) => {
     hideTooltipDOM: vi.fn(),
     drawIndicatorForTooltip: () => ({ labelValue: 'L2' }),
     findSelectedItems: () => [],
-    getSelectionRange: () => ({ xMin: 0, xMax: 1, yMin: 0, yMax: 1 }),
+    minMax: { x: [{ min: 0, max: 1000 }], y: [{ min: 0, max: 100 }] },
     tooltipClear: vi.fn(),
     invalidateClientRectCache: vi.fn(),
 
@@ -153,8 +168,8 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
 
     mousemove(moveEvent([300, 150, 500, 300]));
     expect(chart.drawCustomTooltip).toHaveBeenLastCalledWith(expect.anything(), {
-      fromLabel: 'L1',
-      toLabel: 'L3',
+      from: axisValueAt(100),
+      to: axisValueAt(300),
     });
 
     chart.drawHoverArtifacts({ __pos: [300, 150, 500, 300] });
@@ -172,9 +187,11 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
     chart.drawHoverArtifacts(hover);
     expect(chart.drawCustomTooltip).toHaveBeenCalledTimes(1);
 
-    // 드래그 진입 → 구간 정보가 붙으므로 다시 그려야 한다
+    // 드래그 중에는 같은 hit 라도 매번 다시 그린다 — 헤더가 커서 픽셀에 연속으로 의존한다
+    chart.dragInfo = dragInfoAt(100, 300);
     chart.drawHoverArtifacts(hover, true);
-    expect(chart.drawCustomTooltip).toHaveBeenCalledTimes(2);
+    chart.drawHoverArtifacts(hover, true);
+    expect(chart.drawCustomTooltip).toHaveBeenCalledTimes(3);
   });
 
   it('mouseleave 로 시그니처가 무효화되어 다음 첫 hover 는 다시 그린다', () => {
@@ -214,28 +231,42 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
   });
 });
 
-describe('getDragRangeLabels', () => {
-  it('시작점은 dragInfo, 끝점은 전달된 커서 위치로 스냅한다', () => {
+describe('getDragRange', () => {
+  // 라이브 헤더와 mouseup 페이로드가 갈리면 안 된다 — 같은 dragInfo 로 두 값이 정확히 같아야 한다.
+  it('drag-select 가 내보낼 range 의 x 성분과 정확히 일치한다', () => {
     const chart = createChart();
-    chart.dragInfo = { xcp: 100, ycp: 100 };
+    chart.dragInfo = dragInfoAt(100, 300);
 
-    expect(chart.getDragRangeLabels([300, 150])).toEqual({ fromLabel: 'L1', toLabel: 'L3' });
+    const { xMin, xMax } = chart.getSelectionRange(chart.dragInfo);
+    expect(chart.getDragRange([300, 150])).toEqual({ from: xMin, to: xMax });
   });
 
-  it('역방향 드래그면 fromLabel 이 toLabel 보다 뒤 라벨이다', () => {
+  it('라벨 격자로 스냅하지 않는다 — 1px 만 움직여도 값이 달라진다', () => {
     const chart = createChart();
-    chart.dragInfo = { xcp: 300, ycp: 150 };
 
-    expect(chart.getDragRangeLabels([100, 100])).toEqual({ fromLabel: 'L3', toLabel: 'L1' });
+    chart.dragInfo = dragInfoAt(100, 300);
+    const a = chart.getDragRange([300, 150]).to;
+    chart.dragInfo = dragInfoAt(100, 301);
+    const b = chart.getDragRange([301, 150]).to;
+
+    expect(b).not.toBe(a);
   });
 
-  it('드래그 중이 아니거나 라벨이 없으면 undefined', () => {
+  it('시작/현재 순서를 유지한다 — 역방향 드래그면 from > to', () => {
     const chart = createChart();
-    expect(chart.getDragRangeLabels([300, 150])).toBeUndefined();
+    chart.dragInfo = dragInfoAt(300, 100);
 
-    chart.dragInfo = { xcp: 100, ycp: 100 };
-    chart.data = { labels: [] };
-    expect(chart.getDragRangeLabels([300, 150])).toBeUndefined();
+    const { from, to } = chart.getDragRange([100, 100]);
+    expect(from).toBeGreaterThan(to);
+  });
+
+  it('드래그 전이거나 축 스텝이 없으면 undefined', () => {
+    const chart = createChart();
+    expect(chart.getDragRange([300, 150])).toBeUndefined();
+
+    chart.dragInfo = dragInfoAt(100, 300);
+    chart.axesSteps = { x: [], y: [] };
+    expect(chart.getDragRange([300, 150])).toBeUndefined();
   });
 });
 
@@ -262,7 +293,7 @@ describe('formatter.html 인자', () => {
 
   it('드래그 중이면 2번째 인자로 { dragRange } 를 넘긴다', () => {
     const html = vi.fn(() => '<div>t</div>');
-    const dragRange = { fromLabel: 'L1', toLabel: 'L3' };
+    const dragRange = { from: 100, to: 300 };
     createTooltipChart(html).drawCustomTooltip(HIT_ITEMS, dragRange);
 
     expect(html.mock.calls[0]).toHaveLength(2);

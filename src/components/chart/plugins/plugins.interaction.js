@@ -57,7 +57,10 @@ const modules = {
         }
       }
 
+      // 드래그 중 헤더는 같은 데이터 포인트 위에서도 커서 픽셀마다 달라지므로 fast path 를 쓸 수 없다
+      // (쓰면 헤더가 라벨 간격만큼 뒤처진 채 얼어붙는다). 드래그가 아닌 hover 는 그대로 스킵한다.
       const skipCustomTooltipRedraw =
+        !isDragging &&
         hoverSig !== '' &&
         hoverSig === this._lastHoverSig &&
         this.tooltipDOM &&
@@ -88,7 +91,7 @@ const modules = {
             tooltip.returnValue(seriesList, e);
           } else if (tooltip?.formatter?.html) {
             if (!skipCustomTooltipRedraw) {
-              const dragRange = isDragging ? this.getDragRangeLabels(offset) : undefined;
+              const dragRange = isDragging ? this.getDragRange(offset) : undefined;
               this.drawCustomTooltip(hitInfo?.items, dragRange);
             }
             this.setCustomTooltipLayoutPosition(hitInfo, e);
@@ -2106,28 +2109,30 @@ const modules = {
   },
 
   /**
-   * 드래그 중 커스텀 툴팁 formatter 에 넘길 구간 라벨. 드래그 중이 아니면 undefined.
-   * 양 끝을 hit-test 와 같은 findClosestDataIndex 로 스냅해 툴팁 본문이 가리키는 지점과
-   * 헤더의 구간 끝이 어긋나지 않게 한다. 역방향 드래그면 fromLabel > toLabel 이다.
+   * 드래그 중 커스텀 툴팁 formatter 에 넘길 구간 값. 드래그 중이 아니면 undefined.
+   * mouseup 때 `drag-select` 가 내보낼 range 를 같은 함수로 구해 x 성분만 쓴다 — 평행 계산을 두면
+   * clamp·`Math.ceil`·블록 스냅 같은 보정이 어긋나 라이브 헤더와 최종 페이로드가 달라진다.
+   * 시작/현재 순서를 유지하므로 역방향 드래그면 from > to 다.
    *
    * @param {array} offset  현재 커서 위치
-   * @returns {object|undefined} { fromLabel, toLabel }
+   * @returns {object|undefined} { from, to }
    */
-  getDragRangeLabels(offset) {
-    const labels = this.data?.labels;
-    if (!this.dragInfo || !labels?.length) {
+  getDragRange(offset) {
+    if (!this.dragInfo?.isMove) {
       return undefined;
     }
 
-    const sIds = Object.keys(this.seriesList);
-    const fromIndex = this.findClosestDataIndex([this.dragInfo.xcp, this.dragInfo.ycp], sIds);
-    const toIndex = this.findClosestDataIndex(offset, sIds);
+    const selection =
+      this.options.type === 'heatMap'
+        ? this.getSelectionRangeForHeatMap(this.dragInfo)
+        : this.getSelectionRange(this.dragInfo);
 
-    if (fromIndex === -1 || toIndex === -1) {
+    if (!selection) {
       return undefined;
     }
 
-    return { fromLabel: labels[fromIndex], toLabel: labels[toIndex] };
+    const { xMin, xMax } = selection;
+    return offset[0] >= this.dragInfo.xcp ? { from: xMin, to: xMax } : { from: xMax, to: xMin };
   },
 
   /**

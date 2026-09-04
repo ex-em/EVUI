@@ -934,7 +934,7 @@ const modules = {
    * Draw User Custom Tooltip (tooltip > formatter > html)
    * call "formatter > html" and append to tooltip DOM
    * @param hitInfoItems
-   * @param {object} [dragRange]  드래그 중일 때만 전달되는 { fromLabel, toLabel }
+   * @param {object} [dragRange]  드래그 중일 때만 전달되는 { from, to }
    */
   drawCustomTooltip(hitInfoItems, dragRange) {
     const opt = this.options?.tooltip;
