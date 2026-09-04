@@ -84,11 +84,9 @@ const createChart = (opts = {}) => {
 /** onMouseDown → dragStart 가 window 에 등록하는 dragMove/dragEnd 를 가로챈다. */
 const startDrag = (chart, pos) => {
   const handlers = {};
-  const spy = vi
-    .spyOn(window, 'addEventListener')
-    .mockImplementation((name, fn) => {
-      handlers[name] = fn;
-    });
+  const spy = vi.spyOn(window, 'addEventListener').mockImplementation((name, fn) => {
+    handlers[name] = fn;
+  });
 
   chart.onMouseDown({ __pos: pos });
   spy.mockRestore();
