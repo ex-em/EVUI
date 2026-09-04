@@ -47,7 +47,7 @@ export default {
       },
     };
 
-    const convertToDateString = (value) => dayjs(value).format('MM/DD HH:mm');
+    const convertToDateString = (value) => dayjs(value).format('MM/DD HH:mm:ss');
 
     const chartOptions = {
       type: 'line',
