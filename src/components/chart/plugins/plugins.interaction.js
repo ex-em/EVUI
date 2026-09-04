@@ -12,15 +12,11 @@ const modules = {
    */
   createEventFunctions() {
     /**
-     * To show tooltip and item highlighting, add event listener on mousemove
+     * hover 아티팩트(하이라이트·툴팁·인디케이터)를 그린다.
      *
      * @returns {undefined}
      */
-    this.onMouseMove = (e) => {
-      if (this.dragInfo?.isMove || this.isMobile) {
-        return;
-      }
-
+    this.drawHoverArtifacts = (e) => {
       const args = { e };
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
@@ -175,6 +171,19 @@ const modules = {
 
         this.listeners['mouse-move'](args);
       }
+    };
+
+    /**
+     * To show tooltip and item highlighting, add event listener on mousemove
+     *
+     * @returns {undefined}
+     */
+    this.onMouseMove = (e) => {
+      if (this.dragInfo?.isMove || this.isMobile) {
+        return;
+      }
+
+      this.drawHoverArtifacts(e);
     };
 
     /**
