@@ -64,6 +64,10 @@ const createChart = (opts = {}) => {
     getCurMouseTargetVal: () => ({}),
     hideTooltipDOM: vi.fn(),
     drawIndicatorForTooltip: () => ({ labelValue: 'L2' }),
+    findSelectedItems: () => [],
+    getSelectionRange: () => ({ xMin: 0, xMax: 1, yMin: 0, yMax: 1 }),
+    tooltipClear: vi.fn(),
+    invalidateClientRectCache: vi.fn(),
 
     calls,
     overlayClear: record('overlayClear'),
@@ -173,6 +177,42 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
     // 드래그 진입 → 구간 정보가 붙으므로 다시 그려야 한다
     chart.drawHoverArtifacts(hover, true);
     expect(chart.drawCustomTooltip).toHaveBeenCalledTimes(2);
+  });
+
+  it('mouseleave 로 시그니처가 무효화되어 다음 첫 hover 는 다시 그린다', () => {
+    const hover = { __pos: [300, 150, 500, 300] };
+    chart.listeners['mouse-leave'] = vi.fn();
+    chart.tooltipDOM.style.display = 'block';
+
+    chart.drawHoverArtifacts(hover);
+    chart.drawHoverArtifacts(hover);
+    expect(chart.drawCustomTooltip).toHaveBeenCalledTimes(1);
+
+    chart.onMouseLeave({});
+    chart.tooltipDOM.style.display = 'block';
+
+    chart.drawHoverArtifacts(hover);
+    expect(chart.drawCustomTooltip).toHaveBeenCalledTimes(2);
+  });
+
+  // throttledMove 는 드래그가 끝난 뒤 trailing 호출을 남길 수 있다 — 그 호출이 도착했을 때의
+  // 최종 상태(밴드 유지 + 단일 지점 툴팁)를 고정한다.
+  it('드래그 종료 후의 hover 는 keepDisplay 밴드를 유지하고 구간 정보 없이 그린다', () => {
+    chart.options.dragSelection.keepDisplay = true;
+    chart.listeners['drag-select'] = vi.fn();
+
+    const { mousemove, mouseup } = startDrag(chart, [100, 100, 500, 300]);
+    mousemove(moveEvent([300, 150, 500, 300]));
+    mouseup({});
+
+    expect(chart.dragInfoBackup).toBeTruthy();
+    chart.calls.length = 0;
+
+    chart.onMouseMove(moveEvent([300, 150, 500, 300]));
+
+    expect(chart.calls.at(-1)).toBe('drawSelectionArea');
+    expect(chart.drawSelectionArea).toHaveBeenLastCalledWith(chart.dragInfoBackup);
+    expect(chart.drawCustomTooltip).toHaveBeenLastCalledWith(expect.anything(), undefined);
   });
 });
 
