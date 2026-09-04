@@ -2711,7 +2711,7 @@
                   "name": "formatter",
                   "type": "function / Object",
                   "default": "null",
-                  "description": "데이터가 표시되기 전에 형식을 지정합니다. 함수형(({ x, y, name, seriesId }) => string), { title, value } 객체형, { html } 커스텀 HTML형 3가지 형태를 지원합니다."
+                  "description": "데이터가 표시되기 전에 형식을 지정합니다. 함수형(({ x, y, name, seriesId }) => string), { title, value } 객체형, { html } 커스텀 HTML형 3가지 형태를 지원합니다. dragSelection.use 차트에서 드래그하는 동안에는 html formatter 가 2번째 인자로 { dragRange: { fromLabel, toLabel } } 을 함께 받습니다 (드래그 중이 아니면 전달되지 않아 기존 formatter 는 그대로 동작)."
                 },
                 {
                   "name": "returnValue",
