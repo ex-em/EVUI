@@ -12,6 +12,8 @@ import Event from './example/Event';
 import EventRaw from './example/Event?raw';
 import DragSelection from './example/DragSelection';
 import DragSelectionRaw from './example/DragSelection?raw';
+import DragSelectionTooltip from './example/DragSelectionTooltip';
+import DragSelectionTooltipRaw from './example/DragSelectionTooltip?raw';
 import Tooltip from './example/Tooltip';
 import TooltipRaw from './example/Tooltip?raw';
 import CustomTooltip from './example/CustomTooltip';
@@ -108,6 +110,12 @@ export default {
       description: 'Drag Select 이벤트 등록이 가능 합니다',
       component: DragSelection,
       parsedData: parse(DragSelectionRaw).descriptor,
+    },
+    'Drag Selection Tooltip': {
+      description:
+        '드래그하는 동안 툴팁이 커서를 따라 갱신되며, formatter.html 이 2번째 인자로 드래그 구간을 받습니다',
+      component: DragSelectionTooltip,
+      parsedData: parse(DragSelectionTooltipRaw).descriptor,
     },
     Tooltip: {
       description: 'Tooltip 기능으로 마우스가 위치한 곳의 값을 볼 수 있습니다.',

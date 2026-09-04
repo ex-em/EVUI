@@ -320,9 +320,10 @@ const modules = {
    * 성공 시 true, 휴리스틱 실패 등으로 fallback이 필요하면 false.
    *
    * @param {object} hitInfoItems  hitInfo.items
+   * @param {object} [dragRange]   드래그 중일 때만 전달되는 { fromLabel, toLabel }
    * @returns {boolean}
    */
-  drawCustomTooltipVirtual(hitInfoItems) {
+  drawCustomTooltipVirtual(hitInfoItems, dragRange) {
     const opt = this.options?.tooltip;
     if (!opt?.formatter?.html) return false;
 
@@ -340,7 +341,9 @@ const modules = {
 
     let htmlString;
     try {
-      htmlString = opt.formatter.html(seriesList);
+      htmlString = dragRange
+        ? opt.formatter.html(seriesList, { dragRange })
+        : opt.formatter.html(seriesList);
     } catch (err) {
       // 사용자 코드의 예외는 가상 스크롤에서 가둬두지 않고 fallback 신호로만 사용
       console.warn('[evui] tooltip.formatter.html threw, falling back:', err);

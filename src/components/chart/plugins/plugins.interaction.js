@@ -14,9 +14,11 @@ const modules = {
     /**
      * hover 아티팩트(하이라이트·툴팁·인디케이터)를 그린다.
      *
+     * @param {MouseEvent} e           mousemove event
+     * @param {boolean} isDragging     드래그 진행 중 호출인지 여부
      * @returns {undefined}
      */
-    this.drawHoverArtifacts = (e) => {
+    this.drawHoverArtifacts = (e, isDragging = false) => {
       const args = { e };
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
@@ -45,7 +47,9 @@ const modules = {
       // 흐름은 그대로 유지한다. fast path 를 더 넓히면 부수 효과가 생길 수 있어 보수적으로 둔다.
       let hoverSig = '';
       if (hasItems) {
-        hoverSig = `h=${hitInfo.hitId}`;
+        // 드래그 중에는 formatter 에 구간 정보가 함께 들어가므로, 같은 데이터 포인트라도
+        // 드래그 진입/종료 프레임에서는 fast path 가 매치되면 안 된다.
+        hoverSig = `${isDragging ? 'd|' : ''}h=${hitInfo.hitId}`;
         const sortedKeys = itemKeys.slice().sort();
         for (let i = 0; i < sortedKeys.length; i++) {
           const k = sortedKeys[i];
@@ -84,7 +88,8 @@ const modules = {
             tooltip.returnValue(seriesList, e);
           } else if (tooltip?.formatter?.html) {
             if (!skipCustomTooltipRedraw) {
-              this.drawCustomTooltip(hitInfo?.items);
+              const dragRange = isDragging ? this.getDragRangeLabels(offset) : undefined;
+              this.drawCustomTooltip(hitInfo?.items, dragRange);
             }
             this.setCustomTooltipLayoutPosition(hitInfo, e);
           } else {
@@ -164,7 +169,9 @@ const modules = {
         };
       }
 
-      if (typeof this.listeners['mouse-move'] === 'function') {
+      // 드래그 중에는 mouse-move 를 발화하지 않는다 — 기존에도 드래그 중엔 발화하지 않았고,
+      // 이 이벤트의 hoveredLabel 은 차트 그룹 indicator 동기화를 움직인다.
+      if (!isDragging && typeof this.listeners['mouse-move'] === 'function') {
         if (type !== 'pie') {
           args.curMouseTargetVal = this.getCurMouseTargetVal(offset, hitInfo);
         }
@@ -802,7 +809,15 @@ const modules = {
         };
       }
 
-      this.overlayClear();
+      // 드래그 중에도 hover 를 갱신한다. drawHoverArtifacts 가 overlay 를 비우고 다시 그리므로
+      // 밴드는 그 뒤 마지막에 그려야 hover 아티팩트 위에 남는다. 같은 이유로 이 경로에는
+      // tooltip.throttledMove 를 적용하지 않는다 — clear 와 draw 가 프레임을 넘나들면 깜빡인다.
+      if (!this.isMobile && isInsideCanvas(aOffsetX, aOffsetY)) {
+        this.drawHoverArtifacts(e, true);
+      } else {
+        this.overlayClear();
+      }
+
       this.drawSelectionArea(dragInfo);
     };
 
@@ -2088,6 +2103,31 @@ const modules = {
     }
 
     return items;
+  },
+
+  /**
+   * 드래그 중 커스텀 툴팁 formatter 에 넘길 구간 라벨. 드래그 중이 아니면 undefined.
+   * 양 끝을 hit-test 와 같은 findClosestDataIndex 로 스냅해 툴팁 본문이 가리키는 지점과
+   * 헤더의 구간 끝이 어긋나지 않게 한다. 역방향 드래그면 fromLabel > toLabel 이다.
+   *
+   * @param {array} offset  현재 커서 위치
+   * @returns {object|undefined} { fromLabel, toLabel }
+   */
+  getDragRangeLabels(offset) {
+    const labels = this.data?.labels;
+    if (!this.dragInfo || !labels?.length) {
+      return undefined;
+    }
+
+    const sIds = Object.keys(this.seriesList);
+    const fromIndex = this.findClosestDataIndex([this.dragInfo.xcp, this.dragInfo.ycp], sIds);
+    const toIndex = this.findClosestDataIndex(offset, sIds);
+
+    if (fromIndex === -1 || toIndex === -1) {
+      return undefined;
+    }
+
+    return { fromLabel: labels[fromIndex], toLabel: labels[toIndex] };
   },
 
   /**

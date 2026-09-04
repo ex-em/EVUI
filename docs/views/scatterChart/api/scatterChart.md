@@ -411,6 +411,11 @@ const chartOptions = {
 > - `ev-chart-tooltip-custom`(및 `__header`, `__body`) 클래스는 **선택**입니다. 사용하면 EVUI 기본 스타일과 휠 스크롤 기본 타겟(`htmlScrollTarget: '.ev-chart-tooltip-custom__body'`)이 자동 적용됩니다.
 > - 직접 마크업/클래스를 사용하는 경우, 스크롤이 필요하면 `htmlScrollTarget`을 해당 스크롤 요소의 셀렉터로 지정하세요.
 
+> **드래그 중 구간 정보 (`dragSelection.use`)**
+> - 드래그하는 **동안**에는 `formatter.html` 이 2번째 인자로 `{ dragRange: { fromLabel, toLabel } }` 을 함께 받습니다. 드래그 중이 아니면 2번째 인자는 전달되지 않으므로 기존 formatter 는 그대로 동작합니다.
+> - `fromLabel` 은 드래그를 시작한 지점, `toLabel` 은 현재 커서 지점의 라벨입니다. 양쪽 모두 툴팁 본문과 같은 기준으로 가장 가까운 데이터 라벨에 스냅되며, 역방향(오른쪽 → 왼쪽) 드래그면 `fromLabel` 이 `toLabel` 보다 뒤 라벨이 됩니다.
+> - 드래그 중에는 툴팁·인디케이터·하이라이트가 커서를 따라 갱신됩니다. 단 `mouse-move` 이벤트는 드래그 중 발생하지 않습니다.
+
 #### returnValue
 
 | 이름 | 타입 | 설명 | 종류(예시) |

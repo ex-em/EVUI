@@ -934,8 +934,9 @@ const modules = {
    * Draw User Custom Tooltip (tooltip > formatter > html)
    * call "formatter > html" and append to tooltip DOM
    * @param hitInfoItems
+   * @param {object} [dragRange]  드래그 중일 때만 전달되는 { fromLabel, toLabel }
    */
-  drawCustomTooltip(hitInfoItems) {
+  drawCustomTooltip(hitInfoItems, dragRange) {
     const opt = this.options?.tooltip;
     if (!opt?.formatter?.html) return;
 
@@ -947,7 +948,7 @@ const modules = {
 
     // 가상 스크롤 경로 (자동/명시 활성 + 휴리스틱 성공 시)
     if (this._shouldVirtualizeCustomTooltip?.(itemsCount)) {
-      const ok = this.drawCustomTooltipVirtual(hitInfoItems);
+      const ok = this.drawCustomTooltipVirtual(hitInfoItems, dragRange);
       if (ok) return;
       // 휴리스틱 실패 시 기존 경로로 fallback
     }
@@ -968,7 +969,11 @@ const modules = {
       });
     });
 
-    const userCustomTooltipBody = Util.htmlToElement(opt.formatter.html(seriesList));
+    // 드래그 중이 아니면 2번째 인자를 넘기지 않는다 — 기존 formatter 의 arity 를 그대로 둔다.
+    const html = dragRange
+      ? opt.formatter.html(seriesList, { dragRange })
+      : opt.formatter.html(seriesList);
+    const userCustomTooltipBody = Util.htmlToElement(html);
     if (userCustomTooltipBody) {
       this.tooltipDOM.appendChild(userCustomTooltipBody);
     }
