@@ -834,6 +834,8 @@ describe('dragEnd', () => {
       },
       getMousePosition: () => [cursor.x, cursor.y, chartRect.x2, chartRect.y2],
       overlayClear: vi.fn(),
+      // dragMove 는 캔버스 안 커서마다 hover 를 다시 그린다 — 이 스펙의 관심사는 dragEnd 다.
+      drawHoverArtifacts: vi.fn(),
       drawSelectionArea: vi.fn(),
       removeSelectionArea: vi.fn(),
     });
