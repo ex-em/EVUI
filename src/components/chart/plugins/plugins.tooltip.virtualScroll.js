@@ -320,7 +320,7 @@ const modules = {
    * 성공 시 true, 휴리스틱 실패 등으로 fallback이 필요하면 false.
    *
    * @param {object} hitInfoItems  hitInfo.items
-   * @param {object} [dragRange]   드래그 중일 때만 전달되는 { fromLabel, toLabel }
+   * @param {object} [dragRange]   드래그 중일 때만 전달되는 { from, to }
    * @returns {boolean}
    */
   drawCustomTooltipVirtual(hitInfoItems, dragRange) {

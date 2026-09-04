@@ -86,8 +86,8 @@ export default {
           // 드래그 중에만 2번째 인자로 { dragRange } 가 전달된다.
           html: (seriesList, meta) => {
             const header = meta?.dragRange
-              ? `${convertToDateString(meta.dragRange.fromLabel)} ~ ` +
-                `${convertToDateString(meta.dragRange.toLabel)}`
+              ? `${convertToDateString(meta.dragRange.from)} ~ ` +
+                `${convertToDateString(meta.dragRange.to)}`
               : convertToDateString(seriesList[0]?.data?.x);
             const rows = seriesList
               .map(
