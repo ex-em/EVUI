@@ -96,7 +96,7 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 - `title.show` 토글 시 제목 DOM display와 wrapperDOM padding-top이 함께 전환된다. (수동 QA)
 - `doughnutHoleSize > 0`인 pie는 중앙이 `destination-out`으로 투명하게 뚫리고, `pieStroke.use` 시 내/외곽 테두리가 그려진다. (Chart.visual.spec.js / 수동 QA)
 - 동일 데이터 포인트 위에서의 연속 mousemove는 `drawCustomTooltip`을 다시 실행하지 않는다(hoverSig fast path). 데이터 갱신·mouseleave 후 첫 hover는 다시 그린다. (plugins.dragSelection.hover.spec.js)
-- `dragSelection.use` line 차트에서 드래그하는 동안 커서 위치의 툴팁/하이라이트가 갱신되고 선택 밴드가 그 위에 유지된다. 커서가 캔버스 밖이거나 모바일이면 밴드만 그린다. 커스텀 툴팁 formatter 는 드래그 중에만 2번째 인자로 `{ dragRange }` 를 받는다. (plugins.dragSelection.hover.spec.js)
+- `dragSelection.use` line·수직 bar·콤보 차트에서 드래그하는 동안 커서 위치의 툴팁/하이라이트가 갱신되고 선택 밴드가 그 위에 유지된다. 커서가 캔버스 밖이거나 모바일이면 밴드만 그린다. 커스텀 툴팁 formatter 는 드래그 중에만 2번째 인자로 `{ dragRange }` 를 받는다. (plugins.dragSelection.hover.spec.js)
 
 ## Architecture
 

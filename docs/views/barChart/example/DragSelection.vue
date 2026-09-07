@@ -69,6 +69,8 @@ export default {
       chartData.groups = use ? [['series1', 'series2']] : [];
     });
 
+    const convertToDateString = (value) => dayjs(value).format('MM/DD HH:mm');
+
     const chartOptions = {
       type: 'bar',
       width: '100%',
@@ -103,6 +105,32 @@ export default {
         use: true,
         keepDisplay: true,
       },
+      tooltip: {
+        use: true,
+        formatter: {
+          // 드래그 중에만 2번째 인자로 { dragRange } 가 전달된다.
+          html: (seriesList, meta) => {
+            const header = meta?.dragRange
+              ? `${convertToDateString(meta.dragRange.from)} ~ ` +
+                `${convertToDateString(meta.dragRange.to)}`
+              : convertToDateString(seriesList[0]?.data?.x);
+            // 누적이면 y 는 스택 총합이라 자기 값 o 를 쓴다.
+            const rows = seriesList
+              .map(
+                ({ name, color, data }) =>
+                  `<div data-evui-tooltip-row>
+                     <span style="color:${color}">■</span> ${name} : ${data.o}
+                   </div>`,
+              )
+              .join('');
+
+            return `<div class="ev-chart-tooltip-custom">
+                      <div class="ev-chart-tooltip-custom__header">${header}</div>
+                      <div class="ev-chart-tooltip-custom__body">${rows}</div>
+                    </div>`;
+          },
+        },
+      },
     };
 
     const selectionItems = ref([]);
@@ -112,7 +140,6 @@ export default {
       selectionRange.value = range;
     };
 
-    const convertToDateString = (value) => dayjs(value).format('MM/DD HH:mm');
 
     return {
       chartData,
