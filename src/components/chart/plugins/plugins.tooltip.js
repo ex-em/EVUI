@@ -970,9 +970,23 @@ const modules = {
     });
 
     // 드래그 중이 아니면 2번째 인자를 넘기지 않는다 — 기존 formatter 의 arity 를 그대로 둔다.
-    const html = dragRange
-      ? opt.formatter.html(seriesList, { dragRange })
-      : opt.formatter.html(seriesList);
+    let html;
+    try {
+      html = dragRange
+        ? opt.formatter.html(seriesList, { dragRange })
+        : opt.formatter.html(seriesList);
+    } catch (err) {
+      // 소비처 예외를 그대로 올리면 호출부가 overlay 를 비운 뒤라 그 프레임의 하이라이트와 드래그
+      // 밴드까지 사라지고, update() 꼬리에서 나면 재렌더 예약 플래그가 정리되지 않는다. 가상 경로와
+      // 같이 툴팁만 포기한다. 드래그 중에는 프레임마다 불리므로 경고는 인스턴스당 1회만 남긴다.
+      if (!this._customTooltipWarnedThrow) {
+        this._customTooltipWarnedThrow = true;
+        // eslint-disable-next-line no-console
+        console.warn('[evui] tooltip.formatter.html threw, tooltip skipped:', err);
+      }
+      this.tooltipDOM.style.display = 'none';
+      return;
+    }
     const userCustomTooltipBody = Util.htmlToElement(html);
     if (userCustomTooltipBody) {
       this.tooltipDOM.appendChild(userCustomTooltipBody);
