@@ -184,6 +184,24 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
     expect(chart.calls).toEqual(['overlayClear', 'drawSelectionArea']);
   });
 
+  // 예외가 올라오면 overlayClear 뒤라 hover 도 밴드도 없는 빈 프레임이 된다.
+  it('커스텀 툴팁 formatter 가 던져도 밴드는 그린다', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    chart.tooltipDOM = document.createElement('div');
+    chart.drawCustomTooltip = tooltipModules.drawCustomTooltip;
+    chart.options.tooltip.formatter.html = () => {
+      throw new Error('boom');
+    };
+
+    const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
+    chart.calls.length = 0;
+
+    expect(() => mousemove(moveEvent([300, 150, 500, 300]))).not.toThrow();
+    expect(chart.calls).toContain('drawSelectionArea');
+
+    warn.mockRestore();
+  });
+
   it('모바일에서는 드래그 중 hover 를 그리지 않는다', () => {
     chart.isMobile = true;
     const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
@@ -408,5 +426,33 @@ describe('formatter.html 인자', () => {
 
     expect(html.mock.calls[0]).toHaveLength(2);
     expect(html.mock.calls[0][1]).toEqual({ dragRange });
+  });
+
+  // 빈 seriesList 는 itemsCount 가 0이라 가상 경로 게이트를 통과할 수 없다 — 항상 이 경로다.
+  it('formatter 가 던져도 예외를 올리지 않고 툴팁만 감춘다', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const chart = createTooltipChart(() => {
+      throw new Error('boom');
+    });
+    chart.tooltipDOM.style.display = 'block';
+
+    expect(() => chart.drawCustomTooltip(HIT_ITEMS)).not.toThrow();
+    expect(chart.tooltipDOM.style.display).toBe('none');
+
+    // 드래그 중에는 프레임마다 불리므로 경고가 쌓이면 안 된다
+    chart.drawCustomTooltip(HIT_ITEMS);
+    expect(warn).toHaveBeenCalledTimes(1);
+
+    warn.mockRestore();
+  });
+
+  it('첫 항목을 참조하는 기존 formatter 가 빈 seriesList 에서 던져도 같다', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const chart = createTooltipChart((list) => `<div>${list[0].name}</div>`);
+
+    expect(() => chart.drawCustomTooltip({}, { from: 1, to: 2 })).not.toThrow();
+    expect(chart.tooltipDOM.style.display).toBe('none');
+
+    warn.mockRestore();
   });
 });
