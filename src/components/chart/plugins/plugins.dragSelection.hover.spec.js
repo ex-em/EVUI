@@ -324,6 +324,34 @@ describe('getDragRange', () => {
     expect(from).toBeGreaterThan(to);
   });
 
+  // 분기 라우팅과 from/to 순서만 고정한다 — 블록 스냅 계산 자체는 element.heatMap 의 몫이다.
+  it('heatMap 은 블록 스냅 분기로 라우팅한다', () => {
+    const chart = createChart({ type: 'heatMap' });
+    chart.getSelectionRangeForHeatMap = vi.fn(() => ({ xMin: 'L1', xMax: 'L3' }));
+    chart.dragInfo = dragInfoAt(100, 300);
+
+    expect(chart.getDragRange([300, 150])).toEqual({ from: 'L1', to: 'L3' });
+    expect(chart.getSelectionRangeForHeatMap).toHaveBeenCalledWith(chart.dragInfo);
+  });
+
+  it('heatMap 도 역방향 드래그면 순서를 뒤집는다', () => {
+    const chart = createChart({ type: 'heatMap' });
+    chart.getSelectionRangeForHeatMap = () => ({ xMin: 'L1', xMax: 'L3' });
+    chart.dragInfo = dragInfoAt(300, 100);
+
+    expect(chart.getDragRange([100, 150])).toEqual({ from: 'L3', to: 'L1' });
+  });
+
+  it('scatter 는 heatMap 분기를 타지 않는다', () => {
+    const chart = createChart({ type: 'scatter' });
+    chart.getSelectionRangeForHeatMap = vi.fn();
+    chart.dragInfo = dragInfoAt(100, 300);
+
+    const { xMin, xMax } = chart.getSelectionRange(chart.dragInfo);
+    expect(chart.getDragRange([300, 150])).toEqual({ from: xMin, to: xMax });
+    expect(chart.getSelectionRangeForHeatMap).not.toHaveBeenCalled();
+  });
+
   it('드래그 전이거나 축 스텝이 없으면 undefined', () => {
     const chart = createChart();
     expect(chart.getDragRange([300, 150])).toBeUndefined();

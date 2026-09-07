@@ -100,6 +100,7 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 - `dragSelection.showTooltipOnEmpty` 가 켜지면 드래그 중 hit 이 0개인 프레임에서도 `formatter.html` 이 빈 seriesList + `{ dragRange }` 로 호출된다. 기본값·비드래그 hover·`returnValue` 경로는 기존대로 감춘다. (plugins.dragSelection.hover.spec.js)
 - `formatter.html` 이 던져도 그 프레임의 드래그 밴드는 그려지고 툴팁만 감춰진다. 경고는 인스턴스당 1회다. (plugins.dragSelection.hover.spec.js)
 - 드래그 중 hit 이 0개라 툴팁을 감출 때는 `debouncedHide` 를 우회한 즉시 hide 를 쓰고, 비드래그 hover 는 그대로 디바운스를 탄다. (plugins.dragSelection.hover.spec.js)
+- `getDragRange` 는 `options.type` 으로 분기한다 — heatMap 은 블록 스냅(`getSelectionRangeForHeatMap`), 그 외는 `getSelectionRange`. 역방향 드래그는 두 경로 모두 순서를 뒤집는다. (plugins.dragSelection.hover.spec.js)
 - 드래그 중 재렌더는 마지막 커서 위치의 hover 를 다시 그린 뒤 밴드를 올린다. 커서가 캔버스 밖이었으면 밴드만 그리고, 종료된 드래그의 밴드는 부분 갱신에서만 유지한다. (chart.core.dragArtifacts.spec.js)
 
 ## Architecture
