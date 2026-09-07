@@ -71,7 +71,7 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 14. **(스크롤 성능)**: 가상 스크롤 scroll 핸들러는 rAF throttle + passive, 프로그램적 scrollTop 보정 중에는 `suppressScroll`로 재진입 차단, `overflow-anchor: none`으로 브라우저 scroll anchoring을 끈다. 범례 가상 스크롤도 rAF로 초기 렌더한다.
 15. **(teardown 무누수)**: `tooltipDestroy`는 가상 스크롤 세션(scroll 리스너/ResizeObserver) 해제 후 tooltip DOM들을 제거한다(공유 툴팁이면 제거하지 않고 소유권만 내려놓는다 — 16). `destroyLegend`는 pending rAF를 cancel한다. EvChart.destroy가 overlayCanvas/window 리스너와 전용 드래그 캔버스, startArea position 원복까지 수행한다.
 16. **(그룹 공유 툴팁)**: 생성자 인자 `sharedTooltip`(EvChartGroup 이 provide 한 `{ elements, owner }` 홀더)이 있으면 `createTooltipDOM` 은 홀더가 비어 있을 때만 DOM 을 만들어 `elements` 에 넣고, 이후 차트는 그 참조를 받는다. hover 로 툴팁을 띄우기 직전 `acquireTooltip` 이 소유권을 가져오며, 소유 차트가 바뀌면 이전 소유 차트의 가상 스크롤 세션을 정리하고 tooltipDOM 의 자식·인라인 스타일과 header 상태(인라인 스타일·`textOverflow` 클래스 — header 노드는 재부착되므로 이전 차트의 `display:none` 이 남는다)를 비운 뒤 현재 차트 레이아웃(기본 header/body 또는 formatter.html)으로 재구성한다(`_lastHoverSig`·방향 기억도 초기화). 비소유 차트의 `hideTooltipDOM`·`tooltipClear`·`hideTooltip`·`onWheel`·update 의 툴팁 리셋은 no-op 이다(`isTooltipOwner`) — 이전 셀의 debounce 숨김이 늦게 발화해 새 셀 툴팁을 끄지 않게 한다. `tooltipDestroy` 는 공유 DOM 을 제거하지 않으며, 제거는 그룹 unmount 가 한다.
-17. **드래그 중 overlay 소유권**: 드래그가 시작되면 overlayCanvas 의 clear→draw 는 window mousemove(`dragMove`) 한 곳이 소유한다. canvas mousemove(`onMouseMove`)는 기존대로 조기 반환하고, `dragMove` 가 `drawHoverArtifacts` → `drawSelectionArea` 를 한 프레임 안에서 호출한다. 이 경로에는 `tooltip.throttledMove` 를 적용하지 않는다 — clear 와 draw 가 프레임을 넘나들면 hover 또는 밴드가 깜빡인다. 드래그 중에는 `mouse-move` 를 발화하지 않으므로(기존 동작 유지) 차트 그룹 indicator 동기화는 드래그 동안 멈춘다. 커스텀 툴팁 redraw 스킵(hoverSig fast path)도 드래그 중에는 꺼지므로 프레임당 formatter 1회 비용이 든다 — 헤더가 커서에 연속으로 의존하는 대가다.
+17. **드래그 중 overlay 소유권**: 드래그가 시작되면 overlayCanvas 의 clear→draw 는 window mousemove(`dragMove`) 한 곳이 소유한다. canvas mousemove(`onMouseMove`)는 기존대로 조기 반환하고, `dragMove` 가 `drawHoverArtifacts` → `drawSelectionArea` 를 한 프레임 안에서 호출한다. 이 경로에는 `tooltip.throttledMove` 를 적용하지 않는다 — clear 와 draw 가 프레임을 넘나들면 hover 또는 밴드가 깜빡인다. 드래그 중에는 `mouse-move` 를 발화하지 않으므로(기존 동작 유지) 차트 그룹 indicator 동기화는 드래그 동안 멈춘다. 커스텀 툴팁 redraw 스킵(hoverSig fast path)도 드래그 중에는 꺼지므로 프레임당 formatter 1회 비용이 든다 — 헤더가 커서에 연속으로 의존하는 대가다. 드래그 도중 재렌더가 일어나면 `clear()` 가 overlay 를 항상 비우고 `updateTooltip` 이면 tooltipDOM 까지 비우므로 `restoreDragArtifacts`(chart.core)가 `dragMove` 가 남긴 `lastDragHoverEvent` 로 같은 순서를 한 번 더 재생한다 — 그 이벤트는 커서가 캔버스 안이었던 프레임에만 남고 `dragEnd` 가 지운다.
 
 ## Acceptance Criteria
 
@@ -100,6 +100,7 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 - 동일 데이터 포인트 위에서의 연속 mousemove는 `drawCustomTooltip`을 다시 실행하지 않는다(hoverSig fast path). 데이터 갱신·mouseleave 후 첫 hover는 다시 그린다. (plugins.dragSelection.hover.spec.js)
 - `dragSelection.use` line·수직 bar·콤보 차트에서 드래그하는 동안 커서 위치의 툴팁/하이라이트가 갱신되고 선택 밴드가 그 위에 유지된다. 커서가 캔버스 밖이거나 모바일이면 밴드만 그린다. 커스텀 툴팁 formatter 는 드래그 중에만 2번째 인자로 `{ dragRange }` 를 받는다. (plugins.dragSelection.hover.spec.js)
 - `dragSelection.showTooltipOnEmpty` 가 켜지면 드래그 중 hit 이 0개인 프레임에서도 `formatter.html` 이 빈 seriesList + `{ dragRange }` 로 호출된다. 기본값·비드래그 hover·`returnValue` 경로는 기존대로 감춘다. (plugins.dragSelection.hover.spec.js)
+- 드래그 중 재렌더는 마지막 커서 위치의 hover 를 다시 그린 뒤 밴드를 올린다. 커서가 캔버스 밖이었으면 밴드만 그리고, 종료된 드래그의 밴드는 부분 갱신에서만 유지한다. (chart.core.dragArtifacts.spec.js)
 
 ## Architecture
 
