@@ -2520,7 +2520,7 @@
                   "name": "showTooltipOnEmpty",
                   "type": "Boolean",
                   "default": "false",
-                  "description": "드래그 중 커서 위치에 데이터가 없어(막대 사이 간격·값이 null 인 라벨) hit 이 0개일 때도 tooltip.formatter.html 을 빈 seriesList 와 { dragRange } 로 호출해 구간 헤더만 남깁니다. formatter.html 경로 전용이며 tooltip.returnValue 를 쓰면 동작하지 않습니다. 드래그가 끝나면 이 툴팁은 즉시 사라집니다."
+                  "description": "드래그 중 커서 위치에 데이터가 없어 hit 이 0개일 때도 tooltip.formatter.html 을 빈 seriesList 와 { dragRange } 로 호출해 구간 헤더만 남깁니다. formatter.html 경로 전용이며 tooltip.returnValue 를 쓰면 동작하지 않습니다. 드래그가 끝나면 이 툴팁은 즉시 사라집니다."
                 }
               ]
             },
