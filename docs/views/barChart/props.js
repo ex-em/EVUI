@@ -103,7 +103,8 @@ export default {
     'Drag Selection': {
       description:
         '드래그한 x 구간을 drag-select 이벤트로 받는 기능입니다. 수직 막대에서만 동작하며 horizontal: true면 드래그가 시작되지 않습니다. 누적 토글로 누적 막대도 같은 조건으로 동작함을 확인할 수 있습니다. ' +
-        '드래그하는 동안 툴팁이 커서를 따라 갱신되며, formatter.html 이 2번째 인자로 드래그 구간을 받습니다.',
+        '드래그하는 동안 툴팁이 커서를 따라 갱신되며, formatter.html 이 2번째 인자로 드래그 구간을 받습니다. ' +
+        'showTooltipOnEmpty 를 켜두어 막대 사이 빈 자리를 지날 때도 구간 헤더가 남습니다.',
       component: DragSelection,
       parsedData: parse(DragSelectionRaw).descriptor,
     },

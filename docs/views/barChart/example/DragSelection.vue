@@ -104,6 +104,8 @@ export default {
       dragSelection: {
         use: true,
         keepDisplay: true,
+        // 데이터가 없는 지점을 지나도 드래그 구간 헤더는 계속 보이게 한다.
+        showTooltipOnEmpty: true,
       },
       tooltip: {
         use: true,
