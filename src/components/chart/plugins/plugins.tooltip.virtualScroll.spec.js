@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import VirtualScroll from './plugins.tooltip.virtualScroll';
 
 /**
@@ -56,6 +56,7 @@ const createChart = (html, vsOpt = { use: true, estimatedRowHeight: 25, overscan
     _vsLearnedAverageHeight: undefined,
     _vsDetectFailed: false,
     _vsWarnedFallback: false,
+    _vsWarnedThrow: false,
     tooltipDOM: document.createElement('div'),
     options: {
       tooltip: {
@@ -204,6 +205,24 @@ describe('drawCustomTooltipVirtual — 혼합 아이템 순서 보존', () => {
 });
 
 // ---- 회귀: 행만 있는 본문 ----------------------------------------------
+
+describe('drawCustomTooltipVirtual — 소비처 formatter 예외', () => {
+  // 던지면 비가상 경로로 fallback 해 formatter 가 프레임당 2회 돈다. 드래그 경로는 raw
+  // mousemove 라 경고에 1회 플래그가 없으면 프레임 수만큼 쌓인다.
+  it('경고는 인스턴스당 1회만 남기고 fallback 신호는 매번 준다', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const chart = createChart('');
+    chart.options.tooltip.formatter.html = () => {
+      throw new Error('boom');
+    };
+
+    expect(chart.drawCustomTooltipVirtual(makeHitInfoItems(3))).toBe(false);
+    expect(chart.drawCustomTooltipVirtual(makeHitInfoItems(3))).toBe(false);
+
+    expect(warn).toHaveBeenCalledTimes(1);
+    warn.mockRestore();
+  });
+});
 
 describe('회귀 — 행만 있는 본문', () => {
   it('마크된 행만 있는 본문은 전부 행으로 처리되고 순서 보존된다', () => {
