@@ -835,9 +835,12 @@ const modules = {
       // 드래그 중에도 hover 를 갱신한다. drawHoverArtifacts 가 overlay 를 비우고 다시 그리므로
       // 밴드는 그 뒤 마지막에 그려야 hover 아티팩트 위에 남는다. 같은 이유로 이 경로에는
       // tooltip.throttledMove 를 적용하지 않는다 — clear 와 draw 가 프레임을 넘나들면 깜빡인다.
+      // 재렌더가 overlay·tooltipDOM 을 비우면 update() 가 이 이벤트로 hover 를 되살린다.
       if (!this.isMobile && isInsideCanvas(aOffsetX, aOffsetY)) {
+        this.lastDragHoverEvent = e;
         this.drawHoverArtifacts(e, true);
       } else {
+        this.lastDragHoverEvent = null;
         this.overlayClear();
       }
 
@@ -892,6 +895,7 @@ const modules = {
       }
 
       this.dragInfo = null;
+      this.lastDragHoverEvent = null;
 
       // 데이터 없이 구간만 띄운 툴팁은 드래그가 끝나면 근거가 사라진다 — keepDisplay: false 면
       // 밴드까지 지워져 행 없는 헤더만 남는다. 다음 mousemove 를 기다리지 않고 여기서 감춘다.
