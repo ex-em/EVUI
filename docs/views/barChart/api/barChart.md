@@ -509,6 +509,12 @@ const chartOptions = {
 > - `ev-chart-tooltip-custom`(및 `__header`, `__body`) 클래스는 **선택**입니다. 사용하면 EVUI 기본 스타일과 휠 스크롤 기본 타겟(`htmlScrollTarget: '.ev-chart-tooltip-custom__body'`)이 자동 적용됩니다.
 > - 직접 마크업/클래스를 사용하는 경우, 스크롤이 필요하면 `htmlScrollTarget`을 해당 스크롤 요소의 셀렉터로 지정하세요.
 
+> **드래그 중 구간 정보 (`dragSelection.use`)**
+> - 드래그하는 **동안**에는 `formatter.html` 이 2번째 인자로 `{ dragRange: { from, to } }` 을 함께 받습니다. 드래그 중이 아니면 2번째 인자는 전달되지 않으므로 기존 formatter 는 그대로 동작합니다.
+> - `from` 은 드래그를 시작한 지점, `to` 는 현재 커서 지점의 x축 값입니다. mouseup 때 `drag-select` 가 주는 `range.xMin`/`xMax` 와 **정확히 같은 값**이라(같은 계산을 재사용) 드래그 중 보이는 구간과 최종 결과가 어긋나지 않으며, 막대 간격보다 잘게 움직입니다. 시작/현재 순서를 유지하므로 역방향(오른쪽 → 왼쪽) 드래그면 `from` 이 `to` 보다 큽니다.
+> - `range` 와 같은 제약을 그대로 따릅니다 — `step` 축에서는 `NaN` 이고, 범주형 x축에서는 슬롯 위치가 아니라 선형 보간이라 최대 약 1 막대 폭 오차가 있습니다. `horizontal: true`는 드래그 자체가 시작되지 않으므로 `dragRange`도 없습니다.
+> - 드래그 중에는 툴팁·인디케이터·하이라이트가 커서를 따라 갱신됩니다. 단 `mouse-move` 이벤트는 드래그 중 발생하지 않습니다.
+
 #### returnValue
 
 | 이름 | 타입 | 설명 | 종류(예시) |
