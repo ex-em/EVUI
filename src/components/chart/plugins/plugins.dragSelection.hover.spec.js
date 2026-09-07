@@ -133,6 +133,32 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
     ]);
   });
 
+  // 게이트가 넓어져도(수직 bar·콤보) 드래그 프레임은 line 과 같은 경로를 탄다 — 타입 분기가 없다.
+  it.each([
+    ['수직 bar', 'bar'],
+    ['콤보(options.type 없음)', undefined],
+  ])('%s 도 같은 순서로 hover 를 그리고 구간을 전달한다', (_, type) => {
+    const barChart = createChart({ type });
+    barChart.seriesList = { s1: { type: 'bar', show: true } };
+
+    const { mousemove } = startDrag(barChart, [100, 100, 500, 300]);
+    barChart.calls.length = 0;
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+
+    expect(barChart.calls).toEqual([
+      'overlayClear',
+      'drawItemsHighlight',
+      'drawCustomTooltip',
+      'setCustomTooltipLayoutPosition',
+      'drawSelectionArea',
+    ]);
+    expect(barChart.drawCustomTooltip).toHaveBeenLastCalledWith(expect.anything(), {
+      from: axisValueAt(100),
+      to: axisValueAt(300),
+    });
+  });
+
   it('커서가 캔버스 밖이면 hover 없이 overlay 를 비우고 밴드만 그린다', () => {
     const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
     chart.calls.length = 0;
