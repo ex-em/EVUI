@@ -142,7 +142,6 @@ export default {
       selectionRange.value = range;
     };
 
-
     return {
       chartData,
       chartOptions,
