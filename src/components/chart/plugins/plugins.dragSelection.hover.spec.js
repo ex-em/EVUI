@@ -159,6 +159,22 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
     });
   });
 
+  // 재렌더가 overlay·tooltipDOM 을 비우면 update() 가 이 이벤트로 hover 를 되살린다.
+  it('hover 를 그린 프레임의 이벤트만 lastDragHoverEvent 로 남긴다', () => {
+    const { mousemove, mouseup } = startDrag(chart, [100, 100, 500, 300]);
+
+    const inside = moveEvent([300, 150, 500, 300]);
+    mousemove(inside);
+    expect(chart.lastDragHoverEvent).toBe(inside);
+
+    mousemove(moveEvent([-40, 150, 500, 300]));
+    expect(chart.lastDragHoverEvent).toBeNull();
+
+    mousemove(inside);
+    mouseup({});
+    expect(chart.lastDragHoverEvent).toBeNull();
+  });
+
   it('커서가 캔버스 밖이면 hover 없이 overlay 를 비우고 밴드만 그린다', () => {
     const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
     chart.calls.length = 0;
