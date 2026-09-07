@@ -20,6 +20,8 @@ const modules = {
      */
     this.drawHoverArtifacts = (e, isDragging = false) => {
       const args = { e };
+      // 이번 프레임이 데이터 없이 구간만 띄운 툴팁인지 — dragEnd 가 이걸 보고 정리한다.
+      let isEmptyRangeTooltip = false;
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
@@ -131,7 +133,24 @@ const modules = {
           tooltip.returnValue([], e);
         }
 
-        this.hideTooltipDOM();
+        // 막대 사이 간격이나 값이 null 인 라벨 위에서는 hit 이 0개라 툴팁이 통째로 사라진다.
+        // 드래그 중에는 그 순간에도 어느 구간을 잡고 있는지가 필요하므로, 옵션이 켜져 있으면
+        // 빈 seriesList 로 formatter 를 불러 헤더만 남긴다. 캔버스 툴팁은 구간 값 포맷을
+        // 라이브러리가 정해야 해서 formatter.html 경로만 지원한다.
+        const showRangeOnly =
+          isDragging &&
+          this.options.dragSelection?.showTooltipOnEmpty &&
+          typeof tooltip?.returnValue !== 'function' &&
+          !!tooltip?.formatter?.html;
+        const emptyDragRange = showRangeOnly ? this.getDragRange(offset) : undefined;
+
+        if (emptyDragRange) {
+          this.drawCustomTooltip({}, emptyDragRange);
+          this.setCustomTooltipLayoutPosition(hitInfo, e);
+          isEmptyRangeTooltip = true;
+        } else {
+          this.hideTooltipDOM();
+        }
       }
 
       // value-only plot 라벨 hover → text tooltip (#6). 라벨 박스 위에선 위에서 series hit 을 비워
@@ -139,6 +158,7 @@ const modules = {
       this.handlePlotLabelHover(plotLabelHit, e);
 
       this._lastHoverSig = hoverSig;
+      this._isEmptyRangeTooltip = isEmptyRangeTooltip;
 
       // 전용 드래그 캔버스를 쓰면 keepDisplay 영역이 그 캔버스에 그대로 남아 있어(매 hover의
       // overlayClear는 메인 overlay만 비움) 여기서 다시 그릴 필요가 없다.
@@ -872,6 +892,13 @@ const modules = {
       }
 
       this.dragInfo = null;
+
+      // 데이터 없이 구간만 띄운 툴팁은 드래그가 끝나면 근거가 사라진다 — keepDisplay: false 면
+      // 밴드까지 지워져 행 없는 헤더만 남는다. 다음 mousemove 를 기다리지 않고 여기서 감춘다.
+      if (this._isEmptyRangeTooltip) {
+        this.hideTooltipDOM();
+        this._isEmptyRangeTooltip = false;
+      }
 
       if (prevUserSelect !== undefined) {
         this.dragStartTarget.style.userSelect = prevUserSelect;

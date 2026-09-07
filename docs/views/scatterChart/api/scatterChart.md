@@ -342,6 +342,7 @@ value-only 상태에서 alias(text)가 가려지므로 hover로 보완(데스크
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
 | startArea | String (CSS Selector) | '' | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. 여러 차트를 사용할 때는 차트마다 고유한 셀렉터를 지정하세요(공통 조상을 지정하면 한 번의 드래그가 모든 차트의 selection을 트리거합니다). | '.chart-wrapper' |
 | displayFromStartArea | Boolean | false | (scatter, PC 전용) 드래그 선택 영역을 캔버스 가장자리가 아니라 `startArea`에서 드래그를 시작한 지점부터 표시합니다. `startArea`가 지정되어야 동작합니다. 선택되는 데이터·`drag-select` range 페이로드는 영향받지 않고 화면 표시만 달라집니다. | true / false |
+| showTooltipOnEmpty | Boolean | false | 드래그 중 커서 위치에 데이터가 없어(막대 사이 간격·값이 `null`인 라벨) hit이 0개인 프레임에서도 `tooltip.formatter.html`을 빈 seriesList와 `{ dragRange }`로 호출해 구간 헤더만 남깁니다. `formatter.html` 경로 전용이며 `tooltip.returnValue`를 쓰면 동작하지 않습니다. | true / false |
 
 - PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
 - `startArea`를 지정하면 캔버스 바깥(지정한 영역 내부)에서 드래그를 시작해도 포인터가 캔버스에 진입하는 순간 선택이 시작됩니다.
@@ -416,6 +417,7 @@ const chartOptions = {
 > - `from` 은 드래그를 시작한 지점, `to` 는 현재 커서 지점의 x축 값입니다. mouseup 때 `drag-select` 가 주는 `range.xMin`/`xMax` 와 **정확히 같은 값**이라(같은 계산을 재사용) 드래그 중 보이는 구간과 최종 결과가 어긋나지 않으며, 데이터 라벨 간격보다 잘게 움직입니다. 시작/현재 순서를 유지하므로 역방향(오른쪽 → 왼쪽) 드래그면 `from` 이 `to` 보다 큽니다.
 > - `range` 와 같은 축 제약을 따릅니다 — `step` 축에서는 값이 `NaN` 입니다.
 > - 드래그 중에는 툴팁·인디케이터·하이라이트가 커서를 따라 갱신됩니다. 단 `mouse-move` 이벤트는 드래그 중 발생하지 않습니다.
+> - 커서 위치에 데이터가 없으면(막대 사이 간격, 값이 `null`인 라벨) hit이 0개라 툴팁이 통째로 사라집니다. `dragSelection.showTooltipOnEmpty: true` 를 주면 그 프레임에서도 `formatter.html` 이 빈 seriesList와 `{ dragRange }` 로 호출되어 구간 헤더만 남습니다. 드래그가 끝나면 이 툴팁은 즉시 사라집니다.
 
 #### returnValue
 

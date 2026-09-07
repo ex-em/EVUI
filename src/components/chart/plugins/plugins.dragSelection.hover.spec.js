@@ -296,6 +296,74 @@ describe('getDragRange', () => {
   });
 });
 
+describe('showTooltipOnEmpty', () => {
+  // 막대 사이 간격·값이 null 인 라벨 위에서는 hit 이 0개다. 드래그 중 그 프레임에서도
+  // 어느 구간을 잡고 있는지는 남아야 한다.
+  const createEmptyHitChart = (showTooltipOnEmpty = false) => {
+    const chart = createChart();
+    chart.options.dragSelection.showTooltipOnEmpty = showTooltipOnEmpty;
+    chart.findHitItem = () => ({ items: {}, hitId: null });
+    return chart;
+  };
+
+  it('켜면 드래그 중 무히트 프레임에서 빈 seriesList 로 구간만 그린다', () => {
+    const chart = createEmptyHitChart(true);
+    const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+
+    expect(chart.drawCustomTooltip).toHaveBeenCalledWith(
+      {},
+      { from: axisValueAt(100), to: axisValueAt(300) },
+    );
+    expect(chart.setCustomTooltipLayoutPosition).toHaveBeenCalled();
+    expect(chart.hideTooltipDOM).not.toHaveBeenCalled();
+  });
+
+  it('기본값에서는 기존대로 툴팁을 감춘다', () => {
+    const chart = createEmptyHitChart();
+    const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+
+    expect(chart.hideTooltipDOM).toHaveBeenCalled();
+    expect(chart.drawCustomTooltip).not.toHaveBeenCalled();
+  });
+
+  it('드래그 중이 아닌 무히트 hover 는 켜져 있어도 감춘다', () => {
+    const chart = createEmptyHitChart(true);
+
+    chart.drawHoverArtifacts({ __pos: [300, 150, 500, 300] });
+
+    expect(chart.hideTooltipDOM).toHaveBeenCalled();
+    expect(chart.drawCustomTooltip).not.toHaveBeenCalled();
+  });
+
+  // keepDisplay: false 면 mouseup 때 밴드까지 지워져, 남은 헤더에는 근거가 하나도 없다.
+  it('드래그가 끝나면 데이터 없이 띄운 구간 툴팁을 감춘다', () => {
+    const chart = createEmptyHitChart(true);
+    const { mousemove, mouseup } = startDrag(chart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+    expect(chart.hideTooltipDOM).not.toHaveBeenCalled();
+
+    mouseup({});
+    expect(chart.hideTooltipDOM).toHaveBeenCalled();
+  });
+
+  it('returnValue 를 쓰면 그리지 않는다 — 소비처가 직접 렌더하는 경로다', () => {
+    const chart = createEmptyHitChart(true);
+    chart.options.tooltip.returnValue = vi.fn();
+    const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+
+    expect(chart.options.tooltip.returnValue).toHaveBeenCalledWith([], expect.anything());
+    expect(chart.drawCustomTooltip).not.toHaveBeenCalled();
+    expect(chart.hideTooltipDOM).toHaveBeenCalled();
+  });
+});
+
 describe('formatter.html 인자', () => {
   const createTooltipChart = (html) =>
     Object.assign(Object.create(tooltipModules), {

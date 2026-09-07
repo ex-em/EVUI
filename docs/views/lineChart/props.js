@@ -107,7 +107,8 @@ export default {
     DragSelection: {
       description:
         'Drag Select 이벤트 등록이 가능 합니다. 드래그하는 동안 툴팁이 커서를 따라 갱신되며, ' +
-        'formatter.html 이 2번째 인자로 드래그 구간을 받습니다',
+        'formatter.html 이 2번째 인자로 드래그 구간을 받습니다. showTooltipOnEmpty 를 켜두어 ' +
+        '값이 비어 있는 구간을 지날 때도 구간 헤더가 남습니다',
       component: DragSelection,
       parsedData: parse(DragSelectionRaw).descriptor,
     },
