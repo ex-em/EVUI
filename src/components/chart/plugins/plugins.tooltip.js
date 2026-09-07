@@ -833,7 +833,10 @@ const modules = {
     // skip-redraw fast path 등으로 커스텀 엘리먼트가 비어 있을 수 있다. 같은 데이터 포인트에
     // 머물러 fast path 가 계속 redraw 를 건너뛰는 경우, 여기서 한 번 그려 복구한다.
     // (엘리먼트가 이미 있는 일반 경로에서는 재draw 하지 않으므로 비용/부작용 없음)
-    if (!customTooltipEl && hitInfo?.items && Object.keys(hitInfo.items).length) {
+    // 드래그 중에는 그 fast path 가 꺼져 있어 이 프레임이 방금 그렸다 — 루트가 비어 있다는 것은
+    // 같은 items 로 다시 불러도 결과가 같다는 뜻이라, 재draw 는 formatter 호출만 늘린다.
+    const isDragging = this.dragInfo?.isMove;
+    if (!customTooltipEl && !isDragging && hitInfo?.items && Object.keys(hitInfo.items).length) {
       this.drawCustomTooltip(hitInfo.items);
       customTooltipEl = this.tooltipDOM.firstElementChild;
     }

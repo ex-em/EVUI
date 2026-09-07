@@ -490,4 +490,27 @@ describe('formatter.html 인자', () => {
 
     warn.mockRestore();
   });
+
+  // 텍스트 노드로 시작하는 마크업은 htmlToElement 가 그 노드만 돌려줘 루트가 비어 보인다 —
+  // setCustomTooltipLayoutPosition 의 복구 재draw 조건이다.
+  it('드래그 중에는 루트가 비어도 복구 재draw 를 하지 않는다', () => {
+    const html = vi.fn(() => 'text<div>t</div>');
+    const chart = createTooltipChart(html);
+    chart.dragInfo = { isMove: true };
+
+    chart.drawCustomTooltip(HIT_ITEMS, { from: 1, to: 2 });
+    chart.setCustomTooltipLayoutPosition({ items: HIT_ITEMS }, {});
+
+    expect(html).toHaveBeenCalledTimes(1);
+  });
+
+  it('드래그가 아니면 복구 재draw 로 한 번 더 그린다', () => {
+    const html = vi.fn(() => 'text<div>t</div>');
+    const chart = createTooltipChart(html);
+
+    chart.drawCustomTooltip(HIT_ITEMS);
+    chart.setCustomTooltipLayoutPosition({ items: HIT_ITEMS }, {});
+
+    expect(html).toHaveBeenCalledTimes(2);
+  });
 });
