@@ -35,6 +35,9 @@ export default {
   setup() {
     const time = dayjs().startOf('hour');
     const labels = Array.from({ length: 25 }, (_, i) => time.add(i * 10, 'second'));
+    // 값이 비어 있는 구간. 드래그가 여기를 지나면 hover hit 이 0개라 툴팁이 사라진다 —
+    // showTooltipOnEmpty 로 구간 헤더만 남는 동작을 확인할 수 있다.
+    const isGap = (i) => i >= 10 && i <= 13;
     const chartData = {
       series: {
         series1: { name: 'series#1' },
@@ -42,8 +45,8 @@ export default {
       },
       labels,
       data: {
-        series1: labels.map((_, i) => Math.round(50 + Math.sin(i / 2) * 40)),
-        series2: labels.map((_, i) => Math.round(50 + Math.cos(i / 3) * 30)),
+        series1: labels.map((_, i) => (isGap(i) ? null : Math.round(50 + Math.sin(i / 2) * 40))),
+        series2: labels.map((_, i) => (isGap(i) ? null : Math.round(50 + Math.cos(i / 3) * 30))),
       },
     };
 
@@ -79,6 +82,8 @@ export default {
       dragSelection: {
         use: true,
         keepDisplay: true,
+        // 데이터가 없는 지점을 지나도 드래그 구간 헤더는 계속 보이게 한다.
+        showTooltipOnEmpty: true,
       },
       tooltip: {
         use: true,
