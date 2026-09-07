@@ -78,6 +78,8 @@ const createChart = (opts = {}) => {
     getTimeLabel: () => null,
     getCurMouseTargetVal: () => ({}),
     hideTooltipDOM: vi.fn(),
+    // 드래그 경로는 debouncedHide 를 우회한 즉시 hide 를 쓴다 (chart.core 의 hideTooltip)
+    hideTooltip: vi.fn(),
     drawIndicatorForTooltip: () => ({ labelValue: 'L2' }),
     findSelectedItems: () => [],
     minMax: { x: [{ min: 0, max: 1000 }], y: [{ min: 0, max: 100 }] },
@@ -175,13 +177,15 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
     expect(chart.lastDragHoverEvent).toBeNull();
   });
 
-  it('커서가 캔버스 밖이면 hover 없이 overlay 를 비우고 밴드만 그린다', () => {
+  // 밴드는 clamp 된 좌표로 계속 갱신되므로, 툴팁을 남기면 밴드와 다른 구간을 가리킨다.
+  it('커서가 캔버스 밖이면 툴팁을 감추고 밴드만 그린다', () => {
     const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
     chart.calls.length = 0;
 
     mousemove(moveEvent([-40, 150, 500, 300]));
 
     expect(chart.calls).toEqual(['overlayClear', 'drawSelectionArea']);
+    expect(chart.hideTooltip).toHaveBeenCalled();
   });
 
   // 예외가 올라오면 overlayClear 뒤라 hover 도 밴드도 없는 빈 프레임이 된다.
@@ -351,25 +355,28 @@ describe('showTooltipOnEmpty', () => {
       { from: axisValueAt(100), to: axisValueAt(300) },
     );
     expect(chart.setCustomTooltipLayoutPosition).toHaveBeenCalled();
-    expect(chart.hideTooltipDOM).not.toHaveBeenCalled();
+    expect(chart.hideTooltip).not.toHaveBeenCalled();
   });
 
-  it('기본값에서는 기존대로 툴팁을 감춘다', () => {
+  // debouncedHide 는 trailing 이라 프레임마다 부르면 타이머가 리셋돼 끝까지 감춰지지 않는다.
+  it('기본값에서는 툴팁을 감춘다 — 드래그 중이므로 debounce 를 타지 않는다', () => {
     const chart = createEmptyHitChart();
     const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
 
     mousemove(moveEvent([300, 150, 500, 300]));
 
-    expect(chart.hideTooltipDOM).toHaveBeenCalled();
+    expect(chart.hideTooltip).toHaveBeenCalled();
+    expect(chart.hideTooltipDOM).not.toHaveBeenCalled();
     expect(chart.drawCustomTooltip).not.toHaveBeenCalled();
   });
 
-  it('드래그 중이 아닌 무히트 hover 는 켜져 있어도 감춘다', () => {
+  it('드래그 중이 아닌 무히트 hover 는 켜져 있어도 감추고, debounce 도 그대로 탄다', () => {
     const chart = createEmptyHitChart(true);
 
     chart.drawHoverArtifacts({ __pos: [300, 150, 500, 300] });
 
     expect(chart.hideTooltipDOM).toHaveBeenCalled();
+    expect(chart.hideTooltip).not.toHaveBeenCalled();
     expect(chart.drawCustomTooltip).not.toHaveBeenCalled();
   });
 
@@ -379,10 +386,10 @@ describe('showTooltipOnEmpty', () => {
     const { mousemove, mouseup } = startDrag(chart, [100, 100, 500, 300]);
 
     mousemove(moveEvent([300, 150, 500, 300]));
-    expect(chart.hideTooltipDOM).not.toHaveBeenCalled();
+    expect(chart.hideTooltip).not.toHaveBeenCalled();
 
     mouseup({});
-    expect(chart.hideTooltipDOM).toHaveBeenCalled();
+    expect(chart.hideTooltip).toHaveBeenCalled();
   });
 
   it('returnValue 를 쓰면 그리지 않는다 — 소비처가 직접 렌더하는 경로다', () => {
@@ -394,7 +401,7 @@ describe('showTooltipOnEmpty', () => {
 
     expect(chart.options.tooltip.returnValue).toHaveBeenCalledWith([], expect.anything());
     expect(chart.drawCustomTooltip).not.toHaveBeenCalled();
-    expect(chart.hideTooltipDOM).toHaveBeenCalled();
+    expect(chart.hideTooltip).toHaveBeenCalled();
   });
 });
 
