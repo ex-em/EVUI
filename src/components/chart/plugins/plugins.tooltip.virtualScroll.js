@@ -345,8 +345,12 @@ const modules = {
         ? opt.formatter.html(seriesList, { dragRange })
         : opt.formatter.html(seriesList);
     } catch (err) {
-      // 사용자 코드의 예외는 가상 스크롤에서 가둬두지 않고 fallback 신호로만 사용
-      console.warn('[evui] tooltip.formatter.html threw, falling back:', err);
+      // 사용자 코드의 예외는 가상 스크롤에서 가둬두지 않고 fallback 신호로만 사용.
+      // 드래그 경로는 프레임마다 이 분기로 들어오므로 경고는 인스턴스당 1회만 남긴다.
+      if (!this._vsWarnedThrow) {
+        this._vsWarnedThrow = true;
+        console.warn('[evui] tooltip.formatter.html threw, falling back:', err);
+      }
       return false;
     }
     const parsed = Util.htmlToElement(htmlString);
