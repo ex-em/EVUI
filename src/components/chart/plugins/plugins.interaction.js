@@ -148,6 +148,10 @@ const modules = {
           this.drawCustomTooltip({}, emptyDragRange);
           this.setCustomTooltipLayoutPosition(hitInfo, e);
           isEmptyRangeTooltip = true;
+        } else if (isDragging) {
+          // 드래그 경로는 프레임마다 hide 를 부르므로 debouncedHide(trailing 200ms)의 타이머가
+          // 매번 리셋돼 툴팁이 끝까지 감춰지지 않는다. 드래그 중에는 즉시 감춘다.
+          this.hideTooltip();
         } else {
           this.hideTooltipDOM();
         }
@@ -840,7 +844,10 @@ const modules = {
         this.lastDragHoverEvent = e;
         this.drawHoverArtifacts(e, true);
       } else {
+        // 밴드는 clamp 된 좌표로 계속 갱신되므로 툴팁을 남기면 헤더가 직전 구간에 얼어붙어
+        // 밴드와 다른 구간을 가리킨다. 즉시 hide 인 이유는 drawHoverArtifacts 쪽 주석 참조.
         this.lastDragHoverEvent = null;
+        this.hideTooltip();
         this.overlayClear();
       }
 
@@ -900,7 +907,7 @@ const modules = {
       // 데이터 없이 구간만 띄운 툴팁은 드래그가 끝나면 근거가 사라진다 — keepDisplay: false 면
       // 밴드까지 지워져 행 없는 헤더만 남는다. 다음 mousemove 를 기다리지 않고 여기서 감춘다.
       if (this._isEmptyRangeTooltip) {
-        this.hideTooltipDOM();
+        this.hideTooltip();
         this._isEmptyRangeTooltip = false;
       }
 
