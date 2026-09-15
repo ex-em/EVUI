@@ -17,6 +17,12 @@
         <span :class="['badge', wideTooltip ? 'on' : 'off']">
           툴팁 {{ tipWidth }}px / 상한 {{ tipMaxWidth }}
         </span>
+        <ev-button @click="toggleTallTooltip">
+          {{ tallTooltip ? '④ 툴팁 높이 되돌리기' : '④ 툴팁을 화면보다 높게 (세로 잘림 조건)' }}
+        </ev-button>
+        <span :class="['badge', tallTooltip ? 'on' : 'off']">
+          툴팁 높이 {{ tipHeight }}px / 화면 {{ viewportHeight }}px
+        </span>
         <span v-if="wideBody && scrollX > 0" class="badge warn">
           가로 스크롤을 왼쪽 끝으로 (현재 {{ scrollX }}px)
         </span>
@@ -24,8 +30,12 @@
 
       <div class="row">
         <div :class="['verdict', nowState]">
-          <b>툴팁 위치</b>
+          <b>가로 — 툴팁 위치</b>
           <span>{{ nowText }}</span>
+        </div>
+        <div :class="['verdict', vertState]">
+          <b>세로 — 툴팁 상단</b>
+          <span>{{ vertText }}</span>
         </div>
       </div>
 
@@ -55,11 +65,21 @@
         이름이면 행이 통째로 삐져나가고 <strong>오른쪽 값 칸이 잘려 나갑니다</strong>. 폭이 모자라면
         뭔가는 잘려야 하지만 그게 값이어서는 안 되니, 이름을 <code>…</code>로 줄여 값을 남깁니다.
       </p>
+      <p class="hint">
+        ④는 <strong>세로</strong> 경우입니다 — 툴팁 상한을 화면 높이의 90% 로 올려 커서 위 공간보다
+        높게 만듭니다. 차트가 화면 아래에 고정돼 있어 커서 아래에 자리가 없으니 툴팁이 위로
+        반전되는데, 반전 좌표 <code>커서 y - 툴팁 높이 - 20</code> 가 음수가 되는 조합입니다.
+        가로는 남은 폭을 <code>max-width</code> 상한으로 막지만 세로에는 높이 상한이 없으므로,
+        대신 좌표에 <strong>가시 영역 상단을 하한</strong>으로 겁니다 — 툴팁 상단이 화면 위로
+        나가지 않아야 정상입니다. 하한에 걸린 툴팁은 커서를 덮게 되는데, 잘려서 못 읽는 것보다는
+        낫다고 보고 택한 절충입니다.
+      </p>
       <p class="hint sub">
         마우스를 좌우로 <strong>빠르게</strong> 훑으면 배치 이후 툴팁이 넓어지는 경로도 같이
         재현됩니다 — 문서 폭을 늘린 프레임 {{ overFrames }}회 / 최대 {{ maxOver }}px.
         <a @click="resetProbe">리셋</a>
       </p>
+      <p class="hint sub">세로는 상단이 잘린 프레임 {{ clipFrames }}회 / 최대 {{ maxClip }}px.</p>
     </div>
 
     <div :class="['chart-card', chartSide]">
@@ -121,6 +141,8 @@ export default {
           .join('')}</div>
       </div>`;
 
+    const BASE_MAX_HEIGHT = 300;
+
     const chartOptions = reactive({
       type: 'line',
       width: '100%',
@@ -131,23 +153,29 @@ export default {
       tooltip: {
         use: true,
         useScrollbar: true,
-        maxHeight: 300,
+        maxHeight: BASE_MAX_HEIGHT,
         htmlScrollTarget: '.ev-chart-tooltip-custom__body',
         formatter: { html: htmlFormatter },
       },
     });
 
     const wideBody = ref(false);
+    const tallTooltip = ref(false);
     const chartSide = ref('right');
     const bodyWidth = ref(0);
     const viewportWidth = ref(0);
+    const viewportHeight = ref(0);
     const scrollX = ref(0);
     const nowOver = ref(0);
     const tipWidth = ref(0);
+    const tipHeight = ref(0);
     const tipMaxWidth = ref('-');
+    const clippedTop = ref(0);
     const tooltipShown = ref(false);
     const overFrames = ref(0);
     const maxOver = ref(0);
+    const clipFrames = ref(0);
+    const maxClip = ref(0);
 
     let baseScrollWidth = 0;
     let rafId = null;
@@ -155,6 +183,8 @@ export default {
     const resetProbe = () => {
       overFrames.value = 0;
       maxOver.value = 0;
+      clipFrames.value = 0;
+      maxClip.value = 0;
       baseScrollWidth = document.documentElement.scrollWidth;
     };
 
@@ -170,11 +200,23 @@ export default {
       resetProbe();
     };
 
+    // 위로 반전된 툴팁이 커서 위 공간보다 높아야 상단이 잘린다. 차트가 화면 아래에 붙어 있어
+    // 커서 위 공간이 화면 높이에 가까우므로 상한도 그만큼 올린다 — 고정값이면 큰 화면에서
+    // 툴팁이 낮아 반전해도 화면 안에 들어간다.
+    const toggleTallTooltip = () => {
+      tallTooltip.value = !tallTooltip.value;
+      chartOptions.tooltip.maxHeight = tallTooltip.value
+        ? Math.round(document.documentElement.clientHeight * 0.9)
+        : BASE_MAX_HEIGHT;
+      resetProbe();
+    };
+
     const watchFrame = () => {
       const doc = document.documentElement;
 
       bodyWidth.value = document.body.clientWidth;
       viewportWidth.value = doc.clientWidth;
+      viewportHeight.value = doc.clientHeight;
       scrollX.value = Math.round(window.scrollX);
 
       const dom = [...document.querySelectorAll('.ev-chart-tooltip')].find(
@@ -187,10 +229,16 @@ export default {
         nowOver.value = Math.max(0, Math.round(rect.right - viewportWidth.value));
         tipWidth.value = Math.round(rect.width);
         tipMaxWidth.value = dom.style.maxWidth || '-';
+        // 툴팁은 문서 좌표로 배치되지만, 가시 영역을 벗어났는지는 스크롤 위치와 무관하게
+        // 뷰포트 기준 top 이 음수인지로 드러난다.
+        tipHeight.value = Math.round(rect.height);
+        clippedTop.value = Math.max(0, Math.round(-rect.top));
       } else {
         nowOver.value = 0;
         tipWidth.value = 0;
         tipMaxWidth.value = '-';
+        tipHeight.value = 0;
+        clippedTop.value = 0;
         // 툴팁이 없는 프레임의 문서 폭이 기준선 — 페이지 자체의 가로 스크롤을 상쇄한다.
         baseScrollWidth = doc.scrollWidth;
       }
@@ -199,6 +247,11 @@ export default {
       if (grew > 0) {
         overFrames.value += 1;
         maxOver.value = Math.max(maxOver.value, grew);
+      }
+
+      if (clippedTop.value > 0) {
+        clipFrames.value += 1;
+        maxClip.value = Math.max(maxClip.value, clippedTop.value);
       }
 
       rafId = requestAnimationFrame(watchFrame);
@@ -221,16 +274,22 @@ export default {
       chartOptions,
       wideBody,
       wideTooltip,
+      tallTooltip,
       tipWidth,
+      tipHeight,
       tipMaxWidth,
       chartSide,
       toggleSide,
       bodyWidth,
       viewportWidth,
+      viewportHeight,
       scrollX,
       overFrames,
       maxOver,
+      clipFrames,
+      maxClip,
       toggleWideBody,
+      toggleTallTooltip,
       resetProbe,
       nowState: computed(() => {
         if (!tooltipShown.value) return 'idle';
@@ -239,6 +298,14 @@ export default {
       nowText: computed(() => {
         if (!tooltipShown.value) return '차트에 마우스를 올려주세요';
         return nowOver.value > 0 ? `화면 밖으로 ${nowOver.value}px 넘침` : '화면 안';
+      }),
+      vertState: computed(() => {
+        if (!tooltipShown.value) return 'idle';
+        return clippedTop.value > 0 ? 'bad' : 'good';
+      }),
+      vertText: computed(() => {
+        if (!tooltipShown.value) return '차트에 마우스를 올려주세요';
+        return clippedTop.value > 0 ? `화면 위로 ${clippedTop.value}px 잘림` : '화면 안';
       }),
     };
   },
