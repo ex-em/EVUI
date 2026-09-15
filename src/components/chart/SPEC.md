@@ -66,6 +66,9 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - axes-data-max-change 는 바인딩 시에만 show 된 series 유한 최대값(없으면 null)을 emit 한다 (chart.core.emitDataMax.spec.js).
 - normalizeData 는 원본을 변형하지 않고, cloneChartData 는 불변 날짜 참조를 공유한다 (Chart.normalizeData.spec.js, Chart.cloneChartData.spec.js).
 - 차트 타입별 시각 산출물이 스크린샷 베이스라인과 일치한다 (Chart.visual.spec.js — browser config, `__screenshots__/`).
+- 커스텀 툴팁 hover 중 tooltipDOM 이 가시 영역을 벗어나 `documentElement.scrollWidth` 를 늘리지 않는다 — body 가 뷰포트보다 넓은 레이아웃 포함 (chart.tooltipOverflow.visual.spec.js — browser config). 배치 규칙 상세는 [./plugins/SPEC.md](./plugins/SPEC.md) Business Rules 2·3.
+- 커서가 한 방향으로 이동하는 동안 툴팁의 좌우 배치는 최대 1회만 바뀐다 — hover 지점마다 폭이 달라져도 같다 (chart.tooltipFlip.visual.spec.js — browser config).
+- 배치 이후 툴팁 폭이 커져도 툴팁이 커서를 가로로 덮지 않는다 (chart.tooltipFlip.visual.spec.js).
 
 ## Architecture
 

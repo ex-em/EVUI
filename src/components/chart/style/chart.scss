@@ -298,6 +298,9 @@
 .ev-chart-tooltip {
   position: absolute;
   z-index: 850;
+  // 배치 시 거는 폭 상한에 테두리가 포함되도록 고정한다.
+  // 호스트 앱 전역 리셋 유무로 기준이 달라지면 상한이 테두리만큼 새어 나간다.
+  box-sizing: border-box;
   top: 0;
   left: 0;
   will-change: transform;
