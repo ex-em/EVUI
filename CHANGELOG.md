@@ -1,3 +1,20 @@
+# [3.20.0](https://github.com/ex-em/EVUI/compare/3.19.1...3.20.0) (2026-09-15)
+
+
+### Bug Fixes
+
+* **chart:** drag-select 가 스크롤 윈도우 밖 막대를 담는 문제 ([0be2e84](https://github.com/ex-em/EVUI/commit/0be2e84bc383b01efd954ae317db5cf92db04773))
+* **chart:** drag-select 리스너·zoom 없을 때 mouseup 크래시 가드 ([0a635eb](https://github.com/ex-em/EVUI/commit/0a635ebb74563a57964413a58364fe72b745de1a))
+* **chart:** 축 없는 구성의 drag-select mouseup 크래시 가드 ([a761169](https://github.com/ex-em/EVUI/commit/a761169309830dc0c6f184f222b0212b9ffda22b))
+* **docs:** 플레이그라운드 Apply 시 함수 옵션이 터지는 문제 수정 ([30a04c1](https://github.com/ex-em/EVUI/commit/30a04c1cda0d5b5ea084ec3f623e4dfc852d67bf))
+
+
+### Features
+
+* **chart:** bar 차트 drag-select 진입 허용 (수직 막대) ([dcd825d](https://github.com/ex-em/EVUI/commit/dcd825d6faae00fbda2079417b9026951279a70b)), closes [#2337](https://github.com/ex-em/EVUI/issues/2337)
+* **chart:** drag-select data 에 막대 수집 (Bar.findItems 추가) ([44f8b82](https://github.com/ex-em/EVUI/commit/44f8b8282661fa5559f0021e3c2de70ca0a303d1))
+* **chart:** drag-select 진입 게이트에 콤보 차트 추가 ([09122dc](https://github.com/ex-em/EVUI/commit/09122dc718e7213054450bc7de59d332d6650c45))
+
 ## [3.19.1](https://github.com/ex-em/EVUI/compare/3.19.0...3.19.1) (2026-08-26)
 
 
