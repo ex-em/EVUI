@@ -48,6 +48,13 @@
         끌고 가도 상한이 0 이 되어 툴팁이 테두리만 남는 일이 없어야 하고, 좌우로 훑을 때 방향이
         커서 위치 기준으로 <strong>한 번만</strong> 바뀌어야 합니다.
       </p>
+      <p class="hint">
+        ③에서는 이 예제가 시리즈 이름에 <code>min-width: 0; overflow: hidden; text-overflow:
+        ellipsis</code>를 함께 얹습니다. 라이브러리 기본 스타일의 <code>.series-name { flex: auto }</code>는
+        flex 기본값 <code>min-width: auto</code> 탓에 min-content 아래로 못 줄어들어, 공백 없는 긴
+        이름이면 행이 통째로 삐져나가고 <strong>오른쪽 값 칸이 잘려 나갑니다</strong>. 폭이 모자라면
+        뭔가는 잘려야 하지만 그게 값이어서는 안 되니, 이름을 <code>…</code>로 줄여 값을 남깁니다.
+      </p>
       <p class="hint sub">
         마우스를 좌우로 <strong>빠르게</strong> 훑으면 배치 이후 툴팁이 넓어지는 경로도 같이
         재현됩니다 — 문서 폭을 늘린 프레임 {{ overFrames }}회 / 최대 {{ maxOver }}px.
@@ -89,6 +96,15 @@ export default {
 
     // hover 지점마다 가장 긴 행의 폭이 달라져야 배치 이후 확대 경로가 재현된다.
     const wideTooltip = ref(false);
+    // 툴팁 DOM 은 body 직속이라 scoped style 이 닿지 않는다. formatter 가 만드는 마크업에
+    // 직접 얹어 이 예제에서만 라이브러리 기본 스타일(.series-name { flex: auto })을 덮는다.
+    // flex 아이템 기본 min-width: auto 때문에 공백 없는 긴 이름은 min-content 아래로 못 줄어들고,
+    // 행이 통째로 삐져나가 오른쪽에 있는 값 칸이 잘려 나간다.
+    const nameStyle = () =>
+      wideTooltip.value
+        ? ' style="min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"'
+        : '';
+
     const htmlFormatter = (seriesList) =>
       `<div class="ev-chart-tooltip-custom">
         <div class="ev-chart-tooltip-custom__header">폭이 변하는 툴팁</div>
@@ -98,7 +114,7 @@ export default {
             const base = wideTooltip.value ? 200 : 3;
             const pad = 'x'.repeat(base + (((s.index ?? 0) * 9 + (s.sId?.length ?? 0) * 7) % 52));
             return `<div class="row" data-evui-tooltip-row>
-                <span class="series-name">${s.name}-${pad}</span>
+                <span class="series-name"${nameStyle()}>${s.name}-${pad}</span>
                 <span class="value">${s?.data?.y ?? '-'}</span>
               </div>`;
           })
