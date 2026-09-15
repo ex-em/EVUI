@@ -862,10 +862,17 @@ const modules = {
     this._tooltipFlipX = flipX;
 
     const anchorX = flipX ? leftAnchorX : rightAnchorX;
+
     const expectedPosY = mouseY + distanceMouseAndTooltip;
-    const maximumPosY = view.bottom - height - distanceMouseAndTooltip;
-    const posY =
-      expectedPosY > maximumPosY ? mouseY - height - distanceMouseAndTooltip : expectedPosY;
+    const roomBelow = view.bottom - expectedPosY;
+    const roomAbove = mouseY - distanceMouseAndTooltip - view.top;
+    // 아래에 안 들어가면 위로 반전한다. 가로와 달리 세로는 높이 상한을 걸지 않으므로(DECISIONS
+    // 2026-09-14), 양쪽 모두 안 들어가는 경우까지 남은 공간이 넓은 쪽을 택하고 가시 영역 상단을
+    // 하한으로 걸어야 반전 좌표가 음수가 돼 상단이 잘리는 것을 막을 수 있다.
+    const flipY = height > roomBelow && roomAbove > roomBelow;
+    const posY = flipY
+      ? Math.max(view.top, mouseY - height - distanceMouseAndTooltip)
+      : expectedPosY;
 
     // 상한도 앵커 기준이다 — 반전이면 앵커에서 가시 영역 좌단까지, 아니면 우단까지.
     this.tooltipDOM.style.maxWidth = `${flipX ? roomLeft : roomRight}px`;

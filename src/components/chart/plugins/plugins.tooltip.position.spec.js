@@ -339,3 +339,52 @@ describe('측정 시점에는 폭 상한이 걸려 있지 않다', () => {
     expect(atFormatterCall).toBe('');
   });
 });
+
+describe('세로 배치', () => {
+  beforeEach(() => {
+    setViewport(VIEW_W, VIEW_H);
+    setScroll(0, 0);
+    Object.defineProperty(document.body, 'clientWidth', { value: VIEW_W, configurable: true });
+  });
+  afterEach(() => {
+    setViewport(0, 0);
+    setScroll(0, 0);
+  });
+
+  it('아래에 들어가면 커서 아래에 둔다', () => {
+    const chart = createChart({ width: TIP_W, height: 120 });
+    chart.setCustomTooltipLayoutPosition({}, { pageX: 400, pageY: 100 });
+
+    expect(getTranslate(chart.tooltipDOM).y).toBe(120);
+  });
+
+  it('아래 공간이 모자라면 위로 반전한다', () => {
+    const chart = createChart({ width: TIP_W, height: 120 });
+    chart.setCustomTooltipLayoutPosition({}, { pageX: 400, pageY: 750 });
+
+    expect(getTranslate(chart.tooltipDOM).y).toBe(750 - 120 - 20);
+  });
+
+  it('반전해도 위 공간이 모자라면 가시 영역 상단 밖으로 나가지 않는다', () => {
+    const chart = createChart({ width: TIP_W, height: 700 });
+    chart.setCustomTooltipLayoutPosition({}, { pageX: 400, pageY: 700 });
+
+    expect(getTranslate(chart.tooltipDOM).y).toBe(0);
+  });
+
+  it('세로로 스크롤된 문서에서는 하한도 스크롤된 가시 영역 상단이다', () => {
+    setScroll(0, 500);
+    const chart = createChart({ width: TIP_W, height: 700 });
+    chart.setCustomTooltipLayoutPosition({}, { pageX: 400, pageY: 1200 });
+
+    expect(getTranslate(chart.tooltipDOM).y).toBe(500);
+  });
+
+  it('툴팁이 가시 영역보다 높으면 남은 공간이 넓은 쪽에 둔다', () => {
+    // 위(80px)보다 아래(680px)가 넓으므로, 위로 반전해 커서를 덮지 않고 아래에 그대로 둔다.
+    const chart = createChart({ width: TIP_W, height: 900 });
+    chart.setCustomTooltipLayoutPosition({}, { pageX: 400, pageY: 100 });
+
+    expect(getTranslate(chart.tooltipDOM).y).toBe(120);
+  });
+});
