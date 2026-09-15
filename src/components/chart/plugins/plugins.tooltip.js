@@ -4,6 +4,26 @@ import debounce from '@/common/utils.debounce';
 import Canvas from '../helpers/helpers.canvas';
 import Util from '../helpers/helpers.util';
 
+/**
+ * 문서 좌표계로 표현한 가시 영역(뷰포트).
+ * tooltipDOM 은 body 직속 absolute 라 좌표는 문서 기준인데, 배치 한계는 "지금 보이는 화면"이어야 한다.
+ * `document.body.clientWidth` 는 body 가 뷰포트보다 넓은 레이아웃에서 크게 어긋난다.
+ *
+ * @returns {{left: number, top: number, right: number, bottom: number}} 가시 영역 (문서 좌표)
+ */
+const getVisibleDocumentRect = () => {
+  const doc = document.documentElement;
+  const left = window.scrollX ?? 0;
+  const top = window.scrollY ?? 0;
+
+  return {
+    left,
+    top,
+    right: left + (doc?.clientWidth || window.innerWidth || 0),
+    bottom: top + (doc?.clientHeight || window.innerHeight || 0),
+  };
+};
+
 const LINE_SPACING = 8;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
@@ -40,10 +60,12 @@ const modules = {
     if (this.options.tooltip.debouncedHide) {
       this.hideTooltipDOM = debounce(() => {
         this.tooltipDOM.style.display = 'none';
+        this.resetTooltipPlacement();
       }, 200);
     } else {
       this.hideTooltipDOM = () => {
         this.tooltipDOM.style.display = 'none';
+        this.resetTooltipPlacement();
       };
     }
     this.isInitTooltip = true;
@@ -263,25 +285,17 @@ const modules = {
     this.tooltipHeaderDOM.style.height = 'auto';
     this.tooltipDOM.style.height = 'auto';
     this.tooltipBodyDOM.style.height = `${contentsHeight + 6}px`;
+    // 직전 배치가 걸어둔 폭 상한이 남아 있으면 자연 폭보다 작게 측정된다.
+    this.tooltipDOM.style.maxWidth = '';
     this.tooltipDOM.style.display = 'block';
 
-    // set tooltipDOM's positions
-    const bodyWidth = document.body.clientWidth;
-    const bodyHeight = document.body.clientHeight;
-    const distanceMouseAndTooltip = 20;
     const tooltipDOMHeight =
       this.tooltipDOM?.offsetHeight ||
       this.tooltipHeaderDOM?.offsetHeight + contentsHeight + BODY_PADDING;
-    const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
-    const maximumPosY = bodyHeight - tooltipDOMHeight - distanceMouseAndTooltip;
-    const expectedPosX = mouseX + distanceMouseAndTooltip;
-    const expectedPosY = mouseY + distanceMouseAndTooltip;
-    const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
-    const reversedPosY = mouseY - tooltipDOMHeight - distanceMouseAndTooltip;
-    const posX = expectedPosX > maximumPosX ? reversedPosX : expectedPosX;
-    const posY = expectedPosY > maximumPosY ? reversedPosY : expectedPosY;
-    // left/top 대신 transform을 사용해 합성(compositor) 레이어에서 이동시켜 레이아웃/리페인트를 회피한다.
-    this.tooltipDOM.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
+    // 상한은 테두리를 포함한 tooltipDOM 전체에 걸리므로 반전 판정도 실측 폭으로 한다.
+    // contentsWidth 는 canvas 폭이어서 header padding·테두리만큼 작다(호스트 전역 리셋 유무에 따라 최대 34px).
+    const tooltipDOMWidth = this.tooltipDOM?.offsetWidth || contentsWidth;
+    this.placeTooltipDOM(mouseX, mouseY, tooltipDOMWidth, tooltipDOMHeight);
   },
 
   /**
@@ -785,26 +799,84 @@ const modules = {
       return;
     }
 
+    // 직전 배치가 걸어둔 폭 상한이 남아 있으면 자연 폭보다 작게 측정된다.
+    this.tooltipDOM.style.maxWidth = '';
     this.tooltipDOM.style.display = 'block';
-    const contentsWidth = customTooltipEl.offsetWidth;
     const contentsHeight = customTooltipEl.offsetHeight;
 
     this.tooltipDOM.style.height = 'auto';
     this.tooltipBodyDOM.style.height = `${contentsHeight + 6}px`;
 
-    const bodyWidth = document.body.clientWidth;
-    const bodyHeight = document.body.clientHeight;
+    // 상한이 tooltipDOM 에 걸리므로 판정도 자식(customTooltipEl)이 아닌 tooltipDOM 실측 폭으로 한다
+    // — 커스텀 경로는 인라인 `border: 1px` 가 붙어 자식 폭보다 2px 넓다.
     const tooltipDOMSize = this.tooltipDOM?.getBoundingClientRect();
+    this.placeTooltipDOM(mouseX, mouseY, tooltipDOMSize?.width, tooltipDOMSize?.height);
+  },
+
+  /**
+   * 커서 옆 20px 에 툴팁을 두되, 가시 영역을 넘으면 반대 방향으로 반전한다.
+   * 배치 지점에서 가시 영역 끝까지 남은 폭을 `max-width` 상한으로 걸어, 배치 이후 내용이 넓어지는
+   * 경로(가상 스크롤 rAF 렌더·내부 스크롤바 출현·웹폰트 적용)에서도 레이아웃 단계에서 넘지 못하게 한다
+   * — 사후 교정은 한 프레임 늦어 넘친 프레임이 그대로 그려진다(문서 가로 스크롤바 깜빡임).
+   *
+   * 가로 반전은 매 호출의 폭으로 다시 판정하지 않고 직전 방향을 유지한다. 폭은 hover 지점마다
+   * 달라지므로(시리즈 이름·값 길이), 그때그때 판정하면 커서가 한 방향으로 움직이는 동안에도
+   * 좌우가 번갈아 뒤집힌다 — 실측에서 폭 533→253 구간에 왼쪽→오른쪽 복귀가 잡혔다.
+   *
+   * 반전 배치는 좌표 대신 `translateX(-100%)` 로 **우단을 커서 왼쪽 20px 에 고정**한다.
+   * 좌측을 `커서 - 폭 - 20` 으로 잡으면 배치 이후 폭이 커지는 경로(가상 스크롤 재렌더·
+   * ResizeObserver 재측정)에서 툴팁이 커서 쪽으로 자라 커서를 덮는다 — 실측에서 배치 폭 404,
+   * 직후 실제 폭 471(+65px)로 우단이 커서를 넘었다. 우단을 고정하면 왼쪽으로만 늘어난다.
+   *
+   * @param {number} mouseX  커서 pageX
+   * @param {number} mouseY  커서 pageY
+   * @param {number} width   tooltipDOM 실측 폭(테두리 포함) — 상한이 tooltipDOM 에 걸리므로 기준을 맞춘다
+   * @param {number} height  tooltipDOM 실측 높이
+   *
+   * @returns {undefined}
+   */
+  placeTooltipDOM(mouseX, mouseY, width, height) {
+    // 표시 직전이므로 예약된 debounce 숨김을 취소한다. 남겨두면 200ms 뒤 보이는 툴팁을 숨기고
+    // 방향 기억까지 지워, 다음 배치가 반대편으로 튄다.
+    this.hideTooltipDOM?.cancel?.();
+
+    const view = getVisibleDocumentRect();
     const distanceMouseAndTooltip = 20;
-    const maximumPosX = bodyWidth - contentsWidth - distanceMouseAndTooltip;
-    const maximumPosY = bodyHeight - tooltipDOMSize?.height - distanceMouseAndTooltip;
-    const expectedPosX = mouseX + distanceMouseAndTooltip;
+    const rightAnchorX = mouseX + distanceMouseAndTooltip;
+    const leftAnchorX = mouseX - distanceMouseAndTooltip;
+    // 앵커에서 가시 영역 끝까지 남은 폭. 둘의 합은 항상 `가시 폭 - 40` 이라 한쪽은 반드시 양수다.
+    const roomRight = view.right - rightAnchorX;
+    const roomLeft = leftAnchorX - view.left;
+    const fitsRight = width <= roomRight;
+    const fitsLeft = width <= roomLeft;
+
+    // 지금 방향으로 두면 가시 영역을 벗어나는 경우에만 전환한다(히스테리시스).
+    // 단 어느 쪽에도 안 들어가면(툴팁이 가시 영역보다 넓음) 남은 폭이 넓은 쪽을 택한다 — 커서 위치만
+    // 보는 판정이라 폭 변동에 흔들리지 않고, 상한이 0 이하가 되는 조합도 생기지 않는다.
+    let flipX;
+    if (!fitsRight && !fitsLeft) {
+      flipX = roomLeft > roomRight;
+    } else {
+      flipX = this._tooltipFlipX ? fitsLeft : !fitsRight;
+    }
+    this._tooltipFlipX = flipX;
+
+    const anchorX = flipX ? leftAnchorX : rightAnchorX;
     const expectedPosY = mouseY + distanceMouseAndTooltip;
-    const reversedPosX = mouseX - contentsWidth - distanceMouseAndTooltip;
-    const reversedPosY = mouseY - tooltipDOMSize?.height - distanceMouseAndTooltip;
-    const posX = expectedPosX > maximumPosX ? reversedPosX : expectedPosX;
-    const posY = expectedPosY > maximumPosY ? reversedPosY : expectedPosY;
-    this.tooltipDOM.style.transform = `translate3d(${posX}px, ${posY}px, 0)`;
+    const maximumPosY = view.bottom - height - distanceMouseAndTooltip;
+    const posY =
+      expectedPosY > maximumPosY ? mouseY - height - distanceMouseAndTooltip : expectedPosY;
+
+    // 상한도 앵커 기준이다 — 반전이면 앵커에서 가시 영역 좌단까지, 아니면 우단까지.
+    this.tooltipDOM.style.maxWidth = `${flipX ? roomLeft : roomRight}px`;
+    // left/top 대신 transform을 사용해 합성(compositor) 레이어에서 이동시켜 레이아웃/리페인트를 회피한다.
+    this.tooltipDOM.style.transform = flipX
+      ? `translate3d(${anchorX}px, ${posY}px, 0) translateX(-100%)`
+      : `translate3d(${anchorX}px, ${posY}px, 0)`;
+  },
+
+  resetTooltipPlacement() {
+    this._tooltipFlipX = false;
   },
 
   /**
@@ -815,6 +887,10 @@ const modules = {
   drawCustomTooltip(hitInfoItems) {
     const opt = this.options?.tooltip;
     if (!opt?.formatter?.html) return;
+
+    // 가상 스크롤 행 높이 실측(_measureVisibleCustomTooltipRows)이 직전 배치의 폭 상한에 눌려
+    // 줄바꿈된 높이로 굳는 것을 막는다 — 상한이 풀리면 폭 변화로 측정이 통째로 무효화된다.
+    this.tooltipDOM.style.maxWidth = '';
 
     const itemsCount = Object.keys(hitInfoItems).length;
 
@@ -1178,6 +1254,7 @@ const modules = {
     );
 
     this.tooltipDOM.style.display = 'none';
+    this.resetTooltipPlacement();
   },
 
   /**

@@ -18,6 +18,8 @@ import CustomTooltip from './example/CustomTooltip';
 import CustomTooltipRaw from './example/CustomTooltip?raw';
 import ExternalTooltip from './example/ExternalTooltip';
 import ExternalTooltipRaw from './example/ExternalTooltip?raw';
+import TooltipOverflowGuard from './example/TooltipOverflowGuard';
+import TooltipOverflowGuardRaw from './example/TooltipOverflowGuard?raw';
 import PlotLine from './example/PlotLine';
 import PlotLineRaw from './example/PlotLine?raw';
 import SelectLabel from './example/SelectLabel';
@@ -122,10 +124,12 @@ export default {
       component: ExternalTooltip,
       parsedData: parse(ExternalTooltipRaw).descriptor,
     },
-    'External Tooltip': {
-      description: 'Tooltip의 내용을 외부에서 제어할 수 있습니다.',
-      component: ExternalTooltip,
-      parsedData: parse(ExternalTooltipRaw).descriptor,
+    'Tooltip Overflow Guard': {
+      description:
+        'body가 화면보다 넓은 레이아웃(min-width 하한 등)에서 Tooltip이 화면 밖으로 나가 가로 스크롤을 만들던 문제를 확인합니다. 버튼으로 재현 조건을 켠 뒤, 차트 오른쪽 끝에서 툴팁이 화면 안에 머무는지 봅니다.',
+      component: TooltipOverflowGuard,
+      parsedData: parse(TooltipOverflowGuardRaw).descriptor,
+      devOnly: true,
     },
     'Plot line & Plot band': {
       description: '차트 배경에 선 및 영역을 표시할 수 있습니다.',
