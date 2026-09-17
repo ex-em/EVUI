@@ -24,6 +24,25 @@ const getVisibleDocumentRect = () => {
   };
 };
 
+/**
+ * 상한이 실제로 툴팁 폭을 구속할 때만 쓰는 양자화. 상한은 커서 좌표의 함수라 1px 이동마다 값이
+ * 달라지는데, 구속되는 구간에서는 그 값이 그대로 툴팁의 used width 가 되어 가상 스크롤의
+ * 폭 감시 ResizeObserver(`plugins.tooltip.virtualScroll`)를 매 mousemove 발화시킨다 —
+ * 행 측정 전량 무효화 + prefix sum 재계산 + 앵커 보정으로 커서만 움직여도 내부 스크롤이 흔들린다.
+ * `floor` 라 항상 남은 폭 이하여서 넘침 차단은 그대로다.
+ *
+ * 구속되지 않는 구간(`width <= room`)에는 적용하지 않는다 — 상한을 실측 폭 아래로 내려
+ * 멀쩡히 들어가던 내용을 줄바꿈시키고, 없던 RO 발화를 새로 만든다.
+ *
+ * @param {number} room  앵커에서 가시 영역 끝까지 남은 폭
+ * @returns {number} STEP 배수로 내림한 상한
+ */
+const quantizeTooltipMaxWidth = (room) => {
+  const STEP = 16;
+
+  return Math.floor(room / STEP) * STEP;
+};
+
 const LINE_SPACING = 8;
 const VALUE_MARGIN = 50;
 const SCROLL_WIDTH = 17;
@@ -875,7 +894,8 @@ const modules = {
       : expectedPosY;
 
     // 상한도 앵커 기준이다 — 반전이면 앵커에서 가시 영역 좌단까지, 아니면 우단까지.
-    this.tooltipDOM.style.maxWidth = `${flipX ? roomLeft : roomRight}px`;
+    const room = flipX ? roomLeft : roomRight;
+    this.tooltipDOM.style.maxWidth = `${width <= room ? room : quantizeTooltipMaxWidth(room)}px`;
     // left/top 대신 transform을 사용해 합성(compositor) 레이어에서 이동시켜 레이아웃/리페인트를 회피한다.
     this.tooltipDOM.style.transform = flipX
       ? `translate3d(${anchorX}px, ${posY}px, 0) translateX(-100%)`

@@ -264,7 +264,8 @@ describe('툴팁 좌우 배치 안정성', () => {
 
     // 넓은 쪽 여유는 두 여유의 합(`가시 폭 - 40`)의 절반 이상이다. 폭 판정만으로 한쪽을 고정하면
     // 커서가 그 반대편으로 갈수록 상한이 0 에 수렴한다(수정 전 실측: 22 → 14 → 6px).
-    expect(samples.filter((s) => s.maxWidth < (viewport - 40) / 2)).toEqual([]);
+    // 상한이 구속되는 구간이라 16px 단위로 내림된다 — 경계에서 그만큼 여유를 둔다.
+    expect(samples.filter((s) => s.maxWidth < (viewport - 40) / 2 - 16)).toEqual([]);
     expect(samples.filter((s) => s.left < -0.5 || s.right > viewport + 0.5)).toEqual([]);
     expect(samples.filter((s) => s.scrollWidth !== 0)).toEqual([]);
     expect(countFlipChanges(samples)).toBeLessThanOrEqual(1);

@@ -168,11 +168,11 @@ describe('가로 반전 방향 유지', () => {
     // 커서가 가시 영역 중앙 왼쪽이라 오른쪽 여유(660)가 왼쪽(580)보다 넓다.
     chart.setCustomTooltipLayoutPosition({}, { pageX: 600, pageY: 100 });
     expect(getPlacement(chart.tooltipDOM).flipped).toBe(false);
-    expect(chart.tooltipDOM.style.maxWidth).toBe(`${VIEW_W - 620}px`);
+    expect(chart.tooltipDOM.style.maxWidth).toBe('656px');
 
     chart.setCustomTooltipLayoutPosition({}, { pageX: 700, pageY: 100 });
     expect(getPlacement(chart.tooltipDOM).flipped).toBe(true);
-    expect(chart.tooltipDOM.style.maxWidth).toBe('680px');
+    expect(chart.tooltipDOM.style.maxWidth).toBe('672px');
   });
 
   it('양쪽 모두 안 들어갈 때 커서가 우단 20px 안이어도 상한이 0 이 되지 않는다', () => {
@@ -180,7 +180,32 @@ describe('가로 반전 방향 유지', () => {
     const chart = createChart({ width: VIEW_W + 200 });
     chart.setCustomTooltipLayoutPosition({}, { pageX: VIEW_W - 5, pageY: 100 });
 
-    expect(Number.parseFloat(chart.tooltipDOM.style.maxWidth)).toBe(VIEW_W - 25);
+    expect(Number.parseFloat(chart.tooltipDOM.style.maxWidth)).toBe(1248);
+  });
+
+  it('상한이 구속되는 구간에서는 커서가 조금 움직여도 상한 값이 그대로다', () => {
+    // 상한이 1px 마다 달라지면 그 값이 곧 툴팁의 used width 라, 가상 스크롤의 폭 감시
+    // ResizeObserver 가 mousemove 마다 행 측정을 통째로 무효화한다.
+    const chart = createChart({ width: VIEW_W + 200 });
+    const seen = new Set();
+    for (let pageX = 700; pageX < 764; pageX += 1) {
+      chart.setCustomTooltipLayoutPosition({}, { pageX, pageY: 100 });
+      seen.add(chart.tooltipDOM.style.maxWidth);
+
+      // 양자화는 내림이라 남은 폭(= 앵커에서 가시 영역 좌단까지)을 넘지 않는다.
+      expect(Number.parseFloat(chart.tooltipDOM.style.maxWidth)).toBeLessThanOrEqual(pageX - 20);
+    }
+
+    // 64px 을 1px 씩 훑어도 상한이 바뀌는 지점은 경계 4곳뿐이다(양자화 전에는 64가지).
+    expect(seen.size).toBe(5);
+  });
+
+  it('들어가는 방향에는 양자화를 적용하지 않는다', () => {
+    // 실측 폭 아래로 상한을 내리면 멀쩡히 들어가던 내용이 줄바꿈되고, 없던 RO 발화가 생긴다.
+    const chart = createChart({ width: TIP_W });
+    chart.setCustomTooltipLayoutPosition({}, { pageX: 405, pageY: 100 });
+
+    expect(chart.tooltipDOM.style.maxWidth).toBe(`${VIEW_W - 425}px`);
   });
 
   it('양쪽 모두 안 들어가는 구간에서는 폭이 흔들려도 커서 위치로만 방향이 정해진다', () => {
