@@ -41,7 +41,7 @@ describe('calcDomainBounds', () => {
       // 함수 단독 동작 검증: min===max인 range는 동일 경계 [50, 50]을 반환한다.
       // 단, 실제 파이프라인에선 calculateScaleRange의 maxValue += 1 가드로
       // range.min === range.max(폭 0)가 생기지 않으므로 이 degenerate 입력은 들어오지 않는다.
-      // 도메인 축은 호출부(updateIndicatorHitBounds)에서 tolerance를 더하지 않는다(narrowing 의도).
+      // 도메인 축은 호출부(getIndicatorHitBounds)에서 tolerance를 더하지 않는다(narrowing 의도).
       // EDGE_TOLERANCE는 교차(비도메인) 축에만 적용된다.
       const [min, max] = calcDomainBounds(step(0, 100), range(50, 50), 0, 100, false);
       expect(min).toBe(50);
@@ -118,10 +118,10 @@ describe('calcDomainBounds', () => {
   });
 });
 
-describe('updateIndicatorHitBounds', () => {
+describe('getIndicatorHitBounds', () => {
   const EDGE_TOLERANCE = 15; // 비도메인 축에 적용되는 tolerance (소스와 동일)
 
-  // 마우스/캔버스 없이 mock this로 호출해 _indicatorHitBounds 계약만 검증한다.
+  // 마우스/캔버스 없이 mock this로 호출해 반환 계약만 검증한다.
   const makeCtx = (overrides = {}) => ({
     options: { horizontal: false },
     chartRect: { x1: 0, x2: 200, y1: 0, y2: 100 },
@@ -131,10 +131,7 @@ describe('updateIndicatorHitBounds', () => {
     ...overrides,
   });
 
-  const run = (ctx) => {
-    modules.updateIndicatorHitBounds.call(ctx);
-    return ctx._indicatorHitBounds;
-  };
+  const run = (ctx) => modules.getIndicatorHitBounds.call(ctx);
 
   describe('vertical (도메인 = X축)', () => {
     it('category/문자열 축(calcDomainBounds null)이면 도메인 X는 [x1,x2]로 fallback(tolerance 0)', () => {
@@ -149,7 +146,6 @@ describe('updateIndicatorHitBounds', () => {
       // 비도메인(Y)축: ±EDGE_TOLERANCE 유지
       expect(b.hitYMin).toBe(0 - EDGE_TOLERANCE);
       expect(b.hitYMax).toBe(100 + EDGE_TOLERANCE);
-      expect(b.horizontal).toBe(false);
     });
 
     it('데이터가 스케일보다 좁으면 빈 구간을 제외하고 X 히트 영역이 좁아진다', () => {
@@ -173,6 +169,18 @@ describe('updateIndicatorHitBounds', () => {
       const b = run(ctx);
       expect(b.hitXMin).toBe(20); // min(120, 20)
       expect(b.hitXMax).toBe(160); // max(160, 60)
+    });
+
+    it('다축 중 범위를 못 구하는 축이 섞이면 좁히지 않고 전체 fallback 한다', () => {
+      // axis0: 문자열 라벨 → null(차지 구간 불명), axis1: 10~30% → [20,60]
+      // axis1 기준으로 좁히면 axis0 데이터가 있는 구간까지 hit에서 빠진다.
+      const ctx = makeCtx({
+        axesSteps: { x: [step('a', 'z'), step(0, 100)], y: [] },
+        axesRange: { x: [range(0, 10), range(10, 30)], y: [] },
+      });
+      const b = run(ctx);
+      expect(b.hitXMin).toBe(0);
+      expect(b.hitXMax).toBe(200);
     });
 
     it('chartRect에 labelOffset이 반영된다', () => {
@@ -206,7 +214,6 @@ describe('updateIndicatorHitBounds', () => {
       // 비도메인(X): ±EDGE_TOLERANCE
       expect(b.hitXMin).toBe(0 - EDGE_TOLERANCE);
       expect(b.hitXMax).toBe(200 + EDGE_TOLERANCE);
-      expect(b.horizontal).toBe(true);
     });
 
     it('category Y축(null)이면 도메인 Y가 [y1,y2]로 fallback된다', () => {

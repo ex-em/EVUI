@@ -1023,7 +1023,14 @@ const modules = {
     });
   },
 
-  updateIndicatorHitBounds() {
+  /**
+   * indicator 히트 영역과 선 길이를 계산한다.
+   * 도메인 축(일반 차트 X / horizontal 차트 Y)은 데이터가 존재하는 픽셀 구간으로 제한해
+   * 빈 구간에서 indicator 가 뜨지 않게 하고, 교차 축만 기존 ±EDGE_TOLERANCE 를 유지한다.
+   *
+   * @returns {object} { x1, x2, y1, y2, hitXMin, hitXMax, hitYMin, hitYMax }
+   */
+  getIndicatorHitBounds() {
     const options = this.options;
     const x1 = this.chartRect.x1 + this.labelOffset.left;
     const x2 = this.chartRect.x2 - this.labelOffset.right;
@@ -1037,6 +1044,9 @@ const modules = {
     let xMax = -Infinity;
     let yMin = Infinity;
     let yMax = -Infinity;
+    // 범위를 못 구한 축이 차지하는 픽셀 구간은 알 수 없다. 나머지 축만으로 좁히면
+    // 그 축의 데이터가 있는 구간까지 잘려나가므로, 하나라도 못 구하면 전체를 fallback 한다.
+    let hasUnknownAxis = false;
 
     if (options.horizontal) {
       const ySteps = this.axesSteps?.y || [];
@@ -1051,10 +1061,12 @@ const modules = {
         if (bounds) {
           yMin = Math.min(yMin, bounds[0]);
           yMax = Math.max(yMax, bounds[1]);
+        } else {
+          hasUnknownAxis = true;
         }
       }
-      // 도메인 bounds를 하나도 못 구한 경우(category/문자열 축 등) 차트 경계로 fallback
-      if (!Number.isFinite(yMin)) {
+      // 도메인 bounds를 못 구한 축이 있는 경우(category/문자열 축 등) 차트 경계로 fallback
+      if (hasUnknownAxis || !Number.isFinite(yMin)) {
         yMin = y1;
         yMax = y2;
       }
@@ -1071,17 +1083,18 @@ const modules = {
         if (bounds) {
           xMin = Math.min(xMin, bounds[0]);
           xMax = Math.max(xMax, bounds[1]);
+        } else {
+          hasUnknownAxis = true;
         }
       }
-      // 도메인 bounds를 하나도 못 구한 경우(category/문자열 축 등) 차트 경계로 fallback
-      if (!Number.isFinite(xMin)) {
+      // 도메인 bounds를 못 구한 축이 있는 경우(category/문자열 축 등) 차트 경계로 fallback
+      if (hasUnknownAxis || !Number.isFinite(xMin)) {
         xMin = x1;
         xMax = x2;
       }
     }
 
-    this._indicatorHitBounds = {
-      horizontal: !!options.horizontal,
+    return {
       x1,
       x2,
       y1,
@@ -1104,12 +1117,7 @@ const modules = {
     const ctx = this.overlayCtx;
     const [offsetX, offsetY] = offset;
     const options = this.options;
-    let bounds = this._indicatorHitBounds;
-
-    if (!bounds || bounds.horizontal !== !!options.horizontal) {
-      this.updateIndicatorHitBounds();
-      bounds = this._indicatorHitBounds;
-    }
+    const bounds = this.getIndicatorHitBounds();
 
     if (
       offsetX >= bounds.hitXMin &&
@@ -1422,7 +1430,6 @@ const modules = {
       this.plotLabelTooltipDOM = null;
     }
     this.isInitTooltip = false;
-    this._indicatorHitBounds = null;
   },
 };
 
