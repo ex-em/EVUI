@@ -61,6 +61,8 @@ const createChart = (opts = {}) => {
       dragSelection: {
         use: true,
         keepDisplay: false,
+        // 이 스펙의 드래그 hover 케이스는 전부 이 옵션을 전제로 한다(기본값은 false).
+        updateHoverOnDrag: true,
         fillColor: '#38ACEC',
         opacity: 0.65,
         startArea: '',
@@ -133,6 +135,19 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
       'setCustomTooltipLayoutPosition',
       'drawSelectionArea',
     ]);
+  });
+
+  // 기본값(false)은 기저 동작 — overlay 를 비우고 밴드만 그린다. 툴팁도 건드리지 않는다.
+  it('updateHoverOnDrag 를 끄면 hover 없이 밴드만 그린다', () => {
+    chart.options.dragSelection.updateHoverOnDrag = false;
+    const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
+    chart.calls.length = 0;
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+
+    expect(chart.calls).toEqual(['overlayClear', 'drawSelectionArea']);
+    expect(chart.lastDragHoverEvent).toBeFalsy();
+    expect(chart.hideTooltip).not.toHaveBeenCalled();
   });
 
   // 게이트가 넓어져도(수직 bar·콤보) 드래그 프레임은 line 과 같은 경로를 탄다 — 타입 분기가 없다.
