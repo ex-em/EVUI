@@ -277,6 +277,30 @@ describe('방향 기억 초기화', () => {
     chart.tooltipDOM.remove();
     vi.useRealTimers();
   });
+
+  it('formatter 가 throw 해 툴팁을 포기해도 방향 기억을 버린다', () => {
+    // 예외 경로는 hideTooltipDOM·tooltipClear 를 거치지 않고 직접 숨기므로 따로 버려야 한다.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const chart = createChart({ width: TIP_W });
+    chart.options.tooltip.formatter = {
+      html: () => {
+        throw new Error('boom');
+      },
+    };
+
+    chart.setCustomTooltipLayoutPosition({}, { pageX: 1100, pageY: 100 });
+    expect(getPlacement(chart.tooltipDOM).flipped).toBe(true);
+
+    chart.drawCustomTooltip({ s0: { data: 1, color: '#000', name: 'a', id: 's0', index: 0 } });
+    expect(chart.tooltipDOM.style.display).toBe('none');
+
+    // 다음 프레임에 formatter 가 성공해 루트를 다시 붙인 상태
+    chart.tooltipDOM.appendChild(document.createElement('div'));
+    chart.setCustomTooltipLayoutPosition({}, { pageX: 600, pageY: 100 });
+
+    expect(getPlacement(chart.tooltipDOM).flipped).toBe(false);
+    warn.mockRestore();
+  });
 });
 
 describe('측정 시점에는 폭 상한이 걸려 있지 않다', () => {
