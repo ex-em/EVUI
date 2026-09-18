@@ -42,7 +42,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - **worker 게이트**: `workerRender` opt-in + gate ready + in-flight 여유 + hitInfo/lastHitInfo 없음 + visible series 가 line/bar(timeMode 제외)/heatMap 뿐일 때만 전송. 실패/예외/미지원은 Console.warn 후 main 폴백(무회귀).
 - **epoch 규칙**: `renderEpoch` 는 **모든** drawChart 진입에서 증가한다. worker 프레임/에러의 epoch 가 현재와 다르면 stale 로 drop(bitmap 즉시 close).
 - **present 규칙**: `clear()` 는 buffer/overlay 만 비우고 display 는 비우지 않는다. display 의 clear+blit 는 `commitToDisplay`/`commitWorkerFrame` 이 present 시점에 atomic 하게 수행하고, 직후 `_blitPrev` 스냅샷을 갱신한다.
-- **드래그 중 재렌더**: `clear()` 가 overlay 를 비우고 `updateTooltip` 이 tooltipDOM 을 비우므로, `update()` 는 마지막에 `restoreDragArtifacts` 로 진행 중 드래그의 hover(마지막 커서 위치)와 밴드를 다시 그린다. 복원하지 않으면 라이브 갱신 차트에서 매 틱 툴팁·하이라이트·인디케이터가 사라진 채 다음 커서 이동까지 남는다. 종료된 드래그의 밴드(`dragInfoBackup`)는 `lightUpdate` 에서만 유지하고 전체 갱신에서는 폐기한다.
+- **드래그 중 재렌더**: `clear()` 가 overlay 를 비우고 `updateTooltip` 이 tooltipDOM 을 비우므로, `update()` 는 마지막에 `restoreDragArtifacts` 로 진행 중 드래그의 hover(마지막 커서 위치)와 밴드를 다시 그린다 — hover 복원은 `dragSelection.updateHoverOnDrag` 가 켜진 드래그에만 해당한다(꺼져 있으면 남는 이벤트가 없다). 복원하지 않으면 라이브 갱신 차트에서 매 틱 툴팁·하이라이트·인디케이터가 사라진 채 다음 커서 이동까지 남는다. 종료된 드래그의 밴드(`dragInfoBackup`)는 `lightUpdate` 에서만 유지하고 전체 갱신에서는 폐기한다.
 - **canvas 재할당 최소화**: `setWidth`/`setHeight` 는 device px 치수가 실제로 바뀔 때만 canvas.width/height 를 재대입한다(재대입은 비트맵 소거를 유발). pointsLayer 치수 변경 시 baseline 무효화.
 - **click/dbl-click 구분**: click 콜백은 200ms 지연 실행, dbl-click 이 타이머를 취소한다(uses.js `useWidgetClickEvent`).
 - **줌 규칙**: labels 가 1개 이하면 dragZoom 토글 불가. dragZoom 실행은 `axesX[0].type === 'time'` 일 때만. `executeZoom` 은 clone 데이터를 index 범위로 filter 해 props.data 에 재주입하는 방식이다. `keepZoomStatus` true 면 데이터 갱신에도 현재 줌 구간 유지.

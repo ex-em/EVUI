@@ -2325,10 +2325,16 @@
                   "description": "(scatter, PC 전용) 드래그 선택 영역을 캔버스 가장자리가 아니라 startArea에서 드래그를 시작한 지점부터 표시합니다. startArea가 지정되어야 동작하며, 선택되는 데이터와 drag-select의 range 페이로드는 영향받지 않고 화면 표시만 달라집니다. true이면 startArea를 덮는 전용 캔버스(pointer-events: none)에 선택 영역을 그리며, startArea 요소가 position: static이면 라이브러리가 자동으로 position: relative로 설정하고 차트 destroy 시 원복합니다."
                 },
                 {
+                  "name": "updateHoverOnDrag",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "드래그하는 동안 커서 위치의 툴팁·하이라이트·인디케이터를 갱신하고, tooltip.formatter.html 에 2번째 인자로 { dragRange } 를 넘깁니다. 끄면 드래그 중 툴팁은 드래그 시작 시점 그대로 멈춰 있고 선택 영역만 갱신됩니다."
+                },
+                {
                   "name": "showTooltipOnEmpty",
                   "type": "Boolean",
                   "default": "false",
-                  "description": "드래그 중 커서 위치에 데이터가 없어(점에서 떨어진 빈 공간) hit 이 0개일 때도 tooltip.formatter.html 을 빈 seriesList 와 { dragRange } 로 호출해 구간 헤더만 남깁니다. formatter.html 경로 전용이며 tooltip.returnValue 를 쓰면 동작하지 않습니다. 드래그가 끝나면 이 툴팁은 즉시 사라집니다."
+                  "description": "드래그 중 커서 위치에 데이터가 없어(점에서 떨어진 빈 공간) hit 이 0개일 때도 tooltip.formatter.html 을 빈 seriesList 와 { dragRange } 로 호출해 구간 헤더만 남깁니다. formatter.html 경로 전용이며 tooltip.returnValue 를 쓰면 동작하지 않습니다. 드래그가 끝나면 이 툴팁은 즉시 사라집니다. updateHoverOnDrag 가 꺼져 있으면 이 옵션도 동작하지 않습니다."
                 }
               ]
             },
