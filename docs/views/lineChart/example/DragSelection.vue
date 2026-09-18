@@ -82,6 +82,8 @@ export default {
       dragSelection: {
         use: true,
         keepDisplay: true,
+        // 드래그 중 툴팁이 커서를 따라오게 한다 — 기본값은 false 다.
+        updateHoverOnDrag: true,
         // 데이터가 없는 지점을 지나도 드래그 구간 헤더는 계속 보이게 한다.
         showTooltipOnEmpty: true,
       },
