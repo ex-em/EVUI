@@ -220,6 +220,8 @@ const DEFAULT_OPTIONS = {
     opacity: 0.65,
     startArea: '',
     displayFromStartArea: false,
+    updateHoverOnDrag: false,
+    showTooltipOnEmpty: false,
   },
   zoom: {
     bufferMemoryCnt: 100,

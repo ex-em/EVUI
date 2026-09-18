@@ -33,26 +33,24 @@ import dayjs from 'dayjs';
 
 export default {
   setup() {
-    const time = dayjs().format('YYYY-MM-DD');
+    const time = dayjs().startOf('hour');
+    const labels = Array.from({ length: 25 }, (_, i) => time.add(i * 10, 'second'));
+    // 값이 비어 있는 구간. 드래그가 여기를 지나면 hover hit 이 0개라 툴팁이 사라진다 —
+    // showTooltipOnEmpty 로 구간 헤더만 남는 동작을 확인할 수 있다.
+    const isGap = (i) => i >= 10 && i <= 13;
     const chartData = {
       series: {
         series1: { name: 'series#1' },
         series2: { name: 'series#2' },
       },
-      labels: [
-        dayjs(time),
-        dayjs(time).add(1, 'day'),
-        dayjs(time).add(2, 'day'),
-        dayjs(time).add(3, 'day'),
-        dayjs(time).add(4, 'day'),
-        dayjs(time).add(5, 'day'),
-        dayjs(time).add(6, 'day'),
-      ],
+      labels,
       data: {
-        series1: [100, 25, 36, 47, 0, 50, 80],
-        series2: [80, 36, 25, 47, 15, 100, 0],
+        series1: labels.map((_, i) => (isGap(i) ? null : Math.round(50 + Math.sin(i / 2) * 40))),
+        series2: labels.map((_, i) => (isGap(i) ? null : Math.round(50 + Math.cos(i / 3) * 30))),
       },
     };
+
+    const convertToDateString = (value) => dayjs(value).format('MM/DD HH:mm:ss');
 
     const chartOptions = {
       type: 'line',
@@ -69,8 +67,8 @@ export default {
         {
           type: 'time',
           showGrid: true,
-          timeFormat: 'MM/DD',
-          interval: 'day',
+          timeFormat: 'mm:ss',
+          interval: { time: 30, unit: 'second' },
         },
       ],
       axesY: [
@@ -84,6 +82,35 @@ export default {
       dragSelection: {
         use: true,
         keepDisplay: true,
+        // 드래그 중 툴팁이 커서를 따라오게 한다 — 기본값은 false 다.
+        updateHoverOnDrag: true,
+        // 데이터가 없는 지점을 지나도 드래그 구간 헤더는 계속 보이게 한다.
+        showTooltipOnEmpty: true,
+      },
+      tooltip: {
+        use: true,
+        formatter: {
+          // 드래그 중에만 2번째 인자로 { dragRange } 가 전달된다.
+          html: (seriesList, meta) => {
+            const header = meta?.dragRange
+              ? `${convertToDateString(meta.dragRange.from)} ~ ` +
+                `${convertToDateString(meta.dragRange.to)}`
+              : convertToDateString(seriesList[0]?.data?.x);
+            const rows = seriesList
+              .map(
+                ({ name, color, data }) =>
+                  `<div data-evui-tooltip-row>
+                     <span style="color:${color}">■</span> ${name} : ${data.y}
+                   </div>`,
+              )
+              .join('');
+
+            return `<div class="ev-chart-tooltip-custom">
+                      <div class="ev-chart-tooltip-custom__header">${header}</div>
+                      <div class="ev-chart-tooltip-custom__body">${rows}</div>
+                    </div>`;
+          },
+        },
       },
     };
 
@@ -93,8 +120,6 @@ export default {
       selectionItems.value = data;
       selectionRange.value = range;
     };
-
-    const convertToDateString = (value) => dayjs(value).format('MM/DD');
 
     return {
       chartData,

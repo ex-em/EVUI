@@ -320,9 +320,10 @@ const modules = {
    * 성공 시 true, 휴리스틱 실패 등으로 fallback이 필요하면 false.
    *
    * @param {object} hitInfoItems  hitInfo.items
+   * @param {object} [dragRange]   드래그 중일 때만 전달되는 { from, to }
    * @returns {boolean}
    */
-  drawCustomTooltipVirtual(hitInfoItems) {
+  drawCustomTooltipVirtual(hitInfoItems, dragRange) {
     const opt = this.options?.tooltip;
     if (!opt?.formatter?.html) return false;
 
@@ -340,10 +341,16 @@ const modules = {
 
     let htmlString;
     try {
-      htmlString = opt.formatter.html(seriesList);
+      htmlString = dragRange
+        ? opt.formatter.html(seriesList, { dragRange })
+        : opt.formatter.html(seriesList);
     } catch (err) {
-      // 사용자 코드의 예외는 가상 스크롤에서 가둬두지 않고 fallback 신호로만 사용
-      console.warn('[evui] tooltip.formatter.html threw, falling back:', err);
+      // 사용자 코드의 예외는 가상 스크롤에서 가둬두지 않고 fallback 신호로만 사용.
+      // 드래그 경로는 프레임마다 이 분기로 들어오므로 경고는 인스턴스당 1회만 남긴다.
+      if (!this._vsWarnedThrow) {
+        this._vsWarnedThrow = true;
+        console.warn('[evui] tooltip.formatter.html threw, falling back:', err);
+      }
       return false;
     }
     const parsed = Util.htmlToElement(htmlString);

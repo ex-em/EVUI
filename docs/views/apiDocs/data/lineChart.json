@@ -2711,7 +2711,7 @@
                   "name": "formatter",
                   "type": "function / Object",
                   "default": "null",
-                  "description": "데이터가 표시되기 전에 형식을 지정합니다. 함수형(({ x, y, name, seriesId }) => string), { title, value } 객체형, { html } 커스텀 HTML형 3가지 형태를 지원합니다."
+                  "description": "데이터가 표시되기 전에 형식을 지정합니다. 함수형(({ x, y, name, seriesId }) => string), { title, value } 객체형, { html } 커스텀 HTML형 3가지 형태를 지원합니다. dragSelection.use 차트에서 드래그하는 동안에는 html formatter 가 2번째 인자로 { dragRange: { from, to } } 을 함께 받습니다. from/to 는 mouseup 때 drag-select 가 주는 range.xMin/xMax 와 정확히 같은 값이며, 드래그 중이 아니면 전달되지 않아 기존 formatter 는 그대로 동작합니다."
                 },
                 {
                   "name": "returnValue",
@@ -3234,6 +3234,18 @@
                   "type": "Boolean",
                   "default": "false",
                   "description": "startArea 기준으로 선택 영역을 표시할지 여부입니다."
+                },
+                {
+                  "name": "updateHoverOnDrag",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "드래그하는 동안 커서 위치의 툴팁·하이라이트·인디케이터를 갱신하고, tooltip.formatter.html 에 2번째 인자로 { dragRange } 를 넘깁니다. 끄면 드래그 중에는 선택 영역만 갱신됩니다 — 하이라이트·인디케이터는 드래그를 시작할 때 지워지고, 툴팁은 라이브러리가 건드리지 않습니다."
+                },
+                {
+                  "name": "showTooltipOnEmpty",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "드래그 중 커서 위치에 데이터가 없어(막대 사이 간격·값이 null 인 라벨) hit 이 0개일 때도 tooltip.formatter.html 을 빈 seriesList 와 { dragRange } 로 호출해 구간 헤더만 남깁니다. formatter.html 경로 전용이며 tooltip.returnValue 를 쓰면 동작하지 않습니다. 드래그가 끝나면 이 툴팁은 즉시 사라집니다. updateHoverOnDrag 가 꺼져 있으면 이 옵션도 동작하지 않습니다."
                 }
               ]
             },

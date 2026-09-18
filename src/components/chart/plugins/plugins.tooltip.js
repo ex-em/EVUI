@@ -43,7 +43,7 @@ const quantizeTooltipMaxWidth = (room) => {
   return Math.floor(room / STEP) * STEP;
 };
 
-const clampRatio = r => (Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : 1);
+const clampRatio = (r) => (Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : 1);
 
 /**
  * 스케일 범위(step) 대비 데이터 범위(range)의 픽셀 경계를 계산한다.
@@ -833,7 +833,10 @@ const modules = {
     // skip-redraw fast path 등으로 커스텀 엘리먼트가 비어 있을 수 있다. 같은 데이터 포인트에
     // 머물러 fast path 가 계속 redraw 를 건너뛰는 경우, 여기서 한 번 그려 복구한다.
     // (엘리먼트가 이미 있는 일반 경로에서는 재draw 하지 않으므로 비용/부작용 없음)
-    if (!customTooltipEl && hitInfo?.items && Object.keys(hitInfo.items).length) {
+    // 드래그 중에는 그 fast path 가 꺼져 있어 이 프레임이 방금 그렸다 — 루트가 비어 있다는 것은
+    // 같은 items 로 다시 불러도 결과가 같다는 뜻이라, 재draw 는 formatter 호출만 늘린다.
+    const isDragging = this.dragInfo?.isMove;
+    if (!customTooltipEl && !isDragging && hitInfo?.items && Object.keys(hitInfo.items).length) {
       this.drawCustomTooltip(hitInfo.items);
       customTooltipEl = this.tooltipDOM.firstElementChild;
     }
@@ -934,8 +937,9 @@ const modules = {
    * Draw User Custom Tooltip (tooltip > formatter > html)
    * call "formatter > html" and append to tooltip DOM
    * @param hitInfoItems
+   * @param {object} [dragRange]  드래그 중일 때만 전달되는 { from, to }
    */
-  drawCustomTooltip(hitInfoItems) {
+  drawCustomTooltip(hitInfoItems, dragRange) {
     const opt = this.options?.tooltip;
     if (!opt?.formatter?.html) return;
 
@@ -947,7 +951,7 @@ const modules = {
 
     // 가상 스크롤 경로 (자동/명시 활성 + 휴리스틱 성공 시)
     if (this._shouldVirtualizeCustomTooltip?.(itemsCount)) {
-      const ok = this.drawCustomTooltipVirtual(hitInfoItems);
+      const ok = this.drawCustomTooltipVirtual(hitInfoItems, dragRange);
       if (ok) return;
       // 휴리스틱 실패 시 기존 경로로 fallback
     }
@@ -968,7 +972,26 @@ const modules = {
       });
     });
 
-    const userCustomTooltipBody = Util.htmlToElement(opt.formatter.html(seriesList));
+    // 드래그 중이 아니면 2번째 인자를 넘기지 않는다 — 기존 formatter 의 arity 를 그대로 둔다.
+    let html;
+    try {
+      html = dragRange
+        ? opt.formatter.html(seriesList, { dragRange })
+        : opt.formatter.html(seriesList);
+    } catch (err) {
+      // 소비처 예외를 그대로 올리면 호출부가 overlay 를 비운 뒤라 그 프레임의 하이라이트와 드래그
+      // 밴드까지 사라지고, update() 꼬리에서 나면 재렌더 예약 플래그가 정리되지 않는다. 가상 경로와
+      // 같이 툴팁만 포기한다. 드래그 중에는 프레임마다 불리므로 경고는 인스턴스당 1회만 남긴다.
+      if (!this._customTooltipWarnedThrow) {
+        this._customTooltipWarnedThrow = true;
+        // eslint-disable-next-line no-console
+        console.warn('[evui] tooltip.formatter.html threw, tooltip skipped:', err);
+      }
+      this.tooltipDOM.style.display = 'none';
+      this.resetTooltipPlacement();
+      return;
+    }
+    const userCustomTooltipBody = Util.htmlToElement(html);
     if (userCustomTooltipBody) {
       this.tooltipDOM.appendChild(userCustomTooltipBody);
     }
@@ -1051,13 +1074,7 @@ const modules = {
     if (options.horizontal) {
       const ySteps = this.axesSteps?.y || [];
       for (let i = 0; i < ySteps.length; i += 1) {
-        const bounds = calcDomainBounds(
-          ySteps[i],
-          this.axesRange?.y?.[i],
-          y2,
-          y2 - y1,
-          true,
-        );
+        const bounds = calcDomainBounds(ySteps[i], this.axesRange?.y?.[i], y2, y2 - y1, true);
         if (bounds) {
           yMin = Math.min(yMin, bounds[0]);
           yMax = Math.max(yMax, bounds[1]);
@@ -1073,13 +1090,7 @@ const modules = {
     } else {
       const xSteps = this.axesSteps?.x || [];
       for (let i = 0; i < xSteps.length; i += 1) {
-        const bounds = calcDomainBounds(
-          xSteps[i],
-          this.axesRange?.x?.[i],
-          x1,
-          x2 - x1,
-          false,
-        );
+        const bounds = calcDomainBounds(xSteps[i], this.axesRange?.x?.[i], x1, x2 - x1, false);
         if (bounds) {
           xMin = Math.min(xMin, bounds[0]);
           xMax = Math.max(xMax, bounds[1]);
@@ -1195,10 +1206,7 @@ const modules = {
         hoverRatio = (offsetX - graphPos.x1) / chartWidth;
       }
 
-      const index = Math.min(
-        Math.max(Math.floor(hoverRatio * labelsCount), 0),
-        labelsCount - 1,
-      );
+      const index = Math.min(Math.max(Math.floor(hoverRatio * labelsCount), 0), labelsCount - 1);
       return +this.data.labels[index];
     }
 

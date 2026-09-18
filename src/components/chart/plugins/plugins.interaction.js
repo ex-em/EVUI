@@ -12,16 +12,16 @@ const modules = {
    */
   createEventFunctions() {
     /**
-     * To show tooltip and item highlighting, add event listener on mousemove
+     * hover 아티팩트(하이라이트·툴팁·인디케이터)를 그린다.
      *
+     * @param {MouseEvent} e           mousemove event
+     * @param {boolean} isDragging     드래그 진행 중 호출인지 여부
      * @returns {undefined}
      */
-    this.onMouseMove = (e) => {
-      if (this.dragInfo?.isMove || this.isMobile) {
-        return;
-      }
-
+    this.drawHoverArtifacts = (e, isDragging = false) => {
       const args = { e };
+      // 이번 프레임이 데이터 없이 구간만 띄운 툴팁인지 — dragEnd 가 이걸 보고 정리한다.
+      let isEmptyRangeTooltip = false;
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
@@ -49,7 +49,9 @@ const modules = {
       // 흐름은 그대로 유지한다. fast path 를 더 넓히면 부수 효과가 생길 수 있어 보수적으로 둔다.
       let hoverSig = '';
       if (hasItems) {
-        hoverSig = `h=${hitInfo.hitId}`;
+        // 드래그 중에는 formatter 에 구간 정보가 함께 들어가므로, 같은 데이터 포인트라도
+        // 드래그 진입/종료 프레임에서는 fast path 가 매치되면 안 된다.
+        hoverSig = `${isDragging ? 'd|' : ''}h=${hitInfo.hitId}`;
         const sortedKeys = itemKeys.slice().sort();
         for (let i = 0; i < sortedKeys.length; i++) {
           const k = sortedKeys[i];
@@ -57,7 +59,10 @@ const modules = {
         }
       }
 
+      // 드래그 중 헤더는 같은 데이터 포인트 위에서도 커서 픽셀마다 달라지므로 fast path 를 쓸 수 없다
+      // (쓰면 헤더가 라벨 간격만큼 뒤처진 채 얼어붙는다). 드래그가 아닌 hover 는 그대로 스킵한다.
       const skipCustomTooltipRedraw =
+        !isDragging &&
         hoverSig !== '' &&
         hoverSig === this._lastHoverSig &&
         this.tooltipDOM &&
@@ -88,7 +93,8 @@ const modules = {
             tooltip.returnValue(seriesList, e);
           } else if (tooltip?.formatter?.html) {
             if (!skipCustomTooltipRedraw) {
-              this.drawCustomTooltip(hitInfo?.items);
+              const dragRange = isDragging ? this.getDragRange(offset) : undefined;
+              this.drawCustomTooltip(hitInfo?.items, dragRange);
             }
             this.setCustomTooltipLayoutPosition(hitInfo, e);
           } else {
@@ -127,7 +133,28 @@ const modules = {
           tooltip.returnValue([], e);
         }
 
-        this.hideTooltipDOM();
+        // 막대 사이 간격이나 값이 null 인 라벨 위에서는 hit 이 0개라 툴팁이 통째로 사라진다.
+        // 드래그 중에는 그 순간에도 어느 구간을 잡고 있는지가 필요하므로, 옵션이 켜져 있으면
+        // 빈 seriesList 로 formatter 를 불러 헤더만 남긴다. 캔버스 툴팁은 구간 값 포맷을
+        // 라이브러리가 정해야 해서 formatter.html 경로만 지원한다.
+        const showRangeOnly =
+          isDragging &&
+          this.options.dragSelection?.showTooltipOnEmpty &&
+          typeof tooltip?.returnValue !== 'function' &&
+          !!tooltip?.formatter?.html;
+        const emptyDragRange = showRangeOnly ? this.getDragRange(offset) : undefined;
+
+        if (emptyDragRange) {
+          this.drawCustomTooltip({}, emptyDragRange);
+          this.setCustomTooltipLayoutPosition(hitInfo, e);
+          isEmptyRangeTooltip = true;
+        } else if (isDragging) {
+          // 드래그 경로는 프레임마다 hide 를 부르므로 debouncedHide(trailing 200ms)의 타이머가
+          // 매번 리셋돼 툴팁이 끝까지 감춰지지 않는다. 드래그 중에는 즉시 감춘다.
+          this.hideTooltip();
+        } else {
+          this.hideTooltipDOM();
+        }
       }
 
       // value-only plot 라벨 hover → text tooltip (#6). 라벨 박스 위에선 위에서 series hit 을 비워
@@ -135,6 +162,7 @@ const modules = {
       this.handlePlotLabelHover(plotLabelHit, e);
 
       this._lastHoverSig = hoverSig;
+      this._isEmptyRangeTooltip = isEmptyRangeTooltip;
 
       // 전용 드래그 캔버스를 쓰면 keepDisplay 영역이 그 캔버스에 그대로 남아 있어(매 hover의
       // overlayClear는 메인 overlay만 비움) 여기서 다시 그릴 필요가 없다.
@@ -168,13 +196,28 @@ const modules = {
         };
       }
 
-      if (typeof this.listeners['mouse-move'] === 'function') {
+      // 드래그 중에는 mouse-move 를 발화하지 않는다 — 기존에도 드래그 중엔 발화하지 않았고,
+      // 이 이벤트의 hoveredLabel 은 차트 그룹 indicator 동기화를 움직인다.
+      if (!isDragging && typeof this.listeners['mouse-move'] === 'function') {
         if (type !== 'pie') {
           args.curMouseTargetVal = this.getCurMouseTargetVal(offset, hitInfo);
         }
 
         this.listeners['mouse-move'](args);
       }
+    };
+
+    /**
+     * To show tooltip and item highlighting, add event listener on mousemove
+     *
+     * @returns {undefined}
+     */
+    this.onMouseMove = (e) => {
+      if (this.dragInfo?.isMove || this.isMobile) {
+        return;
+      }
+
+      this.drawHoverArtifacts(e);
     };
 
     /**
@@ -793,7 +836,24 @@ const modules = {
         };
       }
 
-      this.overlayClear();
+      // 드래그 중 hover 갱신은 updateHoverOnDrag 옵션이다 — 끄면 overlay 만 비우고 밴드를 그린다.
+      // 켜면 drawHoverArtifacts 가 overlay 를 비우고 다시 그리므로 밴드는 그 뒤 마지막에 그려야
+      // hover 아티팩트 위에 남는다. 같은 이유로 이 경로에는 tooltip.throttledMove 를 적용하지
+      // 않는다 — clear 와 draw 가 프레임을 넘나들면 깜빡인다.
+      // 재렌더가 overlay·tooltipDOM 을 비우면 update() 가 이 이벤트로 hover 를 되살린다.
+      if (!this.options.dragSelection?.updateHoverOnDrag) {
+        this.overlayClear();
+      } else if (!this.isMobile && isInsideCanvas(aOffsetX, aOffsetY)) {
+        this.lastDragHoverEvent = e;
+        this.drawHoverArtifacts(e, true);
+      } else {
+        // 밴드는 clamp 된 좌표로 계속 갱신되므로 툴팁을 남기면 헤더가 직전 구간에 얼어붙어
+        // 밴드와 다른 구간을 가리킨다. 즉시 hide 인 이유는 drawHoverArtifacts 쪽 주석 참조.
+        this.lastDragHoverEvent = null;
+        this.hideTooltip();
+        this.overlayClear();
+      }
+
       this.drawSelectionArea(dragInfo);
     };
 
@@ -845,6 +905,14 @@ const modules = {
       }
 
       this.dragInfo = null;
+      this.lastDragHoverEvent = null;
+
+      // 데이터 없이 구간만 띄운 툴팁은 드래그가 끝나면 근거가 사라진다 — keepDisplay: false 면
+      // 밴드까지 지워져 행 없는 헤더만 남는다. 다음 mousemove 를 기다리지 않고 여기서 감춘다.
+      if (this._isEmptyRangeTooltip) {
+        this.hideTooltip();
+        this._isEmptyRangeTooltip = false;
+      }
 
       if (prevUserSelect !== undefined) {
         this.dragStartTarget.style.userSelect = prevUserSelect;
@@ -2079,6 +2147,33 @@ const modules = {
     }
 
     return items;
+  },
+
+  /**
+   * 드래그 중 커스텀 툴팁 formatter 에 넘길 구간 값. 드래그 중이 아니면 undefined.
+   * mouseup 때 `drag-select` 가 내보낼 range 를 같은 함수로 구해 x 성분만 쓴다 — 평행 계산을 두면
+   * clamp·`Math.ceil`·블록 스냅 같은 보정이 어긋나 라이브 헤더와 최종 페이로드가 달라진다.
+   * 시작/현재 순서를 유지하므로 역방향 드래그면 from > to 다.
+   *
+   * @param {array} offset  현재 커서 위치
+   * @returns {object|undefined} { from, to }
+   */
+  getDragRange(offset) {
+    if (!this.dragInfo?.isMove) {
+      return undefined;
+    }
+
+    const selection =
+      this.options.type === 'heatMap'
+        ? this.getSelectionRangeForHeatMap(this.dragInfo)
+        : this.getSelectionRange(this.dragInfo);
+
+    if (!selection) {
+      return undefined;
+    }
+
+    const { xMin, xMax } = selection;
+    return offset[0] >= this.dragInfo.xcp ? { from: xMin, to: xMax } : { from: xMax, to: xMin };
   },
 
   /**

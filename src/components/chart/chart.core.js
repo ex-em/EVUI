@@ -1976,8 +1976,24 @@ class EvChart {
       this.refreshDragDisplayCanvas();
     }
 
-    const isDragMove = this.dragInfo && this.drawSelectionArea;
-    if (isDragMove) {
+    this.restoreDragArtifacts(lightUpdate);
+  }
+
+  /**
+   * 재렌더가 비운 드래그 아티팩트를 복원한다. `clear()` 는 overlay 를, `updateTooltip` 은
+   * tooltipDOM 을 비우므로, 복원하지 않으면 드래그 중에는 다음 커서 이동까지 툴팁·하이라이트·
+   * 인디케이터가 사라져 있다(라이브 갱신 대시보드에서 매 틱 발생).
+   *
+   * @param {boolean} lightUpdate  부분 갱신(스크롤바 등)이면 종료된 드래그의 밴드를 유지한다
+   * @returns {undefined}
+   */
+  restoreDragArtifacts(lightUpdate) {
+    if (this.dragInfo && this.drawSelectionArea) {
+      // dragMove 와 같은 순서 — hover 를 그린 뒤 밴드를 올려야 밴드가 위에 남는다.
+      if (this.lastDragHoverEvent && this.drawHoverArtifacts) {
+        this.drawHoverArtifacts(this.lastDragHoverEvent, true);
+      }
+
       this.drawSelectionArea(this.dragInfo);
     } else if (this.dragInfoBackup) {
       if (lightUpdate) {
