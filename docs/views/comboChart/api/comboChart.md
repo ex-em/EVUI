@@ -25,7 +25,7 @@ scatter 시리즈만으로 이루어진 콤보도 이 y축 전체 밴드를 받�
 
 `range.yMin`/`yMax` 는 **첫 번째 y축**(`axesY[0]`) 기준입니다. y축을 2개 이상 쓰는 콤보에서 두 번째 축 시리즈의 값으로 읽으면 어긋납니다. `range.xMin`/`xMax` 는 x축의 최소·최대값 사이 선형 보간이므로 문자 라벨을 쓰는 `step` 축에서는 `NaN` 이 됩니다(차트 타입 공통 동작). 범주형 축(`categoryMode: true`)에서는 이 보간이 막대의 인덱스 슬롯 배치와 어긋나 최대 약 1 막대 폭의 오차가 있습니다 — 아래 DragSelection 예제가 `categoryMode: true` 라 화면에 표시되는 `X min`/`X max` 에도 그 오차가 실립니다.
 
-드래그 중 hover 갱신과 아래 `dragRange` 전달은 `dragSelection.updateHoverOnDrag: true` 일 때만 동작합니다(기본 `false`). 끄면 드래그 중 툴팁·하이라이트가 드래그 시작 시점 그대로 멈춰 있고 선택 영역만 갱신됩니다.
+드래그 중 hover 갱신과 아래 `dragRange` 전달은 `dragSelection.updateHoverOnDrag: true` 일 때만 동작합니다(기본 `false`). 끄면 드래그 중에는 선택 영역만 갱신됩니다 — 하이라이트·인디케이터는 드래그를 시작할 때 지워지고, 툴팁은 라이브러리가 건드리지 않습니다.
 
 드래그하는 **동안**에는 `tooltip.formatter.html` 이 2번째 인자로 `{ dragRange: { from, to } }` 를 함께 받습니다. `from` 은 드래그를 시작한 지점, `to` 는 현재 커서 지점의 x축 값이고, mouseup 때 `drag-select` 가 주는 `range.xMin`/`xMax` 와 **정확히 같은 값**입니다 — 콤보는 `options.type` 이 없어 heatMap 전용 블록 스냅 분기를 타지 않고 위 `range` 와 같은 계산을 그대로 재사용합니다. 따라서 위에 적은 축 제약(`step` 축 `NaN`, 범주형 축의 약 1 막대 폭 오차)도 그대로 적용됩니다. 시작/현재 순서를 유지하므로 역방향(오른쪽 → 왼쪽) 드래그면 `from` 이 `to` 보다 큽니다. 축을 선언하지 않은 구성(시리즈 레벨 `type: 'pie'` 만 둔 콤보)은 `range` 가 `null` 이라 2번째 인자도 전달되지 않습니다. 드래그 중이 아닐 때도 전달되지 않으므로 기존 formatter 는 그대로 동작합니다.
 

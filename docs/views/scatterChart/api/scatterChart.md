@@ -342,7 +342,7 @@ value-only 상태에서 alias(text)가 가려지므로 hover로 보완(데스크
 | opacity | Number | 0.65 | 선택 영역 불투명도 | 0 ~ 1 |
 | startArea | String (CSS Selector) | '' | drag-select를 시작할 수 있는 영역의 CSS 셀렉터. 차트의 조상 요소에서 탐색하며, 미지정하거나 일치하는 조상이 없으면 캔버스 안에서만 시작할 수 있습니다. 여러 차트를 사용할 때는 차트마다 고유한 셀렉터를 지정하세요(공통 조상을 지정하면 한 번의 드래그가 모든 차트의 selection을 트리거합니다). | '.chart-wrapper' |
 | displayFromStartArea | Boolean | false | (scatter, PC 전용) 드래그 선택 영역을 캔버스 가장자리가 아니라 `startArea`에서 드래그를 시작한 지점부터 표시합니다. `startArea`가 지정되어야 동작합니다. 선택되는 데이터·`drag-select` range 페이로드는 영향받지 않고 화면 표시만 달라집니다. | true / false |
-| updateHoverOnDrag | Boolean | false | 드래그하는 동안 커서 위치의 툴팁·하이라이트·인디케이터를 갱신하고, `tooltip.formatter.html`에 2번째 인자로 `{ dragRange }`를 넘깁니다. 끄면 드래그 중 툴팁은 드래그 시작 시점 그대로 멈춰 있고 선택 영역만 갱신됩니다. | true / false |
+| updateHoverOnDrag | Boolean | false | 드래그하는 동안 커서 위치의 툴팁·하이라이트·인디케이터를 갱신하고, `tooltip.formatter.html`에 2번째 인자로 `{ dragRange }`를 넘깁니다. 끄면 드래그 중에는 선택 영역만 갱신됩니다 — 하이라이트·인디케이터는 드래그를 시작할 때 지워지고, 툴팁은 라이브러리가 건드리지 않습니다. | true / false |
 | showTooltipOnEmpty | Boolean | false | 드래그 중 커서 위치에 데이터가 없어(점에서 떨어진 빈 공간) hit이 0개인 프레임에서도 `tooltip.formatter.html`을 빈 seriesList와 `{ dragRange }`로 호출해 구간 헤더만 남깁니다. `formatter.html` 경로 전용이며 `tooltip.returnValue`를 쓰면 동작하지 않습니다. `updateHoverOnDrag`가 꺼져 있으면 이 옵션도 동작하지 않습니다. | true / false |
 
 - PC버전에서는 drag, Mobile에서는 touch로 선택 영역을 지정할 수 있습니다.
@@ -414,7 +414,7 @@ const chartOptions = {
 > - 직접 마크업/클래스를 사용하는 경우, 스크롤이 필요하면 `htmlScrollTarget`을 해당 스크롤 요소의 셀렉터로 지정하세요.
 
 > **드래그 중 구간 정보 (`dragSelection.use` + `updateHoverOnDrag`)**
-> - 아래 동작은 `dragSelection.updateHoverOnDrag: true` 일 때만 적용됩니다(기본 `false`). 끄면 드래그 중 툴팁·하이라이트가 드래그 시작 시점 그대로 멈춰 있고 선택 영역만 갱신됩니다.
+> - 아래 동작은 `dragSelection.updateHoverOnDrag: true` 일 때만 적용됩니다(기본 `false`). 끄면 드래그 중에는 선택 영역만 갱신됩니다 — 하이라이트·인디케이터는 드래그를 시작할 때 지워지고, 툴팁은 라이브러리가 건드리지 않습니다.
 > - 드래그하는 **동안**에는 `formatter.html` 이 2번째 인자로 `{ dragRange: { from, to } }` 을 함께 받습니다. 드래그 중이 아니면 2번째 인자는 전달되지 않으므로 기존 formatter 는 그대로 동작합니다.
 > - `from` 은 드래그를 시작한 지점, `to` 는 현재 커서 지점의 x축 값입니다. mouseup 때 `drag-select` 가 주는 `range.xMin`/`xMax` 와 **정확히 같은 값**이라(같은 계산을 재사용) 드래그 중 보이는 구간과 최종 결과가 어긋나지 않으며, 데이터 라벨 간격보다 잘게 움직입니다. 시작/현재 순서를 유지하므로 역방향(오른쪽 → 왼쪽) 드래그면 `from` 이 `to` 보다 큽니다.
 > - `range` 와 같은 축 제약을 따릅니다 — `step` 축에서는 값이 `NaN` 입니다.
