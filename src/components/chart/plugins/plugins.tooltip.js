@@ -43,7 +43,7 @@ const quantizeTooltipMaxWidth = (room) => {
   return Math.floor(room / STEP) * STEP;
 };
 
-const clampRatio = r => (Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : 1);
+const clampRatio = (r) => (Number.isFinite(r) ? Math.max(0, Math.min(1, r)) : 1);
 
 /**
  * 스케일 범위(step) 대비 데이터 범위(range)의 픽셀 경계를 계산한다.
@@ -1074,13 +1074,7 @@ const modules = {
     if (options.horizontal) {
       const ySteps = this.axesSteps?.y || [];
       for (let i = 0; i < ySteps.length; i += 1) {
-        const bounds = calcDomainBounds(
-          ySteps[i],
-          this.axesRange?.y?.[i],
-          y2,
-          y2 - y1,
-          true,
-        );
+        const bounds = calcDomainBounds(ySteps[i], this.axesRange?.y?.[i], y2, y2 - y1, true);
         if (bounds) {
           yMin = Math.min(yMin, bounds[0]);
           yMax = Math.max(yMax, bounds[1]);
@@ -1096,13 +1090,7 @@ const modules = {
     } else {
       const xSteps = this.axesSteps?.x || [];
       for (let i = 0; i < xSteps.length; i += 1) {
-        const bounds = calcDomainBounds(
-          xSteps[i],
-          this.axesRange?.x?.[i],
-          x1,
-          x2 - x1,
-          false,
-        );
+        const bounds = calcDomainBounds(xSteps[i], this.axesRange?.x?.[i], x1, x2 - x1, false);
         if (bounds) {
           xMin = Math.min(xMin, bounds[0]);
           xMax = Math.max(xMax, bounds[1]);
@@ -1218,10 +1206,7 @@ const modules = {
         hoverRatio = (offsetX - graphPos.x1) / chartWidth;
       }
 
-      const index = Math.min(
-        Math.max(Math.floor(hoverRatio * labelsCount), 0),
-        labelsCount - 1,
-      );
+      const index = Math.min(Math.max(Math.floor(hoverRatio * labelsCount), 0), labelsCount - 1);
       return +this.data.labels[index];
     }
 

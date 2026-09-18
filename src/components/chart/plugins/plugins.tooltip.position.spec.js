@@ -322,7 +322,10 @@ describe('측정 시점에는 폭 상한이 걸려 있지 않다', () => {
     Object.defineProperty(child, 'offsetWidth', { get: () => record(TIP_W), configurable: true });
     Object.defineProperty(child, 'offsetHeight', { get: () => record(120), configurable: true });
     tooltipDOM.appendChild(child);
-    Object.defineProperty(tooltipDOM, 'offsetHeight', { get: () => record(120), configurable: true });
+    Object.defineProperty(tooltipDOM, 'offsetHeight', {
+      get: () => record(120),
+      configurable: true,
+    });
     tooltipDOM.getBoundingClientRect = () => ({ width: record(TIP_W), height: 120 });
 
     const chart = Object.assign(Object.create(Tooltip), {
