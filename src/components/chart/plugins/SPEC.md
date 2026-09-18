@@ -78,7 +78,7 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 - `tooltip.formatter.html` + 시리즈 수가 `virtualScroll.threshold` 이상이면 row 컨테이너 직속 자식이 spacer/viewport/spacer 3개로 재구성되고 가시 범위 밖 행은 DOM에서 detach된다. row 탐지 실패 시 경고 1회 후 전체 부착으로 fallback한다. (plugins.tooltip.virtualScroll.spec.js)
 - 툴팁 배치는 가시 영역(스크롤 오프셋 포함) 기준으로 반전되고, 배치 지점에서 남은 폭이 `max-width` 상한으로 걸린다(측정 직전 해제). (plugins.tooltip.position.spec.js)
 - 반전된 뒤에는 폭이 줄어도 방향을 유지하고, 커서가 왼쪽 가장자리라 왼쪽에 못 놓으면 오른쪽으로 되돌린다. 양쪽 모두 안 들어가면 남은 폭이 넓은 쪽을 택하고, 그 구간에서는 폭이 변해도 커서 위치로만 방향이 정해진다(커서가 우단에 붙어도 상한이 0 이 되지 않는다). (plugins.tooltip.position.spec.js)
-- 방향 기억은 `tooltipClear`(mouse-leave 주 경로)에서도 버려지고, 예약된 `debouncedHide` 가 있는 채 다시 표시되면 유지된다. (plugins.tooltip.position.spec.js)
+- 방향 기억은 `tooltipClear`(mouse-leave 주 경로)와 formatter 예외로 툴팁을 포기하는 경로에서도 버려지고, 예약된 `debouncedHide` 가 있는 채 다시 표시되면 유지된다. (plugins.tooltip.position.spec.js)
 - 반전 배치의 우단은 폭과 무관하게 `커서 - 20px` 이다. (plugins.tooltip.position.spec.js)
 - body가 뷰포트보다 넓은 레이아웃에서 차트 위를 훑어도 툴팁이 가시 영역을 벗어나거나 `documentElement.scrollWidth`를 늘리지 않는다. 배치 후 내용이 넓어져도 같다. (chart.tooltipOverflow.visual.spec.js — 실제 브라우저)
 - 범례 클릭 시 대상 시리즈의 `show`가 토글되고 `click-legend` 리스너가 `{ seriesIds, isActiveAll }`(heatMap은 `{ seriesIndices, isActiveAll }`)로 호출된다. 마지막 활성 1개는 inactive 모드에서 비활성화되지 않는다. (수동 QA)

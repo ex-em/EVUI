@@ -988,6 +988,7 @@ const modules = {
         console.warn('[evui] tooltip.formatter.html threw, tooltip skipped:', err);
       }
       this.tooltipDOM.style.display = 'none';
+      this.resetTooltipPlacement();
       return;
     }
     const userCustomTooltipBody = Util.htmlToElement(html);

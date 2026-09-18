@@ -208,6 +208,7 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     chart.tooltipDOM = document.createElement('div');
     chart.drawCustomTooltip = tooltipModules.drawCustomTooltip;
+    chart.resetTooltipPlacement = tooltipModules.resetTooltipPlacement;
     chart.options.tooltip.formatter.html = () => {
       throw new Error('boom');
     };
