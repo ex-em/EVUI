@@ -1,3 +1,24 @@
+# [3.21.0](https://github.com/ex-em/EVUI/compare/3.20.0...3.21.0) (2026-09-18)
+
+
+### Bug Fixes
+
+* **chart:** 위로 반전된 툴팁의 상단이 화면 밖으로 잘리던 문제 수정 ([7d30d92](https://github.com/ex-em/EVUI/commit/7d30d92d3084ea5b6a852aacc5d6758c4f130472))
+* **chart:** 커스텀 HTML 툴팁이 가시 영역을 벗어나 문서 가로 스크롤을 만들던 문제 수정 ([24c9161](https://github.com/ex-em/EVUI/commit/24c91617f839762c7db84de891f0fd1f328094c3))
+* 기존 코드에서 중복된 hasLineSeries 계산 제거 ([3a09be1](https://github.com/ex-em/EVUI/commit/3a09be1e184453b08f0b47a696c199836ba5f83d))
+
+
+### Features
+
+* **chart:** updateIndicatorHitBounds 로직 개선 및 테스트 추가 ([2d20821](https://github.com/ex-em/EVUI/commit/2d20821633ec4f2cf23351753fd5e536849ac437))
+* **chart:** 인디케이터 히트 감지 개선을 위한 updateIndicatorHitBounds 메서드 추가 ([70ab6ea](https://github.com/ex-em/EVUI/commit/70ab6ea93fcac39814c2394cb98cef39d2460e35))
+* **chart:** 정밀한 도메인 경계 계산을 위한 calcDomainBounds 함수 추가 ([c97e04f](https://github.com/ex-em/EVUI/commit/c97e04fa06fe77b6c8545d612f6e05c5166e6247))
+
+
+### Performance Improvements
+
+* **chart:** 툴팁 폭 상한이 커서를 1px 단위로 따라다니던 문제 수정 ([acccf87](https://github.com/ex-em/EVUI/commit/acccf876273f40ec63bee3e9c2af689f7475d79b))
+
 # [3.20.0](https://github.com/ex-em/EVUI/compare/3.19.1...3.20.0) (2026-09-15)
 
 
