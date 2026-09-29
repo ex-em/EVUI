@@ -100,6 +100,7 @@ export default {
     const injectBrushIdx = inject('brushIdx', { start: 0, end: -1 });
     const injectEvChartPropsInGroup = inject('evChartPropsInGroup', []);
     const injectGroupInteraction = inject('groupInteraction', null);
+    const injectGroupSharedTooltip = inject('groupSharedTooltip', null);
 
     const {
       eventListeners,
@@ -199,6 +200,7 @@ export default {
         selectItemInfo,
         selected,
         injectBrushSeries,
+        injectGroupSharedTooltip,
       );
     };
 
