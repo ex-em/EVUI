@@ -111,6 +111,34 @@ describe('sharedTooltip (그룹 공유 툴팁)', () => {
     expect(dom.lastElementChild).toBe(def.tooltipBodyDOM);
   });
 
+  it('소유권 전환 시 이전 차트가 숨긴 header 를 풀어 둔다(showHeader:false·pie 의 display:none)', () => {
+    const shared = { elements: null, owner: null };
+    const noHeader = createChart(shared, { showHeader: false });
+    const line = createChart(shared);
+    noHeader.createTooltipDOM();
+    line.createTooltipDOM();
+
+    noHeader.acquireTooltip();
+    noHeader.tooltipHeaderDOM.style.display = 'none'; // drawTooltip 의 헤더 숨김 경로
+
+    line.acquireTooltip();
+    expect(line.tooltipHeaderDOM.style.display).not.toBe('none');
+  });
+
+  it('소유권 전환 시 이전 차트의 textOverflow 클래스를 남기지 않는다', () => {
+    const shared = { elements: null, owner: null };
+    const ellipsis = createChart(shared, { textOverflow: 'ellipsis' });
+    const wrap = createChart(shared, { textOverflow: 'wrap' });
+    ellipsis.createTooltipDOM();
+    wrap.createTooltipDOM();
+
+    ellipsis.acquireTooltip();
+    ellipsis.tooltipHeaderDOM.classList.add('ev-chart-tooltip-header--ellipsis');
+
+    wrap.acquireTooltip();
+    expect(wrap.tooltipHeaderDOM.className).toBe('ev-chart-tooltip-header');
+  });
+
   it('소유권 전환 시 이전 소유 차트의 가상 스크롤 세션을 정리한다', () => {
     const shared = { elements: null, owner: null };
     const a = createChart(shared);
