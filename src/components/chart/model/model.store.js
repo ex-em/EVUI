@@ -263,11 +263,6 @@ const modules = {
       dataset.toTime = nextToTime;
       dataset.fromTime = dataset.toTime - length * 1000;
 
-      // (원래 코드에 있던 early return 유지)
-      if (lastTime && (dataset.toTime - lastTime) / 1000 > length && key === '') {
-        return;
-      }
-
       // 9) dataGroup 슬롯 확보
       for (let i = 0; i < length; i++) {
         if (!dataGroup[i]) {
