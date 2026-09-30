@@ -169,6 +169,18 @@ const modules = {
       toTime: 0,
     };
     const noDataEdge = { fromTime: 0, toTime: 0 };
+    // 렌더 X축 윈도우는 전역 우측단(= 점을 받은 series 의 toTime 최댓값)을 따라야 prune 윈도우(globalToTime)와
+    // 일치한다. last-write-wins 로 마지막 처리 키의 toTime 을 쓰면, 신규 점이 끊긴 stale series 가 마지막
+    // 키일 때 살아있는 series 의 maxX 까지 그 옛 시각에 묶여 축이 prune 전까지 freeze 된다. fromTime 은
+    // 항상 toTime - length*1000 이므로 max 인 series 의 fromTime 을 함께 취한다.
+    // 점을 받은 적 없는 series(lastDataTime 0)는 리셋 전 시각·Date.now() fallback 을 들고 있어 따로 모은다.
+    const takeEdge = (dataset) => {
+      const edge = dataset.lastDataTime ? minMaxValues : noDataEdge;
+      if (dataset.toTime > edge.toTime) {
+        edge.toTime = dataset.toTime;
+        edge.fromTime = dataset.fromTime;
+      }
+    };
 
     for (let x = 0; x < keys.length; x++) {
       const key = keys[x];
@@ -399,16 +411,13 @@ const modules = {
         minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
         minMaxValues.minY = Math.min(minMaxValues.minY, tempMinMax.minY);
       }
-      // 렌더 X축 윈도우는 전역 우측단(= 점을 받은 series 의 toTime 최댓값)을 따라야 prune 윈도우(globalToTime)와
-      // 일치한다. last-write-wins 로 마지막 처리 키의 toTime 을 쓰면, 신규 점이 끊긴 stale series 가 마지막
-      // 키일 때 살아있는 series 의 maxX 까지 그 옛 시각에 묶여 축이 prune 전까지 freeze 된다. fromTime 은
-      // 항상 toTime - length*1000 이므로 max 인 series 의 fromTime 을 함께 취한다.
-      // 점을 받은 적 없는 series(lastDataTime 0)는 리셋 전 시각·Date.now() fallback 을 들고 있어 따로 모은다.
-      const edge = dataset.lastDataTime ? minMaxValues : noDataEdge;
-      if (dataset.toTime > edge.toTime) {
-        edge.toTime = dataset.toTime;
-        edge.fromTime = dataset.fromTime;
-      }
+      takeEdge(dataset);
+    }
+
+    // 처리한 키가 없는 배치(소비자가 마지막 키까지 뺀 `data: {}`)면 누적 저장소 전체로 잡는다 — 우측단이 0 이면
+    // X축이 epoch 기준으로 역전된다.
+    if (!minMaxValues.toTime && !noDataEdge.toTime) {
+      Object.values(this.dataSet).forEach(takeEdge);
     }
 
     // 점을 받은 series 가 하나도 없을 때(마운트·리셋 직후)만 나머지 series 로 우측단을 잡는다.
