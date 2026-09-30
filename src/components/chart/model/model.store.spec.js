@@ -1073,6 +1073,23 @@ describe('model.store createRealTimeScatterDataSet 기준 시각 역행 방지 �
     expect(pointXs(store, 's1')).toEqual([T + 10 * SECOND]);
   });
 
+  it('빈 문자열 키에 창보다 오래된 배치가 와도 같은 틱의 다른 series 는 반영된다', () => {
+    const store = buildStore({ range: 10, scatterIds: ['', 'a'] });
+
+    store.createRealTimeScatterDataSet({
+      '': [{ x: T + 100 * SECOND, y: 1 }],
+      a: [{ x: T + 100 * SECOND, y: 1 }],
+    });
+    store.createRealTimeScatterDataSet({
+      '': [{ x: T + 50 * SECOND, y: 2 }],
+      a: [{ x: T + 101 * SECOND, y: 2 }],
+    });
+
+    expect(pointXs(store, 'a').sort((x, y) => x - y)).toEqual([T + 100 * SECOND, T + 101 * SECOND]);
+    expect(maxX(store, 'a')).toBe(T + 101 * SECOND);
+    expect(pointXs(store, '')).toEqual([T + 100 * SECOND]);
+  });
+
   it('리셋 후에는 이전보다 과거 시각의 배치가 새 기준이 되고, 리셋 전 점은 남지 않는다', () => {
     const store = buildStore();
 
