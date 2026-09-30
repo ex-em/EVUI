@@ -180,6 +180,7 @@ describe('Chart.vue realTimeScatterReset — 리셋 전 배치 폐기', () => {
     await feed(wrapper, { realTimeScatterReset: true });
     vi.advanceTimersByTime(0);
 
-    expect(lastUpdateData()).toEqual({});
+    // 키는 남긴다 — 키가 하나도 없으면 링 루프가 돌지 않아 X축이 epoch 로 계산된다.
+    expect(lastUpdateData()).toEqual({ s1: [] });
   });
 });
