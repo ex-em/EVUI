@@ -168,6 +168,7 @@ const modules = {
       fromTime: 0,
       toTime: 0,
     };
+    const noDataEdge = { fromTime: 0, toTime: 0 };
 
     for (let x = 0; x < keys.length; x++) {
       const key = keys[x];
@@ -222,8 +223,12 @@ const modules = {
       // 실제 점이 준 최신 시각(lastDataTime) 아래로는 내려가지 않는다 — 늦게 온 옛 배치가 기준을 되돌리면
       // 다음 배치의 gap 이 그만큼 부풀어 좌단 버킷이 일찍 비워진다. 하한을 toTime 으로 두지 않는 건
       // 점 없는 배치에서 toTime 이 Date.now() fallback 으로 채워질 수 있어서다.
-      const nextToTime = lastTime ? Math.max(lastTime, dataset.lastDataTime) : prevToTime;
+      // 단, 창(fromTime)에 한 점도 못 들어갈 만큼 과거인 배치는 늦은 응답이 아니라 시각 이동(시계 보정·
+      // 미래 이상치 이후)으로 보고 기준을 다시 잡는다 — 하한을 고집하면 이후 점이 전부 창 밖에 버려진다.
+      let nextToTime = prevToTime;
       if (lastTime) {
+        const isBeforeWindow = lastTime < dataset.lastDataTime - length * 1000;
+        nextToTime = isBeforeWindow ? lastTime : Math.max(lastTime, dataset.lastDataTime);
         dataset.lastDataTime = nextToTime;
       }
 
@@ -394,14 +399,22 @@ const modules = {
         minMaxValues.maxY = Math.max(minMaxValues.maxY, tempMinMax.maxY);
         minMaxValues.minY = Math.min(minMaxValues.minY, tempMinMax.minY);
       }
-      // 렌더 X축 윈도우는 전역 우측단(= 모든 series 의 toTime 최댓값)을 따라야 prune 윈도우(globalToTime)와
+      // 렌더 X축 윈도우는 전역 우측단(= 점을 받은 series 의 toTime 최댓값)을 따라야 prune 윈도우(globalToTime)와
       // 일치한다. last-write-wins 로 마지막 처리 키의 toTime 을 쓰면, 신규 점이 끊긴 stale series 가 마지막
       // 키일 때 살아있는 series 의 maxX 까지 그 옛 시각에 묶여 축이 prune 전까지 freeze 된다. fromTime 은
       // 항상 toTime - length*1000 이므로 max 인 series 의 fromTime 을 함께 취한다.
-      if (dataset.toTime > minMaxValues.toTime) {
-        minMaxValues.toTime = dataset.toTime;
-        minMaxValues.fromTime = dataset.fromTime;
+      // 점을 받은 적 없는 series(lastDataTime 0)는 리셋 전 시각·Date.now() fallback 을 들고 있어 따로 모은다.
+      const edge = dataset.lastDataTime ? minMaxValues : noDataEdge;
+      if (dataset.toTime > edge.toTime) {
+        edge.toTime = dataset.toTime;
+        edge.fromTime = dataset.fromTime;
       }
+    }
+
+    // 점을 받은 series 가 하나도 없을 때(마운트·리셋 직후)만 나머지 series 로 우측단을 잡는다.
+    if (!minMaxValues.toTime) {
+      minMaxValues.toTime = noDataEdge.toTime;
+      minMaxValues.fromTime = noDataEdge.fromTime;
     }
 
     if (!Number.isFinite(minMaxValues.minY)) {
@@ -450,13 +463,20 @@ const modules = {
       return;
     }
 
-    // 전역 윈도우 우측단 = 모든 series 의 toTime 중 최댓값(= 살아있는 series 의 최신 시각).
+    // 전역 윈도우 우측단 — 렌더 우측단과 같은 규칙(점을 받은 series 의 toTime 최댓값, 없으면 전 series).
     let globalToTime = 0;
+    let noDataToTime = 0;
     for (let i = 0; i < keys.length; i++) {
-      const t = dataSet[keys[i]].toTime || 0;
-      if (t > globalToTime) {
-        globalToTime = t;
+      const ds = dataSet[keys[i]];
+      const t = ds.toTime || 0;
+      if (ds.lastDataTime) {
+        globalToTime = Math.max(globalToTime, t);
+      } else {
+        noDataToTime = Math.max(noDataToTime, t);
       }
+    }
+    if (!globalToTime) {
+      globalToTime = noDataToTime;
     }
 
     const range = this.options.realTimeScatter?.range || 300;
