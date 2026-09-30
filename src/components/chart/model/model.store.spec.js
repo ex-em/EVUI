@@ -1141,6 +1141,16 @@ describe('model.store createRealTimeScatterDataSet 기준 시각 역행 방지 �
     expect(store.dataSet.s1).toBeDefined();
   });
 
+  it('처리한 키가 없는 배치(data: {})면 누적 저장소 전체로 우측단을 잡는다', () => {
+    const store = buildStore();
+
+    store.createRealTimeScatterDataSet({ s1: [{ x: T + 100 * SECOND, y: 1 }] });
+    store.createRealTimeScatterDataSet({});
+
+    expect(maxX(store, 's1')).toBe(T + 100 * SECOND);
+    expect(store.seriesList.s1.minMax.minX.valueOf()).toBe(T - 199 * SECOND);
+  });
+
   it('점을 받은 series 가 하나도 없으면 만료 판정도 전 series 기준이다(종전 동작)', () => {
     vi.useFakeTimers({ toFake: ['Date'] });
     vi.setSystemTime(T);
