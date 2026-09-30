@@ -183,6 +183,7 @@ const modules = {
           length: 0,
           fromTime: 0,
           toTime: 0,
+          lastDataTime: 0,
         };
 
         this.dataSet[key] = {
@@ -217,8 +218,14 @@ const modules = {
       // 4) prevToTime은 덮기 전 값 (없으면 fallback)
       const prevToTime = dataset.toTime || fallbackTime;
 
-      // 5) nextToTime 결정: 새 데이터가 있으면 lastTime, 없으면 이전 유지
-      const nextToTime = lastTime || prevToTime;
+      // 5) nextToTime 결정: 새 데이터가 있으면 lastTime, 없으면 이전 유지.
+      // 실제 점이 준 최신 시각(lastDataTime) 아래로는 내려가지 않는다 — 늦게 온 옛 배치가 기준을 되돌리면
+      // 다음 배치의 gap 이 그만큼 부풀어 좌단 버킷이 일찍 비워진다. 하한을 toTime 으로 두지 않는 건
+      // 점 없는 배치에서 toTime 이 Date.now() fallback 으로 채워질 수 있어서다.
+      const nextToTime = lastTime ? Math.max(lastTime, dataset.lastDataTime) : prevToTime;
+      if (lastTime) {
+        dataset.lastDataTime = nextToTime;
+      }
 
       const resetDataGroup = (group) => {
         group.data.length = 0;
@@ -533,6 +540,20 @@ const modules = {
     if (this.defaultSelectItemInfo?.seriesID === sId) {
       this.defaultSelectItemInfo = null;
     }
+  },
+
+  /**
+   * realTimeScatterReset 용 — 전 series 링을 비우고 기준 시각 하한(lastDataTime)을 푼다.
+   * 하한이 남으면 리셋 뒤 과거 시각 데이터가 모두 창 밖으로 취급돼 차트가 멈춘다.
+   * toTime·링 포인터는 그대로 두어 리셋 직후 첫 배치의 만료 판정이 리셋 전과 같다.
+   *
+   * @returns {undefined}
+   */
+  resetRealTimeScatterDataSet() {
+    Object.values(this.dataSet ?? {}).forEach((dataset) => {
+      dataset.dataGroup = [];
+      dataset.lastDataTime = 0;
+    });
   },
 
   /**

@@ -22,7 +22,13 @@ import { isEqual, debounce } from 'lodash-es';
 import { resize } from '@/directives/resize';
 import EvChart from './chart.core';
 import EvChartToolbar from './ChartToolbar';
-import { useModel, useWrapper, useZoomModel, cloneChartData } from './uses';
+import {
+  useModel,
+  useWrapper,
+  useZoomModel,
+  cloneChartData,
+  mergeRealTimeScatterData,
+} from './uses';
 
 export default {
   name: 'EvChart',
@@ -138,6 +144,9 @@ export default {
     const nowMs = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
     let pendingUpdate = null;
     let pendingTimer = null;
+    // realTimeScatter 는 배치마다 다른 구간의 증분이라 최신 배치로 덮으면 앞선 배치가 링에 들어가지 않는다.
+    // 마지막 flush 이후 data watcher 로 들어온 배치만 모은다 — options 변경의 pendingUpdate 와는 별개다.
+    let pendingRealTimeScatterData = null;
 
     const scheduleUpdate = (params) => {
       if (!pendingUpdate) {
@@ -168,6 +177,7 @@ export default {
         }
         pendingUpdate = null;
         pendingTimer = null;
+        pendingRealTimeScatterData = null;
       };
 
       clearTimeout(pendingTimer);
@@ -279,7 +289,15 @@ export default {
           !isEqual(newData.labels, evChart.data.labels) ||
           !isEqual(newData.data, evChart.data.data);
 
-        evChart.data = props.options.realTimeScatter?.use ? newData : cloneChartData(newData);
+        if (props.options.realTimeScatter?.use) {
+          pendingRealTimeScatterData = mergeRealTimeScatterData(
+            pendingRealTimeScatterData,
+            newData,
+          );
+          evChart.data = { ...newData, data: pendingRealTimeScatterData };
+        } else {
+          evChart.data = cloneChartData(newData);
+        }
 
         scheduleUpdate({
           updateSeries: isUpdateSeries,
@@ -364,11 +382,14 @@ export default {
       () => props.realTimeScatterReset,
       (flag) => {
         if (flag) {
-          Object.keys(evChart.dataSet ?? {}).forEach((series) => {
-            if (evChart.dataSet[series]) {
-              evChart.dataSet[series].dataGroup = [];
-            }
-          });
+          evChart.resetRealTimeScatterDataSet();
+
+          // 리셋 전에 받아 둔 배치를 버린다. update 는 updateData 와 무관하게 evChart.data 를 링에 다시
+          // 넣으므로, 남겨 두면 대기 중 flush·이후 options 변경에서 리셋 전 점이 새 기준이 된다.
+          if (props.options.realTimeScatter?.use) {
+            pendingRealTimeScatterData = null;
+            evChart.data = { ...evChart.data, data: {} };
+          }
 
           // 전체 리셋 후에는 만료 제거 가드도 비워, 데이터가 다시 오면 series 가 재생성되게 한다.
           evChart.prunedRealTimeScatterSeries?.clear();
@@ -423,6 +444,7 @@ export default {
       clearTimeout(pendingTimer);
       pendingUpdate = null;
       pendingTimer = null;
+      pendingRealTimeScatterData = null;
 
       if (evChart && 'destroy' in evChart) {
         evChart.destroy();

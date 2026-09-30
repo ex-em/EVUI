@@ -333,6 +333,30 @@ export const cloneChartData = (data) =>
     return undefined;
   });
 
+/**
+ * realTimeScatter flush 대기 중 증분(pending)에 최신 배치를 series 키별로 이어 붙인다.
+ * 최신 배치 series 에서 빠진 키는 버린다(삭제된 series 를 되살리지 않게). 소비자 배열은 변이하지 않는다.
+ */
+export const mergeRealTimeScatterData = (pending, latest) => {
+  if (!pending) {
+    return latest.data;
+  }
+
+  const latestData = latest.data ?? {};
+  const merged = {};
+  Object.keys(latestData).forEach((key) => {
+    merged[key] = pending[key]?.length
+      ? pending[key].concat(latestData[key] ?? [])
+      : latestData[key];
+  });
+  Object.keys(pending).forEach((key) => {
+    if (!(key in merged) && latest.series?.[key]) {
+      merged[key] = pending[key];
+    }
+  });
+  return merged;
+};
+
 const useWidgetClickEvent = () => {
   let timer = null;
   const Delay = 200;

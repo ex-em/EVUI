@@ -23,7 +23,8 @@ EvChart 코어에 mixin되는 데이터 모델 계층이다. 사용자가 넘긴
 
 ### realTimeScatter 링 버퍼 (model.store.js)
 
-- **링 버퍼 누적**: `createRealTimeScatterDataSet(datas)`가 series별 `dataSet[key]`에 초 단위 버킷 링 버퍼(`dataGroup`, 길이 = `options.realTimeScatter.range || 300`)를 유지한다. 배치 lastTime 기준으로 gap(초)만큼 링을 전진시키며 지나간 버킷을 reset하고, 윈도우(`fromTime`~`toTime`) 안 점만 push한다. 버킷별 max/min을 유지하고, series min/max는 윈도우 내 점만 집계한다(minY/maxY 모두 ±Infinity에서 시작 — 음수 전용 데이터 대응, 유효 데이터 없으면 0/0 fallback). [NEEDS CLARIFICATION: 함수 중간의 early return 조건이 `key === ''`를 포함해 빈 문자열 series 키에서만 동작한다("원래 코드에 있던 early return 유지" 주석) — 의도된 가드인가, 사실상 도달 불가한 잔존 코드인가?]
+- **링 버퍼 누적**: `createRealTimeScatterDataSet(datas)`가 series별 `dataSet[key]`에 초 단위 버킷 링 버퍼(`dataGroup`, 길이 = `options.realTimeScatter.range || 300`)를 유지한다. 배치 lastTime 기준으로 gap(초)만큼 링을 전진시키며 지나간 버킷을 reset하고, 윈도우(`fromTime`~`toTime`) 안 점만 push한다. 버킷별 max/min을 유지하고, series min/max는 윈도우 내 점만 집계한다(minY/maxY 모두 ±Infinity에서 시작 — 음수 전용 데이터 대응, 유효 데이터 없으면 0/0 fallback). [NEEDS CLARIFICATION: 함수 중간의 early return 조건이 `key === ''`를 포함해 빈 문자열 series 키에서만 동작한다("원래 코드에 있던 early return 유지" 주석) — 의도된 가드인가, 잔존 코드인가? 기준 시각 단조화(#2346) 전에는 `toTime`이 늘 `lastTime`으로 덮여 도달 불가였으나, 이제 창보다 오래된 배치가 오면 도달한다. `continue`가 아니라 `return`이라 같은 틱의 나머지 키·minMax·prune을 건너뛴다.]
+- **기준 시각 단조**: `toTime`은 실제 점이 준 최신 시각(`dataset.lastDataTime`) 아래로 내려가지 않는다. 늦게 온 옛 배치는 링을 밀지 않고(gap 0) 창 안의 점만 제 칸에 넣는다. 점 없는 배치에서 `toTime`을 채우는 `Date.now()` fallback은 하한이 아니다. `resetRealTimeScatterDataSet()`은 전 series `dataGroup`을 비우고 하한(`lastDataTime`)만 푼다 — `toTime`·링 포인터는 유지해 리셋 직후 첫 배치의 만료 판정이 리셋 전과 같다.
 - **좌표 dedupe**: `options.coordinateDedupe !== false`(기본 on)이면 버킷별 `dataKeys` Set으로 동일 (x,y) 중복 push를 차단한다. `false`는 #2011의 "모든 중복 좌표 표시" opt-out으로, data 레이어에서 dedupe를 강제하지 않는다. dedupe on + scatter series 2개 이상일 때만 점에 좌표 키 `k`를 캐시한다(단일 series는 element가 k를 읽지 않아 생략).
 - **blit 틱 메타**: 틱마다 `dataset.lastTick = { seq, gapCount, prevToTime, toTime, length, startIndex, endIndex, maxDirtyAge }`를 기록한다. `seq`는 단조 증가(sub-second 틱 갱신 판정용), `maxDirtyAge`는 신규 점이 우측단에서 떨어진 최대 버킷 거리(-1=신규 없음)로, draw 단계(`chart.core` blit gate / `element.scatter` strip draw)가 strip-only redraw ↔ full redraw 폴백 판정에 소비한다.
 - **시리즈 만료 제거**: `pruneExpiredRealTimeScatterSeries(datas)`가 (a) `ds.toTime < globalToTime - (range-1)*1000` AND (b) 이번 틱 신규 점 없음(`!datas[sId]?.length`)이면 grace 없이 즉시 제거한다. (a)의 좌단은 렌더 좌단(`minMax.minX = fromTime + 1000`, 링이 보유하는 가장 오래된 버킷)과 같은 기준이어야 "가시 점 0개"와 등가다 — `globalToTime - range*1000`을 쓰면 점이 안 보이는 틱에 제거되지 않고 1버킷 뒤에 제거된다(외부 범례를 자체 판정으로 갱신하는 소비자에선 드리프트). "series 키 부재"로는 판정하지 않는다. `removeRealTimeScatterSeries(sId)`는 `dataSet`/`seriesList`/`seriesInfo.charts.scatter`/선택 상태에서 제거하고 재추가 방지 가드 `prunedRealTimeScatterSeries` Set에 등록한 뒤, 범례를 rebuild한다(external이면 `emitLegendData`, 아니면 `updateLegend`).
@@ -60,6 +61,7 @@ EvChart 코어에 mixin되는 데이터 모델 계층이다. 사용자가 넘긴
 - 같은 series 집합을 reconcile하면 전 인스턴스 참조가 재사용되고, opt/type 변경 series만 recreate되며, index만 바뀐 색 명시 series는 재사용된다. 재사용 인스턴스의 show는 `_freshShow`로, group/stack 메타는 기본값으로 리셋된다. (reconcileSeriesSet.spec.js)
 - realTimeScatter: 동일 (x,y)는 배치 내 1회만 push되고(`coordinateDedupe=false`면 전부 push), (a)+(b) 조건 충족 series는 즉시 제거되며, 제거된 series는 신규 점이 오기 전까지 데이터 레이어에서 재생성되지 않고 신규 점이 오면 reconcile에서 부활한다. 생존 series의 maxX는 전역 max toTime을 따른다. (model.store.spec.js, reconcileSeriesSet.spec.js)
 - realTimeScatter 만료 경계: 마지막 값이 렌더 좌단(`fromTime + 1000`) 밖으로 밀려난 **그 틱**에 제거된다(한 틱 지연 없음). `y=null` 축 패딩만 보내는 series 는 range 를 넘겨도 보존된다. (model.store.spec.js)
+- realTimeScatter 기준 시각: 옛 배치가 와도 `toTime`(축 우측단)이 역행하지 않아 이후 배치에서 창 안의 점이 보존되고, 점 없는 배치의 fallback 시각은 하한이 되지 않는다. 리셋 후에는 과거 시각 배치가 새 기준이 되고, 리셋 직후 첫 배치에 빠진 series 는 즉시 제거되지 않는다. (model.store.spec.js)
 - hit test: directHit > hit > 거리 기반 fallback 우선순위를 지키고, 값(o)이 null인 series는 좌표가 더 가까워도 fallback에서 제외되며(0은 포함), all-null 라벨은 `disableNullLabelSnap` 여부에 따라 이웃 스냅 또는 그대로 반환한다. (model.store.spec.js)
 - `getVisibleWindowMaxSeries`는 윈도우 내 유한값 max만 반환하고 show=false·NaN/Infinity를 제외하며, 윈도우가 data 길이 밖이어도 안전하게 clamp한다. (model.store.spec.js)
 
@@ -92,7 +94,7 @@ model은 클래스가 아닌 메서드 모음(plain object) 2개로 구성되고
 |------|------|
 | index.js | `{ Store, Series }` export + 공용 JSDoc typedef(ChartDOMSize, ChartRect, MouseLabelValue, ChartSeriesDataPoint, InterpolationType) |
 | model.series.js | 시리즈 인스턴스 생성(createSeriesSet/addSeries)·증분 재조정(reconcileSeriesSet, 재사용 판정)·overlapping 정렬·스택 그룹 메타(addGroupInfo) |
-| model.store.js | 데이터셋 정규화(일반/스택/pie/sunburst/scatter/heatMap/realTimeScatter 링 버퍼)·만료 제거·min/max·hit test·라벨 조회·집계 |
+| model.store.js | 데이터셋 정규화(일반/스택/pie/sunburst/scatter/heatMap/realTimeScatter 링 버퍼)·만료 제거·리셋·min/max·hit test·라벨 조회·집계 |
 
 ## Dependencies
 
@@ -115,6 +117,7 @@ model은 클래스가 아닌 메서드 모음(plain object) 2개로 구성되고
 | stackTops | 스택 그룹별 부호별(`pos`/`neg`) 누적 top 배열. base 조회를 O(1)로 만드는 createDataSet 지역 상태 |
 | _dataEpoch | 데이터셋 재생성마다 +1되는 카운터. geometry 메모이즈 무효화 키 |
 | dataGroup(링 버퍼) | realTimeScatter의 초 단위 버킷 배열. `startIndex`/`endIndex` 링 포인터로 전진하며 버킷별 data/dataKeys/max/min 보유 |
+| lastDataTime | realTimeScatter series가 실제 점으로 받은 최신 버킷 시각. `toTime`의 단조 하한이며 리셋에서 0으로 풀린다 |
 | prunedRealTimeScatterSeries | 만료 제거된 series 키 Set(재추가 방지 가드). 해제는 reconcileSeriesSet에서만 |
 | reconcile key | 인스턴스 생성 시 opt 외 입력을 캡처한 키(type/isHorizontal/timeMode/realTime/heatMapColor/isGradient). 재사용 판정 기준 |
 | _freshShow | 생성자가 resolve한 show 값(범례 토글 전). 재사용 시 이 값으로 리셋 |
