@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import modules from './model.store';
 import Util from '../helpers/helpers.util';
 
@@ -1007,6 +1007,94 @@ describe('model.store createRealTimeScatterDataSet 개별 series 만료 제거',
     // 축 우측단은 전역 max(t0+3s)여야 한다 — c 의 stale toTime(t0)이 아니라.
     expect(store.seriesList.a.minMax.maxX.valueOf()).toBe(t0 + 3 * SECOND);
     expect(store.seriesList.b.minMax.maxX.valueOf()).toBe(t0 + 3 * SECOND);
+  });
+});
+
+/**
+ * realTimeScatter 기준 시각(toTime)은 실제 점이 준 최신 시각 아래로 되돌아가지 않는다(#2346).
+ * 늦게 도착한 옛 배치가 toTime 을 되돌리면 다음 배치의 gap 이 그만큼 부풀어 좌단 버킷이 일찍 비워진다.
+ * 리셋은 그 하한을 풀어, 시각이 정당하게 뒤로 가는 경우에도 차트가 멈추지 않게 한다.
+ */
+describe('model.store createRealTimeScatterDataSet 기준 시각 역행 방지 · 리셋 재설정', () => {
+  const SECOND = 1000;
+  const T = 1_700_000_000_000;
+
+  const buildStore = ({ range = 300, scatterIds = ['s1'] } = {}) => {
+    const store = Object.create(modules);
+    Object.assign(store, {
+      isInit: false,
+      updateSeries: false,
+      dataSet: {},
+      options: { realTimeScatter: { range }, legend: {} },
+      seriesInfo: { charts: { scatter: [...scatterIds] } },
+      seriesList: Object.fromEntries(scatterIds.map((id) => [id, { show: true }])),
+    });
+    return store;
+  };
+
+  const pointXs = (store, sId) =>
+    store.dataSet[sId].dataGroup.flatMap((g) => g.data).map((p) => p.x);
+  const maxX = (store, sId) => store.seriesList[sId].minMax.maxX.valueOf();
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it('옛 배치가 와도 축 우측단이 되돌아가지 않고, 이후 배치에서 창 안의 점이 보존된다', () => {
+    const store = buildStore();
+
+    store.createRealTimeScatterDataSet({
+      s1: [
+        { x: T + 41 * SECOND, y: 1 },
+        { x: T + 100 * SECOND, y: 2 },
+      ],
+    });
+    store.createRealTimeScatterDataSet({ s1: [{ x: T + 40 * SECOND, y: 3 }] });
+    expect(maxX(store, 's1')).toBe(T + 100 * SECOND);
+
+    // 창(range 300)은 T+41 ~ T+340 — T+41·T+100 은 남고 T+40 만 밀려나야 한다.
+    store.createRealTimeScatterDataSet({ s1: [{ x: T + 340 * SECOND, y: 4 }] });
+    expect(pointXs(store, 's1').sort((a, b) => a - b)).toEqual([
+      T + 41 * SECOND,
+      T + 100 * SECOND,
+      T + 340 * SECOND,
+    ]);
+  });
+
+  it('점 없는 배치가 채운 fallback 시각(Date.now)은 하한이 되지 않는다', () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(T + 3600 * SECOND);
+    const store = buildStore();
+
+    store.createRealTimeScatterDataSet({ s1: [] });
+    store.createRealTimeScatterDataSet({ s1: [{ x: T + 10 * SECOND, y: 1 }] });
+
+    expect(maxX(store, 's1')).toBe(T + 10 * SECOND);
+    expect(pointXs(store, 's1')).toEqual([T + 10 * SECOND]);
+  });
+
+  it('리셋 후에는 이전보다 과거 시각의 배치가 새 기준이 되고, 리셋 전 점은 남지 않는다', () => {
+    const store = buildStore();
+
+    store.createRealTimeScatterDataSet({ s1: [{ x: T + 100 * SECOND, y: 1 }] });
+    store.resetRealTimeScatterDataSet();
+    store.createRealTimeScatterDataSet({ s1: [{ x: T - 500 * SECOND, y: 2 }] });
+
+    expect(maxX(store, 's1')).toBe(T - 500 * SECOND);
+    expect(pointXs(store, 's1')).toEqual([T - 500 * SECOND]);
+  });
+
+  it('리셋 직후 첫 배치에 빠진 series 를 즉시 만료 제거하지 않는다(리셋 전과 동일)', () => {
+    const store = buildStore({ scatterIds: ['a', 'b'] });
+
+    store.createRealTimeScatterDataSet({
+      a: [{ x: T, y: 1 }],
+      b: [{ x: T, y: 2 }],
+    });
+    store.resetRealTimeScatterDataSet();
+    store.createRealTimeScatterDataSet({ a: [{ x: T + SECOND, y: 1 }] });
+
+    expect(store.dataSet.b).toBeDefined();
   });
 });
 
