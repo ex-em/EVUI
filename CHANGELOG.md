@@ -1,3 +1,16 @@
+## [3.21.1](https://github.com/ex-em/EVUI/compare/3.21.0...3.21.1) (2026-10-01)
+
+
+### Bug Fixes
+
+* **chart:** realTimeScatter flush 전 증분 유실과 늦은 배치의 기준 시각 역행 수정 ([bff139b](https://github.com/ex-em/EVUI/commit/bff139b666e7c522dc743c5552424e0943497233)), closes [#2346](https://github.com/ex-em/EVUI/issues/2346)
+* **chart:** realTimeScatter 리셋 뒤 새 배치 전 update 에서 X축이 epoch 로 계산되던 문제 수정 ([9828c0c](https://github.com/ex-em/EVUI/commit/9828c0c3dc9f8b0075756914c699d0c274bba9ea)), closes [#2346](https://github.com/ex-em/EVUI/issues/2346)
+* **chart:** realTimeScatter 빈 series·미래 이상치가 기준 시각을 붙잡던 문제 수정 ([0356c10](https://github.com/ex-em/EVUI/commit/0356c1038a6759a070c4ae66aeb65b8e0527653e)), closes [#2346](https://github.com/ex-em/EVUI/issues/2346)
+* **chart:** realTimeScatter 빈 문자열 키의 early return 이 같은 틱의 다른 series 를 건너뛰던 문제 수정 ([876f277](https://github.com/ex-em/EVUI/commit/876f27726a2954b87a152da397a6e99ca2b72f4a)), closes [#2346](https://github.com/ex-em/EVUI/issues/2346)
+* **chart:** realTimeScatter 처리할 키가 없는 배치(data: {})에서 X축이 epoch 로 계산되던 문제 수정 ([dab24aa](https://github.com/ex-em/EVUI/commit/dab24aac346236bfa9a18560f499e6a9f88f4a03)), closes [#2346](https://github.com/ex-em/EVUI/issues/2346)
+* **chart:** realTimeScatter 처리할 키가 없는 배치(data: {})에서 Y 범위가 접혀 점이 사라지던 문제 수정 ([90eb09d](https://github.com/ex-em/EVUI/commit/90eb09d9ec7bb1fc9b5b37e0e7b7d2d6bd87a5a3)), closes [#2346](https://github.com/ex-em/EVUI/issues/2346)
+* **chart:** realTimeScatterReset 뒤 리셋 전 점이 화면에 남던 문제 수정 ([5d0a62a](https://github.com/ex-em/EVUI/commit/5d0a62aa611490059ec7781f4901c3653f9036fc)), closes [#2346](https://github.com/ex-em/EVUI/issues/2346)
+
 # [3.21.0](https://github.com/ex-em/EVUI/compare/3.20.0...3.21.0) (2026-09-18)
 
 
