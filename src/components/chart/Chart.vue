@@ -386,11 +386,9 @@ export default {
 
           // 리셋 전에 받아 둔 배치를 버린다. update 는 updateData 와 무관하게 evChart.data 를 링에 다시
           // 넣으므로, 남겨 두면 대기 중 flush·이후 options 변경에서 리셋 전 점이 새 기준이 된다.
-          // 키는 남기고 배열만 비운다 — 키가 하나도 없으면 링 루프가 돌지 않아 X축이 epoch 로 계산된다.
           if (props.options.realTimeScatter?.use) {
             pendingRealTimeScatterData = null;
-            const emptied = Object.keys(evChart.data.data ?? {}).map((key) => [key, []]);
-            evChart.data = { ...evChart.data, data: Object.fromEntries(emptied) };
+            evChart.data = { ...evChart.data, data: {} };
           }
 
           // 전체 리셋 후에는 만료 제거 가드도 비워, 데이터가 다시 오면 series 가 재생성되게 한다.
