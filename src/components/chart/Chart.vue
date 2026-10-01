@@ -386,9 +386,12 @@ export default {
 
           // 리셋 전에 받아 둔 배치를 버린다. update 는 updateData 와 무관하게 evChart.data 를 링에 다시
           // 넣으므로, 남겨 두면 대기 중 flush·이후 options 변경에서 리셋 전 점이 새 기준이 된다.
+          // 점 레이어도 무효화한다 — 남기면 다음 배치가 링을 전진시킬 때 blit 이 리셋 전 점이 든 래스터를
+          // 밀어 써, 전체 재렌더 전까지 리셋 전 점이 남는다.
           if (props.options.realTimeScatter?.use) {
             pendingRealTimeScatterData = null;
             evChart.data = { ...evChart.data, data: {} };
+            evChart.pointsLayerValid = false;
           }
 
           // 전체 리셋 후에는 만료 제거 가드도 비워, 데이터가 다시 오면 series 가 재생성되게 한다.

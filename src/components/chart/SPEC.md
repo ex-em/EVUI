@@ -25,7 +25,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - **차트 그룹 연동**: inject `isChartGroup`/`brushSeries`/`groupSelectedLabel`/`groupHoveredLabel`/`brushIdx`/`evChartPropsInGroup`/`groupInteraction` 으로 EvChartGroup/EvChartBrush 와 선택·hover 동기화(`drawSyncedIndicator`, `syncHover` 옵션), brush 인덱스 시프트 보정을 수행한다. 그룹 내 차트는 toolbar/zoom 모델을 만들지 않는다(그룹이 소유).
 - **watch 전략 opt-in**: `shallowDataWatch`/`shallowOptionsWatch`(기본 false) 로 deep watch 를 끈다. mount 시점 1회 평가, 런타임 토글 불가.
 - **리사이즈**: `v-resize` 디렉티브 + `resizeTimeout` debounce. resize 프레임은 worker 비동기 합성 대신 main 동기 렌더(`drawChart(undefined, forceMainSeries=true)`)로 blank 깜빡임을 방지한다. `onActivated` 시 재적용.
-- **realtime scatter 리셋/부활**: `v-model:realTimeScatterReset` true 시 `resetRealTimeScatterDataSet`(전 series dataGroup 비움 + 기준 시각 하한 해제 — [./model/SPEC.md](./model/SPEC.md))을 부르고, 보류 중 병합분과 `evChart.data.data` 의 미소비 배치를 버린 뒤, 만료 제거 가드(`prunedRealTimeScatterSeries`)를 비우고 false 로 되돌린다. 만료 제거된 series 가 신규 점과 함께 돌아오면 data watcher 가 updateSeries 를 강제해 인스턴스·범례를 복구한다.
+- **realtime scatter 리셋/부활**: `v-model:realTimeScatterReset` true 시 `resetRealTimeScatterDataSet`(전 series dataGroup 비움 + 기준 시각 하한 해제 — [./model/SPEC.md](./model/SPEC.md))을 부르고, 보류 중 병합분과 `evChart.data.data` 의 미소비 배치를 버리고, 점 레이어(`pointsLayerValid`)를 무효화해 다음 렌더가 레이어를 다시 그리게 한 뒤(남기면 다음 배치가 링을 전진시킬 때 blit 이 리셋 전 점이 든 래스터를 밀어 쓴다), 만료 제거 가드(`prunedRealTimeScatterSeries`)를 비우고 false 로 되돌린다. 만료 제거된 series 가 신규 점과 함께 돌아오면 data watcher 가 updateSeries 를 강제해 인스턴스·범례를 복구한다.
 
 ## Business Rules
 
@@ -60,6 +60,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - drawChart 는 realTimeScatter.use 차트를 항상 `drawAxisAndSeries` 로 라우팅하고, 일반 차트는 static→series→overlay→foreground→commit 순서를 지킨다 (Chart.drawPipeline.spec.js).
 - 같은 틱의 data/options 다중 변경은 scheduleUpdate 가 플래그 OR-병합하여 `evChart.update` 1회로 coalesce 되고, `deferUntil` 이 미래면 그 시점 이후로 연기된다 (Chart.scheduleUpdate.spec.js).
 - realTimeScatter 는 flush 전(setTimeout 0 사이·`deferUntil` 보류 중) 들어온 증분이 series 별로 모두 update 에 전달되고, flush 뒤 배치는 이미 넘긴 배치를 다시 싣지 않으며, 최신 series 에서 빠진 키의 보류분은 버려진다. 리셋이 끼면 리셋 전 배치는 버려지고 같은 tick 의 배치는 남으며, 리셋 뒤 새 배치 없이 flush 되면 빈 data 가 전달된다. 일반 차트는 최신 배치 기준이다 (Chart.realTimeScatterMerge.spec.js).
+- realTimeScatterReset 뒤 리셋 전 점이 화면에 남지 않는다 — 같은 tick 에 링을 전진시키는 새 점이나 빈 data 가 와도 마찬가지다 (chart.realtime.reset.visual.spec.js — browser config).
 - shallowDataWatch/shallowOptionsWatch true 면 top-level 참조 교체만 감지되고 in-place mutation 은 미감지, false(기본)면 deep 감지된다 (Chart.shallowDataWatch.spec.js, Chart.shallowOptionsWatch.spec.js).
 - blit 게이트의 각 차원(모드/정렬/선택/scatterOnly/DPR/스냅샷/옵션/y고정/x전진/디바이스/gap) 위반 시 `evaluateBlitGate.ok === false` 로 full 폴백한다 (chart.core.blitGate.spec.js).
 - blit on/off 산출 픽셀이 동등하다 — 반투명 알파 누적 0, 분수 DPR(1.25/1.5) 포함, 2-series 색 등가·세로줄 없음, 좌단 점 온전 (chart.blit.equiv/color/golden.visual.spec.js, chart.realtime.leftedge.visual.spec.js — browser config 전용).
