@@ -2,6 +2,7 @@ import { ref, reactive } from 'vue';
 import { defaultsDeep } from 'lodash-es';
 
 const DEFAULT_OPTIONS = {
+  sharedTooltip: false,
   zoom: {
     bufferMemoryCnt: 100,
     keepZoomStatus: false,

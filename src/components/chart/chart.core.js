@@ -35,6 +35,7 @@ class EvChart {
     defaultSelectItemInfo,
     defaultSelectInfo,
     brushSeries,
+    sharedTooltip = null,
   ) {
     Object.keys(Model).forEach((key) => Object.assign(this, Model[key]));
 
@@ -55,6 +56,8 @@ class EvChart {
 
     this.isMobile = mobileCheck();
     this.brushSeries = brushSeries;
+    // EvChartGroup options.sharedTooltip 이면 그룹이 provide 한 { elements, owner } 홀더, 아니면 null
+    this.sharedTooltip = sharedTooltip;
     this.target = target;
     this.data = data;
     this.options = options;
@@ -1950,10 +1953,13 @@ class EvChart {
         this.createTooltipDOM();
       }
 
-      this.tooltipDOM.innerHTML = '';
+      // 공유 툴팁은 다른 차트가 소유 중일 수 있으므로 여기서 비우지 않는다(다음 hover 의 acquireTooltip 이 재구성).
+      if (this.isTooltipOwner()) {
+        this.tooltipDOM.innerHTML = '';
 
-      if (!options.tooltip?.formatter?.html) {
-        this.setDefaultTooltipLayout();
+        if (!options.tooltip?.formatter?.html) {
+          this.setDefaultTooltipLayout();
+        }
       }
     }
 
@@ -2387,7 +2393,7 @@ class EvChart {
    * @returns {undefined}
    */
   hideTooltip() {
-    if (this.options.tooltip.use && this.tooltipDOM?.style) {
+    if (this.options.tooltip.use && this.tooltipDOM?.style && this.isTooltipOwner()) {
       this.tooltipDOM.style.display = 'none';
     }
   }

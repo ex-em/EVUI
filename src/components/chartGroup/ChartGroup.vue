@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { onMounted, ref, watch, provide, toRef, computed } from 'vue';
+import { onMounted, onUnmounted, ref, watch, provide, toRef, computed } from 'vue';
 import evChartToolbar from '../chart/ChartToolbar';
 import { useGroupModel } from './uses';
 import { useZoomModel } from '../chart/uses';
@@ -59,6 +59,15 @@ export default {
     provide('brushSeries', brushSeries);
     provide('evChartPropsInGroup', evChartPropsInGroup);
     provide('groupInteraction', groupInteraction);
+
+    // sharedTooltip: 자식 차트마다 툴팁 DOM 을 만들지 않고 그룹당 1벌을 공유한다(내용만 교체).
+    // 그리드 셀 차트처럼 차트 수가 많을 때 body 에 붙는 툴팁 DOM 이 차트 수만큼 늘어나는 것을 막는다.
+    // 마운트 시점 값으로 고정된다(런타임 토글 미지원). DOM 은 자식이 모두 해제된 뒤 그룹이 제거한다.
+    const sharedTooltip = normalizedOptions.sharedTooltip ? { elements: null, owner: null } : null;
+    provide('groupSharedTooltip', sharedTooltip);
+    onUnmounted(() => {
+      sharedTooltip?.elements?.tooltipDOM.remove();
+    });
 
     // 차트 클릭으로 detail 패널/popup 을 여는 순간, 그룹 폴링 redraw 를 짧게(durationMs) 양보해
     // 사용자가 연 것이 먼저 페인트되게 한다. one-shot bounded — 시간창이 지나면 자동 재개되므로

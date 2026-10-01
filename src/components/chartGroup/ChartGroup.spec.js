@@ -114,4 +114,45 @@ describe('EvChartGroup Component', () => {
       expect(gi.deferUntil).toBe(now + 500);
     });
   });
+
+  describe('sharedTooltip', () => {
+    const Capture = {
+      name: 'Capture',
+      inject: ['groupSharedTooltip'],
+      render: () => null,
+    };
+    const mountGroup = (options) =>
+      mount(
+        {
+          components: { EvChartGroup, Capture },
+          data: () => ({ options }),
+          template: '<ev-chart-group :options="options"><Capture /></ev-chart-group>',
+        },
+        { global: { directives: { resize: {} } } },
+      );
+
+    it('기본값(false)이면 공유 홀더를 provide 하지 않는다(null)', () => {
+      const wrapper = mountGroup({});
+      expect(wrapper.findComponent(Capture).vm.groupSharedTooltip).toBeNull();
+    });
+
+    it('true 면 { elements, owner } 홀더를 provide 한다', () => {
+      const wrapper = mountGroup({ sharedTooltip: true });
+      expect(wrapper.findComponent(Capture).vm.groupSharedTooltip).toEqual({
+        elements: null,
+        owner: null,
+      });
+    });
+
+    it('그룹 unmount 시 공유 툴팁 DOM 을 제거한다', () => {
+      const wrapper = mountGroup({ sharedTooltip: true });
+      const holder = wrapper.findComponent(Capture).vm.groupSharedTooltip;
+      const dom = document.createElement('div');
+      document.body.appendChild(dom);
+      holder.elements = { tooltipDOM: dom };
+
+      wrapper.unmount();
+      expect(dom.isConnected).toBe(false);
+    });
+  });
 });
