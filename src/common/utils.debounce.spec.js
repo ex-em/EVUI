@@ -191,6 +191,54 @@ describe('utils.debounce', () => {
     });
   });
 
+  describe('requestAnimationFrame path', () => {
+    beforeEach(() => {
+      vi.useFakeTimers({
+        toFake: [
+          'setTimeout',
+          'clearTimeout',
+          'requestAnimationFrame',
+          'cancelAnimationFrame',
+          'Date',
+        ],
+      });
+    });
+
+    it('should invoke on the next frame when wait is omitted', () => {
+      const func = vi.fn();
+      const debounced = debounce(func);
+
+      debounced();
+      expect(func).not.toHaveBeenCalled();
+
+      vi.advanceTimersToNextFrame();
+      expect(func).toHaveBeenCalledTimes(1);
+    });
+
+    it('should cancel a pending frame', () => {
+      const func = vi.fn();
+      const debounced = debounce(func);
+
+      debounced();
+      debounced.cancel();
+
+      vi.advanceTimersToNextFrame();
+      expect(func).not.toHaveBeenCalled();
+    });
+
+    it('should bypass rAF when wait is explicitly 0', () => {
+      const raf = vi.spyOn(globalThis, 'requestAnimationFrame');
+      const func = vi.fn();
+      const debounced = debounce(func, 0);
+
+      debounced();
+      expect(raf).not.toHaveBeenCalled();
+
+      vi.advanceTimersByTime(0);
+      expect(func).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('error handling', () => {
     it('should throw TypeError if func is not a function', () => {
       expect(() => debounce('not a function', 100)).toThrow(TypeError);
