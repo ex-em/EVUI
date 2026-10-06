@@ -111,6 +111,24 @@ describe('Chart.vue 콘솔 조회 진입점', () => {
     wrapper.unmount();
   });
 
+  it('화면 전환으로 차트가 모두 바뀌면 반납된 번호를 작은 것부터 다시 쓴다', async () => {
+    const mountTwo = async () => {
+      const pair = [mountChart(), mountChart()];
+      await flushPromises();
+      return pair;
+    };
+    vi.spyOn(console, 'table').mockImplementation(() => {});
+    const before = await mountTwo();
+    const beforeNos = window.__EVUI_CHART__.list().map((row) => row.no);
+
+    before.forEach((wrapper) => wrapper.unmount());
+    const after = await mountTwo();
+    const afterNos = window.__EVUI_CHART__.list().map((row) => row.no);
+
+    expect(afterNos).toEqual(beforeNos);
+    after.forEach((wrapper) => wrapper.unmount());
+  });
+
   it('unmount 뒤에는 요소에 진입점이 남지 않는다', async () => {
     const wrapper = mountChart();
     await flushPromises();
