@@ -165,4 +165,71 @@ describe('Chart.vue 콘솔 조회 진입점', () => {
     expect(row).not.toHaveProperty('element');
     wrapper.unmount();
   });
+
+  it.each([
+    ['아래', (h) => ({ top: h + 100, bottom: h + 400 })],
+    ['위', () => ({ top: -400, bottom: -100 })],
+  ])('list() 는 화면 %s 로 벗어난 차트를 보여주지 않는다', async (_, rectOf) => {
+    vi.spyOn(console, 'table').mockImplementation(() => {});
+    const shown = mountChart();
+    await flushPromises();
+    const shownNo = lastInstance()._inspectNo;
+    const hidden = mountChart();
+    await flushPromises();
+    chartElementOf(hidden).getBoundingClientRect = () => rectOf(window.innerHeight);
+
+    const rows = window.__EVUI_CHART__.list();
+
+    expect(rows.map((row) => row.no)).toEqual([shownNo]);
+    shown.unmount();
+    hidden.unmount();
+  });
+
+  describe('realTimeScatter 가 아닌 차트', () => {
+    const LINE_OPTIONS = { type: 'line' };
+
+    it('list() 에 나오지 않고 차트 번호도 받지 않는다', async () => {
+      vi.spyOn(console, 'table').mockImplementation(() => {});
+      const rts = mountChart();
+      await flushPromises();
+      const line = mountChart({ options: LINE_OPTIONS });
+      await flushPromises();
+      const lineChart = lastInstance();
+
+      const rows = window.__EVUI_CHART__.list();
+
+      expect(rows).toHaveLength(1);
+      expect(lineChart._inspectNo).toBeUndefined();
+      rts.unmount();
+      line.unmount();
+    });
+
+    it('요소로 골라도 경고하고 조회 객체를 주지 않는다', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+      const line = mountChart({ options: LINE_OPTIONS });
+      await flushPromises();
+
+      expect(window.__EVUI_CHART__(chartElementOf(line))).toBeNull();
+      expect(warn).toHaveBeenLastCalledWith(
+        expect.stringContaining('realTimeScatter 차트가 아니다'),
+      );
+      expect(chartElementOf(line).__evuiChart__).toBeNull();
+      line.unmount();
+    });
+
+    it('realTimeScatter 를 끈 뒤 언마운트돼도 받은 번호를 반납한다', async () => {
+      const first = mountChart();
+      await flushPromises();
+      const firstChart = lastInstance();
+      const no = firstChart._inspectNo;
+      firstChart.options = { ...firstChart.options, realTimeScatter: { use: false } };
+
+      first.unmount();
+      const second = mountChart();
+      await flushPromises();
+
+      expect(lastInstance()._inspectNo).toBe(no);
+      second.unmount();
+    });
+  });
 });
