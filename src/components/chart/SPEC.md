@@ -4,7 +4,7 @@
 
 EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. line/bar/pie/scatter/heatMap(+combo) 타입을 더블 버퍼(buffer→display) 렌더 파이프라인으로 그리고, 대량·실시간 워크로드를 위한 세 가지 성능 경로 — realtime scatter blit fast-path(이전 라스터 시프트 + 신규 strip만 재그림), worker(OffscreenCanvas) series 래스터 오프로드(opt-in), deep-watch opt-out(shallowDataWatch/shallowOptionsWatch) — 를 조건부로 제공한다. 줌(툴바/드래그/휠), 선택(selectItem/selectLabel/selectSeries), 툴팁/인디케이터/plotLine·plotBand, 내·외부 범례, EvChartGroup/EvChartBrush 연동(provide/inject)을 포함한다.
 
-이 문서는 차트 **루트 파일**(Chart.vue, ChartToolbar.vue, chart.core.js, chart.blit.js, chart.selection.js, chartZoom.core.js, uses.js, index.js)과 helpers/ 를 다룬다. plugins/element/scale/model/annotation 의 상세는 각 하위 SPEC( [./plugins/SPEC.md](./plugins/SPEC.md), [./element/SPEC.md](./element/SPEC.md), [./scale/SPEC.md](./scale/SPEC.md), [./model/SPEC.md](./model/SPEC.md), [./annotation/SPEC.md](./annotation/SPEC.md) )에 위임한다.
+이 문서는 차트 **루트 파일**(Chart.vue, ChartToolbar.vue, chart.core.js, chart.blit.js, chart.selection.js, chart.inspect.js, chartZoom.core.js, uses.js, index.js)과 helpers/ 를 다룬다. plugins/element/scale/model/annotation 의 상세는 각 하위 SPEC( [./plugins/SPEC.md](./plugins/SPEC.md), [./element/SPEC.md](./element/SPEC.md), [./scale/SPEC.md](./scale/SPEC.md), [./model/SPEC.md](./model/SPEC.md), [./annotation/SPEC.md](./annotation/SPEC.md) )에 위임한다.
 
 > **공식 API**: line/bar/pie/scatter/heatMap 은 `/api-docs` 페이지가 렌더링하는 [docs/views/apiDocs/data/](../../../docs/views/apiDocs/data/)`{lineChart,barChart,pieChart,scatterChart,heatMap}.json` 이 SSOT 다([작성 가이드](../../../docs/views/apiDocs/data/README.md), 수정 후 `npm run docs:validate` 필수). 아직 JSON 으로 옮기지 않은 comboChart·zoomChart 는 `docs/views/{comboChart,zoomChart}/api/*.md`.
 
@@ -26,6 +26,8 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - **watch 전략 opt-in**: `shallowDataWatch`/`shallowOptionsWatch`(기본 false) 로 deep watch 를 끈다. mount 시점 1회 평가, 런타임 토글 불가.
 - **리사이즈**: `v-resize` 디렉티브 + `resizeTimeout` debounce. resize 프레임은 worker 비동기 합성 대신 main 동기 렌더(`drawChart(undefined, forceMainSeries=true)`)로 blank 깜빡임을 방지한다. `onActivated` 시 재적용.
 - **realtime scatter 리셋/부활**: `v-model:realTimeScatterReset` true 시 `resetRealTimeScatterDataSet`(전 series dataGroup 비움 + 기준 시각 하한 해제 — [./model/SPEC.md](./model/SPEC.md))을 부르고, 보류 중 병합분과 `evChart.data.data` 의 미소비 배치를 버리고, 점 레이어(`pointsLayerValid`)를 무효화해 다음 렌더가 레이어를 다시 그리게 한 뒤(남기면 다음 배치가 링을 전진시킬 때 blit 이 리셋 전 점이 든 래스터를 밀어 쓴다), 만료 제거 가드(`prunedRealTimeScatterSeries`)를 비우고 false 로 되돌린다. 만료 제거된 series 가 신규 점과 함께 돌아오면 data watcher 가 updateSeries 를 강제해 인스턴스·범례를 복구한다.
+- **콘솔 조회(운영 빌드 진단)**: `.ev-chart` 요소의 비열거 속성 `__evuiChart__`, 또는 전역 `window.__EVUI_CHART__(el)`(조상 `.ev-chart`, 없으면 유일한 하위 `.ev-chart`)·`window.__EVUI_CHART__(번호)`(로그·`list()` 의 차트 번호)로 조회 객체 `{ chart, version, query(from, to), queryData(from, to), redraw() }` 를 얻는다. `query` 는 realTimeScatter 링 보유 점을 초별·series 별로 세고(초별 표 열은 `time`·`total`·series 이름 — 이름이 겹치는 series 만 id 앞 8자를 붙인다. series 칸은 그 초 점들의 y 값을 오름차순으로 잇고(6개 이상이면 `최소 ~ 최대 (n개)`), 점이 없으면 `null` 이라 y 가 0 인 점과 구분된다. `total` 은 실점 개수) `y: null` 점(소비자가 배치마다 축 이동용으로 넣는 조회 경계)은 데이터가 아니라 세지 않으며 요청 구간을 창 안/일부 창 밖/창 밖으로 판정한다. `queryData` 는 같은 계산에서 실점이 있는 초만, 그 구간에 점이 있는 series 열만 남긴 표를 찍는다. `redraw` 는 저장소를 건드리지 않고 full redraw 1회를 강제한다. `__EVUI_CHART__.list()` 는 화면의 차트 목록(차트 번호·`title` 열(= `realTimeScatter.label`)·series 이름 포함)을 보여준다. 출력은 `Console.log`/`Console.table` 이고 같은 내용을 객체로 반환한다.
+- **realTimeScatter 빈 초 자동 로그(운영 빌드 진단)**: localStorage(`EVUI_CHART_LOG_EMPTY`)로 켜 두면(`__EVUI_CHART__.logEmpty(true|false)`, 인자 없이 부르면 현재 상태) 마운트 뒤 새로 지나간 초 중 모든 series 에 실점이 없는 초를 저장소 반영마다 `Console.warn` 으로 찍는다(마운트·리셋 재조회 데이터에 이미 있던 공백은 찍지 않는다) — `[EVUI <버전>] realTimeScatter 차트 #<번호> <이름> 빈 초 YYYY-MM-DD HH:mm:ss ~ YYYY-MM-DD HH:mm:ss (n초)`. 연속 빈 초는 한 줄로 묶고, 마운트(로그를 켠 뒤 첫 저장소 반영)되자마자 `빈 초 로그 켜짐 — <초> 부터 지나가는 초를 본다`(데이터가 없으면 `첫 데이터가 들어오면 그 시각부터 본다`)를 `Console.log` 로 한 번 찍는다. 공백이 다음 배치로 이어지면 `빈 초 시작 <초>` 를 바로 찍은 뒤 데이터가 다시 들어올 때 구간 줄을 찍는다. 이미 지나간 초에 점이 늦게 들어오면 바로잡는다 — 열린 공백은 구간을 다시 찍거나(`앞서 찍은 시작 … 은 늦게 채워짐`) 시작을 취소하고(`빈 초 시작 … 취소`), 닫힌 구간은 `늦게 채워짐 <초>` 를 찍는다. 줄 종류는 `%c` 색 배지로 가른다 — `빈 초 시작` 주황, `빈 초`(데이터가 다시 들어와 확정) 초록, `늦게 채워짐` 파랑, `빈 초 시작 취소` 회색, `빈 초 로그 켜짐` 진회색. 한 화면에 차트가 여럿이면 줄 맨 앞 `차트 #<번호>` 테두리 배지(번호별 색)로 가른다. 소비자가 `realTimeScatter.label`(예: 위젯 제목)을 주면 배지가 `차트 #<번호> <이름>` 이 된다(화면 표시에는 영향 없음). 빈 초 로그 줄에는 series 를 찍지 않는다. 배지 이름은 줄을 찍는 시점의 값이라, 소비자가 이름을 마운트 뒤에 넣거나 바꾸면 그다음 저장소 반영에서 `차트 이름` 줄을 한 번 찍고 이후 줄에 붙인다 — 번호는 창마다 처음 본 순서(마운트 시 부착)로 매기고 리마운트는 새 번호다. 켜짐 줄 끝에는 `__EVUI_CHART__(<번호>).query()` 를 붙인다. DOM 요소는 붙이지 않는다.
 
 ## Business Rules
 
@@ -33,6 +35,8 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - **클론 정책**: `cloneChartData` 는 `cloneDeepWith` 로 깊은 복제하되 ① dayjs/Date 등 불변 날짜 객체는 참조 공유 ② reactive 값은 `toRaw` 로 벗겨 proxy trap 비용을 제거한다.
 - **realTimeScatter 데이터 경로**: `realTimeScatter.use` 차트는 data 를 `{ ...data, groups: [], labels: [] }` 로 치환하고 `cloneChartData` 를 거치지 않는다(참조 그대로 `evChart.data` 할당).
 - **realTimeScatter 증분 병합**: 마지막 flush 이후 data watcher 로 들어온 배치를 `mergeRealTimeScatterData` 가 series 키별로 이어 붙여 `evChart.data.data` 로 넘긴다. 최신 배치 series 에서 빠진 키의 보류분은 버리고, 소비자 배열은 변이하지 않으며, 누적본은 flush·리셋·unmount 에서 비운다. 누적 여부는 options watcher 의 pendingUpdate 와 독립이다(flush 뒤 options 만 보류 중이어도 이미 넘긴 배치를 다시 싣지 않는다). 같은 tick 의 동기 재할당은 watcher 이전에 Vue 가 합치므로 대상이 아니다. 일반 차트는 최신 배치 기준을 유지한다.
+- **콘솔 조회 계약**: 진입점은 mount 에서 요소에 getter 로 달고(접근 시점의 인스턴스로 조회 객체를 만든다) unmount 에서 destroy 보다 먼저 지운다. 전역 함수는 DOM 을 거슬러 찾을 뿐 차트 참조를 보관하지 않는다. `query` 는 점 자신의 x 초로 센다 — 창 시작 초(`fromTime`)의 점은 링의 최신 슬롯에 놓이므로 슬롯 위치로 역산하지 않는다. 창은 렌더 X축과 같은 `[fromTime+1000, toTime]`·전역 우측단 규칙을 쓰고, 초별 행은 요청 구간과 창이 겹치는 초만 만든다. 시각 문자열은 dayjs 로 브라우저 로컬 해석, `to` 는 그 초 전체를 포함, 해석 실패는 경고 후 null 이다. `redraw` 는 `pointsLayerValid=false` 후 `render()` 만 부른다(`update()` 는 `evChart.data.data` 를 링에 다시 넣어 조회 대상을 바꾼다). `drawAxisAndSeries` 는 직전 프레임 모드(`_lastFrameMode`: blit/layer/rebuild/direct)와 마지막 저장소 재raster 시각(`_lastRasterAt`)을 남긴다. 상시 기록은 없다 — 조회 값은 호출할 때 dataSet 에서 계산하므로, 버려지거나 지워진 점의 흔적은 남지 않는다(링에 없음 = 미전달 또는 저장소 손실, 둘은 가르지 않는다).
+- **빈 초 판정**: 켜져 있을 때만 `createRealTimeScatterDataSet` 끝에서 판정한다. 기준점은 마운트(또는 로그를 켠) 뒤 데이터 시각으로 우측단이 잡힌 첫 배치(실점 또는 경계점 `y: null` 이 있는 배치 — 보통 마운트 데이터)의 우측단 직전 초이고, 그 배치가 가져온 지난 초는 보지 않는다. 점이 하나도 없는 배치의 우측단은 `Date.now()` 대체값이라 데이터 시각과 어긋날 수 있어 기준으로 쓰지 않는다. series 가 모두 사라져 우측단이 없으면 판정하지 않는다. 이후 배치마다 직전 판정 다음 초 ~ 렌더 우측단(`toTime`) 직전 초를 본다 — 우측단 초는 아직 점이 들어오는 중이라 다음 배치가 지나갈 때 본다. 각 초는 series 마다 그 초의 링 버킷에서 x 초가 같은 실점(`y` 있음)을 찾고, 모든 series 에 없을 때 빈 초다(창 시작 초 점이 놓이는 최신 슬롯은 x 초로 걸러낸다). 소비자 경계점(`y: null`, 조회 끝 시각)이 우측단을 데이터보다 먼저 밀어 점이 이미 지나간 초로 늦게 들어올 수 있으므로, 열린 공백은 매 배치 시작 초부터 다시 보고(창 왼쪽 밖으로 나간 초는 더 채워질 수 없어 빈 채로 확정), 닫힌 구간으로 찍은 초는 창 안에 있는 동안 늦게 채워지는지 본다. 리셋은 판정 위치를 바꾸지 않는다 — 재조회가 가져온 지난 초는 다시 보지 않고, 열린 공백은 리셋을 넘어 이어진다. 시각이 뒤로 가면(기준 재설정) 열린 공백을 그 전까지로 닫아 찍고 그 시점을 새 기준으로 삼는다.
 - **옵션 정규화**: `defaultsDeep({}, options, DEFAULT_OPTIONS)` 로 props 와 분리된 새 객체를 만든다. scatter/heatMap 이고 tooltip 미지정이면 `tooltip.use=false`, pie 이고 padding 미지정이면 pie 전용 padding(top2/right2/left2/bottom4)을 적용한다.
 - **shallow watch 계약**: `shallowDataWatch`/`shallowOptionsWatch` true 면 해당 watcher 가 `deep:false` 로 등록된다. 소비자는 갱신 시 **새 top-level 객체 참조**를 할당해야 한다(in-place mutation 미감지). 바꾸려면 `:key` 등으로 remount.
 - **update 플래그 산출**: data watcher 는 series/groups/labels/data 를 각 1회씩 `isEqual` 비교해 updateSeries/updateData 를 정하고, heatMap 타입은 항상 updateSeries. options watcher 는 legend.table 변경 → updateLegend, tooltip 변경 → updateTooltip.
@@ -51,7 +55,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - **axes-scale-change**: 리스너가 없으면 payload 계산 자체를 생략. `axesX/axesY[i].scaleChange` 가 true 인 축의 labelRange(min/max)가 직전 emit 값과 다를 때만 `{x:[{minSteps,maxSteps}],y:[...]}` 를 emit.
 - **axes-data-max-change**: 소비처가 이벤트를 바인딩했을 때만 리스너가 등록되고(uses.js), 등록 시 렌더마다 show 된 series 들의 `minMax.maxY` 유한수 통합 최대값(없으면 null)을 emit 한다.
 - **(blit≡full)**: blit 경로 산출 픽셀은 full redraw 와 동일해야 한다 — 정수 CSS px 시프트의 q-배수 양자화(device 시프트 정수화 → drawImage 무손실), 잔차 carry(`_blitCarry`, `rtXOffsetCss` 로 full/strip/hit-test 에 일관 반영), series별 레이어 z-order 합성으로 보장한다.
-- **(무구독 비용 0)**: axes-data-max-change/axes-scale-change 는 구독이 없으면 집계·계산 비용이 0 이다. blit 진단(`recordBlitDiag`)은 디버그 플래그 없으면 체크 1회로 종료.
+- **(무구독 비용 0)**: axes-data-max-change/axes-scale-change 는 구독이 없으면 집계·계산 비용이 0 이다. blit 진단(`recordBlitDiag`)은 디버그 플래그 없으면 체크 1회로 종료. 콘솔 조회는 호출 전 비용이 mount 시 요소 속성 정의 1회와 realTimeScatter 프레임당 필드 2개 기록뿐이다. 빈 초 로그는 꺼져 있으면 배치당 window 플래그 확인 1회(localStorage 는 창마다 처음 1회)이고, 켜져 있으면 새로 지나간 초마다 series 별 버킷 하나를 본다.
 - **(프레임 간 자원 보존)**: 점 객체 풀·geometry 메모이즈(`_dataEpoch`/`_scaleVersion` 키)·색상 rgba 캐시(512 엔트리)·client rect 캐시를 유지하고, `reconcileSeriesSet` 이 series 인스턴스를 재사용한다.
 - **(무회귀 폴백)**: blit/worker 어느 성능 경로든 조건 미달·실패 시 항상 기존 main full redraw 로 폴백하며 화면 출력은 동일해야 한다.
 
@@ -70,6 +74,9 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - normalizeData 는 원본을 변형하지 않고, cloneChartData 는 불변 날짜 참조를 공유한다 (Chart.normalizeData.spec.js, Chart.cloneChartData.spec.js).
 - 차트 타입별 시각 산출물이 스크린샷 베이스라인과 일치한다 (Chart.visual.spec.js — browser config, `__screenshots__/`).
 - 커스텀 툴팁 hover 중 tooltipDOM 이 가시 영역을 벗어나 `documentElement.scrollWidth` 를 늘리지 않는다 — body 가 뷰포트보다 넓은 레이아웃 포함 (chart.tooltipOverflow.visual.spec.js — browser config). 배치 규칙 상세는 [./plugins/SPEC.md](./plugins/SPEC.md) Business Rules 2·3.
+- 콘솔 조회: 10:00:00~10:05:00 입력 뒤 10:02:00~10:02:10 조회의 초별 값·개수가 입력과 같고 `y: null` 점은 세지 않으며(boundary 열 없음), 창 시작 초의 점은 창 밖 보유점으로 센다. 초별 표 series 열은 이름(겹치면 id 앞 8자)이고 ms 열은 없으며, 점이 없는 칸은 `null`·y 가 0 인 점은 `0`·6개 이상은 범위로 보이고, queryData 는 실점이 있는 초와 점이 있는 series 열만 남기며, 창 밖/일부 창 밖 판정, ms 입력, 해석 불가 입력 경고, 리셋 직후 빈 링 조회, redraw 가 update 없이 점 레이어를 무효화하고 render 한다 (chart.inspect.spec.js).
+- 빈 초 로그: 마운트되자마자 켜짐을 한 번 찍고(데이터가 없으면 첫 데이터부터 본다고 찍음) 경계점만 있는 마운트 데이터부터 판정하며, localStorage 로 켜 두면 마운트 뒤 지나간 빈 초를 범위 한 줄로 찍고, 꺼져 있으면 찍지 않으며, 마운트 데이터에 이미 있던 공백과 점 없는 배치의 대체 시각은 기준으로 쓰지 않는다. 배치를 넘어 이어진 공백은 시작을 바로 찍고 데이터가 다시 들어오면 구간을 찍으며, 한 배치 안에서 공백이 닫히고 새로 열리면 새 시작을 찍는다. 우측단 초는 다음 배치에서 판정하고, 창 시작 초 점이 놓인 슬롯은 그 슬롯 초의 데이터로 보지 않으며, 한 series 라도 점이 있으면 비지 않은 것이다. 리셋 뒤 재조회의 지난 공백은 찍지 않고 열린 공백은 리셋을 넘어 이어지며, 시각이 뒤로 가면 열린 공백을 닫아 찍고 기준을 다시 잡는다. 우측단이 지나간 뒤 늦게 들어온 점은 열린 공백을 닫고, 시작 초가 채워지면 시작을 바로잡고, 모두 채워지면 시작을 취소하며, 창 밖까지 이어진 공백은 시작부터 한 구간으로 닫고, 이미 찍은 구간이 채워지면 늦게 채워짐을 찍는다. series 가 모두 사라져 우측단이 없어도 시각 역행으로 보지 않는다. 빈 구간 시작·확정·늦게 채워짐은 서로 다른 색 배지로 찍는다. 차트가 여럿이면 줄마다 차트 번호와 차트별 색 배지가 붙고, 켜짐 줄에는 번호 조회 명령만 붙고 DOM 요소는 붙지 않는다. 줄에는 series 를 찍지 않고 `realTimeScatter.label` 이 있으면 배지에 이름이 붙으며, 이름이 마운트 뒤에 들어오면 차트 이름을 한 번 알리고 이후 줄에 붙인다. 콘솔에서 켜고 끈 상태가 localStorage 에 남는다 (chart.inspect.spec.js).
+- 차트 두 개에서 각 차트 안쪽 요소로 찾은 진입점이 자기 차트를 가리키고, 로그·list() 의 차트 번호로도 그 차트를 찾으며, unmount 뒤 요소에 진입점이 남지 않는다 (Chart.inspectEntry.spec.js).
 - 커서가 한 방향으로 이동하는 동안 툴팁의 좌우 배치는 최대 1회만 바뀐다 — hover 지점마다 폭이 달라져도 같다 (chart.tooltipFlip.visual.spec.js — browser config).
 - 배치 이후 툴팁 폭이 커져도 툴팁이 커서를 가로로 덮지 않는다 (chart.tooltipFlip.visual.spec.js).
 
@@ -113,12 +120,13 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 
 | 파일 | 역할 |
 |------|------|
-| Chart.vue | EvChart 컴포넌트 셸 — props/emits, deep/shallow watch, scheduleUpdate coalesce(+deferUntil, realTimeScatter 증분 병합), 그룹 inject, 라이프사이클(mount 시 EvChart 생성·init, unmount 시 destroy), 템플릿 ref 공개 메서드(redraw/toggleSeries/highlightSeries/unhighlightSeries/onResize) |
+| Chart.vue | EvChart 컴포넌트 셸 — props/emits, deep/shallow watch, scheduleUpdate coalesce(+deferUntil, realTimeScatter 증분 병합), 그룹 inject, 라이프사이클(mount 시 EvChart 생성·init·콘솔 진입점 부착, unmount 시 진입점 해제 후 destroy), 템플릿 ref 공개 메서드(redraw/toggleSeries/highlightSeries/unhighlightSeries/onResize) |
 | ChartToolbar.vue | 줌 툴바 아이콘 목록 렌더, 클릭 시 `onClickToolbar(e, iconType)` emit |
 | index.js | Vue plugin 등록(`EvChart.install`) |
 | chart.core.js | EvChart 클래스 — canvas 3장 생성, mixin 합성, init/update/render/resize/destroy, drawChart 오케스트레이션(ChartShell/RenderCore), worker 게이트 연동(commitWorkerFrame/drawSeriesLayerFallback), 축 생성·스케일 계산, external legend API, annotation 레이어(ensureAnnotationCanvas/drawAnnotationLayer/buildAnnotationViewport, `_annotationSource` 참조 캐시), `_scaleVersion`/`renderEpoch` 관리 |
 | chart.blit.js | realtime scatter blit fast-path 프로토타입 모듈 — 게이트(evaluateBlitGate), ping-pong 레이어 관리(createPointsLayers/resizePointsLayers), 시프트+strip 본체(drawChartBlitFastPath), 합성(compositePointsLayer), baseline(rebuildPointsLayer/maybeRebuildPointsLayer, 스탬프), strip dedupe, hit-test 지연 재계산(ensureHitCoordsFresh), 진단(recordBlitDiag) |
 | chart.selection.js | selectSeries 선택 line 최상위 덧그리기 프로토타입 모듈 — line-safe 판정(selectedSeriesAllLineSafe/shouldDrawSelectedOnTop)과 부분 렌더(drawSelectedSeriesOnly) |
+| chart.inspect.js | 콘솔 조회 진입점 — 요소 부착/해제(attachInspector/detachInspector), 전역 `__EVUI_CHART__`(list/logEmpty), 조회 객체(query/queryData/redraw, 상시 기록 없이 호출 시 dataSet 계산), realTimeScatter 빈 초 자동 로그(isEmptySecondLogOn/logEmptySeconds) |
 | chartZoom.core.js | EvChartZoom 클래스 — executeZoom(index filter), dragZoom(time축), 휠 이동, 줌 이력(zoomAreaMemory previous/current/latest), 줌 애니메이션 canvas, 툴바 아이콘 상태 |
 | uses.js | `DEFAULT_OPTIONS`/`DEFAULT_DATA`, normalizeData(비-변형)/cloneChartData(toRaw+불변날짜 예외)/mergeRealTimeScatterData(보류 증분 병합), useModel(옵션·데이터 정규화, eventListeners, click/dbl-click 200ms 구분), useWrapper(wrapper 크기 style), useZoomModel(EvChartZoom 생성·zoom 옵션/데이터 동기화·brushIdx watch) |
 | helpers/helpers.util.js | 색상 파싱·rgba 캐시(512), 라벨 sign 포맷(K/M/G/T/P), 텍스트 측정(canvas 싱글톤, worker-safe lazy), ellipsis truncate, coordinateKey(`x\|y`), showLabelTip, calcBoxDistance, calcExtraWidthLabel |
@@ -140,8 +148,9 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 |------|------|
 | vue (Composition API) | Chart.vue/uses.js — watch/inject/lifecycle/reactive |
 | lodash-es | isEqual/debounce(Chart.vue), cloneDeep/cloneDeepWith/defaults/defaultsDeep/isNil(uses.js, helpers) |
-| @/common/utils | mobileCheck/truthyNumber/Console(chart.core), getQuantity(uses), billions·millions·trillion·quadrillion·truthy(라벨 포맷) |
+| @/common/utils | mobileCheck/truthyNumber/Console(chart.core), Console(chart.inspect), getQuantity(uses), billions·millions·trillion·quadrillion·truthy(라벨 포맷) |
 | @/directives/resize | 차트 wrapper 리사이즈 감지(v-resize) |
+| dayjs · package.json(version) | 콘솔 조회의 시각 해석·표기와 evui 버전 출력(chart.inspect) |
 | EvChartGroup / EvChartBrush | provide/inject 계약의 공급자(isChartGroup, brushSeries, groupSelectedLabel/HoveredLabel, brushIdx, evChartPropsInGroup, groupInteraction.deferUntil) — 본 컴포넌트는 소비자 |
 | OffscreenCanvas / Web Worker | workerRender 경로(feature-detect, 미지원 시 main 폴백) |
 
@@ -194,4 +203,6 @@ drawForeground(plot front + tip) → commitToDisplay(display clear + buffer blit
     → listeners(uses.js eventListeners) → emit → v-model(selectedItem/Label/Series, legendData, zoomIdx) 갱신
 [줌] 툴바/드래그/휠 → EvChartZoom.executeZoom → props.data 를 clone 기준 index filter 로 재주입
     → data watcher 재진입(위 플로우 반복) + update:zoomStartIdx/EndIdx emit
+[콘솔] $0 → __EVUI_CHART__ → 조상 .ev-chart.__evuiChart__ → query·queryData(호출 시 dataSet 계산, 읽기만) / redraw(render)
+[빈 초 로그] (localStorage 켬) createRealTimeScatterDataSet 끝 → logEmptySeconds(마운트 뒤 지나간 초) → Console.warn
 ```

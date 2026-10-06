@@ -19,6 +19,9 @@ export const Console = {
   dir(item, options) {
     windowConsole.dir(item, options);
   },
+  table(data, columns) {
+    windowConsole.table(data, columns);
+  },
 };
 
 export function getQuantity(input) {

@@ -12,7 +12,7 @@ EVUI 컴포넌트(차트·그리드·트리그리드·슬라이더·인풋넘버
 - **비율 변환**: `convertToPercent(value, total)` — `(value/total)*100`을 `toFixed(2)` 문자열로. `convertToValue(value, total)` — `(value/100)*total`을 `toFixed(2)` 문자열로. 두 함수 모두 0 또는 비유효 입력이면 숫자 `0` 반환.
 - **단위 배수**: `millions`/`billions`/`trillion`/`quadrillion` — 1e6/1e9/1e12/1e15 곱, 비유효 숫자는 0.
 - **크기·단위 파싱**: `getQuantity(input)` — `"100px"`, `"50%"`, `"12.5"`, 음수, `"normal"`을 `{ value, unit }`으로 파싱(불일치 시 null, `"normal"`은 `{ value: NaN, unit: undefined }`). `getSize(size)` — `{value, unit}`을 CSS 크기 문자열로(단위 없으면 px, falsy면 `'100%'`).
-- **콘솔 래퍼**: `Console` — `globalThis.console`을 참조하는 log/warn/info/error/debug/dir 래퍼. window가 없는 worker(render off-main) 컨텍스트에서도 import 가능.
+- **콘솔 래퍼**: `Console` — `globalThis.console`을 참조하는 log/warn/info/error/debug/dir/table 래퍼. window가 없는 worker(render off-main) 컨텍스트에서도 import 가능.
 - **모바일 감지**: `mobileCheck()` — userAgent 정규식(Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini) 또는 `'ontouchstart' in window`. `navigator.maxTouchPoints`는 사용하지 않는다(터치 노트북 오판 방지, #1497).
 
 ### 부동소수점 안전 연산 (utils.bignumber.js)
@@ -94,7 +94,7 @@ src/common/
 | utils.js — truthyNumber/truthy | chart: chart.core, element.bar, element.heatmap, element.tip, plugins.scrollbar, scale.js, scale.linear, scale.step, helpers.util / docs: ResizableWrapper.vue |
 | utils.js — numberWithComma | chart: element.tip, plugins.interaction / grid: GridSummary.vue, uses.js / treeGrid: uses.js / docs: grid example Summary.vue |
 | utils.js — convertToPercent | chart: element.heatmap, plugins.legend.gradient, plugins.tooltip / slider: uses.js |
-| utils.js — Console, mobileCheck | chart: chart.core |
+| utils.js — Console, mobileCheck | chart: chart.core, chart.inspect |
 | utils.js — millions/billions/trillion/quadrillion | chart: helpers.util |
 | utils.js — checkNullAndUndefined | chart: element.heatmap, plugins.scrollbar |
 | utils.js — getQuantity | chart: uses.js |

@@ -1,6 +1,7 @@
 import { reverse } from 'lodash-es';
 import dayjs from 'dayjs';
 import Util from '../helpers/helpers.util';
+import { isEmptySecondLogOn, logEmptySeconds } from '../chart.inspect';
 
 const modules = {
   /**
@@ -444,6 +445,11 @@ const modules = {
         maxY: minMaxValues.maxY,
       };
     });
+
+    // 콘솔 진단(chart.inspect): localStorage 로 켠 경우에만 마운트 뒤 새로 지나간 빈 초를 찍는다.
+    if (isEmptySecondLogOn()) {
+      logEmptySeconds(this, minMaxValues.fromTime + 1000, minMaxValues.toTime);
+    }
   },
 
   /**

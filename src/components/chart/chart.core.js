@@ -727,6 +727,7 @@ class EvChart {
     this.recordBlitDiag(blitGate, didBlit, blitBlockers);
 
     if (didBlit) {
+      this._lastFrameMode = 'blit';
       this._framesSinceFullRedraw++;
       // blit 도 레이어 내용을 현재 상태로 전진시킨다 — 스탬프를 갱신해야 직후의 데이터 불변
       // 폴백 렌더(legend hover 등)가 불필요한 rebuild 를 건너뛸 수 있다.
@@ -742,11 +743,14 @@ class EvChart {
       this.drawStaticLayer(this.bufferCtx, hitInfo);
       let rebuilt = false;
       let coordsRefreshed = false;
+      // 콘솔 조회(chart.inspect)용: 이 프레임 점이 저장소에서 다시 raster 됐는지(rebuild/direct), 레이어 재사용인지.
+      let frameMode = 'direct';
       if (!forceOff && this.canRouteFallbackViaLayer(hitInfo)) {
         // 주기 강제 full(refreshDue)은 drift 리셋이 목적이므로 스탬프가 같아도 재raster 강제.
         rebuilt = this.maybeRebuildPointsLayer(blitBlockers.blockedByRefreshDue);
         if (this.pointsLayerValid) {
           this.compositePointsLayer(this.getMaxVisibleScatterPointSize());
+          frameMode = rebuilt ? 'rebuild' : 'layer';
         } else {
           this.drawSeriesLayer(this.bufferCtx, hitInfo); // 레이어 사용 불가(치수 미확보 등) → 기존 직접 경로
           coordsRefreshed = true;
@@ -770,6 +774,10 @@ class EvChart {
         // _blitCarry 는 리셋하지 않는다 — rebuild baseline 을 현재 위상(rtXOffsetCss)으로 그리므로
         // 직전 blit 프레임과 위치가 연속(REFRESH rebuild 시에도 무-스냅). carry 는 Bresenham 으로
         // 매 blit [-0.5,0.5] 에 머물러 누적 drift 가 없다.
+      }
+      this._lastFrameMode = frameMode;
+      if (frameMode !== 'layer') {
+        this._lastRasterAt = Date.now();
       }
     }
   }

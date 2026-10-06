@@ -31,6 +31,7 @@ EvChart 코어에 mixin되는 데이터 모델 계층이다. 사용자가 넘긴
 - **y=null 경계 패딩은 활성 신호다**: 축 우측단(윈도우 흐름) 유지용으로 매 틱 `{x: toTime, y: null}`만 보내는 소비자가 있고, (b)는 이를 신규 점으로 세어 series를 보존한다(JSDoc 명문화). 그 series는 `lastTime`이 전진해 만료되지 않으므로, 만료 판정이 필요한 target에 패딩을 계속 보내지 않는 것은 소비자 책임이다 — 소비자의 종료 신호는 키 제거 또는 빈 배열.
 - **만료 시리즈 부활**: pruned 키의 부활(가드 해제)은 `reconcileSeriesSet`에서만 일어난다 — 신규 점이 들어온 pruned 키는 Set에서 빼고 일반 경로로 재생성, 신규 점 없는 pruned 키는 `data.series`에 남아 있어도 재생성 대상에서 제외. `createRealTimeScatterDataSet`의 키 필터는 skip만 하고 Set에서 빼지 않는다.
 - **X축 윈도우 동기화**: 렌더 X축 윈도우는 전역 우측단 — 점을 받은 series(`lastDataTime > 0`) toTime의 max, 그런 series가 없으면(마운트·리셋 직후) 전 series toTime의 max — 을 따른다. 처리할 키가 없는 배치(`data: {}`)는 기존 series 전부를 빈 배치로 처리해, 축 우측단·Y 범위·`lastTick`이 키를 남긴 빈 배치(`{ <키>: [] }`)와 같아진다. `{}`만 이어지는 동안은 시각이 전진하지 않아 만료도 일어나지 않는다 — 축을 움직일 신호(다른 series의 점, `y=null` 패딩)가 필요하다. stale series가 마지막 처리 키일 때의 축 freeze와, 리셋 전 시각·`Date.now()` fallback을 든 빈 series가 축을 붙잡는 것을 막는다. scatter series의 `minMax.minX`는 `fromTime + 1000`(dayjs) — 링이 실제 보유한 가장 오래된 버킷에 맞춰 좌단 1버킷 결손·깜빡임을 막는다.
+- **빈 초 로그 훅**: `createRealTimeScatterDataSet` 끝에서 `isEmptySecondLogOn()`(chart.inspect, localStorage 로 켬)이면 `logEmptySeconds(this, fromTime + 1000, toTime)`(전역 창)을 부른다. 판정 규칙은 chart SPEC 「빈 초 판정」.
 
 ### 조회 (model.store.js)
 
@@ -104,6 +105,7 @@ model은 클래스가 아닌 메서드 모음(plain object) 2개로 구성되고
 | dayjs | realTimeScatter series `minMax.minX/maxX` 생성 |
 | ../helpers/helpers.util | `coordinateKey`(dedupe 키), `isNullOrUndefined`, `isPieType`, `calcBoxDistance`(fallback 거리), `checkSafeInteger`(집계 범위 경고) |
 | ../element/element.* | Line/Scatter/Bar/TimeBar/Pie/HeatMap 시리즈 인스턴스 생성자 |
+| ../chart.inspect | realTimeScatter 빈 초 자동 로그(isEmptySecondLogOn/logEmptySeconds) |
 | chart.core.js (소비자) | 생성자 mixin, init 경로(createSeriesSet→addGroupInfo→createDataSet→getStoreMinMax)·update 경로(reconcileSeriesSet→…) 호출 |
 | interaction 모듈 (소비자) | `buildLabelValidMask` optional 호출(hit test mask) |
 | blit 경로 (소비자) | `dataset.lastTick` 메타 소비(strip-only redraw 판정) |
