@@ -550,6 +550,8 @@ describe('chart.inspect 빈 초 자동 로그', () => {
       // 5초에는 점이 있어 공백은 6초부터다. 창(range 5)은 이미 13초부터라 6~12초는 창 밖에서 확정된 빈 초다.
       expect(emptyLogs().at(-1)).toContain(`빈 초 ${text(6)} ~ ${text(15)} (10초)`);
       expect(emptyLogs().at(-1)).not.toContain('늦게 채워짐');
+      // 다시 볼 초 Set 은 크기 상한이 있어(V8 약 1,677만) 창 안 초만 담아야 한다.
+      expect(chart._emptyLogReported.size).toBeLessThanOrEqual(range);
     });
 
     it('이미 찍은 빈 구간이 채워지면 늦게 채워짐을 찍는다', () => {
@@ -632,7 +634,7 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     expect(emptyLogs()).toHaveLength(2);
   });
 
-  it('시각이 창보다 크게 뛰어도 창 밖 초는 한 구간으로 확정하고 창 크기만큼만 보고 기억한다', () => {
+  it('데이터가 오지 않은 사이 창 밖으로 지나간 초는 빈 초로 찍지 않고 그 배치부터 다시 본다', () => {
     const range = 5;
     const jump = 10000;
     const chart = createRtsChart(['s1'], range);
@@ -647,12 +649,25 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     chart.createRealTimeScatterDataSet({ s1: batchOf(0, 5) });
     reads = 0;
 
+    // 소비처가 화면 밖 위젯의 조회를 멈췄다가 다시 화면에 들어온 경우처럼 창이 range 넘게 지나갔다.
     chart.createRealTimeScatterDataSet({ s1: batchOf(jump - 2, jump) });
-
-    expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 ${text(5)} ~ ${text(jump - 3)}`)]);
+    expect(emptyLogs()).toEqual([]);
     expect(reads).toBeLessThan(range * 10);
-    // 다시 볼 초 Set 은 크기 상한이 있어(V8 약 1,677만) 창 안 초만 담아야 한다.
-    expect(chart._emptyLogReported.size).toBeLessThanOrEqual(range);
+
+    [jump + 1, jump + 2].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
+    expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 시작 ${text(jump + 1)}`)]);
+  });
+
+  it('열린 공백이 있던 채 데이터가 끊겼다가 다시 오면 마지막으로 본 초까지로 닫아 찍는다', () => {
+    const chart = createRtsChart(['s1'], 5);
+    chart.createRealTimeScatterDataSet({ s1: batchOf(0, 5) });
+    [6, 7, 8].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
+
+    chart.createRealTimeScatterDataSet({ s1: batchOf(100, 100) });
+
+    expect(emptyLogs().at(-1)).toContain(
+      `빈 초 ${text(6)} ~ ${text(7)} (2초, 그 뒤로 데이터가 오지 않아 기준을 다시 잡음)`,
+    );
   });
 
   it('콘솔에서 켜고 끈 상태가 localStorage 에 남는다', () => {

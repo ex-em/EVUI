@@ -526,11 +526,17 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
   if (!winTo) {
     return;
   }
-  // 시각이 뒤로 가면(시계 보정 등) 열린 공백을 그 전까지로 닫아 찍고 그 시점을 새 기준으로 삼는다.
-  if (last < checkedTo) {
+  // 시각이 뒤로 가거나(시계 보정 등), 데이터가 오지 않은 사이 창이 range 넘게 지나가면(소비처가 화면 밖 차트의
+  // 조회를 멈춘 경우 등) 직전 판정 다음 초부터 창 시작 전까지는 본 적이 없다 — 빈 초로 찍지 않고 열린 공백만 마지막으로
+  // 본 초까지로 닫아 찍은 뒤 이 배치를 새 기준으로 삼는다.
+  const isTimeBack = last < checkedTo;
+  if (isTimeBack || checkedTo + SECOND < winFrom) {
     const openFrom = chart._emptyLogOpenFrom;
     if (openFrom != null) {
-      warnEmptyRange(chart, openFrom, checkedTo, ', 시각이 뒤로 가 기준을 다시 잡음');
+      const note = isTimeBack
+        ? ', 시각이 뒤로 가 기준을 다시 잡음'
+        : ', 그 뒤로 데이터가 오지 않아 기준을 다시 잡음';
+      warnEmptyRange(chart, openFrom, checkedTo, note);
     }
     chart._emptyLogOpenFrom = null;
     chart._emptyLogFilledStart = null;
@@ -620,14 +626,31 @@ const findChartElement = (target) => {
   return inner.length === 1 ? inner[0] : null;
 };
 
+// 진단 대상은 realTimeScatter 차트뿐이다. 다른 차트는 목록·번호·조회 객체에서 뺀다.
+const isRealTimeScatter = (chart) => !!chart?.options?.realTimeScatter?.use;
+
+const chartOf = (element) => chartLinks.get(element)?.getChart?.() ?? null;
+
+// 화면에 조금이라도 걸친 차트. 소비처가 화면 밖 차트의 조회를 멈추는 경우가 많아 목록도 같은 기준으로 보인다.
+const isInViewport = (element) => {
+  const rect = element.getBoundingClientRect();
+  const height = window.innerHeight || document.documentElement.clientHeight;
+  return !(rect.bottom < 0 || rect.top > height);
+};
+
 const findChartElementByNo = (no) =>
   [...document.querySelectorAll('.ev-chart')].find(
-    (element) => element[ELEMENT_KEY]?.chart?._inspectNo === no,
+    (element) => chartOf(element)?._inspectNo === no,
   ) ?? null;
 
 const consoleEntry = (target) => {
   const element =
     typeof target === 'number' ? findChartElementByNo(target) : findChartElement(target);
+  const chart = element ? chartOf(element) : null;
+  if (chart && !isRealTimeScatter(chart)) {
+    Console.warn(`${LOG_PREFIX} realTimeScatter 차트가 아니다 — 대상 목록: ${GLOBAL_KEY}.list()`);
+    return null;
+  }
   const inspector = element?.[ELEMENT_KEY];
   if (!inspector) {
     Console.warn(
@@ -668,17 +691,14 @@ consoleEntry.logEmpty = (on) => {
 
 consoleEntry.list = () => {
   const rows = [...document.querySelectorAll('.ev-chart')]
-    .filter((element) => element[ELEMENT_KEY])
-    .map((element) => {
-      const { chart } = element[ELEMENT_KEY];
-      return {
-        no: chartNoOf(chart),
-        title: chartLabelOf(chart),
-        type: chart.options?.type,
-        realTimeScatter: !!chart.options?.realTimeScatter?.use,
-        series: describeSeries(chart, Object.keys(chart.seriesList ?? {})),
-      };
-    });
+    .filter(isInViewport)
+    .map(chartOf)
+    .filter(isRealTimeScatter)
+    .map((chart) => ({
+      no: chartNoOf(chart),
+      title: chartLabelOf(chart),
+      series: describeSeries(chart, Object.keys(chart.seriesList ?? {})),
+    }));
   // 행에 요소를 넣지 않는다 — 콘솔에 남은 반환값이 내려간 차트의 DOM 을 붙잡는다. 차트로는 번호로 들어간다.
   Console.table(rows);
   return rows;
@@ -699,10 +719,10 @@ export const attachInspector = (element, getChart) => {
   Object.defineProperty(element, ELEMENT_KEY, {
     configurable: true,
     enumerable: false,
-    get: () => (getChart() ? createInspector(link) : null),
+    get: () => (isRealTimeScatter(getChart()) ? createInspector(link) : null),
   });
   const chart = getChart();
-  if (chart) {
+  if (isRealTimeScatter(chart)) {
     chartNoOf(chart);
   }
   if (typeof window !== 'undefined' && !window[GLOBAL_KEY]) {
@@ -718,7 +738,8 @@ export const attachInspector = (element, getChart) => {
  */
 export const detachInspector = (element) => {
   if (element) {
-    const no = element[ELEMENT_KEY]?.chart?._inspectNo;
+    // 진단 대상에서 빠진 뒤(realTimeScatter 를 끈 차트)에도 받은 번호는 반납해야 해 요소 getter 대신 연결로 읽는다.
+    const no = chartOf(element)?._inspectNo;
     if (no != null) {
       usedChartNos.delete(no);
     }
