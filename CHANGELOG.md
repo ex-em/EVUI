@@ -1,3 +1,19 @@
+# [3.22.0](https://github.com/ex-em/EVUI/compare/3.21.1...3.22.0) (2026-10-06)
+
+
+### Bug Fixes
+
+* **chart:** 다시 켜기·시각 역행으로 기준을 다시 잡으면 앞서 채워진 시작 알림을 버린다 ([3bfd8a1](https://github.com/ex-em/EVUI/commit/3bfd8a1b95d5a0e6b85a7d9fb57d6f5c0c137b51)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+* **chart:** 빈 초 로그 다시 켜기·시각 점프와 조회 창 기준 수정 ([f56fe63](https://github.com/ex-em/EVUI/commit/f56fe63c7864c9df162c6503dd9531629cca72cc)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+* **chart:** 콘솔에 남은 조회 객체·list() 결과가 unmount 된 차트를 붙잡지 않게 한다 ([1cdee63](https://github.com/ex-em/EVUI/commit/1cdee63d68bbcbea91245295a941bd149964d933)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+
+
+### Features
+
+* **chart:** realTimeScatter 운영 빌드 콘솔 진단 도구(__EVUI_CHART__) 추가 ([d9ea9f4](https://github.com/ex-em/EVUI/commit/d9ea9f4dcc6c5fe797470dac0c0d4b19f93b7165))
+* **chart:** 빈 초 로그에 소비자 진단 문자열(data.logInfo)을 붙이고 시작 취소 줄을 없앤다 ([295fa78](https://github.com/ex-em/EVUI/commit/295fa780001e016649cc201fddd4357467afb0c6)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+* **chart:** 콘솔 진단 차트 번호를 언마운트 때 반납해 화면 전환 뒤 [#1](https://github.com/ex-em/EVUI/issues/1) 부터 다시 매긴다 ([97c4b21](https://github.com/ex-em/EVUI/commit/97c4b211f58b3d8dc9631e5e4c547f5ceeca64cd)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+
 ## [3.21.1](https://github.com/ex-em/EVUI/compare/3.21.0...3.21.1) (2026-10-01)
 
 
