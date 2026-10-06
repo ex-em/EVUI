@@ -698,7 +698,13 @@ consoleEntry.version = version;
 // options.minSeconds: 이 길이(초) 이상인 빈 구간만 찍는다. 기본 1 — 모든 빈 초.
 consoleEntry.logEmpty = (on, options) => {
   if (on === undefined) {
-    return isEmptySecondLogOn();
+    const isOn = isEmptySecondLogOn();
+    const min = emptyLogMinSeconds();
+    const scope = min > 1 ? `${min}초 이상 빈 구간만` : '모든 빈 초';
+    Console.log(
+      `${LOG_PREFIX} realTimeScatter 빈 초 로그 ${isOn ? `켜져 있음 — ${scope}` : '꺼져 있음'}`,
+    );
+    return isOn;
   }
   // 이미 켜져 있을 때 다시 켜면 열린 공백(시작 줄만 찍힌 것)을 지우지 않도록 꺼짐 → 켜짐일 때만 올린다.
   if (on && !isEmptySecondLogOn()) {
