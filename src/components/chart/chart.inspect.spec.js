@@ -504,6 +504,41 @@ describe('chart.inspect 빈 초 자동 로그', () => {
       ]);
     });
 
+    it.each([
+      [
+        '콘솔에서 다시 켜면',
+        (chart) => {
+          inspectorOf(chart);
+          window.__EVUI_CHART__.logEmpty(false);
+          window.__EVUI_CHART__.logEmpty(true);
+        },
+        [304, 305],
+        304,
+      ],
+      [
+        '시각이 뒤로 가면',
+        (chart) =>
+          chart.createRealTimeScatterDataSet({
+            s1: [
+              { x: at(-400), y: 1 },
+              { x: at(-400), y: null },
+            ],
+          }),
+        [-399, -398],
+        -399,
+      ],
+    ])(
+      '%s 기준을 다시 잡으므로 앞서 채워진 시작을 다음 공백 줄에 붙이지 않는다',
+      (_, rebase, secs, start) => {
+        const chart = fillOpenGap();
+
+        rebase(chart);
+        advanceEmpty(chart, secs);
+
+        expect(emptyLogs().at(-1)).toMatch(new RegExp(`빈 초 시작 ${text(start)} — `));
+      },
+    );
+
     it('창 밖까지 이어진 열린 공백은 시작부터 한 구간으로 닫는다', () => {
       const range = 5;
       const chart = createRtsChart(['s1'], range);
