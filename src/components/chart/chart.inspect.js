@@ -346,7 +346,6 @@ const BADGE_STYLES = {
   start: `${BADGE} background: #e8590c;`,
   range: `${BADGE} background: #2b8a3e;`,
   late: `${BADGE} background: #1971c2;`,
-  cancel: `${BADGE} background: #868e96;`,
   on: `${BADGE} background: #495057;`,
 };
 
@@ -354,15 +353,17 @@ const BADGE_STYLES = {
 // 화면 전환으로 차트가 모두 바뀌면 #1 부터 다시 매겨진다. 줄 맨 앞 테두리 배지 색도 번호로 정한다(종류 배지는 채움).
 // 번호만 들고 차트 참조는 들지 않는다.
 const usedChartNos = new Set();
+// 테두리 배지는 글자색 하나로 라이트·다크 콘솔(warn 배경 포함)을 모두 견뎌야 해 중간 밝기만 쓴다 — 양쪽 대비
+// 약 3:1 이 한 색으로 낼 수 있는 상한이다. 주황은 `빈 초 시작` 배지와 겹쳐 뺐다.
 const CHART_COLORS = [
-  '#5f3dc4',
-  '#c2255c',
-  '#0b7285',
+  '#9775fa',
+  '#e64980',
+  '#1098ad',
   '#5c940d',
-  '#d9480f',
-  '#364fc7',
-  '#862e9c',
-  '#087f5b',
+  '#fa5252',
+  '#5c7cfa',
+  '#cc5de8',
+  '#0ca678',
 ];
 
 const chartNoOf = (chart) => {
@@ -385,8 +386,11 @@ const chartTagStyle = (no) => {
 const badgeArgs = (chart, kind, label, rest) => {
   const no = chartNoOf(chart);
   const chartLabel = chartLabelOf(chart);
+  // 소비자가 배치마다 data 에 넘기는 진단 문자열(예: 요청 lastTime). 이번 저장소 반영의 data 값이다.
+  const logInfo = chart.data?.logInfo;
   return [
-    `${LOG_PREFIX} realTimeScatter %c차트 #${no}${chartLabel ? ` ${chartLabel}` : ''}%c %c${label}%c ${rest}`,
+    `${LOG_PREFIX} realTimeScatter %c차트 #${no}${chartLabel ? ` ${chartLabel}` : ''}%c %c${label}%c ${rest}` +
+      `${logInfo ? ` — ${logInfo}` : ''}`,
     chartTagStyle(no),
     '',
     BADGE_STYLES[kind],
@@ -542,6 +546,9 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
   const walkFrom = Math.max(nextFrom, winFrom);
   let runFrom = nextFrom < winFrom ? nextFrom : null;
   let openResolved = openFrom == null;
+  // 시작 줄을 찍은 공백이 늦은 데이터로 모두 채워지면 따로 찍지 않고, 다음 공백 줄에 한 번 알린다.
+  let filledStart = chart._emptyLogFilledStart ?? null;
+  const filledNote = (from) => `앞서 찍은 시작 ${formatTime(from)} 은 늦게 채워짐`;
   chart._emptyLogCheckedTo = last;
 
   for (let sec = walkFrom; sec <= last; sec += SECOND) {
@@ -549,32 +556,26 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
     if (isEmpty && runFrom === null) {
       runFrom = sec;
     } else if (!isEmpty && runFrom !== null) {
-      const note =
-        !openResolved && runFrom !== openFrom
-          ? `, 앞서 찍은 시작 ${formatTime(openFrom)} 은 늦게 채워짐`
-          : '';
+      const lateStart = !openResolved && runFrom !== openFrom ? openFrom : filledStart;
+      const note = lateStart == null ? '' : `, ${filledNote(lateStart)}`;
       warnEmptyRange(chart, runFrom, sec - SECOND, note);
       rememberReported(chart, runFrom, sec - SECOND, winFrom);
+      filledStart = null;
       openResolved = true;
       runFrom = null;
     }
   }
 
   if (!openResolved && runFrom === null) {
-    Console.warn(
-      ...badgeArgs(
-        chart,
-        'cancel',
-        '빈 초 시작 취소',
-        `${formatTime(openFrom)} — 늦게 들어온 데이터로 채워졌다`,
-      ),
-    );
+    filledStart = openFrom;
   } else if (!openResolved && runFrom !== openFrom) {
-    warnEmptyStart(chart, runFrom, `앞서 찍은 시작 ${formatTime(openFrom)} 은 늦게 채워짐`);
+    warnEmptyStart(chart, runFrom, filledNote(openFrom));
   } else if (openResolved && runFrom !== null) {
-    warnEmptyStart(chart, runFrom);
+    warnEmptyStart(chart, runFrom, filledStart == null ? '' : filledNote(filledStart));
+    filledStart = null;
   }
   chart._emptyLogOpenFrom = runFrom;
+  chart._emptyLogFilledStart = filledStart;
 };
 
 // 요소 → 차트 연결. unmount 때 끊는다 — 조회 객체가 차트 대신 이것을 들어, DevTools 가 콘솔 출력으로 쥔
