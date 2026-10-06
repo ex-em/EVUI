@@ -683,6 +683,19 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     expect(window.__EVUI_CHART__.logEmpty()).toBe(false);
   });
 
+  it.each([
+    ['기준을 주고 켜면', [true, { minSeconds: 10 }], '켜져 있음 — 10초 이상 빈 구간만'],
+    ['기준 없이 켜면', [true], '켜져 있음 — 모든 빈 초'],
+    ['끄면', [false], '꺼져 있음'],
+  ])('%s 상태를 물을 때 켜짐 여부와 기준을 한 줄로 알린다', (_, args, state) => {
+    inspectorOf(createRtsChart());
+    window.__EVUI_CHART__.logEmpty(...args);
+
+    window.__EVUI_CHART__.logEmpty();
+
+    expect(plain(console.log.mock.calls.at(-1)[0])).toContain(`빈 초 로그 ${state}`);
+  });
+
   describe('짧은 공백 거르기(minSeconds)', () => {
     // 3초 이상 빈 구간만 찍도록 켠다.
     const enableMin3 = (chart) => {
