@@ -22,6 +22,7 @@ import { isEqual, debounce } from 'lodash-es';
 import { resize } from '@/directives/resize';
 import EvChart from './chart.core';
 import EvChartToolbar from './ChartToolbar';
+import { attachInspector, detachInspector } from './chart.inspect';
 import {
   useModel,
   useWrapper,
@@ -438,12 +439,14 @@ export default {
       }
 
       await createChart();
+      attachInspector(wrapper.value, () => evChart);
       await drawChart();
 
       isMounted.value = true;
     });
 
     onBeforeUnmount(() => {
+      detachInspector(wrapper.value);
       clearTimeout(pendingTimer);
       pendingUpdate = null;
       pendingTimer = null;
