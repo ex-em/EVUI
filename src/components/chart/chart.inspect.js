@@ -358,9 +358,10 @@ const BADGE_STYLES = {
   on: `${BADGE} background: #495057;`,
 };
 
-// 한 화면의 여러 차트를 가르는 번호. 창마다 처음 본 순서로 매기고(리마운트는 새 번호), 줄 맨 앞 테두리 배지 색도
-// 번호로 정한다 — 종류 배지(채움)와 모양이 달라 섞여 보이지 않는다.
-let chartSeq = 0;
+// 한 화면의 여러 차트를 가르는 번호. 지금 마운트된 차트 중 비어 있는 가장 작은 번호를 주고 언마운트 때 반납한다 —
+// 화면 전환으로 차트가 모두 바뀌면 #1 부터 다시 매겨진다. 줄 맨 앞 테두리 배지 색도 번호로 정한다(종류 배지는 채움).
+// 번호만 들고 차트 참조는 들지 않는다.
+const usedChartNos = new Set();
 const CHART_COLORS = [
   '#5f3dc4',
   '#c2255c',
@@ -373,7 +374,14 @@ const CHART_COLORS = [
 ];
 
 const chartNoOf = (chart) => {
-  chart._inspectNo ??= ++chartSeq;
+  if (chart._inspectNo == null) {
+    let no = 1;
+    while (usedChartNos.has(no)) {
+      no++;
+    }
+    usedChartNos.add(no);
+    chart._inspectNo = no;
+  }
   return chart._inspectNo;
 };
 
@@ -680,12 +688,17 @@ export const attachInspector = (element, getChart) => {
 };
 
 /**
- * 요소에서 진입점을 지운다. DevTools `$0` 이 떨어진 요소를 붙잡고 있어도 인스턴스가 남지 않게 destroy 전에 부른다.
+ * 요소에서 진입점을 지우고 차트 번호를 반납한다. DevTools `$0` 이 떨어진 요소를 붙잡고 있어도 인스턴스가 남지 않게
+ * destroy 전에 부른다.
  * @param {HTMLElement} element
  * @returns {undefined}
  */
 export const detachInspector = (element) => {
   if (element) {
+    const no = element[ELEMENT_KEY]?.chart?._inspectNo;
+    if (no != null) {
+      usedChartNos.delete(no);
+    }
     delete element[ELEMENT_KEY];
   }
 };
