@@ -73,22 +73,12 @@ const resolveRange = (from, to, fallback) => {
   return resolved;
 };
 
-/**
- * 렌더 X축과 같은 창 [fromTime+1000, toTime]. 우측단은 model.store createRealTimeScatterDataSet 과
- * 같은 규칙 — 점을 받은 series 의 toTime 최댓값, 없으면 나머지 series 의 최댓값.
- */
-const getRenderWindow = (dataSet) => {
-  let edge = null;
-  let noDataEdge = null;
-  Object.values(dataSet).forEach((ds) => {
-    if (ds.lastDataTime) {
-      if (!edge || ds.toTime > edge.toTime) edge = ds;
-    } else if (!noDataEdge || ds.toTime > noDataEdge.toTime) {
-      noDataEdge = ds;
-    }
-  });
-  const ds = edge ?? noDataEdge;
-  return ds?.toTime ? { from: ds.fromTime + SECOND, to: ds.toTime } : null;
+// 렌더 X축 창. 저장소가 배치마다 scatter series minMax 에 쓴 값을 읽어 우측단 규칙을 저장소 한 곳에만 둔다.
+const getRenderWindow = (chart) => {
+  const id = chart.seriesInfo?.charts?.scatter?.[0];
+  const minMax = chart.seriesList?.[id]?.minMax;
+  const to = minMax?.maxX?.valueOf();
+  return to ? { from: minMax.minX.valueOf(), to } : null;
 };
 
 const judgeRange = (range, win) => {
@@ -139,7 +129,7 @@ const collectRealTimeScatter = (chart, from, to) => {
     return null;
   }
   const dataSet = chart.dataSet ?? {};
-  const win = getRenderWindow(dataSet);
+  const win = getRenderWindow(chart);
   const range = resolveRange(from, to, win);
   if (!range) {
     return null;
@@ -339,7 +329,9 @@ const chartLabelOf = (chart) => chart.options?.realTimeScatter?.label || '';
 
 const describeSeries = (chart, ids) => {
   const names = ids.map((id) => chart.seriesList?.[id]?.name ?? id);
-  return names.length > 3 ? `${names.slice(0, 3).join(', ')} 외 ${names.length - 3}` : names.join(', ');
+  return names.length > 3
+    ? `${names.slice(0, 3).join(', ')} 외 ${names.length - 3}`
+    : names.join(', ');
 };
 
 const formatSpan = (from, to) => {
@@ -404,14 +396,7 @@ const badgeArgs = (chart, kind, label, rest) => {
 
 const warnEmptyRange = (chart, from, to, note = '') => {
   const { range, count } = formatSpan(from, to);
-  Console.warn(
-    ...badgeArgs(
-      chart,
-      'range',
-      '빈 초',
-      `${range} (${count}초${note})`,
-    ),
-  );
+  Console.warn(...badgeArgs(chart, 'range', '빈 초', `${range} (${count}초${note})`));
 };
 
 const warnEmptyStart = (chart, from, note = '') => {
@@ -464,19 +449,23 @@ const reportLateFills = (chart, isEmptyAt, winFrom) => {
         chart,
         'late',
         '늦게 채워짐',
-        `${range} (${count}초) — 앞서 빈 초로 찍은 초에 데이터가 늦게 ` +
-          '들어왔다',
+        `${range} (${count}초) — 앞서 빈 초로 찍은 초에 데이터가 늦게 들어왔다`,
       ),
     );
   });
 };
 
-const rememberReported = (chart, from, to) => {
+// 창 밖 초는 더 채워질 수 없어 담지 않는다 — Set 은 크기 상한이 있어 창 크기로 묶어야 한다.
+const rememberReported = (chart, from, to, winFrom) => {
   chart._emptyLogReported ??= new Set();
-  for (let sec = from; sec <= to; sec += SECOND) {
+  for (let sec = Math.max(from, winFrom); sec <= to; sec += SECOND) {
     chart._emptyLogReported.add(sec);
   }
 };
+
+// 콘솔에서 켤 때마다 올린다. 세대가 다른 차트는 판정 상태를 비워 다시 켠 뒤 배치를 새 기준으로 삼는다 —
+// 꺼 둔 동안 창 밖으로 나간 초를 빈 초로 찍지 않게.
+let logEmptyGeneration = 0;
 
 /**
  * 저장소 반영 뒤, 마운트 이후 지나간 초(우측단 초 직전까지) 중 모든 series 에 실점이 없는 초를 콘솔에 찍는다.
@@ -485,6 +474,13 @@ const rememberReported = (chart, from, to) => {
  * @returns {undefined}
  */
 export const logEmptySeconds = (chart, winFrom, winTo) => {
+  if (chart._emptyLogGeneration !== logEmptyGeneration) {
+    chart._emptyLogGeneration = logEmptyGeneration;
+    chart._emptyLogCheckedTo = null;
+    chart._emptyLogOpenFrom = null;
+    chart._emptyLogReported?.clear();
+    chart._emptyLogAnnounced = false;
+  }
   const dataSet = chart.dataSet ?? {};
   const ids = Object.keys(dataSet);
   const isEmptyAt = (sec) => !ids.some((id) => hasPointAt(dataSet[id], sec));
@@ -539,10 +535,12 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
 
   reportLateFills(chart, isEmptyAt, winFrom);
 
-  // 열린 공백은 시작 초부터 다시 본다. 창 밖으로 나간 초는 더 채워질 수 없어 빈 채로 확정한다.
+  // 열린 공백은 시작 초부터 다시 본다. 창 밖으로 나간 초는 더 채워질 수 없어 걷지 않고 빈 채로 확정한다 —
+  // 데이터 시각이 크게 뛰어도 걷는 범위가 창 크기로 묶인다.
   const openFrom = chart._emptyLogOpenFrom;
-  const walkFrom = openFrom == null ? checkedTo + SECOND : Math.max(openFrom, winFrom);
-  let runFrom = openFrom != null && openFrom < winFrom ? openFrom : null;
+  const nextFrom = openFrom ?? checkedTo + SECOND;
+  const walkFrom = Math.max(nextFrom, winFrom);
+  let runFrom = nextFrom < winFrom ? nextFrom : null;
   let openResolved = openFrom == null;
   chart._emptyLogCheckedTo = last;
 
@@ -556,7 +554,7 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
           ? `, 앞서 찍은 시작 ${formatTime(openFrom)} 은 늦게 채워짐`
           : '';
       warnEmptyRange(chart, runFrom, sec - SECOND, note);
-      rememberReported(chart, runFrom, sec - SECOND);
+      rememberReported(chart, runFrom, sec - SECOND, winFrom);
       openResolved = true;
       runFrom = null;
     }
@@ -607,7 +605,8 @@ const findChartElementByNo = (no) =>
   ) ?? null;
 
 const consoleEntry = (target) => {
-  const element = typeof target === 'number' ? findChartElementByNo(target) : findChartElement(target);
+  const element =
+    typeof target === 'number' ? findChartElementByNo(target) : findChartElement(target);
   const inspector = element?.[ELEMENT_KEY];
   if (!inspector) {
     Console.warn(
@@ -624,6 +623,10 @@ consoleEntry.version = version;
 consoleEntry.logEmpty = (on) => {
   if (on === undefined) {
     return isEmptySecondLogOn();
+  }
+  // 이미 켜져 있을 때 다시 켜면 열린 공백(시작 줄만 찍힌 것)을 지우지 않도록 꺼짐 → 켜짐일 때만 올린다.
+  if (on && !isEmptySecondLogOn()) {
+    logEmptyGeneration += 1;
   }
   window[LOG_EMPTY_FLAG] = !!on;
   try {
