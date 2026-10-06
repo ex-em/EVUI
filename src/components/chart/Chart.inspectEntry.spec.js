@@ -42,7 +42,6 @@ const mountChart = ({ data = batch({ s1: [] }), deferUntil = 0, options = RTS_OP
     },
   });
 
-
 const chartElementOf = (wrapper) => wrapper.find('.ev-chart').element;
 const lastInstance = () => EvChartCore.mock.instances.at(-1);
 
@@ -99,7 +98,10 @@ describe('Chart.vue 콘솔 조회 진입점', () => {
 
   it('list() 는 realTimeScatter.label 을 title 열로 보여준다', async () => {
     const wrapper = mountChart({
-      options: { ...RTS_OPTIONS, realTimeScatter: { use: true, label: 'Postgresql Slow Query Monitor' } },
+      options: {
+        ...RTS_OPTIONS,
+        realTimeScatter: { use: true, label: 'Postgresql Slow Query Monitor' },
+      },
     });
     await flushPromises();
     const table = vi.spyOn(console, 'table').mockImplementation(() => {});
@@ -138,5 +140,29 @@ describe('Chart.vue 콘솔 조회 진입점', () => {
 
     expect('__evuiChart__' in element).toBe(false);
     expect(window.__EVUI_CHART__(element)).toBeNull();
+  });
+
+  it('unmount 전에 콘솔에 받아 둔 조회 객체는 unmount 뒤 차트를 놓는다', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const wrapper = mountChart();
+    await flushPromises();
+    const inspector = window.__EVUI_CHART__(chartElementOf(wrapper));
+
+    wrapper.unmount();
+
+    expect(inspector.chart).toBeNull();
+    expect(inspector.query()).toBeNull();
+    expect(warn).toHaveBeenLastCalledWith(expect.stringContaining('언마운트된 차트다'));
+  });
+
+  it('list() 반환 행에는 요소를 넣지 않는다', async () => {
+    const wrapper = mountChart();
+    await flushPromises();
+    vi.spyOn(console, 'table').mockImplementation(() => {});
+
+    const [row] = window.__EVUI_CHART__.list();
+
+    expect(row).not.toHaveProperty('element');
+    wrapper.unmount();
   });
 });

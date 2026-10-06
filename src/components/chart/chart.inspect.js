@@ -577,13 +577,31 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
   chart._emptyLogOpenFrom = runFrom;
 };
 
-const createInspector = (chart) => ({
-  chart,
-  version,
-  query: (from, to) => queryRealTimeScatter(chart, from, to),
-  queryData: (from, to) => queryRealTimeScatterData(chart, from, to),
-  redraw: () => forceRedraw(chart),
-});
+// 요소 → 차트 연결. unmount 때 끊는다 — 조회 객체가 차트 대신 이것을 들어, DevTools 가 콘솔 출력으로 쥔
+// 조회 객체가 내려간 차트를 붙잡지 않는다.
+const chartLinks = new WeakMap();
+
+const createInspector = (link) => {
+  const withChart =
+    (fn) =>
+    (...args) => {
+      const chart = link.getChart?.();
+      if (!chart) {
+        Console.warn(`${LOG_PREFIX} 언마운트된 차트다 — 화면의 차트 목록: ${GLOBAL_KEY}.list()`);
+        return null;
+      }
+      return fn(chart, ...args);
+    };
+  return {
+    get chart() {
+      return link.getChart?.() ?? null;
+    },
+    version,
+    query: withChart(queryRealTimeScatter),
+    queryData: withChart(queryRealTimeScatterData),
+    redraw: withChart(forceRedraw),
+  };
+};
 
 const findChartElement = (target) => {
   const closest = target?.closest?.('.ev-chart');
@@ -656,10 +674,10 @@ consoleEntry.list = () => {
         type: chart.options?.type,
         realTimeScatter: !!chart.options?.realTimeScatter?.use,
         series: describeSeries(chart, Object.keys(chart.seriesList ?? {})),
-        element,
       };
     });
-  Console.table(rows.map(({ element, ...rest }) => rest));
+  // 행에 요소를 넣지 않는다 — 콘솔에 남은 반환값이 내려간 차트의 DOM 을 붙잡는다. 차트로는 번호로 들어간다.
+  Console.table(rows);
   return rows;
 };
 
@@ -673,13 +691,12 @@ export const attachInspector = (element, getChart) => {
   if (!element) {
     return;
   }
+  const link = { getChart };
+  chartLinks.set(element, link);
   Object.defineProperty(element, ELEMENT_KEY, {
     configurable: true,
     enumerable: false,
-    get: () => {
-      const chart = getChart();
-      return chart ? createInspector(chart) : null;
-    },
+    get: () => (getChart() ? createInspector(link) : null),
   });
   const chart = getChart();
   if (chart) {
@@ -691,8 +708,8 @@ export const attachInspector = (element, getChart) => {
 };
 
 /**
- * 요소에서 진입점을 지우고 차트 번호를 반납한다. DevTools `$0` 이 떨어진 요소를 붙잡고 있어도 인스턴스가 남지 않게
- * destroy 전에 부른다.
+ * 요소에서 진입점을 지우고 차트 번호를 반납한다. DevTools `$0` 이 떨어진 요소나 콘솔에 남은 조회 객체가 있어도
+ * 인스턴스가 남지 않게 destroy 전에 부른다.
  * @param {HTMLElement} element
  * @returns {undefined}
  */
@@ -701,6 +718,11 @@ export const detachInspector = (element) => {
     const no = element[ELEMENT_KEY]?.chart?._inspectNo;
     if (no != null) {
       usedChartNos.delete(no);
+    }
+    const link = chartLinks.get(element);
+    if (link) {
+      link.getChart = null;
+      chartLinks.delete(element);
     }
     delete element[ELEMENT_KEY];
   }
