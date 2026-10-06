@@ -482,6 +482,7 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
     chart._emptyLogGeneration = logEmptyGeneration;
     chart._emptyLogCheckedTo = null;
     chart._emptyLogOpenFrom = null;
+    chart._emptyLogFilledStart = null;
     chart._emptyLogReported?.clear();
     chart._emptyLogAnnounced = false;
   }
@@ -532,6 +533,7 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
       warnEmptyRange(chart, openFrom, checkedTo, ', 시각이 뒤로 가 기준을 다시 잡음');
     }
     chart._emptyLogOpenFrom = null;
+    chart._emptyLogFilledStart = null;
     chart._emptyLogReported?.clear();
     chart._emptyLogCheckedTo = last;
     return;
