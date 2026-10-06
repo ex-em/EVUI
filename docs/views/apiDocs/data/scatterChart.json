@@ -180,6 +180,12 @@
               "type": "Object",
               "default": "{}",
               "description": "차트에 표시할 시리즈별 데이터입니다. 시리즈 ID를 key로 하여 { x, y } 형태의 좌표 배열을 지정하며, 개별 데이터에 color를 지정할 수도 있습니다."
+            },
+            {
+              "name": "logInfo",
+              "type": "String",
+              "default": "''",
+              "description": "realTimeScatter 빈 초 로그(콘솔 진단) 줄 끝에 붙일 문자열입니다(예: 'lastTime 2026-10-06 11:45:30'). 배치마다 넘기면 그 배치를 반영할 때 찍힌 줄에 붙습니다. 화면 표시에는 영향이 없습니다."
             }
           ]
         },

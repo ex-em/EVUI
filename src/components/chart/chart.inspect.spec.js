@@ -469,15 +469,38 @@ describe('chart.inspect 빈 초 자동 로그', () => {
       ]);
     });
 
-    it('열린 공백이 모두 채워지면 시작을 취소한다', () => {
+    // 301초부터 열린 공백이 늦은 데이터로 모두 채워진 상태(판정은 302초까지).
+    const fillOpenGap = () => {
       const chart = createRtsChart();
       chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
       advanceEmpty(chart, [301, 302, 303]);
-
       chart.createRealTimeScatterDataSet(lateBatch([301, 302], 303));
+      return chart;
+    };
+    const filledNote = `앞서 찍은 시작 ${text(301)} 은 늦게 채워짐`;
+
+    it('열린 공백이 모두 채워지면 따로 찍지 않고 다음 빈 초 시작 줄에 한 번 알린다', () => {
+      const chart = fillOpenGap();
+      expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 시작 ${text(301)}`)]);
+
+      advanceEmpty(chart, [304, 305]);
+      chart.createRealTimeScatterDataSet({ s1: batchOf(306, 307) });
 
       expect(emptyLogs().slice(1)).toEqual([
-        expect.stringContaining(`빈 초 시작 취소 ${text(301)}`),
+        expect.stringContaining(`빈 초 시작 ${text(303)} (${filledNote})`),
+        expect.stringContaining(`빈 초 ${text(303)} ~ ${text(305)} (3초)`),
+      ]);
+    });
+
+    it('열린 공백이 모두 채워진 뒤 다음 공백이 한 배치 안에서 닫히면 그 구간 줄에 알린다', () => {
+      const chart = fillOpenGap();
+
+      chart.createRealTimeScatterDataSet(lateBatch([305], 306));
+      advanceEmpty(chart, [307]);
+
+      expect(emptyLogs().slice(1)).toEqual([
+        expect.stringContaining(`빈 초 ${text(303)} ~ ${text(304)} (2초, ${filledNote})`),
+        expect.stringMatching(new RegExp(`빈 초 시작 ${text(306)} — `)),
       ]);
     });
 
@@ -505,6 +528,16 @@ describe('chart.inspect 빈 초 자동 로그', () => {
         expect.stringContaining(`늦게 채워짐 ${text(303)} (1초)`),
       ]);
     });
+  });
+
+  it('소비자가 data.logInfo 를 넘기면 줄 끝에 붙인다', () => {
+    const chart = createRtsChart();
+    chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
+    chart.data = { logInfo: 'lastTime 2026-10-02 10:05:00' };
+
+    chart.createRealTimeScatterDataSet(gapBatch);
+
+    expect(emptyLogs()).toEqual([expect.stringMatching(/\(4초\) — lastTime 2026-10-02 10:05:00$/)]);
   });
 
   it('한 series 라도 그 초에 점이 있으면 비지 않은 것으로 본다', () => {
