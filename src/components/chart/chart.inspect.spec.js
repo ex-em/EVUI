@@ -75,14 +75,8 @@ describe('chart.inspect query', () => {
     expect(result.judge).toBe('창 안');
     // 칸은 그 초 점들의 y 값(오름차순), total 은 실점 개수다. 10:02:05 의 y: null 점은 세지 않는다.
     const valuesAt = (sec) => Array.from({ length: pointsAt(sec) }, (_, k) => k + 1).join(', ');
-    expect(
-      result.seconds.map((row) => [row.time, row.total, row['name-s1']]),
-    ).toEqual(
-      Array.from({ length: 11 }, (_, i) => [
-        text(120 + i),
-        pointsAt(120 + i),
-        valuesAt(120 + i),
-      ]),
+    expect(result.seconds.map((row) => [row.time, row.total, row['name-s1']])).toEqual(
+      Array.from({ length: 11 }, (_, i) => [text(120 + i), pointsAt(120 + i), valuesAt(120 + i)]),
     );
     const expectedPoints = Array.from({ length: 11 }, (_, i) => pointsAt(120 + i)).reduce(
       (a, b) => a + b,
@@ -105,6 +99,16 @@ describe('chart.inspect query', () => {
     expect(result.seconds).toHaveLength(300);
     expect(result.series[0].outOfWindow).toBe(pointsAt(0));
     expect(result.seconds.at(-1)).toMatchObject({ time: text(300), total: pointsAt(300) });
+  });
+
+  it('창은 이번 배치에서 빠진 series 의 우측단이 아니라 저장소가 그린 X축을 따른다', () => {
+    const chart = createRtsChart(['s1', 's2']);
+    chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300), s2: batchOf(0, 300) });
+    chart.createRealTimeScatterDataSet({ s1: batchOf(301, 310) });
+    // s1 이 빠진 배치 — 저장소는 이번 배치 키(s2)로 X축 우측단을 잡는다.
+    chart.createRealTimeScatterDataSet({ s2: batchOf(301, 305) });
+
+    expect(inspectorOf(chart).query().window).toMatchObject({ from: at(6), to: at(305) });
   });
 
   it.each([
@@ -132,13 +136,7 @@ describe('chart.inspect query', () => {
 
     const [row] = inspectorOf(chart).query(text(5), text(5)).seconds;
 
-    expect(Object.keys(row)).toEqual([
-      'time',
-      'total',
-      'WAS',
-      'DB (bbbbbbbb)',
-      'DB (cccccccc)',
-    ]);
+    expect(Object.keys(row)).toEqual(['time', 'total', 'WAS', 'DB (bbbbbbbb)', 'DB (cccccccc)']);
   });
 
   it('점이 없는 초는 null, y 가 0 인 점은 0 으로 보이고, 점이 많으면 범위로 줄인다', () => {
@@ -158,8 +156,14 @@ describe('chart.inspect query', () => {
   it('queryData 는 실점이 있는 초와 그 구간에 점이 있는 series 열만 보인다', () => {
     const chart = createRtsChart(['s1', 's2', 's3']);
     chart.createRealTimeScatterDataSet({
-      s1: [{ x: at(1), y: 0 }, { x: at(5), y: null }],
-      s2: [{ x: at(3), y: 7 }, { x: at(5), y: null }],
+      s1: [
+        { x: at(1), y: 0 },
+        { x: at(5), y: null },
+      ],
+      s2: [
+        { x: at(3), y: 7 },
+        { x: at(5), y: null },
+      ],
       s3: [{ x: at(5), y: null }],
     });
 
@@ -224,7 +228,9 @@ describe('chart.inspect 빈 초 자동 로그', () => {
 
     chart.createRealTimeScatterDataSet(gapBatch);
 
-    expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 ${text(302)} ~ ${text(305)} (4초)`)]);
+    expect(emptyLogs()).toEqual([
+      expect.stringContaining(`빈 초 ${text(302)} ~ ${text(305)} (4초)`),
+    ]);
   });
 
   it('빈 구간 시작·확정·늦게 채워짐은 서로 다른 색 배지로 찍는다', () => {
@@ -232,7 +238,12 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
     [301, 302, 303].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
     chart.createRealTimeScatterDataSet({ s1: batchOf(304, 305) });
-    chart.createRealTimeScatterDataSet({ s1: [{ x: at(302), y: 1 }, { x: at(306), y: null }] });
+    chart.createRealTimeScatterDataSet({
+      s1: [
+        { x: at(302), y: 1 },
+        { x: at(306), y: null },
+      ],
+    });
 
     // 인자: [본문, 차트 번호 배지 스타일, '', 종류 배지 스타일, ''].
     const styleOf = (label) =>
@@ -324,7 +335,9 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     expect(announces).toEqual([expect.stringContaining(`${text(300)} 부터 지나가는 초를 본다`)]);
 
     [301, 302].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
-    expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 시작 ${text(300)} — 데이터가 다시`)]);
+    expect(emptyLogs()).toEqual([
+      expect.stringContaining(`빈 초 시작 ${text(300)} — 데이터가 다시`),
+    ]);
     expect(console.log.mock.calls.filter(([m]) => m.includes('빈 초 로그 켜짐'))).toHaveLength(1);
   });
 
@@ -389,7 +402,12 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
     [301, 302, 303].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
 
-    chart.createRealTimeScatterDataSet({ s1: [{ x: at(303), y: 1 }, { x: at(306), y: null }] });
+    chart.createRealTimeScatterDataSet({
+      s1: [
+        { x: at(303), y: 1 },
+        { x: at(306), y: null },
+      ],
+    });
 
     expect(emptyLogs().slice(-2)).toEqual([
       expect.stringContaining(`빈 초 ${text(301)} ~ ${text(302)} (2초)`),
@@ -401,7 +419,12 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     const chart = createRtsChart();
     // 0초 점은 창 시작 초라 링의 최신 슬롯(300초 칸)에 놓인다.
     chart.createRealTimeScatterDataSet({
-      s1: [{ x: at(0), y: 1 }, { x: at(150), y: 1 }, { x: at(299), y: 1 }, { x: at(300), y: null }],
+      s1: [
+        { x: at(0), y: 1 },
+        { x: at(150), y: 1 },
+        { x: at(299), y: 1 },
+        { x: at(300), y: null },
+      ],
     });
 
     chart.createRealTimeScatterDataSet(boundaryAt(301));
@@ -503,7 +526,9 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     expect(emptyLogs()).toEqual([]);
 
     chart.createRealTimeScatterDataSet(gapBatch);
-    expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 ${text(302)} ~ ${text(305)} (4초)`)]);
+    expect(emptyLogs()).toEqual([
+      expect.stringContaining(`빈 초 ${text(302)} ~ ${text(305)} (4초)`),
+    ]);
   });
 
   it('열린 공백은 리셋을 넘어 이어지고 데이터가 다시 들어오면 구간을 찍는다', () => {
@@ -523,13 +548,43 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     [301, 302].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
 
     // 창(range 300)에 한 점도 못 들어갈 만큼 과거인 배치는 기준 재설정이 된다.
-    const pointAt = (sec) => ({ s1: [{ x: at(sec), y: 1 }, { x: at(sec), y: null }] });
+    const pointAt = (sec) => ({
+      s1: [
+        { x: at(sec), y: 1 },
+        { x: at(sec), y: null },
+      ],
+    });
     chart.createRealTimeScatterDataSet(pointAt(-400));
 
-    expect(emptyLogs().at(-1)).toContain(`빈 초 ${text(301)} (1초, 시각이 뒤로 가 기준을 다시 잡음)`);
+    expect(emptyLogs().at(-1)).toContain(
+      `빈 초 ${text(301)} (1초, 시각이 뒤로 가 기준을 다시 잡음)`,
+    );
     chart.createRealTimeScatterDataSet(pointAt(-399));
     chart.createRealTimeScatterDataSet(pointAt(-398));
     expect(emptyLogs()).toHaveLength(2);
+  });
+
+  it('시각이 창보다 크게 뛰어도 창 밖 초는 한 구간으로 확정하고 창 크기만큼만 보고 기억한다', () => {
+    const range = 5;
+    const jump = 10000;
+    const chart = createRtsChart(['s1'], range);
+    let reads = 0;
+    // 초마다 series 저장소를 한 번 읽으므로 읽은 횟수가 판정한 초 수다.
+    chart.dataSet = new Proxy(chart.dataSet, {
+      get(target, key) {
+        reads += 1;
+        return target[key];
+      },
+    });
+    chart.createRealTimeScatterDataSet({ s1: batchOf(0, 5) });
+    reads = 0;
+
+    chart.createRealTimeScatterDataSet({ s1: batchOf(jump - 2, jump) });
+
+    expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 ${text(5)} ~ ${text(jump - 3)}`)]);
+    expect(reads).toBeLessThan(range * 10);
+    // 다시 볼 초 Set 은 크기 상한이 있어(V8 약 1,677만) 창 안 초만 담아야 한다.
+    expect(chart._emptyLogReported.size).toBeLessThanOrEqual(range);
   });
 
   it('콘솔에서 켜고 끈 상태가 localStorage 에 남는다', () => {
@@ -543,6 +598,47 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     window.__EVUI_CHART__.logEmpty(false);
     expect(window.localStorage.getItem(STORAGE_KEY)).toBeNull();
     expect(window.__EVUI_CHART__.logEmpty()).toBe(false);
+  });
+
+  describe('콘솔에서 다시 켜기', () => {
+    const announces = () =>
+      console.log.mock.calls.map(([m]) => plain(m)).filter((m) => m.includes('빈 초 로그 켜짐'));
+
+    beforeEach(() => {
+      delete window.__EVUI_CHART_LOG_EMPTY__;
+    });
+
+    it('껐다 다시 켜면 켠 뒤 배치부터 다시 보고, 꺼 둔 동안 지나간 초는 찍지 않는다', () => {
+      const chart = createRtsChart(['s1'], 10);
+      inspectorOf(chart);
+      window.__EVUI_CHART__.logEmpty(true);
+      chart.createRealTimeScatterDataSet({ s1: batchOf(0, 10) });
+
+      window.__EVUI_CHART__.logEmpty(false);
+      for (let sec = 11; sec <= 40; sec++) {
+        chart.createRealTimeScatterDataSet({ s1: batchOf(sec, sec) });
+      }
+      window.__EVUI_CHART__.logEmpty(true);
+      [41, 42].forEach((sec) => chart.createRealTimeScatterDataSet({ s1: batchOf(sec, sec) }));
+
+      expect(emptyLogs()).toEqual([]);
+      expect(announces()).toHaveLength(2);
+      expect(announces().at(-1)).toContain(`${text(41)} 부터 지나가는 초를 본다`);
+    });
+
+    it('이미 켜져 있을 때 다시 켜도 열린 공백을 이어 간다', () => {
+      const chart = createRtsChart();
+      inspectorOf(chart);
+      window.__EVUI_CHART__.logEmpty(true);
+      chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
+      [301, 302, 303].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
+
+      window.__EVUI_CHART__.logEmpty(true);
+      chart.createRealTimeScatterDataSet({ s1: batchOf(304, 305) });
+
+      expect(emptyLogs().at(-1)).toContain(`빈 초 ${text(301)} ~ ${text(303)} (3초)`);
+      expect(announces()).toHaveLength(1);
+    });
   });
 });
 
