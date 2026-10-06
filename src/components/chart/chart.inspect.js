@@ -283,9 +283,13 @@ const forceRedraw = (chart) => {
   return frame;
 };
 
+// 찍을 빈 구간의 최소 길이(초). 플래그·localStorage 값이 곧 이 길이다(켬만 한 값 true·'1' 은 1초).
+const toMinSeconds = (value) => Math.max(1, Math.floor(Number(value)) || 1);
+
 const readStoredLogEmpty = () => {
   try {
-    return window.localStorage?.getItem(LOG_EMPTY_STORAGE_KEY) === '1';
+    const value = window.localStorage?.getItem(LOG_EMPTY_STORAGE_KEY);
+    return value ? toMinSeconds(value) : false;
   } catch (e) {
     // 저장소 접근이 막힌 환경(사생활 보호 모드 등)은 꺼진 것으로 본다.
     return false;
@@ -303,8 +307,10 @@ export const isEmptySecondLogOn = () => {
   if (window[LOG_EMPTY_FLAG] === undefined) {
     window[LOG_EMPTY_FLAG] = readStoredLogEmpty();
   }
-  return window[LOG_EMPTY_FLAG] === true;
+  return Number(window[LOG_EMPTY_FLAG]) >= 1;
 };
+
+const emptyLogMinSeconds = () => toMinSeconds(window[LOG_EMPTY_FLAG]);
 
 // 링 버킷은 초 단위라 그 초의 버킷만 본다. 같은 버킷의 창 시작 초 점(링 최신 슬롯에 놓임)은 x 초로 걸러낸다.
 const hasPointAt = (ds, sec) => {
@@ -512,12 +518,14 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
           ? '첫 데이터가 들어오면 그 시각부터 본다'
           : `${formatTime(winTo)} 부터 지나가는 초를 본다`;
       const no = chartNoOf(chart);
+      const min = emptyLogMinSeconds();
+      const filter = min > 1 ? ` · ${min}초 이상 빈 구간만` : '';
       Console.log(
         ...badgeArgs(
           chart,
           'on',
           '빈 초 로그 켜짐',
-          `— ${since} — 조회: ${GLOBAL_KEY}(${no}).query()`,
+          `— ${since}${filter} — 조회: ${GLOBAL_KEY}(${no}).query()`,
         ),
       );
     }
@@ -529,10 +537,15 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
   // 시각이 뒤로 가거나(시계 보정 등), 데이터가 오지 않은 사이 창이 range 넘게 지나가면(소비처가 화면 밖 차트의
   // 조회를 멈춘 경우 등) 직전 판정 다음 초부터 창 시작 전까지는 본 적이 없다 — 빈 초로 찍지 않고 열린 공백만 마지막으로
   // 본 초까지로 닫아 찍은 뒤 이 배치를 새 기준으로 삼는다.
+  const minSeconds = emptyLogMinSeconds();
+  const spanOf = (from, to) => (to - from) / SECOND + 1;
   const isTimeBack = last < checkedTo;
   if (isTimeBack || checkedTo + SECOND < winFrom) {
     const openFrom = chart._emptyLogOpenFrom;
-    if (openFrom != null) {
+    if (
+      openFrom != null &&
+      (chart._emptyLogOpenShown || spanOf(openFrom, checkedTo) >= minSeconds)
+    ) {
       const note = isTimeBack
         ? ', 시각이 뒤로 가 기준을 다시 잡음'
         : ', 그 뒤로 데이터가 오지 않아 기준을 다시 잡음';
@@ -554,6 +567,9 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
   const walkFrom = Math.max(nextFrom, winFrom);
   let runFrom = nextFrom < winFrom ? nextFrom : null;
   let openResolved = openFrom == null;
+  // 열린 공백 중 시작 줄을 찍은 것의 시작 초. minSeconds 보다 짧아 아직 찍지 않았으면 null 이다.
+  const shownFrom = chart._emptyLogOpenShown ? openFrom : null;
+  let shown = false;
   // 시작 줄을 찍은 공백이 늦은 데이터로 모두 채워지면 따로 찍지 않고, 다음 공백 줄에 한 번 알린다.
   let filledStart = chart._emptyLogFilledStart ?? null;
   const filledNote = (from) => `앞서 찍은 시작 ${formatTime(from)} 은 늦게 채워짐`;
@@ -564,25 +580,40 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
     if (isEmpty && runFrom === null) {
       runFrom = sec;
     } else if (!isEmpty && runFrom !== null) {
-      const lateStart = !openResolved && runFrom !== openFrom ? openFrom : filledStart;
-      const note = lateStart == null ? '' : `, ${filledNote(lateStart)}`;
-      warnEmptyRange(chart, runFrom, sec - SECOND, note);
-      rememberReported(chart, runFrom, sec - SECOND, winFrom);
-      filledStart = null;
+      const to = sec - SECOND;
+      const isShownOpen = !openResolved && shownFrom != null;
+      // 짧은 공백은 찍지 않는다. 단 시작 줄을 이미 찍은 공백은 닫는 줄도 찍는다.
+      if (isShownOpen || spanOf(runFrom, to) >= minSeconds) {
+        let lateStart = filledStart;
+        if (isShownOpen) {
+          lateStart = runFrom !== shownFrom ? shownFrom : null;
+        }
+        const note = lateStart == null ? '' : `, ${filledNote(lateStart)}`;
+        warnEmptyRange(chart, runFrom, to, note);
+        rememberReported(chart, runFrom, to, winFrom);
+        filledStart = null;
+      }
       openResolved = true;
       runFrom = null;
     }
   }
 
   if (!openResolved && runFrom === null) {
-    filledStart = openFrom;
-  } else if (!openResolved && runFrom !== openFrom) {
-    warnEmptyStart(chart, runFrom, filledNote(openFrom));
-  } else if (openResolved && runFrom !== null) {
+    if (shownFrom != null) {
+      filledStart = shownFrom;
+    }
+  } else if (!openResolved && shownFrom != null) {
+    if (runFrom !== shownFrom) {
+      warnEmptyStart(chart, runFrom, filledNote(shownFrom));
+    }
+    shown = true;
+  } else if (runFrom !== null && spanOf(runFrom, last) >= minSeconds) {
     warnEmptyStart(chart, runFrom, filledStart == null ? '' : filledNote(filledStart));
     filledStart = null;
+    shown = true;
   }
   chart._emptyLogOpenFrom = runFrom;
+  chart._emptyLogOpenShown = shown;
   chart._emptyLogFilledStart = filledStart;
 };
 
@@ -664,7 +695,8 @@ const consoleEntry = (target) => {
 
 consoleEntry.version = version;
 
-consoleEntry.logEmpty = (on) => {
+// options.minSeconds: 이 길이(초) 이상인 빈 구간만 찍는다. 기본 1 — 모든 빈 초.
+consoleEntry.logEmpty = (on, options) => {
   if (on === undefined) {
     return isEmptySecondLogOn();
   }
@@ -672,19 +704,20 @@ consoleEntry.logEmpty = (on) => {
   if (on && !isEmptySecondLogOn()) {
     logEmptyGeneration += 1;
   }
-  window[LOG_EMPTY_FLAG] = !!on;
+  const minSeconds = toMinSeconds(options?.minSeconds);
+  window[LOG_EMPTY_FLAG] = on ? minSeconds : false;
   try {
     if (on) {
-      window.localStorage.setItem(LOG_EMPTY_STORAGE_KEY, '1');
+      window.localStorage.setItem(LOG_EMPTY_STORAGE_KEY, String(minSeconds));
     } else {
       window.localStorage.removeItem(LOG_EMPTY_STORAGE_KEY);
     }
   } catch (e) {
     Console.warn(`${LOG_PREFIX} localStorage 를 쓸 수 없어 이 창에서만 적용된다`);
   }
+  const state = on ? `켬${minSeconds > 1 ? ` (${minSeconds}초 이상 빈 구간만)` : ''}` : '끔';
   Console.log(
-    `${LOG_PREFIX} realTimeScatter 빈 초 로그 ${on ? '켬' : '끔'} — ` +
-      '이미 열린 다른 창은 새로고침해야 반영된다',
+    `${LOG_PREFIX} realTimeScatter 빈 초 로그 ${state} — 이미 열린 다른 창은 새로고침해야 반영된다`,
   );
   return !!on;
 };
