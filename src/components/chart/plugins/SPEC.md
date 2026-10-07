@@ -10,7 +10,7 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 ## Features
 
 ### 툴팁 (plugins.tooltip.js / plugins.tooltip.virtualScroll.js)
-- **기본 캔버스 툴팁**: `tooltip.use` 시 `document.body` 직속 tooltip DOM(header + body + canvas)을 생성하고, hover 아이템들을 색상 마커·시리즈명·값으로 캔버스에 렌더. `textOverflow`(ellipsis/wrap), `sortByValue`, `maxWidth`/`maxHeight`+`useScrollbar`, `fontColor.label`/`fontColor.value`(함수형 허용) 지원. scatter(`drawTooltipForScatter`)/heatMap(`drawToolTipForHeatMap`)은 전용 draw 함수 사용.
+- **기본 캔버스 툴팁**: `tooltip.use` 시 `document.body` 직속 tooltip DOM(header + body + canvas)을 생성하고, hover 아이템들을 색상 마커·시리즈명·값으로 캔버스에 렌더. `textOverflow`(ellipsis/wrap), `sortByValue`, `maxWidth`/`maxHeight`+`useScrollbar`, `fontColor.label`/`fontColor.value`(함수형 허용) 지원. scatter(`drawTooltipForScatter`)/heatMap(`drawToolTipForHeatMap`)은 전용 draw 함수 사용. EvChartGroup `sharedTooltip` 그룹이면 이 DOM 1벌을 그룹 내 차트가 공유한다(Business Rules 16).
 - **커스텀 HTML 툴팁**: `tooltip.formatter.html(seriesList)`이 반환한 HTML을 파싱해 tooltip DOM에 부착(`drawCustomTooltip`). 루트 노드는 항상 `tooltipDOM.firstElementChild`로 취급하며 위치 계산(`setCustomTooltipLayoutPosition`)은 그 크기 기준.
 - **커스텀 툴팁 가상 스크롤**: `tooltip.virtualScroll` 옵션(use: true/'auto'+threshold 기본 50)에 따라 formatter.html 결과에서 row 컨테이너를 탐지(① `[data-evui-tooltip-row]` 속성 행 개수=시리즈 수+동일 부모, ② BFS로 자식 수=시리즈 수인 가장 얕은 요소)하여 상/하 spacer + viewport 구조로 재구성. prefix sum 기반 가시 범위 계산, 실측 높이 학습(행 아이템만), 앵커 보정으로 스크롤 점프 방지, ResizeObserver로 폭 변화 시 측정 무효화. 탐지 실패 시 전체 부착 경로로 fallback(콘솔 경고 1회, `_vsDetectFailed`로 같은 마크업 동안 재시도 차단 — `render()`에서 리셋).
 - **인디케이터/그룹 동기화**: hover 위치 수직/수평 indicator(`drawIndicator`), 툴팁 기반 라벨 위치 indicator(`drawIndicatorForTooltip`), 차트 그룹의 다른 차트 hover를 받아 그리는 `drawSyncedIndicator`(time 축 값 비례 또는 `dataLabel` 매칭 — categoryMode/time/기본 축별 좌표 계산). `syncHover === false`면 동기화 비활성.
@@ -69,7 +69,8 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 12. **스크롤바 한계 방어**: minMax가 아직 확정되지 않은 상태(null)에서는 range를 절대 변경하지 않는다(`+null === 0` 오염 방지). 라이브 데이터로 윈도우가 한계 밖으로 밀려도 폭을 유지한 채 가장자리 정렬한다.
 13. **(hover 성능)**: hit-test는 라벨 유효성 사전계산 마스크(O(1) 조회), 툴팁 값 포맷 WeakMap 캐시, hoverSig 기반 커스텀 툴팁 redraw 스킵으로 mousemove 당 비용을 상수화한다. 루프 내 `offsetWidth`는 1회만 읽는다(강제 동기 레이아웃 회피).
 14. **(스크롤 성능)**: 가상 스크롤 scroll 핸들러는 rAF throttle + passive, 프로그램적 scrollTop 보정 중에는 `suppressScroll`로 재진입 차단, `overflow-anchor: none`으로 브라우저 scroll anchoring을 끈다. 범례 가상 스크롤도 rAF로 초기 렌더한다.
-15. **(teardown 무누수)**: `tooltipDestroy`는 가상 스크롤 세션(scroll 리스너/ResizeObserver) 해제 후 tooltip DOM들을 제거한다. `destroyLegend`는 pending rAF를 cancel한다. EvChart.destroy가 overlayCanvas/window 리스너와 전용 드래그 캔버스, startArea position 원복까지 수행한다.
+15. **(teardown 무누수)**: `tooltipDestroy`는 가상 스크롤 세션(scroll 리스너/ResizeObserver) 해제 후 tooltip DOM들을 제거한다(공유 툴팁이면 제거하지 않고 소유권만 내려놓는다 — 16). `destroyLegend`는 pending rAF를 cancel한다. EvChart.destroy가 overlayCanvas/window 리스너와 전용 드래그 캔버스, startArea position 원복까지 수행한다.
+16. **(그룹 공유 툴팁)**: 생성자 인자 `sharedTooltip`(EvChartGroup 이 provide 한 `{ elements, owner }` 홀더)이 있으면 `createTooltipDOM` 은 홀더가 비어 있을 때만 DOM 을 만들어 `elements` 에 넣고, 이후 차트는 그 참조를 받는다. hover 로 툴팁을 띄우기 직전 `acquireTooltip` 이 소유권을 가져오며, 소유 차트가 바뀌면 이전 소유 차트의 가상 스크롤 세션을 정리하고 tooltipDOM 의 자식·인라인 스타일과 header 상태(인라인 스타일·`textOverflow` 클래스 — header 노드는 재부착되므로 이전 차트의 `display:none` 이 남는다)를 비운 뒤 현재 차트 레이아웃(기본 header/body 또는 formatter.html)으로 재구성한다(`_lastHoverSig`·방향 기억도 초기화). 비소유 차트의 `hideTooltipDOM`·`tooltipClear`·`hideTooltip`·`onWheel`·update 의 툴팁 리셋은 no-op 이다(`isTooltipOwner`) — 이전 셀의 debounce 숨김이 늦게 발화해 새 셀 툴팁을 끄지 않게 한다. `tooltipDestroy` 는 공유 DOM 을 제거하지 않으며, 제거는 그룹 unmount 가 한다.
 
 ## Acceptance Criteria
 
@@ -94,6 +95,7 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 - `findHitItem`은 directHit > 일반 hit(거리순) > 거리 fallback 순으로 hitId를 정하고, all-null 라벨은 스냅 대상에서 제외한다(단 `disableNullLabelSnap` 시 synthetic item으로 label/index 전달). (plugins.interaction.spec.js)
 - `title.show` 토글 시 제목 DOM display와 wrapperDOM padding-top이 함께 전환된다. (수동 QA)
 - `doughnutHoleSize > 0`인 pie는 중앙이 `destination-out`으로 투명하게 뚫리고, `pieStroke.use` 시 내/외곽 테두리가 그려진다. (Chart.visual.spec.js / 수동 QA)
+- `sharedTooltip` 홀더를 공유한 차트들은 차트 수와 무관하게 `.ev-chart-tooltip` 1개를 쓰고, 소유권은 hover 차트로 옮겨간다. 비소유 차트의 숨김·클리어는 no-op 이고 destroy 는 공유 DOM 을 남긴 채 소유권만 해제한다. (plugins.tooltip.shared.spec.js)
 - 동일 데이터 포인트 위에서의 연속 mousemove는 `drawCustomTooltip`을 다시 실행하지 않는다(hoverSig fast path). 데이터 갱신·mouseleave 후 첫 hover는 다시 그린다. (plugins.interaction.spec.js)
 
 ## Architecture
@@ -134,7 +136,7 @@ EvChart (chart.core.js)
 ```
 
 - 플러그인은 전부 `this`를 EvChart 인스턴스로 가정하는 메서드 모음이다. 인스턴스 own property로 assign되므로 클래스 프로토타입의 동명 메서드보다 우선한다.
-- DOM 소유권: 툴팁은 `document.body`, 나머지(범례/제목/스크롤바/드래그 캔버스)는 `this.wrapperDOM`(드래그 캔버스만 startArea) 하위에 생성한다.
+- DOM 소유권: 툴팁은 `document.body`(그룹 공유 툴팁은 EvChartGroup 이 unmount 시 제거), 나머지(범례/제목/스크롤바/드래그 캔버스)는 `this.wrapperDOM`(드래그 캔버스만 startArea) 하위에 생성한다.
 
 ## File Structure
 
