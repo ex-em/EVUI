@@ -288,8 +288,9 @@ const toMinSeconds = (value) => Math.max(1, Math.floor(Number(value)) || 1);
 
 const readStoredLogEmpty = () => {
   try {
-    const value = window.localStorage?.getItem(LOG_EMPTY_STORAGE_KEY);
-    return value ? toMinSeconds(value) : false;
+    // '0'·'false' 처럼 직접 넣은 끔 의도의 값을 켬으로 읽지 않게 1 이상만 받는다.
+    const value = Math.floor(Number(window.localStorage?.getItem(LOG_EMPTY_STORAGE_KEY)));
+    return value >= 1 ? value : false;
   } catch (e) {
     // 저장소 접근이 막힌 환경(사생활 보호 모드 등)은 꺼진 것으로 본다.
     return false;
