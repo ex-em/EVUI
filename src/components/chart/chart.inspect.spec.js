@@ -634,28 +634,48 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     expect(emptyLogs()).toHaveLength(2);
   });
 
+  // 초마다 series 저장소를 한 번 읽으므로 읽은 횟수가 판정한 초 수다.
+  const trackReads = (chart) => {
+    const counter = { reads: 0 };
+    chart.dataSet = new Proxy(chart.dataSet, {
+      get(target, key) {
+        counter.reads += 1;
+        return target[key];
+      },
+    });
+    return counter;
+  };
+
   it('데이터가 오지 않은 사이 창 밖으로 지나간 초는 빈 초로 찍지 않고 그 배치부터 다시 본다', () => {
     const range = 5;
     const jump = 10000;
     const chart = createRtsChart(['s1'], range);
-    let reads = 0;
-    // 초마다 series 저장소를 한 번 읽으므로 읽은 횟수가 판정한 초 수다.
-    chart.dataSet = new Proxy(chart.dataSet, {
-      get(target, key) {
-        reads += 1;
-        return target[key];
-      },
-    });
+    const counter = trackReads(chart);
     chart.createRealTimeScatterDataSet({ s1: batchOf(0, 5) });
-    reads = 0;
+    counter.reads = 0;
 
     // 소비처가 화면 밖 위젯의 조회를 멈췄다가 다시 화면에 들어온 경우처럼 창이 range 넘게 지나갔다.
     chart.createRealTimeScatterDataSet({ s1: batchOf(jump - 2, jump) });
     expect(emptyLogs()).toEqual([]);
-    expect(reads).toBeLessThan(range * 10);
+    expect(counter.reads).toBeLessThan(range * 10);
 
     [jump + 1, jump + 2].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
     expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 시작 ${text(jump + 1)}`)]);
+  });
+
+  it('열린 공백이 창보다 길게 이어져도 배치마다 창 크기만큼만 걷는다', () => {
+    const range = 5;
+    const chart = createRtsChart(['s1'], range);
+    const counter = trackReads(chart);
+    chart.createRealTimeScatterDataSet({ s1: batchOf(0, 5) });
+    for (let sec = 6; sec <= 200; sec++) {
+      chart.createRealTimeScatterDataSet(boundaryAt(sec));
+    }
+    counter.reads = 0;
+
+    chart.createRealTimeScatterDataSet(boundaryAt(201));
+
+    expect(counter.reads).toBeLessThan(range * 10);
   });
 
   it('열린 공백이 있던 채 데이터가 끊겼다가 다시 오면 마지막으로 본 초까지로 닫아 찍는다', () => {
@@ -775,6 +795,25 @@ describe('chart.inspect 빈 초 자동 로그', () => {
 
       expect(emptyLogs().at(-1)).toContain(
         `빈 초 ${text(303)} ~ ${text(304)} (2초, 앞서 찍은 시작 ${text(301)} 은 늦게 채워짐)`,
+      );
+    });
+
+    it('시작을 찍은 공백이 늦게 모두 채워진 뒤 새로 생긴 짧은 공백은 찍지 않고 알림을 다음 줄로 넘긴다', () => {
+      const chart = createRtsChart();
+      enableMin3(chart);
+      chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
+      [301, 302, 303, 304].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
+
+      // 301~304 가 늦게 모두 채워지고, 304 의 실점 뒤 305~306 이 새로 비었다(2초 — 기준 미만).
+      chart.createRealTimeScatterDataSet({
+        s1: [...[301, 302, 303, 304].map((sec) => ({ x: at(sec), y: 1 })), { x: at(307), y: null }],
+      });
+      chart.createRealTimeScatterDataSet({ s1: batchOf(307, 308) });
+      expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 시작 ${text(301)}`)]);
+
+      [309, 310, 311, 312].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
+      expect(emptyLogs().at(-1)).toContain(
+        `빈 초 시작 ${text(309)} (앞서 찍은 시작 ${text(301)} 은 늦게 채워짐)`,
       );
     });
 

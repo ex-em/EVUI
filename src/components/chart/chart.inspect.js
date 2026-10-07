@@ -561,7 +561,7 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
   reportLateFills(chart, isEmptyAt, winFrom);
 
   // 열린 공백은 시작 초부터 다시 본다. 창 밖으로 나간 초는 더 채워질 수 없어 걷지 않고 빈 채로 확정한다 —
-  // 데이터 시각이 크게 뛰어도 걷는 범위가 창 크기로 묶인다.
+  // 열린 공백이 창보다 길어져도 걷는 범위가 창 크기로 묶인다.
   const openFrom = chart._emptyLogOpenFrom;
   const nextFrom = openFrom ?? checkedTo + SECOND;
   const walkFrom = Math.max(nextFrom, winFrom);
@@ -579,6 +579,13 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
     const isEmpty = isEmptyAt(sec);
     if (isEmpty && runFrom === null) {
       runFrom = sec;
+      // 직전 판정까지 본 초가 모두 채워진 뒤 새로 비기 시작했다 — 열린 공백의 연속이 아니라 새 공백이다.
+      if (!openResolved && sec > checkedTo) {
+        if (shownFrom != null) {
+          filledStart = shownFrom;
+        }
+        openResolved = true;
+      }
     } else if (!isEmpty && runFrom !== null) {
       const to = sec - SECOND;
       const isShownOpen = !openResolved && shownFrom != null;
