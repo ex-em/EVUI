@@ -113,6 +113,19 @@ describe('utils.throttle', () => {
     });
   });
 
+  describe('wait omitted', () => {
+    it('should invoke on every call — wait/maxWait 가 0 이라 제한이 걸리지 않는다(lodash 원본과 동일)', () => {
+      const func = vi.fn();
+      const throttled = throttle(func);
+
+      throttled();
+      throttled();
+      throttled();
+
+      expect(func).toHaveBeenCalledTimes(3);
+    });
+  });
+
   describe('error handling', () => {
     it('should throw TypeError if func is not a function', () => {
       expect(() => throttle('not a function', 100)).toThrow(TypeError);
