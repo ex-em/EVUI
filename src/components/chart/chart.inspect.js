@@ -313,6 +313,9 @@ export const isEmptySecondLogOn = () => {
 
 const emptyLogMinSeconds = () => toMinSeconds(window[LOG_EMPTY_FLAG]);
 
+// 켬·상태·켜짐 줄에 붙이는 기준 설명. 기준을 주면 공백이 끝나 길이가 확정된 뒤에만 찍는다.
+const minSecondsText = (min) => `${min}초 이상 빈 구간만(공백이 끝나면 찍음)`;
+
 // 링 버킷은 초 단위라 그 초의 버킷만 본다. 같은 버킷의 창 시작 초 점(링 최신 슬롯에 놓임)은 x 초로 걸러낸다.
 const hasPointAt = (ds, sec) => {
   if (!ds.dataGroup?.length || sec > ds.toTime || sec <= ds.fromTime) {
@@ -480,8 +483,9 @@ let logEmptyGeneration = 0;
 
 /**
  * 저장소 반영 뒤, 마운트 이후 지나간 초(우측단 초 직전까지) 중 모든 series 에 실점이 없는 초를 콘솔에 찍는다.
- * 연속 빈 초는 한 줄로 묶고, 다음 배치로 이어지면 시작을 먼저 찍는다. 우측단은 소비자 경계점(조회 끝 시각)이
- * 데이터보다 앞서 밀 수 있어, 열린 공백은 매 배치 다시 보고 이미 찍은 초가 늦게 채워지면 바로잡는다.
+ * 연속 빈 초는 한 줄로 묶고, 기준이 1 이면 다음 배치로 이어질 때 시작을 먼저 찍는다. 우측단은 소비자 경계점(조회 끝
+ * 시각)이 데이터보다 앞서 밀 수 있어, 열린 공백은 매 배치 다시 보고(기준이 1 이면 찍은 시작을 바로잡는다), 닫힌 구간으로
+ * 찍은 초가 늦게 채워지면 알린다.
  * @returns {undefined}
  */
 export const logEmptySeconds = (chart, winFrom, winTo) => {
@@ -520,7 +524,7 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
           : `${formatTime(winTo)} 부터 지나가는 초를 본다`;
       const no = chartNoOf(chart);
       const min = emptyLogMinSeconds();
-      const filter = min > 1 ? ` · ${min}초 이상 빈 구간만` : '';
+      const filter = min > 1 ? ` · ${minSecondsText(min)}` : '';
       Console.log(
         ...badgeArgs(
           chart,
@@ -539,14 +543,15 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
   // 조회를 멈춘 경우 등) 직전 판정 다음 초부터 창 시작 전까지는 본 적이 없다 — 빈 초로 찍지 않고 열린 공백만 마지막으로
   // 본 초까지로 닫아 찍은 뒤 이 배치를 새 기준으로 삼는다.
   const minSeconds = emptyLogMinSeconds();
+  // 기준(minSeconds)을 주면 시작 줄을 찍지 않고 데이터로 닫힌 구간만 거른다 — 소비자 경계점이 우측단을 데이터보다
+  // 앞서 밀어 판정 순간의 끝 공백에는 아직 오지 않은 초가 섞이므로, 공백 길이는 데이터가 다시 들어와 닫혀야 확정된다.
+  const showsStart = minSeconds === 1;
   const spanOf = (from, to) => (to - from) / SECOND + 1;
   const isTimeBack = last < checkedTo;
   if (isTimeBack || checkedTo + SECOND < winFrom) {
     const openFrom = chart._emptyLogOpenFrom;
-    if (
-      openFrom != null &&
-      (chart._emptyLogOpenShown || spanOf(openFrom, checkedTo) >= minSeconds)
-    ) {
+    // 기준을 주면 데이터로 닫히지 않은 열린 공백은 길이가 확정되지 않아 찍지 않는다.
+    if (openFrom != null && showsStart) {
       const note = isTimeBack
         ? ', 시각이 뒤로 가 기준을 다시 잡음'
         : ', 그 뒤로 데이터가 오지 않아 기준을 다시 잡음';
@@ -568,9 +573,8 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
   const walkFrom = Math.max(nextFrom, winFrom);
   let runFrom = nextFrom < winFrom ? nextFrom : null;
   let openResolved = openFrom == null;
-  // 열린 공백 중 시작 줄을 찍은 것의 시작 초. minSeconds 보다 짧아 아직 찍지 않았으면 null 이다.
-  const shownFrom = chart._emptyLogOpenShown ? openFrom : null;
-  let shown = false;
+  // 시작 줄을 찍은 열린 공백의 시작 초(기준을 주면 시작 줄이 없어 null).
+  const shownFrom = showsStart ? openFrom : null;
   // 시작 줄을 찍은 공백이 늦은 데이터로 모두 채워지면 따로 찍지 않고, 다음 공백 줄에 한 번 알린다.
   let filledStart = chart._emptyLogFilledStart ?? null;
   const filledNote = (from) => `앞서 찍은 시작 ${formatTime(from)} 은 늦게 채워짐`;
@@ -580,22 +584,11 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
     const isEmpty = isEmptyAt(sec);
     if (isEmpty && runFrom === null) {
       runFrom = sec;
-      // 직전 판정까지 본 초가 모두 채워진 뒤 새로 비기 시작했다 — 열린 공백의 연속이 아니라 새 공백이다.
-      if (!openResolved && sec > checkedTo) {
-        if (shownFrom != null) {
-          filledStart = shownFrom;
-        }
-        openResolved = true;
-      }
     } else if (!isEmpty && runFrom !== null) {
       const to = sec - SECOND;
-      const isShownOpen = !openResolved && shownFrom != null;
-      // 짧은 공백은 찍지 않는다. 단 시작 줄을 이미 찍은 공백은 닫는 줄도 찍는다.
-      if (isShownOpen || spanOf(runFrom, to) >= minSeconds) {
-        let lateStart = filledStart;
-        if (isShownOpen) {
-          lateStart = runFrom !== shownFrom ? shownFrom : null;
-        }
+      if (spanOf(runFrom, to) >= minSeconds) {
+        const lateStart =
+          !openResolved && shownFrom != null && runFrom !== shownFrom ? shownFrom : filledStart;
         const note = lateStart == null ? '' : `, ${filledNote(lateStart)}`;
         warnEmptyRange(chart, runFrom, to, note);
         rememberReported(chart, runFrom, to, winFrom);
@@ -610,18 +603,13 @@ export const logEmptySeconds = (chart, winFrom, winTo) => {
     if (shownFrom != null) {
       filledStart = shownFrom;
     }
-  } else if (!openResolved && shownFrom != null) {
-    if (runFrom !== shownFrom) {
-      warnEmptyStart(chart, runFrom, filledNote(shownFrom));
-    }
-    shown = true;
-  } else if (runFrom !== null && spanOf(runFrom, last) >= minSeconds) {
+  } else if (!openResolved && shownFrom != null && runFrom !== shownFrom) {
+    warnEmptyStart(chart, runFrom, filledNote(shownFrom));
+  } else if (openResolved && runFrom !== null && showsStart) {
     warnEmptyStart(chart, runFrom, filledStart == null ? '' : filledNote(filledStart));
     filledStart = null;
-    shown = true;
   }
   chart._emptyLogOpenFrom = runFrom;
-  chart._emptyLogOpenShown = shown;
   chart._emptyLogFilledStart = filledStart;
 };
 
@@ -709,17 +697,17 @@ consoleEntry.logEmpty = (on, options) => {
   if (on === undefined) {
     const isOn = isEmptySecondLogOn();
     const min = emptyLogMinSeconds();
-    const scope = min > 1 ? `${min}초 이상 빈 구간만` : '모든 빈 초';
+    const scope = min > 1 ? minSecondsText(min) : '모든 빈 초';
     Console.log(
       `${LOG_PREFIX} realTimeScatter 빈 초 로그 ${isOn ? `켜져 있음 — ${scope}` : '꺼져 있음'}`,
     );
     return isOn;
   }
-  // 이미 켜져 있을 때 다시 켜면 열린 공백(시작 줄만 찍힌 것)을 지우지 않도록 꺼짐 → 켜짐일 때만 올린다.
-  if (on && !isEmptySecondLogOn()) {
+  const minSeconds = toMinSeconds(options?.minSeconds);
+  // 꺼짐 → 켜짐이거나 기준이 바뀔 때만 올린다. 같은 기준으로 다시 켜면 열린 공백(시작 줄만 찍힌 것)을 지우지 않는다.
+  if (on && (!isEmptySecondLogOn() || emptyLogMinSeconds() !== minSeconds)) {
     logEmptyGeneration += 1;
   }
-  const minSeconds = toMinSeconds(options?.minSeconds);
   window[LOG_EMPTY_FLAG] = on ? minSeconds : false;
   try {
     if (on) {
@@ -730,7 +718,7 @@ consoleEntry.logEmpty = (on, options) => {
   } catch (e) {
     Console.warn(`${LOG_PREFIX} localStorage 를 쓸 수 없어 이 창에서만 적용된다`);
   }
-  const state = on ? `켬${minSeconds > 1 ? ` (${minSeconds}초 이상 빈 구간만)` : ''}` : '끔';
+  const state = on ? `켬${minSeconds > 1 ? ` (${minSecondsText(minSeconds)})` : ''}` : '끔';
   Console.log(
     `${LOG_PREFIX} realTimeScatter 빈 초 로그 ${state} — 이미 열린 다른 창은 새로고침해야 반영된다`,
   );
