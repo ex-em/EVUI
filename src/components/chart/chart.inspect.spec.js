@@ -233,6 +233,17 @@ describe('chart.inspect 빈 초 자동 로그', () => {
     ]);
   });
 
+  it.each(['0', 'false', '-3'])('localStorage 값이 %s 이면 켜지지 않는다', (value) => {
+    delete window.__EVUI_CHART_LOG_EMPTY__;
+    window.localStorage.setItem(STORAGE_KEY, value);
+    const chart = createRtsChart();
+    chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
+
+    chart.createRealTimeScatterDataSet(gapBatch);
+
+    expect(emptyLogs()).toEqual([]);
+  });
+
   it('빈 구간 시작·확정·늦게 채워짐은 서로 다른 색 배지로 찍는다', () => {
     const chart = createRtsChart();
     chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
