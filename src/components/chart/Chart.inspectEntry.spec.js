@@ -32,8 +32,11 @@ const batch = (data, seriesIds = Object.keys(data)) => ({
   data,
 });
 
-const mountChart = ({ data = batch({ s1: [] }), deferUntil = 0, options = RTS_OPTIONS } = {}) =>
-  mount(EvChartComponent, {
+// jsdom 은 레이아웃이 없어 rect 가 모두 0 이다 — list() 가 화면에 보이는 차트로 보도록 크기를 준다.
+const VISIBLE_RECT = { top: 0, bottom: 200, width: 300, height: 200 };
+
+const mountChart = ({ data = batch({ s1: [] }), deferUntil = 0, options = RTS_OPTIONS } = {}) => {
+  const wrapper = mount(EvChartComponent, {
     props: { data, options },
     attachTo: document.body,
     global: {
@@ -41,6 +44,9 @@ const mountChart = ({ data = batch({ s1: [] }), deferUntil = 0, options = RTS_OP
       directives: { resize: {} },
     },
   });
+  wrapper.find('.ev-chart').element.getBoundingClientRect = () => VISIBLE_RECT;
+  return wrapper;
+};
 
 const chartElementOf = (wrapper) => wrapper.find('.ev-chart').element;
 const lastInstance = () => EvChartCore.mock.instances.at(-1);
@@ -167,9 +173,10 @@ describe('Chart.vue 콘솔 조회 진입점', () => {
   });
 
   it.each([
-    ['아래', (h) => ({ top: h + 100, bottom: h + 400 })],
-    ['위', () => ({ top: -400, bottom: -100 })],
-  ])('list() 는 화면 %s 로 벗어난 차트를 보여주지 않는다', async (_, rectOf) => {
+    ['화면 아래로 벗어난', (h) => ({ ...VISIBLE_RECT, top: h + 100, bottom: h + 400 })],
+    ['화면 위로 벗어난', () => ({ ...VISIBLE_RECT, top: -400, bottom: -100 })],
+    ['display: none 으로 숨긴', () => ({ top: 0, bottom: 0, width: 0, height: 0 })],
+  ])('list() 는 %s 차트를 보여주지 않는다', async (_, rectOf) => {
     vi.spyOn(console, 'table').mockImplementation(() => {});
     const shown = mountChart();
     await flushPromises();
