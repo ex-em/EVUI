@@ -1,3 +1,20 @@
+# [3.23.0](https://github.com/ex-em/EVUI/compare/3.22.0...3.23.0) (2026-10-07)
+
+
+### Bug Fixes
+
+* **chart:** display: none 인 차트를 콘솔 list() 에서 뺀다 ([65859c3](https://github.com/ex-em/EVUI/commit/65859c345a4d76f4742c2c0fd5caf07428a55eb1)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+* **chart:** 빈 초 로그 localStorage 값이 1 이상일 때만 켠다 ([d271cbe](https://github.com/ex-em/EVUI/commit/d271cbe45053e6df65be254b287509d8e725e26d)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+* **chart:** 빈 초 로그 minSeconds 는 데이터로 닫혀 길이가 확정된 공백만 찍는다 ([0c8b8e0](https://github.com/ex-em/EVUI/commit/0c8b8e0ec13f856d2ed717b7ff16060fc8907534)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+* **chart:** 빈 초 로그 minSeconds 에서 늦게 채워진 뒤 생긴 짧은 공백을 찍지 않는다 ([174453d](https://github.com/ex-em/EVUI/commit/174453dc460681bdff62012ddc863fc64e6921df)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+* **chart:** 콘솔 진단을 realTimeScatter·화면 안 차트로 좁히고 데이터가 오지 않은 초는 빈 초로 찍지 않는다 ([1233a05](https://github.com/ex-em/EVUI/commit/1233a05429fdc64064d8a5442c99e199cea4b2de)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+
+
+### Features
+
+* **chart:** logEmpty() 가 켜짐 여부와 함께 빈 초 로그 기준을 한 줄로 알린다 ([2684f66](https://github.com/ex-em/EVUI/commit/2684f66a488b050aade6163da071a8c377f4c6da)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+* **chart:** 빈 초 로그에 최소 길이 옵션(logEmpty(true, { minSeconds }))을 둔다 ([66cff4a](https://github.com/ex-em/EVUI/commit/66cff4adfae77c3757801b9f250e43ebfecd2136)), closes [#2348](https://github.com/ex-em/EVUI/issues/2348)
+
 # [3.22.0](https://github.com/ex-em/EVUI/compare/3.21.1...3.22.0) (2026-10-06)
 
 
