@@ -748,18 +748,16 @@ describe('chart.inspect 빈 초 자동 로그', () => {
       ]);
     });
 
-    it('열린 공백은 기준에 닿을 때 시작을 찍고, 닫힐 때 구간을 찍는다', () => {
+    it('기준을 주면 시작 줄 없이, 공백이 끝나 길이가 확정된 뒤 기준 이상 구간만 찍는다', () => {
       const chart = createRtsChart();
       enableMin3(chart);
       chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
-      [301, 302, 303].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
+      [301, 302, 303, 304].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
       expect(emptyLogs()).toEqual([]);
 
-      chart.createRealTimeScatterDataSet(boundaryAt(304));
       chart.createRealTimeScatterDataSet({ s1: batchOf(305, 306) });
 
       expect(emptyLogs()).toEqual([
-        expect.stringContaining(`빈 초 시작 ${text(301)}`),
         expect.stringContaining(`빈 초 ${text(301)} ~ ${text(304)} (4초)`),
       ]);
       expect(window.localStorage.getItem(STORAGE_KEY)).toBe('3');
@@ -769,32 +767,52 @@ describe('chart.inspect 빈 초 자동 로그', () => {
       expect(announce).toContain('3초 이상 빈 구간만');
     });
 
-    it('찍지 않은 짧은 공백이 늦게 채워져도 다음 공백 줄에 알리지 않는다', () => {
+    // 5초 기준으로 켜고 5초 간격 점을 넣는다. 소비자 경계점(조회 끝 시각)은 실제 점보다 10초 앞서 우측단을 민다.
+    const laggingCadence = () => {
       const chart = createRtsChart();
-      enableMin3(chart);
-      chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
-      [301, 302, 303].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
-      chart.createRealTimeScatterDataSet({
-        s1: [
-          { x: at(301), y: 1 },
-          { x: at(302), y: 1 },
-          { x: at(303), y: null },
-        ],
-      });
+      inspectorOf(chart);
+      window.__EVUI_CHART__.logEmpty(true, { minSeconds: 5 });
+      const cadence = [];
+      for (let sec = 0; sec <= 300; sec += 5) {
+        cadence.push({ x: at(sec), y: 1 });
+      }
+      chart.createRealTimeScatterDataSet({ s1: [...cadence, { x: at(310), y: null }] });
+      const poll = (sec, delivered = true) =>
+        chart.createRealTimeScatterDataSet({
+          s1: [...(delivered ? [{ x: at(sec - 10), y: 1 }] : []), { x: at(sec), y: null }],
+        });
+      return { chart, poll };
+    };
 
-      [304, 305, 306].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
+    it('경계점이 데이터보다 앞서 끝 공백이 길어 보여도 실제로 기준보다 짧은 공백은 찍지 않는다', () => {
+      const { poll } = laggingCadence();
+      [315, 320, 325, 330].forEach((sec) => poll(sec));
+      expect(emptyLogs()).toEqual([]);
 
+      // 325 점이 빠져 321~329 가 9초 비었다 — 데이터가 다시 들어올 때 한 줄로 찍는다.
+      poll(335, false);
+      [340, 345].forEach((sec) => poll(sec));
       expect(emptyLogs()).toEqual([
-        expect.stringMatching(new RegExp(`빈 초 시작 ${text(303)} — `)),
+        expect.stringContaining(`빈 초 ${text(321)} ~ ${text(329)} (9초)`),
       ]);
     });
 
-    it('시작을 찍은 공백은 늦게 채워져 기준보다 짧아져도 닫는 줄을 찍는다', () => {
+    it('기준을 주면 기준을 다시 잡을 때 길이가 확정되지 않은 열린 공백을 찍지 않는다', () => {
+      const { chart, poll } = laggingCadence();
+      // 데이터는 320초까지 왔고 321초부터 열린 끝 공백은 아직 오지 않은 점 때문에 9초로 보인다.
+      [315, 320, 325, 330].forEach((sec) => poll(sec));
+
+      // 화면 밖에 range 넘게 있다 돌아온 것처럼 창이 크게 지나갔다.
+      chart.createRealTimeScatterDataSet({ s1: batchOf(1000, 1000) });
+
+      expect(emptyLogs()).toEqual([]);
+    });
+
+    it('기준을 주면 늦게 채워져 짧아진 공백은 찍지 않고 다음 줄에 알리지도 않는다', () => {
       const chart = createRtsChart();
       enableMin3(chart);
       chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
       [301, 302, 303, 304].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
-
       chart.createRealTimeScatterDataSet({
         s1: [
           { x: at(301), y: 1 },
@@ -803,29 +821,29 @@ describe('chart.inspect 빈 초 자동 로그', () => {
           { x: at(306), y: null },
         ],
       });
+      expect(emptyLogs()).toEqual([]);
 
-      expect(emptyLogs().at(-1)).toContain(
-        `빈 초 ${text(303)} ~ ${text(304)} (2초, 앞서 찍은 시작 ${text(301)} 은 늦게 채워짐)`,
-      );
+      [307, 308, 309, 310].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
+      chart.createRealTimeScatterDataSet({ s1: batchOf(310, 311) });
+
+      expect(emptyLogs()).toEqual([
+        expect.stringMatching(new RegExp(`빈 초 ${text(306)} ~ ${text(309)} \\(4초\\)$`)),
+      ]);
     });
 
-    it('시작을 찍은 공백이 늦게 모두 채워진 뒤 새로 생긴 짧은 공백은 찍지 않고 알림을 다음 줄로 넘긴다', () => {
+    it('켜진 채 기준을 바꾸면 판정을 새로 시작하고 켜짐 줄을 다시 찍는다', () => {
       const chart = createRtsChart();
       enableMin3(chart);
       chart.createRealTimeScatterDataSet({ s1: batchOf(0, 300) });
-      [301, 302, 303, 304].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
 
-      // 301~304 가 늦게 모두 채워지고, 304 의 실점 뒤 305~306 이 새로 비었다(2초 — 기준 미만).
-      chart.createRealTimeScatterDataSet({
-        s1: [...[301, 302, 303, 304].map((sec) => ({ x: at(sec), y: 1 })), { x: at(307), y: null }],
-      });
-      chart.createRealTimeScatterDataSet({ s1: batchOf(307, 308) });
-      expect(emptyLogs()).toEqual([expect.stringContaining(`빈 초 시작 ${text(301)}`)]);
+      window.__EVUI_CHART__.logEmpty(true, { minSeconds: 5 });
+      chart.createRealTimeScatterDataSet({ s1: batchOf(301, 302) });
 
-      [309, 310, 311, 312].forEach((sec) => chart.createRealTimeScatterDataSet(boundaryAt(sec)));
-      expect(emptyLogs().at(-1)).toContain(
-        `빈 초 시작 ${text(309)} (앞서 찍은 시작 ${text(301)} 은 늦게 채워짐)`,
-      );
+      const announces = console.log.mock.calls
+        .map(([m]) => plain(m))
+        .filter((m) => m.includes('빈 초 로그 켜짐'));
+      expect(announces).toHaveLength(2);
+      expect(announces.at(-1)).toContain('5초 이상 빈 구간만');
     });
 
     it('기준을 다시 잡을 때 찍지 않은 짧은 공백은 닫아 찍지 않는다', () => {
