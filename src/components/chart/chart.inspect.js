@@ -671,10 +671,11 @@ const isRealTimeScatter = (chart) => !!chart?.options?.realTimeScatter?.use;
 const chartOf = (element) => chartLinks.get(element)?.getChart?.() ?? null;
 
 // 화면에 조금이라도 걸친 차트. 소비처가 화면 밖 차트의 조회를 멈추는 경우가 많아 목록도 같은 기준으로 보인다.
+// display: none(v-show 등)인 요소는 rect 가 모두 0 이라 위치만으로는 화면 안으로 읽혀 크기로 거른다.
 const isInViewport = (element) => {
   const rect = element.getBoundingClientRect();
   const height = window.innerHeight || document.documentElement.clientHeight;
-  return !(rect.bottom < 0 || rect.top > height);
+  return (rect.width > 0 || rect.height > 0) && !(rect.bottom < 0 || rect.top > height);
 };
 
 const findChartElementByNo = (no) =>
