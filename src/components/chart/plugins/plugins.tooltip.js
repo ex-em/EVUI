@@ -79,39 +79,86 @@ const modules = {
    * @returns {undefined}
    */
   createTooltipDOM() {
-    this.tooltipDOM = document.createElement('div');
-    this.tooltipDOM.className = 'ev-chart-tooltip';
+    // 그룹 공유 툴팁(EvChartGroup options.sharedTooltip): 그룹당 DOM 1벌을 만들어 두고
+    // 이후 차트는 참조만 받는다. 내용은 hover 시 acquireTooltip 으로 소유권을 가져와 갈아끼운다.
+    const shared = this.sharedTooltip;
+    if (shared?.elements) {
+      Object.assign(this, shared.elements);
+    } else {
+      this.tooltipDOM = document.createElement('div');
+      this.tooltipDOM.className = 'ev-chart-tooltip';
 
-    this.tooltipHeaderDOM = document.createElement('div');
-    this.tooltipHeaderDOM.className = 'ev-chart-tooltip-header';
+      this.tooltipHeaderDOM = document.createElement('div');
+      this.tooltipHeaderDOM.className = 'ev-chart-tooltip-header';
 
-    this.tooltipBodyDOM = document.createElement('div');
-    this.tooltipBodyDOM.className = 'ev-chart-tooltip-body';
+      this.tooltipBodyDOM = document.createElement('div');
+      this.tooltipBodyDOM.className = 'ev-chart-tooltip-body';
 
-    this.tooltipCanvas = document.createElement('canvas');
-    this.tooltipCanvas.className = 'ev-chart-tooltip-canvas';
-    this.tooltipCtx = this.tooltipCanvas.getContext('2d');
+      this.tooltipCanvas = document.createElement('canvas');
+      this.tooltipCanvas.className = 'ev-chart-tooltip-canvas';
+      this.tooltipCtx = this.tooltipCanvas.getContext('2d');
 
-    this.tooltipDOM.style.display = 'none';
+      this.tooltipDOM.style.display = 'none';
+
+      if (!this.options.tooltip?.formatter?.html) {
+        this.setDefaultTooltipLayout();
+      }
+
+      document.body.appendChild(this.tooltipDOM);
+
+      if (shared) {
+        shared.elements = {
+          tooltipDOM: this.tooltipDOM,
+          tooltipHeaderDOM: this.tooltipHeaderDOM,
+          tooltipBodyDOM: this.tooltipBodyDOM,
+          tooltipCanvas: this.tooltipCanvas,
+          tooltipCtx: this.tooltipCtx,
+        };
+        shared.owner = this;
+      }
+    }
+
+    // 공유 툴팁이면 다른 차트가 소유 중일 때 숨기지 않는다 — 셀 A 이탈의 debounce 숨김이
+    // 뒤늦게 발화해 셀 B 가 띄운 툴팁을 끄는 것을 막는다.
+    const hide = () => {
+      if (!this.isTooltipOwner()) return;
+      this.tooltipDOM.style.display = 'none';
+      this.resetTooltipPlacement();
+    };
+    this.hideTooltipDOM = this.options.tooltip.debouncedHide ? debounce(hide, 200) : hide;
+    this.isInitTooltip = true;
+  },
+
+  /**
+   * 공유 툴팁이 아니거나, 공유 툴팁을 이 차트가 소유 중이면 true.
+   *
+   * @returns {boolean}
+   */
+  isTooltipOwner() {
+    return !this.sharedTooltip || this.sharedTooltip.owner === this;
+  },
+
+  /**
+   * 공유 툴팁의 소유권을 이 차트로 가져온다. 이전 소유 차트의 내용·인라인 스타일을 비우고
+   * 이 차트의 레이아웃(기본 header/body 또는 formatter.html)으로 다시 채울 준비를 한다.
+   *
+   * @returns {undefined}
+   */
+  acquireTooltip() {
+    const shared = this.sharedTooltip;
+    if (!shared || shared.owner === this) return;
+
+    shared.owner?._teardownCustomTooltipVirtualScroll?.();
+    shared.owner = this;
+
+    this._lastHoverSig = '';
+    this.resetTooltipPlacement();
+    this.tooltipDOM.innerHTML = '';
+    this.tooltipDOM.style.cssText = 'display: none;';
 
     if (!this.options.tooltip?.formatter?.html) {
       this.setDefaultTooltipLayout();
     }
-
-    document.body.appendChild(this.tooltipDOM);
-
-    if (this.options.tooltip.debouncedHide) {
-      this.hideTooltipDOM = debounce(() => {
-        this.tooltipDOM.style.display = 'none';
-        this.resetTooltipPlacement();
-      }, 200);
-    } else {
-      this.hideTooltipDOM = () => {
-        this.tooltipDOM.style.display = 'none';
-        this.resetTooltipPlacement();
-      };
-    }
-    this.isInitTooltip = true;
   },
 
   setDefaultTooltipLayout() {
@@ -1371,6 +1418,8 @@ const modules = {
    * @returns {undefined}
    */
   tooltipClear() {
+    if (!this.isTooltipOwner()) return;
+
     this.clearRectRatio = this.pixelRatio < 1 ? this.pixelRatio : 1;
 
     this.tooltipCtx.clearRect(
@@ -1421,7 +1470,14 @@ const modules = {
 
   tooltipDestroy() {
     this._teardownCustomTooltipVirtualScroll?.();
-    if (this.tooltipDOM) {
+    if (this.sharedTooltip) {
+      // 공유 DOM 은 그룹이 제거한다. 소유 중이었으면 숨기고 소유권만 내려놓는다.
+      if (this.sharedTooltip.owner === this) {
+        if (this.tooltipDOM) this.tooltipDOM.style.display = 'none';
+        this.sharedTooltip.owner = null;
+      }
+      this.tooltipDOM = null;
+    } else if (this.tooltipDOM) {
       this.tooltipDOM.remove();
       this.tooltipDOM = null;
     }
