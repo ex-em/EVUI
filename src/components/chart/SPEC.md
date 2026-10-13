@@ -22,7 +22,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - **어노테이션/뱃지**: `options.annotations` 선언으로 차트 위에 text/badge/callout/circle 을 pixel/axis/series 좌표로 표시. 전용 오버레이 캔버스(옵션 사용 시 지연 생성)에 순수 함수 파이프라인으로 렌더하며, series 추적 항목은 매 프레임 좌표를 재해석한다. 상세는 [./annotation/SPEC.md](./annotation/SPEC.md).
 - **축 스케일**: linear/time/time+categoryMode/log/step 5종 스케일 인스턴스를 `createAxes` 가 축 옵션 type 으로 생성. 상세는 [./scale/SPEC.md](./scale/SPEC.md).
 - **이벤트**: click(200ms 지연으로 dbl-click 과 구분), dbl-click, drag-select, mouse-move, click-legend, axes-scale-change(옵션 `scaleChange` 축만), axes-data-max-change(바인딩 시에만 집계·emit).
-- **차트 그룹 연동**: inject `isChartGroup`/`brushSeries`/`groupSelectedLabel`/`groupHoveredLabel`/`brushIdx`/`evChartPropsInGroup`/`groupInteraction` 으로 EvChartGroup/EvChartBrush 와 선택·hover 동기화(`drawSyncedIndicator`, `syncHover` 옵션), brush 인덱스 시프트 보정을 수행한다. 그룹 내 차트는 toolbar/zoom 모델을 만들지 않는다(그룹이 소유).
+- **차트 그룹 연동**: inject `isChartGroup`/`brushSeries`/`groupSelectedLabel`/`groupHoveredLabel`/`brushIdx`/`evChartPropsInGroup`/`groupInteraction`/`groupSharedTooltip` 으로 EvChartGroup/EvChartBrush 와 선택·hover 동기화(`drawSyncedIndicator`, `syncHover` 옵션), brush 인덱스 시프트 보정, 그룹 공유 툴팁(`sharedTooltip` 옵션 — 홀더를 `EvChart` 생성자 8번째 인자로 전달)을 수행한다. 그룹 내 차트는 toolbar/zoom 모델을 만들지 않는다(그룹이 소유).
 - **watch 전략 opt-in**: `shallowDataWatch`/`shallowOptionsWatch`(기본 false) 로 deep watch 를 끈다. mount 시점 1회 평가, 런타임 토글 불가.
 - **리사이즈**: `v-resize` 디렉티브 + `resizeTimeout` debounce. resize 프레임은 worker 비동기 합성 대신 main 동기 렌더(`drawChart(undefined, forceMainSeries=true)`)로 blank 깜빡임을 방지한다. `onActivated` 시 재적용.
 - **realtime scatter 리셋/부활**: `v-model:realTimeScatterReset` true 시 `resetRealTimeScatterDataSet`(전 series dataGroup 비움 + 기준 시각 하한 해제 — [./model/SPEC.md](./model/SPEC.md))을 부르고, 보류 중 병합분과 `evChart.data.data` 의 미소비 배치를 버리고, 점 레이어(`pointsLayerValid`)를 무효화해 다음 렌더가 레이어를 다시 그리게 한 뒤(남기면 다음 배치가 링을 전진시킬 때 blit 이 리셋 전 점이 든 래스터를 밀어 쓴다), 만료 제거 가드(`prunedRealTimeScatterSeries`)를 비우고 false 로 되돌린다. 만료 제거된 series 가 신규 점과 함께 돌아오면 data watcher 가 updateSeries 를 강제해 인스턴스·범례를 복구한다.
@@ -151,7 +151,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 | @/common/utils | mobileCheck/truthyNumber/Console(chart.core), Console(chart.inspect), getQuantity(uses), billions·millions·trillion·quadrillion·truthy(라벨 포맷) |
 | @/directives/resize | 차트 wrapper 리사이즈 감지(v-resize) |
 | dayjs · package.json(version) | 콘솔 조회의 시각 해석·표기와 evui 버전 출력(chart.inspect) |
-| EvChartGroup / EvChartBrush | provide/inject 계약의 공급자(isChartGroup, brushSeries, groupSelectedLabel/HoveredLabel, brushIdx, evChartPropsInGroup, groupInteraction.deferUntil) — 본 컴포넌트는 소비자 |
+| EvChartGroup / EvChartBrush | provide/inject 계약의 공급자(isChartGroup, brushSeries, groupSelectedLabel/HoveredLabel, brushIdx, evChartPropsInGroup, groupInteraction.deferUntil, groupSharedTooltip) — 본 컴포넌트는 소비자 |
 | OffscreenCanvas / Web Worker | workerRender 경로(feature-detect, 미지원 시 main 폴백) |
 
 ## Glossary
