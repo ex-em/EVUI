@@ -155,6 +155,10 @@ const modules = {
     this.resetTooltipPlacement();
     this.tooltipDOM.innerHTML = '';
     this.tooltipDOM.style.cssText = 'display: none;';
+    // header 는 노드째 재부착되므로 이전 소유 차트가 남긴 상태(showHeader:false·pie 의
+    // display:none, textOverflow 클래스)를 비운다. width·font 등은 그릴 때마다 다시 설정된다.
+    this.tooltipHeaderDOM.style.cssText = '';
+    this.tooltipHeaderDOM.className = 'ev-chart-tooltip-header';
 
     if (!this.options.tooltip?.formatter?.html) {
       this.setDefaultTooltipLayout();
