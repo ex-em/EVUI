@@ -9,3 +9,4 @@
 | - | `getNormalizedOptions` 로 옵션을 새 객체에 defaultsDeep 병합 | 소비자 props 를 in-place 변형하지 않고 기본값 보장 | props 직접 변형(반응성 오염) |
 | - | 폴링 redraw 양보를 타이머 없이 `deferUntil` 절대 타임스탬프로 구현 | detail/popup 오픈 시 우선 페인트하되, 상태가 타임스탬프뿐이라 타이머/cleanup 불필요하고 시간창 경과 시 자동 재개 | 타이머 기반 일시정지(cleanup 필요, resume 누락 시 영구 정지 위험) |
 | - | 폴링 양보에 `MAX_DEFER_MS`(2000) 상한 | 반복 호출로 그룹 라이브 갱신이 무한 정지되는 것을 방지 | 상한 없음(무기한 정지 가능) |
+| 2026-09-29 | `sharedTooltip` 옵션(기본 false)으로 그룹 내 차트가 툴팁 DOM 1벌을 공유하고, hover 차트가 소유권(owner)을 가져와 내용만 교체 | 그리드 셀 차트처럼 그룹 안 차트가 수만 개면 차트마다 body 에 툴팁 DOM 이 생성된다. syncHover 는 인디케이터만 동기화하고 툴팁은 hover 차트 1개만 띄우므로 동시 표시 충돌이 없다. 기존 사용처 영향을 막으려 opt-in 으로 둔다 | 기본 on(기존 그룹의 formatter/스타일 혼합 사용처 회귀 위험), 그룹이 직접 툴팁을 렌더(차트별 draw 경로 전면 재작성), 소유권 없이 참조만 공유(이전 셀의 debounce 숨김이 새 셀 툴팁을 끔) |
