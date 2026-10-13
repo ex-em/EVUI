@@ -57,6 +57,11 @@ const modules = {
         }
       }
 
+      // 그룹 공유 툴팁이면 표시 직전에 소유권을 가져온다(소유 차트가 바뀌면 fast path 시그니처도 초기화됨).
+      if (hasItems && tooltip.use && this.isInitTooltip) {
+        this.acquireTooltip();
+      }
+
       const skipCustomTooltipRedraw =
         hoverSig !== '' &&
         hoverSig === this._lastHoverSig &&
@@ -569,7 +574,7 @@ const modules = {
 
     this.onWheel = (e) => {
       const isTooltipVisible = this.tooltipDOM?.style?.display === 'block';
-      if (!isTooltipVisible) return;
+      if (!isTooltipVisible || !this.isTooltipOwner()) return;
 
       // 가상 스크롤 활성 세션에서는 모듈이 실제 스크롤 컨테이너(rowContainer)를 알고 있으므로
       // 이를 최우선으로 사용한다. (커스텀 툴팁 경로에서 tooltipBodyDOM은 detach 상태라 사용 불가)
