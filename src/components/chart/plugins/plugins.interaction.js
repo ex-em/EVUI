@@ -150,6 +150,9 @@ const modules = {
         const emptyDragRange = showRangeOnly ? this.getDragRange(offset) : undefined;
 
         if (emptyDragRange) {
+          // 위 acquire 는 hit 이 있을 때만 돈다. 공유 툴팁은 소유 차트만 감출 수 있으므로
+          // 구간만 띄울 때도 소유권을 가져와야 dragEnd 의 hideTooltip 이 이 툴팁을 끈다.
+          this.acquireTooltip();
           this.drawCustomTooltip({}, emptyDragRange);
           this.setCustomTooltipLayoutPosition(hitInfo, e);
           isEmptyRangeTooltip = true;
