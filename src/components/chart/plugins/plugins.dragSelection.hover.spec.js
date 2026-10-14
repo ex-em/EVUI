@@ -76,6 +76,7 @@ const createChart = (opts = {}) => {
     findHitItem: () => ({ items: { ...HIT_ITEMS }, hitId: 's1' }),
     findPlotLabelHitRegion: () => null,
     handlePlotLabelHover: vi.fn(),
+    hidePlotLabelTooltip: vi.fn(),
     isNotUseIndicator: () => true,
     getTimeLabel: () => null,
     getCurMouseTargetVal: () => ({}),
@@ -236,6 +237,46 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
     mouseup({});
     expect(canvasChart.hideTooltip).toHaveBeenCalled();
     expect(canvasChart.resetTooltipPlacement).toHaveBeenCalled();
+  });
+
+  // 소비처가 직접 그리는 툴팁도 같다 — 무히트·mouseleave 와 같은 신호(빈 seriesList)로 알린다.
+  it('returnValue 를 쓰면 놓을 때 빈 seriesList 로 알린다', () => {
+    chart.options.tooltip.returnValue = vi.fn();
+    const { mousemove, mouseup } = startDrag(chart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+    expect(chart.options.tooltip.returnValue).toHaveBeenLastCalledWith(
+      [expect.objectContaining({ sId: 's1' })],
+      expect.anything(),
+    );
+
+    const upEvent = {};
+    mouseup(upEvent);
+    expect(chart.options.tooltip.returnValue).toHaveBeenLastCalledWith([], upEvent);
+  });
+
+  it('tooltip.use 가 꺼져 있으면 놓아도 returnValue 를 부르지 않는다', () => {
+    const returnValue = vi.fn();
+    const offChart = createChart({ tooltip: { use: false, returnValue } });
+    const { mousemove, mouseup } = startDrag(offChart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+    mouseup({});
+    expect(returnValue).not.toHaveBeenCalled();
+  });
+
+  it('plot 라벨 위에서 멈춘 채 놓으면 라벨 툴팁도 감춘다', () => {
+    chart.findPlotLabelHitRegion = () => ({ text: 'p' });
+    chart.handlePlotLabelHover = interactionModules.handlePlotLabelHover;
+    chart.showPlotLabelTooltip = vi.fn();
+    const { mousemove, mouseup } = startDrag(chart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+    expect(chart.showPlotLabelTooltip).toHaveBeenCalled();
+    expect(chart.hidePlotLabelTooltip).not.toHaveBeenCalled();
+
+    mouseup({});
+    expect(chart.hidePlotLabelTooltip).toHaveBeenCalled();
   });
 
   // 예외가 올라오면 overlayClear 뒤라 hover 도 밴드도 없는 빈 프레임이 된다.
