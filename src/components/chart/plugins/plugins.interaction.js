@@ -20,8 +20,6 @@ const modules = {
      */
     this.drawHoverArtifacts = (e, isDragging = false) => {
       const args = { e };
-      // 이번 프레임이 데이터 없이 구간만 띄운 툴팁인지 — dragEnd 가 이걸 보고 정리한다.
-      let isEmptyRangeTooltip = false;
       const { indicator, tooltip, type } = this.options;
       const offset = this.getMousePosition(e);
       const hitInfo = this.findHitItem(offset);
@@ -155,11 +153,12 @@ const modules = {
           this.acquireTooltip();
           this.drawCustomTooltip({}, emptyDragRange);
           this.setCustomTooltipLayoutPosition(hitInfo, e);
-          isEmptyRangeTooltip = true;
         } else if (isDragging) {
           // 드래그 경로는 프레임마다 hide 를 부르므로 debouncedHide(trailing 200ms)의 타이머가
           // 매번 리셋돼 툴팁이 끝까지 감춰지지 않는다. 드래그 중에는 즉시 감춘다.
+          // hideTooltipDOM 을 거치지 않으므로 방향 기억도 여기서 버린다.
           this.hideTooltip();
+          this.resetTooltipPlacement();
         } else {
           this.hideTooltipDOM();
         }
@@ -170,7 +169,6 @@ const modules = {
       this.handlePlotLabelHover(plotLabelHit, e);
 
       this._lastHoverSig = hoverSig;
-      this._isEmptyRangeTooltip = isEmptyRangeTooltip;
 
       // 전용 드래그 캔버스를 쓰면 keepDisplay 영역이 그 캔버스에 그대로 남아 있어(매 hover의
       // overlayClear는 메인 overlay만 비움) 여기서 다시 그릴 필요가 없다.
@@ -859,6 +857,7 @@ const modules = {
         // 밴드와 다른 구간을 가리킨다. 즉시 hide 인 이유는 drawHoverArtifacts 쪽 주석 참조.
         this.lastDragHoverEvent = null;
         this.hideTooltip();
+        this.resetTooltipPlacement();
         this.overlayClear();
       }
 
@@ -912,15 +911,16 @@ const modules = {
         }
       }
 
+      // 마지막 드래그 프레임이 띄운 툴팁은 종류와 무관하게 드래그와 함께 끝낸다 — 구간 헤더는 끝난
+      // 드래그의 것이고 keepDisplay: false 면 밴드까지 지워진다. 커서가 멈춰 있으면 다음 mousemove
+      // 가 오지 않으므로 여기서 감춘다.
+      if (this.lastDragHoverEvent) {
+        this.hideTooltip();
+        this.resetTooltipPlacement();
+      }
+
       this.dragInfo = null;
       this.lastDragHoverEvent = null;
-
-      // 데이터 없이 구간만 띄운 툴팁은 드래그가 끝나면 근거가 사라진다 — keepDisplay: false 면
-      // 밴드까지 지워져 행 없는 헤더만 남는다. 다음 mousemove 를 기다리지 않고 여기서 감춘다.
-      if (this._isEmptyRangeTooltip) {
-        this.hideTooltip();
-        this._isEmptyRangeTooltip = false;
-      }
 
       if (prevUserSelect !== undefined) {
         this.dragStartTarget.style.userSelect = prevUserSelect;

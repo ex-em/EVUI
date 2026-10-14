@@ -82,6 +82,7 @@ const createChart = (opts = {}) => {
     hideTooltipDOM: vi.fn(),
     // 드래그 경로는 debouncedHide 를 우회한 즉시 hide 를 쓴다 (chart.core 의 hideTooltip)
     hideTooltip: vi.fn(),
+    resetTooltipPlacement: vi.fn(),
     acquireTooltip: vi.fn(),
     drawIndicatorForTooltip: () => ({ labelValue: 'L2' }),
     findSelectedItems: () => [],
@@ -202,6 +203,39 @@ describe('dragSelection 드래그 중 hover 갱신', () => {
 
     expect(chart.calls).toEqual(['overlayClear', 'drawSelectionArea']);
     expect(chart.hideTooltip).toHaveBeenCalled();
+    expect(chart.resetTooltipPlacement).toHaveBeenCalled();
+  });
+
+  // 헤더의 구간은 끝난 드래그의 것이다 — keepDisplay: false 면 밴드도 이미 지워졌다.
+  it('데이터 위에서 멈춘 채 놓으면 구간 헤더를 그린 툴팁을 감춘다', () => {
+    const { mousemove, mouseup } = startDrag(chart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+    expect(chart.drawCustomTooltip).toHaveBeenLastCalledWith(expect.anything(), {
+      from: axisValueAt(100),
+      to: axisValueAt(300),
+    });
+    expect(chart.hideTooltip).not.toHaveBeenCalled();
+
+    mouseup({});
+    expect(chart.hideTooltip).toHaveBeenCalled();
+    expect(chart.resetTooltipPlacement).toHaveBeenCalled();
+  });
+
+  // 드래그 툴팁은 종류와 무관하게 드래그와 함께 끝난다 — 구간 정보가 없는 캔버스 툴팁도 같다.
+  it('formatter.html 이 없는 캔버스 툴팁도 놓으면 감춘다', () => {
+    const canvasChart = createChart({ tooltip: { use: true } });
+    canvasChart.setTooltipLayoutPosition = vi.fn();
+    canvasChart.drawTooltip = vi.fn();
+    const { mousemove, mouseup } = startDrag(canvasChart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+    expect(canvasChart.drawTooltip).toHaveBeenCalled();
+    expect(canvasChart.hideTooltip).not.toHaveBeenCalled();
+
+    mouseup({});
+    expect(canvasChart.hideTooltip).toHaveBeenCalled();
+    expect(canvasChart.resetTooltipPlacement).toHaveBeenCalled();
   });
 
   // 예외가 올라오면 overlayClear 뒤라 hover 도 밴드도 없는 빈 프레임이 된다.
@@ -411,6 +445,7 @@ describe('showTooltipOnEmpty', () => {
     mousemove(moveEvent([300, 150, 500, 300]));
 
     expect(chart.hideTooltip).toHaveBeenCalled();
+    expect(chart.resetTooltipPlacement).toHaveBeenCalled();
     expect(chart.hideTooltipDOM).not.toHaveBeenCalled();
     expect(chart.drawCustomTooltip).not.toHaveBeenCalled();
   });
@@ -435,6 +470,7 @@ describe('showTooltipOnEmpty', () => {
 
     mouseup({});
     expect(chart.hideTooltip).toHaveBeenCalled();
+    expect(chart.resetTooltipPlacement).toHaveBeenCalled();
   });
 
   // 공유 툴팁은 소유 차트만 숨길 수 있다. 소유권 없이 그리면 드래그가 끝나도 이 차트의
