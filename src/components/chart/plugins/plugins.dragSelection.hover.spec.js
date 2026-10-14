@@ -82,6 +82,7 @@ const createChart = (opts = {}) => {
     hideTooltipDOM: vi.fn(),
     // 드래그 경로는 debouncedHide 를 우회한 즉시 hide 를 쓴다 (chart.core 의 hideTooltip)
     hideTooltip: vi.fn(),
+    acquireTooltip: vi.fn(),
     drawIndicatorForTooltip: () => ({ labelValue: 'L2' }),
     findSelectedItems: () => [],
     minMax: { x: [{ min: 0, max: 1000 }], y: [{ min: 0, max: 100 }] },
