@@ -913,10 +913,17 @@ const modules = {
 
       // 마지막 드래그 프레임이 띄운 툴팁은 종류와 무관하게 드래그와 함께 끝낸다 — 구간 헤더는 끝난
       // 드래그의 것이고 keepDisplay: false 면 밴드까지 지워진다. 커서가 멈춰 있으면 다음 mousemove
-      // 가 오지 않으므로 여기서 감춘다.
+      // 가 오지 않으므로 여기서 감춘다. returnValue 소비처와 plot 라벨 툴팁에는 mouseleave 와 같은
+      // 숨김 신호를 보낸다.
       if (this.lastDragHoverEvent) {
+        const { tooltip } = this.options;
+        if (tooltip.use && this.isInitTooltip && typeof tooltip.returnValue === 'function') {
+          tooltip.returnValue([], e);
+        }
+
         this.hideTooltip();
         this.resetTooltipPlacement();
+        this.hidePlotLabelTooltip?.();
       }
 
       this.dragInfo = null;
