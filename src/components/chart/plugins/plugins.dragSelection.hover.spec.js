@@ -437,6 +437,30 @@ describe('showTooltipOnEmpty', () => {
     expect(chart.hideTooltip).toHaveBeenCalled();
   });
 
+  // 공유 툴팁은 소유 차트만 숨길 수 있다. 소유권 없이 그리면 드래그가 끝나도 이 차트의
+  // hideTooltip 이 no-op 이라 헤더만 남은 툴팁이 화면에 고정된다.
+  it('그룹 공유 툴팁이면 구간 툴팁을 그리기 전에 소유권을 가져온다', () => {
+    const chart = createEmptyHitChart(true);
+    const shared = { elements: null, owner: { _teardownCustomTooltipVirtualScroll: vi.fn() } };
+    let ownerAtDraw;
+    Object.assign(chart, {
+      sharedTooltip: shared,
+      acquireTooltip: tooltipModules.acquireTooltip,
+      resetTooltipPlacement: tooltipModules.resetTooltipPlacement,
+      tooltipDOM: document.createElement('div'),
+      tooltipHeaderDOM: document.createElement('div'),
+      drawCustomTooltip: vi.fn(() => {
+        ownerAtDraw = shared.owner;
+      }),
+    });
+    const { mousemove } = startDrag(chart, [100, 100, 500, 300]);
+
+    mousemove(moveEvent([300, 150, 500, 300]));
+
+    expect(chart.drawCustomTooltip).toHaveBeenCalled();
+    expect(ownerAtDraw).toBe(chart);
+  });
+
   it('returnValue 를 쓰면 그리지 않는다 — 소비처가 직접 렌더하는 경로다', () => {
     const chart = createEmptyHitChart(true);
     chart.options.tooltip.returnValue = vi.fn();
