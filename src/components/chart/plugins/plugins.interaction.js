@@ -1169,9 +1169,7 @@ const modules = {
 
     const [x, y] = offset;
     return (
-      regions.find(
-        (r) => x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height,
-      ) ?? null
+      regions.find((r) => x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height) ?? null
     );
   },
 
