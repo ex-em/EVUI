@@ -92,5 +92,10 @@
   "lint-staged": {
     "*.{js,vue}": "eslint --fix",
     "docs/views/apiDocs/data/*.json": "node scripts/validate-api-docs.js"
+  },
+  "overrides": {
+    "vue": {
+      "@vue/server-renderer": "3.5.42"
+    }
   }
 }
