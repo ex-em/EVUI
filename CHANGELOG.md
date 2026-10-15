@@ -1,3 +1,28 @@
+# [3.24.0](https://github.com/ex-em/EVUI/compare/3.23.0...3.24.0) (2026-10-15)
+
+
+### Bug Fixes
+
+* **chart:** formatter 예외로 툴팁을 포기할 때 방향 기억도 버림 ([135e128](https://github.com/ex-em/EVUI/commit/135e128ba34e4fb57a4c8c280a094cf8e2ce25a7))
+* **chart:** 가상 툴팁 경로의 formatter 예외 경고를 인스턴스당 1회로 묶음 ([b3c98e0](https://github.com/ex-em/EVUI/commit/b3c98e0b29d8835374e67684869863996779ab8e))
+* **chart:** 공유 툴팁 소유 전환 시 이전 차트의 header 상태를 비운다 ([f2fb25b](https://github.com/ex-em/EVUI/commit/f2fb25b8c51452030ee465e2042c2dd2503cd81e)), closes [#2345](https://github.com/ex-em/EVUI/issues/2345)
+* **chart:** 데이터 없는 구간 드래그 툴팁도 공유 툴팁 소유권을 가져온다 ([907f201](https://github.com/ex-em/EVUI/commit/907f20123fdc4feb429e35d5c0e6c0c97d2d734a))
+* **chart:** 드래그 중 재렌더가 지운 툴팁·하이라이트 복원 ([374daac](https://github.com/ex-em/EVUI/commit/374daacb0c9e984d5eedf39d199911f2f6d82df3))
+* **chart:** 드래그 중 툴팁 hide 가 debouncedHide 를 타지 않게 함 ([55bcd30](https://github.com/ex-em/EVUI/commit/55bcd301f60e10f228bfa18c6dd674cae50760c3))
+* **chart:** 드래그 중 툴팁 구간을 drag-select range 와 일치시킴 ([e503390](https://github.com/ex-em/EVUI/commit/e5033909788753309233fac0d1d32462fd531a9a))
+* **chart:** 드래그 중에는 커스텀 툴팁 복구 재draw 를 건너뜀 ([3046716](https://github.com/ex-em/EVUI/commit/3046716383ccfda814fc00372e966958987db152))
+* **chart:** 드래그가 끝나면 returnValue 소비처와 plot 라벨 툴팁에도 숨김을 알린다 ([8216218](https://github.com/ex-em/EVUI/commit/8216218441876a35ed79c3ce4432b8a4cc9031ef))
+* **chart:** 드래그가 끝나면 드래그 중 띄운 툴팁을 감추고 방향 기억도 버린다 ([41a3f9e](https://github.com/ex-em/EVUI/commit/41a3f9e7dc23d1522f0c1c8cea3228a45e501d69))
+* **chart:** 커스텀 툴팁 formatter 예외를 호출 지점에서 가둠 ([1aca7f2](https://github.com/ex-em/EVUI/commit/1aca7f2882364c645c2cdfc8b05c3e675033b496))
+
+
+### Features
+
+* **chart:** dragSelection 드래그 중 hover 갱신 + formatter 에 구간 정보 전달 ([4df9559](https://github.com/ex-em/EVUI/commit/4df955950650495ca15d0145606be8be9e51df25)), closes [#2340](https://github.com/ex-em/EVUI/issues/2340)
+* **chart:** dragSelection.showTooltipOnEmpty 로 데이터 없는 구간의 드래그 툴팁 유지 ([3e513f3](https://github.com/ex-em/EVUI/commit/3e513f3514669b8f1641e19f61c2f2586af8ed99))
+* **chart:** dragSelection.updateHoverOnDrag 로 드래그 중 hover 갱신 옵션화 ([6e7a0dd](https://github.com/ex-em/EVUI/commit/6e7a0dd0e1e024195a1a56d1b09aee8fd9f1c170))
+* **chartGroup:** sharedTooltip 옵션으로 그룹 내 차트가 툴팁 DOM 1벌을 공유한다 ([7744540](https://github.com/ex-em/EVUI/commit/77445405f0247f8d44b42f24e3a6b3a4d22d071f))
+
 # [3.23.0](https://github.com/ex-em/EVUI/compare/3.22.0...3.23.0) (2026-10-07)
 
 
