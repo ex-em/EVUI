@@ -313,6 +313,26 @@ export default {
    *
    * @returns {object} min/max information
    */
+  /**
+   * x(라벨) 값을 Map 키로 바꾼다. Date·dayjs·숫자는 ms 숫자로, 숫자로 못 바꾸는 범주 값은 그대로 쓴다 —
+   * 시리즈마다 따로 만든 Date 객체도 같은 시각이면 같은 키가 된다.
+   * @returns {number|string}
+   */
+  toXKey(value) {
+    const ms = +value;
+    return Number.isNaN(ms) ? value : ms;
+  },
+
+  /**
+   * 시리즈 원본 data 가 시리즈 자기 x 를 쓰는 { x, y } 배열인지 — 첫 유효 원소에 x 가 있는지로 본다
+   * (model.store addSeriesDS 와 같은 기준). 원시값·{ value } 배열은 labels 인덱스를 공유한다.
+   * @returns {boolean}
+   */
+  isPointSeries(rawData) {
+    const first = rawData?.find?.((item) => item != null);
+    return first !== null && typeof first === 'object' && 'x' in first;
+  },
+
   getStringMinMax(array) {
     const minMax = {
       min: array[0],

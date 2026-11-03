@@ -4,6 +4,18 @@ import Util from '../helpers/helpers.util';
 
 class TimeBar extends Bar {
   /**
+   * 막대 한 칸의 픽셀 폭. mixed(#2352)면 시리즈 자기 점 개수가 아니라 공통 최소 간격의 폭을 쓴다 —
+   * 1초·5초 시리즈의 막대 폭을 맞추고 같은 칸 안에 나란히 놓기 위해서다.
+   * @returns {number}
+   */
+  getCategoryArea(dArea, minmaxX, mixedXInterval) {
+    if (mixedXInterval) {
+      return (dArea * mixedXInterval) / (minmaxX.graphMax - minmaxX.graphMin);
+    }
+    return dArea / (this.data.length || 1);
+  }
+
+  /**
    * Compute pixel geometry (xp/yp/w/h) for each time bar and store it on the main model.
    * 기하 계산만 수행한다(canvas 그리기 없음). subW(부분 bar 클리핑) 누적과 gradient용 w 보정까지
    * draw와 동일하게 반영해 hit-test가 동일한 item.xp/yp/w/h를 소비하도록 한다.
@@ -36,7 +48,7 @@ class TimeBar extends Bar {
     const xep = chartRect.x2 - labelOffset.right;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (this.data.length || 1);
+    const cArea = this.getCategoryArea(dArea, minmaxX, param.mixedXInterval);
     const cPad = 2;
 
     let bArea;
@@ -164,7 +176,7 @@ class TimeBar extends Bar {
     const xep = chartRect.x2 - labelOffset.right;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (this.data.length || 1);
+    const cArea = this.getCategoryArea(dArea, minmaxX, param.mixedXInterval);
     const cPad = 2;
 
     let bArea;

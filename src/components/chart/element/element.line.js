@@ -114,7 +114,10 @@ class Line {
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
 
     if (this.combo) {
-      barAreaByCombo = xArea / (this.data.length || 1);
+      // mixed(#2352)는 timeMode bar 공통 칸 폭에 맞춘다 — 시리즈 자기 점 개수로 나누면 시리즈마다 어긋난다.
+      barAreaByCombo = param.mixedXInterval
+        ? (xArea * param.mixedXInterval) / (minmaxX.graphMax - minmaxX.graphMin)
+        : xArea / (this.data.length || 1);
       xArea -= barAreaByCombo;
       this.size.comboOffset = barAreaByCombo;
     }
@@ -290,7 +293,10 @@ class Line {
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
 
     if (this.combo) {
-      barAreaByCombo = xArea / (this.data.length || 1);
+      // mixed(#2352)는 timeMode bar 공통 칸 폭에 맞춘다 — 시리즈 자기 점 개수로 나누면 시리즈마다 어긋난다.
+      barAreaByCombo = param.mixedXInterval
+        ? (xArea * param.mixedXInterval) / (minmaxX.graphMax - minmaxX.graphMin)
+        : xArea / (this.data.length || 1);
       xArea -= barAreaByCombo;
       this.size.comboOffset = barAreaByCombo;
     }

@@ -590,6 +590,11 @@ class EvChart {
       return { ok: false, reason: 'time-bar' };
     }
 
+    // 시리즈마다 x 가 다른 차트(#2352)는 칸 폭·콤보 오프셋을 main 의 mixed 판정으로 정한다 — worker 는 모른다.
+    if (this.isMixedX) {
+      return { ok: false, reason: 'mixed-x' };
+    }
+
     // time(Date)·step(string) 축은 render.snapshot 의 extractSeriesData 가 좌표를 숫자로 정규화한다
     // (time→타임스탬프, step→Number). worker 는 메인과 동일 element 코드로 좌표를 재계산하므로
     // bit-identical. timeMode bar 만 위에서 차단한다.
@@ -911,6 +916,8 @@ class EvChart {
       isHorizontal: this.options.horizontal,
       dataEpoch: this._dataEpoch,
       scaleVersion: this._scaleVersion,
+      mixedXInterval: this.getMixedBarInterval?.() ?? null,
+      mixedLabels: this.mixedLabels ?? null,
     };
 
     let showSeriesCount = 0;
@@ -975,6 +982,8 @@ class EvChart {
       // realtime scatter blit↔full 동등: full redraw(legend hover 등)도 blit 라스터에 베이크된
       // sub-pixel 위상(_blitCarry)으로 점을 찍어야 위치가 일치한다(element.scatter calcItem 이 읽음).
       rtXOffsetCss: this._blitCarry,
+      mixedXInterval: this.getMixedBarInterval?.() ?? null,
+      mixedLabels: this.mixedLabels ?? null,
     };
 
     let showIndex = 0;

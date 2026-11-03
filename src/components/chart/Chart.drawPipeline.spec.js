@@ -446,6 +446,16 @@ describe('worker 진입 가드 canRenderSeriesOnWorker', () => {
     expect(chart.canRenderSeriesOnWorker().reason).toBe('time-bar');
   });
 
+  it('시리즈마다 x 가 다른 mixed 차트 → false (mixed-x)', () => {
+    const chart = makeGuardChart({
+      charts: { line: ['l1', 'l2'] },
+      seriesList: { l1: { type: 'line', show: true }, l2: { type: 'line', show: true } },
+      options: { axesX: [{ type: 'time' }], axesY: [{ type: 'linear' }] },
+    });
+    chart.isMixedX = true;
+    expect(chart.canRenderSeriesOnWorker().reason).toBe('mixed-x');
+  });
+
   it('line + time 축 → ok (snapshot 이 좌표를 타임스탬프로 정규화)', () => {
     const chart = makeGuardChart({
       charts: { line: ['l1'] },

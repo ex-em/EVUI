@@ -35,6 +35,19 @@ class Bar {
   }
 
   /**
+   * mixed(#2352) 막대의 화면 칸 순서. x 와 같은 라벨의 인덱스를 가시 윈도우 기준으로 바꾸고,
+   * 라벨에 없거나 윈도우 밖이면 -1(그리지 않음)이다.
+   * @returns {number}
+   */
+  getMixedScreenIndex(item, mixedLabels, startIndex, endIndex) {
+    const labelIndex = item ? mixedLabels.indexByX.get(Util.toXKey(item.x)) : undefined;
+    if (labelIndex === undefined || labelIndex < startIndex || labelIndex > endIndex) {
+      return -1;
+    }
+    return labelIndex - startIndex;
+  }
+
+  /**
    * Compute pixel geometry (xp/yp/w/h) for each bar and store it on the main model.
    * 기하 계산만 수행한다(canvas 그리기 없음). hit-test가 item.xp/yp/w/h 및 size/visibleStartIndex/
    * filteredCount를 소비한다. 좌표 의미·stacked 누적·반올림·null 처리는 draw와 동일해야 한다.
@@ -81,7 +94,9 @@ class Bar {
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    let totalCount = this.data.length;
+    // mixed(#2352)면 막대를 자기 배열 순서가 아니라 x 와 같은 라벨 칸에 놓으므로 칸 수도 라벨 기준이다.
+    const mixedLabels = param.mixedLabels;
+    let totalCount = mixedLabels ? mixedLabels.count : this.data.length;
     const [minIndex, maxIndex] = isHorizontal
       ? [minmaxY.minIndex, minmaxY.maxIndex]
       : [minmaxX.minIndex, minmaxX.maxIndex];
@@ -136,17 +151,30 @@ class Bar {
     this.chartRect = chartRect;
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
-    this.filteredCount = totalCount;
-
     const startIndex = truthyNumber(minIndex) ? minIndex : 0;
-    const endIndex = truthyNumber(maxIndex) ? maxIndex : this.data.length - 1;
+    const endIndex = truthyNumber(maxIndex)
+      ? maxIndex
+      : (mixedLabels ? mixedLabels.count : this.data.length) - 1;
 
-    this.visibleStartIndex = startIndex;
+    // hit-test 는 data 인덱스 공간에서 찾는다 — mixed 는 라벨 칸 ≠ data 인덱스라 전체를 대상으로 하고,
+    // 칸 밖·라벨에 없는 점은 아래에서 기하를 비워 stale 좌표가 잡히지 않게 한다.
+    this.filteredCount = mixedLabels ? this.data.length : totalCount;
+    this.visibleStartIndex = mixedLabels ? 0 : startIndex;
 
-    for (let i = startIndex; i <= endIndex; i++) {
-      const screenIndex = i - startIndex;
+    const loopStart = mixedLabels ? 0 : startIndex;
+    const loopEnd = mixedLabels ? this.data.length - 1 : endIndex;
+    for (let i = loopStart; i <= loopEnd; i++) {
       const item = this.data[i];
-      if (item) {
+      const screenIndex = mixedLabels
+        ? this.getMixedScreenIndex(item, mixedLabels, startIndex, endIndex)
+        : i - startIndex;
+      if (mixedLabels && item && screenIndex === -1) {
+        item.xp = null; // eslint-disable-line
+        item.yp = null; // eslint-disable-line
+        item.w = null; // eslint-disable-line
+        item.h = null; // eslint-disable-line
+      }
+      if (item && screenIndex !== -1) {
         const categoryPoint = isHorizontal
           ? ysp - cArea * screenIndex - cPad
           : xsp + cArea * screenIndex + cPad;
@@ -275,8 +303,11 @@ class Bar {
     //   - 빈 윈도우(sentinel { minIndex: 0, maxIndex: -1 }): start > end 이므로
     //     totalCount === 0 이고 아래 for 루프도 0회 → 아무것도 그리지 않는다.
     const hasWindow = truthyNumber(minIndex) && truthyNumber(maxIndex);
+    const mixedLabels = param.mixedLabels;
     const startIndex = hasWindow ? minIndex : 0;
-    const endIndex = hasWindow ? maxIndex : this.data.length - 1;
+    const endIndex = hasWindow
+      ? maxIndex
+      : (mixedLabels ? mixedLabels.count : this.data.length) - 1;
     const totalCount = endIndex - startIndex + 1;
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
@@ -325,14 +356,18 @@ class Bar {
     this.chartRect = chartRect;
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
-    this.filteredCount = totalCount;
+    this.filteredCount = mixedLabels ? this.data.length : totalCount;
 
-    this.visibleStartIndex = startIndex;
+    this.visibleStartIndex = mixedLabels ? 0 : startIndex;
 
-    for (let i = startIndex; i <= endIndex; i++) {
-      const screenIndex = i - startIndex;
+    const loopStart = mixedLabels ? 0 : startIndex;
+    const loopEnd = mixedLabels ? this.data.length - 1 : endIndex;
+    for (let i = loopStart; i <= loopEnd; i++) {
       const item = this.data[i];
-      if (item) {
+      const screenIndex = mixedLabels
+        ? this.getMixedScreenIndex(item, mixedLabels, startIndex, endIndex)
+        : i - startIndex;
+      if (item && screenIndex !== -1) {
         const categoryPoint = isHorizontal
           ? ysp - cArea * screenIndex - cPad
           : xsp + cArea * screenIndex + cPad;

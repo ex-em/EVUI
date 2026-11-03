@@ -1,3 +1,5 @@
+import Util from './helpers/helpers.util';
+
 export default class EvChartZoom {
   constructor(
     evChartInfo,
@@ -142,20 +144,24 @@ export default class EvChartZoom {
         : 0;
 
     if (evChartOptions[dragChartIdx].axesX[0].type === 'time') {
-      const zoomSeries = zoomInfoData[0].items;
-      const zoomStartDate = zoomSeries[0].x;
-      const zoomEndDate = zoomSeries[zoomSeries.length - 1].x;
+      // 시리즈마다 시각이 다를 수 있어(#2352) 드래그에 걸린 전 시리즈 항목의 시각 범위를 쓰고,
+      // 라벨·x 는 dayjs·Date·ms 어느 쪽이든 ms 로 비교한다.
+      let zoomStartTime = Infinity;
+      let zoomEndTime = -Infinity;
+      zoomInfoData.forEach(({ items }) => {
+        items.forEach(({ x }) => {
+          const time = +x;
+          if (time < zoomStartTime) zoomStartTime = time;
+          if (time > zoomEndTime) zoomEndTime = time;
+        });
+      });
       const currentChartDataLabels = evChartData[dragChartIdx].labels;
       const cloneChartDataLabels = this.evChartCloneData[dragChartIdx].labels;
       const [currentZoomStartIdx, currentZoomEndIdx] = this.zoomAreaMemory.current[0];
 
-      let newZoomStartIdx = cloneChartDataLabels.findIndex(
-        (label) => +label.$d === +zoomStartDate.$d,
-      );
+      let newZoomStartIdx = cloneChartDataLabels.findIndex((label) => +label >= zoomStartTime);
 
-      let newZoomEndIdx = cloneChartDataLabels.findLastIndex(
-        (label) => +label.$d === +zoomEndDate.$d,
-      );
+      let newZoomEndIdx = cloneChartDataLabels.findLastIndex((label) => +label <= zoomEndTime);
 
       const calculateAxesXPosition = (zoomIdx) => {
         const axesXInterval = exceptAxesYChartWidth / (currentChartDataLabels.length - 1);
@@ -267,13 +273,20 @@ export default class EvChartZoom {
       const evChartData = this.evChartProps.data[idx];
 
       const cloneSeriesNames = Object.keys(cloneSeries);
+      // { x, y } 시리즈는 시리즈마다 같은 인덱스가 같은 시각이 아니므로(#2352) 줌 인덱스(labels)를
+      // 시각 구간으로 바꿔 자른다. 시각으로 못 바꾸는 범주 라벨이면 인덱스로 자른다.
+      const zoomStartTime = +cloneLabels[zoomStartIdx];
+      const zoomEndTime = +cloneLabels[zoomEndIdx];
+      const canSliceByTime = !Number.isNaN(zoomStartTime) && !Number.isNaN(zoomEndTime);
 
       for (let jdx = 0; jdx < cloneSeriesNames.length; jdx++) {
         const cloneSeriesName = cloneSeriesNames[jdx];
+        const seriesData = cloneData[cloneSeriesName];
 
-        evChartData.data[cloneSeriesName] = cloneData[cloneSeriesName].filter(
-          (d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx,
-        );
+        evChartData.data[cloneSeriesName] =
+          canSliceByTime && Util.isPointSeries(seriesData)
+            ? seriesData.filter((d) => d != null && +d.x >= zoomStartTime && +d.x <= zoomEndTime)
+            : seriesData.filter((d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx);
       }
 
       evChartData.labels = cloneLabels.filter(

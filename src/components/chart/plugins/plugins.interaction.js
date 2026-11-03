@@ -1383,23 +1383,34 @@ const modules = {
     let fallbackId = null;
     let fallbackDistance = Infinity;
 
+    const allSeriesIsBar = sIds.every((sId) => this.seriesList[sId].type === 'bar');
+
+    // mixed(시리즈마다 x 가 다른) 차트는 시리즈별 인덱스를 쓴다(#2352). 전 시리즈가 bar 면 bar 가
+    // 인덱스 없이 박스 hit 으로 찾으므로(이미 위치 기준) 기존 경로를 그대로 탄다.
+    const mixedIndices =
+      this.isMixedX && !allSeriesIsBar ? this.resolveMixedHitIndices(offset, sIds) : null;
+
     // 1. 먼저 공통으로 사용할 데이터 인덱스 결정
-    const targetDataIndex = this.findClosestDataIndex(offset, sIds, disableNullLabelSnap);
+    let targetDataIndex;
+    if (this.isMixedX && !allSeriesIsBar) {
+      targetDataIndex = mixedIndices ? 0 : -1;
+    } else {
+      targetDataIndex = this.findClosestDataIndex(offset, sIds, disableNullLabelSnap);
+    }
 
     if (targetDataIndex === -1 && !this.isNotUseIndicator()) {
       return { items, hitId, maxTip: [maxs, maxv], maxHighlight: null };
     }
 
-    // 2. 모든 시리즈가 동일한 데이터 인덱스 사용
-    const allSeriesIsBar = sIds.every((sId) => this.seriesList[sId].type === 'bar');
-
+    // 2. 모든 시리즈가 동일한 데이터 인덱스 사용 (mixed 는 시리즈별 인덱스, 같은 x 가 없으면 제외)
     for (let ix = 0; ix < sIds.length; ix++) {
       const sId = sIds[ix];
       const series = this.seriesList[sId];
+      const seriesDataIndex = mixedIndices ? mixedIndices.get(sId) : targetDataIndex;
 
-      if (series.findGraphData && series.show) {
+      if (series.findGraphData && series.show && seriesDataIndex !== undefined) {
         // 특정 데이터 인덱스로 데이터 요청
-        const item = series.findGraphData(offset, isHorizontal, targetDataIndex, !allSeriesIsBar);
+        const item = series.findGraphData(offset, isHorizontal, seriesDataIndex, !allSeriesIsBar);
 
         if (item?.data) {
           let gdata;
@@ -1497,7 +1508,13 @@ const modules = {
     const maxHighlight = maxg !== null ? [maxSID, maxg] : null;
 
     // all-null 라벨인 경우 synthetic items[''] 로 label/index 만 채워 전달.
-    if (disableNullLabelSnap && Object.keys(items).length === 0 && targetDataIndex !== -1) {
+    // mixed 는 공통 라벨 인덱스가 없어 해당하지 않는다.
+    if (
+      !mixedIndices &&
+      disableNullLabelSnap &&
+      Object.keys(items).length === 0 &&
+      targetDataIndex !== -1
+    ) {
       const refSeriesID = sIds.find((sId) => {
         const s = this.seriesList[sId];
         return s?.show && s?.data?.length > 0;
@@ -2081,8 +2098,12 @@ const modules = {
       y2: this.chartRect.y2 - this.labelOffset.bottom,
     };
 
-    // 첫 번째 시리즈의 데이터를 기준으로 라벨 위치 계산
-    const firstSeriesId = Object.keys(hitInfo.items)[0];
+    // 첫 번째 시리즈의 데이터를 기준으로 라벨 위치 계산.
+    // mixed 는 툴팁 헤더와 같은 hit 아이템을 기준으로 한다(#2352).
+    const firstSeriesId =
+      this.isMixedX && hitInfo.items[hitInfo.hitId]
+        ? hitInfo.hitId
+        : Object.keys(hitInfo.items)[0];
     const firstItem = hitInfo.items[firstSeriesId];
 
     if (!firstItem?.data) {

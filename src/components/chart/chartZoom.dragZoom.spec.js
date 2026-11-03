@@ -92,3 +92,47 @@ describe('dragZoom (bar 시리즈)', () => {
     expect(zoom.executeZoom).not.toHaveBeenCalled();
   });
 });
+
+/**
+ * 수집 간격이 다른 { x, y } 시리즈(1초·5초)의 줌 — labels 를 공통 시간 격자로 쓰고,
+ * 줌 인덱스(labels 인덱스)는 그대로 둔 채 각 시리즈를 그 시각 구간으로 자른다(#2352).
+ */
+describe('혼합 interval 줌', () => {
+  const BASE = Date.UTC(2026, 0, 1);
+  const at = (sec) => BASE + sec * 1000;
+  const SEC_LABELS = Array.from({ length: 60 }, (_, sec) => at(sec));
+  const points = (step) =>
+    SEC_LABELS.filter((_, sec) => sec % step === 0).map((x, ix) => ({ x, y: ix }));
+
+  it('dragZoom 은 모든 시리즈 항목의 시각 범위로 labels 인덱스를 잡는다', () => {
+    const zoom = createZoom(SEC_LABELS);
+    const data = [
+      { seriesId: 's5', items: points(5).filter(({ x }) => x >= at(10) && x <= at(15)) },
+      { seriesId: 's1', items: points(1).filter(({ x }) => x >= at(8) && x <= at(17)) },
+    ];
+
+    zoom.dragZoom(dragArgs(data));
+
+    expect(zoom.executeZoom).toHaveBeenCalledWith(8, 17);
+  });
+
+  it('executeZoom 은 시리즈를 인덱스가 아니라 labels 시각 구간으로 자른다', () => {
+    const zoom = Object.create(EvChartZoom.prototype);
+    const evChartData = { data: {}, labels: SEC_LABELS };
+    Object.assign(zoom, {
+      evChartCloneData: [{
+        data: { s1: points(1), s5: points(5) },
+        labels: SEC_LABELS,
+        series: { s1: {}, s5: {} },
+      }],
+      evChartProps: { data: [evChartData] },
+      brushIdx: { isUseButton: false, isUseScroll: false },
+    });
+
+    zoom.executeZoom(10, 20);
+
+    expect(evChartData.labels).toEqual(SEC_LABELS.slice(10, 21));
+    expect(evChartData.data.s1.map(({ x }) => x)).toEqual(SEC_LABELS.slice(10, 21));
+    expect(evChartData.data.s5.map(({ x }) => x)).toEqual([at(10), at(15), at(20)]);
+  });
+});
