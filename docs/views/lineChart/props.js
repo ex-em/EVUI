@@ -8,6 +8,8 @@ import FillWithNull from './example/FillWithNull';
 import FillWithNullRaw from './example/FillWithNull?raw';
 import Stack from './example/Stack';
 import StackRaw from './example/Stack?raw';
+import MixedInterval from './example/MixedInterval';
+import MixedIntervalRaw from './example/MixedInterval?raw';
 import Event from './example/Event';
 import EventRaw from './example/Event?raw';
 import DragSelection from './example/DragSelection';
@@ -82,6 +84,16 @@ export default {
         'Stack Line Chart는 계열의 순서에 맞춰 데이터를 누적하여 각 계열의 데이터 비교를 시각적으로 판단하는데 도움을 줍니다.',
       component: Stack,
       parsedData: parse(StackRaw).descriptor,
+    },
+    'Mixed Interval (1s · 5s)': {
+      description:
+        '시리즈마다 수집 간격이 다른(1초·5초) 데이터를 { x, y } 로 넘겼을 때의 현재 동작을 축 타입(time / time categoryMode / step / linear)별로 ' +
+        'line·bar·timeMode bar·stack line·stack bar·stack timeMode bar 전부 한 화면에서 확인하는 검증용 예제입니다. ' +
+        'hover 툴팁이 같은 시각의 값을 보여주는지, 시리즈 순서를 바꿔도 같은지, ' +
+        '축별 차트 그룹(syncHover)에서 다른 차트에 indicator 가 같은 시각으로 공유되는지 확인합니다.',
+      component: MixedInterval,
+      parsedData: parse(MixedIntervalRaw).descriptor,
+      devOnly: true,
     },
     Event: {
       description: 'Click, Double Click 등 이벤트 등록이 가능합니다.',
