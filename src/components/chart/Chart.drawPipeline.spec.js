@@ -192,7 +192,16 @@ describe('worker series 래스터 경로', () => {
       renderWorkerGate: gate,
       // snapshot/pack 입력(toRenderSnapshot/packSeries 가 읽는 최소 필드).
       pixelRatio: 2,
-      chartRect: { x1: 0, x2: 200, y1: 0, y2: 100, chartWidth: 200, chartHeight: 100, width: 200, height: 100 },
+      chartRect: {
+        x1: 0,
+        x2: 200,
+        y1: 0,
+        y2: 100,
+        chartWidth: 200,
+        chartHeight: 100,
+        width: 200,
+        height: 100,
+      },
       labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
       axesSteps: { x: [], y: [] },
       options: {},
@@ -325,7 +334,16 @@ describe('epoch 경합 가드', () => {
       renderEpoch: 0,
       renderWorkerGate: gate,
       pixelRatio: 2,
-      chartRect: { x1: 0, x2: 200, y1: 0, y2: 100, chartWidth: 200, chartHeight: 100, width: 200, height: 100 },
+      chartRect: {
+        x1: 0,
+        x2: 200,
+        y1: 0,
+        y2: 100,
+        chartWidth: 200,
+        chartHeight: 100,
+        width: 200,
+        height: 100,
+      },
       labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
       axesSteps: { x: [], y: [] },
       options: {},
@@ -505,7 +523,11 @@ describe('worker 진입 가드 canRenderSeriesOnWorker', () => {
     const chart = makeGuardChart({
       charts: { line: ['l1'] },
       seriesList: { l1: { type: 'line', show: true } },
-      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }], selectItem: { use: true } },
+      options: {
+        axesX: [{ type: 'linear' }],
+        axesY: [{ type: 'linear' }],
+        selectItem: { use: true },
+      },
     });
     expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
   });
@@ -514,7 +536,11 @@ describe('worker 진입 가드 canRenderSeriesOnWorker', () => {
     const chart = makeGuardChart({
       charts: { line: ['l1'] },
       seriesList: { l1: { type: 'line', show: true } },
-      options: { axesX: [{ type: 'linear' }], axesY: [{ type: 'linear' }], selectSeries: { use: true } },
+      options: {
+        axesX: [{ type: 'linear' }],
+        axesY: [{ type: 'linear' }],
+        selectSeries: { use: true },
+      },
     });
     expect(chart.canRenderSeriesOnWorker().ok).toBe(true);
   });

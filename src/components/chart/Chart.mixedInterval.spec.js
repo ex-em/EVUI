@@ -52,10 +52,12 @@ const createMixedChart = ({ order, types, labels = [], axesX }) => {
     isNotUseIndicator: () => false,
   });
 
-  const data = Object.fromEntries(order.map((id) => [
-    id,
-    SOURCE[id].secs.map((sec) => ({ x: at(sec), y: SOURCE[id].valueOf(sec) })),
-  ]));
+  const data = Object.fromEntries(
+    order.map((id) => [
+      id,
+      SOURCE[id].secs.map((sec) => ({ x: at(sec), y: SOURCE[id].valueOf(sec) })),
+    ]),
+  );
   chart.createDataSet(data, labels);
   chart.data = { series: Object.fromEntries(order.map((id) => [id, {}])), data, labels };
 
@@ -134,7 +136,10 @@ describe('혼합 interval — 정렬 판정(createDataSet)', () => {
   });
 });
 
-const ORDERS = [['s1', 's5'], ['s5', 's1']];
+const ORDERS = [
+  ['s1', 's5'],
+  ['s5', 's1'],
+];
 
 describe('혼합 interval — hover(findHitItem)', () => {
   describe.each(ORDERS)('line 두 시리즈, 순서 %s → %s', (first, second) => {
@@ -191,7 +196,8 @@ describe('혼합 interval — hover(findHitItem)', () => {
 
 describe('혼합 interval — x 를 Date 로 넘길 때', () => {
   it('hover 와 스택이 epoch ms 와 같은 결과를 낸다', () => {
-    const asDate = (secs, valueOf) => secs.map((sec) => ({ x: new Date(at(sec)), y: valueOf(sec) }));
+    const asDate = (secs, valueOf) =>
+      secs.map((sec) => ({ x: new Date(at(sec)), y: valueOf(sec) }));
     const chart = createLineChart({
       data: { s1: asDate(SEC_1, SOURCE.s1.valueOf), s5: asDate(SEC_5, SOURCE.s5.valueOf) },
     });
@@ -211,17 +217,26 @@ describe('혼합 interval — x 를 Date 로 넘길 때', () => {
 });
 
 describe('혼합 interval — 클릭(getHitItemByPosition)', () => {
-  it.each(ORDERS)('line 두 시리즈, 순서 %s → %s: 10초 1초 점을 클릭하면 10초가 선택된다', (first, second) => {
-    const chart = createMixedChart({
-      order: [first, second],
-      types: { s1: 'line', s5: 'line' },
-    });
-    const hit = chart.getHitItemByPosition([xpOf(at(10)), Y0 - 20], false, undefined, false, true);
+  it.each(ORDERS)(
+    'line 두 시리즈, 순서 %s → %s: 10초 1초 점을 클릭하면 10초가 선택된다',
+    (first, second) => {
+      const chart = createMixedChart({
+        order: [first, second],
+        types: { s1: 'line', s5: 'line' },
+      });
+      const hit = chart.getHitItemByPosition(
+        [xpOf(at(10)), Y0 - 20],
+        false,
+        undefined,
+        false,
+        true,
+      );
 
-    expect(hit.sId).toBe('s1');
-    expect(hit.label).toBe(at(10));
-    expect(hit.value).toBe(20);
-  });
+      expect(hit.sId).toBe('s1');
+      expect(hit.label).toBe(at(10));
+      expect(hit.value).toBe(20);
+    },
+  );
 });
 
 describe('혼합 interval — selectItem(getItem)', () => {
@@ -245,10 +260,14 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     const ids = ['base', 'top'];
     const seriesList = {
       base: Object.assign(new Line('base', { name: 'base' }, 0), {
-        isExistGrp: true, stackIndex: 0, groupIndex: 0,
+        isExistGrp: true,
+        stackIndex: 0,
+        groupIndex: 0,
       }),
       top: Object.assign(new Line('top', { name: 'top' }, 1), {
-        isExistGrp: true, stackIndex: 1, groupIndex: 0,
+        isExistGrp: true,
+        stackIndex: 1,
+        groupIndex: 0,
       }),
     };
     const chart = Object.assign(Object.create(interaction), store, {
@@ -449,7 +468,10 @@ describe('혼합 interval — 값 기반 축 일반 bar(x 값 위치)', () => {
   });
 
   const createComboChart = () => {
-    const chart = createMixedChart({ order: ['s1', 's5'], types: { s1: 'line', s5: 'categoryBar' } });
+    const chart = createMixedChart({
+      order: ['s1', 's5'],
+      types: { s1: 'line', s5: 'categoryBar' },
+    });
     layoutBars(chart, valueAxisParam(), ['s5']);
     return chart;
   };
@@ -533,7 +555,9 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
 
   const createStepChart = ({ types, labels, extra = {} }) => {
     const ids = Object.keys(types);
-    const seriesList = Object.fromEntries(ids.map((id, idx) => [id, createSeries(types[id], id, idx)]));
+    const seriesList = Object.fromEntries(
+      ids.map((id, idx) => [id, createSeries(types[id], id, idx)]),
+    );
     const charts = { line: [], bar: [], scatter: [], pie: [], heatMap: [] };
     ids.forEach((id) => charts[types[id] === 'line' ? 'line' : 'bar'].push(id));
     const chart = Object.assign(Object.create(interaction), store, {
@@ -650,7 +674,10 @@ describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)',
 
     // 라벨 0~9초: 5초 시리즈는 0·5초 점(100·105)만 윈도우 안이다
     expect(chart.getVisibleWindowMaxSeries(0, 9)).toMatchObject({
-      sId: 's5', value: 105, index: 1, domain: at(5),
+      sId: 's5',
+      value: 105,
+      index: 1,
+      domain: at(5),
     });
   });
 

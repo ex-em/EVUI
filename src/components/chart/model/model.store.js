@@ -8,7 +8,12 @@ const MIN_SNAP_THRESHOLD_PX = 6;
 
 // mixed 일반 bar 배치(#2352) — 값 위치 배치 표식과, labels 없는 step 축의 빈 칸 맵.
 const MIXED_BY_VALUE = Object.freeze({ byValue: true });
-const NO_LABEL_SLOTS = Object.freeze({ indexByX: new Map(), count: 0, times: null, interval: null });
+const NO_LABEL_SLOTS = Object.freeze({
+  indexByX: new Map(),
+  count: 0,
+  times: null,
+  interval: null,
+});
 
 // 오름차순 값의 양수 간격 중앙값(없으면 null). 중복 수집 한 쌍 같은 튀는 간격에 흔들리지 않게 중앙값을 쓴다.
 const getMedianGap = (values) => {
@@ -1381,7 +1386,9 @@ const modules = {
       const series = this.seriesList[sIds[s]];
       if (series?.show && series.data?.length) {
         const lo = mixedLabels ? 0 : Math.max(0, minIndex);
-        const hi = mixedLabels ? series.data.length - 1 : Math.min(series.data.length - 1, maxIndex);
+        const hi = mixedLabels
+          ? series.data.length - 1
+          : Math.min(series.data.length - 1, maxIndex);
         for (let i = lo; i <= hi; i += 1) {
           const p = series.data[i];
           const slot = mixedLabels ? Util.getMixedSlot(p?.x, mixedLabels) : i;

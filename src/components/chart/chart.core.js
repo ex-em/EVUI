@@ -548,7 +548,7 @@ class EvChart {
     }
 
     this.drawAnnotationLayer();
-    
+
     return true;
   }
 
@@ -1182,7 +1182,7 @@ class EvChart {
     if (this.annotationCtx) {
       return true;
     }
-    
+
     // brush(미니맵) 차트는 overlay 도 없고 어노테이션을 쓰지 않는다.
     if (this.options.brush || !this.chartDOM || !this.displayCanvas) {
       return false;
@@ -1224,7 +1224,12 @@ class EvChart {
       // 단, 직전 프레임에 그려둔 게 있으면(어노테이션이 제거된 경우) 한 번 지워 잔상을 없앤다.
       if (this._hadAnnotations && this.annotationCtx) {
         const r = this.pixelRatio < 1 ? this.pixelRatio : 1;
-        this.annotationCtx.clearRect(0, 0, this.annotationCanvas.width / r, this.annotationCanvas.height / r);
+        this.annotationCtx.clearRect(
+          0,
+          0,
+          this.annotationCanvas.width / r,
+          this.annotationCanvas.height / r,
+        );
         this._hadAnnotations = false;
       }
       return;
@@ -1260,14 +1265,16 @@ class EvChart {
     // line/bar 는 labels 가 평면 배열(주로 카테고리 x축), heatMap 은 { x:[], y:[] } 객체다.
     // step 축의 라벨→인덱스 변환에 쓰이므로 축 방향별로 알맞은 배열을 골라 넘긴다.
     const rawLabels = this.data?.labels;
-    const isAxisLabelObject = rawLabels && !Array.isArray(rawLabels) && typeof rawLabels === 'object';
+    const isAxisLabelObject =
+      rawLabels && !Array.isArray(rawLabels) && typeof rawLabels === 'object';
     const xLabels = isAxisLabelObject ? rawLabels.x : rawLabels;
     const yLabels = isAxisLabelObject ? rawLabels.y : rawLabels;
-    const buildAxes = (steps, axisOpts, labels) => (steps ?? []).map((step, i) => ({
-      ...step,
-      type: axisOpts?.[i]?.type || 'linear',
-      labels,
-    }));
+    const buildAxes = (steps, axisOpts, labels) =>
+      (steps ?? []).map((step, i) => ({
+        ...step,
+        type: axisOpts?.[i]?.type || 'linear',
+        labels,
+      }));
     return {
       chartRect: this.chartRect,
       labelOffset: this.labelOffset,
@@ -1538,7 +1545,7 @@ class EvChart {
     if (this.overlayCtx) {
       this.overlayCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     }
-    
+
     if (this.annotationCtx) {
       this.annotationCtx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     }
