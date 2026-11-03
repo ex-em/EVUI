@@ -917,7 +917,7 @@ class EvChart {
       dataEpoch: this._dataEpoch,
       scaleVersion: this._scaleVersion,
       mixedXInterval: this.getMixedBarInterval?.() ?? null,
-      mixedLabels: this.mixedLabels ?? null,
+      mixedXLayout: this.getMixedXLayout?.() ?? null,
     };
 
     let showSeriesCount = 0;
@@ -983,7 +983,7 @@ class EvChart {
       // sub-pixel 위상(_blitCarry)으로 점을 찍어야 위치가 일치한다(element.scatter calcItem 이 읽음).
       rtXOffsetCss: this._blitCarry,
       mixedXInterval: this.getMixedBarInterval?.() ?? null,
-      mixedLabels: this.mixedLabels ?? null,
+      mixedXLayout: this.getMixedXLayout?.() ?? null,
     };
 
     let showIndex = 0;

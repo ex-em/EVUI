@@ -258,7 +258,15 @@ const modules = {
     let halfBarSize;
     let dp;
 
-    if (type === 'bar') {
+    if (type === 'bar' && this.isMixedX) {
+      // mixed(#2352) 막대는 배열 인덱스가 화면 칸이 아니라서 그려진 막대 기하로 tip 위치를 잡는다.
+      const item = series.data?.[ldata];
+      if (item?.xp === null || item?.xp === undefined) {
+        return false;
+      }
+      halfBarSize = Math.round(item.w / 2);
+      dp = item.xp + halfBarSize;
+    } else if (type === 'bar') {
       const scrollbarOpt = isHorizontal ? this.scrollbar.y : this.scrollbar.x;
       if (scrollbarOpt?.use) {
         const [min, max] = scrollbarOpt?.range ?? [];

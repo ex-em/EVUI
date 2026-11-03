@@ -4,6 +4,7 @@ import store from './model/model.store';
 import Line from './element/element.line';
 import Bar from './element/element.bar';
 import TimeBar from './element/element.bar.time';
+import tip from './element/element.tip';
 
 /**
  * 수집 간격이 다른 시리즈(1초 60점 · 5초 12점)를 { x, y } 로 넘긴 차트의 hit-test 계약 (#2352).
@@ -32,7 +33,7 @@ const createSeries = (type, id, idx) => {
   return new TimeBar(id, { name: id, timeMode: true }, idx, false);
 };
 
-const createMixedChart = ({ order, types, labels = [] }) => {
+const createMixedChart = ({ order, types, labels = [], axesX }) => {
   const seriesList = {};
   const charts = { line: [], bar: [], scatter: [], pie: [], heatMap: [] };
 
@@ -44,7 +45,7 @@ const createMixedChart = ({ order, types, labels = [] }) => {
   const chart = Object.assign(Object.create(interaction), store, {
     seriesList,
     seriesInfo: { charts },
-    options: { horizontal: false },
+    options: { horizontal: false, axesX },
     tooltipCtx: null,
     getFormattedTooltipLabel: ({ seriesName }) => seriesName,
     getFormattedTooltipValue: ({ value }) => String(value),
@@ -344,37 +345,46 @@ describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {
   });
 });
 
-describe('혼합 interval — 범주형 축 일반 bar 배치', () => {
-  // 단언이 실패해도 다음 테스트에 console.warn spy 호출 수가 넘어가지 않게 한다.
+// 일반 bar 두 시리즈(s1 → showIndex 0, s5 → 1)의 기하를 차트의 mixed 배치 정보로 채운다.
+const layoutBars = (chart, param, ids = ['s1', 's5']) => {
+  ids.forEach((id, showIndex) => {
+    chart.seriesList[id].computeGeometry({
+      ...param,
+      showIndex,
+      showSeriesCount: ids.length,
+      mixedXLayout: chart.getMixedXLayout(),
+      mixedXInterval: chart.getMixedBarInterval(),
+    });
+  });
+};
+
+const isDrawn = (p) => p.xp !== null && p.xp !== undefined;
+
+describe('혼합 interval — 범주형 축(time categoryMode) 일반 bar 배치', () => {
   afterEach(() => vi.restoreAllMocks());
 
-  const LABELS_60 = SEC_1.map(at);
-  // 60칸 = 600px → 한 칸 10px. categoryMode 축처럼 라벨 인덱스 윈도우(0~59)를 준다.
-  const categoryParam = (extra) => ({
+  const CATEGORY_AXIS = [{ type: 'time', categoryMode: true }];
+  // 600px 를 라벨 칸 수로 나눈다. categoryMode 축처럼 라벨 인덱스 윈도우를 준다.
+  const categoryParam = (labelCount, graphMax) => ({
     chartRect: { x1: 0, x2: 600, y1: 0, y2: 300, chartWidth: 600, chartHeight: 300 },
     labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
     axesSteps: {
-      x: [{ graphMin: at(0), graphMax: at(59), minIndex: 0, maxIndex: 59 }],
+      x: [{ graphMin: at(0), graphMax, minIndex: 0, maxIndex: labelCount - 1 }],
       y: [{ graphMin: 0, graphMax: 200 }],
     },
     isHorizontal: false,
     thickness: 1,
     cPadRatio: 0,
-    showSeriesCount: 2,
-    ...extra,
   });
 
   it('5초 막대가 자기 배열 순서가 아니라 같은 시각의 라벨 칸에 놓인다', () => {
     const chart = createMixedChart({
       order: ['s1', 's5'],
       types: { s1: 'categoryBar', s5: 'categoryBar' },
-      labels: LABELS_60,
+      labels: SEC_1.map(at),
+      axesX: CATEGORY_AXIS,
     });
-    ['s1', 's5'].forEach((id, showIndex) => {
-      chart.seriesList[id].computeGeometry(
-        categoryParam({ showIndex, mixedLabels: chart.mixedLabels }),
-      );
-    });
+    layoutBars(chart, categoryParam(60, at(59)));
 
     const s1At10 = chart.seriesList.s1.data[10];
     const s5At10 = chart.seriesList.s5.data[2];
@@ -382,30 +392,251 @@ describe('혼합 interval — 범주형 축 일반 bar 배치', () => {
     expect(Math.floor(s5At10.xp / 10)).toBe(10);
   });
 
-  it('labels 에 없는 x 의 막대는 그리지 않고 경고를 한 번 남긴다', () => {
+  it('labels 에 없는 시각(5초 격자 + 끼어든 시각, 1초 시리즈)도 앞뒤 칸 사이에 시간 순으로 모두 그린다', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // 5초 격자 12칸 + 32.5초에 끼어든 시각 하나 = 13칸
+    const labels = [...SEC_5.map(at), at(32) + 500].sort((a, b) => a - b);
     const chart = createMixedChart({
       order: ['s1', 's5'],
       types: { s1: 'categoryBar', s5: 'categoryBar' },
-      labels: LABELS_60.slice(0, 30),
+      labels,
+      axesX: CATEGORY_AXIS,
     });
-    chart.seriesList.s5.computeGeometry(
-      categoryParam({ showIndex: 1, mixedLabels: chart.mixedLabels }),
-    );
+    layoutBars(chart, categoryParam(labels.length, at(55)));
 
-    expect(chart.seriesList.s5.data[6].xp).toBe(null); // 30초 — labels 밖
-    expect(warn).toHaveBeenCalledTimes(1);
+    const s1 = chart.seriesList.s1.data;
+    const s5 = chart.seriesList.s5.data;
+    expect(s1.every(isDrawn)).toBe(true);
+    expect(s5.every(isDrawn)).toBe(true);
+    // 1초 막대끼리 시간 순으로 놓이고 겹치지 않는다
+    s1.slice(1).forEach((p, i) => expect(p.xp).toBeGreaterThanOrEqual(s1[i].xp + s1[i].w));
+
+    // 10초: 5초 막대는 같은 시각 1초 막대 바로 옆, 둘 다 10초 라벨 칸(2번 칸) 안
+    const slot = 600 / labels.length;
+    expect(s5[2].xp).toBeGreaterThanOrEqual(s1[10].xp + s1[10].w);
+    expect(s5[2].xp + s5[2].w).toBeLessThanOrEqual(s1[11].xp);
+    expect(Math.floor(s1[10].xp / slot)).toBe(2);
+    // 3초(labels 에 없음)는 0초 칸 안
+    expect(Math.floor(s1[3].xp / slot)).toBe(0);
+    expect(warn).not.toHaveBeenCalled();
   });
 
-  it('labels 가 없으면 배치 맵 없이 경고한다', () => {
+  it('labels 가 없으면 경고 없이 x 값 위치로 그린다', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const chart = createMixedChart({
       order: ['s1', 's5'],
       types: { s1: 'categoryBar', s5: 'categoryBar' },
+      axesX: CATEGORY_AXIS,
     });
 
-    expect(chart.mixedLabels).toBe(null);
-    expect(warn).toHaveBeenCalledTimes(1);
+    expect(chart.getMixedXLayout()).toEqual({ byValue: true });
+    expect(warn).not.toHaveBeenCalled();
+  });
+});
+
+describe('혼합 interval — 값 기반 축 일반 bar(x 값 위치)', () => {
+  // time 축(값 기반)처럼 라벨 인덱스 윈도우가 없다. 60초 = 600px.
+  const valueAxisParam = (graphMax = at(60)) => ({
+    chartRect: { x1: 0, x2: 600, y1: 0, y2: 300, chartWidth: 600, chartHeight: 300 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    axesSteps: {
+      x: [{ graphMin: BASE, graphMax }],
+      y: [{ graphMin: 0, graphMax: 200 }],
+    },
+    isHorizontal: false,
+    thickness: 1,
+    cPadRatio: 0,
+  });
+
+  const createComboChart = () => {
+    const chart = createMixedChart({ order: ['s1', 's5'], types: { s1: 'line', s5: 'categoryBar' } });
+    layoutBars(chart, valueAxisParam(), ['s5']);
+    return chart;
+  };
+
+  it('5초 00초 막대가 1초 00초 막대 옆에 놓이고 hover 헤더가 시간 순으로만 움직인다', () => {
+    const chart = createMixedChart({
+      order: ['s1', 's5'],
+      types: { s1: 'categoryBar', s5: 'categoryBar' },
+    });
+    layoutBars(chart, valueAxisParam());
+
+    const s1 = chart.seriesList.s1.data;
+    const s5 = chart.seriesList.s5.data;
+    expect(s1.every(isDrawn)).toBe(true);
+    expect(s5.every(isDrawn)).toBe(true);
+    expect(s5[0].xp).toBeGreaterThanOrEqual(s1[0].xp + s1[0].w);
+    expect(s5[0].xp + s5[0].w).toBeLessThanOrEqual(s1[1].xp);
+
+    const headers = [];
+    for (let px = 0; px <= 60; px += 1) {
+      const { items, hitId } = chart.findHitItem([px, 290]);
+      const x = items[hitId]?.data?.x;
+      if (x !== undefined && headers[headers.length - 1] !== x) headers.push(x);
+    }
+    expect(headers).toEqual([...headers].sort((a, b) => a - b));
+    expect(headers).toEqual(expect.arrayContaining([at(0), at(1), at(2), at(5)]));
+  });
+
+  it('축 끝 시각(graphMax)의 막대도 그래프 영역 안에 그린다', () => {
+    const chart = createMixedChart({
+      order: ['s1', 's5'],
+      types: { s1: 'categoryBar', s5: 'categoryBar' },
+    });
+    layoutBars(chart, valueAxisParam(at(59)));
+
+    const last = chart.seriesList.s1.data[59];
+    expect(isDrawn(last)).toBe(true);
+    expect(last.xp + last.w).toBeLessThanOrEqual(600);
+  });
+
+  it('line 콤보 툴팁·selectItem 에 같은 시각 막대가 함께 담긴다', () => {
+    const chart = createComboChart();
+
+    expect(Object.keys(chart.findHitItem([xpOf(at(10)), 200]).items)).toEqual(['s1', 's5']);
+    // 1초 10초 점(20) + 5초 10초 막대(110)
+    expect(chart.getItem({ seriesID: 's1', dataIndex: 10 })[0].acc).toBe(130);
+  });
+
+  it('그리지 못한 막대(기하 없음)는 같은 시각이어도 툴팁·selectItem 에서 빠진다', () => {
+    const chart = createComboChart();
+    Object.assign(chart.seriesList.s5.data[2], { xp: null, yp: null, w: null, h: null });
+
+    expect(Object.keys(chart.findHitItem([xpOf(at(10)), 200]).items)).toEqual(['s1']);
+    expect(chart.getItem({ seriesID: 's1', dataIndex: 10 })[0].acc).toBe(20);
+  });
+
+  it('maxTip 은 배열 인덱스 칸이 아니라 그려진 막대 위에 놓인다', () => {
+    const chart = Object.assign(
+      createMixedChart({ order: ['s1', 's5'], types: { s1: 'categoryBar', s5: 'categoryBar' } }),
+      tip,
+    );
+    const param = valueAxisParam();
+    layoutBars(chart, param);
+    Object.assign(chart, {
+      chartRect: param.chartRect,
+      labelOffset: param.labelOffset,
+      axesSteps: param.axesSteps,
+      lastTip: { pos: null, value: null, label: null },
+      scrollbar: { x: {}, y: {} },
+    });
+
+    // 5초 시리즈 최댓값 = 55초(155, data[11])
+    const maxBar = chart.seriesList.s5.data[11];
+    const { dp } = chart.calculateTipInfo(chart.seriesList.s5, 'max');
+    expect(dp).toBe(maxBar.xp + Math.round(maxBar.w / 2));
+  });
+});
+
+describe('혼합 interval — step 축(문자열 범주)', () => {
+  const clockOf = (sec) => `09:00:${String(sec).padStart(2, '0')}`;
+
+  const createStepChart = ({ types, labels, extra = {} }) => {
+    const ids = Object.keys(types);
+    const seriesList = Object.fromEntries(ids.map((id, idx) => [id, createSeries(types[id], id, idx)]));
+    const charts = { line: [], bar: [], scatter: [], pie: [], heatMap: [] };
+    ids.forEach((id) => charts[types[id] === 'line' ? 'line' : 'bar'].push(id));
+    const chart = Object.assign(Object.create(interaction), store, {
+      seriesList,
+      seriesInfo: { charts },
+      options: { horizontal: false, axesX: [{ type: 'step' }] },
+    });
+    const source = {
+      s1: SEC_1.map((sec) => ({ x: clockOf(sec), y: 10 + sec })),
+      s5: SEC_5.map((sec) => ({ x: clockOf(sec), y: 100 + sec })),
+      ...extra,
+    };
+    const data = Object.fromEntries(ids.map((id) => [id, source[id]]));
+    chart.data = { series: Object.fromEntries(ids.map((id) => [id, {}])), data, labels };
+    chart.createDataSet(data, labels);
+    return chart;
+  };
+
+  // 60칸 = 600px → 한 칸 10px.
+  const stepParam = (count = 60) => ({
+    chartRect: { x1: 0, x2: 600, y1: 0, y2: 300, chartWidth: 600, chartHeight: 300 },
+    labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+    axesSteps: {
+      x: [{ graphMin: clockOf(0), graphMax: clockOf(59), minIndex: 0, maxIndex: count - 1 }],
+      y: [{ graphMin: 0, graphMax: 200 }],
+    },
+    isHorizontal: false,
+    thickness: 1,
+    cPadRatio: 0,
+  });
+
+  it('labels 에 없는 x 를 시리즈 앞 범주 뒤에 끼워 시간 순 범주로 늘린다', () => {
+    const chart = createStepChart({
+      types: { s1: 'categoryBar', s5: 'categoryBar' },
+      labels: SEC_5.map(clockOf),
+    });
+
+    expect(chart.data.labels).toEqual(SEC_1.map(clockOf));
+    expect(chart.getMixedXLayout()).toMatchObject({ count: 60, times: null });
+  });
+
+  it('정렬 차트에서도 그리지 않는 step 축 line·timeMode bar 의 x 로는 범주를 늘리지 않는다', () => {
+    const labels = SEC_5.map(clockOf);
+    const chart = createStepChart({ types: { s1: 'line', s5: 'timeBar' }, labels });
+
+    expect(chart.isMixedX).toBe(true);
+    expect(chart.data.labels).toBe(labels);
+  });
+
+  it('labels 가 없어도 시리즈 x 로 범주를 만든다', () => {
+    const chart = createStepChart({ types: { s1: 'categoryBar', s5: 'categoryBar' }, labels: [] });
+
+    expect(chart.data.labels).toEqual(SEC_1.map(clockOf));
+  });
+
+  it('일반 bar 는 늘어난 범주 칸에 모두 그린다', () => {
+    const chart = createStepChart({
+      types: { s1: 'categoryBar', s5: 'categoryBar' },
+      labels: SEC_5.map(clockOf),
+    });
+    layoutBars(chart, stepParam());
+
+    const s1 = chart.seriesList.s1.data;
+    const s5 = chart.seriesList.s5.data;
+    expect(s1.every(isDrawn)).toBe(true);
+    expect(s5.every(isDrawn)).toBe(true);
+    expect(Math.floor(s1[3].xp / 10)).toBe(3);
+    expect(Math.floor(s5[2].xp / 10)).toBe(10);
+  });
+
+  it('범주를 늘린 labels 로 다시 데이터셋을 만들어도(옵션만 바뀐 갱신) 원시값 시리즈가 밀리지 않는다', () => {
+    const labels = SEC_5.map(clockOf);
+    const chart = createStepChart({
+      types: { s1: 'categoryBar', r: 'categoryBar' },
+      labels,
+      extra: { r: SEC_5.map((sec) => 200 + sec) },
+    });
+    chart.createDataSet(chart.data.data, chart.data.labels);
+
+    expect(chart.seriesList.r.data[1].x).toBe(clockOf(5));
+    expect(chart.data.labels).toEqual(SEC_1.map(clockOf));
+  });
+
+  it('다시 판정해 혼합이 아니게 되면 늘린 범주를 원래 labels 로 되돌린다', () => {
+    const labels = SEC_5.map(clockOf);
+    const chart = createStepChart({ types: { s1: 'categoryBar', s5: 'categoryBar' }, labels });
+    chart.seriesList.s5.show = false;
+    chart.createDataSet(chart.data.data, chart.data.labels);
+
+    expect(chart.isMixedX).toBe(false);
+    expect(chart.data.labels).toBe(labels);
+  });
+
+  it('x 가 같은 기존 step 차트는 labels 를 바꾸지 않는다', () => {
+    const labels = SEC_1.map(clockOf);
+    const chart = createStepChart({
+      types: { s1: 'categoryBar', s5: 'categoryBar' },
+      labels,
+      extra: { s5: SEC_1.map((sec) => ({ x: clockOf(sec), y: sec })) },
+    });
+
+    expect(chart.isMixedX).toBe(false);
+    expect(chart.data.labels).toBe(labels);
   });
 });
 
@@ -421,6 +652,18 @@ describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)',
     expect(chart.getVisibleWindowMaxSeries(0, 9)).toMatchObject({
       sId: 's5', value: 105, index: 1, domain: at(5),
     });
+  });
+
+  it('labels 에 없는 시각의 점도 그 시각이 그려지는 칸의 윈도우에 든다', () => {
+    const chart = createMixedChart({
+      order: ['s1', 's5'],
+      types: { s1: 'line', s5: 'line' },
+      labels: SEC_5.map(at),
+    });
+    chart.seriesList.s5.show = false;
+
+    // 라벨 칸 0~1(0초·5초 칸 = 0~10초 전): 1초 시리즈 9초 점(19)이 최댓값이다
+    expect(chart.getVisibleWindowMaxSeries(0, 1)).toMatchObject({ sId: 's1', value: 19, index: 9 });
   });
 });
 

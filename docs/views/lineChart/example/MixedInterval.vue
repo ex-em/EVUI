@@ -10,6 +10,10 @@
         <span>값 기반 축(time·linear)에도 1초 labels 전달</span>
       </label>
       <label class="control">
+        <ev-toggle v-model="isCoarseLabels" />
+        <span>labels 를 5초 격자로(1초 점 대부분이 labels 에 없음)</span>
+      </label>
+      <label class="control">
         <ev-toggle v-model="isSyncHover" />
         <span>축별 차트 그룹 indicator 공유(syncHover)</span>
       </label>
@@ -29,7 +33,7 @@
       <ev-chart-group :options="groupOptions">
         <div class="chart-grid">
           <div
-            v-for="kind in CHART_KINDS"
+            v-for="kind in axisCase.kinds"
             :key="kind.key"
             class="chart-cell"
           >
@@ -80,7 +84,7 @@ const CHART_KINDS = [
   { key: 'stackBarTime', title: 'stack bar (series.timeMode)', type: 'bar', timeMode: true, stack: true },
 ];
 
-// toX: 초 → 그 축의 x 값. labeled: labels 를 항상 넘기는 축(범주형)인지.
+// toX: 초 → 그 축의 x 값. labeled: labels 를 항상 넘기는 축(범주형)인지. kindKeys: 그 축에 둘 차트(기본 전부).
 const AXIS_DEFS = [
   {
     key: 'time',
@@ -101,10 +105,11 @@ const AXIS_DEFS = [
   {
     key: 'step',
     title: "axesX type: 'step'",
-    desc: "labels('HH:mm:ss' 문자열 60개) 인덱스로 배치한다. x 도 같은 문자열.",
+    desc: "labels('HH:mm:ss' 문자열 60개) 인덱스로 배치한다. x 도 같은 문자열. step 축은 line·timeMode bar 를 그리지 않아 일반 bar 만 둔다.",
     axisX: { type: 'step' },
     toX: toClock,
     labeled: true,
+    kindKeys: ['bar', 'stackBar'],
   },
   {
     key: 'linear',
@@ -116,7 +121,7 @@ const AXIS_DEFS = [
   },
 ];
 
-const buildData = (axisDef, kind, isFiveFirst, isValueAxisLabeled) => {
+const buildData = (axisDef, kind, isFiveFirst, isValueAxisLabeled, isCoarseLabels) => {
   const ids = isFiveFirst ? ['s5', 's1'] : ['s1', 's5'];
   const points = {
     s1: SEC_1.map((sec) => ({ x: axisDef.toX(sec), y: valueOf1s(sec) })),
@@ -130,19 +135,25 @@ const buildData = (axisDef, kind, isFiveFirst, isValueAxisLabeled) => {
       { ...SERIES_OPT[id], timeMode: !!kind.timeMode, fill: !!kind.stack && kind.type === 'line' },
     ])),
     groups: kind.stack ? [ids] : [],
-    labels: hasLabels ? SEC_1.map(axisDef.toX) : [],
+    labels: hasLabels ? (isCoarseLabels ? SEC_5 : SEC_1).map(axisDef.toX) : [],
     data: Object.fromEntries(ids.map((id) => [id, points[id]])),
   };
 };
 
-const buildOptions = (axisDef, kind, isSelectLabel) => ({
+// categoryMode 축 눈금 간격은 labels 격자와 같아야 한다.
+const axisXOf = (axisDef, isCoarseLabels) =>
+  isCoarseLabels && axisDef.axisX.categoryMode
+    ? { ...axisDef.axisX, interval: { time: 5, unit: 'second' } }
+    : axisDef.axisX;
+
+const buildOptions = (axisDef, kind, isSelectLabel, isCoarseLabels) => ({
   type: kind.type,
   width: '100%',
   height: '100%',
   legend: { show: true, position: 'top' },
   tooltip: { use: true },
   selectLabel: { use: isSelectLabel, useSeriesOpacity: true, limit: 2 },
-  axesX: [axisDef.axisX],
+  axesX: [axisXOf(axisDef, isCoarseLabels)],
   axesY: [{ type: 'linear', startToZero: true, autoScaleRatio: 0.1, showGrid: true }],
 });
 
@@ -150,6 +161,7 @@ export default {
   setup() {
     const isFiveFirst = ref(false);
     const isValueAxisLabeled = ref(false);
+    const isCoarseLabels = ref(false);
     const isSyncHover = ref(true);
     const isSelectLabel = ref(false);
     // selectLabel 선택 상태는 v-model 로 들고 있어야 유지된다(차트별).
@@ -161,24 +173,34 @@ export default {
     ));
     const groupOptions = computed(() => ({ syncHover: isSyncHover.value }));
 
+    const kindsOf = (axisDef) =>
+      CHART_KINDS.filter((kind) => !axisDef.kindKeys || axisDef.kindKeys.includes(kind.key));
+
     const axisCases = computed(() => AXIS_DEFS.map((axisDef) => ({
       key: axisDef.key,
       title: axisDef.title,
       desc: axisDef.desc,
-      charts: Object.fromEntries(CHART_KINDS.map((kind) => [
+      kinds: kindsOf(axisDef),
+      charts: Object.fromEntries(kindsOf(axisDef).map((kind) => [
         kind.key,
         {
-          data: buildData(axisDef, kind, isFiveFirst.value, isValueAxisLabeled.value),
-          options: buildOptions(axisDef, kind, isSelectLabel.value),
+          data: buildData(
+            axisDef,
+            kind,
+            isFiveFirst.value,
+            isValueAxisLabeled.value,
+            isCoarseLabels.value,
+          ),
+          options: buildOptions(axisDef, kind, isSelectLabel.value, isCoarseLabels.value),
         },
       ])),
     })));
 
     return {
-      CHART_KINDS,
       axisCases,
       isFiveFirst,
       isValueAxisLabeled,
+      isCoarseLabels,
       isSyncHover,
       isSelectLabel,
       selectedLabels,

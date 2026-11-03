@@ -324,6 +324,33 @@ export default {
   },
 
   /**
+   * mixed(#2352) 점의 labels 칸 인덱스(소수 = 칸 사이). 시각 라벨이면 labels 에 없는 시각을 앞뒤 칸 사이로
+   * 보간하고(마지막 칸 뒤는 라벨 간격으로), 첫 라벨보다 이르거나 문자열 범주에 없는 값은 null.
+   * @returns {number|null}
+   */
+  getMixedSlot(xValue, { indexByX, times, interval }) {
+    const exact = indexByX.get(this.toXKey(xValue));
+    if (exact !== undefined) {
+      return exact;
+    }
+
+    const t = +xValue;
+    if (!times || !Number.isFinite(t) || t < times[0]) {
+      return null;
+    }
+
+    let lo = 0;
+    let hi = times.length - 1;
+    while (lo < hi) {
+      const m = (lo + hi + 1) >> 1;
+      if (times[m] <= t) lo = m;
+      else hi = m - 1;
+    }
+    const gap = lo < times.length - 1 ? times[lo + 1] - times[lo] : interval;
+    return gap ? lo + (t - times[lo]) / gap : null;
+  },
+
+  /**
    * 시리즈 원본 data 가 시리즈 자기 x 를 쓰는 { x, y } 배열인지 — 첫 유효 원소에 x 가 있는지로 본다
    * (model.store addSeriesDS 와 같은 기준). 원시값·{ value } 배열은 labels 인덱스를 공유한다.
    * @returns {boolean}

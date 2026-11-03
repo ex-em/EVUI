@@ -2111,9 +2111,7 @@ const modules = {
     // 첫 번째 시리즈의 데이터를 기준으로 라벨 위치 계산.
     // mixed 는 툴팁 헤더와 같은 hit 아이템을 기준으로 한다(#2352).
     const firstSeriesId =
-      this.isMixedX && hitInfo.items[hitInfo.hitId]
-        ? hitInfo.hitId
-        : Object.keys(hitInfo.items)[0];
+      this.isMixedX && hitInfo.items[hitInfo.hitId] ? hitInfo.hitId : Object.keys(hitInfo.items)[0];
     const firstItem = hitInfo.items[firstSeriesId];
 
     if (!firstItem?.data) {

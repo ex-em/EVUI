@@ -35,16 +35,48 @@ class Bar {
   }
 
   /**
-   * mixed(#2352) 막대의 화면 칸 순서. x 와 같은 라벨의 인덱스를 가시 윈도우 기준으로 바꾸고,
-   * 라벨에 없거나 윈도우 밖이면 -1(그리지 않음)이다.
+   * 막대 한 칸의 픽셀 폭. mixed(#2352)면 시리즈 자기 점 개수가 아니라 공통 최소 간격의 폭을 쓴다 —
+   * 1초·5초 시리즈의 막대 폭을 맞추고 같은 칸 안에 나란히 놓기 위해서다.
    * @returns {number}
    */
-  getMixedScreenIndex(item, mixedLabels, startIndex, endIndex) {
-    const labelIndex = item ? mixedLabels.indexByX.get(Util.toXKey(item.x)) : undefined;
-    if (labelIndex === undefined || labelIndex < startIndex || labelIndex > endIndex) {
-      return -1;
+  getCategoryArea(dArea, minmaxX, mixedXInterval) {
+    if (mixedXInterval) {
+      return (dArea * mixedXInterval) / (minmaxX.graphMax - minmaxX.graphMin);
     }
-    return labelIndex - startIndex;
+    return dArea / (this.data.length || 1);
+  }
+
+  /**
+   * mixed(#2352) 막대 한 개의 칸 폭. 값 위치 배치는 공통 간격 폭, 범주형 축은 라벨 칸이고 시리즈가 라벨보다
+   * 촘촘하면 그 비율만큼 나눈다(5초 라벨에 1초 시리즈면 칸의 1/5).
+   * @returns {number}
+   */
+  getMixedCellArea(layout, dArea, slotArea, minmaxX, mixedXInterval) {
+    if (layout.byValue) {
+      return this.getCategoryArea(dArea, minmaxX, mixedXInterval);
+    }
+    return layout.interval && mixedXInterval
+      ? slotArea * Math.min(1, mixedXInterval / layout.interval)
+      : slotArea;
+  }
+
+  /**
+   * mixed(#2352) 막대 한 개가 놓일 칸의 시작 픽셀(놓을 자리가 없으면 null). 값 위치 배치는 x 값 위치,
+   * 범주형 축은 x 의 labels 칸(칸 사이 시각은 보간)이다.
+   * @returns {number|null}
+   */
+  getMixedCellStart(xValue, layout, { xsp, xArea, minmaxX, slotArea, startIndex, endIndex }) {
+    if (layout.byValue) {
+      const t = +xValue;
+      return t >= minmaxX.graphMin && t <= minmaxX.graphMax
+        ? Canvas.calculateSubX(t, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp)
+        : null;
+    }
+
+    const slot = Util.getMixedSlot(xValue, layout);
+    return slot === null || slot < startIndex || slot >= endIndex + 1
+      ? null
+      : xsp + (slot - startIndex) * slotArea;
   }
 
   /**
@@ -94,9 +126,9 @@ class Bar {
     const minmaxX = axesSteps.x[this.xAxisIndex];
     const minmaxY = axesSteps.y[this.yAxisIndex];
 
-    // mixed(#2352)면 막대를 자기 배열 순서가 아니라 x 와 같은 라벨 칸에 놓으므로 칸 수도 라벨 기준이다.
-    const mixedLabels = param.mixedLabels;
-    let totalCount = mixedLabels ? mixedLabels.count : this.data.length;
+    // mixed(#2352)면 막대를 자기 배열 순서가 아니라 x 위치(또는 x 의 라벨 칸)에 놓는다.
+    const layout = param.mixedXLayout;
+    let totalCount = layout?.count ?? this.data.length;
     const [minIndex, maxIndex] = isHorizontal
       ? [minmaxY.minIndex, minmaxY.maxIndex]
       : [minmaxX.minIndex, minmaxX.maxIndex];
@@ -117,12 +149,17 @@ class Bar {
     const ysp = isHorizontal ? yAxisPosition : yAxisPosition + yZeroPosition;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (totalCount || 1);
+    const slotArea = dArea / (totalCount || 1);
+    const cArea = layout
+      ? this.getMixedCellArea(layout, dArea, slotArea, minmaxX, param.mixedXInterval)
+      : slotArea;
 
     let cPad;
     const isUnableToDrawCategoryPadding = param.cPadRatio >= 1 || param.cPadRatio <= 0;
     if (isUnableToDrawCategoryPadding) {
       cPad = 2;
+    } else if (layout) {
+      cPad = Math.max((cArea * param.cPadRatio) / 2, 2);
     } else {
       cPad = Math.max((dArea * (param.cPadRatio / 2)) / totalCount, 2);
     }
@@ -151,30 +188,37 @@ class Bar {
     this.chartRect = chartRect;
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
+    this.filteredCount = totalCount;
     const startIndex = truthyNumber(minIndex) ? minIndex : 0;
-    const endIndex = truthyNumber(maxIndex)
-      ? maxIndex
-      : (mixedLabels ? mixedLabels.count : this.data.length) - 1;
+    const endIndex = truthyNumber(maxIndex) ? maxIndex : (layout?.count ?? this.data.length) - 1;
+    this.visibleStartIndex = startIndex;
 
-    // hit-test 는 data 인덱스 공간에서 찾는다 — mixed 는 라벨 칸 ≠ data 인덱스라 전체를 대상으로 하고,
-    // 칸 밖·라벨에 없는 점은 아래에서 기하를 비워 stale 좌표가 잡히지 않게 한다.
-    this.filteredCount = mixedLabels ? this.data.length : totalCount;
-    this.visibleStartIndex = mixedLabels ? 0 : startIndex;
+    // mixed(#2352)는 아래 정렬 루프 대신 모든 점을 x 위치(또는 x 의 라벨 칸)에 놓는다. hit-test 는 data
+    // 인덱스 공간에서 찾는데 화면 칸 ≠ data 인덱스라 전체를 대상으로 한다.
+    let loopEnd = endIndex;
+    if (layout) {
+      this.filteredCount = this.data.length;
+      this.visibleStartIndex = 0;
+      this.computeMixedGeometry(layout, {
+        cellGeo: { xsp, xArea, minmaxX, slotArea, startIndex, endIndex },
+        cPad,
+        bArea,
+        barSeriesX,
+        w,
+        bPad,
+        ysp,
+        yArea,
+        yZeroPosition,
+        minmaxY,
+        displayOverflow: param.displayOverflow,
+      });
+      loopEnd = -1;
+    }
 
-    const loopStart = mixedLabels ? 0 : startIndex;
-    const loopEnd = mixedLabels ? this.data.length - 1 : endIndex;
-    for (let i = loopStart; i <= loopEnd; i++) {
+    for (let i = startIndex; i <= loopEnd; i++) {
+      const screenIndex = i - startIndex;
       const item = this.data[i];
-      const screenIndex = mixedLabels
-        ? this.getMixedScreenIndex(item, mixedLabels, startIndex, endIndex)
-        : i - startIndex;
-      if (mixedLabels && item && screenIndex === -1) {
-        item.xp = null; // eslint-disable-line
-        item.yp = null; // eslint-disable-line
-        item.w = null; // eslint-disable-line
-        item.h = null; // eslint-disable-line
-      }
-      if (item && screenIndex !== -1) {
+      if (item) {
         const categoryPoint = isHorizontal
           ? ysp - cArea * screenIndex - cPad
           : xsp + cArea * screenIndex + cPad;
@@ -261,6 +305,51 @@ class Bar {
   }
 
   /**
+   * mixed(#2352) 막대 기하 — 모든 점을 x 위치(또는 x 의 라벨 칸)에 놓고 축 끝 막대는 그래프 영역 안으로 당긴다.
+   * mixed 는 세로 차트만이다. 높이·스택·displayOverflow 규칙은 computeGeometry 세로 경로와 같다.
+   * @returns {undefined}
+   */
+  computeMixedGeometry(layout, geo) {
+    const { cellGeo, cPad, bArea, barSeriesX, w, bPad, ysp, yArea, yZeroPosition, minmaxY } = geo;
+    const { xsp, xArea } = cellGeo;
+    const xep = xsp + xArea;
+
+    for (let i = 0; i < this.data.length; i++) {
+      const item = this.data[i];
+      const cellStart = item ? this.getMixedCellStart(item.x, layout, cellGeo) : null;
+      if (item && cellStart === null) {
+        item.xp = null; // eslint-disable-line
+        item.yp = null; // eslint-disable-line
+        item.w = null; // eslint-disable-line
+        item.h = null; // eslint-disable-line
+      } else if (item) {
+        const x = Math.round(cellStart + cPad + (bArea * barSeriesX - (w + bPad)));
+        const barValue = item.b ? item.o : item.y;
+        const drawValue =
+          geo.displayOverflow && barValue > minmaxY.graphMax ? minmaxY.graphMax : barValue;
+        let h = Canvas.calculateY(
+          drawValue,
+          minmaxY.graphMin,
+          minmaxY.graphMax,
+          yArea,
+          -yZeroPosition,
+        );
+        const y = item.b
+          ? Canvas.calculateY(item.b, minmaxY.graphMin, minmaxY.graphMax, yArea, ysp - yZeroPosition)
+          : ysp;
+        const minimumBarHeight = barValue > 0 ? -1 : 1;
+        h = barValue && h !== null && Math.abs(h) === 0 ? minimumBarHeight : h;
+
+        item.xp = Math.min(Math.max(x, xsp), xep - w); // eslint-disable-line
+        item.yp = y; // eslint-disable-line
+        item.w = w; // eslint-disable-line
+        item.h = h; // eslint-disable-line
+        item.index = i;
+      }
+    }
+  }
+
+  /**
    * Draw series data
    * @param {object} param     object for drawing series data
    *
@@ -303,11 +392,9 @@ class Bar {
     //   - 빈 윈도우(sentinel { minIndex: 0, maxIndex: -1 }): start > end 이므로
     //     totalCount === 0 이고 아래 for 루프도 0회 → 아무것도 그리지 않는다.
     const hasWindow = truthyNumber(minIndex) && truthyNumber(maxIndex);
-    const mixedLabels = param.mixedLabels;
+    const layout = param.mixedXLayout;
     const startIndex = hasWindow ? minIndex : 0;
-    const endIndex = hasWindow
-      ? maxIndex
-      : (mixedLabels ? mixedLabels.count : this.data.length) - 1;
+    const endIndex = hasWindow ? maxIndex : (layout?.count ?? this.data.length) - 1;
     const totalCount = endIndex - startIndex + 1;
 
     const xArea = chartRect.chartWidth - (labelOffset.left + labelOffset.right);
@@ -322,12 +409,17 @@ class Bar {
     const ysp = isHorizontal ? yAxisPosition : yAxisPosition + yZeroPosition;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (totalCount || 1);
+    const slotArea = dArea / (totalCount || 1);
+    const cArea = layout
+      ? this.getMixedCellArea(layout, dArea, slotArea, minmaxX, param.mixedXInterval)
+      : slotArea;
 
     let cPad;
     const isUnableToDrawCategoryPadding = param.cPadRatio >= 1 || param.cPadRatio <= 0;
     if (isUnableToDrawCategoryPadding) {
       cPad = 2;
+    } else if (layout) {
+      cPad = Math.max((cArea * param.cPadRatio) / 2, 2);
     } else {
       cPad = Math.max((dArea * (param.cPadRatio / 2)) / totalCount, 2);
     }
@@ -356,18 +448,18 @@ class Bar {
     this.chartRect = chartRect;
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
-    this.filteredCount = mixedLabels ? this.data.length : totalCount;
+    this.filteredCount = layout ? this.data.length : totalCount;
 
-    this.visibleStartIndex = mixedLabels ? 0 : startIndex;
+    this.visibleStartIndex = layout ? 0 : startIndex;
 
-    const loopStart = mixedLabels ? 0 : startIndex;
-    const loopEnd = mixedLabels ? this.data.length - 1 : endIndex;
+    const loopStart = layout ? 0 : startIndex;
+    const loopEnd = layout ? this.data.length - 1 : endIndex;
     for (let i = loopStart; i <= loopEnd; i++) {
       const item = this.data[i];
-      const screenIndex = mixedLabels
-        ? this.getMixedScreenIndex(item, mixedLabels, startIndex, endIndex)
-        : i - startIndex;
-      if (item && screenIndex !== -1) {
+      // mixed 막대 위치는 위 computeGeometry 가 정한 기하를 그대로 쓴다(xp null = 축·가시 칸 밖).
+      const isPlaced = layout ? item?.xp !== null && item?.xp !== undefined : !!item;
+      if (isPlaced) {
+        const screenIndex = i - startIndex;
         const categoryPoint = isHorizontal
           ? ysp - cArea * screenIndex - cPad
           : xsp + cArea * screenIndex + cPad;
@@ -377,7 +469,7 @@ class Bar {
           x = xsp;
           y = Math.round(categoryPoint - (bArea * barSeriesX - (h + bPad)));
         } else {
-          x = Math.round(categoryPoint + (bArea * barSeriesX - (w + bPad)));
+          x = layout ? item.xp : Math.round(categoryPoint + (bArea * barSeriesX - (w + bPad)));
           y = ysp;
         }
 

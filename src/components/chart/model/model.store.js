@@ -6,6 +6,75 @@ import { isEmptySecondLogOn, logEmptySeconds } from '../chart.inspect';
 // plugins.interaction findClosestDataIndex 의 최소 hover 스냅 반경과 같은 값.
 const MIN_SNAP_THRESHOLD_PX = 6;
 
+// mixed 일반 bar 배치(#2352) — 값 위치 배치 표식과, labels 없는 step 축의 빈 칸 맵.
+const MIXED_BY_VALUE = Object.freeze({ byValue: true });
+const NO_LABEL_SLOTS = Object.freeze({ indexByX: new Map(), count: 0, times: null, interval: null });
+
+// 오름차순 값의 양수 간격 중앙값(없으면 null). 중복 수집 한 쌍 같은 튀는 간격에 흔들리지 않게 중앙값을 쓴다.
+const getMedianGap = (values) => {
+  const gaps = [];
+  for (let i = 1; i < values.length; i++) {
+    const gap = values[i] - values[i - 1];
+    if (gap > 0) {
+      gaps.push(gap);
+    }
+  }
+  gaps.sort((a, b) => a - b);
+  return gaps.length ? gaps[Math.floor(gaps.length / 2)] : null;
+};
+
+/**
+ * step 축(범주) mixed(#2352)의 범주 목록 — labels 에 없는 x 를 그 시리즈 바로 앞 점의 범주 뒤에 끼운다
+ * (시리즈 x 가 오름차순이라 시각 문자열은 시간 순이 유지된다). 같은 자리는 먼저 나온 순. 끼울 게 없으면 null.
+ * @returns {array|null}
+ */
+const buildMixedCategories = (labels, pointLists) => {
+  const HEAD = {};
+  const known = new Set(labels.map((labelValue) => Util.toXKey(labelValue)));
+  const childrenOf = new Map();
+  const valueOf = new Map();
+  pointLists.forEach((points) => {
+    let prevKey = HEAD;
+    points.forEach((point) => {
+      const key = Util.toXKey(point.x);
+      if (!known.has(key)) {
+        known.add(key);
+        valueOf.set(key, point.x);
+        if (!childrenOf.has(prevKey)) {
+          childrenOf.set(prevKey, []);
+        }
+        childrenOf.get(prevKey).push(key);
+      }
+      prevKey = key;
+    });
+  });
+  if (!childrenOf.size) {
+    return null;
+  }
+
+  const result = [];
+  // 끼운 범주가 또 끼운 범주를 부르는 사슬(1초 시리즈)이 길어도 재귀하지 않는다.
+  const pushInserted = (rootKey) => {
+    const stack = (childrenOf.get(rootKey) ?? []).slice().reverse();
+    childrenOf.delete(rootKey);
+    while (stack.length) {
+      const key = stack.pop();
+      result.push(valueOf.get(key));
+      const children = childrenOf.get(key);
+      childrenOf.delete(key);
+      for (let i = (children?.length ?? 0) - 1; i >= 0; i--) {
+        stack.push(children[i]);
+      }
+    }
+  };
+  pushInserted(HEAD);
+  labels.forEach((labelValue) => {
+    result.push(labelValue);
+    pushInserted(Util.toXKey(labelValue));
+  });
+  return result;
+};
+
 // { x, y } 스택(tops.byX)은 같은 시각의 아래 값만 base 로 본다(#2352). 원시값은 라벨 인덱스.
 const getStackTop = (tops, isPositive, index, labelValue) => {
   if (!tops) {
@@ -17,10 +86,20 @@ const getStackTop = (tops, isPositive, index, labelValue) => {
 
 // findGraphData 가 인덱싱하는 배열 — line 은 x 가 있는 점만 거른 배열, 그 외는 data 그대로.
 const getHitTestPoints = (series) =>
-  typeof series._getValidGData === 'function' ? series._getValidGData() : series.data ?? [];
+  typeof series._getValidGData === 'function' ? series._getValidGData() : (series.data ?? []);
 
 const hitPosOf = (point) => (point.xp == null ? null : point.xp + (point.w ? point.w / 2 : 0));
 const hasValue = (point) => point.o !== null && point.o !== undefined;
+
+// 그리지 않은 막대(labels 칸이 없는 x — 기하 null)는 같은 시각이어도 hover·클릭·selectItem 에 넣지 않는다.
+const dropUndrawn = (indices, seriesList) => {
+  indices.forEach((index, sId) => {
+    if (hitPosOf(getHitTestPoints(seriesList[sId])[index]) === null) {
+      indices.delete(sId);
+    }
+  });
+  return indices;
+};
 
 /**
  * 픽셀 위치에 가장 가까운, 값이 있는 점. xp 는 x 오름차순과 같은 순서이고 축 범위 밖 점(xp null)은
@@ -90,11 +169,14 @@ const modules = {
   /**
    * Take chart data and labels to create normalized data and min/max info
    * @param {object}  data    chart series info
-   * @param {object}  label   chart label
+   * @param {object}  rawLabel   chart label
    *
    * @returns {undefined}
    */
-  createDataSet(data, label) {
+  createDataSet(data, rawLabel) {
+    // mixed step(#2352)이 범주를 늘려 둔 this.data.labels 로 다시 불리면(데이터 없이 옵션만 바뀐 갱신)
+    // 원래 labels 로 되돌린다 — 원시값 시리즈가 늘어난 범주 인덱스로 밀리지 않게.
+    const label = rawLabel === this.mixedCategoryLabels ? this.mixedSourceLabels : rawLabel;
     // 데이터셋이 재생성될 때마다 +1. computeGeometry 가 (dataEpoch, scaleVersion) 키로 geometry
     // 재계산을 skip 하는 데 쓴다 — 데이터 변경 프레임은 이 증가로 전 시리즈 geometry 가 무효화된다.
     this._dataEpoch = (this._dataEpoch ?? 0) + 1;
@@ -244,6 +326,12 @@ const modules = {
     this.isMixedX = false;
     this.xIntervalBySeries = null;
     this.mixedLabels = null;
+    // 늘려 둔 step 범주는 판정마다 다시 만든다(혼합이 아니게 되면 원래 labels 로 돌아간다).
+    if (this.mixedCategoryLabels && this.data?.labels === this.mixedCategoryLabels) {
+      this.data.labels = this.mixedSourceLabels;
+    }
+    this.mixedCategoryLabels = null;
+    this.mixedSourceLabels = null;
 
     if (this.options.horizontal) {
       return;
@@ -305,17 +393,43 @@ const modules = {
       }
     });
 
-    // labels(공통 시간 격자)가 있으면 x → 라벨 칸 맵을 둔다. 일반 bar(timeMode 아님) 배치와 범주형 축
-    // 인덱스 윈도우(maxTip)가 쓴다 — 둘 다 x 가 아니라 라벨 칸으로 동작한다.
-    if (labels?.length) {
+    // step 축은 범주 축이라 labels 에 없는 x 는 자리가 없다 — 범주를 늘려 일반 bar 의 모든 점을 그린다.
+    // 늘린 범주는 차트 자기 data 복제본의 labels 로 두어 축·selectLabel·툴팁이 같은 인덱스를 쓴다. step 축
+    // line·timeMode bar 는 정렬 차트에서도 그리지 않으므로 범주를 늘리는 데 쓰지 않는다.
+    const isStepX = this.options.axesX?.[0]?.type === 'step';
+    let slotLabels = labels;
+    if (isStepX) {
+      const pointLists = bar
+        .map((sId) => this.seriesList[sId])
+        .filter((series) => series && !series.timeMode && Array.isArray(series.data))
+        .map((series) => series.data);
+      const categories = buildMixedCategories(labels ?? [], pointLists);
+      if (categories) {
+        this.mixedSourceLabels = labels;
+        this.mixedCategoryLabels = categories;
+        this.data.labels = categories;
+        slotLabels = categories;
+      }
+    }
+
+    // labels(공통 시간 격자)가 있으면 x → 라벨 칸 맵을 둔다. 범주형 축 배치와 maxTip 창이 쓴다. 시각
+    // 라벨(categoryMode)이면 labels 에 없는 시각을 앞뒤 칸 사이로 보간하도록 시각 배열과 라벨 간격도 둔다.
+    if (slotLabels?.length) {
       const indexByX = new Map();
-      labels.forEach((labelValue, index) => {
+      slotLabels.forEach((labelValue, index) => {
         const key = Util.toXKey(labelValue);
         if (!indexByX.has(key)) {
           indexByX.set(key, index);
         }
       });
-      this.mixedLabels = { indexByX, count: labels.length };
+      const times = isStepX ? null : slotLabels.map((labelValue) => +labelValue);
+      const isTimeLabels = !!times?.every(Number.isFinite);
+      this.mixedLabels = {
+        indexByX,
+        count: slotLabels.length,
+        times: isTimeLabels ? times : null,
+        interval: isTimeLabels ? getMedianGap(times) : null,
+      };
     }
 
     // selectLabel·줌 인덱스는 labels 칸을 가리키므로 labels 없이는 고를 칸이 없다.
@@ -323,33 +437,6 @@ const modules = {
       this._mixedXWarnedSelectLabel = true;
       // eslint-disable-next-line no-console
       console.warn('[evui] selectLabel on mixed-interval series needs data.labels.');
-    }
-
-    const barIds = ids.filter((sId) => {
-      const series = this.seriesList[sId];
-      return series.type === 'bar' && !series.timeMode;
-    });
-    if (!barIds.length) {
-      return;
-    }
-
-    if (!this.mixedLabels) {
-      if (!this._mixedXWarnedNoLabels) {
-        this._mixedXWarnedNoLabels = true;
-        // eslint-disable-next-line no-console
-        console.warn('[evui] mixed-interval bar series need data.labels (or series.timeMode).');
-      }
-      return;
-    }
-
-    const { indexByX } = this.mixedLabels;
-    const hasUnlabeledX = barIds.some((sId) =>
-      this.seriesList[sId].data.some((point) => !indexByX.has(Util.toXKey(point.x))),
-    );
-    if (hasUnlabeledX && !this._mixedXWarnedLabel) {
-      this._mixedXWarnedLabel = true;
-      // eslint-disable-next-line no-console
-      console.warn('[evui] mixed-interval bar points whose x is not in data.labels are not drawn.');
     }
   },
 
@@ -1285,20 +1372,20 @@ const modules = {
 
     const isHorizontal = this.options.horizontal;
     let best = null;
-    // mixed(#2352)는 data 인덱스가 라벨 칸이 아니므로 전체를 돌며 x 의 라벨 칸으로 윈도우를 판정한다.
-    const indexByX = this.isMixedX ? this.mixedLabels?.indexByX : null;
+    // mixed(#2352)는 data 인덱스가 라벨 칸이 아니므로 전체를 돌며 막대 배치와 같은 x 의 칸(칸 사이 보간
+    // 포함)으로 윈도우를 판정한다.
+    const mixedLabels = this.isMixedX ? this.mixedLabels : null;
 
     const sIds = Object.keys(this.seriesList);
     for (let s = 0; s < sIds.length; s += 1) {
       const series = this.seriesList[sIds[s]];
       if (series?.show && series.data?.length) {
-        const lo = indexByX ? 0 : Math.max(0, minIndex);
-        const hi = indexByX ? series.data.length - 1 : Math.min(series.data.length - 1, maxIndex);
+        const lo = mixedLabels ? 0 : Math.max(0, minIndex);
+        const hi = mixedLabels ? series.data.length - 1 : Math.min(series.data.length - 1, maxIndex);
         for (let i = lo; i <= hi; i += 1) {
           const p = series.data[i];
-          const labelIndex = indexByX ? indexByX.get(Util.toXKey(p?.x)) : i;
-          const inWindow =
-            labelIndex !== undefined && labelIndex >= minIndex && labelIndex <= maxIndex;
+          const slot = mixedLabels ? Util.getMixedSlot(p?.x, mixedLabels) : i;
+          const inWindow = slot !== null && slot >= minIndex && slot < maxIndex + 1;
           const value = isHorizontal ? p?.x : p?.y;
           const v = inWindow ? value : null;
           // null뿐 아니라 NaN/Infinity도 후보에서 제외한다. 비유한값이 best로 뽑히면
@@ -1451,7 +1538,10 @@ const modules = {
       // mixed 차트에서 dataIndex 는 선택 시리즈 배열 기준이다. 나머지는 선택 점과 x 가 같은 점만 본다.
       let indexBySeries = null;
       if (this.isMixedX) {
-        indexBySeries = this.findMixedIndicesAtX(dataInfo.x, Object.keys(this.seriesList));
+        indexBySeries = dropUndrawn(
+          this.findMixedIndicesAtX(dataInfo.x, Object.keys(this.seriesList)),
+          this.seriesList,
+        );
         indexBySeries.set(seriesID, dataIndex);
       }
 
@@ -1546,6 +1636,23 @@ const modules = {
   },
 
   /**
+   * mixed 일반 bar 배치(#2352). 범주형 축(step·time categoryMode)은 labels 칸 맵이고, 그 외 축과 labels 없는
+   * categoryMode 는 x 값 위치(`byValue`)다.
+   * @returns {object|null} mixed 가 아니면 null
+   */
+  getMixedXLayout() {
+    if (!this.isMixedX) {
+      return null;
+    }
+    const axisX = this.options.axesX?.[0];
+    if (axisX?.type === 'step') {
+      return this.mixedLabels ?? NO_LABEL_SLOTS;
+    }
+    const isCategoryTime = axisX?.type === 'time' && !!axisX.categoryMode;
+    return isCategoryTime && this.mixedLabels ? this.mixedLabels : MIXED_BY_VALUE;
+  },
+
+  /**
    * mixed 차트 hover·클릭에서 시리즈별로 볼 인덱스를 정한다(#2352). 커서에 가장 가까운 유효 점의 x 를
    * 기준 시각으로 삼고, 다른 시리즈는 그 x 와 같은 점만 넣는다(없으면 Map 에 없음).
    * @returns {Map<string, number>|null} sId → findGraphData 인덱스. 스냅 반경 밖이면 null
@@ -1584,7 +1691,7 @@ const modules = {
     }
 
     const refX = getHitTestPoints(this.seriesList[ref.sId])[ref.index].x;
-    const indices = this.findMixedIndicesAtX(refX, visibleIDs);
+    const indices = dropUndrawn(this.findMixedIndicesAtX(refX, visibleIDs), this.seriesList);
     indices.set(ref.sId, ref.index);
     return indices;
   },
