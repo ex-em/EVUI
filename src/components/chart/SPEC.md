@@ -44,13 +44,13 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 - **blit 주기 리셋**: `_framesSinceFullRedraw` 가 `BLIT_REFRESH_INTERVAL`(300, 디버그 override 가능) 에 도달하면 게이트 무관 강제 full redraw 로 sub-pixel drift 를 리셋한다.
 - **blit 점당 1회 raster 불변식**: strip 은 `item.drawn` 미표시 점만 그리고, baseline rebuild(`rebuildPointsLayer`)는 `markDrawn:true` 로 그린다 — 반투명(alpha<1) 색에서도 알파 누적 없이 blit≡full.
 - **blit dedupe**: `coordinateDedupe !== false` 이고 visible scatter 가 2개 이상이면 strip/baseline 모두 좌표 owner(series) 만 그린다(hollow 마커 비침·z-order 정합). 단일 realtime series 는 push 단계 유일성 보장으로 dedupe 생략.
-- **worker 게이트**: `workerRender` opt-in + gate ready + in-flight 여유 + hitInfo/lastHitInfo 없음 + visible series 가 line/bar(timeMode 제외)/heatMap 뿐일 때만 전송. 실패/예외/미지원은 Console.warn 후 main 폴백(무회귀).
+- **worker 게이트**: `workerRender` opt-in + gate ready + in-flight 여유 + hitInfo/lastHitInfo 없음 + visible series 가 line/bar(timeMode 제외)/heatMap 뿐이고 시리즈마다 x 가 다른 mixed 차트(`isMixedX`)가 아닐 때만 전송(mixed 의 칸 폭·콤보 오프셋은 main 의 판정에 기대므로). 실패/예외/미지원은 Console.warn 후 main 폴백(무회귀).
 - **epoch 규칙**: `renderEpoch` 는 **모든** drawChart 진입에서 증가한다. worker 프레임/에러의 epoch 가 현재와 다르면 stale 로 drop(bitmap 즉시 close).
 - **present 규칙**: `clear()` 는 buffer/overlay 만 비우고 display 는 비우지 않는다. display 의 clear+blit 는 `commitToDisplay`/`commitWorkerFrame` 이 present 시점에 atomic 하게 수행하고, 직후 `_blitPrev` 스냅샷을 갱신한다.
 - **드래그 중 재렌더**: `clear()` 가 overlay 를 비우고 `updateTooltip` 이 tooltipDOM 을 비우므로, `update()` 는 마지막에 `restoreDragArtifacts` 로 진행 중 드래그의 hover(마지막 커서 위치)와 밴드를 다시 그린다 — hover 복원은 `dragSelection.updateHoverOnDrag` 가 켜진 드래그에만 해당한다(꺼져 있으면 남는 이벤트가 없다). 복원하지 않으면 라이브 갱신 차트에서 매 틱 툴팁·하이라이트·인디케이터가 사라진 채 다음 커서 이동까지 남는다. 종료된 드래그의 밴드(`dragInfoBackup`)는 `lightUpdate` 에서만 유지하고 전체 갱신에서는 폐기한다.
 - **canvas 재할당 최소화**: `setWidth`/`setHeight` 는 device px 치수가 실제로 바뀔 때만 canvas.width/height 를 재대입한다(재대입은 비트맵 소거를 유발). pointsLayer 치수 변경 시 baseline 무효화.
 - **click/dbl-click 구분**: click 콜백은 200ms 지연 실행, dbl-click 이 타이머를 취소한다(uses.js `useWidgetClickEvent`).
-- **줌 규칙**: labels 가 1개 이하면 dragZoom 토글 불가. dragZoom 실행은 `axesX[0].type === 'time'` 일 때만. `executeZoom` 은 clone 데이터를 index 범위로 filter 해 props.data 에 재주입하는 방식이다. `keepZoomStatus` true 면 데이터 갱신에도 현재 줌 구간 유지.
+- **줌 규칙**: labels 가 1개 이하면 dragZoom 토글 불가. dragZoom 실행은 `axesX[0].type === 'time'` 일 때만이고, 드래그에 걸린 전 시리즈 항목의 시각 범위(최소~최대 x, ms 비교)를 덮는 labels 인덱스 구간으로 줌한다. `executeZoom` 은 clone 데이터를 index 범위로 filter 해 props.data 에 재주입하는 방식이다 — 단 `{ x, y }` 시리즈는 시리즈마다 같은 인덱스가 같은 시각이 아닐 수 있어 `labels[start]`~`labels[end]` 시각 구간으로 자른다(시각으로 못 바꾸는 범주 라벨이면 인덱스). 줌 인덱스(`zoomStartIdx`/`zoomEndIdx`)는 항상 labels 인덱스다. `keepZoomStatus` true 면 데이터 갱신에도 현재 줌 구간 유지.
 - **selectSeries 최상위 덧그리기 게이트**: 선택 시리즈 전부가 line·비-fill·비-그룹일 때만(`selectedSeriesAllLineSafe`), brush/realTimeScatter/workerRender/legend hover 프레임 제외.
 - **범례 클릭 규칙**: `clickMode:'active'` — 전체 활성 상태에서 클릭하면 해당 시리즈만 단독 활성, 전체 비활성이 되면 전체 활성으로 복원. 그 외 모드는 마지막 1개 show 는 끌 수 없다. `eventBehavior.legendClick:'emitOnly'` 면 차트 갱신 없이 `click-legend` 만 emit.
 - **axes-scale-change**: 리스너가 없으면 payload 계산 자체를 생략. `axesX/axesY[i].scaleChange` 가 true 인 축의 labelRange(min/max)가 직전 emit 값과 다를 때만 `{x:[{minSteps,maxSteps}],y:[...]}` 를 emit.
@@ -128,7 +128,7 @@ EXEM EVUI의 Canvas 기반 차트 컴포넌트(`<ev-chart>`)를 제공한다. li
 | chart.blit.js | realtime scatter blit fast-path 프로토타입 모듈 — 게이트(evaluateBlitGate), ping-pong 레이어 관리(createPointsLayers/resizePointsLayers), 시프트+strip 본체(drawChartBlitFastPath), 합성(compositePointsLayer), baseline(rebuildPointsLayer/maybeRebuildPointsLayer, 스탬프), strip dedupe, hit-test 지연 재계산(ensureHitCoordsFresh), 진단(recordBlitDiag) |
 | chart.selection.js | selectSeries 선택 line 최상위 덧그리기 프로토타입 모듈 — line-safe 판정(selectedSeriesAllLineSafe/shouldDrawSelectedOnTop)과 부분 렌더(drawSelectedSeriesOnly) |
 | chart.inspect.js | 콘솔 조회 진입점 — 요소 부착/해제(attachInspector/detachInspector), 전역 `__EVUI_CHART__`(list/logEmpty), 조회 객체(query/queryData/redraw, 상시 기록 없이 호출 시 dataSet 계산), realTimeScatter 빈 초 자동 로그(isEmptySecondLogOn/logEmptySeconds) |
-| chartZoom.core.js | EvChartZoom 클래스 — executeZoom(index filter), dragZoom(time축), 휠 이동, 줌 이력(zoomAreaMemory previous/current/latest), 줌 애니메이션 canvas, 툴바 아이콘 상태 |
+| chartZoom.core.js | EvChartZoom 클래스 — executeZoom(index filter, `{ x, y }` 는 labels 시각 구간), dragZoom(time축), 휠 이동, 줌 이력(zoomAreaMemory previous/current/latest), 줌 애니메이션 canvas, 툴바 아이콘 상태 |
 | uses.js | `DEFAULT_OPTIONS`/`DEFAULT_DATA`, normalizeData(비-변형)/cloneChartData(toRaw+불변날짜 예외)/mergeRealTimeScatterData(보류 증분 병합), useModel(옵션·데이터 정규화, eventListeners, click/dbl-click 200ms 구분), useWrapper(wrapper 크기 style), useZoomModel(EvChartZoom 생성·zoom 옵션/데이터 동기화·brushIdx watch) |
 | helpers/helpers.util.js | 색상 파싱·rgba 캐시(512), 라벨 sign 포맷(K/M/G/T/P), 텍스트 측정(canvas 싱글톤, worker-safe lazy), ellipsis truncate, coordinateKey(`x\|y`), showLabelTip, calcBoxDistance, calcExtraWidthLabel |
 | helpers/helpers.canvas.js | calculateX/Y/SubX(값→px, ceil/floor 양자화), drawPoint/drawPointBatch(+_appendPointPath 색상 그룹 배칭), roundedRect, createGradient |
@@ -202,7 +202,7 @@ drawForeground(plot front + tip) → commitToDisplay(display clear + buffer blit
     │
 [상호작용] click/dbl-click/mouse-move/drag-select/legend → plugins.interaction/legend
     → listeners(uses.js eventListeners) → emit → v-model(selectedItem/Label/Series, legendData, zoomIdx) 갱신
-[줌] 툴바/드래그/휠 → EvChartZoom.executeZoom → props.data 를 clone 기준 index filter 로 재주입
+[줌] 툴바/드래그/휠 → EvChartZoom.executeZoom → props.data 를 clone 기준 index filter(`{ x, y }` 는 labels 시각 구간)로 재주입
     → data watcher 재진입(위 플로우 반복) + update:zoomStartIdx/EndIdx emit
 [콘솔] $0 → __EVUI_CHART__ → 조상 .ev-chart.__evuiChart__ → query·queryData(호출 시 dataSet 계산, 읽기만) / redraw(render)
 [빈 초 로그] (localStorage 켬) createRealTimeScatterDataSet 끝 → logEmptySeconds(마운트 뒤 지나간 초) → Console.warn

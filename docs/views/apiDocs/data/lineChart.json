@@ -239,7 +239,7 @@
               "name": "data",
               "type": "Object",
               "default": "{}",
-              "description": "차트에 표시할 시리즈별 데이터입니다."
+              "description": "차트에 표시할 시리즈별 데이터입니다. 값 배열(labels 와 같은 순서) 대신 { x, y } 배열을 넘기면 시리즈마다 x(시각)가 달라도 됩니다(예: 1초·5초 수집). x 는 epoch ms·Date·dayjs 이고 시리즈 안에서 오름차순이어야 합니다. 시리즈마다 x 가 다르면 툴팁·클릭 선택·인디케이터는 헤더 시각과 x 가 정확히 같은 점만 보여주고, 스택은 같은 시각의 아래 값 위에만 쌓습니다(그 시각에 아래 점이 없으면 0 위). step 축에서는 line 을 그리지 않습니다."
             },
             {
               "name": "groups",
@@ -251,7 +251,7 @@
               "name": "labels",
               "type": "Array",
               "default": "[]",
-              "description": "축의 각 눈금에 해당하는 명칭입니다. line 차트에서는 time만 인정됩니다."
+              "description": "축의 각 눈금에 해당하는 명칭입니다. line 차트에서는 time만 인정됩니다. { x, y } 시리즈의 x 가 시리즈마다 다를 때는 공통 시간 격자로 쓰입니다 — selectLabel·줌·brush 의 인덱스는 이 labels 의 인덱스이고, 그룹 indicator 공유와 범주형 축(categoryMode·step) 배치도 labels 가 있어야 동작합니다."
             }
           ]
         },
