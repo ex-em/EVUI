@@ -448,6 +448,14 @@ const modules = {
         sizeObj = this.seriesList[lineSeries].size;
       }
 
+      // 원시값·{ value } 는 그 값을, { x, y } 원소는 값 축 쪽을 읽는다(#2352 — 혼합 시리즈는 { x, y } 다).
+      const readValue = (datum) => {
+        if (datum && typeof datum === 'object' && 'x' in datum) {
+          return isHorizontal ? datum.x : datum.y;
+        }
+        return datum?.value ?? datum;
+      };
+
       data.forEach((selectedData, i) => {
         value = valueAxesSteps.graphMax;
 
@@ -455,8 +463,8 @@ const modules = {
           if (isExistGrp) {
             const positiveSum = visibleSeries?.reduce(
               (ac, sId) =>
-                groups.includes(sId) && (selectedData[sId]?.value ?? selectedData[sId]) > 0
-                  ? ac + (selectedData[sId]?.value ?? selectedData[sId])
+                groups.includes(sId) && readValue(selectedData[sId]) > 0
+                  ? ac + readValue(selectedData[sId])
                   : ac,
               0,
             );
@@ -464,7 +472,7 @@ const modules = {
             const nonGroupValues =
               visibleSeries
                 ?.filter((sId) => !groups.includes(sId))
-                ?.map((sId) => selectedData[sId]?.value ?? selectedData[sId]) ?? [];
+                ?.map((sId) => readValue(selectedData[sId])) ?? [];
 
             const maxNonGroupValue =
               nonGroupValues?.length > 0
@@ -477,7 +485,7 @@ const modules = {
                 : Math.max(maxNonGroupValue, 0);
           } else if (visibleSeries.length) {
             const visibleValue = visibleSeries.map(
-              (sId) => selectedData[sId]?.value ?? selectedData[sId],
+              (sId) => readValue(selectedData[sId]),
             );
 
             const maxValue =

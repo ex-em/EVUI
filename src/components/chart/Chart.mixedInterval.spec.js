@@ -56,6 +56,7 @@ const createMixedChart = ({ order, types, labels = [] }) => {
     SOURCE[id].secs.map((sec) => ({ x: at(sec), y: SOURCE[id].valueOf(sec) })),
   ]));
   chart.createDataSet(data, labels);
+  chart.data = { series: Object.fromEntries(order.map((id) => [id, {}])), data, labels };
 
   // timeMode bar: 1초 폭 칸을 bar 시리즈 수로 나눠 나란히 놓는다.
   const barIds = order.filter((id) => types[id] !== 'line');
@@ -184,6 +185,27 @@ describe('혼합 interval — hover(findHitItem)', () => {
       expect(xOf(onS5, 's5')).toBe(at(10));
       expect(onS5.s1).toBeUndefined();
     });
+  });
+});
+
+describe('혼합 interval — x 를 Date 로 넘길 때', () => {
+  it('hover 와 스택이 epoch ms 와 같은 결과를 낸다', () => {
+    const asDate = (secs, valueOf) => secs.map((sec) => ({ x: new Date(at(sec)), y: valueOf(sec) }));
+    const chart = createLineChart({
+      data: { s1: asDate(SEC_1, SOURCE.s1.valueOf), s5: asDate(SEC_5, SOURCE.s5.valueOf) },
+    });
+    Object.values(chart.seriesList).forEach((series) => {
+      series.data.forEach((p) => {
+        p.xp = xpOf(+p.x); // eslint-disable-line no-param-reassign
+        p.yp = Y0 - p.y; // eslint-disable-line no-param-reassign
+      });
+    });
+
+    expect(chart.isMixedX).toBe(true);
+    const { items } = chart.findHitItem([xpOf(at(10)), Y0 - 20]);
+    expect(+xOf(items, 's1')).toBe(at(10));
+    expect(+xOf(items, 's5')).toBe(at(10));
+    expect(chart.xIntervalBySeries).toEqual({ s1: 1000, s5: 5000 });
   });
 });
 
@@ -399,6 +421,55 @@ describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)',
     expect(chart.getVisibleWindowMaxSeries(0, 9)).toMatchObject({
       sId: 's5', value: 105, index: 1, domain: at(5),
     });
+  });
+});
+
+describe('혼합 interval — selectLabel(labels = 공통 시간 격자)', () => {
+  const LABELS_60 = SEC_1.map(at);
+  const createSelectChart = () => {
+    const chart = createMixedChart({
+      order: ['s5', 's1'],
+      types: { s1: 'line', s5: 'line' },
+      labels: LABELS_60,
+    });
+    chart.options = { ...chart.options, type: 'line', selectLabel: { use: true, limit: 5 } };
+    chart.defaultSelectInfo = { dataIndex: [] };
+    return chart;
+  };
+
+  it('값 기반 축에서 클릭한 점의 시각으로 labels 칸을 고른다', () => {
+    const chart = createSelectChart();
+    Object.assign(chart, {
+      chartRect: { x1: 0, x2: 800, y1: 0, y2: 400 },
+      labelOffset: { left: 0, right: 0, top: 0, bottom: 0 },
+      axesX: [{ units: { rectStart: 'x1', rectEnd: 'x2' } }],
+      scrollbar: { x: {} },
+    });
+
+    // 5초 시리즈 10초 점(5초 시리즈 data 인덱스 2) 클릭 → labels 칸 10
+    const { labelIndex } = chart.getLabelInfoByPosition([xpOf(at(10)), Y0 - 110], 'xAxis');
+    expect(labelIndex).toBe(10);
+  });
+
+  it('선택 결과 data 는 그 시각과 x 가 같은 원소만 담는다', () => {
+    const chart = createSelectChart();
+    const result = chart.getSelectedLabelInfoWithLabelData([10, 3]);
+
+    expect(result.label).toEqual([at(10), at(3)]);
+    expect(result.data[0]).toEqual({ s5: { x: at(10), y: 110 }, s1: { x: at(10), y: 20 } });
+    expect(result.data[1]).toEqual({ s5: undefined, s1: { x: at(3), y: 13 } });
+  });
+
+  it('시리즈별 선택 인덱스·tip 위치 정보도 같은 시각의 점을 쓴다', () => {
+    const chart = createSelectChart();
+
+    const selected = chart.getMixedSelectedIndices([3, 10]);
+    expect(selected.get('s1')).toEqual([3, 10]);
+    expect(selected.get('s5')).toEqual([2]);
+
+    const [atTen, atThree] = chart.getItem({ dataIndex: [10, 3] });
+    expect(atTen.acc).toBe(130);
+    expect(atThree.acc).toBe(13);
   });
 });
 

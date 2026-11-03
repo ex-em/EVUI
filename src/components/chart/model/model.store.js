@@ -318,6 +318,13 @@ const modules = {
       this.mixedLabels = { indexByX, count: labels.length };
     }
 
+    // selectLabel·줌 인덱스는 labels 칸을 가리키므로 labels 없이는 고를 칸이 없다.
+    if (!this.mixedLabels && this.options.selectLabel?.use && !this._mixedXWarnedSelectLabel) {
+      this._mixedXWarnedSelectLabel = true;
+      // eslint-disable-next-line no-console
+      console.warn('[evui] selectLabel on mixed-interval series needs data.labels.');
+    }
+
     const barIds = ids.filter((sId) => {
       const series = this.seriesList[sId];
       return series.type === 'bar' && !series.timeMode;
@@ -1381,11 +1388,16 @@ const modules = {
     let useStack = false;
     let findInfo = false;
 
+    // mixed(#2352)는 라벨 인덱스가 시리즈 data 인덱스가 아니라 labels[labelIndex] 시각과 같은 점을 본다.
+    const labelValue = this.data?.labels?.[labelIndex];
+    const mixedIndices =
+      this.isMixedX && labelValue !== undefined ? this.findMixedIndicesAtX(labelValue, sIds) : null;
+
     if (labelIndex > -1) {
       for (let ix = 0; ix < sIds.length; ix++) {
         const sId = sIds[ix];
         const series = this.seriesList[sId];
-        const data = series.data[labelIndex];
+        const data = series.data[mixedIndices ? mixedIndices.get(sId) : labelIndex];
 
         if (data && series.show && series.showLegend) {
           const ldata = isHorizontal ? data.y : data.x;
@@ -1467,6 +1479,10 @@ const modules = {
       }
 
       itemPosition = dataIndex?.map((idx) => {
+        if (this.isMixedX) {
+          return this.getMixedItemAtLabel(idx, useApproximate);
+        }
+
         const dataInfo = this.getDataByValues(firShowSeriesID, idx);
 
         if (!dataInfo) {
@@ -1590,6 +1606,52 @@ const modules = {
       }
     });
     return indices;
+  },
+
+  /**
+   * mixed 차트 selectLabel 의 라벨 인덱스 목록을 시리즈별 data 인덱스 목록으로 바꾼다(#2352).
+   * labels[라벨 인덱스] 시각과 x 가 같은 점만 담는다.
+   * @returns {Map<string, number[]>}
+   */
+  getMixedSelectedIndices(labelIndexList) {
+    const sIds = Object.keys(this.seriesList);
+    const selected = new Map(sIds.map((sId) => [sId, []]));
+    labelIndexList.forEach((labelIndex) => {
+      const labelValue = this.data?.labels?.[labelIndex];
+      if (labelValue !== undefined) {
+        this.findMixedIndicesAtX(labelValue, sIds).forEach((index, sId) => {
+          selected.get(sId).push(index);
+        });
+      }
+    });
+    return selected;
+  },
+
+  /**
+   * mixed 차트에서 선택 라벨 하나의 tip 위치 정보 — labels[labelIndex] 시각에 점이 있는 시리즈만 본다.
+   * @returns {object|null} getHitItemByPosition 결과. 그 시각에 점이 하나도 없으면 null
+   */
+  getMixedItemAtLabel(labelIndex, useApproximate) {
+    const labelValue = this.data?.labels?.[labelIndex];
+    if (labelValue === undefined) {
+      return null;
+    }
+
+    const indexBySeries = this.findMixedIndicesAtX(labelValue, Object.keys(this.seriesList));
+    const [refId, refIndex] = indexBySeries.entries().next().value ?? [];
+    const refPoint = refId ? getHitTestPoints(this.seriesList[refId])[refIndex] : null;
+    if (!refPoint) {
+      return null;
+    }
+
+    return this.getHitItemByPosition(
+      [refPoint.xp ?? 0, refPoint.yp ?? 0],
+      useApproximate,
+      labelIndex,
+      true,
+      false,
+      indexBySeries,
+    );
   },
 
   /**
@@ -1919,7 +1981,10 @@ const modules = {
         true,
         true,
       );
-      labelIndex = hitInfo.dataIndex ?? -1;
+      // mixed(#2352)의 dataIndex 는 hit 시리즈 data 인덱스라 x 의 labels 칸으로 바꾼다(labels 없으면 선택 불가).
+      labelIndex = this.isMixedX
+        ? (this.mixedLabels?.indexByX.get(Util.toXKey(hitInfo.label)) ?? -1)
+        : (hitInfo.dataIndex ?? -1);
     }
 
     return {

@@ -13,6 +13,10 @@
         <ev-toggle v-model="isSyncHover" />
         <span>축별 차트 그룹 indicator 공유(syncHover)</span>
       </label>
+      <label class="control">
+        <ev-toggle v-model="isSelectLabel" />
+        <span>selectLabel(클릭한 시각 선택, 최대 2개)</span>
+      </label>
     </div>
 
     <section
@@ -31,7 +35,10 @@
           >
             <p class="chart-title">{{ kind.title }}</p>
             <div class="chart-area">
+              <!-- selectLabel 은 차트 생성 시점에 선택 상태를 만들므로 토글하면 다시 만든다 -->
               <ev-chart
+                :key="`${kind.key}-${isSelectLabel}`"
+                v-model:selectedLabel="selectedLabels[`${axisCase.key}-${kind.key}`]"
                 :data="axisCase.charts[kind.key].data"
                 :options="axisCase.charts[kind.key].options"
               />
@@ -44,7 +51,7 @@
 </template>
 
 <script>
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import dayjs from 'dayjs';
 
 // 2026-01-01 09:00:00(로컬)부터 60초. 렌더가 매번 같도록 고정 시각·결정적 값.
@@ -128,12 +135,13 @@ const buildData = (axisDef, kind, isFiveFirst, isValueAxisLabeled) => {
   };
 };
 
-const buildOptions = (axisDef, kind) => ({
+const buildOptions = (axisDef, kind, isSelectLabel) => ({
   type: kind.type,
   width: '100%',
   height: '100%',
   legend: { show: true, position: 'top' },
   tooltip: { use: true },
+  selectLabel: { use: isSelectLabel, useSeriesOpacity: true, limit: 2 },
   axesX: [axisDef.axisX],
   axesY: [{ type: 'linear', startToZero: true, autoScaleRatio: 0.1, showGrid: true }],
 });
@@ -143,6 +151,14 @@ export default {
     const isFiveFirst = ref(false);
     const isValueAxisLabeled = ref(false);
     const isSyncHover = ref(true);
+    const isSelectLabel = ref(false);
+    // selectLabel 선택 상태는 v-model 로 들고 있어야 유지된다(차트별).
+    const selectedLabels = reactive(Object.fromEntries(
+      AXIS_DEFS.flatMap((axisDef) => CHART_KINDS.map((kind) => [
+        `${axisDef.key}-${kind.key}`,
+        { dataIndex: [] },
+      ])),
+    ));
     const groupOptions = computed(() => ({ syncHover: isSyncHover.value }));
 
     const axisCases = computed(() => AXIS_DEFS.map((axisDef) => ({
@@ -153,7 +169,7 @@ export default {
         kind.key,
         {
           data: buildData(axisDef, kind, isFiveFirst.value, isValueAxisLabeled.value),
-          options: buildOptions(axisDef, kind),
+          options: buildOptions(axisDef, kind, isSelectLabel.value),
         },
       ])),
     })));
@@ -164,6 +180,8 @@ export default {
       isFiveFirst,
       isValueAxisLabeled,
       isSyncHover,
+      isSelectLabel,
+      selectedLabels,
       groupOptions,
     };
   },

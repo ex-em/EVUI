@@ -1980,9 +1980,19 @@ const modules = {
         result.label = result.dataIndex.map((i) => this.data.labels[i]);
 
         const dataEntries = Object.entries(this.data.data);
-        result.data = result.dataIndex.map((labelIdx) =>
-          Object.fromEntries(dataEntries.map(([sId, data]) => [sId, data[labelIdx]])),
-        );
+        result.data = result.dataIndex.map((labelIdx) => {
+          if (!this.isMixedX) {
+            return Object.fromEntries(dataEntries.map(([sId, data]) => [sId, data[labelIdx]]));
+          }
+          // mixed(#2352)는 labels[labelIdx] 시각과 x 가 같은 원소를 시리즈마다 찾는다(없으면 undefined).
+          const labelKey = Util.toXKey(this.data.labels[labelIdx]);
+          return Object.fromEntries(
+            dataEntries.map(([sId, data]) => [
+              sId,
+              data?.find?.((item) => item != null && Util.toXKey(item.x) === labelKey),
+            ]),
+          );
+        });
         break;
       }
 

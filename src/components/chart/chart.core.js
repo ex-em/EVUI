@@ -995,6 +995,20 @@ class EvChart {
       }
     });
 
+    // mixed(#2352)는 선택 라벨 인덱스가 시리즈 data 인덱스가 아니라서, 시리즈마다 같은 시각 점의 인덱스로
+    // 바꿔 넘긴다(line·bar 의 selectLabel useSeriesOpacity).
+    const mixedSelected =
+      this.isMixedX && this.defaultSelectInfo?.dataIndex?.length
+        ? this.getMixedSelectedIndices?.(this.defaultSelectInfo.dataIndex)
+        : null;
+    const selectLabelOf = (sId) =>
+      mixedSelected
+        ? {
+            ...opt.selectLabel,
+            selected: { ...opt.selectLabel.selected, dataIndex: mixedSelected.get(sId) ?? [] },
+          }
+        : opt.selectLabel;
+
     /**
      * new Map<`${x}${y}`, seriesID>
      */
@@ -1028,6 +1042,7 @@ class EvChart {
             series.draw({
               legendHitInfo,
               ...opt,
+              selectLabel: selectLabelOf(series.sId),
             });
             break;
           }
@@ -1052,6 +1067,7 @@ class EvChart {
               showIndex,
               legendHitInfo,
               ...opt,
+              selectLabel: selectLabelOf(series.sId),
             });
 
             if (series.show) {
