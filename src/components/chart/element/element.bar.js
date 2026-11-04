@@ -199,12 +199,10 @@ class Bar {
     const endIndex = truthyNumber(maxIndex) ? maxIndex : (layout?.count ?? this.data.length) - 1;
     this.visibleStartIndex = startIndex;
 
-    // mixed(#2352)는 아래 정렬 루프 대신 모든 점을 x 위치(또는 x 의 라벨 칸)에 놓는다. hit-test 는 data
-    // 인덱스 공간에서 찾는데 화면 칸 ≠ data 인덱스라 전체를 대상으로 한다.
+    // mixed(#2352)는 아래 정렬 루프 대신 모든 점을 x 위치(또는 x 의 라벨 칸)에 놓는다. hit-test 범위
+    // (visibleStartIndex·filteredCount)는 화면 칸이 아니라 그려진 막대의 data 구간이다(computeMixedGeometry).
     let loopEnd = endIndex;
     if (layout) {
-      this.filteredCount = this.data.length;
-      this.visibleStartIndex = 0;
       this.computeMixedGeometry(layout, {
         cellGeo: { xsp, xArea, cArea, minmaxX, slotArea, startIndex, endIndex },
         cPad,
@@ -319,6 +317,8 @@ class Bar {
     const { cellGeo, cPad, bArea, barSeriesX, w, bPad, ysp, yArea, yZeroPosition, minmaxY } = geo;
     const { xsp, xArea } = cellGeo;
     const xep = xsp + xArea;
+    let firstDrawn = null;
+    let lastDrawn = null;
 
     for (let i = 0; i < this.data.length; i++) {
       const item = this.data[i];
@@ -351,8 +351,17 @@ class Bar {
         item.w = w; // eslint-disable-line
         item.h = h; // eslint-disable-line
         item.index = i;
+        if (firstDrawn === null) {
+          firstDrawn = i;
+        }
+        lastDrawn = i;
       }
     }
+
+    // x 가 오름차순이라 그려진 막대는 data 에서 연속 구간이다. hit-test 이진 탐색이 구간 밖 null 막대를
+    // 밟으면 한쪽으로만 가서 목표 막대를 지나치므로, 탐색 범위를 그 구간으로 좁힌다.
+    this.visibleStartIndex = firstDrawn ?? 0;
+    this.filteredCount = firstDrawn === null ? 0 : lastDrawn - firstDrawn + 1;
   }
 
   /**
@@ -454,9 +463,11 @@ class Bar {
     this.chartRect = chartRect;
     this.labelOffset = labelOffset;
     this.borderRadius = param.borderRadius;
-    this.filteredCount = layout ? this.data.length : totalCount;
-
-    this.visibleStartIndex = layout ? 0 : startIndex;
+    // mixed 는 computeGeometry 가 그려진 막대 구간으로 정한 hit-test 범위를 그대로 쓴다.
+    if (!layout) {
+      this.filteredCount = totalCount;
+      this.visibleStartIndex = startIndex;
+    }
 
     const loopStart = layout ? 0 : startIndex;
     const loopEnd = layout ? this.data.length - 1 : endIndex;

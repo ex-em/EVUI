@@ -380,6 +380,10 @@ const layoutBars = (chart, param, ids = ['s1', 's5']) => {
 
 const isDrawn = (p) => p.xp !== null && p.xp !== undefined;
 
+// 그리기 호출은 모두 무시하는 canvas context
+const createStubCtx = () =>
+  new Proxy({}, { get: (t, k) => (k in t ? t[k] : () => ({ addColorStop() {} })) });
+
 describe('혼합 interval — 범주형 축(time categoryMode) 일반 bar 배치', () => {
   afterEach(() => vi.restoreAllMocks());
 
@@ -586,9 +590,7 @@ describe('혼합 interval — 값 기반 축 일반 bar(x 값 위치)', () => {
     layoutBars(chart, param, ['s5']);
     const line = chart.seriesList.s1;
     line.combo = true;
-    // 그리기 호출은 모두 무시하는 canvas context
-    const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : () => ({ addColorStop() {} })) });
-    line.draw({ ...param, ctx, mixedXInterval: chart.getMixedBarInterval() });
+    line.draw({ ...param, ctx: createStubCtx(), mixedXInterval: chart.getMixedBarInterval() });
 
     const bars = chart.seriesList.s5.data;
     // 0초 · 25초 · 55초
@@ -877,6 +879,29 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
     const { hitId, items } = chart.findHitItem([25, 150]);
     expect(hitId).toBe('s5');
     expect(Object.keys(items).sort()).toEqual(['s1', 's5']);
+  });
+
+  it('라벨 윈도우(축 range·스크롤바)가 걸려도 윈도우 안 막대를 hover·클릭으로 찾는다', () => {
+    const chart = createStepChart({
+      types: { s1: 'categoryBar', s5: 'categoryBar' },
+      labels: SEC_1.map(clockOf),
+    });
+    // 0~20 칸만 보인다. 그리기 경로도 hit 범위를 정하므로 draw 까지 돌린다.
+    const param = {
+      ...stepParam(21),
+      ctx: createStubCtx(),
+      showSeriesCount: 2,
+      mixedXLayout: chart.getMixedXLayout(),
+      mixedXInterval: chart.getMixedBarInterval(),
+    };
+    ['s1', 's5'].forEach((id, showIndex) => chart.seriesList[id].draw({ ...param, showIndex }));
+
+    // 5초 시리즈 10초 막대(data 2). 그 뒤 막대들은 윈도우 밖이라 기하가 없다.
+    const bar = chart.seriesList.s5.data[2];
+    expect(isDrawn(chart.seriesList.s5.data[5])).toBe(false);
+    const offset = [bar.xp + 1, 290];
+    expect(chart.findHitItem(offset).hitId).toBe('s5');
+    expect(chart.getHitItemByPosition(offset)).toMatchObject({ sId: 's5', label: clockOf(10) });
   });
 });
 
