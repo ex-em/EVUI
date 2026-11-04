@@ -1180,7 +1180,7 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
     const { items } = chart.findHitItem([bar.xp + bar.w / 2, 290]);
     expect(items.s2.data.o).toBe(30);
     expect(items.s3).toBeUndefined();
-    // 3(s0) + 30(s2) + 0.5(s1 의 'a' — 반복 x 는 첫 칸) + 0(l)
+    // 3(s0) + 30(s2) + 0.5(s1 의 'a' — 반복 x 는 첫 칸). l 은 기하를 채우지 않아 그리지 않은 점으로 빠진다.
     expect(chart.getItem({ seriesID: 's0', dataIndex: 2 })[0].acc).toBe(33.5);
   });
 
