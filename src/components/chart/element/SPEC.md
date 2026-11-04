@@ -25,12 +25,12 @@ EvChart의 시리즈(그래프 본체)를 캔버스에 그리는 타입별 렌�
 - **기하 메모이즈**: `(dataEpoch, scaleVersion)` + `this.data` 참조가 직전과 같으면 computeGeometry skip. 버전 미전달 시 항상 재계산.
 - **히트 테스트**: X축 기준 이진 탐색으로 최근접 포인트 탐색(임계값 = 평균 데이터 간격). Y 거리 15px 이내면 `hit`, 포인트 중심 반경(`max(pointSize + LINE_OPTION.pointSize, highlight.maxSize)`) 이내면 `directHit`(combo에서 bar보다 line 우선 판정용). `findApproximateData`는 X·Y 유클리드 거리 기반 근사 탐색(간격 40% 또는 최소 10px 감지 범위, 5px 미만이면 hit).
 - **선택/범례 강조**: extent 3단계 — downplay(opacity 0.3, lineWidth ×1) / normal(1, ×1) / highlight(1, ×2). downplay 시 opacity는 `unSelectedOpacity`로 대체.
-- **combo 오프셋**: `combo: true` 면 x 영역을 막대 한 칸만큼 줄이고 반 칸 밀어 점을 막대 칸 가운데에 맞춘다. 칸 폭은 기본 `축 길이 / data.length`, mixed 차트는 TimeBar 와 같은 `param.mixedXInterval` 픽셀 폭이다.
+- **combo 오프셋**: `combo: true` 면 x 영역을 막대 한 칸만큼 줄이고 반 칸 밀어 점을 막대 칸 가운데에 맞춘다. 칸 폭은 기본 `축 길이 / data.length`, mixed 차트는 bar 와 같은 공통 칸 폭(`축 길이 × param.mixedXInterval / (구간 + param.mixedXInterval)`)이다 — 값 기반 축 일반 bar 도 같은 줄인 폭 위에 놓이므로 점이 같은 시각 막대 칸 가운데에 온다.
 
 ### Bar (element.bar.js)
 
 - **수직/수평/스택 바 렌더**: `isHorizontal` 분기, 스택(`isExistGrp`)은 `item.b`(누적 base) 기준 위치 재계산. 값이 0이 아닌데 픽셀 크기가 0으로 떨어지면 최소 ±1px 보정(`w/h === null`인 range 밖 신호는 보정 제외).
-- **범주 칸 배치**: 막대는 데이터 배열 인덱스 순서로 칸(`cArea = 축 길이 / 칸 수`)에 놓는다. 시리즈마다 x 가 다른 mixed 차트는 model `getMixedXLayout()` 이 준 `param.mixedXLayout` 으로 모든 점을 그린다 — 값 기반 축(time·linear, labels 없는 categoryMode 포함)은 timeMode bar 처럼 x 값 위치에 공통 간격 폭(`getCategoryArea`)으로 놓고 축 끝 시각의 막대는 그래프 영역 안으로 당긴다. 범주형 축(time categoryMode·step)은 x 와 같은 labels 칸에 놓고, labels 에 없는 시각은 앞뒤 칸 사이를 시간 비율로 보간한 자리(`Util.getMixedSlot`)에 놓으며, 시리즈가 라벨보다 촘촘하면 칸 폭을 그 비율로 나눈다(5초 라벨에 1초 시리즈면 칸의 1/5). step 축(문자열 범주)은 model 이 labels 에 없는 x 를 범주로 끼워 늘린 labels 칸에 놓는다. 정렬 차트에서도 그리지 않는 경우(step 축 line·timeMode bar, 축 끝 시각의 timeMode bar)는 mixed 에서도 그리지 않는다. 축·가시 칸 밖 막대는 기하를 null 로 비워 그리지도 hit 되지도 않는다. mixed 배치는 정렬 루프와 분리된 `computeMixedGeometry` 가 맡아 정렬 차트의 기하 루프는 바뀌지 않는다. 이때 hit-test 용 `visibleStartIndex`/`filteredCount` 는 data 전체(0, data.length)이고, draw 는 computeGeometry 가 정한 x 를 그대로 쓴다.
+- **범주 칸 배치**: 막대는 데이터 배열 인덱스 순서로 칸(`cArea = 축 길이 / 칸 수`)에 놓는다. 시리즈마다 x 가 다른 mixed 차트는 model `getMixedXLayout()` 이 준 `param.mixedXLayout` 으로 모든 점을 그린다 — 값 기반 축(time·linear, labels 없는 categoryMode 포함)은 공통 간격 폭(`getCategoryArea` — 축 끝 시각도 한 칸을 차지하도록 `구간 + 간격` 으로 나눈다)의 칸을, 그래프 폭에서 그 한 칸을 뺀 폭 위의 x 값 비율 자리에 놓는다. 칸이 서로 겹치지 않고, 간격이 고르고 축 범위가 첫~마지막 x 와 같으면(time 축 기본) 정렬 차트의 칸과 같으며, 막대 가운데는 축 눈금 시각에서 최대 반 칸 벗어난다. 막대가 그래프 영역을 넘으면 안으로 당긴다. 범주형 축(time categoryMode·step)은 x 와 같은 labels 칸에 놓고, labels 에 없는 시각은 앞뒤 칸 사이를 시간 비율로 보간한 자리(`Util.getMixedSlot`)에 놓으며, 시리즈가 라벨보다 촘촘하면 칸 폭을 그 비율로 나눈다(5초 라벨에 1초 시리즈면 칸의 1/5). step 축(문자열 범주)은 model 이 labels 에 없는 x 를 범주로 끼워 늘린 labels 칸에 놓는다. 정렬 차트에서도 그리지 않는 경우(step 축 line·timeMode bar, 축 끝 시각의 timeMode bar)는 mixed 에서도 그리지 않는다. 축·가시 칸 밖 막대는 기하를 null 로 비워 그리지도 hit 되지도 않는다. mixed 배치는 정렬 루프와 분리된 `computeMixedGeometry` 가 맡아 정렬 차트의 기하 루프는 바뀌지 않는다. 이때 hit-test 용 `visibleStartIndex`/`filteredCount` 는 data 전체(0, data.length)이고, draw 는 computeGeometry 가 정한 x 를 그대로 쓴다.
 - **가시 인덱스 윈도우**: `minIndex/maxIndex`(axesSteps)가 지정되면 그 범위만 그린다. 빈 윈도우 sentinel `{ minIndex: 0, maxIndex: -1 }`은 0회 루프로 아무것도 그리지 않음. `visibleStartIndex`/`filteredCount`를 기록해 히트 테스트가 소비.
 - **두께 계산 `calculateBarSize`**: `'Npx'` 문자열이면 `min(bArea, N)`, 0~1 숫자면 `ceil(bArea × ratio)`, 그 외 bArea 전체.
 - **값 라벨 `drawValueLabels`**: align start/center/out/end(기본). 스택 바에서 `out`은 미지원(console.warn 후 미표시). 텍스트가 막대 안에 들어가지 않으면 그리지 않음.
@@ -42,7 +42,7 @@ EvChart의 시리즈(그래프 본체)를 캔버스에 그리는 타입별 렌�
 ### TimeBar (element.bar.time.js)
 
 - **시간 진행형 바**: Bar 상속. `Canvas.calculateSubX`로 X를 구해 차트 좌/우 경계에 걸친 막대를 `subW` 누적으로 부분 클리핑. gradient 색상일 때 draw가 적용하는 w 보정을 computeGeometry에도 동일 반영. `cPad`는 2로 고정. 기하 메모이즈 없음(매 호출 재계산).
-- **칸 폭(`getCategoryArea`)**: 기본은 시리즈 자기 점 개수로 나눈 `축 길이 / data.length`. mixed 차트는 `param.mixedXInterval`(보이는 timeMode bar 시리즈 간격 중 최솟값, model `getMixedBarInterval`)의 픽셀 폭을 칸으로 쓰고 그 안에서 `showSeriesCount` 로 나란히 놓는다. 시리즈 시각이 그 간격의 격자 위에 있으면(예: 1초·5초) 막대가 겹치지 않는다.
+- **칸 폭(`getCategoryArea`)**: 기본은 시리즈 자기 점 개수로 나눈 `축 길이 / data.length`. mixed 차트는 `param.mixedXInterval`(보이는 timeMode bar 시리즈 간격 중 최솟값, model `getMixedBarInterval`) 한 칸의 폭(`축 길이 × 간격 / (구간 + 간격)` — 축 끝 시각도 한 칸을 차지한다)을 쓰고 그 안에서 `showSeriesCount` 로 나란히 놓는다. 시리즈 시각이 그 간격의 격자 위에 있으면(예: 1초·5초) 막대가 겹치지 않는다.
 
 ### Pie (element.pie.js)
 
@@ -99,7 +99,7 @@ EvChart의 시리즈(그래프 본체)를 캔버스에 그리는 타입별 렌�
 - heatmap 셀 border는 `2 × lineWidth`가 셀 폭·높이(floor) 미만일 때만 그려지고, 기하 좌표도 동일하게 보정된다.
 - blit strip 경로에서 이미 `drawn: true`인 scatter 점은 다시 그려지지 않는다(반투명 색에서도 full redraw와 픽셀 동일).
 - tip은 `dp === null`(axis range 밖)이면 그려지지 않는다 — 좌상단 (0,0) 부근에 유령 tip이 생기지 않는다.
-- mixed 차트에서 1초·5초 timeMode bar 는 같은 폭으로 같은 1초 칸 안에 나란히 놓이고, 일반 bar 는 모든 점이 그려진다 — 값 기반 축은 x 값 위치(축 끝 시각 포함), categoryMode 는 x 의 labels 칸이고 labels 에 없는 시각(5초 격자 + 끼어든 시각에 1초 시리즈)은 칸 사이에 시간 순으로 겹치지 않게 놓인다. maxTip 은 그 막대 위에 놓인다. step 축은 labels 에 없는 문자열 x 도 늘어난 범주 칸에 일반 bar 가 그려진다. x 가 같은 기존 차트의 기하는 바뀌지 않는다. (Chart.mixedInterval.spec.js, Chart.visual.spec.js)
+- mixed 차트에서 1초·5초 timeMode bar 는 같은 폭으로 같은 1초 칸 안에 나란히 놓이고, 일반 bar 는 모든 점이 그려진다 — 값 기반 축은 x 값 비율 자리에 칸이 겹치지 않게(축 끝 시각의 두 시리즈도 나란히, 간격이 고르고 축 범위가 첫~마지막 x 면 정렬 차트와 같은 칸·폭) 놓이고 combo line 점은 같은 시각 막대 칸 가운데에 찍힌다, categoryMode 는 x 의 labels 칸이고 labels 에 없는 시각(5초 격자 + 끼어든 시각에 1초 시리즈)은 칸 사이에 시간 순으로 겹치지 않게 놓인다. maxTip 은 그 막대 위에 놓인다. step 축은 labels 에 없는 문자열 x 도 늘어난 범주 칸에 일반 bar 가 그려진다. x 가 같은 기존 차트의 기하는 바뀌지 않는다. (Chart.mixedInterval.spec.js, Chart.visual.spec.js)
 
 ## Architecture
 

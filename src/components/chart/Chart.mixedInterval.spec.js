@@ -33,7 +33,7 @@ const createSeries = (type, id, idx) => {
   return new TimeBar(id, { name: id, timeMode: true }, idx, false);
 };
 
-const createMixedChart = ({ order, types, labels = [], axesX }) => {
+const createMixedChart = ({ order, types, labels = [], axesX, source = SOURCE }) => {
   const seriesList = {};
   const charts = { line: [], bar: [], scatter: [], pie: [], heatMap: [] };
 
@@ -55,7 +55,7 @@ const createMixedChart = ({ order, types, labels = [], axesX }) => {
   const data = Object.fromEntries(
     order.map((id) => [
       id,
-      SOURCE[id].secs.map((sec) => ({ x: at(sec), y: SOURCE[id].valueOf(sec) })),
+      source[id].secs.map((sec) => ({ x: at(sec), y: source[id].valueOf(sec) })),
     ]),
   );
   chart.createDataSet(data, labels);
@@ -360,7 +360,8 @@ describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {
     line.combo = true;
     line.computeGeometry(geometryParam({ mixedXInterval: chart.getMixedBarInterval() }));
 
-    expect(line.size.comboOffset).toBe(10);
+    // 60초 구간 + 축 끝 시각 한 칸 = 1초 칸 61개
+    expect(line.size.comboOffset).toBeCloseTo(600 / 61);
   });
 });
 
@@ -510,6 +511,93 @@ describe('혼합 interval — 값 기반 축 일반 bar(x 값 위치)', () => {
     const last = chart.seriesList.s1.data[59];
     expect(isDrawn(last)).toBe(true);
     expect(last.xp + last.w).toBeLessThanOrEqual(600);
+  });
+
+  it('축 끝 시각의 두 시리즈 막대가 한 자리에 겹치지 않고 나란히 놓인다', () => {
+    const chart = createMixedChart({
+      order: ['s1', 's5'],
+      types: { s1: 'categoryBar', s5: 'categoryBar' },
+    });
+    // 막대를 칸 몫보다 좁게 둬 반올림 1px 겹침과 구분한다.
+    layoutBars(chart, { ...valueAxisParam(at(55)), thickness: 0.5 });
+
+    const [s1At54, s1At55] = chart.seriesList.s1.data.slice(54, 56);
+    const s5At55 = chart.seriesList.s5.data[11];
+    expect(s5At55.xp).toBeGreaterThanOrEqual(s1At55.xp + s1At55.w);
+    expect(s5At55.xp + s5At55.w).toBeLessThanOrEqual(600);
+    expect(s1At54.xp + s1At54.w).toBeLessThanOrEqual(s1At55.xp);
+  });
+
+  // 같은 시각 격자를 labels 로 넘긴 정렬 차트. 5초 시리즈는 자기 시각이 아닌 칸이 null 이다.
+  const createAlignedBars = (source, secs) => {
+    const ids = ['s1', 's5'];
+    const chart = Object.assign(Object.create(interaction), store, {
+      seriesList: Object.fromEntries(ids.map((id, idx) => [id, new Bar(id, { name: id }, idx)])),
+      seriesInfo: { charts: { line: [], bar: ids, scatter: [], pie: [], heatMap: [] } },
+      options: { horizontal: false, axesX: [{ type: 'time' }] },
+    });
+    const data = Object.fromEntries(
+      ids.map((id) => [
+        id,
+        secs.map((sec) => (source[id].secs.includes(sec) ? source[id].valueOf(sec) : null)),
+      ]),
+    );
+    chart.createDataSet(data, secs.map(at));
+    return chart;
+  };
+
+  it.each([
+    { name: '1초 60점 · 5초 12점', source: SOURCE, lastSec: 59 },
+    {
+      name: '점이 적은 구간(1초 3점 · 5초 1점)',
+      source: { s1: { secs: [0, 1, 2], valueOf: (sec) => 10 + sec }, s5: SOURCE.s5 },
+      lastSec: 2,
+    },
+  ])('고른 간격이면 정렬 차트와 같은 칸에 같은 폭으로 놓인다 — $name', ({ source, lastSec }) => {
+    const secs = Array.from({ length: lastSec + 1 }, (_, i) => i);
+    const inRange = {
+      ...source,
+      s5: { ...source.s5, secs: source.s5.secs.filter((s) => s <= lastSec) },
+    };
+    const types = { s1: 'categoryBar', s5: 'categoryBar' };
+    const mixed = createMixedChart({ order: ['s1', 's5'], types, source: inRange });
+    const aligned = createAlignedBars(inRange, secs);
+    expect(mixed.isMixedX).toBe(true);
+    expect(aligned.isMixedX).toBe(false);
+
+    const param = valueAxisParam(at(lastSec));
+    layoutBars(mixed, param);
+    layoutBars(aligned, param);
+
+    ['s1', 's5'].forEach((id) => {
+      mixed.seriesList[id].data.forEach((p) => {
+        const a = aligned.seriesList[id].data[(p.x - BASE) / 1000];
+        expect([p.xp, p.w]).toEqual([a.xp, a.w]);
+      });
+    });
+  });
+
+  it('line 콤보 점은 같은 시각 막대 칸 가운데에 찍힌다', () => {
+    const chart = createMixedChart({
+      order: ['s1', 's5'],
+      types: { s1: 'line', s5: 'categoryBar' },
+    });
+    const param = valueAxisParam(at(59));
+    layoutBars(chart, param, ['s5']);
+    const line = chart.seriesList.s1;
+    line.combo = true;
+    // 그리기 호출은 모두 무시하는 canvas context
+    const ctx = new Proxy({}, { get: (t, k) => (k in t ? t[k] : () => ({ addColorStop() {} })) });
+    line.draw({ ...param, ctx, mixedXInterval: chart.getMixedBarInterval() });
+
+    const bars = chart.seriesList.s5.data;
+    // 0초 · 25초 · 55초
+    [0, 5, 11].forEach((k) => {
+      const centerOfBar = bars[k].xp + bars[k].w / 2;
+      expect(Math.abs(line.data[k * 5].xp - centerOfBar)).toBeLessThan(1);
+    });
+    // 툴팁·tip 위치가 쓰는 오프셋(그리기 경로에서 다시 정한다)도 막대 칸 폭과 같다.
+    expect(line.size.comboOffset).toBeCloseTo(chart.seriesList.s5.size.cat);
   });
 
   it('line 콤보 툴팁·selectItem 에 같은 시각 막대가 함께 담긴다', () => {

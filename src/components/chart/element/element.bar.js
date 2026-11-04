@@ -36,12 +36,13 @@ class Bar {
 
   /**
    * 막대 한 칸의 픽셀 폭. mixed(#2352)면 시리즈 자기 점 개수가 아니라 공통 최소 간격의 폭을 쓴다 —
-   * 1초·5초 시리즈의 막대 폭을 맞추고 같은 칸 안에 나란히 놓기 위해서다.
+   * 1초·5초 시리즈의 막대 폭을 맞추고 같은 칸 안에 나란히 놓기 위해서다. 축 끝 시각도 한 칸을 차지하므로
+   * (구간 + 한 간격)을 나눈다 — 축 범위가 첫~마지막 x 이고 간격이 고르면 정렬 차트의 칸 폭과 같다.
    * @returns {number}
    */
   getCategoryArea(dArea, minmaxX, mixedXInterval) {
     if (mixedXInterval) {
-      return (dArea * mixedXInterval) / (minmaxX.graphMax - minmaxX.graphMin);
+      return (dArea * mixedXInterval) / (minmaxX.graphMax - minmaxX.graphMin + mixedXInterval);
     }
     return dArea / (this.data.length || 1);
   }
@@ -61,15 +62,20 @@ class Bar {
   }
 
   /**
-   * mixed(#2352) 막대 한 개가 놓일 칸의 시작 픽셀(놓을 자리가 없으면 null). 값 위치 배치는 x 값 위치,
-   * 범주형 축은 x 의 labels 칸(칸 사이 시각은 보간)이다.
+   * mixed(#2352) 막대 한 개가 놓일 칸의 시작 픽셀(놓을 자리가 없으면 null). 값 위치 배치는 마지막 칸 자리를
+   * 뺀 폭 위의 x 값 비율(칸이 겹치지 않고 combo line 점이 칸 가운데에 온다), 범주형 축은 x 의 labels 칸
+   * (칸 사이 시각은 보간)이다.
    * @returns {number|null}
    */
-  getMixedCellStart(xValue, layout, { xsp, xArea, minmaxX, slotArea, startIndex, endIndex }) {
+  getMixedCellStart(
+    xValue,
+    layout,
+    { xsp, xArea, cArea, minmaxX, slotArea, startIndex, endIndex },
+  ) {
     if (layout.byValue) {
       const t = +xValue;
       return t >= minmaxX.graphMin && t <= minmaxX.graphMax
-        ? Canvas.calculateSubX(t, minmaxX.graphMin, minmaxX.graphMax, xArea, xsp)
+        ? Canvas.calculateSubX(t, minmaxX.graphMin, minmaxX.graphMax, xArea - cArea, xsp)
         : null;
     }
 
@@ -200,7 +206,7 @@ class Bar {
       this.filteredCount = this.data.length;
       this.visibleStartIndex = 0;
       this.computeMixedGeometry(layout, {
-        cellGeo: { xsp, xArea, minmaxX, slotArea, startIndex, endIndex },
+        cellGeo: { xsp, xArea, cArea, minmaxX, slotArea, startIndex, endIndex },
         cPad,
         bArea,
         barSeriesX,
