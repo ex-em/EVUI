@@ -377,6 +377,19 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     expect(chart.isMixedX).toBe(false);
     expect(bases(chart, 'pt')).toEqual([100, 105, 110]);
   });
+
+  it('맨 아래가 x 가 labels 와 자리마다 같은 { x, y } 여도 인덱스로 쌓는다(중복 라벨 포함)', () => {
+    const labels = ['a', 'b', 'a', 'c'];
+    const chart = createGroupStack(
+      [
+        ['pt', labels.map((x, i) => ({ x, y: 10 * (i + 1) }))],
+        ['raw2', [100, 100, 100, 100]],
+      ],
+      labels,
+    );
+    expect(chart.isMixedX).toBe(false);
+    expect(bases(chart, 'raw2')).toEqual([10, 20, 30, 40]);
+  });
 });
 
 describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {

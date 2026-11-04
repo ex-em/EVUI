@@ -348,9 +348,11 @@ const modules = {
                   tops = stackTops.get(series.groupIndex);
                   if (!tops) {
                     // { x, y } 스택은 시리즈마다 같은 인덱스가 같은 시각이 아닐 수 있어 시각을 키로 쌓는다.
-                    tops = Util.isPointSeries(sData)
-                      ? { pos: new Map(), neg: new Map(), byX: true }
-                      : { pos: [], neg: [] };
+                    // x 가 labels 와 자리마다 같으면 원시값처럼 인덱스로 쌓는다(중복 라벨도 칸마다).
+                    tops =
+                      Util.isPointSeries(sData) && !Util.isAlignedToLabels(sData, label)
+                        ? { pos: new Map(), neg: new Map(), byX: true }
+                        : { pos: [], neg: [] };
                     stackTops.set(series.groupIndex, tops);
                   } else if (
                     !tops.byX &&
