@@ -314,6 +314,69 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
       { x: at(5), y: 115, o: 100, b: 15 },
     ]);
   });
+
+  // 원시값 시리즈가 섞인 그룹 — entries 는 스택 순서대로 [id, data]
+  const createGroupStack = (entries, labels) => {
+    const ids = entries.map(([id]) => id);
+    const seriesList = Object.fromEntries(
+      ids.map((id, idx) => [
+        id,
+        Object.assign(new Line(id, { name: id }, idx), {
+          isExistGrp: true,
+          stackIndex: idx,
+          groupIndex: 0,
+        }),
+      ]),
+    );
+    const chart = Object.assign(Object.create(interaction), store, {
+      seriesList,
+      seriesInfo: { charts: { line: ids, bar: [], scatter: [], pie: [], heatMap: [] } },
+      options: { horizontal: false },
+    });
+    chart.createDataSet(Object.fromEntries(entries), labels);
+    return chart;
+  };
+  const bases = (chart, id) => chart.seriesList[id].data.map(({ b }) => b);
+  const LABELS_5 = [0, 5, 10, 15].map(at);
+  const ONES = points([0, 1, 2, 3, 4, 5, 10, 15], () => 1);
+
+  it('아래 원시값 · 위 1초 { x, y }: 같은 인덱스가 아니라 같은 시각의 원시값 위에 쌓는다', () => {
+    const chart = createGroupStack(
+      [
+        ['raw', [100, 105, 110, 115]],
+        ['pt', ONES],
+      ],
+      LABELS_5,
+    );
+    expect(chart.isMixedX).toBe(true);
+    expect(bases(chart, 'pt')).toEqual([100, 0, 0, 0, 0, 105, 110, 115]);
+  });
+
+  it('{ x, y } 위에 다시 원시값이 오면 그 원시값도 같은 시각의 top 위에 쌓는다', () => {
+    const chart = createGroupStack(
+      [
+        ['raw', [100, 105, 110, 115]],
+        ['pt', points([0, 1, 2, 3, 4, 5, 10, 15], (sec) => sec + 1)],
+        ['raw2', [1000, 1000, 1000, 1000]],
+      ],
+      LABELS_5,
+    );
+    // 0·5·10·15초 원시값 + 같은 시각 { x, y } 값(1·6·11·16)
+    expect(bases(chart, 'raw2')).toEqual([101, 111, 121, 131]);
+  });
+
+  it('x 가 labels 와 자리마다 같은 { x, y } 는 정렬 차트처럼 인덱스로 쌓는다(중복 라벨 포함)', () => {
+    const labels = [at(0), at(5), at(0)];
+    const chart = createGroupStack(
+      [
+        ['raw', [100, 105, 110]],
+        ['pt', labels.map((x) => ({ x, y: 1 }))],
+      ],
+      labels,
+    );
+    expect(chart.isMixedX).toBe(false);
+    expect(bases(chart, 'pt')).toEqual([100, 105, 110]);
+  });
 });
 
 describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {

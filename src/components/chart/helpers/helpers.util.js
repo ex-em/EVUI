@@ -355,6 +355,18 @@ export default {
   },
 
   /**
+   * { x, y } 시리즈의 x 가 labels 와 길이·자리마다 같은지(#2352). 같으면 원시값 시리즈와 인덱스가 같은 시각이라
+   * 정렬 차트처럼 인덱스로 맞춘다. null 원소는 그 자리를 지킨 것으로 본다.
+   * @returns {boolean}
+   */
+  isAlignedToLabels(points, labels) {
+    return (
+      points.length === labels?.length &&
+      points.every((point, i) => point == null || this.toXKey(point.x) === this.toXKey(labels[i]))
+    );
+  },
+
+  /**
    * Comparing strings
    * @param {array} array    compared array
    *

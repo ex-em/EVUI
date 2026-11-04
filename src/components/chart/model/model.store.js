@@ -147,6 +147,16 @@ const getStackTop = (tops, isPositive, index, labelValue) => {
   return tops.byX ? bucket.get(Util.toXKey(labelValue)) : bucket[index];
 };
 
+// 원시값 시리즈가 쌓은 인덱스 top 을 시각 키 top 으로 바꾼다 — 인덱스는 labels 인덱스다.
+const toStackTopsByX = ({ pos, neg }, label) => {
+  const toMap = (bucket) => {
+    const byX = new Map();
+    bucket.forEach((top, index) => byX.set(Util.toXKey(label[index]), top));
+    return byX;
+  };
+  return { pos: toMap(pos), neg: toMap(neg), byX: true };
+};
+
 // findGraphData 가 인덱싱하는 배열 — line 은 x 가 있는 점만 거른 배열, 그 외는 data 그대로.
 const getHitTestPoints = (series) =>
   typeof series._getValidGData === 'function' ? series._getValidGData() : (series.data ?? []);
@@ -336,6 +346,14 @@ const modules = {
                     tops = Util.isPointSeries(sData)
                       ? { pos: new Map(), neg: new Map(), byX: true }
                       : { pos: [], neg: [] };
+                    stackTops.set(series.groupIndex, tops);
+                  } else if (
+                    !tops.byX &&
+                    Util.isPointSeries(sData) &&
+                    !Util.isAlignedToLabels(sData, label)
+                  ) {
+                    // 원시값 위에 x 가 labels 와 어긋난 { x, y } 가 오면 같은 시각끼리 쌓도록 시각 키로 바꾼다.
+                    tops = toStackTopsByX(tops, label);
                     stackTops.set(series.groupIndex, tops);
                   }
                 }
