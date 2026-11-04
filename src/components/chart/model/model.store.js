@@ -28,55 +28,113 @@ const getMedianGap = (values) => {
   return gaps.length ? gaps[Math.floor(gaps.length / 2)] : null;
 };
 
+// 범주 순서가 labels·시리즈 순서로 정해지지 않을 때의 비교 — 숫자·Date 는 값, 그 외는 문자열 사전순.
+const compareXKey = (a, b) => {
+  if (typeof a === 'number' && typeof b === 'number') {
+    return a - b;
+  }
+  const sa = String(a);
+  const sb = String(b);
+  if (sa === sb) {
+    return 0;
+  }
+  return sa < sb ? -1 : 1;
+};
+
 /**
- * step 축(범주) mixed(#2352)의 범주 목록 — labels 에 없는 x 를 그 시리즈 바로 앞 점의 범주 뒤에 끼운다
- * (시리즈 x 가 오름차순이라 시각 문자열은 시간 순이 유지된다). 같은 자리는 먼저 나온 순. 끼울 게 없으면 null.
+ * step 축(범주) mixed(#2352)의 범주 목록 — labels 순서와 각 시리즈 x 순서를 모두 지키며 labels 에 없는 x 를
+ * 끼우고, 두 순서로 앞뒤가 안 정해지는 값끼리는 compareXKey 로 놓는다. 끼울 게 없으면 null.
  * @returns {array|null}
  */
 const buildMixedCategories = (labels, pointLists) => {
-  const HEAD = {};
-  const known = new Set(labels.map((labelValue) => Util.toXKey(labelValue)));
-  const childrenOf = new Map();
-  const valueOf = new Map();
+  // 라벨은 자리마다(중복 라벨 포함), 끼울 x 는 키마다 노드 하나. 간선 = "앞에 와야 한다".
+  const values = [];
+  const keys = [];
+  const nextOf = [];
+  const inDegree = [];
+  const addNode = (value, key) => {
+    values.push(value);
+    keys.push(key);
+    nextOf.push([]);
+    inDegree.push(0);
+    return values.length - 1;
+  };
+  const addEdge = (from, to) => {
+    if (from !== to) {
+      nextOf[from].push(to);
+      inDegree[to] += 1;
+    }
+  };
+
+  const labelNodeOf = new Map();
+  labels.forEach((labelValue, i) => {
+    const key = Util.toXKey(labelValue);
+    const id = addNode(labelValue, key);
+    if (!labelNodeOf.has(key)) {
+      labelNodeOf.set(key, id);
+    }
+    if (i > 0) {
+      addEdge(id - 1, id);
+    }
+  });
+
+  const insertedNodeOf = new Map();
   pointLists.forEach((points) => {
-    let prevKey = HEAD;
+    let prev = null;
     points.forEach((point) => {
       const key = Util.toXKey(point.x);
-      if (!known.has(key)) {
-        known.add(key);
-        valueOf.set(key, point.x);
-        if (!childrenOf.has(prevKey)) {
-          childrenOf.set(prevKey, []);
-        }
-        childrenOf.get(prevKey).push(key);
+      let id = labelNodeOf.get(key) ?? insertedNodeOf.get(key);
+      if (id === undefined) {
+        id = addNode(point.x, key);
+        insertedNodeOf.set(key, id);
       }
-      prevKey = key;
+      if (prev !== null) {
+        addEdge(prev, id);
+      }
+      prev = id;
     });
   });
-  if (!childrenOf.size) {
+  if (!insertedNodeOf.size) {
     return null;
   }
 
-  const result = [];
-  // 끼운 범주가 또 끼운 범주를 부르는 사슬(1초 시리즈)이 길어도 재귀하지 않는다.
-  const pushInserted = (rootKey) => {
-    const stack = (childrenOf.get(rootKey) ?? []).slice().reverse();
-    childrenOf.delete(rootKey);
-    while (stack.length) {
-      const key = stack.pop();
-      result.push(valueOf.get(key));
-      const children = childrenOf.get(key);
-      childrenOf.delete(key);
-      for (let i = (children?.length ?? 0) - 1; i >= 0; i--) {
-        stack.push(children[i]);
-      }
+  // 위상 정렬. 준비된 노드는 시리즈 수 + 1 개를 넘지 않아 선형 탐색으로 고른다. 순서가 서로 어긋난
+  // 입력(순환)이면 아직 안 놓인 가장 앞 노드를 놓아 모든 값을 한 번씩 담는다.
+  const placed = new Array(values.length).fill(false);
+  const ready = [];
+  inDegree.forEach((degree, id) => {
+    if (degree === 0) {
+      ready.push(id);
     }
-  };
-  pushInserted(HEAD);
-  labels.forEach((labelValue) => {
-    result.push(labelValue);
-    pushInserted(Util.toXKey(labelValue));
   });
+  const result = [];
+  let cursor = 0;
+  while (result.length < values.length) {
+    let pick = -1;
+    let pickAt = -1;
+    ready.forEach((id, at) => {
+      const order = pick === -1 ? -1 : compareXKey(keys[id], keys[pick]);
+      if (order < 0 || (order === 0 && id < pick)) {
+        pick = id;
+        pickAt = at;
+      }
+    });
+    if (pick === -1) {
+      while (placed[cursor]) cursor += 1;
+      pick = cursor;
+    } else {
+      ready.splice(pickAt, 1);
+    }
+
+    placed[pick] = true;
+    result.push(values[pick]);
+    nextOf[pick].forEach((id) => {
+      inDegree[id] -= 1;
+      if (inDegree[id] === 0 && !placed[id]) {
+        ready.push(id);
+      }
+    });
+  }
   return result;
 };
 

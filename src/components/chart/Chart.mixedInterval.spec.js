@@ -662,6 +662,106 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
     expect(chart.isMixedX).toBe(false);
     expect(chart.data.labels).toBe(labels);
   });
+
+  const pointsAt = (secs) => secs.map((sec) => ({ x: clockOf(sec), y: sec }));
+  // 각 시리즈 점의 범주 칸이 data 순서대로 오름차순이어야 hover·클릭의 이진 탐색이 맞는다.
+  const expectSlotsAscending = (chart, ids) => {
+    const { indexByX } = chart.getMixedXLayout();
+    ids.forEach((id) => {
+      const slots = chart.seriesList[id].data.map((p) => indexByX.get(p.x));
+      expect(slots).toEqual([...slots].sort((a, b) => a - b));
+    });
+  };
+
+  it.each([
+    {
+      name: '성긴 시리즈가 먼저 와도',
+      types: { s5: 'categoryBar', s1: 'categoryBar' },
+      labels: [],
+      extra: {},
+      expected: SEC_1,
+    },
+    {
+      name: '서로 다른 시리즈가 같은 라벨 구간에 끼워도',
+      types: { s4: 'categoryBar', s3: 'categoryBar' },
+      labels: [clockOf(0), clockOf(10)],
+      extra: { s4: pointsAt([0, 4, 8]), s3: pointsAt([0, 3, 6, 9]) },
+      expected: [0, 3, 4, 6, 8, 9, 10],
+    },
+    {
+      name: '시리즈가 라벨을 건너뛰어도',
+      types: { s7: 'categoryBar', s5: 'categoryBar' },
+      labels: [clockOf(0), clockOf(5), clockOf(10)],
+      extra: { s7: pointsAt([0, 7, 14]), s5: pointsAt([0, 5, 10]) },
+      expected: [0, 5, 7, 10, 14],
+    },
+  ])('늘린 범주는 시간 순이다 — $name', ({ types, labels, extra, expected }) => {
+    const chart = createStepChart({ types, labels, extra });
+
+    expect(chart.data.labels).toEqual(expected.map(clockOf));
+    expectSlotsAscending(chart, Object.keys(types));
+  });
+
+  it('labels 순서와 시리즈 x 순서는 x 문자열 비교보다 앞선다', () => {
+    // 자릿수가 다른 문자열은 사전순('10:00' < '9:59')이 시간 순과 반대다.
+    const chart = createStepChart({
+      types: { a: 'categoryBar', b: 'categoryBar' },
+      labels: ['9:59', '10:00'],
+      extra: {
+        a: [
+          { x: '9:59', y: 1 },
+          { x: '9:59:30', y: 2 },
+          { x: '10:00', y: 3 },
+        ],
+        b: [
+          { x: '9:58', y: 1 },
+          { x: '10:00', y: 2 },
+        ],
+      },
+    });
+
+    expect(chart.data.labels).toEqual(['9:58', '9:59', '9:59:30', '10:00']);
+  });
+
+  it('시리즈가 잇지 않는 labels 끼리도 순서를 바꾸지 않는다', () => {
+    const labels = ['9:59', '10:00'];
+    const chart = createStepChart({
+      types: { a: 'categoryBar', b: 'categoryBar' },
+      labels,
+      extra: {
+        a: [
+          { x: '9:59', y: 1 },
+          { x: '9:59:30', y: 2 },
+        ],
+        b: [
+          { x: '10:00', y: 1 },
+          { x: '10:00:30', y: 2 },
+        ],
+      },
+    });
+
+    expect(chart.data.labels.filter((value) => labels.includes(value))).toEqual(labels);
+  });
+
+  it('시리즈 x 순서가 labels 와 어긋나도 모든 값을 한 번씩 담는다', () => {
+    const chart = createStepChart({
+      types: { a: 'categoryBar', b: 'categoryBar' },
+      labels: ['A', 'B'],
+      extra: {
+        a: [
+          { x: 'B', y: 1 },
+          { x: 'A', y: 2 },
+          { x: 'C', y: 3 },
+        ],
+        b: [
+          { x: 'A', y: 1 },
+          { x: 'B', y: 2 },
+        ],
+      },
+    });
+
+    expect(chart.data.labels).toEqual(['A', 'B', 'C']);
+  });
 });
 
 describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)', () => {
