@@ -185,6 +185,21 @@ const dropUndrawn = (indices, seriesList) => {
   return indices;
 };
 
+// 원시값 bar 끼리는 labels 순서를 공유해 같은 칸이 같은 data 인덱스다(#2352) — x 첫 일치 대신 그 인덱스를
+// 담고, labels 보다 짧아 그 인덱스가 없는 시리즈는 뺀다.
+const pinRawIndices = (indices, rawIds, index, seriesList) => {
+  indices.forEach((_, sId) => {
+    if (!rawIds.has(sId)) {
+      return;
+    }
+    if (index < seriesList[sId].data.length) {
+      indices.set(sId, index);
+    } else {
+      indices.delete(sId);
+    }
+  });
+};
+
 /**
  * 픽셀 위치에 가장 가까운, 값이 있는 점. xp 는 x 오름차순과 같은 순서이고 위치가 없는 점(축 범위 밖 null,
  * 그리지 않는 step 축 line 의 NaN)은 양 끝에만 있다는 전제로 이진 탐색한다. spacing 은 점 사이 평균 픽셀 간격.
@@ -1856,16 +1871,7 @@ const modules = {
     const indices = this.findMixedIndicesAtX(x, seriesIDs);
     const rawIds = this.mixedLabels?.rawIds;
     if (rawIds?.has(sId)) {
-      indices.forEach((_, id) => {
-        if (!rawIds.has(id)) {
-          return;
-        }
-        if (index < this.seriesList[id].data.length) {
-          indices.set(id, index);
-        } else {
-          indices.delete(id);
-        }
-      });
+      pinRawIndices(indices, rawIds, index, this.seriesList);
     }
     return indices;
   },
@@ -1882,11 +1888,7 @@ const modules = {
       const rawIndex = this.mixedSourceSlots
         ? this.mixedSourceSlots.indexOf(labelIndex)
         : labelIndex;
-      indices.forEach((_, sId) => {
-        if (rawIds.has(sId)) {
-          indices.set(sId, rawIndex);
-        }
-      });
+      pinRawIndices(indices, rawIds, rawIndex, this.seriesList);
     }
     return indices;
   },

@@ -1144,6 +1144,23 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
     // 3(s0) + 30(s2) + 0.5(s1 의 'a' — 반복 x 는 첫 칸) + 0(l)
     expect(chart.getItem({ seriesID: 's0', dataIndex: 2 })[0].acc).toBe(33.5);
   });
+
+  it('labels 보다 짧은 원시값 bar 는 같은 라벨 값의 뒤 칸 selectLabel 에서 빠진다', () => {
+    const chart = createStepChart({
+      types: { s0: 'categoryBar', s3: 'categoryBar', s1: 'categoryBar' },
+      labels: ['a', 'b', 'a', 'c'],
+      extra: {
+        s0: [1, 2, 3, 4],
+        s3: [7, 8],
+        s1: ['a', 'x', 'b', 'c'].map((x) => ({ x, y: 0.5 })),
+      },
+    });
+    layoutBars(chart, stepParam(chart.data.labels.length), ['s0', 's3', 's1']);
+
+    // 범주 a x b a c — 두 번째 'a' 칸(3)에는 s3 값이 없다
+    expect(chart.getMixedSelectedIndices([3]).get('s3')).toEqual([]);
+    expect(chart.getItem({ dataIndex: [3] })[0].acc).toBe(3.5);
+  });
 });
 
 describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)', () => {
