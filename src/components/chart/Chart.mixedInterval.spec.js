@@ -1098,6 +1098,36 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
       expect(chart.getItem({ dataIndex: [second] })[0].acc).toBe(3.5);
     },
   );
+
+  it('원시값 막대를 hover·selectItem 하면 다른 원시값 막대도 같은 칸 값을 담는다(line 콤보, 같은 라벨 값)', () => {
+    const chart = createStepChart({
+      types: {
+        s0: 'categoryBar',
+        s2: 'categoryBar',
+        s3: 'categoryBar',
+        s1: 'categoryBar',
+        l: 'line',
+      },
+      labels: ['a', 'b', 'a', 'c'],
+      extra: {
+        s0: [1, 2, 3, 4],
+        s2: [10, 20, 30, 40],
+        s3: [7, 8], // 칸 2 에 값이 없는 짧은 원시값
+        s1: ['a', 'x', 'b', 'c'].map((x) => ({ x, y: 0.5 })),
+        l: [0, 0, 0, 0],
+      },
+    });
+    const count = chart.data.labels.length;
+    layoutBars(chart, stepParam(count), ['s0', 's2', 's3', 's1']);
+
+    // 두 번째 'a' 칸의 s0 막대(data 2)
+    const bar = chart.seriesList.s0.data[2];
+    const { items } = chart.findHitItem([bar.xp + bar.w / 2, 290]);
+    expect(items.s2.data.o).toBe(30);
+    expect(items.s3).toBeUndefined();
+    // 3(s0) + 30(s2) + 0.5(s1 의 'a' — 반복 x 는 첫 칸) + 0(l)
+    expect(chart.getItem({ seriesID: 's0', dataIndex: 2 })[0].acc).toBe(33.5);
+  });
 });
 
 describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)', () => {

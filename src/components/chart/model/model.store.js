@@ -1638,7 +1638,12 @@ const modules = {
       let indexBySeries = null;
       if (this.isMixedX) {
         indexBySeries = dropUndrawn(
-          this.findMixedIndicesAtX(dataInfo.x, Object.keys(this.seriesList)),
+          this.findMixedIndicesAtPoint(
+            seriesID,
+            dataIndex,
+            dataInfo.x,
+            Object.keys(this.seriesList),
+          ),
           this.seriesList,
         );
         indexBySeries.set(seriesID, dataIndex);
@@ -1790,7 +1795,10 @@ const modules = {
     }
 
     const refX = getHitTestPoints(this.seriesList[ref.sId])[ref.index].x;
-    const indices = dropUndrawn(this.findMixedIndicesAtX(refX, visibleIDs), this.seriesList);
+    const indices = dropUndrawn(
+      this.findMixedIndicesAtPoint(ref.sId, ref.index, refX, visibleIDs),
+      this.seriesList,
+    );
     indices.set(ref.sId, ref.index);
     return indices;
   },
@@ -1831,6 +1839,29 @@ const modules = {
       }
     });
     return selected;
+  },
+
+  /**
+   * 기준 점과 같은 칸의 시리즈별 인덱스(#2352). 기준이 원시값 bar 면 다른 원시값 bar 는 같은 data 인덱스이고
+   * (labels 순서를 공유 — labels 에 같은 값이 있어도 그 칸), 나머지는 x 가 같은 점이다.
+   * @returns {Map<string, number>} 그 칸에 점이 있는 시리즈만 담는다(기준 시리즈는 호출부가 넣는다)
+   */
+  findMixedIndicesAtPoint(sId, index, x, seriesIDs) {
+    const indices = this.findMixedIndicesAtX(x, seriesIDs);
+    const rawIds = this.mixedLabels?.rawIds;
+    if (rawIds?.has(sId)) {
+      indices.forEach((_, id) => {
+        if (!rawIds.has(id)) {
+          return;
+        }
+        if (index < this.seriesList[id].data.length) {
+          indices.set(id, index);
+        } else {
+          indices.delete(id);
+        }
+      });
+    }
+    return indices;
   },
 
   /**
