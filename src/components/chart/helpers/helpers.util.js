@@ -308,12 +308,6 @@ export default {
   },
 
   /**
-   * Comparing strings
-   * @param {array} array    compared array
-   *
-   * @returns {object} min/max information
-   */
-  /**
    * x(라벨) 값을 Map 키로 바꾼다. Date·dayjs·숫자는 ms 숫자로, 숫자로 못 바꾸는 범주 값은 그대로 쓴다 —
    * 시리즈마다 따로 만든 Date 객체도 같은 시각이면 같은 키가 된다.
    * @returns {number|string}
@@ -360,6 +354,12 @@ export default {
     return first !== null && typeof first === 'object' && 'x' in first;
   },
 
+  /**
+   * Comparing strings
+   * @param {array} array    compared array
+   *
+   * @returns {object} min/max information
+   */
   getStringMinMax(array) {
     const minMax = {
       min: array[0],

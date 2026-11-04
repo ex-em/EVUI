@@ -89,7 +89,7 @@ const AXIS_DEFS = [
   {
     key: 'time',
     title: "axesX type: 'time' (값 기반 TimeScale)",
-    desc: '시리즈별 { x: epoch ms, y } 를 넘긴다. 이번 작업(A안)의 대상 형태다.',
+    desc: '시리즈별 { x: epoch ms, y } 를 넘긴다. 시리즈마다 x 가 달라도 점을 제 시각 위치에 그린다.',
     axisX: { type: 'time', timeFormat: 'HH:mm:ss', interval: { time: 10, unit: 'second' } },
     toX: toMs,
     labeled: false,

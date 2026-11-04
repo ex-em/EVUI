@@ -87,7 +87,7 @@ export default {
     },
     'Mixed Interval (1s · 5s)': {
       description:
-        '시리즈마다 수집 간격이 다른(1초·5초) 데이터를 { x, y } 로 넘겼을 때의 현재 동작을 축 타입(time / time categoryMode / step / linear)별로 ' +
+        '시리즈마다 수집 간격이 다른(1초·5초) 데이터를 { x, y } 로 넘긴 차트를 축 타입(time / time categoryMode / step / linear)별로 ' +
         'line·bar·timeMode bar·stack line·stack bar·stack timeMode bar 전부 한 화면에서 확인하는 검증용 예제입니다. ' +
         'hover 툴팁이 같은 시각의 값을 보여주는지, 시리즈 순서를 바꿔도 같은지, ' +
         '축별 차트 그룹(syncHover)에서 다른 차트에 indicator 가 같은 시각으로 공유되는지 확인합니다.',
