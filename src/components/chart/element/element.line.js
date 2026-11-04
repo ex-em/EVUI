@@ -18,6 +18,21 @@ const NON_CIRCLE_POINT_STYLES = new Set([
 ]);
 const TWO_PI = Math.PI * 2;
 
+/**
+ * combo line 이 점을 맞출 막대 한 칸의 폭. mixed(#2352)는 범주형 축이면 labels 칸, 값 기반 축이면 bar 공통
+ * 칸 폭(Bar.getCategoryArea 와 같은 식)이다 — 시리즈 자기 점 개수로 나누면 시리즈마다 어긋난다.
+ * @returns {number}
+ */
+const getComboBarArea = (xArea, minmaxX, { mixedXLayout, mixedXInterval }, dataLength) => {
+  if (mixedXLayout && !mixedXLayout.byValue) {
+    return xArea / (mixedXLayout.count || 1);
+  }
+  if (mixedXInterval) {
+    return (xArea * mixedXInterval) / (minmaxX.graphMax - minmaxX.graphMin + mixedXInterval);
+  }
+  return xArea / (dataLength || 1);
+};
+
 class Line {
   constructor(sId, opt, sIdx) {
     const merged = defaultsDeep({}, opt, LINE_OPTION);
@@ -114,11 +129,7 @@ class Line {
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
 
     if (this.combo) {
-      // mixed(#2352)는 bar 공통 칸 폭(getCategoryArea)에 맞춘다 — 시리즈 자기 점 개수로 나누면 시리즈마다 어긋난다.
-      barAreaByCombo = param.mixedXInterval
-        ? (xArea * param.mixedXInterval)
-          / (minmaxX.graphMax - minmaxX.graphMin + param.mixedXInterval)
-        : xArea / (this.data.length || 1);
+      barAreaByCombo = getComboBarArea(xArea, minmaxX, param, this.data.length);
       xArea -= barAreaByCombo;
       this.size.comboOffset = barAreaByCombo;
     }
@@ -294,11 +305,7 @@ class Line {
     const yArea = chartRect.chartHeight - (labelOffset.top + labelOffset.bottom);
 
     if (this.combo) {
-      // mixed(#2352)는 bar 공통 칸 폭(getCategoryArea)에 맞춘다 — 시리즈 자기 점 개수로 나누면 시리즈마다 어긋난다.
-      barAreaByCombo = param.mixedXInterval
-        ? (xArea * param.mixedXInterval)
-          / (minmaxX.graphMax - minmaxX.graphMin + param.mixedXInterval)
-        : xArea / (this.data.length || 1);
+      barAreaByCombo = getComboBarArea(xArea, minmaxX, param, this.data.length);
       xArea -= barAreaByCombo;
       this.size.comboOffset = barAreaByCombo;
     }

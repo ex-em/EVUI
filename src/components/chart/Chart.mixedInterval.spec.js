@@ -456,6 +456,33 @@ describe('혼합 interval — 범주형 축(time categoryMode) 일반 bar 배치
     expect(chart.getMixedXLayout()).toEqual({ byValue: true });
     expect(warn).not.toHaveBeenCalled();
   });
+
+  it('combo line 점은 같은 시각 막대의 labels 칸 가운데에 찍힌다', () => {
+    const chart = createMixedChart({
+      order: ['s1', 's5'],
+      types: { s1: 'line', s5: 'categoryBar' },
+      labels: SEC_1.map(at),
+      axesX: CATEGORY_AXIS,
+    });
+    const param = categoryParam(60, at(59));
+    layoutBars(chart, param, ['s5']);
+    const line = chart.seriesList.s1;
+    line.combo = true;
+    line.draw({
+      ...param,
+      ctx: createStubCtx(),
+      mixedXLayout: chart.getMixedXLayout(),
+      mixedXInterval: chart.getMixedBarInterval(),
+    });
+
+    // 5초 막대도 1초 labels 칸(10px)에 놓인다. 0초 · 25초 · 55초
+    const bars = chart.seriesList.s5.data;
+    [0, 5, 11].forEach((k) => {
+      const centerOfBar = bars[k].xp + bars[k].w / 2;
+      expect(Math.abs(line.data[k * 5].xp - centerOfBar)).toBeLessThan(1);
+    });
+    expect(line.size.comboOffset).toBeCloseTo(600 / 60);
+  });
 });
 
 describe('혼합 interval — 값 기반 축 일반 bar(x 값 위치)', () => {
