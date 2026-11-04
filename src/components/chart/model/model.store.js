@@ -364,11 +364,12 @@ const modules = {
 
               if (sData) {
                 const inStackGroup = series.isExistGrp && !series.isOverlapping;
-                // 점 모양은 zero 변환 전 원본으로 본다(첫 원소가 0 으로 채워져도 { x, y }).
+                // 점 모양은 zero 변환 전 원본으로 본다. 가로 차트는 x 경로 밖이라 막대 칸과 같은 인덱스로 쌓는다.
                 const stacksByX =
                   inStackGroup &&
+                  !this.options.horizontal &&
                   Util.isPointSeries(rawData) &&
-                  !Util.isAlignedToLabels(sData, label, this.options.horizontal);
+                  !Util.isAlignedToLabels(sData, label);
                 let tops = null;
                 if (inStackGroup) {
                   tops = stackTops.get(series.groupIndex);

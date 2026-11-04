@@ -457,6 +457,30 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     // 0초(0 으로 채운 자리)·5초·6초(아래 값 없음)·10초
     expect(bases(chart, 'pt')).toEqual([1, 2, 0, 3]);
   });
+
+  it('가로 차트는 y 가 labels 와 어긋난 { x, y } 도 막대가 놓이는 인덱스로 쌓는다', () => {
+    const chart = createGroupStack(
+      [
+        [
+          'pt',
+          [
+            { x: 1, y: 'a' },
+            { x: 2, y: 'c' },
+          ],
+        ],
+        [
+          'pt2',
+          [
+            { x: 10, y: 'a' },
+            { x: 10, y: 'b' },
+          ],
+        ],
+      ],
+      ['a', 'b', 'c', 'd'],
+      { horizontal: true },
+    );
+    expect(bases(chart, 'pt2')).toEqual([1, 2]);
+  });
 });
 
 describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {

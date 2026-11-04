@@ -367,19 +367,19 @@ export default {
   },
 
   /**
-   * { x, y } 시리즈의 범주 축 값(세로 x·가로 y)이 labels 와 길이·자리마다 같은지(#2352). 같으면 원시값 시리즈와
-   * 인덱스가 같은 칸이라 정렬 차트처럼 인덱스로 맞춘다. 객체가 아닌 원소(null, interpolation 'zero' 가 넣은 0)는
-   * 그 자리를 지킨 것으로 본다.
+   * { x, y } 시리즈의 x 가 labels 와 길이·자리마다 같은지(#2352). 같으면 원시값 시리즈와 인덱스가 같은 칸이라
+   * 정렬 차트처럼 인덱스로 맞춘다. 객체가 아닌 원소(null, interpolation 'zero' 가 넣은 0)는 그 자리를 지킨
+   * 것으로 본다.
    * @returns {boolean}
    */
-  isAlignedToLabels(points, labels, isHorizontal = false) {
+  isAlignedToLabels(points, labels) {
     return (
       points.length === labels?.length &&
       points.every(
         (point, i) =>
           point === null ||
           typeof point !== 'object' ||
-          this.toXKey(isHorizontal ? point.y : point.x) === this.toXKey(labels[i]),
+          this.toXKey(point.x) === this.toXKey(labels[i]),
       )
     );
   },
