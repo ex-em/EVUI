@@ -371,14 +371,15 @@ const modules = {
                     // { x, y } 스택은 시리즈마다 같은 인덱스가 같은 시각이 아닐 수 있어 시각을 키로 쌓는다.
                     // x 가 labels 와 자리마다 같으면 원시값처럼 인덱스로 쌓는다(중복 라벨도 칸마다).
                     tops =
-                      Util.isPointSeries(sData) && !Util.isAlignedToLabels(sData, label)
+                      Util.isPointSeries(sData) &&
+                      !Util.isAlignedToLabels(sData, label, this.options.horizontal)
                         ? { pos: new Map(), neg: new Map(), byX: true }
                         : { pos: [], neg: [] };
                     stackTops.set(series.groupIndex, tops);
                   } else if (
                     !tops.byX &&
                     Util.isPointSeries(sData) &&
-                    !Util.isAlignedToLabels(sData, label)
+                    !Util.isAlignedToLabels(sData, label, this.options.horizontal)
                   ) {
                     // 원시값 위에 x 가 labels 와 어긋난 { x, y } 가 오면 같은 시각끼리 쌓도록 시각 키로 바꾼다.
                     tops = toStackTopsByX(tops, label);

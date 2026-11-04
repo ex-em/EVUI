@@ -316,7 +316,7 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
   });
 
   // 원시값 시리즈가 섞인 그룹 — entries 는 스택 순서대로 [id, data]
-  const createGroupStack = (entries, labels) => {
+  const createGroupStack = (entries, labels, options = {}) => {
     const ids = entries.map(([id]) => id);
     const seriesList = Object.fromEntries(
       ids.map((id, idx) => [
@@ -331,7 +331,7 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     const chart = Object.assign(Object.create(interaction), store, {
       seriesList,
       seriesInfo: { charts: { line: ids, bar: [], scatter: [], pie: [], heatMap: [] } },
-      options: { horizontal: false },
+      options: { horizontal: false, ...options },
     });
     chart.createDataSet(Object.fromEntries(entries), labels);
     return chart;
@@ -405,6 +405,31 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     // 두 번째 'a' 칸(인덱스 2)은 원시값·{ x, y } 가 섞인 스택의 반복 라벨이라 첫 칸 기준(DECISIONS)
     const raw2 = bases(chart, 'raw2');
     expect([raw2[0], raw2[1], raw2[3]]).toEqual([11, 12, 14]);
+  });
+
+  it('가로 차트는 y 가 labels 와 자리마다 같은 { x, y } 를 인덱스로 쌓는다(중복 라벨 포함)', () => {
+    const labels = ['a', 'b', 'a', 'c'];
+    const chart = createGroupStack(
+      [
+        ['pt', labels.map((y, i) => ({ x: 10 * (i + 1), y }))],
+        ['pt2', labels.map((y) => ({ x: 100, y }))],
+      ],
+      labels,
+      { horizontal: true },
+    );
+    expect(bases(chart, 'pt2')).toEqual([10, 20, 30, 40]);
+  });
+
+  it('interpolation zero 가 null 을 0 으로 바꾼 자리도 labels 자리를 지킨 것으로 본다', () => {
+    const labels = ['a', 'b', 'a', 'c'];
+    const entries = [
+      ['pt', [{ x: 'a', y: 10 }, null, { x: 'a', y: 30 }, { x: 'c', y: 40 }]],
+      ['raw2', [100, 100, 100, 100]],
+    ];
+    const chart = createGroupStack(entries, labels);
+    chart.seriesList.pt.interpolation = 'zero';
+    chart.createDataSet(Object.fromEntries(entries), labels);
+    expect(bases(chart, 'raw2')).toEqual([10, 0, 30, 40]);
   });
 });
 
