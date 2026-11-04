@@ -176,4 +176,27 @@ describe('혼합 interval 줌', () => {
 
     expect(evChartData.data.s).toEqual([{ x: 'a', y: 2 }, { x: 'c', y: 3 }]);
   });
+
+  it.each([
+    ['앞에 같은 값이 있는 끝 경계', ['a', 'b', 'c', 'b']],
+    ['앞에 같은 값이 있는 시작 경계', ['a', 'b', 'a', 'c']],
+  ])('step 축 줌 경계는 labels 에 같은 값이 있어도 그 자리의 칸이다 — %s', (_, labels) => {
+    const r = [1, 2, 3, 4];
+    const s1 = ['a', 'x', 'b', 'c'].map((x, y) => ({ x, y }));
+    const { zoom, evChartData } = createExecuteZoom({ r, s1 }, labels);
+
+    zoom.executeZoom(2, 3);
+
+    expect(evChartData.data.r).toEqual([3, 4]);
+    expect(evChartData.data.s1.map(({ x }) => x)).toEqual(['c']);
+  });
+
+  it('범주를 늘리지 않는 step 축 줌(x 가 모두 labels 에 있음)도 경계는 그 자리의 칸이다', () => {
+    const s1 = ['a', 'c', 'b', 'd'].map((x, y) => ({ x, y }));
+    const { zoom, evChartData } = createExecuteZoom({ s1 }, ['a', 'b', 'c', 'b', 'd']);
+
+    zoom.executeZoom(2, 3);
+
+    expect(evChartData.data.s1.map(({ x }) => x)).toEqual(['c']);
+  });
 });

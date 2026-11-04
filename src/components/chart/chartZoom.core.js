@@ -280,23 +280,30 @@ export default class EvChartZoom {
       const zoomStartTime = +cloneLabels[zoomStartIdx];
       const zoomEndTime = +cloneLabels[zoomEndIdx];
       const canSliceByTime = !Number.isNaN(zoomStartTime) && !Number.isNaN(zoomEndTime);
-      let categoryPosOf = null;
-      const getCategoryPosOf = () => {
-        if (!categoryPosOf) {
+      let categoryOrder = null;
+      const getCategoryOrder = () => {
+        if (!categoryOrder) {
           const pointLists = cloneSeriesNames
             .map((name) => cloneData[name])
             .filter((seriesData) => Util.isPointSeries(seriesData))
             .map((seriesData) => seriesData.filter((d) => d != null));
-          const categories = buildMixedCategories(cloneLabels, pointLists)?.values ?? cloneLabels;
-          categoryPosOf = new Map();
-          categories.forEach((value, pos) => {
+          const mixed = buildMixedCategories(cloneLabels, pointLists);
+          const posOf = new Map();
+          (mixed?.values ?? cloneLabels).forEach((value, pos) => {
             const key = Util.toXKey(value);
-            if (!categoryPosOf.has(key)) {
-              categoryPosOf.set(key, pos);
+            if (!posOf.has(key)) {
+              posOf.set(key, pos);
             }
           });
+          // 경계는 labels 그 자리의 칸이다 — labels 에 같은 값이 앞에 있어도 그 칸으로 가지 않는다.
+          const slots = mixed?.labelSlots;
+          categoryOrder = {
+            posOf,
+            startPos: slots ? slots[zoomStartIdx] : zoomStartIdx,
+            endPos: slots ? slots[zoomEndIdx] : zoomEndIdx,
+          };
         }
-        return categoryPosOf;
+        return categoryOrder;
       };
 
       for (let jdx = 0; jdx < cloneSeriesNames.length; jdx++) {
@@ -309,9 +316,7 @@ export default class EvChartZoom {
             (d) => d != null && +d.x >= zoomStartTime && +d.x <= zoomEndTime,
           );
         } else if (isPoint && !Util.isAlignedToLabels(seriesData, cloneLabels)) {
-          const posOf = getCategoryPosOf();
-          const startPos = posOf.get(Util.toXKey(cloneLabels[zoomStartIdx]));
-          const endPos = posOf.get(Util.toXKey(cloneLabels[zoomEndIdx]));
+          const { posOf, startPos, endPos } = getCategoryOrder();
           evChartData.data[cloneSeriesName] = seriesData.filter((d) => {
             const pos = d == null ? undefined : posOf.get(Util.toXKey(d.x));
             return pos >= startPos && pos <= endPos;
