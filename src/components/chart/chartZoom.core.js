@@ -277,7 +277,7 @@ export default class EvChartZoom {
       // labels 와 어긋난 { x, y } 시리즈는 같은 인덱스가 같은 시각이 아니므로(#2352) 줌 인덱스(labels)를
       // 시각 구간으로 바꿔 자르고, 시각으로 못 바꾸는 범주 라벨(step)이면 labels·시리즈 x 순서로 만든 범주
       // 순서 구간으로 자른다. 원시값·labels 와 자리마다 같은 시리즈와 가로 차트(x 가 값 축)는 인덱스로 자른다.
-      const isHorizontal = !!this.evChartProps.options?.horizontal;
+      const isHorizontal = !!this.evChartProps.options?.[idx]?.horizontal;
       const zoomStartTime = +cloneLabels[zoomStartIdx];
       const zoomEndTime = +cloneLabels[zoomEndIdx];
       const canSliceByTime = !Number.isNaN(zoomStartTime) && !Number.isNaN(zoomEndTime);

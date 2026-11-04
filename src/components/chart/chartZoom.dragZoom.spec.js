@@ -214,13 +214,23 @@ describe('혼합 interval 줌', () => {
     expect(evChartData.data.r).toEqual([2, 3]);
   });
 
-  it('가로 차트는 { x, y } 시리즈도 인덱스로 자른다(x 가 값 축)', () => {
-    const s = ['a', 'b', 'c', 'd'].map((y, i) => ({ x: 10 * (i + 1), y }));
-    const { zoom, evChartData } = createExecuteZoom({ s }, ['a', 'b', 'c', 'd']);
-    zoom.evChartProps.options = { horizontal: true };
+  it('가로 차트는 { x, y } 시리즈도 인덱스로 자른다(x 가 값 축, 그룹이면 차트마다 옵션을 본다)', () => {
+    const labels = ['a', 'b', 'c', 'd'];
+    const vertical = labels.map((x, y) => ({ x, y }));
+    const horizontal = labels.map((y, i) => ({ x: 10 * (i + 1), y }));
+    // 런타임처럼 data·options 모두 차트마다 하나씩 담긴 배열이다.
+    const charts = [{ s: vertical }, { s: horizontal }];
+    const evChartData = charts.map(() => ({ data: {}, labels }));
+    const zoom = Object.create(EvChartZoom.prototype);
+    Object.assign(zoom, {
+      evChartCloneData: charts.map((data) => ({ data, labels, series: { s: {} } })),
+      evChartProps: { data: evChartData, options: [{}, { horizontal: true }] },
+      brushIdx: { isUseButton: false, isUseScroll: false },
+    });
 
     zoom.executeZoom(1, 2);
 
-    expect(evChartData.data.s).toEqual([{ x: 20, y: 'b' }, { x: 30, y: 'c' }]);
+    expect(evChartData[0].data.s).toEqual(vertical.slice(1, 3));
+    expect(evChartData[1].data.s).toEqual([{ x: 20, y: 'b' }, { x: 30, y: 'c' }]);
   });
 });
