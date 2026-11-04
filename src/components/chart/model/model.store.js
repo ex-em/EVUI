@@ -44,7 +44,8 @@ const compareXKey = (a, b) => {
 /**
  * step 축(범주) mixed(#2352)의 범주 목록 — labels 순서와 각 시리즈 x 순서를 모두 지키며 labels 에 없는 x 를
  * 끼우고, 두 순서로 앞뒤가 안 정해지는 값끼리는 compareXKey 로 놓는다. 끼울 게 없으면 null.
- * @returns {array|null}
+ * labelSlots 는 labels 자리마다의 범주 인덱스다 — labels 에 같은 값이 있어도 자리마다 다르다.
+ * @returns {{values: array, labelSlots: number[]}|null}
  */
 export const buildMixedCategories = (labels, pointLists) => {
   // 라벨은 자리마다(중복 라벨 포함), 끼울 x 는 키마다 노드 하나. 간선 = "앞에 와야 한다".
@@ -108,6 +109,7 @@ export const buildMixedCategories = (labels, pointLists) => {
     }
   });
   const result = [];
+  const labelSlots = new Array(labels.length);
   let cursor = 0;
   while (result.length < values.length) {
     let pick = -1;
@@ -127,6 +129,9 @@ export const buildMixedCategories = (labels, pointLists) => {
     }
 
     placed[pick] = true;
+    if (pick < labels.length) {
+      labelSlots[pick] = result.length;
+    }
     result.push(values[pick]);
     nextOf[pick].forEach((id) => {
       inDegree[id] -= 1;
@@ -135,7 +140,7 @@ export const buildMixedCategories = (labels, pointLists) => {
       }
     });
   }
-  return result;
+  return { values: result, labelSlots };
 };
 
 // { x, y } 스택(tops.byX)은 같은 시각의 아래 값만 base 로 본다(#2352). 원시값은 라벨 인덱스.
@@ -414,6 +419,7 @@ const modules = {
     }
     this.mixedCategoryLabels = null;
     this.mixedSourceLabels = null;
+    this.mixedSourceSlots = null;
 
     if (this.options.horizontal) {
       return;
@@ -485,9 +491,11 @@ const modules = {
         .map((sId) => this.seriesList[sId])
         .filter((series) => series && !series.timeMode && Array.isArray(series.data))
         .map((series) => series.data);
-      const categories = buildMixedCategories(labels ?? [], pointLists);
-      if (categories) {
+      const mixedCategories = buildMixedCategories(labels ?? [], pointLists);
+      if (mixedCategories) {
+        const categories = mixedCategories.values;
         this.mixedSourceLabels = labels;
+        this.mixedSourceSlots = mixedCategories.labelSlots;
         this.mixedCategoryLabels = categories;
         this.data.labels = categories;
         slotLabels = categories;
@@ -511,6 +519,9 @@ const modules = {
         count: slotLabels.length,
         times: isTimeLabels ? times : null,
         interval: isTimeLabels ? getMedianGap(times) : null,
+        // 원시값 bar 는 labels 순서라 x 가 아니라 자기 순서로 칸을 찾는다(labels 에 같은 값이 있어도 각자 칸).
+        rawIds: new Set(bar.filter((sId) => ids.includes(sId) && !Util.isPointSeries(data?.[sId]))),
+        sourceSlots: this.mixedSourceSlots,
       };
     }
 
@@ -1468,7 +1479,7 @@ const modules = {
           : Math.min(series.data.length - 1, maxIndex);
         for (let i = lo; i <= hi; i += 1) {
           const p = series.data[i];
-          const slot = mixedLabels ? Util.getMixedSlot(p?.x, mixedLabels) : i;
+          const slot = mixedLabels ? Util.getMixedSlotOf(sIds[s], i, p?.x, mixedLabels) : i;
           const inWindow = slot !== null && slot >= minIndex && slot < maxIndex + 1;
           const value = isHorizontal ? p?.x : p?.y;
           const v = inWindow ? value : null;
@@ -1562,7 +1573,9 @@ const modules = {
     // mixed(#2352)는 라벨 인덱스가 시리즈 data 인덱스가 아니라 labels[labelIndex] 시각과 같은 점을 본다.
     const labelValue = this.data?.labels?.[labelIndex];
     const mixedIndices =
-      this.isMixedX && labelValue !== undefined ? this.findMixedIndicesAtX(labelValue, sIds) : null;
+      this.isMixedX && labelValue !== undefined
+        ? this.findMixedIndicesAtLabel(labelIndex, sIds)
+        : null;
 
     if (labelIndex > -1) {
       for (let ix = 0; ix < sIds.length; ix++) {
@@ -1810,12 +1823,33 @@ const modules = {
     labelIndexList.forEach((labelIndex) => {
       const labelValue = this.data?.labels?.[labelIndex];
       if (labelValue !== undefined) {
-        this.findMixedIndicesAtX(labelValue, sIds).forEach((index, sId) => {
+        this.findMixedIndicesAtLabel(labelIndex, sIds).forEach((index, sId) => {
           selected.get(sId).push(index);
         });
       }
     });
     return selected;
+  },
+
+  /**
+   * labels 칸 하나에 놓인 점의 시리즈별 인덱스(#2352). { x, y } 는 그 칸 라벨과 x 가 같은 점이고, 원시값 bar 는
+   * 그 칸에 놓인 자기 순서의 점이다(labels 에 같은 값이 있어도 칸마다 다르다).
+   * @returns {Map<string, number>} 그 칸에 점이 있는 시리즈만 담는다
+   */
+  findMixedIndicesAtLabel(labelIndex, seriesIDs) {
+    const indices = this.findMixedIndicesAtX(this.data?.labels?.[labelIndex], seriesIDs);
+    const rawIds = this.mixedLabels?.rawIds;
+    if (rawIds?.size) {
+      const rawIndex = this.mixedSourceSlots
+        ? this.mixedSourceSlots.indexOf(labelIndex)
+        : labelIndex;
+      indices.forEach((_, sId) => {
+        if (rawIds.has(sId)) {
+          indices.set(sId, rawIndex);
+        }
+      });
+    }
+    return indices;
   },
 
   /**
@@ -1828,7 +1862,7 @@ const modules = {
       return null;
     }
 
-    const indexBySeries = this.findMixedIndicesAtX(labelValue, Object.keys(this.seriesList));
+    const indexBySeries = this.findMixedIndicesAtLabel(labelIndex, Object.keys(this.seriesList));
     const [refId, refIndex] = indexBySeries.entries().next().value ?? [];
     const refPoint = refId ? getHitTestPoints(this.seriesList[refId])[refIndex] : null;
     if (!refPoint) {

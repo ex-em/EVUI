@@ -345,6 +345,18 @@ export default {
   },
 
   /**
+   * mixed(#2352) 시리즈 원소 하나의 labels 칸. 원시값 bar(`layout.rawIds`)는 labels 순서라 자기 순서로 칸을
+   * 정하고(범주를 늘렸으면 `layout.sourceSlots`), 그 외는 x 로 찾는다(`getMixedSlot`).
+   * @returns {number|null}
+   */
+  getMixedSlotOf(sId, index, xValue, layout) {
+    if (!layout.rawIds?.has(sId)) {
+      return this.getMixedSlot(xValue, layout);
+    }
+    return layout.sourceSlots ? (layout.sourceSlots[index] ?? null) : index;
+  },
+
+  /**
    * 시리즈 원본 data 가 시리즈 자기 x 를 쓰는 { x, y } 배열인지 — 첫 유효 원소에 x 가 있는지로 본다
    * (model.store addSeriesDS 와 같은 기준). 원시값·{ value } 배열은 labels 인덱스를 공유한다.
    * @returns {boolean}

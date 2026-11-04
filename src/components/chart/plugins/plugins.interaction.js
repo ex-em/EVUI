@@ -1985,12 +1985,10 @@ const modules = {
             return Object.fromEntries(dataEntries.map(([sId, data]) => [sId, data[labelIdx]]));
           }
           // mixed(#2352)는 labels[labelIdx] 시각과 x 가 같은 원소를 시리즈마다 찾는다(없으면 undefined).
-          // 원시값 시리즈는 원래 labels 순서라, step 축이 범주를 늘렸으면 원래 labels 에서 같은 시각을
-          // 찾아 읽는다(늘어난 범주면 -1 이라 undefined).
+          // 원시값 시리즈는 원래 labels 순서라, step 축이 범주를 늘렸으면 그 칸에 놓인 원래 labels 자리를
+          // 읽는다(labels 에 같은 값이 있어도 칸마다 다르고, 늘어난 범주면 -1 이라 undefined).
           const labelKey = Util.toXKey(this.data.labels[labelIdx]);
-          const rawIdx = this.mixedSourceLabels
-            ? this.mixedSourceLabels.findIndex((label) => Util.toXKey(label) === labelKey)
-            : labelIdx;
+          const rawIdx = this.mixedSourceSlots ? this.mixedSourceSlots.indexOf(labelIdx) : labelIdx;
           return Object.fromEntries(
             dataEntries.map(([sId, data]) => [
               sId,

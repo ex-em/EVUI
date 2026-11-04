@@ -287,7 +287,7 @@ export default class EvChartZoom {
             .map((name) => cloneData[name])
             .filter((seriesData) => Util.isPointSeries(seriesData))
             .map((seriesData) => seriesData.filter((d) => d != null));
-          const categories = buildMixedCategories(cloneLabels, pointLists) ?? cloneLabels;
+          const categories = buildMixedCategories(cloneLabels, pointLists)?.values ?? cloneLabels;
           categoryPosOf = new Map();
           categories.forEach((value, pos) => {
             const key = Util.toXKey(value);

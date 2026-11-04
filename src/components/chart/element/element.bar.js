@@ -64,13 +64,14 @@ class Bar {
   /**
    * mixed(#2352) 막대 한 개가 놓일 칸의 시작 픽셀(놓을 자리가 없으면 null). 값 위치 배치는 마지막 칸 자리를
    * 뺀 폭 위의 x 값 비율(칸이 겹치지 않고 combo line 점이 칸 가운데에 온다), 범주형 축은 x 의 labels 칸
-   * (칸 사이 시각은 보간)이다.
+   * (칸 사이 시각은 보간, 원시값 bar 는 자기 순서의 칸)이다.
    * @returns {number|null}
    */
   getMixedCellStart(
     xValue,
     layout,
     { xsp, xArea, cArea, minmaxX, slotArea, startIndex, endIndex },
+    index,
   ) {
     if (layout.byValue) {
       const t = +xValue;
@@ -79,7 +80,7 @@ class Bar {
         : null;
     }
 
-    const slot = Util.getMixedSlot(xValue, layout);
+    const slot = Util.getMixedSlotOf(this.sId, index, xValue, layout);
     return slot === null || slot < startIndex || slot >= endIndex + 1
       ? null
       : xsp + (slot - startIndex) * slotArea;
@@ -322,7 +323,7 @@ class Bar {
 
     for (let i = 0; i < this.data.length; i++) {
       const item = this.data[i];
-      const cellStart = item ? this.getMixedCellStart(item.x, layout, cellGeo) : null;
+      const cellStart = item ? this.getMixedCellStart(item.x, layout, cellGeo, i) : null;
       if (item && cellStart === null) {
         item.xp = null; // eslint-disable-line
         item.yp = null; // eslint-disable-line

@@ -1039,6 +1039,52 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
     // tip 위치를 정하는 시리즈별 인덱스도 같은 시각의 원소를 가리킨다.
     expect(chart.getMixedSelectedIndices([10, 11]).get('s0')).toEqual([2]);
   });
+
+  // labels 에 같은 값('a')이 두 번 있을 때 원시값 시리즈는 정렬 차트처럼 자기 순서의 칸에 놓인다.
+  it.each([
+    {
+      name: '범주를 늘린 차트',
+      labels: ['a', 'b', 'a', 'c'],
+      s1: ['a', 'x', 'b', 'c'],
+      rawSlots: [0, 2, 3, 4], // 범주 a x b a c
+    },
+    {
+      name: '범주를 늘리지 않은 차트',
+      labels: ['a', 'b', 'a', 'c'],
+      s1: ['a', 'b', 'c'],
+      rawSlots: [0, 1, 2, 3],
+    },
+  ])(
+    'labels 에 같은 값이 있어도 원시값 막대는 자기 칸에 놓인다 — $name',
+    ({ labels, s1, rawSlots }) => {
+      const chart = createStepChart({
+        types: { s0: 'categoryBar', s1: 'categoryBar' },
+        labels,
+        extra: { s0: [1, 2, 3, 4], s1: s1.map((x) => ({ x, y: 0.5 })) },
+      });
+      chart.options = { ...chart.options, type: 'bar', selectLabel: { use: true, limit: 5 } };
+      chart.defaultSelectInfo = { dataIndex: [] };
+      const count = chart.data.labels.length;
+      const slotW = 600 / count;
+      layoutBars(chart, stepParam(count), ['s0', 's1']);
+
+      const s0 = chart.seriesList.s0.data;
+      expect(s0.map((p) => Math.floor(p.xp / slotW))).toEqual(rawSlots);
+
+      // 두 번째 'a' 칸(원시값 3)의 selectLabel 값·시리즈별 인덱스·maxTip 창
+      const second = rawSlots[2];
+      expect(chart.getSelectedLabelInfoWithLabelData([second]).data[0].s0).toBe(3);
+      expect(chart.getMixedSelectedIndices([second]).get('s0')).toEqual([2]);
+      expect(chart.getVisibleWindowMaxSeries(second, second)).toMatchObject({
+        sId: 's0',
+        index: 2,
+        value: 3,
+      });
+      // 라벨 기준 툴팁 값·selectLabel tip 위치 정보도 그 칸의 원시값(3)을 쓴다.
+      expect(chart.getItemByLabelIndex(second)).toMatchObject({ value: 3 });
+      expect(chart.getItem({ dataIndex: [second] })[0].acc).toBe(3.5);
+    },
+  );
 });
 
 describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)', () => {
