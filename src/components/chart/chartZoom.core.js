@@ -1,4 +1,5 @@
 import Util from './helpers/helpers.util';
+import { buildMixedCategories } from './model/model.store';
 
 export default class EvChartZoom {
   constructor(
@@ -274,19 +275,52 @@ export default class EvChartZoom {
 
       const cloneSeriesNames = Object.keys(cloneSeries);
       // { x, y } 시리즈는 시리즈마다 같은 인덱스가 같은 시각이 아니므로(#2352) 줌 인덱스(labels)를
-      // 시각 구간으로 바꿔 자른다. 시각으로 못 바꾸는 범주 라벨이면 인덱스로 자른다.
+      // 시각 구간으로 바꿔 자른다. 시각으로 못 바꾸는 범주 라벨(step)이면 labels 와 어긋난 시리즈만
+      // labels·시리즈 x 순서로 만든 범주 순서 구간으로 자르고, 나머지는 인덱스로 자른다.
       const zoomStartTime = +cloneLabels[zoomStartIdx];
       const zoomEndTime = +cloneLabels[zoomEndIdx];
       const canSliceByTime = !Number.isNaN(zoomStartTime) && !Number.isNaN(zoomEndTime);
+      let categoryPosOf = null;
+      const getCategoryPosOf = () => {
+        if (!categoryPosOf) {
+          const pointLists = cloneSeriesNames
+            .map((name) => cloneData[name])
+            .filter((seriesData) => Util.isPointSeries(seriesData))
+            .map((seriesData) => seriesData.filter((d) => d != null));
+          const categories = buildMixedCategories(cloneLabels, pointLists) ?? cloneLabels;
+          categoryPosOf = new Map();
+          categories.forEach((value, pos) => {
+            const key = Util.toXKey(value);
+            if (!categoryPosOf.has(key)) {
+              categoryPosOf.set(key, pos);
+            }
+          });
+        }
+        return categoryPosOf;
+      };
 
       for (let jdx = 0; jdx < cloneSeriesNames.length; jdx++) {
         const cloneSeriesName = cloneSeriesNames[jdx];
         const seriesData = cloneData[cloneSeriesName];
+        const isPoint = Util.isPointSeries(seriesData);
 
-        evChartData.data[cloneSeriesName] =
-          canSliceByTime && Util.isPointSeries(seriesData)
-            ? seriesData.filter((d) => d != null && +d.x >= zoomStartTime && +d.x <= zoomEndTime)
-            : seriesData.filter((d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx);
+        if (isPoint && canSliceByTime) {
+          evChartData.data[cloneSeriesName] = seriesData.filter(
+            (d) => d != null && +d.x >= zoomStartTime && +d.x <= zoomEndTime,
+          );
+        } else if (isPoint && !Util.isAlignedToLabels(seriesData, cloneLabels)) {
+          const posOf = getCategoryPosOf();
+          const startPos = posOf.get(Util.toXKey(cloneLabels[zoomStartIdx]));
+          const endPos = posOf.get(Util.toXKey(cloneLabels[zoomEndIdx]));
+          evChartData.data[cloneSeriesName] = seriesData.filter((d) => {
+            const pos = d == null ? undefined : posOf.get(Util.toXKey(d.x));
+            return pos >= startPos && pos <= endPos;
+          });
+        } else {
+          evChartData.data[cloneSeriesName] = seriesData.filter(
+            (d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx,
+          );
+        }
       }
 
       evChartData.labels = cloneLabels.filter(

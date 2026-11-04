@@ -46,7 +46,7 @@ const compareXKey = (a, b) => {
  * 끼우고, 두 순서로 앞뒤가 안 정해지는 값끼리는 compareXKey 로 놓는다. 끼울 게 없으면 null.
  * @returns {array|null}
  */
-const buildMixedCategories = (labels, pointLists) => {
+export const buildMixedCategories = (labels, pointLists) => {
   // 라벨은 자리마다(중복 라벨 포함), 끼울 x 는 키마다 노드 하나. 간선 = "앞에 와야 한다".
   const values = [];
   const keys = [];

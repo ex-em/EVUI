@@ -135,4 +135,45 @@ describe('혼합 interval 줌', () => {
     expect(evChartData.data.s1.map(({ x }) => x)).toEqual(SEC_LABELS.slice(10, 21));
     expect(evChartData.data.s5.map(({ x }) => x)).toEqual([at(10), at(15), at(20)]);
   });
+
+  const createExecuteZoom = (data, labels) => {
+    const zoom = Object.create(EvChartZoom.prototype);
+    const evChartData = { data: {}, labels };
+    Object.assign(zoom, {
+      evChartCloneData: [{
+        data,
+        labels,
+        series: Object.fromEntries(Object.keys(data).map((id) => [id, {}])),
+      }],
+      evChartProps: { data: [evChartData] },
+      brushIdx: { isUseButton: false, isUseScroll: false },
+    });
+    return { zoom, evChartData };
+  };
+
+  it('step 축(문자열 labels)은 labels 와 어긋난 { x, y } 시리즈를 범주 순서 구간으로 자른다', () => {
+    const clock = (sec) => `09:00:${String(sec).padStart(2, '0')}`;
+    const labels = Array.from({ length: 12 }, (_, i) => clock(i * 5));
+    const s1 = Array.from({ length: 60 }, (_, sec) => ({ x: clock(sec), y: sec }));
+    const s5 = labels.map((x, i) => ({ x, y: i }));
+    const { zoom, evChartData } = createExecuteZoom({ s1, s5 }, labels);
+
+    zoom.executeZoom(2, 4);
+
+    expect(evChartData.labels).toEqual([clock(10), clock(15), clock(20)]);
+    expect(evChartData.data.s1.map(({ x }) => x)).toEqual(
+      Array.from({ length: 11 }, (_, i) => clock(10 + i)),
+    );
+    expect(evChartData.data.s5.map(({ x }) => x)).toEqual([clock(10), clock(15), clock(20)]);
+  });
+
+  it('x 가 labels 와 자리마다 같은 step { x, y } 시리즈는 지금처럼 인덱스로 자른다(중복 라벨·null 포함)', () => {
+    const labels = ['a', 'b', 'a', 'c'];
+    const s = [{ x: 'a', y: 0 }, null, { x: 'a', y: 2 }, { x: 'c', y: 3 }];
+    const { zoom, evChartData } = createExecuteZoom({ s }, labels);
+
+    zoom.executeZoom(2, 3);
+
+    expect(evChartData.data.s).toEqual([{ x: 'a', y: 2 }, { x: 'c', y: 3 }]);
+  });
 });
