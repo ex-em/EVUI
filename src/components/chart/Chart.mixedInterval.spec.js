@@ -671,7 +671,7 @@ describe('혼합 interval — 값 기반 축 일반 bar(x 값 위치)', () => {
     });
   });
 
-  it('timeMode bar 와 섞어도 x 가 같은 정렬 차트와 같은 자리에 놓는다', () => {
+  it('timeMode bar 와 섞어도 간격이 고르고 축 범위가 첫~마지막 x 면 정렬 차트와 같은 자리에 놓는다', () => {
     // timeMode bar 는 전체 폭 비례, 일반 bar 는 한 칸 줄인 폭이라 정렬 차트도 같은 시각 막대가 겹친다.
     const tenSec = { secs: [0, 10, 20, 30, 40, 50], valueOf: (sec) => 10 + sec };
     const types = { t: 'bar', n: 'categoryBar' };
