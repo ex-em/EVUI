@@ -216,7 +216,8 @@ describe('혼합 interval 줌', () => {
 
   it('가로 차트는 { x, y } 시리즈도 인덱스로 자른다(x 가 값 축, 그룹이면 차트마다 옵션을 본다)', () => {
     const labels = ['a', 'b', 'c', 'd'];
-    const vertical = labels.map((x, y) => ({ x, y }));
+    // 세로 차트는 labels 사이에 x 가 낀 시리즈라 인덱스로 자르면(가로 판정이 새면) 결과가 갈린다.
+    const vertical = ['a', 'a2', 'b', 'c', 'd'].map((x, y) => ({ x, y }));
     const horizontal = labels.map((y, i) => ({ x: 10 * (i + 1), y }));
     // 런타임처럼 data·options 모두 차트마다 하나씩 담긴 배열이다.
     const charts = [{ s: vertical }, { s: horizontal }];
@@ -230,7 +231,7 @@ describe('혼합 interval 줌', () => {
 
     zoom.executeZoom(1, 2);
 
-    expect(evChartData[0].data.s).toEqual(vertical.slice(1, 3));
+    expect(evChartData[0].data.s).toEqual(vertical.slice(2, 4));
     expect(evChartData[1].data.s).toEqual([{ x: 20, y: 'b' }, { x: 30, y: 'c' }]);
   });
 
