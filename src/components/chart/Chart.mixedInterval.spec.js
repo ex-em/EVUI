@@ -390,6 +390,22 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     expect(chart.isMixedX).toBe(false);
     expect(bases(chart, 'raw2')).toEqual([10, 20, 30, 40]);
   });
+
+  it('원시값 아래 어긋난 { x, y } 는 labels 에 같은 값이 있어도 그 값의 첫 칸 위에 쌓는다', () => {
+    const chart = createGroupStack(
+      [
+        ['raw', [1, 2, 3, 4]],
+        ['pt', ['a', 'x', 'b', 'c'].map((x) => ({ x, y: 10 }))],
+        ['raw2', [100, 100, 100, 100]],
+      ],
+      ['a', 'b', 'a', 'c'],
+    );
+    // { x, y } 의 'a' 는 그려지는 첫 'a' 칸의 원시값(1) 위
+    expect(bases(chart, 'pt')).toEqual([1, 0, 2, 4]);
+    // 두 번째 'a' 칸(인덱스 2)은 원시값·{ x, y } 가 섞인 스택의 반복 라벨이라 첫 칸 기준(DECISIONS)
+    const raw2 = bases(chart, 'raw2');
+    expect([raw2[0], raw2[1], raw2[3]]).toEqual([11, 12, 14]);
+  });
 });
 
 describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {

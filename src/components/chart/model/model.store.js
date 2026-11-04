@@ -152,11 +152,17 @@ const getStackTop = (tops, isPositive, index, labelValue) => {
   return tops.byX ? bucket.get(Util.toXKey(labelValue)) : bucket[index];
 };
 
-// 원시값 시리즈가 쌓은 인덱스 top 을 시각 키 top 으로 바꾼다 — 인덱스는 labels 인덱스다.
+// 원시값 시리즈가 쌓은 인덱스 top 을 시각 키 top 으로 바꾼다 — 인덱스는 labels 인덱스다. labels 에 같은
+// 값이 있으면 첫 자리 top 을 둔다({ x, y } 점이 그려지는 칸과 같다).
 const toStackTopsByX = ({ pos, neg }, label) => {
   const toMap = (bucket) => {
     const byX = new Map();
-    bucket.forEach((top, index) => byX.set(Util.toXKey(label[index]), top));
+    bucket.forEach((top, index) => {
+      const key = Util.toXKey(label[index]);
+      if (!byX.has(key)) {
+        byX.set(key, top);
+      }
+    });
     return byX;
   };
   return { pos: toMap(pos), neg: toMap(neg), byX: true };
