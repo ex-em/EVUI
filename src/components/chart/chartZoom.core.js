@@ -274,9 +274,10 @@ export default class EvChartZoom {
       const evChartData = this.evChartProps.data[idx];
 
       const cloneSeriesNames = Object.keys(cloneSeries);
-      // { x, y } 시리즈는 시리즈마다 같은 인덱스가 같은 시각이 아니므로(#2352) 줌 인덱스(labels)를
-      // 시각 구간으로 바꿔 자른다. 시각으로 못 바꾸는 범주 라벨(step)이면 labels 와 어긋난 시리즈만
-      // labels·시리즈 x 순서로 만든 범주 순서 구간으로 자르고, 나머지는 인덱스로 자른다.
+      // labels 와 어긋난 { x, y } 시리즈는 같은 인덱스가 같은 시각이 아니므로(#2352) 줌 인덱스(labels)를
+      // 시각 구간으로 바꿔 자르고, 시각으로 못 바꾸는 범주 라벨(step)이면 labels·시리즈 x 순서로 만든 범주
+      // 순서 구간으로 자른다. 원시값·labels 와 자리마다 같은 시리즈와 가로 차트(x 가 값 축)는 인덱스로 자른다.
+      const isHorizontal = !!this.evChartProps.options?.horizontal;
       const zoomStartTime = +cloneLabels[zoomStartIdx];
       const zoomEndTime = +cloneLabels[zoomEndIdx];
       const canSliceByTime = !Number.isNaN(zoomStartTime) && !Number.isNaN(zoomEndTime);
@@ -309,22 +310,25 @@ export default class EvChartZoom {
       for (let jdx = 0; jdx < cloneSeriesNames.length; jdx++) {
         const cloneSeriesName = cloneSeriesNames[jdx];
         const seriesData = cloneData[cloneSeriesName];
-        const isPoint = Util.isPointSeries(seriesData);
+        const byIndex =
+          isHorizontal ||
+          !Util.isPointSeries(seriesData) ||
+          Util.isAlignedToLabels(seriesData, cloneLabels);
 
-        if (isPoint && canSliceByTime) {
+        if (byIndex) {
+          evChartData.data[cloneSeriesName] = seriesData.filter(
+            (d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx,
+          );
+        } else if (canSliceByTime) {
           evChartData.data[cloneSeriesName] = seriesData.filter(
             (d) => d != null && +d.x >= zoomStartTime && +d.x <= zoomEndTime,
           );
-        } else if (isPoint && !Util.isAlignedToLabels(seriesData, cloneLabels)) {
+        } else {
           const { posOf, startPos, endPos } = getCategoryOrder();
           evChartData.data[cloneSeriesName] = seriesData.filter((d) => {
             const pos = d == null ? undefined : posOf.get(Util.toXKey(d.x));
             return pos >= startPos && pos <= endPos;
           });
-        } else {
-          evChartData.data[cloneSeriesName] = seriesData.filter(
-            (d, dataIdx) => zoomStartIdx <= dataIdx && zoomEndIdx >= dataIdx,
-          );
         }
       }
 

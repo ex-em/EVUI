@@ -199,4 +199,28 @@ describe('혼합 interval 줌', () => {
 
     expect(evChartData.data.s1.map(({ x }) => x)).toEqual(['c']);
   });
+
+  it('x 가 labels 와 자리마다 같은 { x, y } 시리즈는 시각 labels 에서도 인덱스로 잘라 null 자리를 지킨다', () => {
+    const labels = [0, 5, 10, 15].map(at);
+    const a = [{ x: at(0), y: 1 }, { x: at(5), y: 2 }, null, { x: at(15), y: 4 }];
+    const b = labels.map((x, y) => ({ x, y }));
+    const r = [1, 2, 3]; // labels 보다 짧은 원시값
+    const { zoom, evChartData } = createExecuteZoom({ a, b, r }, labels);
+
+    zoom.executeZoom(1, 3);
+
+    expect(evChartData.data.a).toEqual([{ x: at(5), y: 2 }, null, { x: at(15), y: 4 }]);
+    expect(evChartData.data.b).toEqual(b.slice(1, 4));
+    expect(evChartData.data.r).toEqual([2, 3]);
+  });
+
+  it('가로 차트는 { x, y } 시리즈도 인덱스로 자른다(x 가 값 축)', () => {
+    const s = ['a', 'b', 'c', 'd'].map((y, i) => ({ x: 10 * (i + 1), y }));
+    const { zoom, evChartData } = createExecuteZoom({ s }, ['a', 'b', 'c', 'd']);
+    zoom.evChartProps.options = { horizontal: true };
+
+    zoom.executeZoom(1, 2);
+
+    expect(evChartData.data.s).toEqual([{ x: 20, y: 'b' }, { x: 30, y: 'c' }]);
+  });
 });
