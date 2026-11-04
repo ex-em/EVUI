@@ -481,6 +481,18 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     );
     expect(bases(chart, 'pt2')).toEqual([1, 2]);
   });
+
+  it('labels 보다 짧아도 앞부분이 labels 와 자리마다 같은 { x, y } 는 인덱스로 쌓는다(중복 라벨 포함)', () => {
+    const labels = ['a', 'b', 'a', 'c', 'd'];
+    const chart = createGroupStack(
+      [
+        ['pt', labels.slice(0, 4).map((x, i) => ({ x, y: 10 * (i + 1) }))],
+        ['raw2', [100, 100, 100, 100, 100]],
+      ],
+      labels,
+    );
+    expect(bases(chart, 'raw2')).toEqual([10, 20, 30, 40, 0]);
+  });
 });
 
 describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {

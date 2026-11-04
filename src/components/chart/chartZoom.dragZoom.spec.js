@@ -233,4 +233,14 @@ describe('혼합 interval 줌', () => {
     expect(evChartData[0].data.s).toEqual(vertical.slice(1, 3));
     expect(evChartData[1].data.s).toEqual([{ x: 20, y: 'b' }, { x: 30, y: 'c' }]);
   });
+
+  it('labels 보다 짧아도 앞부분이 labels 와 자리마다 같은 { x, y } 는 인덱스로 잘라 null 자리를 지킨다', () => {
+    const labels = [0, 5, 10, 15, 20].map(at);
+    const a = [{ x: at(0), y: 1 }, { x: at(5), y: 2 }, null, { x: at(15), y: 4 }];
+    const { zoom, evChartData } = createExecuteZoom({ a, b: [...a] }, labels);
+
+    zoom.executeZoom(1, 3);
+
+    expect(evChartData.data.a).toEqual([{ x: at(5), y: 2 }, null, { x: at(15), y: 4 }]);
+  });
 });
