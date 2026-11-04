@@ -930,6 +930,24 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
     expect(chart.findHitItem(offset).hitId).toBe('s5');
     expect(chart.getHitItemByPosition(offset)).toMatchObject({ sId: 's5', label: clockOf(10) });
   });
+
+  it('범주를 늘려도 원시값 시리즈의 selectLabel 값은 원래 labels 의 같은 시각 값이다', () => {
+    const chart = createStepChart({
+      types: { s0: 'categoryBar', s1: 'categoryBar' },
+      labels: SEC_5.map(clockOf),
+      extra: { s0: SEC_5.map((sec) => 1000 + sec) },
+    });
+    chart.options = { ...chart.options, type: 'bar', selectLabel: { use: true, limit: 5 } };
+    chart.defaultSelectInfo = { dataIndex: [] };
+    expect(chart.data.labels).toHaveLength(60);
+
+    // 10초는 원래 labels 에 있고, 11초는 1초 시리즈 x 로 끼운 범주다.
+    const { data } = chart.getSelectedLabelInfoWithLabelData([10, 11]);
+    expect(data[0]).toEqual({ s0: 1010, s1: { x: clockOf(10), y: 20 } });
+    expect(data[1]).toEqual({ s0: undefined, s1: { x: clockOf(11), y: 21 } });
+    // tip 위치를 정하는 시리즈별 인덱스도 같은 시각의 원소를 가리킨다.
+    expect(chart.getMixedSelectedIndices([10, 11]).get('s0')).toEqual([2]);
+  });
 });
 
 describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)', () => {
