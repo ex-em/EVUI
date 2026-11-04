@@ -608,6 +608,34 @@ describe('혼합 interval — 값 기반 축 일반 bar(x 값 위치)', () => {
     });
   });
 
+  it('timeMode bar 와 섞어도 x 가 같은 정렬 차트와 같은 자리에 놓는다', () => {
+    // timeMode bar 는 전체 폭 비례, 일반 bar 는 한 칸 줄인 폭이라 정렬 차트도 같은 시각 막대가 겹친다.
+    const tenSec = { secs: [0, 10, 20, 30, 40, 50], valueOf: (sec) => 10 + sec };
+    const types = { t: 'bar', n: 'categoryBar' };
+    const mixed = createMixedChart({
+      order: ['t', 'n'],
+      types,
+      source: { t: tenSec, n: { ...tenSec, secs: [0, 5, 10, 20, 30, 40, 50] } },
+    });
+    const aligned = createMixedChart({
+      order: ['t', 'n'],
+      types,
+      source: { t: tenSec, n: tenSec },
+    });
+    expect([mixed.isMixedX, aligned.isMixedX]).toEqual([true, false]);
+
+    const param = valueAxisParam(at(50));
+    layoutBars(mixed, param, ['t', 'n']);
+    layoutBars(aligned, param, ['t', 'n']);
+
+    ['t', 'n'].forEach((id) => {
+      aligned.seriesList[id].data.forEach((a) => {
+        const p = mixed.seriesList[id].data.find(({ x }) => x === a.x);
+        expect([p.xp, p.w]).toEqual([a.xp, a.w]);
+      });
+    });
+  });
+
   it('line 콤보 점은 같은 시각 막대 칸 가운데에 찍힌다', () => {
     const chart = createMixedChart({
       order: ['s1', 's5'],
