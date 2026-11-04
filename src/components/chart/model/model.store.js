@@ -1201,6 +1201,8 @@ const modules = {
     const data = series.data;
     const pos = tops.pos;
     const neg = tops.neg;
+    // 시각 키 top 은 한 시리즈 안에서 같은 키의 첫 자리만 쓴다 — labels 에 같은 값이 있으면 첫 칸 기준(#2352).
+    const written = tops.byX ? { pos: new Set(), neg: new Set() } : null;
 
     for (let i = 0; i < data.length; i++) {
       const p = data[i];
@@ -1211,7 +1213,12 @@ const modules = {
       if (position != null && !isPassingValue) {
         const bucket = baseValue >= 0 ? pos : neg;
         if (tops.byX) {
-          bucket.set(Util.toXKey(isHorizontal ? p.y : p.x), position);
+          const key = Util.toXKey(isHorizontal ? p.y : p.x);
+          const keys = baseValue >= 0 ? written.pos : written.neg;
+          if (!keys.has(key)) {
+            keys.add(key);
+            bucket.set(key, position);
+          }
         } else {
           bucket[i] = position;
         }

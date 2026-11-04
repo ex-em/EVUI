@@ -431,6 +431,20 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     chart.createDataSet(Object.fromEntries(entries), labels);
     expect(bases(chart, 'raw2')).toEqual([10, 0, 30, 40]);
   });
+
+  it('시각 키로 바뀐 뒤 쌓인 원시값도 같은 labels 값은 첫 칸 top 을 남긴다', () => {
+    const chart = createGroupStack(
+      [
+        ['raw', [1, 2, 3, 4]],
+        ['pt', ['a', 'x', 'b', 'c'].map((x) => ({ x, y: 10 }))],
+        ['raw2', [100, 100, 300, 100]],
+        ['pt3', [{ x: 'a', y: 1000 }]],
+      ],
+      ['a', 'b', 'a', 'c'],
+    );
+    // 첫 'a' 칸 top: 1 + 10 + 100
+    expect(bases(chart, 'pt3')).toEqual([111]);
+  });
 });
 
 describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {
