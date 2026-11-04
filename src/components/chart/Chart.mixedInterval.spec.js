@@ -445,6 +445,18 @@ describe('혼합 interval — 스택(같은 시각에서만 쌓기)', () => {
     // 첫 'a' 칸 top: 1 + 10 + 100
     expect(bases(chart, 'pt3')).toEqual([111]);
   });
+
+  it('interpolation zero 로 첫 원소가 0 이 된 { x, y } 도 원본 모양으로 보고 같은 시각끼리 쌓는다', () => {
+    const entries = [
+      ['r', [1, 2, 3, 4]],
+      ['pt', [null, { x: at(5), y: 10 }, { x: at(6), y: 10 }, { x: at(10), y: 10 }]],
+    ];
+    const chart = createGroupStack(entries, LABELS_5);
+    chart.seriesList.pt.interpolation = 'zero';
+    chart.createDataSet(Object.fromEntries(entries), LABELS_5);
+    // 0초(0 으로 채운 자리)·5초·6초(아래 값 없음)·10초
+    expect(bases(chart, 'pt')).toEqual([1, 2, 0, 3]);
+  });
 });
 
 describe('혼합 interval — timeMode bar 폭·콤보 line 오프셋', () => {

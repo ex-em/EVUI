@@ -364,23 +364,22 @@ const modules = {
 
               if (sData) {
                 const inStackGroup = series.isExistGrp && !series.isOverlapping;
+                // 점 모양은 zero 변환 전 원본으로 본다(첫 원소가 0 으로 채워져도 { x, y }).
+                const stacksByX =
+                  inStackGroup &&
+                  Util.isPointSeries(rawData) &&
+                  !Util.isAlignedToLabels(sData, label, this.options.horizontal);
                 let tops = null;
                 if (inStackGroup) {
                   tops = stackTops.get(series.groupIndex);
                   if (!tops) {
                     // { x, y } 스택은 시리즈마다 같은 인덱스가 같은 시각이 아닐 수 있어 시각을 키로 쌓는다.
                     // x 가 labels 와 자리마다 같으면 원시값처럼 인덱스로 쌓는다(중복 라벨도 칸마다).
-                    tops =
-                      Util.isPointSeries(sData) &&
-                      !Util.isAlignedToLabels(sData, label, this.options.horizontal)
-                        ? { pos: new Map(), neg: new Map(), byX: true }
-                        : { pos: [], neg: [] };
+                    tops = stacksByX
+                      ? { pos: new Map(), neg: new Map(), byX: true }
+                      : { pos: [], neg: [] };
                     stackTops.set(series.groupIndex, tops);
-                  } else if (
-                    !tops.byX &&
-                    Util.isPointSeries(sData) &&
-                    !Util.isAlignedToLabels(sData, label, this.options.horizontal)
-                  ) {
+                  } else if (!tops.byX && stacksByX) {
                     // 원시값 위에 x 가 labels 와 어긋난 { x, y } 가 오면 같은 시각끼리 쌓도록 시각 키로 바꾼다.
                     tops = toStackTopsByX(tops, label);
                     stackTops.set(series.groupIndex, tops);
