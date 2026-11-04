@@ -762,6 +762,34 @@ describe('혼합 interval — step 축(문자열 범주)', () => {
 
     expect(chart.data.labels).toEqual(['A', 'B', 'C']);
   });
+
+  it('그리지 않는 step 축 line 만 있으면 정렬 차트처럼 hover·클릭에 잡히지 않는다', () => {
+    const chart = createStepChart({
+      types: { s1: 'line', s5: 'line' },
+      labels: SEC_5.map(clockOf),
+    });
+    ['s1', 's5'].forEach((id) => chart.seriesList[id].computeGeometry(stepParam(12)));
+
+    expect(chart.isMixedX).toBe(true);
+    for (let px = 0; px <= 600; px += 25) {
+      expect(Object.keys(chart.findHitItem([px, 150]).items)).toEqual([]);
+      expect(chart.getHitItemByPosition([px, 150], false)).toMatchObject({ sId: '', label: null });
+    }
+  });
+
+  it('bar 콤보에서는 정렬 차트처럼 같은 시각의 그리지 않는 line 값도 툴팁에 담는다', () => {
+    const chart = createStepChart({
+      types: { s1: 'line', s5: 'categoryBar' },
+      labels: SEC_5.map(clockOf),
+    });
+    layoutBars(chart, stepParam(12), ['s5']);
+    chart.seriesList.s1.computeGeometry(stepParam(12));
+
+    // 12칸 = 칸 50px, 25px 는 00초 칸 가운데
+    const { hitId, items } = chart.findHitItem([25, 150]);
+    expect(hitId).toBe('s5');
+    expect(Object.keys(items).sort()).toEqual(['s1', 's5']);
+  });
 });
 
 describe('혼합 interval — maxTip 윈도우(범주형 축 라벨 인덱스)', () => {

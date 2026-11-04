@@ -165,14 +165,15 @@ const dropUndrawn = (indices, seriesList) => {
 };
 
 /**
- * 픽셀 위치에 가장 가까운, 값이 있는 점. xp 는 x 오름차순과 같은 순서이고 축 범위 밖 점(xp null)은
- * 양 끝에만 있다는 전제로 이진 탐색한다. spacing 은 점 사이 평균 픽셀 간격(스냅 반경용).
+ * 픽셀 위치에 가장 가까운, 값이 있는 점. xp 는 x 오름차순과 같은 순서이고 위치가 없는 점(축 범위 밖 null,
+ * 그리지 않는 step 축 line 의 NaN)은 양 끝에만 있다는 전제로 이진 탐색한다. spacing 은 점 사이 평균 픽셀 간격.
  */
 const findNearestValuedByPos = (points, pos) => {
   let lo = 0;
   let hi = points.length - 1;
-  while (lo <= hi && hitPosOf(points[lo]) == null) lo += 1;
-  while (hi >= lo && hitPosOf(points[hi]) == null) hi -= 1;
+  // 정렬 차트처럼 그리지 않는 점은 hover·클릭 기준점이 되지 않는다(같은 시각 포함은 dropUndrawn 이 정한다).
+  while (lo <= hi && !Number.isFinite(hitPosOf(points[lo]))) lo += 1;
+  while (hi >= lo && !Number.isFinite(hitPosOf(points[hi]))) hi -= 1;
   if (lo > hi) {
     return null;
   }
