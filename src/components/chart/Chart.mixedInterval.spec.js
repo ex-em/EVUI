@@ -1009,6 +1009,19 @@ describe('혼합 interval — selectLabel(labels = 공통 시간 격자)', () =>
     expect(atTen.acc).toBe(130);
     expect(atThree.acc).toBe(13);
   });
+
+  it('원시값 시리즈가 섞여도 그 시리즈 값은 labels 인덱스로 담는다', () => {
+    const chart = createSelectChart();
+    const data = { ...chart.data.data, s1: SEC_1.map((sec) => 10 + sec) };
+    chart.data = { ...chart.data, data };
+    chart.createDataSet(data, LABELS_60);
+    expect(chart.isMixedX).toBe(true);
+
+    expect(chart.getSelectedLabelInfoWithLabelData([10]).data[0]).toEqual({
+      s5: { x: at(10), y: 110 },
+      s1: 20,
+    });
+  });
 });
 
 describe('혼합 interval — 인디케이터', () => {

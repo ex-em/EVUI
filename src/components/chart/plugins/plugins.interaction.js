@@ -1985,11 +1985,14 @@ const modules = {
             return Object.fromEntries(dataEntries.map(([sId, data]) => [sId, data[labelIdx]]));
           }
           // mixed(#2352)는 labels[labelIdx] 시각과 x 가 같은 원소를 시리즈마다 찾는다(없으면 undefined).
+          // 원시값 시리즈는 labels 순서를 공유하므로 정렬 차트처럼 인덱스로 읽는다.
           const labelKey = Util.toXKey(this.data.labels[labelIdx]);
           return Object.fromEntries(
             dataEntries.map(([sId, data]) => [
               sId,
-              data?.find?.((item) => item != null && Util.toXKey(item.x) === labelKey),
+              Util.isPointSeries(data)
+                ? data.find((item) => item != null && Util.toXKey(item.x) === labelKey)
+                : data?.[labelIdx],
             ]),
           );
         });
