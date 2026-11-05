@@ -25,7 +25,8 @@ jobs:
 
   visual:
     name: Visual (browser, blit 계약)
-    runs-on: ubuntu-latest
+    # Playwright 1.58 은 ubuntu 26.04 를 지원하지 않아 ubuntu-latest 에서 chromium 설치가 실패한다.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
