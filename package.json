@@ -7,7 +7,7 @@
   "type": "module",
   "homepage": ".",
   "scripts": {
-    "lint": "eslint --ext .js,.vue --ignore-path .eslintignore --fix src",
+    "lint": "eslint src --fix",
     "format": "prettier --write \"src/**/*.{js,vue,scss,css,json}\" \"docs/**/*.{js,vue,scss,css,json}\" \"*.{js,cjs,json,md}\"",
     "format:check": "prettier --check \"src/**/*.{js,vue,scss,css,json}\" \"docs/**/*.{js,vue,scss,css,json}\" \"*.{js,cjs,json,md}\"",
     "docs": "vite serve --config vite.config.js --port 9999 --host",
@@ -17,11 +17,12 @@
     "build:docs": "vite build --config vite.config.js --mode production",
     "preview": "vite preview --port 9999",
     "prepare": "husky",
-    "test": "vitest",
-    "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage",
+    "test": "node --no-experimental-webstorage node_modules/vitest/vitest.mjs",
+    "test:run": "node --no-experimental-webstorage node_modules/vitest/vitest.mjs run",
+    "test:coverage": "node --no-experimental-webstorage node_modules/vitest/vitest.mjs run --coverage",
     "test:visual": "vitest --config vitest.config.browser.js",
-    "test:visual:update": "vitest --config vitest.config.browser.js --update"
+    "test:visual:update": "vitest --config vitest.config.browser.js --update",
+    "audit": "node .github/scripts/audit-dependencies.cjs"
   },
   "files": [
     "dist"
@@ -41,56 +42,83 @@
   },
   "dependencies": {
     "bignumber.js": "^9.3.1",
-    "dayjs": "^1.11.19",
-    "korean-regexp": "^1.0.10",
+    "dayjs": "^1.11.23",
+    "korean-regexp": "^1.0.13",
     "lodash-es": "^4.18.1",
-    "vue": "^3.5.8",
-    "vue3-observe-visibility": "^1.0.1"
+    "vue": "^3.5.45",
+    "vue3-observe-visibility": "^1.0.7"
   },
   "devDependencies": {
     "@codemirror/lang-javascript": "^6.2.5",
-    "@codemirror/state": "^6.7.1",
-    "@commitlint/cli": "^20.3.1",
-    "@commitlint/config-conventional": "^20.3.1",
-    "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1",
-    "@vitejs/plugin-vue": "^5.1.4",
-    "@vitest/browser": "^4.0.18",
-    "@vitest/browser-playwright": "^4.0.18",
-    "@vitest/coverage-v8": "^4.0.18",
-    "@vue/compiler-sfc": "^3.5.8",
-    "@vue/test-utils": "^2.4.6",
+    "@codemirror/state": "^6.7.6",
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/git": "^11.0.1",
+    "@vitejs/plugin-vue": "^6.0.11",
+    "@vitest/browser": "^4.1.12",
+    "@vitest/browser-playwright": "^4.1.12",
+    "@vitest/coverage-v8": "^4.1.12",
+    "@vue/compiler-sfc": "^3.5.45",
+    "@vue/test-utils": "^2.6.0",
     "codemirror": "^6.0.2",
-    "eslint": "^8.57.1",
-    "eslint-config-exem": "^3.0.3",
+    "eslint": "^9.39.5",
+    "eslint-config-exem": "^3.1.2",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-import": "^2.21.2",
-    "eslint-plugin-vue": "^8.7.1",
-    "gh-pages": "^6.1.1",
-    "highlight.js": "^10.2.0",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-vue": "^10.12.1",
+    "gh-pages": "^6.3.0",
+    "highlight.js": "^11.12.0",
     "husky": "^9.1.7",
-    "jsdom": "^27.4.0",
-    "lint-staged": "^16.2.7",
+    "jsdom": "~27.4.0",
+    "lint-staged": "^17.6.1",
     "lodash-es": "^4.18.1",
-    "marked": "^14.1.2",
-    "marked-gfm-heading-id": "^4.1.3",
-    "playwright": "^1.58.1",
-    "prettier": "^3.7.4",
-    "sass": "^1.94.2",
-    "semantic-release": "^25.0.2",
-    "stylelint": "^16.9.0",
-    "stylelint-order": "^6.0.4",
-    "typescript": "^5.0.0",
-    "vite": "^5.4.8",
-    "vitest": "^4.0.18",
-    "vitest-browser-vue": "^2.0.2",
-    "vue-router": "^4.6.3"
+    "marked": "^18.2.1",
+    "marked-gfm-heading-id": "^4.1.4",
+    "playwright": "^1.65.1",
+    "prettier": "^3.10.1",
+    "sass": "^1.108.2",
+    "semantic-release": "^25.0.9",
+    "stylelint": "^18.0.0",
+    "stylelint-order": "^8.1.3",
+    "typescript": "~5.9.3",
+    "vite": "^8.3.8",
+    "vitest": "^4.1.12",
+    "vitest-browser-vue": "^2.1.0",
+    "vue-router": "^5.5.1",
+    "@eslint/eslintrc": "^3.3.7",
+    "@eslint/js": "^9.39.5",
+    "@stylistic/stylelint-plugin": "^6.0.1",
+    "postcss-html": "^2.0.1",
+    "postcss-scss": "^4.0.9",
+    "rimraf": "^6.1.4",
+    "vue-eslint-parser": "^10.4.2"
   },
   "peerDependencies": {
-    "vue": "*"
+    "vue": "^3.5.8"
   },
   "lint-staged": {
     "*.{js,vue}": "eslint --fix",
     "docs/views/apiDocs/data/*.json": "node scripts/validate-api-docs.js"
+  },
+  "packageManager": "npm@11.19.1",
+  "overrides": {
+    "glob@>=9 <14.0.2": "^14.0.6",
+    "minimatch@>=7 <11.0.1": "^11.0.9",
+    "eslint-config-exem": {
+      "eslint": "$eslint"
+    }
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^22.22.2 || ^24.15.0 || >=26.0.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": ">=11.19.1 <12",
+      "onFail": "error"
+    }
   }
 }

@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    target-branch: '3.4'
+    schedule:
+      interval: weekly
+    groups:
+      vitest:
+        patterns: ['vitest', '@vitest/*', 'vitest-browser-vue']
+      vue-tooling:
+        patterns: ['vue', '@vue/*', '@vitejs/plugin-vue', 'vite']
+  - package-ecosystem: github-actions
+    directory: /
+    target-branch: '3.4'
+    schedule:
+      interval: weekly

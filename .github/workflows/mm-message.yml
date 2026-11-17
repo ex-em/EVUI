@@ -20,6 +20,7 @@ jobs:
   relay:
     runs-on: [self-hosted, linux, x64]
     timeout-minutes: 3
+    if: github.repository == 'ex-em/EVUI'
     steps:
       - name: Relay raw event payload to internal github endpoint
         shell: bash
@@ -30,7 +31,13 @@ jobs:
         run: |
           set -euo pipefail
 
+          if [ -z "$RELAY_URL" ]; then
+            echo 'Message relay URL is not configured; skipping.'
+            exit 0
+          fi
+
           curl --fail --show-error --silent \
+            --connect-timeout 10 --max-time 30 \
             --retry 3 --retry-delay 2 --retry-connrefused \
             -X POST "$RELAY_URL" \
             -H "Content-Type: application/json" \

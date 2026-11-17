@@ -2,23 +2,27 @@ name: Commitlint
 
 on:
   pull_request:
-    branches: [3.0, 3.4]
+    branches: ['3.0', '3.4']
+
+permissions:
+  contents: read
 
 jobs:
   commitlint:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: 20
-
-      - name: Install commitlint
-        run: npm install @commitlint/cli @commitlint/config-conventional
-
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --strict-peer-deps
       - name: Validate PR commits
-        run: npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+        run: npx --no commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}

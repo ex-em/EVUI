@@ -1,13 +1,10 @@
 {
-  "plugins": [
-    "stylelint-order"
-  ],
+  "plugins": ["stylelint-order", "@stylistic/stylelint-plugin"],
   "rules": {
-    "indentation": 2,
-    "declaration-colon-space-after": "always",
-    "declaration-colon-space-before": "never",
-    "block-opening-brace-space-before": "always",
-    "declaration-block-single-line-max-declarations": 1,
+    "@stylistic/indentation": 2,
+    "@stylistic/declaration-colon-space-after": "always",
+    "@stylistic/declaration-colon-space-before": "never",
+    "@stylistic/block-opening-brace-space-before": "always",
     "max-nesting-depth": 4,
     "selector-max-compound-selectors": 3,
     "selector-no-qualifying-type": true,
@@ -16,32 +13,24 @@
     "at-rule-empty-line-before": [
       "always",
       {
-        "except": [
-          "after-same-name",
-          "first-nested"
-        ]
+        "except": ["after-same-name", "first-nested"]
       }
     ],
-    "at-rule-name-case": "lower",
-    "color-hex-case": "upper",
+    "@stylistic/at-rule-name-case": "lower",
+    "@stylistic/color-hex-case": "upper",
     "color-hex-length": "long",
     "color-no-invalid-hex": true,
-    "string-quotes": "single",
-    "value-list-comma-space-after": "always-single-line",
+    "@stylistic/string-quotes": "single",
+    "@stylistic/value-list-comma-space-after": "always-single-line",
     "comment-whitespace-inside": "always",
     "length-zero-no-unit": true,
-    "number-no-trailing-zeros": true,
-    "declaration-block-trailing-semicolon": "always",
+    "@stylistic/number-no-trailing-zeros": true,
+    "@stylistic/declaration-block-trailing-semicolon": "always",
     "declaration-block-no-duplicate-properties": true,
-    "declaration-block-semicolon-newline-after": "always-multi-line",
-    "block-closing-brace-empty-line-before": "never",
-    "block-closing-brace-newline-before": "always",
-    "order/order": [
-      "custom-properties",
-      "dollar-variables",
-      "declarations",
-      "at-rules"
-    ],
+    "@stylistic/declaration-block-semicolon-newline-after": "always-multi-line",
+    "@stylistic/block-closing-brace-empty-line-before": "never",
+    "@stylistic/block-closing-brace-newline-before": "always",
+    "order/order": ["custom-properties", "dollar-variables", "declarations", "at-rules"],
     "order/properties-order": [
       "display",
       "list-style",
@@ -68,6 +57,77 @@
       "vertical-align",
       "white-space",
       "content"
-    ]
-  }
+    ],
+    "@stylistic/declaration-block-single-line-max-declarations": 1
+  },
+  "overrides": [
+    {
+      "files": ["**/*.vue", "**/*.html"],
+      "customSyntax": "postcss-html",
+      "rules": {
+        "@stylistic/indentation": null,
+        "@stylistic/scss/indentation": 2,
+        "@stylistic/declaration-colon-space-after": null,
+        "@stylistic/scss/declaration-colon-space-after": "always",
+        "@stylistic/declaration-colon-space-before": null,
+        "@stylistic/scss/declaration-colon-space-before": "never",
+        "@stylistic/block-opening-brace-space-before": null,
+        "@stylistic/scss/block-opening-brace-space-before": "always",
+        "@stylistic/at-rule-name-case": null,
+        "@stylistic/scss/at-rule-name-case": "lower",
+        "@stylistic/color-hex-case": null,
+        "@stylistic/scss/color-hex-case": "upper",
+        "@stylistic/string-quotes": null,
+        "@stylistic/scss/string-quotes": "single",
+        "@stylistic/value-list-comma-space-after": null,
+        "@stylistic/scss/value-list-comma-space-after": "always-single-line",
+        "@stylistic/number-no-trailing-zeros": null,
+        "@stylistic/scss/number-no-trailing-zeros": true,
+        "@stylistic/declaration-block-trailing-semicolon": null,
+        "@stylistic/scss/declaration-block-trailing-semicolon": "always",
+        "@stylistic/declaration-block-semicolon-newline-after": null,
+        "@stylistic/scss/declaration-block-semicolon-newline-after": "always-multi-line",
+        "@stylistic/block-closing-brace-empty-line-before": null,
+        "@stylistic/scss/block-closing-brace-empty-line-before": "never",
+        "@stylistic/block-closing-brace-newline-before": null,
+        "@stylistic/scss/block-closing-brace-newline-before": "always",
+        "@stylistic/declaration-block-single-line-max-declarations": null,
+        "@stylistic/scss/declaration-block-single-line-max-declarations": 1
+      }
+    },
+    {
+      "files": ["**/*.scss"],
+      "customSyntax": "postcss-scss",
+      "rules": {
+        "@stylistic/indentation": null,
+        "@stylistic/scss/indentation": 2,
+        "@stylistic/declaration-colon-space-after": null,
+        "@stylistic/scss/declaration-colon-space-after": "always",
+        "@stylistic/declaration-colon-space-before": null,
+        "@stylistic/scss/declaration-colon-space-before": "never",
+        "@stylistic/block-opening-brace-space-before": null,
+        "@stylistic/scss/block-opening-brace-space-before": "always",
+        "@stylistic/at-rule-name-case": null,
+        "@stylistic/scss/at-rule-name-case": "lower",
+        "@stylistic/color-hex-case": null,
+        "@stylistic/scss/color-hex-case": "upper",
+        "@stylistic/string-quotes": null,
+        "@stylistic/scss/string-quotes": "single",
+        "@stylistic/value-list-comma-space-after": null,
+        "@stylistic/scss/value-list-comma-space-after": "always-single-line",
+        "@stylistic/number-no-trailing-zeros": null,
+        "@stylistic/scss/number-no-trailing-zeros": true,
+        "@stylistic/declaration-block-trailing-semicolon": null,
+        "@stylistic/scss/declaration-block-trailing-semicolon": "always",
+        "@stylistic/declaration-block-semicolon-newline-after": null,
+        "@stylistic/scss/declaration-block-semicolon-newline-after": "always-multi-line",
+        "@stylistic/block-closing-brace-empty-line-before": null,
+        "@stylistic/scss/block-closing-brace-empty-line-before": "never",
+        "@stylistic/block-closing-brace-newline-before": null,
+        "@stylistic/scss/block-closing-brace-newline-before": "always",
+        "@stylistic/declaration-block-single-line-max-declarations": null,
+        "@stylistic/scss/declaration-block-single-line-max-declarations": 1
+      }
+    }
+  ]
 }

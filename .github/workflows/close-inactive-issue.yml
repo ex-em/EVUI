@@ -1,21 +1,25 @@
 name: Close Inactive Issues
-# inactive 면서 일동안 활동이 없는 이슈를 닫음
 
 on:
   schedule:
-    - cron: "0 15 * * *"
-# 한국시간 매일 자정에 실행
+    - cron: '0 15 * * *'
+
+permissions:
+  contents: read
+  issues: write
 
 jobs:
-  check-need-info:
+  inactive-issues:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: github.repository == 'ex-em/EVUI'
     steps:
-      - name: close-issues
-        uses: actions-cool/issues-helper@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          actions: 'close-issues'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          labels: 'inactive'
-          inactive-day: 3
-          body: '오래된 이슈는 닫고 있어요. 필요하다면 다시 열어주세요. :smile:'
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const manageInactive = require('./.github/scripts/inactive-issues.cjs');
+            await manageInactive({ github, context, mode: 'close' });
