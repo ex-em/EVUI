@@ -61,8 +61,8 @@ jobs:
           cache: npm
       - run: npm ci --strict-peer-deps
       - name: Install Playwright chromium
-        run: npx --no playwright install --with-deps chromium
+        run: npx --no -- playwright install --with-deps chromium
       # Compare blit and full redraw within the same browser execution.
       # Committed Chart.visual.spec.js images are macOS-specific.
       - name: Run blit equivalence visual tests
-        run: npx --no vitest run --config vitest.config.browser.js chart.blit chart.realtime
+        run: npx --no -- vitest run --config vitest.config.browser.js chart.blit chart.realtime

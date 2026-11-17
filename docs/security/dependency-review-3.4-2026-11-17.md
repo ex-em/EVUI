@@ -128,3 +128,7 @@
 - [Vue Router 5 마이그레이션](https://router.vuejs.org/guide/migration/v4-to-v5.html)
 - [npm 공식 레지스트리](https://registry.npmjs.org/): 각 직접 패키지의 버전·engines·peerDependencies를 조회했다.
 - 남은 개별 보안 권고와 실제 경로는 위 보안 결과에 직접 연결했다.
+
+## CI 인자 전달 후속 수정
+
+최초 PR의 Commitlint 작업에서 npm이 `--from`·`--to`를 자신의 옵션으로 해석해 실패했다. 커밋 메시지 자체는 유효했다. `npx --no -- commitlint ...`처럼 명시적인 구분자를 추가하고 Playwright·Vitest·semantic-release 호출에도 같은 방식으로 적용했다. 유효 커밋의 검사 통과와 잘못된 메시지의 거부를 확인했으며 실제 릴리스 명령은 실행하지 않았다.

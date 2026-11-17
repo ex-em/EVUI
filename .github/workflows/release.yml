@@ -58,7 +58,7 @@ jobs:
           RELEASE_DRY_RUN: ${{ inputs.dry-run }}
         run: |
           if [ "$RELEASE_DRY_RUN" = 'true' ]; then
-            npx --no semantic-release --dry-run
+            npx --no -- semantic-release --dry-run
           else
-            npx --no semantic-release
+            npx --no -- semantic-release
           fi
