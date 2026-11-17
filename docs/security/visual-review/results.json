@@ -1,0 +1,2647 @@
+{
+  "date": "2026-11-17",
+  "browser": "Chrome 157.0.8103.79 (macOS, headless)",
+  "baseline": "53772bad",
+  "after": "b0e31732 + Checkbox/ContextMenu story fixes",
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 900
+    },
+    "narrow": {
+      "width": 390,
+      "height": 844
+    }
+  },
+  "themes": ["light", "dark"],
+  "stories": 32,
+  "additionalStates": 9,
+  "comparisons": 164,
+  "exactPixelMatches": 164,
+  "results": [
+    {
+      "id": "button--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "button--evui-3",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "checkbox--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "contextmenu--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "grid--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 1866],
+        "after": [1280, 1866]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "icon--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "inputnumber--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "pagination--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "radio--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "select--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1311, 900],
+        "after": [1311, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1311,
+      "scrollWidthAfter": 1311
+    },
+    {
+      "id": "tab--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "textfield--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "toggle--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "treegrid--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--calendar",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 3344],
+        "after": [1280, 3344]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--slider",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 1016],
+        "after": [1280, 1016]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--tree",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1310, 2757],
+        "after": [1310, 2757]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1310,
+      "scrollWidthAfter": 1310
+    },
+    {
+      "id": "visualreview--scheduler",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 2226],
+        "after": [1280, 2226]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--time-picker",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--menu",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--bar-chart",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1404, 900],
+        "after": [1404, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1404,
+      "scrollWidthAfter": 1404
+    },
+    {
+      "id": "visualreview--pie-chart",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1414, 900],
+        "after": [1414, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1414,
+      "scrollWidthAfter": 1414
+    },
+    {
+      "id": "visualreview--heat-map",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1414, 900],
+        "after": [1414, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1414,
+      "scrollWidthAfter": 1414
+    },
+    {
+      "id": "visualreview--scatter-chart",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1326, 900],
+        "after": [1326, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1326,
+      "scrollWidthAfter": 1326
+    },
+    {
+      "id": "visualreview--date-picker",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--line-chart",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1414, 900],
+        "after": [1414, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1414,
+      "scrollWidthAfter": 1414
+    },
+    {
+      "id": "window--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-loading--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-message--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-messagebox--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-notification--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-progress--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "select--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1311, 900],
+        "after": [1311, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1311,
+      "scrollWidthAfter": 1311
+    },
+    {
+      "id": "window--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "contextmenu--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-message--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-messagebox--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-notification--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "textfield--default",
+      "state": "focused",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "toggle--default",
+      "state": "checked",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--date-picker",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "button--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "button--evui-3",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "checkbox--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "contextmenu--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "grid--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 1866],
+        "after": [1280, 1866]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "icon--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "inputnumber--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "pagination--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "radio--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "select--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1311, 900],
+        "after": [1311, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1311,
+      "scrollWidthAfter": 1311
+    },
+    {
+      "id": "tab--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "textfield--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "toggle--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "treegrid--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--calendar",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 3344],
+        "after": [1280, 3344]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--slider",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 1016],
+        "after": [1280, 1016]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--tree",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1310, 2757],
+        "after": [1310, 2757]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1310,
+      "scrollWidthAfter": 1310
+    },
+    {
+      "id": "visualreview--scheduler",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 2226],
+        "after": [1280, 2226]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--time-picker",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--menu",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--bar-chart",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1404, 900],
+        "after": [1404, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1404,
+      "scrollWidthAfter": 1404
+    },
+    {
+      "id": "visualreview--pie-chart",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1414, 900],
+        "after": [1414, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1414,
+      "scrollWidthAfter": 1414
+    },
+    {
+      "id": "visualreview--heat-map",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1414, 900],
+        "after": [1414, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1414,
+      "scrollWidthAfter": 1414
+    },
+    {
+      "id": "visualreview--scatter-chart",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1326, 900],
+        "after": [1326, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1326,
+      "scrollWidthAfter": 1326
+    },
+    {
+      "id": "visualreview--date-picker",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--line-chart",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1414, 900],
+        "after": [1414, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1414,
+      "scrollWidthAfter": 1414
+    },
+    {
+      "id": "window--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-loading--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-message--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-messagebox--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-notification--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-progress--default",
+      "state": "default",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "select--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1311, 900],
+        "after": [1311, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1311,
+      "scrollWidthAfter": 1311
+    },
+    {
+      "id": "window--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "contextmenu--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-message--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-messagebox--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "notice-notification--default",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "textfield--default",
+      "state": "focused",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "toggle--default",
+      "state": "checked",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "visualreview--date-picker",
+      "state": "opened",
+      "viewport": "desktop",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [1280, 900],
+        "after": [1280, 900]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 1280,
+      "scrollWidthAfter": 1280
+    },
+    {
+      "id": "button--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "button--evui-3",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 936],
+        "after": [390, 936]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "checkbox--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "contextmenu--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "grid--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 1866],
+        "after": [390, 1866]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "icon--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [516, 844],
+        "after": [516, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 516,
+      "scrollWidthAfter": 516
+    },
+    {
+      "id": "inputnumber--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "pagination--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "radio--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "select--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [421, 844],
+        "after": [421, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 421,
+      "scrollWidthAfter": 421
+    },
+    {
+      "id": "tab--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "textfield--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "toggle--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "treegrid--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--calendar",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [609, 3746],
+        "after": [609, 3746]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 609,
+      "scrollWidthAfter": 609
+    },
+    {
+      "id": "visualreview--slider",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 1016],
+        "after": [390, 1016]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--tree",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [420, 2887],
+        "after": [420, 2887]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 420,
+      "scrollWidthAfter": 420
+    },
+    {
+      "id": "visualreview--scheduler",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 3594],
+        "after": [390, 3594]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--time-picker",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [407, 844],
+        "after": [407, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 407,
+      "scrollWidthAfter": 407
+    },
+    {
+      "id": "visualreview--menu",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--bar-chart",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [514, 844],
+        "after": [514, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 514,
+      "scrollWidthAfter": 514
+    },
+    {
+      "id": "visualreview--pie-chart",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [524, 844],
+        "after": [524, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 524,
+      "scrollWidthAfter": 524
+    },
+    {
+      "id": "visualreview--heat-map",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [524, 844],
+        "after": [524, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 524,
+      "scrollWidthAfter": 524
+    },
+    {
+      "id": "visualreview--scatter-chart",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [436, 844],
+        "after": [436, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 436,
+      "scrollWidthAfter": 436
+    },
+    {
+      "id": "visualreview--date-picker",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [434, 844],
+        "after": [434, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 434,
+      "scrollWidthAfter": 434
+    },
+    {
+      "id": "visualreview--line-chart",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [524, 844],
+        "after": [524, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 524,
+      "scrollWidthAfter": 524
+    },
+    {
+      "id": "window--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-loading--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-message--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-messagebox--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-notification--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-progress--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "select--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [421, 844],
+        "after": [421, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 421,
+      "scrollWidthAfter": 421
+    },
+    {
+      "id": "window--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "contextmenu--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-message--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-messagebox--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-notification--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "textfield--default",
+      "state": "focused",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "toggle--default",
+      "state": "checked",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--date-picker",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "light",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [434, 844],
+        "after": [434, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 434,
+      "scrollWidthAfter": 434
+    },
+    {
+      "id": "button--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "button--evui-3",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 936],
+        "after": [390, 936]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "checkbox--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "contextmenu--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "grid--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 1866],
+        "after": [390, 1866]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "icon--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [516, 844],
+        "after": [516, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 516,
+      "scrollWidthAfter": 516
+    },
+    {
+      "id": "inputnumber--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "pagination--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "radio--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "select--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [421, 844],
+        "after": [421, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 421,
+      "scrollWidthAfter": 421
+    },
+    {
+      "id": "tab--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "textfield--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "toggle--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "treegrid--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--calendar",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [609, 3746],
+        "after": [609, 3746]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 609,
+      "scrollWidthAfter": 609
+    },
+    {
+      "id": "visualreview--slider",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 1016],
+        "after": [390, 1016]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--tree",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [420, 2887],
+        "after": [420, 2887]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 420,
+      "scrollWidthAfter": 420
+    },
+    {
+      "id": "visualreview--scheduler",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 3594],
+        "after": [390, 3594]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--time-picker",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [407, 844],
+        "after": [407, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 407,
+      "scrollWidthAfter": 407
+    },
+    {
+      "id": "visualreview--menu",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--bar-chart",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [514, 844],
+        "after": [514, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 514,
+      "scrollWidthAfter": 514
+    },
+    {
+      "id": "visualreview--pie-chart",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [524, 844],
+        "after": [524, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 524,
+      "scrollWidthAfter": 524
+    },
+    {
+      "id": "visualreview--heat-map",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [524, 844],
+        "after": [524, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 524,
+      "scrollWidthAfter": 524
+    },
+    {
+      "id": "visualreview--scatter-chart",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [436, 844],
+        "after": [436, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 436,
+      "scrollWidthAfter": 436
+    },
+    {
+      "id": "visualreview--date-picker",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [434, 844],
+        "after": [434, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 434,
+      "scrollWidthAfter": 434
+    },
+    {
+      "id": "visualreview--line-chart",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [524, 844],
+        "after": [524, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 524,
+      "scrollWidthAfter": 524
+    },
+    {
+      "id": "window--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-loading--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-message--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-messagebox--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-notification--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-progress--default",
+      "state": "default",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "select--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [421, 844],
+        "after": [421, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 421,
+      "scrollWidthAfter": 421
+    },
+    {
+      "id": "window--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "contextmenu--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-message--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-messagebox--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "notice-notification--default",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "textfield--default",
+      "state": "focused",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "toggle--default",
+      "state": "checked",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [390, 844],
+        "after": [390, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 390,
+      "scrollWidthAfter": 390
+    },
+    {
+      "id": "visualreview--date-picker",
+      "state": "opened",
+      "viewport": "narrow",
+      "theme": "dark",
+      "exactPixelMatch": true,
+      "changedPixels": 0,
+      "dimensions": {
+        "before": [434, 844],
+        "after": [434, 844]
+      },
+      "runtimeErrors": [],
+      "renderError": null,
+      "scrollWidthBefore": 434,
+      "scrollWidthAfter": 434
+    }
+  ]
+}

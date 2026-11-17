@@ -99,7 +99,6 @@ const StoryTemplate: Story = {
     </div>
 
   </div>
-  </div>
               `,
   }),
 };

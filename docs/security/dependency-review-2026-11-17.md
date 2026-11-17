@@ -164,3 +164,7 @@
 - [npm 공식 레지스트리](https://registry.npmjs.org/): 각 패키지 버전, engines, peerDependencies를 직접 조회했다.
 - [minimatch 보안 권고](https://github.com/advisories/GHSA-g3hv-75wg-m249)
 - [checkout 릴리스](https://github.com/actions/checkout/releases/tag/v7.0.1), [setup-node 릴리스](https://github.com/actions/setup-node/releases/tag/v7.1.0), [gh-pages 릴리스](https://github.com/peaceiris/actions-gh-pages/releases/tag/v4.1.0)
+
+## 후속 시각 검증
+
+[시각 검증 보고서](./visual-review-2026-11-17.md): 기존 스토리와 추가 컴포넌트를 포함한 164쌍의 이미지가 모두 픽셀 단위로 일치했다. 기존 체크박스·컨텍스트 메뉴 예제의 렌더 오류 두 개를 수정했다. 기존 좁은 화면 가로 넘침과 다크 테마 제약도 별도 기록했다.
