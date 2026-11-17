@@ -6,15 +6,23 @@ on:
   issue_comment:
     types: [created, edited]
 
+permissions:
+  contents: read
+  issues: write
+
 jobs:
-  issue-remove-inactive:
+  inactive-issues:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: github.repository == 'ex-em/EVUI'
     steps:
-      - name: remove inactive
-        if: github.event.issue.state == 'open' && github.actor == github.event.issue.user.login
-        uses: actions-cool/issues-helper@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          actions: 'remove-labels'
-          issue-number: ${{ github.event.issue.number }}
-          labels: 'inactive'
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        if: github.event.issue.state == 'open' && !github.event.issue.pull_request && github.actor == github.event.issue.user.login
+        with:
+          script: |
+            const manageInactive = require('./.github/scripts/inactive-issues.cjs');
+            await manageInactive({ github, context, mode: 'remove' });

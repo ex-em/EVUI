@@ -2,6 +2,7 @@ import pluginJs from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import eslintConfigPrettier from 'eslint-config-prettier';
 import vuePlugin from 'eslint-plugin-vue';
+import globals from 'globals';
 
 export default tseslint.config(
   pluginJs.configs.recommended,
@@ -12,6 +13,7 @@ export default tseslint.config(
       'typescript-eslint': tseslint.plugin,
     },
     languageOptions: {
+      globals: globals.browser,
       parserOptions: {
         parser: tseslint.parser,
         extraFileExtensions: ['.vue'],
@@ -20,7 +22,15 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ['**/dist/', '**/node_modules/'],
+    files: ['**/*.cjs', '**/scripts/**/*.{js,ts}', '**/*config.{js,ts}'],
+    languageOptions: { globals: globals.node },
+  },
+  {
+    files: ['**/*.cjs'],
+    rules: { '@typescript-eslint/no-require-imports': 'off' },
+  },
+  {
+    ignores: ['**/dist/', '**/node_modules/', '**/storybook-static/'],
   },
   eslintConfigPrettier
 );

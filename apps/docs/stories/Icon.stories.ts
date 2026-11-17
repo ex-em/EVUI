@@ -1,5 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/vue3';
-import { EvIcon, iconList } from 'evui';
+import { EvIcon } from 'evui';
+import iconStyles from '../../../packages/evui/src/style/lib/icon.css?raw';
+
+const iconNames = [...iconStyles.matchAll(/\.ev-icon-([\w-]+)::before/g)].map(
+  (match) => match[1]
+);
 
 const meta: Meta<typeof EvIcon> = {
   component: EvIcon,
@@ -17,7 +22,7 @@ const StoryTemplate: Story = {
     },
     template: `
     <div style="width: 500px; overflow-wrap: anywhere;">
-    ${Object.keys(iconList)
+    ${iconNames
       .map((i) => `<EvIcon icon="ev-icon-${i}" v-bind="args" ></EvIcon>`)
       .join('  ')}
     </div>
