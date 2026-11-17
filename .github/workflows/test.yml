@@ -1,50 +1,68 @@
-name: Test
+name: Test and dependency security
 
 on:
   pull_request:
-    branches: [3.0, 3.4]
+    branches: ['3.0', '3.4']
+  push:
+    branches: ['3.4']
+  schedule:
+    - cron: '0 0 * * 1'
+
+permissions:
+  contents: read
 
 jobs:
   unit:
     name: Unit (node)
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 20
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
           cache: npm
+      - run: npm ci --strict-peer-deps
+      - run: npm run test:run
+      - run: node --test .github/scripts/*.test.cjs
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run unit tests
-        run: npm run test:run
+  security-build:
+    name: Dependency audit and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci --strict-peer-deps
+      - run: npm run audit
+      - run: npm audit --omit=dev --audit-level=low
+      - run: npm run docs:validate
+      - run: npm run build:lib
+      - run: npm run build:docs
 
   visual:
     name: Visual (browser, blit 계약)
-    # Playwright 1.58 은 ubuntu 26.04 를 지원하지 않아 ubuntu-latest 에서 chromium 설치가 실패한다.
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 20
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
+      - run: npm ci --strict-peer-deps
       - name: Install Playwright chromium
-        run: npx playwright install --with-deps chromium
-
-      # blit≡full 픽셀 동등 가드(chart.blit.*·chart.realtime.*)만 돈다. 이들은 같은 실행 안에서
-      # blit 라스터 vs full redraw 를 getImageData 로 자기비교하므로 OS 독립적이다.
-      # Chart.visual.spec.js 는 커밋된 스크린샷 베이스라인이 macOS(chromium-darwin) 전용이라
-      # ubuntu 러너에서는 재현이 불가해 제외한다(별도 macOS job 이 필요하면 후속 과제).
+        run: npx --no playwright install --with-deps chromium
+      # Compare blit and full redraw within the same browser execution.
+      # Committed Chart.visual.spec.js images are macOS-specific.
       - name: Run blit equivalence visual tests
-        run: npx vitest run --config vitest.config.browser.js chart.blit chart.realtime
+        run: npx --no vitest run --config vitest.config.browser.js chart.blit chart.realtime

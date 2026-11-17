@@ -8,8 +8,8 @@ export default defineConfig({
   resolve: {
     extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue'],
     alias: {
-      '@': path.join(__dirname, 'src/'),
-      docs: path.join(__dirname, 'docs/'),
+      '@': path.join(import.meta.dirname, 'src/'),
+      docs: path.join(import.meta.dirname, 'docs/'),
     },
   },
   css: {

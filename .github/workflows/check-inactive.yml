@@ -1,20 +1,25 @@
 name: Check inactive
-# Check inactive issues and label `inactive` if it is inactive for 30 days
-# 10일 동안 활동이 없는 이슈를 찾아서 inactive 라벨을 붙임
 
 on:
   schedule:
-    - cron: "0 15 * * *"
-# 한국시간 매일 자정에 실행
+    - cron: '0 15 * * *'
+
+permissions:
+  contents: read
+  issues: write
 
 jobs:
-  check-inactive:
+  inactive-issues:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     if: github.repository == 'ex-em/EVUI'
     steps:
-      - name: check-inactive
-        uses: actions-cool/issues-helper@v3
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          actions: 'check-inactive'
-          token: ${{ secrets.GITHUB_TOKEN }}
-          inactive-day: 10
+          persist-credentials: false
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const manageInactive = require('./.github/scripts/inactive-issues.cjs');
+            await manageInactive({ github, context, mode: 'check' });

@@ -1,0 +1,1010 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@npmcli/arborist": {
+      "name": "@npmcli/arborist",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@npmcli/map-workspaces",
+        "@npmcli/metavuln-calculator",
+        "@npmcli/package-json",
+        "@npmcli/run-script",
+        "cacache",
+        "minimatch",
+        "npm-registry-fetch",
+        "pacote"
+      ],
+      "effects": ["libnpmdiff", "libnpmexec", "libnpmfund", "libnpmpack", "npm"],
+      "range": ">=6.2.6",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/arborist"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/config": {
+      "name": "@npmcli/config",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/map-workspaces", "@npmcli/package-json"],
+      "effects": ["npm"],
+      "range": ">=8.3.4",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/config"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/map-workspaces": {
+      "name": "@npmcli/map-workspaces",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/package-json", "glob", "minimatch"],
+      "effects": ["@npmcli/arborist", "@npmcli/config", "npm"],
+      "range": ">=3.0.3",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/map-workspaces"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/metavuln-calculator": {
+      "name": "@npmcli/metavuln-calculator",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["cacache", "pacote"],
+      "effects": ["@npmcli/arborist", "npm"],
+      "range": "7.0.0 - 9.0.3",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/metavuln-calculator"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/package-json": {
+      "name": "@npmcli/package-json",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["glob"],
+      "effects": [
+        "@npmcli/arborist",
+        "@npmcli/config",
+        "@npmcli/map-workspaces",
+        "@npmcli/run-script",
+        "init-package-json",
+        "libnpmexec",
+        "libnpmpublish",
+        "npm",
+        "pacote"
+      ],
+      "range": "3.1.0 - 8.0.0",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/package-json"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/run-script": {
+      "name": "@npmcli/run-script",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/package-json"],
+      "effects": ["@npmcli/arborist", "libnpmexec", "libnpmpack", "libnpmversion", "npm", "pacote"],
+      "range": "7.0.4 - 10.0.4",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/run-script"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@semantic-release/github": {
+      "name": "@semantic-release/github",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["semantic-release"],
+      "effects": ["semantic-release"],
+      "range": "5.3.0-beta.1 - 5.3.0-beta.8 || 5.4.0-beta.1 || 5.5.0-beta.1 || 5.6.0-beta.1 - 5.6.0-beta.3 || >=11.0.0",
+      "nodes": ["node_modules/@semantic-release/github"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@semantic-release/npm": {
+      "name": "@semantic-release/npm",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm"],
+      "effects": ["semantic-release"],
+      "range": ">=11.0.0",
+      "nodes": ["node_modules/@semantic-release/npm"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@sigstore/sign": {
+      "name": "@sigstore/sign",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["make-fetch-happen"],
+      "effects": ["sigstore"],
+      "range": "2.0.0 - 4.1.1",
+      "nodes": ["node_modules/npm/node_modules/@sigstore/sign"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@sigstore/tuf": {
+      "name": "@sigstore/tuf",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["tuf-js"],
+      "effects": ["npm", "sigstore"],
+      "range": "*",
+      "nodes": ["node_modules/npm/node_modules/@sigstore/tuf"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@tufjs/models": {
+      "name": "@tufjs/models",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["minimatch"],
+      "effects": ["tuf-js"],
+      "range": ">=1.0.1",
+      "nodes": ["node_modules/npm/node_modules/@tufjs/models"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@vitest/browser": {
+      "name": "@vitest/browser",
+      "severity": "critical",
+      "isDirect": true,
+      "via": [
+        "@vitest/mocker",
+        {
+          "source": 1120010,
+          "name": "@vitest/browser",
+          "dependency": "@vitest/browser",
+          "title": "Vitest browser mode serves unsanitized otelCarrier query parameter as inline script",
+          "url": "https://github.com/advisories/GHSA-2h32-95rg-cppp",
+          "severity": "critical",
+          "cwe": ["CWE-79"],
+          "cvss": {
+            "score": 9.6,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:C/C:H/I:H/A:H"
+          },
+          "range": ">=4.0.17 <4.1.6"
+        },
+        {
+          "source": 1139523,
+          "name": "@vitest/browser",
+          "dependency": "@vitest/browser",
+          "title": "@vitest/browser: Browser Mode provider commands bypass the file-access permission gate",
+          "url": "https://github.com/advisories/GHSA-p63j-vcc4-9vmv",
+          "severity": "critical",
+          "cwe": ["CWE-22", "CWE-552", "CWE-862"],
+          "cvss": {
+            "score": 9.4,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:L"
+          },
+          "range": ">=4.0.0 <4.1.10"
+        },
+        {
+          "source": 1139526,
+          "name": "@vitest/browser",
+          "dependency": "@vitest/browser",
+          "title": "Vitest Browser: Exposed Browser Mode API Can Proxy CDP and Overwrite Config Files, Leading to RCE",
+          "url": "https://github.com/advisories/GHSA-g8mr-85jm-7xhm",
+          "severity": "critical",
+          "cwe": ["CWE-749", "CWE-862"],
+          "cvss": {
+            "score": 9.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          },
+          "range": ">=4.0.0 <=4.1.7"
+        },
+        "vitest"
+      ],
+      "effects": ["@vitest/browser-playwright", "@vitest/coverage-v8"],
+      "range": "2.1.0-beta.1 - 4.1.10",
+      "nodes": ["node_modules/@vitest/browser"],
+      "fixAvailable": true
+    },
+    "@vitest/browser-playwright": {
+      "name": "@vitest/browser-playwright",
+      "severity": "critical",
+      "isDirect": true,
+      "via": ["@vitest/browser", "@vitest/mocker", "vitest"],
+      "effects": ["vitest"],
+      "range": "<=4.1.10",
+      "nodes": ["node_modules/@vitest/browser-playwright"],
+      "fixAvailable": true
+    },
+    "@vitest/coverage-v8": {
+      "name": "@vitest/coverage-v8",
+      "severity": "critical",
+      "isDirect": true,
+      "via": ["@vitest/browser", "vitest"],
+      "effects": [],
+      "range": "4.0.0-beta.1 - 4.1.5",
+      "nodes": ["node_modules/@vitest/coverage-v8"],
+      "fixAvailable": true
+    },
+    "@vitest/mocker": {
+      "name": "@vitest/mocker",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1193684,
+          "name": "@vitest/mocker",
+          "dependency": "@vitest/mocker",
+          "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+          "url": "https://github.com/advisories/GHSA-82fw-gwwq-j7x9",
+          "severity": "moderate",
+          "cwe": ["CWE-22"],
+          "cvss": {
+            "score": 5.9,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N"
+          },
+          "range": ">=2.1.0 <4.1.11"
+        },
+        {
+          "source": 1242767,
+          "name": "@vitest/mocker",
+          "dependency": "@vitest/mocker",
+          "title": "Vitest: Code injection via unauthenticated manual mock registration",
+          "url": "https://github.com/advisories/GHSA-qxg6-89mg-rqv8",
+          "severity": "moderate",
+          "cwe": ["CWE-94", "CWE-116", "CWE-306"],
+          "cvss": {
+            "score": 4.7,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:C/C:L/I:L/A:N"
+          },
+          "range": ">=2.1.0-beta.7 <4.1.12"
+        }
+      ],
+      "effects": ["@vitest/browser", "@vitest/browser-playwright", "vitest"],
+      "range": "<=4.1.11",
+      "nodes": [
+        "node_modules/@vitest/browser-playwright/node_modules/@vitest/mocker",
+        "node_modules/@vitest/browser/node_modules/@vitest/mocker",
+        "node_modules/vitest/node_modules/@vitest/mocker"
+      ],
+      "fixAvailable": true
+    },
+    "@vue/server-renderer": {
+      "name": "@vue/server-renderer",
+      "severity": "high",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1241259,
+          "name": "@vue/server-renderer",
+          "dependency": "@vue/server-renderer",
+          "title": "@vue/server-renderer: XSS via missing CR in attribute-name blacklist",
+          "url": "https://github.com/advisories/GHSA-g2v6-rqmx-r4w6",
+          "severity": "high",
+          "cwe": ["CWE-79", "CWE-116"],
+          "cvss": {
+            "score": 7.2,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:L/I:L/A:N"
+          },
+          "range": "<3.5.42"
+        },
+        "vue"
+      ],
+      "effects": ["vue"],
+      "range": "<=3.5.41",
+      "nodes": ["node_modules/@vue/server-renderer"],
+      "fixAvailable": true
+    },
+    "cacache": {
+      "name": "cacache",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["glob"],
+      "effects": [
+        "@npmcli/arborist",
+        "@npmcli/metavuln-calculator",
+        "make-fetch-happen",
+        "npm",
+        "pacote"
+      ],
+      "range": "17.0.5 - 21.0.1",
+      "nodes": ["node_modules/npm/node_modules/cacache"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "editorconfig": {
+      "name": "editorconfig",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["minimatch"],
+      "effects": ["js-beautify"],
+      "range": "1.0.3 - 3.0.2",
+      "nodes": ["node_modules/editorconfig"],
+      "fixAvailable": true
+    },
+    "esbuild": {
+      "name": "esbuild",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1102341,
+          "name": "esbuild",
+          "dependency": "esbuild",
+          "title": "esbuild enables any website to send any requests to the development server and read the response",
+          "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+          "severity": "moderate",
+          "cwe": ["CWE-346"],
+          "cvss": {
+            "score": 5.3,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:R/S:U/C:H/I:N/A:N"
+          },
+          "range": "<=0.24.2"
+        }
+      ],
+      "effects": ["vite"],
+      "range": "<=0.24.2",
+      "nodes": ["node_modules/esbuild"],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.8",
+        "isSemVerMajor": true
+      }
+    },
+    "glob": {
+      "name": "glob",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1244013,
+          "name": "glob",
+          "dependency": "glob",
+          "title": "Glob: AbortSignal cancellation bypass allows post-timeout filesystem traversal",
+          "url": "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4",
+          "severity": "moderate",
+          "cwe": ["CWE-400"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=9.0.0 <=14.0.1"
+        },
+        "minimatch"
+      ],
+      "effects": [
+        "@npmcli/map-workspaces",
+        "@npmcli/package-json",
+        "cacache",
+        "js-beautify",
+        "npm"
+      ],
+      "range": "9.0.0 - 14.0.1",
+      "nodes": ["node_modules/glob", "node_modules/npm/node_modules/glob"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "ignore-walk": {
+      "name": "ignore-walk",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["minimatch"],
+      "effects": ["npm-packlist"],
+      "range": ">=6.0.2",
+      "nodes": ["node_modules/npm/node_modules/ignore-walk"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "init-package-json": {
+      "name": "init-package-json",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/package-json"],
+      "effects": ["npm"],
+      "range": "6.0.1 - 8.2.5",
+      "nodes": ["node_modules/npm/node_modules/init-package-json"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "js-beautify": {
+      "name": "js-beautify",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["editorconfig", "glob"],
+      "effects": [],
+      "range": ">=1.14.9",
+      "nodes": ["node_modules/js-beautify"],
+      "fixAvailable": true
+    },
+    "libnpmaccess": {
+      "name": "libnpmaccess",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "8.0.0-pre.0 - 10.0.3",
+      "nodes": ["node_modules/npm/node_modules/libnpmaccess"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmdiff": {
+      "name": "libnpmdiff",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/arborist", "minimatch", "pacote"],
+      "effects": ["npm"],
+      "range": ">=5.0.14",
+      "nodes": ["node_modules/npm/node_modules/libnpmdiff"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmexec": {
+      "name": "libnpmexec",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/arborist", "@npmcli/package-json", "@npmcli/run-script", "pacote"],
+      "effects": ["npm"],
+      "range": ">=5.0.14",
+      "nodes": ["node_modules/npm/node_modules/libnpmexec"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmfund": {
+      "name": "libnpmfund",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/arborist"],
+      "effects": ["npm"],
+      "range": ">=4.0.14",
+      "nodes": ["node_modules/npm/node_modules/libnpmfund"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmorg": {
+      "name": "libnpmorg",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "6.0.0-pre.0 - 8.0.1",
+      "nodes": ["node_modules/npm/node_modules/libnpmorg"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmpack": {
+      "name": "libnpmpack",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/arborist", "@npmcli/run-script", "pacote"],
+      "effects": ["npm"],
+      "range": ">=5.0.14",
+      "nodes": ["node_modules/npm/node_modules/libnpmpack"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmpublish": {
+      "name": "libnpmpublish",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/package-json", "npm-registry-fetch", "sigstore"],
+      "effects": ["npm"],
+      "range": ">=9.0.0-pre.0",
+      "nodes": ["node_modules/npm/node_modules/libnpmpublish"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmsearch": {
+      "name": "libnpmsearch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "7.0.0-pre.0 - 9.0.1",
+      "nodes": ["node_modules/npm/node_modules/libnpmsearch"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmteam": {
+      "name": "libnpmteam",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "6.0.0-pre.0 - 8.0.2",
+      "nodes": ["node_modules/npm/node_modules/libnpmteam"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmversion": {
+      "name": "libnpmversion",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/run-script"],
+      "effects": ["npm"],
+      "range": "6.0.0 - 9.0.0-pre.1",
+      "nodes": ["node_modules/npm/node_modules/libnpmversion"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "make-fetch-happen": {
+      "name": "make-fetch-happen",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["cacache"],
+      "effects": ["@sigstore/sign", "npm", "npm-registry-fetch", "tuf-js"],
+      "range": "13.0.0 - 15.0.6",
+      "nodes": ["node_modules/npm/node_modules/make-fetch-happen"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "minimatch": {
+      "name": "minimatch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1244623,
+          "name": "minimatch",
+          "dependency": "minimatch",
+          "title": "minimatch has potential denial of service via globparts amplification",
+          "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+          "severity": "moderate",
+          "cwe": ["CWE-405"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=7.0.0 <11.0.1"
+        }
+      ],
+      "effects": [
+        "@npmcli/arborist",
+        "@npmcli/map-workspaces",
+        "@tufjs/models",
+        "editorconfig",
+        "glob",
+        "ignore-walk",
+        "libnpmdiff",
+        "npm"
+      ],
+      "range": "7.0.0 - 11.0.0",
+      "nodes": [
+        "node_modules/editorconfig/node_modules/minimatch",
+        "node_modules/glob/node_modules/minimatch",
+        "node_modules/npm/node_modules/minimatch"
+      ],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "npm": {
+      "name": "npm",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@npmcli/arborist",
+        "@npmcli/config",
+        "@npmcli/map-workspaces",
+        "@npmcli/metavuln-calculator",
+        "@npmcli/package-json",
+        "@npmcli/run-script",
+        "@sigstore/tuf",
+        "cacache",
+        "glob",
+        "init-package-json",
+        "libnpmaccess",
+        "libnpmdiff",
+        "libnpmexec",
+        "libnpmfund",
+        "libnpmorg",
+        "libnpmpack",
+        "libnpmpublish",
+        "libnpmsearch",
+        "libnpmteam",
+        "libnpmversion",
+        "make-fetch-happen",
+        "minimatch",
+        "npm-profile",
+        "npm-registry-fetch",
+        "pacote"
+      ],
+      "effects": ["@semantic-release/npm"],
+      "range": "6.6.0-next.0 - 6.10.1 || 7.21.0 - 8.5.4 || 8.19.0 - 8.19.2 || >=9.0.0-pre.0",
+      "nodes": ["node_modules/npm"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "npm-packlist": {
+      "name": "npm-packlist",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["ignore-walk"],
+      "effects": ["pacote"],
+      "range": ">=8.0.1",
+      "nodes": ["node_modules/npm/node_modules/npm-packlist"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "npm-profile": {
+      "name": "npm-profile",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "9.0.0 - 12.0.2",
+      "nodes": ["node_modules/npm/node_modules/npm-profile"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "npm-registry-fetch": {
+      "name": "npm-registry-fetch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["make-fetch-happen"],
+      "effects": [
+        "@npmcli/arborist",
+        "libnpmaccess",
+        "libnpmorg",
+        "libnpmpublish",
+        "libnpmsearch",
+        "libnpmteam",
+        "npm",
+        "npm-profile",
+        "pacote"
+      ],
+      "range": "16.0.0 - 19.1.1",
+      "nodes": ["node_modules/npm/node_modules/npm-registry-fetch"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "pacote": {
+      "name": "pacote",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@npmcli/package-json",
+        "@npmcli/run-script",
+        "cacache",
+        "npm-packlist",
+        "npm-registry-fetch",
+        "sigstore"
+      ],
+      "effects": [
+        "@npmcli/arborist",
+        "@npmcli/metavuln-calculator",
+        "libnpmdiff",
+        "libnpmexec",
+        "libnpmpack",
+        "npm"
+      ],
+      "range": ">=17.0.0",
+      "nodes": ["node_modules/npm/node_modules/pacote"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "semantic-release": {
+      "name": "semantic-release",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["@semantic-release/github", "@semantic-release/npm"],
+      "effects": ["@semantic-release/github"],
+      "range": "16.0.0-beta.1 - 16.0.0-beta.47 || >=22.0.0-beta.1",
+      "nodes": ["node_modules/semantic-release"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "sigstore": {
+      "name": "sigstore",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@sigstore/sign", "@sigstore/tuf"],
+      "effects": ["libnpmpublish", "pacote"],
+      "range": ">=1.6.0",
+      "nodes": ["node_modules/npm/node_modules/sigstore"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "tuf-js": {
+      "name": "tuf-js",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@tufjs/models", "make-fetch-happen"],
+      "effects": ["@sigstore/tuf"],
+      "range": ">=1.1.2",
+      "nodes": ["node_modules/npm/node_modules/tuf-js"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "vite": {
+      "name": "vite",
+      "severity": "high",
+      "isDirect": true,
+      "via": [
+        {
+          "source": 1116229,
+          "name": "vite",
+          "dependency": "vite",
+          "title": "Vite Vulnerable to Path Traversal in Optimized Deps `.map` Handling",
+          "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+          "severity": "moderate",
+          "cwe": ["CWE-22", "CWE-200"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=6.4.1"
+        },
+        {
+          "source": 1120784,
+          "name": "vite",
+          "dependency": "vite",
+          "title": "launch-editor: NTLMv2 hash disclosure via UNC path handling on Windows",
+          "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+          "severity": "moderate",
+          "cwe": ["CWE-73", "CWE-522"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=6.4.2"
+        },
+        {
+          "source": 1242622,
+          "name": "vite",
+          "dependency": "vite",
+          "title": "launch-editor: escapeCmdArgs() omits % escaping on Windows",
+          "url": "https://github.com/advisories/GHSA-698v-4r3x-3vcv",
+          "severity": "moderate",
+          "cwe": ["CWE-78"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=6.4.3"
+        },
+        {
+          "source": 1242651,
+          "name": "vite",
+          "dependency": "vite",
+          "title": "launch-editor: Editor CLI flag misinterpretation causing arbitrary command execution for some editors",
+          "url": "https://github.com/advisories/GHSA-r825-w8mm-5pxw",
+          "severity": "moderate",
+          "cwe": ["CWE-88"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=6.4.3"
+        },
+        {
+          "source": 1242658,
+          "name": "vite",
+          "dependency": "vite",
+          "title": "launch-editor: `fs.existsSync()` existence check can be bypassed on Windows",
+          "url": "https://github.com/advisories/GHSA-587h-7wmj-h5pm",
+          "severity": "high",
+          "cwe": ["CWE-77"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=6.4.3"
+        },
+        {
+          "source": 1242724,
+          "name": "vite",
+          "dependency": "vite",
+          "title": "Vite: Cross origin script execution through Vite custom middleware",
+          "url": "https://github.com/advisories/GHSA-9jrq-w75r-8gcw",
+          "severity": "low",
+          "cwe": ["CWE-80"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=6.4.3"
+        },
+        {
+          "source": 1242730,
+          "name": "vite",
+          "dependency": "vite",
+          "title": "Vite: Files outside `server.fs.allow` could be served when project paths match system paths on non-Windows machine",
+          "url": "https://github.com/advisories/GHSA-rq7h-c2jc-7f22",
+          "severity": "moderate",
+          "cwe": ["CWE-22", "CWE-284"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=6.4.3"
+        },
+        {
+          "source": 1243432,
+          "name": "vite",
+          "dependency": "vite",
+          "title": "vite: `server.fs.deny` bypass on Windows alternate paths",
+          "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+          "severity": "moderate",
+          "cwe": ["CWE-22", "CWE-200"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": "<=6.4.2"
+        },
+        "esbuild"
+      ],
+      "effects": [],
+      "range": "<=6.4.3",
+      "nodes": ["node_modules/vite"],
+      "fixAvailable": {
+        "name": "vite",
+        "version": "8.3.8",
+        "isSemVerMajor": true
+      }
+    },
+    "vitest": {
+      "name": "vitest",
+      "severity": "critical",
+      "isDirect": true,
+      "via": [
+        "@vitest/browser-playwright",
+        "@vitest/mocker",
+        {
+          "source": 1139529,
+          "name": "vitest",
+          "dependency": "vitest",
+          "title": "When Vitest UI server is listening, arbitrary file can be read and executed",
+          "url": "https://github.com/advisories/GHSA-5xrq-8626-4rwp",
+          "severity": "critical",
+          "cwe": ["CWE-22", "CWE-862"],
+          "cvss": {
+            "score": 9.8,
+            "vectorString": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"
+          },
+          "range": ">=4.0.0 <4.1.0"
+        },
+        {
+          "source": 1193683,
+          "name": "vitest",
+          "dependency": "vitest",
+          "title": "Vitest: Path Traversal / Arbitrary File Read via @vitest/mocker Redirect Mock",
+          "url": "https://github.com/advisories/GHSA-82fw-gwwq-j7x9",
+          "severity": "moderate",
+          "cwe": ["CWE-22"],
+          "cvss": {
+            "score": 5.9,
+            "vectorString": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:H/I:N/A:N"
+          },
+          "range": ">=2.1.0 <4.1.11"
+        }
+      ],
+      "effects": ["@vitest/browser", "@vitest/browser-playwright", "@vitest/coverage-v8"],
+      "range": "2.1.0-beta.1 - 4.1.10",
+      "nodes": ["node_modules/vitest"],
+      "fixAvailable": true
+    },
+    "vue": {
+      "name": "vue",
+      "severity": "high",
+      "isDirect": true,
+      "via": ["@vue/server-renderer"],
+      "effects": ["@vue/server-renderer"],
+      "range": "3.2.13 - 3.5.41",
+      "nodes": ["node_modules/vue"],
+      "fixAvailable": true
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 39,
+      "high": 3,
+      "critical": 4,
+      "total": 46
+    },
+    "dependencies": {
+      "prod": 29,
+      "dev": 1187,
+      "optional": 156,
+      "peer": 58,
+      "peerOptional": 0,
+      "total": 1215
+    }
+  }
+}

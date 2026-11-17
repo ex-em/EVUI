@@ -2,14 +2,18 @@ module.exports = {
   root: true,
   env: {
     node: true,
+    browser: true,
     es2022: true,
   },
   parserOptions: {
     ecmaVersion: 2022,
   },
+  settings: {
+    'import/parsers': { 'vue-eslint-parser': ['.vue'] },
+  },
   extends: [
-    'plugin:vue/vue3-essential',
-    'plugin:vue/vue3-strongly-recommended',
+    'plugin:vue/essential',
+    'plugin:vue/strongly-recommended',
     'eslint:recommended',
     'exem',
     'prettier',
@@ -311,7 +315,12 @@ module.exports = {
     'no-undef': 'error',
     'no-undef-init': 'error',
     'no-undefined': 'off',
-    'no-unused-vars': ['error', { vars: 'all', args: 'after-used', ignoreRestSiblings: true }],
+    'no-unused-vars': [
+      'error',
+      { vars: 'all', args: 'after-used', ignoreRestSiblings: true, caughtErrors: 'none' },
+    ],
+    // Surface the new ESLint 9 recommendation without changing the legacy lint gate.
+    'no-constant-binary-expression': 'warn',
     'no-use-before-define': ['error', { functions: true, classes: true, variables: true }],
     // es6
     'arrow-body-style': [

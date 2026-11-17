@@ -1,0 +1,627 @@
+{
+  "auditReportVersion": 2,
+  "vulnerabilities": {
+    "@npmcli/arborist": {
+      "name": "@npmcli/arborist",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@npmcli/map-workspaces",
+        "@npmcli/metavuln-calculator",
+        "@npmcli/package-json",
+        "@npmcli/run-script",
+        "cacache",
+        "minimatch",
+        "npm-registry-fetch",
+        "pacote"
+      ],
+      "effects": ["libnpmdiff", "libnpmexec", "libnpmfund", "libnpmpack", "npm"],
+      "range": ">=6.2.6",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/arborist"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/config": {
+      "name": "@npmcli/config",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/map-workspaces", "@npmcli/package-json"],
+      "effects": ["npm"],
+      "range": ">=8.3.4",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/config"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/map-workspaces": {
+      "name": "@npmcli/map-workspaces",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/package-json", "glob", "minimatch"],
+      "effects": ["@npmcli/arborist", "@npmcli/config", "npm"],
+      "range": ">=3.0.3",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/map-workspaces"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/metavuln-calculator": {
+      "name": "@npmcli/metavuln-calculator",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["cacache", "pacote"],
+      "effects": ["@npmcli/arborist", "npm"],
+      "range": "7.0.0 - 9.0.3",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/metavuln-calculator"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/package-json": {
+      "name": "@npmcli/package-json",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["glob"],
+      "effects": [
+        "@npmcli/arborist",
+        "@npmcli/config",
+        "@npmcli/map-workspaces",
+        "@npmcli/run-script",
+        "init-package-json",
+        "libnpmexec",
+        "libnpmpublish",
+        "npm",
+        "pacote"
+      ],
+      "range": "3.1.0 - 8.0.0",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/package-json"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@npmcli/run-script": {
+      "name": "@npmcli/run-script",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/package-json"],
+      "effects": ["@npmcli/arborist", "libnpmexec", "libnpmpack", "libnpmversion", "npm", "pacote"],
+      "range": "7.0.4 - 10.0.4",
+      "nodes": ["node_modules/npm/node_modules/@npmcli/run-script"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@semantic-release/github": {
+      "name": "@semantic-release/github",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["semantic-release"],
+      "effects": ["semantic-release"],
+      "range": "5.3.0-beta.1 - 5.3.0-beta.8 || 5.4.0-beta.1 || 5.5.0-beta.1 || 5.6.0-beta.1 - 5.6.0-beta.3 || >=11.0.0",
+      "nodes": ["node_modules/@semantic-release/github"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@semantic-release/npm": {
+      "name": "@semantic-release/npm",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm"],
+      "effects": ["semantic-release"],
+      "range": ">=11.0.0",
+      "nodes": ["node_modules/@semantic-release/npm"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@sigstore/sign": {
+      "name": "@sigstore/sign",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["make-fetch-happen"],
+      "effects": ["sigstore"],
+      "range": "2.0.0 - 4.1.1",
+      "nodes": ["node_modules/npm/node_modules/@sigstore/sign"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@sigstore/tuf": {
+      "name": "@sigstore/tuf",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["tuf-js"],
+      "effects": ["npm", "sigstore"],
+      "range": "*",
+      "nodes": ["node_modules/npm/node_modules/@sigstore/tuf"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "@tufjs/models": {
+      "name": "@tufjs/models",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["minimatch"],
+      "effects": ["tuf-js"],
+      "range": ">=1.0.1",
+      "nodes": ["node_modules/npm/node_modules/@tufjs/models"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "cacache": {
+      "name": "cacache",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["glob"],
+      "effects": [
+        "@npmcli/arborist",
+        "@npmcli/metavuln-calculator",
+        "make-fetch-happen",
+        "npm",
+        "pacote"
+      ],
+      "range": "17.0.5 - 21.0.1",
+      "nodes": ["node_modules/npm/node_modules/cacache"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "glob": {
+      "name": "glob",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1244013,
+          "name": "glob",
+          "dependency": "glob",
+          "title": "Glob: AbortSignal cancellation bypass allows post-timeout filesystem traversal",
+          "url": "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4",
+          "severity": "moderate",
+          "cwe": ["CWE-400"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=9.0.0 <=14.0.1"
+        },
+        "minimatch"
+      ],
+      "effects": ["@npmcli/map-workspaces", "@npmcli/package-json", "cacache", "npm"],
+      "range": "9.0.0 - 14.0.1",
+      "nodes": ["node_modules/npm/node_modules/glob"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "ignore-walk": {
+      "name": "ignore-walk",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["minimatch"],
+      "effects": ["npm-packlist"],
+      "range": ">=6.0.2",
+      "nodes": ["node_modules/npm/node_modules/ignore-walk"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "init-package-json": {
+      "name": "init-package-json",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/package-json"],
+      "effects": ["npm"],
+      "range": "6.0.1 - 8.2.5",
+      "nodes": ["node_modules/npm/node_modules/init-package-json"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmaccess": {
+      "name": "libnpmaccess",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "8.0.0-pre.0 - 10.0.3",
+      "nodes": ["node_modules/npm/node_modules/libnpmaccess"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmdiff": {
+      "name": "libnpmdiff",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/arborist", "minimatch", "pacote"],
+      "effects": ["npm"],
+      "range": ">=5.0.14",
+      "nodes": ["node_modules/npm/node_modules/libnpmdiff"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmexec": {
+      "name": "libnpmexec",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/arborist", "@npmcli/package-json", "@npmcli/run-script", "pacote"],
+      "effects": ["npm"],
+      "range": ">=5.0.14",
+      "nodes": ["node_modules/npm/node_modules/libnpmexec"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmfund": {
+      "name": "libnpmfund",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/arborist"],
+      "effects": ["npm"],
+      "range": ">=4.0.14",
+      "nodes": ["node_modules/npm/node_modules/libnpmfund"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmorg": {
+      "name": "libnpmorg",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "6.0.0-pre.0 - 8.0.1",
+      "nodes": ["node_modules/npm/node_modules/libnpmorg"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmpack": {
+      "name": "libnpmpack",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/arborist", "@npmcli/run-script", "pacote"],
+      "effects": ["npm"],
+      "range": ">=5.0.14",
+      "nodes": ["node_modules/npm/node_modules/libnpmpack"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmpublish": {
+      "name": "libnpmpublish",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/package-json", "npm-registry-fetch", "sigstore"],
+      "effects": ["npm"],
+      "range": ">=9.0.0-pre.0",
+      "nodes": ["node_modules/npm/node_modules/libnpmpublish"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmsearch": {
+      "name": "libnpmsearch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "7.0.0-pre.0 - 9.0.1",
+      "nodes": ["node_modules/npm/node_modules/libnpmsearch"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmteam": {
+      "name": "libnpmteam",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "6.0.0-pre.0 - 8.0.2",
+      "nodes": ["node_modules/npm/node_modules/libnpmteam"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "libnpmversion": {
+      "name": "libnpmversion",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@npmcli/run-script"],
+      "effects": ["npm"],
+      "range": "6.0.0 - 9.0.0-pre.1",
+      "nodes": ["node_modules/npm/node_modules/libnpmversion"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "make-fetch-happen": {
+      "name": "make-fetch-happen",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["cacache"],
+      "effects": ["@sigstore/sign", "npm", "npm-registry-fetch", "tuf-js"],
+      "range": "13.0.0 - 15.0.6",
+      "nodes": ["node_modules/npm/node_modules/make-fetch-happen"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "minimatch": {
+      "name": "minimatch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        {
+          "source": 1244623,
+          "name": "minimatch",
+          "dependency": "minimatch",
+          "title": "minimatch has potential denial of service via globparts amplification",
+          "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+          "severity": "moderate",
+          "cwe": ["CWE-405"],
+          "cvss": {
+            "score": 0,
+            "vectorString": null
+          },
+          "range": ">=7.0.0 <11.0.1"
+        }
+      ],
+      "effects": [
+        "@npmcli/arborist",
+        "@npmcli/map-workspaces",
+        "@tufjs/models",
+        "glob",
+        "ignore-walk",
+        "libnpmdiff",
+        "npm"
+      ],
+      "range": "7.0.0 - 11.0.0",
+      "nodes": ["node_modules/npm/node_modules/minimatch"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "npm": {
+      "name": "npm",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@npmcli/arborist",
+        "@npmcli/config",
+        "@npmcli/map-workspaces",
+        "@npmcli/metavuln-calculator",
+        "@npmcli/package-json",
+        "@npmcli/run-script",
+        "@sigstore/tuf",
+        "cacache",
+        "glob",
+        "init-package-json",
+        "libnpmaccess",
+        "libnpmdiff",
+        "libnpmexec",
+        "libnpmfund",
+        "libnpmorg",
+        "libnpmpack",
+        "libnpmpublish",
+        "libnpmsearch",
+        "libnpmteam",
+        "libnpmversion",
+        "make-fetch-happen",
+        "minimatch",
+        "npm-profile",
+        "npm-registry-fetch",
+        "pacote"
+      ],
+      "effects": ["@semantic-release/npm"],
+      "range": "6.6.0-next.0 - 6.10.1 || 7.21.0 - 8.5.4 || 8.19.0 - 8.19.2 || >=9.0.0-pre.0",
+      "nodes": ["node_modules/npm"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "npm-packlist": {
+      "name": "npm-packlist",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["ignore-walk"],
+      "effects": ["pacote"],
+      "range": ">=8.0.1",
+      "nodes": ["node_modules/npm/node_modules/npm-packlist"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "npm-profile": {
+      "name": "npm-profile",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["npm-registry-fetch"],
+      "effects": ["npm"],
+      "range": "9.0.0 - 12.0.2",
+      "nodes": ["node_modules/npm/node_modules/npm-profile"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "npm-registry-fetch": {
+      "name": "npm-registry-fetch",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["make-fetch-happen"],
+      "effects": [
+        "@npmcli/arborist",
+        "libnpmaccess",
+        "libnpmorg",
+        "libnpmpublish",
+        "libnpmsearch",
+        "libnpmteam",
+        "npm",
+        "npm-profile",
+        "pacote"
+      ],
+      "range": "16.0.0 - 19.1.1",
+      "nodes": ["node_modules/npm/node_modules/npm-registry-fetch"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "pacote": {
+      "name": "pacote",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": [
+        "@npmcli/package-json",
+        "@npmcli/run-script",
+        "cacache",
+        "npm-packlist",
+        "npm-registry-fetch",
+        "sigstore"
+      ],
+      "effects": [
+        "@npmcli/arborist",
+        "@npmcli/metavuln-calculator",
+        "libnpmdiff",
+        "libnpmexec",
+        "libnpmpack",
+        "npm"
+      ],
+      "range": ">=17.0.0",
+      "nodes": ["node_modules/npm/node_modules/pacote"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "semantic-release": {
+      "name": "semantic-release",
+      "severity": "moderate",
+      "isDirect": true,
+      "via": ["@semantic-release/github", "@semantic-release/npm"],
+      "effects": ["@semantic-release/github"],
+      "range": "16.0.0-beta.1 - 16.0.0-beta.47 || >=22.0.0-beta.1",
+      "nodes": ["node_modules/semantic-release"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "sigstore": {
+      "name": "sigstore",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@sigstore/sign", "@sigstore/tuf"],
+      "effects": ["libnpmpublish", "pacote"],
+      "range": ">=1.6.0",
+      "nodes": ["node_modules/npm/node_modules/sigstore"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    },
+    "tuf-js": {
+      "name": "tuf-js",
+      "severity": "moderate",
+      "isDirect": false,
+      "via": ["@tufjs/models", "make-fetch-happen"],
+      "effects": ["@sigstore/tuf"],
+      "range": ">=1.1.2",
+      "nodes": ["node_modules/npm/node_modules/tuf-js"],
+      "fixAvailable": {
+        "name": "semantic-release",
+        "version": "21.1.2",
+        "isSemVerMajor": true
+      }
+    }
+  },
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 35,
+      "high": 0,
+      "critical": 0,
+      "total": 35
+    },
+    "dependencies": {
+      "prod": 30,
+      "dev": 973,
+      "optional": 53,
+      "peer": 0,
+      "peerOptional": 0,
+      "total": 1002
+    }
+  }
+}

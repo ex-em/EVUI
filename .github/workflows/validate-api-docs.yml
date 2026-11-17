@@ -2,22 +2,23 @@ name: Validate API Docs
 
 on:
   pull_request:
-    branches: [3.0, 3.4]
+    branches: ['3.0', '3.4']
     paths:
-      - "docs/views/apiDocs/data/**"
-      - "scripts/validate-api-docs.js"
+      - 'docs/views/apiDocs/data/**'
+      - 'scripts/validate-api-docs.js'
+
+permissions:
+  contents: read
 
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
-      - name: Use Checkout
-        uses: actions/checkout@v4
-
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 20
-
-      - name: Validate API docs schema
-        run: node scripts/validate-api-docs.js
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+      - run: node scripts/validate-api-docs.js
