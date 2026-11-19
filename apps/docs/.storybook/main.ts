@@ -1,4 +1,4 @@
-import { StorybookConfig } from '@storybook/vue3-vite';
+import type { StorybookConfig } from '@storybook/vue3-vite';
 
 const config: StorybookConfig = {
   stories: [
@@ -7,12 +7,7 @@ const config: StorybookConfig = {
   ],
   addons: [
     '@storybook/addon-links',
-    '@storybook/addon-essentials',
-    '@storybook/addon-controls',
-    '@storybook/addon-actions',
     '@storybook/addon-a11y',
-    '@storybook/addon-toolbars',
-    '@storybook/addon-backgrounds',
     {
       name: '@storybook/addon-docs',
       options: {

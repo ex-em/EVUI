@@ -38,7 +38,6 @@ const StoryTemplate: Story = {
         tooltip-title="4번 옵션"
       />
     </div>
-              </EvCheckboxGroup>
               `,
   }),
 };

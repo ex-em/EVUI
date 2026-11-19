@@ -1,0 +1,2969 @@
+[
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-8hc4-vh64-cxmj",
+    "url": "https://github.com/advisories/GHSA-8hc4-vh64-cxmj",
+    "vulnerable": ">=1.3.2 <=1.7.3",
+    "patched": ">=1.7.4",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "micromatch",
+    "severity": "moderate",
+    "advisory": "GHSA-952p-6rrq-rcjv",
+    "url": "https://github.com/advisories/GHSA-952p-6rrq-rcjv",
+    "vulnerable": "<4.0.8",
+    "patched": ">=4.0.8",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > lint-staged@15.2.7 ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "body-parser",
+    "severity": "high",
+    "advisory": "GHSA-qwcr-r2fm-qrc7",
+    "url": "https://github.com/advisories/GHSA-qwcr-r2fm-qrc7",
+    "vulnerable": "<1.20.3",
+    "patched": ">=1.20.3",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-64vr-g452-qvp3",
+    "url": "https://github.com/advisories/GHSA-64vr-g452-qvp3",
+    "vulnerable": ">=5.3.0 <5.3.6",
+    "patched": ">=5.3.6",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-9cwx-2883-4wfx",
+    "url": "https://github.com/advisories/GHSA-9cwx-2883-4wfx",
+    "vulnerable": ">=5.3.0 <=5.3.5",
+    "patched": ">=5.3.6",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "rollup",
+    "severity": "high",
+    "advisory": "GHSA-gcx4-mw62-g8wm",
+    "url": "https://github.com/advisories/GHSA-gcx4-mw62-g8wm",
+    "vulnerable": ">=4.0.0 <4.22.4",
+    "patched": ">=4.22.4",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "markdown-to-jsx",
+    "severity": "moderate",
+    "advisory": "GHSA-4wx3-54gh-9fr9",
+    "url": "https://github.com/advisories/GHSA-4wx3-54gh-9fr9",
+    "vulnerable": "<7.4.0",
+    "patched": ">=7.4.0",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 "
+    ]
+  },
+  {
+    "package": "serve-static",
+    "severity": "low",
+    "advisory": "GHSA-cm22-4g7w-348p",
+    "url": "https://github.com/advisories/GHSA-cm22-4g7w-348p",
+    "vulnerable": "<1.16.0",
+    "patched": ">=1.16.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "express",
+    "severity": "low",
+    "advisory": "GHSA-qw6h-vgh9-j6wx",
+    "url": "https://github.com/advisories/GHSA-qw6h-vgh9-j6wx",
+    "vulnerable": "<4.20.0",
+    "patched": ">=4.20.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "store2",
+    "severity": "moderate",
+    "advisory": "GHSA-w5hq-hm5m-4548",
+    "url": "https://github.com/advisories/GHSA-w5hq-hm5m-4548",
+    "vulnerable": "<2.14.4",
+    "patched": ">=2.14.4",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "path-to-regexp",
+    "severity": "high",
+    "advisory": "GHSA-9wv6-86v2-598j",
+    "url": "https://github.com/advisories/GHSA-9wv6-86v2-598j",
+    "vulnerable": "<0.1.10",
+    "patched": ">=0.1.10",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "esbuild",
+    "severity": "moderate",
+    "advisory": "GHSA-67mh-4wv8-2f99",
+    "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+    "vulnerable": "<=0.24.2",
+    "patched": ">=0.25.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      ". > esbuild@0.21.5",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > tsx@4.16.0 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-vg6x-rcgg-rjx6",
+    "url": "https://github.com/advisories/GHSA-vg6x-rcgg-rjx6",
+    "vulnerable": ">=5.0.0 <=5.4.11",
+    "patched": ">=5.4.12",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-x574-m823-4x7w",
+    "url": "https://github.com/advisories/GHSA-x574-m823-4x7w",
+    "vulnerable": ">=5.0.0 <5.4.15",
+    "patched": ">=5.4.15",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-356w-63v5-8wf4",
+    "url": "https://github.com/advisories/GHSA-356w-63v5-8wf4",
+    "vulnerable": ">=5.0.0 <5.4.18",
+    "patched": ">=5.4.18",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "cookie",
+    "severity": "low",
+    "advisory": "GHSA-pxg6-pf52-xh8x",
+    "url": "https://github.com/advisories/GHSA-pxg6-pf52-xh8x",
+    "vulnerable": "<0.7.0",
+    "patched": ">=0.7.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "@babel/runtime",
+    "severity": "moderate",
+    "advisory": "GHSA-968p-4wvh-cqc8",
+    "url": "https://github.com/advisories/GHSA-968p-4wvh-cqc8",
+    "vulnerable": "<7.26.10",
+    "patched": ">=7.26.10",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-actions@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/test@8.1.11 "
+    ]
+  },
+  {
+    "package": "@babel/helpers",
+    "severity": "moderate",
+    "advisory": "GHSA-968p-4wvh-cqc8",
+    "url": "https://github.com/advisories/GHSA-968p-4wvh-cqc8",
+    "vulnerable": "<7.26.10",
+    "patched": ">=7.26.10",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-859w-5945-r5v3",
+    "url": "https://github.com/advisories/GHSA-859w-5945-r5v3",
+    "vulnerable": ">=5.0.0 <=5.4.18",
+    "patched": ">=5.4.19",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-xcj6-pq6g-qj4x",
+    "url": "https://github.com/advisories/GHSA-xcj6-pq6g-qj4x",
+    "vulnerable": ">=5.0.0 <5.4.17",
+    "patched": ">=5.4.17",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "cross-spawn",
+    "severity": "high",
+    "advisory": "GHSA-3xgq-45jj-v275",
+    "url": "https://github.com/advisories/GHSA-3xgq-45jj-v275",
+    "vulnerable": ">=7.0.0 <7.0.5",
+    "patched": ">=7.0.5",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > lint-staged@15.2.7 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 "
+    ]
+  },
+  {
+    "package": "path-to-regexp",
+    "severity": "high",
+    "advisory": "GHSA-rhx6-c78j-4q9w",
+    "url": "https://github.com/advisories/GHSA-rhx6-c78j-4q9w",
+    "vulnerable": "<0.1.12",
+    "patched": ">=0.1.12",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "low",
+    "advisory": "GHSA-v6h2-p8h4-qcjw",
+    "url": "https://github.com/advisories/GHSA-v6h2-p8h4-qcjw",
+    "vulnerable": ">=1.0.0 <=1.1.11",
+    "patched": ">=1.1.12",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "low",
+    "advisory": "GHSA-v6h2-p8h4-qcjw",
+    "url": "https://github.com/advisories/GHSA-v6h2-p8h4-qcjw",
+    "vulnerable": ">=2.0.0 <=2.0.1",
+    "patched": ">=2.0.2",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "on-headers",
+    "severity": "low",
+    "advisory": "GHSA-76c9-3jph-rj3q",
+    "url": "https://github.com/advisories/GHSA-76c9-3jph-rj3q",
+    "vulnerable": "<1.1.0",
+    "patched": ">=1.1.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "low",
+    "advisory": "GHSA-g4jq-h2w9-997c",
+    "url": "https://github.com/advisories/GHSA-g4jq-h2w9-997c",
+    "vulnerable": "<=5.4.19",
+    "patched": ">=5.4.20",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "low",
+    "advisory": "GHSA-jqfw-vq24-v9c3",
+    "url": "https://github.com/advisories/GHSA-jqfw-vq24-v9c3",
+    "vulnerable": "<=5.4.19",
+    "patched": ">=5.4.20",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-93m4-6634-74q7",
+    "url": "https://github.com/advisories/GHSA-93m4-6634-74q7",
+    "vulnerable": ">=5.2.6 <=5.4.20",
+    "patched": ">=5.4.21",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "validator",
+    "severity": "moderate",
+    "advisory": "GHSA-9965-vmph-33xx",
+    "url": "https://github.com/advisories/GHSA-9965-vmph-33xx",
+    "vulnerable": "<13.15.20",
+    "patched": ">=13.15.20",
+    "affectedDependencyRoots": ["packages/evui > vite-plugin-dts@3.9.1 "]
+  },
+  {
+    "package": "tar-fs",
+    "severity": "high",
+    "advisory": "GHSA-vj76-c3g6-qr5v",
+    "url": "https://github.com/advisories/GHSA-vj76-c3g6-qr5v",
+    "vulnerable": ">=2.0.0 <2.1.4",
+    "patched": ">=2.1.4",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "tmp",
+    "severity": "low",
+    "advisory": "GHSA-52f5-9888-hmc6",
+    "url": "https://github.com/advisories/GHSA-52f5-9888-hmc6",
+    "vulnerable": "<=0.2.3",
+    "patched": ">=0.2.4",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "form-data",
+    "severity": "critical",
+    "advisory": "GHSA-fjxv-7rqg-78g4",
+    "url": "https://github.com/advisories/GHSA-fjxv-7rqg-78g4",
+    "vulnerable": ">=4.0.0 <4.0.4",
+    "patched": ">=4.0.4",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "tar-fs",
+    "severity": "high",
+    "advisory": "GHSA-8cj5-5rvv-wf4v",
+    "url": "https://github.com/advisories/GHSA-8cj5-5rvv-wf4v",
+    "vulnerable": ">=2.0.0 <2.1.3",
+    "patched": ">=2.1.3",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "tar-fs",
+    "severity": "high",
+    "advisory": "GHSA-pq67-2wwv-3xjx",
+    "url": "https://github.com/advisories/GHSA-pq67-2wwv-3xjx",
+    "vulnerable": ">=2.0.0 <2.1.2",
+    "patched": ">=2.1.2",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "send",
+    "severity": "low",
+    "advisory": "GHSA-m6fv-jmcg-4jfg",
+    "url": "https://github.com/advisories/GHSA-m6fv-jmcg-4jfg",
+    "vulnerable": "<0.19.0",
+    "patched": ">=0.19.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "nanoid",
+    "severity": "moderate",
+    "advisory": "GHSA-mwcw-c2x4-8c55",
+    "url": "https://github.com/advisories/GHSA-mwcw-c2x4-8c55",
+    "vulnerable": "<3.3.8",
+    "patched": ">=3.3.8",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "glob",
+    "severity": "high",
+    "advisory": "GHSA-5j98-mcp5-4vw2",
+    "url": "https://github.com/advisories/GHSA-5j98-mcp5-4vw2",
+    "vulnerable": ">=10.2.0 <10.5.0",
+    "patched": ">=10.5.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > glob@10.4.2"
+    ]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-jr5f-v2jv-69x6",
+    "url": "https://github.com/advisories/GHSA-jr5f-v2jv-69x6",
+    "vulnerable": ">=1.0.0 <1.8.2",
+    "patched": ">=1.8.2",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "vue-template-compiler",
+    "severity": "moderate",
+    "advisory": "GHSA-g3ch-rx76-35fx",
+    "url": "https://github.com/advisories/GHSA-g3ch-rx76-35fx",
+    "vulnerable": ">=2.0.0 <3.0.0",
+    "patched": "<0.0.0",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "storybook",
+    "severity": "high",
+    "advisory": "GHSA-8452-54wp-rmv6",
+    "url": "https://github.com/advisories/GHSA-8452-54wp-rmv6",
+    "vulnerable": ">=8.0.0 <8.6.15",
+    "patched": ">=8.6.15",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11"]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-4hjh-wcwx-xvwj",
+    "url": "https://github.com/advisories/GHSA-4hjh-wcwx-xvwj",
+    "vulnerable": ">=1.0.0 <1.12.0",
+    "patched": ">=1.12.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-4r4m-qw57-chr8",
+    "url": "https://github.com/advisories/GHSA-4r4m-qw57-chr8",
+    "vulnerable": ">=5.0.0 <5.4.16",
+    "patched": ">=5.4.16",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "tar",
+    "severity": "high",
+    "advisory": "GHSA-34x7-hfp2-rc4v",
+    "url": "https://github.com/advisories/GHSA-34x7-hfp2-rc4v",
+    "vulnerable": "<7.5.7",
+    "patched": ">=7.5.7",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "diff",
+    "severity": "low",
+    "advisory": "GHSA-73rr-hh4g-fpgx",
+    "url": "https://github.com/advisories/GHSA-73rr-hh4g-fpgx",
+    "vulnerable": ">=5.0.0 <5.2.2",
+    "patched": ">=5.2.2",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "validator",
+    "severity": "high",
+    "advisory": "GHSA-vghf-hv5q-vc2g",
+    "url": "https://github.com/advisories/GHSA-vghf-hv5q-vc2g",
+    "vulnerable": "<13.15.22",
+    "patched": ">=13.15.22",
+    "affectedDependencyRoots": ["packages/evui > vite-plugin-dts@3.9.1 "]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "moderate",
+    "advisory": "GHSA-mh29-5h37-fv8m",
+    "url": "https://github.com/advisories/GHSA-mh29-5h37-fv8m",
+    "vulnerable": "<3.14.2",
+    "patched": ">=3.14.2",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "moderate",
+    "advisory": "GHSA-mh29-5h37-fv8m",
+    "url": "https://github.com/advisories/GHSA-mh29-5h37-fv8m",
+    "vulnerable": ">=4.0.0 <4.1.1",
+    "patched": ">=4.1.1",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "qs",
+    "severity": "low",
+    "advisory": "GHSA-w7fw-mjwx-w883",
+    "url": "https://github.com/advisories/GHSA-w7fw-mjwx-w883",
+    "vulnerable": ">=6.7.0 <=6.14.1",
+    "patched": ">=6.14.2",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/test@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "tar",
+    "severity": "high",
+    "advisory": "GHSA-8qq5-rm4j-mr97",
+    "url": "https://github.com/advisories/GHSA-8qq5-rm4j-mr97",
+    "vulnerable": "<=7.5.2",
+    "patched": ">=7.5.3",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "tar",
+    "severity": "high",
+    "advisory": "GHSA-83g3-92jg-28cx",
+    "url": "https://github.com/advisories/GHSA-83g3-92jg-28cx",
+    "vulnerable": "<7.5.8",
+    "patched": ">=7.5.8",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-3ppc-4f35-3m26",
+    "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+    "vulnerable": "<3.1.3",
+    "patched": ">=3.1.3",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > minimatch@3.1.2",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-3ppc-4f35-3m26",
+    "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+    "vulnerable": ">=5.0.0 <5.1.7",
+    "patched": ">=5.1.7",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-3ppc-4f35-3m26",
+    "url": "https://github.com/advisories/GHSA-3ppc-4f35-3m26",
+    "vulnerable": ">=9.0.0 <9.0.6",
+    "patched": ">=9.0.6",
+    "affectedDependencyRoots": [
+      ". > nx@19.0.4 ",
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "rollup",
+    "severity": "high",
+    "advisory": "GHSA-mw96-cpmx-2vgc",
+    "url": "https://github.com/advisories/GHSA-mw96-cpmx-2vgc",
+    "vulnerable": ">=4.0.0 <4.59.0",
+    "patched": ">=4.59.0",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "storybook",
+    "severity": "high",
+    "advisory": "GHSA-mjf5-7g4m-gx5w",
+    "url": "https://github.com/advisories/GHSA-mjf5-7g4m-gx5w",
+    "vulnerable": ">=8.1.0 <8.6.17",
+    "patched": ">=8.6.17",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11"]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-7r86-cg39-jmmj",
+    "url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+    "vulnerable": "<3.1.3",
+    "patched": ">=3.1.3",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > minimatch@3.1.2",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-7r86-cg39-jmmj",
+    "url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+    "vulnerable": ">=5.0.0 <5.1.8",
+    "patched": ">=5.1.8",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-7r86-cg39-jmmj",
+    "url": "https://github.com/advisories/GHSA-7r86-cg39-jmmj",
+    "vulnerable": ">=9.0.0 <9.0.7",
+    "patched": ">=9.0.7",
+    "affectedDependencyRoots": [
+      ". > nx@19.0.4 ",
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-23c5-xmqv-rm74",
+    "url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+    "vulnerable": "<3.1.4",
+    "patched": ">=3.1.4",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > minimatch@3.1.2",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-23c5-xmqv-rm74",
+    "url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+    "vulnerable": ">=5.0.0 <5.1.8",
+    "patched": ">=5.1.8",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "minimatch",
+    "severity": "high",
+    "advisory": "GHSA-23c5-xmqv-rm74",
+    "url": "https://github.com/advisories/GHSA-23c5-xmqv-rm74",
+    "vulnerable": ">=9.0.0 <9.0.7",
+    "patched": ">=9.0.7",
+    "affectedDependencyRoots": [
+      ". > nx@19.0.4 ",
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "ajv",
+    "severity": "moderate",
+    "advisory": "GHSA-2g4f-4pwh-qvx6",
+    "url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+    "vulnerable": "<6.14.0",
+    "patched": ">=6.14.0",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "ajv",
+    "severity": "moderate",
+    "advisory": "GHSA-2g4f-4pwh-qvx6",
+    "url": "https://github.com/advisories/GHSA-2g4f-4pwh-qvx6",
+    "vulnerable": ">=7.0.0-alpha.0 <8.18.0",
+    "patched": ">=8.18.0",
+    "affectedDependencyRoots": [
+      ". > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "qs",
+    "severity": "moderate",
+    "advisory": "GHSA-6rw7-vpxm-498p",
+    "url": "https://github.com/advisories/GHSA-6rw7-vpxm-498p",
+    "vulnerable": "<6.14.1",
+    "patched": ">=6.14.1",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/test@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "tar",
+    "severity": "high",
+    "advisory": "GHSA-qffp-2rhf-9h96",
+    "url": "https://github.com/advisories/GHSA-qffp-2rhf-9h96",
+    "vulnerable": "<=7.5.9",
+    "patched": ">=7.5.10",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "tar",
+    "severity": "high",
+    "advisory": "GHSA-9ppj-qmqm-q256",
+    "url": "https://github.com/advisories/GHSA-9ppj-qmqm-q256",
+    "vulnerable": "<=7.5.10",
+    "patched": ">=7.5.11",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "flatted",
+    "severity": "high",
+    "advisory": "GHSA-25h7-pfq9-p65f",
+    "url": "https://github.com/advisories/GHSA-25h7-pfq9-p65f",
+    "vulnerable": "<3.4.0",
+    "patched": ">=3.4.0",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "tar",
+    "severity": "high",
+    "advisory": "GHSA-r6q2-hw4h-h46w",
+    "url": "https://github.com/advisories/GHSA-r6q2-hw4h-h46w",
+    "vulnerable": "<=7.5.3",
+    "patched": ">=7.5.4",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "path-to-regexp",
+    "severity": "high",
+    "advisory": "GHSA-37ch-88jc-xwx2",
+    "url": "https://github.com/advisories/GHSA-37ch-88jc-xwx2",
+    "vulnerable": "<0.1.13",
+    "patched": ">=0.1.13",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "high",
+    "advisory": "GHSA-3mfm-83xf-c92r",
+    "url": "https://github.com/advisories/GHSA-3mfm-83xf-c92r",
+    "vulnerable": ">=4.0.0 <=4.7.8",
+    "patched": ">=4.7.9",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "critical",
+    "advisory": "GHSA-2w6w-674q-4c4q",
+    "url": "https://github.com/advisories/GHSA-2w6w-674q-4c4q",
+    "vulnerable": ">=4.0.0 <=4.7.8",
+    "patched": ">=4.7.9",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "moderate",
+    "advisory": "GHSA-f886-m6hf-6m8v",
+    "url": "https://github.com/advisories/GHSA-f886-m6hf-6m8v",
+    "vulnerable": "<1.1.13",
+    "patched": ">=1.1.13",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "moderate",
+    "advisory": "GHSA-f886-m6hf-6m8v",
+    "url": "https://github.com/advisories/GHSA-f886-m6hf-6m8v",
+    "vulnerable": ">=2.0.0 <2.0.3",
+    "patched": ">=2.0.3",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "moderate",
+    "advisory": "GHSA-2qvq-rjwj-gvw9",
+    "url": "https://github.com/advisories/GHSA-2qvq-rjwj-gvw9",
+    "vulnerable": ">=4.0.0 <4.7.9",
+    "patched": ">=4.7.9",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "picomatch",
+    "severity": "moderate",
+    "advisory": "GHSA-3v7f-55p6-f55p",
+    "url": "https://github.com/advisories/GHSA-3v7f-55p6-f55p",
+    "vulnerable": "<2.3.2",
+    "patched": ">=2.3.2",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > lint-staged@15.2.7 ",
+      ". > stylelint@16.6.1 ",
+      ". > picomatch@2.3.1",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > sass@1.77.6 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "picomatch",
+    "severity": "high",
+    "advisory": "GHSA-c2c7-rcm5-vvqj",
+    "url": "https://github.com/advisories/GHSA-c2c7-rcm5-vvqj",
+    "vulnerable": "<2.3.2",
+    "patched": ">=2.3.2",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > lint-staged@15.2.7 ",
+      ". > stylelint@16.6.1 ",
+      ". > picomatch@2.3.1",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > sass@1.77.6 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "yaml",
+    "severity": "moderate",
+    "advisory": "GHSA-48c2-rrv3-qjmp",
+    "url": "https://github.com/advisories/GHSA-48c2-rrv3-qjmp",
+    "vulnerable": ">=2.0.0 <2.8.3",
+    "patched": ">=2.8.3",
+    "affectedDependencyRoots": [". > lint-staged@15.2.7 "]
+  },
+  {
+    "package": "handlebars",
+    "severity": "moderate",
+    "advisory": "GHSA-7rx3-28cr-v5wh",
+    "url": "https://github.com/advisories/GHSA-7rx3-28cr-v5wh",
+    "vulnerable": ">=4.6.0 <=4.7.8",
+    "patched": ">=4.7.9",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "low",
+    "advisory": "GHSA-442j-39wm-28r2",
+    "url": "https://github.com/advisories/GHSA-442j-39wm-28r2",
+    "vulnerable": ">=4.0.0 <=4.7.8",
+    "patched": ">=4.7.9",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "high",
+    "advisory": "GHSA-xhpv-hc6g-r9c6",
+    "url": "https://github.com/advisories/GHSA-xhpv-hc6g-r9c6",
+    "vulnerable": ">=4.0.0 <=4.7.8",
+    "patched": ">=4.7.9",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "high",
+    "advisory": "GHSA-9cx6-37pm-9jff",
+    "url": "https://github.com/advisories/GHSA-9cx6-37pm-9jff",
+    "vulnerable": ">=4.0.0 <=4.7.8",
+    "patched": ">=4.7.9",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "lodash-es",
+    "severity": "high",
+    "advisory": "GHSA-r5fr-rjxr-66jc",
+    "url": "https://github.com/advisories/GHSA-r5fr-rjxr-66jc",
+    "vulnerable": ">=4.0.0 <=4.17.23",
+    "patched": ">=4.18.0",
+    "affectedDependencyRoots": [
+      "apps/docs > evui@link:../../packages/evui ",
+      "packages/evui > lodash-es@4.17.21"
+    ]
+  },
+  {
+    "package": "lodash",
+    "severity": "high",
+    "advisory": "GHSA-r5fr-rjxr-66jc",
+    "url": "https://github.com/advisories/GHSA-r5fr-rjxr-66jc",
+    "vulnerable": ">=4.0.0 <=4.17.23",
+    "patched": ">=4.18.0",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/test@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "defu",
+    "severity": "high",
+    "advisory": "GHSA-737v-mqg7-c878",
+    "url": "https://github.com/advisories/GHSA-737v-mqg7-c878",
+    "vulnerable": "<=6.1.4",
+    "patched": ">=6.1.5",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-4w7w-66w2-5vf9",
+    "url": "https://github.com/advisories/GHSA-4w7w-66w2-5vf9",
+    "vulnerable": "<=6.4.1",
+    "patched": ">=6.4.2",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-3p68-rc4w-qgx5",
+    "url": "https://github.com/advisories/GHSA-3p68-rc4w-qgx5",
+    "vulnerable": ">=1.0.0 <1.15.0",
+    "patched": ">=1.15.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "postcss",
+    "severity": "moderate",
+    "advisory": "GHSA-qx2v-qp2m-jg93",
+    "url": "https://github.com/advisories/GHSA-qx2v-qp2m-jg93",
+    "vulnerable": "<8.5.10",
+    "patched": ">=8.5.10",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "immutable",
+    "severity": "high",
+    "advisory": "GHSA-wf6x-7x77-mvgw",
+    "url": "https://github.com/advisories/GHSA-wf6x-7x77-mvgw",
+    "vulnerable": ">=4.0.0-rc.1 <4.3.8",
+    "patched": ">=4.3.8",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > sass@1.77.6 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "high",
+    "advisory": "GHSA-xjpj-3mr7-gcpf",
+    "url": "https://github.com/advisories/GHSA-xjpj-3mr7-gcpf",
+    "vulnerable": ">=4.0.0 <=4.7.8",
+    "patched": ">=4.7.9",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-w9j2-pvgh-6h63",
+    "url": "https://github.com/advisories/GHSA-w9j2-pvgh-6h63",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-pmwg-cvhr-8vh7",
+    "url": "https://github.com/advisories/GHSA-pmwg-cvhr-8vh7",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-3w6x-2g7m-8v23",
+    "url": "https://github.com/advisories/GHSA-3w6x-2g7m-8v23",
+    "vulnerable": ">=1.0.0 <1.15.2",
+    "patched": ">=1.15.2",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "low",
+    "advisory": "GHSA-xhjh-pmcv-23jw",
+    "url": "https://github.com/advisories/GHSA-xhjh-pmcv-23jw",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-445q-vr5w-6q77",
+    "url": "https://github.com/advisories/GHSA-445q-vr5w-6q77",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-m7pr-hjqh-92cm",
+    "url": "https://github.com/advisories/GHSA-m7pr-hjqh-92cm",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-5c9x-8gcm-mpgx",
+    "url": "https://github.com/advisories/GHSA-5c9x-8gcm-mpgx",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-vf2m-468p-8v99",
+    "url": "https://github.com/advisories/GHSA-vf2m-468p-8v99",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-pf86-5x62-jrwf",
+    "url": "https://github.com/advisories/GHSA-pf86-5x62-jrwf",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-6chq-wfr3-2hj9",
+    "url": "https://github.com/advisories/GHSA-6chq-wfr3-2hj9",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-xx6v-rp6x-q39c",
+    "url": "https://github.com/advisories/GHSA-xx6v-rp6x-q39c",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-43fc-jf86-j433",
+    "url": "https://github.com/advisories/GHSA-43fc-jf86-j433",
+    "vulnerable": ">=1.0.0 <=1.13.4",
+    "patched": ">=1.13.5",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-q8qp-cvcw-x6jj",
+    "url": "https://github.com/advisories/GHSA-q8qp-cvcw-x6jj",
+    "vulnerable": ">=1.0.0 <1.15.2",
+    "patched": ">=1.15.2",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "ws",
+    "severity": "moderate",
+    "advisory": "GHSA-58qx-3vcg-4xpx",
+    "url": "https://github.com/advisories/GHSA-58qx-3vcg-4xpx",
+    "vulnerable": ">=8.0.0 <8.20.1",
+    "patched": ">=8.20.1",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-fvcv-3m26-pcqx",
+    "url": "https://github.com/advisories/GHSA-fvcv-3m26-pcqx",
+    "vulnerable": ">=1.0.0 <1.15.0",
+    "patched": ">=1.15.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "uuid",
+    "severity": "moderate",
+    "advisory": "GHSA-w5hq-g745-h8pq",
+    "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+    "vulnerable": "<11.1.1",
+    "patched": ">=11.1.1",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/addon-actions@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 "
+    ]
+  },
+  {
+    "package": "qs",
+    "severity": "moderate",
+    "advisory": "GHSA-q8mj-m7cp-5q26",
+    "url": "https://github.com/advisories/GHSA-q8mj-m7cp-5q26",
+    "vulnerable": ">=6.11.1 <=6.15.1",
+    "patched": ">=6.15.2",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/test@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "high",
+    "advisory": "GHSA-c27g-q93r-2cwf",
+    "url": "https://github.com/advisories/GHSA-c27g-q93r-2cwf",
+    "vulnerable": "<=5.4.8",
+    "patched": ">=5.4.9",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-62hf-57xw-28j9",
+    "url": "https://github.com/advisories/GHSA-62hf-57xw-28j9",
+    "vulnerable": ">=1.0.0 <1.15.1",
+    "patched": ">=1.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "@babel/plugin-transform-modules-systemjs",
+    "severity": "high",
+    "advisory": "GHSA-fv7c-fp4j-7gwp",
+    "url": "https://github.com/advisories/GHSA-fv7c-fp4j-7gwp",
+    "vulnerable": ">=7.12.0 <=7.29.3",
+    "patched": ">=7.29.4",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-hfxv-24rg-xrqf",
+    "url": "https://github.com/advisories/GHSA-hfxv-24rg-xrqf",
+    "vulnerable": ">=1.0.0 <1.16.0",
+    "patched": ">=1.16.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-777c-7fjr-54vf",
+    "url": "https://github.com/advisories/GHSA-777c-7fjr-54vf",
+    "vulnerable": ">=1.7.0 <1.16.0",
+    "patched": ">=1.16.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-p92q-9vqr-4j8v",
+    "url": "https://github.com/advisories/GHSA-p92q-9vqr-4j8v",
+    "vulnerable": ">=1.0.0 <1.16.0",
+    "patched": ">=1.16.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-j5f8-grm9-p9fc",
+    "url": "https://github.com/advisories/GHSA-j5f8-grm9-p9fc",
+    "vulnerable": ">=1.0.0 <1.16.0",
+    "patched": ">=1.16.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-3g43-6gmg-66jw",
+    "url": "https://github.com/advisories/GHSA-3g43-6gmg-66jw",
+    "vulnerable": ">=1.0.0 <1.15.2",
+    "patched": ">=1.15.2",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "high",
+    "advisory": "GHSA-35jp-ww65-95wh",
+    "url": "https://github.com/advisories/GHSA-35jp-ww65-95wh",
+    "vulnerable": ">=1.0.0 <1.16.0",
+    "patched": ">=1.16.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-898c-q2cr-xwhg",
+    "url": "https://github.com/advisories/GHSA-898c-q2cr-xwhg",
+    "vulnerable": ">=1.0.0 <1.16.0",
+    "patched": ">=1.16.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "tmp",
+    "severity": "high",
+    "advisory": "GHSA-ph9p-34f9-6g65",
+    "url": "https://github.com/advisories/GHSA-ph9p-34f9-6g65",
+    "vulnerable": "<0.2.6",
+    "patched": ">=0.2.6",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "form-data",
+    "severity": "high",
+    "advisory": "GHSA-hmw2-7cc7-3qxx",
+    "url": "https://github.com/advisories/GHSA-hmw2-7cc7-3qxx",
+    "vulnerable": ">=4.0.0 <4.0.6",
+    "patched": ">=4.0.6",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "tar",
+    "severity": "moderate",
+    "advisory": "GHSA-vmf3-w455-68vh",
+    "url": "https://github.com/advisories/GHSA-vmf3-w455-68vh",
+    "vulnerable": "<=7.5.15",
+    "patched": ">=7.5.16",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-v6wh-96g9-6wx3",
+    "url": "https://github.com/advisories/GHSA-v6wh-96g9-6wx3",
+    "vulnerable": "<=6.4.2",
+    "patched": ">=6.4.3",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "moderate",
+    "advisory": "GHSA-h67p-54hq-rp68",
+    "url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+    "vulnerable": "<3.15.0",
+    "patched": ">=3.15.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "moderate",
+    "advisory": "GHSA-h67p-54hq-rp68",
+    "url": "https://github.com/advisories/GHSA-h67p-54hq-rp68",
+    "vulnerable": ">=4.0.0 <=4.1.1",
+    "patched": ">=4.2.0",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "ws",
+    "severity": "high",
+    "advisory": "GHSA-96hv-2xvq-fx4p",
+    "url": "https://github.com/advisories/GHSA-96hv-2xvq-fx4p",
+    "vulnerable": ">=8.0.0 <8.21.0",
+    "patched": ">=8.21.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "@babel/core",
+    "severity": "low",
+    "advisory": "GHSA-4x5r-pxfx-6jf8",
+    "url": "https://github.com/advisories/GHSA-4x5r-pxfx-6jf8",
+    "vulnerable": "<=7.29.0",
+    "patched": ">=7.29.6",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-3jxr-9vmj-r5cp",
+    "url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+    "vulnerable": ">=2.0.0 <2.1.2",
+    "patched": ">=2.1.2",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-3jxr-9vmj-r5cp",
+    "url": "https://github.com/advisories/GHSA-3jxr-9vmj-r5cp",
+    "vulnerable": "<1.1.16",
+    "patched": ">=1.1.16",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "high",
+    "advisory": "GHSA-52cp-r559-cp3m",
+    "url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+    "vulnerable": ">=4.0.0 <4.3.0",
+    "patched": ">=4.3.0",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "high",
+    "advisory": "GHSA-52cp-r559-cp3m",
+    "url": "https://github.com/advisories/GHSA-52cp-r559-cp3m",
+    "vulnerable": ">=3.0.0 <3.15.0",
+    "patched": ">=3.15.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "tar",
+    "severity": "moderate",
+    "advisory": "GHSA-w8wr-v893-vjvp",
+    "url": "https://github.com/advisories/GHSA-w8wr-v893-vjvp",
+    "vulnerable": "<=7.5.17",
+    "patched": ">=7.5.18",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "tar",
+    "severity": "critical",
+    "advisory": "GHSA-23hp-3jrh-7fpw",
+    "url": "https://github.com/advisories/GHSA-23hp-3jrh-7fpw",
+    "vulnerable": "<=7.5.18",
+    "patched": ">=7.5.19",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "tar",
+    "severity": "high",
+    "advisory": "GHSA-8x88-c5mf-7j5w",
+    "url": "https://github.com/advisories/GHSA-8x88-c5mf-7j5w",
+    "vulnerable": "<=7.5.17",
+    "patched": ">=7.5.18",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "tar",
+    "severity": "moderate",
+    "advisory": "GHSA-gvwx-54wh-qm9j",
+    "url": "https://github.com/advisories/GHSA-gvwx-54wh-qm9j",
+    "vulnerable": "<=7.5.16",
+    "patched": ">=7.5.17",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "body-parser",
+    "severity": "low",
+    "advisory": "GHSA-v422-hmwv-36x6",
+    "url": "https://github.com/advisories/GHSA-v422-hmwv-36x6",
+    "vulnerable": "<1.20.6",
+    "patched": ">=1.20.6",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "postcss",
+    "severity": "high",
+    "advisory": "GHSA-6g55-p6wh-862q",
+    "url": "https://github.com/advisories/GHSA-6g55-p6wh-862q",
+    "vulnerable": "<=8.5.11",
+    "patched": ">=8.5.12",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "nx",
+    "severity": "moderate",
+    "advisory": "GHSA-g2r8-wvmj-jf5w",
+    "url": "https://github.com/advisories/GHSA-g2r8-wvmj-jf5w",
+    "vulnerable": ">=17.0.4 <22.7.2",
+    "patched": ">=22.7.2",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-mh99-v99m-4gvg",
+    "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+    "vulnerable": "<1.1.17",
+    "patched": ">=1.1.17",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-mh99-v99m-4gvg",
+    "url": "https://github.com/advisories/GHSA-mh99-v99m-4gvg",
+    "vulnerable": ">=2.0.0 <2.1.3",
+    "patched": ">=2.1.3",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "postcss",
+    "severity": "moderate",
+    "advisory": "GHSA-fxqj-rqcc-2cmp",
+    "url": "https://github.com/advisories/GHSA-fxqj-rqcc-2cmp",
+    "vulnerable": "<=8.5.22",
+    "patched": ">=8.5.23",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-rgw5-rvv9-x895",
+    "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+    "vulnerable": ">=2.0.0 <2.1.4",
+    "patched": ">=2.1.4",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-rgw5-rvv9-x895",
+    "url": "https://github.com/advisories/GHSA-rgw5-rvv9-x895",
+    "vulnerable": "<1.1.18",
+    "patched": ">=1.1.18",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "high",
+    "advisory": "GHSA-5p4m-2wfm-xmqj",
+    "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+    "vulnerable": ">=3.0.0 <3.15.1",
+    "patched": ">=3.15.1",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "high",
+    "advisory": "GHSA-5p4m-2wfm-xmqj",
+    "url": "https://github.com/advisories/GHSA-5p4m-2wfm-xmqj",
+    "vulnerable": ">=4.0.0 <4.3.1",
+    "patched": ">=4.3.1",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "nanoid",
+    "severity": "high",
+    "advisory": "GHSA-28wg-ghj8-5hjv",
+    "url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+    "vulnerable": "<3.3.16",
+    "patched": ">=3.3.16",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "nanoid",
+    "severity": "high",
+    "advisory": "GHSA-2v37-7h3g-55p8",
+    "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+    "vulnerable": "<3.3.18",
+    "patched": ">=3.3.18",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "postcss",
+    "severity": "high",
+    "advisory": "GHSA-r28c-9q8g-f849",
+    "url": "https://github.com/advisories/GHSA-r28c-9q8g-f849",
+    "vulnerable": "<=8.5.17",
+    "patched": ">=8.5.18",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "tar",
+    "severity": "high",
+    "advisory": "GHSA-r292-9mhp-454m",
+    "url": "https://github.com/advisories/GHSA-r292-9mhp-454m",
+    "vulnerable": "<=7.5.20",
+    "patched": ">=7.5.21",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-mmx7-hfxf-jppx",
+    "url": "https://github.com/advisories/GHSA-mmx7-hfxf-jppx",
+    "vulnerable": ">=1.0.0 <1.18.0",
+    "patched": ">=1.18.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-pmv8-rq9r-6j72",
+    "url": "https://github.com/advisories/GHSA-pmv8-rq9r-6j72",
+    "vulnerable": ">=1.0.0 <1.18.0",
+    "patched": ">=1.18.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "postcss-selector-parser",
+    "severity": "low",
+    "advisory": "GHSA-w9m9-85wc-3x92",
+    "url": "https://github.com/advisories/GHSA-w9m9-85wc-3x92",
+    "vulnerable": ">=6.1.0 <6.1.3",
+    "patched": ">=6.1.3",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "browserslist",
+    "severity": "high",
+    "advisory": "GHSA-c83g-rgw3-j3cx",
+    "url": "https://github.com/advisories/GHSA-c83g-rgw3-j3cx",
+    "vulnerable": "<=4.28.6",
+    "patched": ">=4.28.7",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "browserslist",
+    "severity": "high",
+    "advisory": "GHSA-73wf-gq98-2v4g",
+    "url": "https://github.com/advisories/GHSA-73wf-gq98-2v4g",
+    "vulnerable": "<=4.28.6",
+    "patched": ">=4.28.7",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-7q8q-rj6j-mhjq",
+    "url": "https://github.com/advisories/GHSA-7q8q-rj6j-mhjq",
+    "vulnerable": ">=1.0.0 <1.18.0",
+    "patched": ">=1.18.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-jqh4-m9w3-8hp9",
+    "url": "https://github.com/advisories/GHSA-jqh4-m9w3-8hp9",
+    "vulnerable": ">=1.7.0 <1.18.0",
+    "patched": ">=1.18.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-42h9-826w-cgv3",
+    "url": "https://github.com/advisories/GHSA-42h9-826w-cgv3",
+    "vulnerable": ">=1.0.0 <1.18.0",
+    "patched": ">=1.18.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "nanoid",
+    "severity": "high",
+    "advisory": "GHSA-xwg4-73v4-xw9w",
+    "url": "https://github.com/advisories/GHSA-xwg4-73v4-xw9w",
+    "vulnerable": "<3.3.12",
+    "patched": ">=3.3.12",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "qs",
+    "severity": "moderate",
+    "advisory": "GHSA-4mjr-xmp4-gh2g",
+    "url": "https://github.com/advisories/GHSA-4mjr-xmp4-gh2g",
+    "vulnerable": ">=2.2.5 <6.16.0",
+    "patched": ">=6.16.0",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/test@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "immutable",
+    "severity": "high",
+    "advisory": "GHSA-xvcm-6775-5m9r",
+    "url": "https://github.com/advisories/GHSA-xvcm-6775-5m9r",
+    "vulnerable": ">=4.0.0-beta.1 <4.3.9",
+    "patched": ">=4.3.9",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > sass@1.77.6 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "colord",
+    "severity": "moderate",
+    "advisory": "GHSA-2wm5-q62r-hmrv",
+    "url": "https://github.com/advisories/GHSA-2wm5-q62r-hmrv",
+    "vulnerable": "<2.9.4",
+    "patched": ">=2.9.4",
+    "affectedDependencyRoots": [
+      ". > stylelint@16.6.1 ",
+      ". > colord@2.9.3",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "high",
+    "advisory": "GHSA-2883-xcg3-v3hh",
+    "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+    "vulnerable": ">=3.0.0 <3.15.2",
+    "patched": ">=3.15.2",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "js-yaml",
+    "severity": "high",
+    "advisory": "GHSA-2883-xcg3-v3hh",
+    "url": "https://github.com/advisories/GHSA-2883-xcg3-v3hh",
+    "vulnerable": ">=4.0.0 <4.3.2",
+    "patched": ">=4.3.2",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "immutable",
+    "severity": "high",
+    "advisory": "GHSA-v56q-mh7h-f735",
+    "url": "https://github.com/advisories/GHSA-v56q-mh7h-f735",
+    "vulnerable": ">=4.0.0-rc.1 <4.3.9",
+    "patched": ">=4.3.9",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > sass@1.77.6 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "moderate",
+    "advisory": "GHSA-q2hr-2g5m-vwhr",
+    "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+    "vulnerable": "<1.1.21",
+    "patched": ">=1.1.21",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "moderate",
+    "advisory": "GHSA-q2hr-2g5m-vwhr",
+    "url": "https://github.com/advisories/GHSA-q2hr-2g5m-vwhr",
+    "vulnerable": ">=2.0.0 <2.1.7",
+    "patched": ">=2.1.7",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-qhr7-859c-m2p7",
+    "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+    "vulnerable": "<1.1.20",
+    "patched": ">=1.1.20",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-qhr7-859c-m2p7",
+    "url": "https://github.com/advisories/GHSA-qhr7-859c-m2p7",
+    "vulnerable": ">=2.0.0 <2.1.6",
+    "patched": ">=2.1.6",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-6j4f-fj2g-mc7p",
+    "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+    "vulnerable": "<1.1.19",
+    "patched": ">=1.1.19",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "brace-expansion",
+    "severity": "high",
+    "advisory": "GHSA-6j4f-fj2g-mc7p",
+    "url": "https://github.com/advisories/GHSA-6j4f-fj2g-mc7p",
+    "vulnerable": ">=2.0.0 <2.1.5",
+    "patched": ">=2.1.5",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > nx@19.0.4 ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-vh66-26gq-q6x8",
+    "url": "https://github.com/advisories/GHSA-vh66-26gq-q6x8",
+    "vulnerable": ">=1.7.0 <1.20.0",
+    "patched": ">=1.20.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-9fr6-4gfg-395g",
+    "url": "https://github.com/advisories/GHSA-9fr6-4gfg-395g",
+    "vulnerable": ">=1.0.0 <1.20.0",
+    "patched": ">=1.20.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "axios",
+    "severity": "moderate",
+    "advisory": "GHSA-j8rh-479h-cp32",
+    "url": "https://github.com/advisories/GHSA-j8rh-479h-cp32",
+    "vulnerable": ">=1.0.0 <1.20.0",
+    "patched": ">=1.20.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "flatted",
+    "severity": "high",
+    "advisory": "GHSA-rf6f-7fwh-wjgh",
+    "url": "https://github.com/advisories/GHSA-rf6f-7fwh-wjgh",
+    "vulnerable": "<=3.4.1",
+    "patched": ">=3.4.2",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint@8.57.0 ",
+      "packages/eslint-config > eslint-config-prettier@9.1.0 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "source-map-js",
+    "severity": "high",
+    "advisory": "GHSA-68fv-2mgg-jv7q",
+    "url": "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+    "vulnerable": ">=1.0.0 <1.2.2",
+    "patched": ">=1.2.2",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      ". > stylelint@16.6.1 ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > sass@1.77.6 ",
+      "packages/evui > vite@5.3.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/evui > vue-tsc@2.0.24 ",
+      "packages/stylelint-config > vue@3.4.31 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "proxy-addr",
+    "severity": "critical",
+    "advisory": "GHSA-jqcg-44mw-7w3h",
+    "url": "https://github.com/advisories/GHSA-jqcg-44mw-7w3h",
+    "vulnerable": ">=1.1.0 <2.0.8",
+    "patched": ">=2.0.8",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "nx",
+    "severity": "high",
+    "advisory": "GHSA-w2vw-w76x-qr89",
+    "url": "https://github.com/advisories/GHSA-w2vw-w76x-qr89",
+    "vulnerable": ">=14.0.0 <22.7.8",
+    "patched": ">=22.7.8",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "nx",
+    "severity": "high",
+    "advisory": "GHSA-w3vv-58gj-gw77",
+    "url": "https://github.com/advisories/GHSA-w3vv-58gj-gw77",
+    "vulnerable": ">=14.6.0 <22.7.9",
+    "patched": ">=22.7.9",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "nx",
+    "severity": "moderate",
+    "advisory": "GHSA-hrvq-x7jp-36xv",
+    "url": "https://github.com/advisories/GHSA-hrvq-x7jp-36xv",
+    "vulnerable": ">=13.10.0 <22.7.10",
+    "patched": ">=22.7.10",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "compression",
+    "severity": "high",
+    "advisory": "GHSA-vc2v-76pw-4v95",
+    "url": "https://github.com/advisories/GHSA-vc2v-76pw-4v95",
+    "vulnerable": "<1.8.2",
+    "patched": ">=1.8.2",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "@vue/server-renderer",
+    "severity": "high",
+    "advisory": "GHSA-g2v6-rqmx-r4w6",
+    "url": "https://github.com/advisories/GHSA-g2v6-rqmx-r4w6",
+    "vulnerable": "<3.5.42",
+    "patched": ">=3.5.42",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > @evui/stylelint-config@link:packages/stylelint-config ",
+      "apps/docs > evui@link:../../packages/evui ",
+      "apps/docs > vue@3.4.31 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > vue@3.4.31 ",
+      "packages/evui > vue3-observe-visibility@1.0.1 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vue@3.4.31 ",
+      "packages/stylelint-config > vue@3.4.31 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "moderate",
+    "advisory": "GHSA-xw65-4hp5-5hc7",
+    "url": "https://github.com/advisories/GHSA-xw65-4hp5-5hc7",
+    "vulnerable": ">=4.0.0 <=4.7.9",
+    "patched": ">=4.7.10",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "critical",
+    "advisory": "GHSA-8r5x-fm3f-whwj",
+    "url": "https://github.com/advisories/GHSA-8r5x-fm3f-whwj",
+    "vulnerable": ">=4.0.0 <=4.7.9",
+    "patched": ">=4.7.10",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "handlebars",
+    "severity": "critical",
+    "advisory": "GHSA-p8wg-vrv2-v86f",
+    "url": "https://github.com/advisories/GHSA-p8wg-vrv2-v86f",
+    "vulnerable": ">=3.0.0 <=4.7.9",
+    "patched": ">=4.7.10",
+    "affectedDependencyRoots": [
+      ". > handlebars@4.7.8",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-698v-4r3x-3vcv",
+    "url": "https://github.com/advisories/GHSA-698v-4r3x-3vcv",
+    "vulnerable": "<=6.4.3",
+    "patched": ">=6.4.4",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-r825-w8mm-5pxw",
+    "url": "https://github.com/advisories/GHSA-r825-w8mm-5pxw",
+    "vulnerable": "<=6.4.3",
+    "patched": ">=6.4.4",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "high",
+    "advisory": "GHSA-587h-7wmj-h5pm",
+    "url": "https://github.com/advisories/GHSA-587h-7wmj-h5pm",
+    "vulnerable": "<=6.4.3",
+    "patched": ">=6.4.4",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "low",
+    "advisory": "GHSA-9jrq-w75r-8gcw",
+    "url": "https://github.com/advisories/GHSA-9jrq-w75r-8gcw",
+    "vulnerable": "<=6.4.3",
+    "patched": ">=6.4.4",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-rq7h-c2jc-7f22",
+    "url": "https://github.com/advisories/GHSA-rq7h-c2jc-7f22",
+    "vulnerable": "<=6.4.3",
+    "patched": ">=6.4.4",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "@storybook/core-server",
+    "severity": "critical",
+    "advisory": "GHSA-f2ph-cmg5-wxc8",
+    "url": "https://github.com/advisories/GHSA-f2ph-cmg5-wxc8",
+    "vulnerable": ">=8.0.0 <8.6.19",
+    "patched": ">=8.6.19",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "storybook",
+    "severity": "critical",
+    "advisory": "GHSA-f2ph-cmg5-wxc8",
+    "url": "https://github.com/advisories/GHSA-f2ph-cmg5-wxc8",
+    "vulnerable": ">=8.0.0 <8.6.19",
+    "patched": ">=8.6.19",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11"]
+  },
+  {
+    "package": "@storybook/core-server",
+    "severity": "high",
+    "advisory": "GHSA-px85-f4q5-jh77",
+    "url": "https://github.com/advisories/GHSA-px85-f4q5-jh77",
+    "vulnerable": ">=8.0.0 <8.6.19",
+    "patched": ">=8.6.19",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "storybook",
+    "severity": "high",
+    "advisory": "GHSA-px85-f4q5-jh77",
+    "url": "https://github.com/advisories/GHSA-px85-f4q5-jh77",
+    "vulnerable": ">=8.0.0 <8.6.19",
+    "patched": ">=8.6.19",
+    "affectedDependencyRoots": ["apps/docs > storybook@8.1.11"]
+  },
+  {
+    "package": "body-parser",
+    "severity": "high",
+    "advisory": "GHSA-27r3-jxmh-p828",
+    "url": "https://github.com/advisories/GHSA-27r3-jxmh-p828",
+    "vulnerable": "<1.20.9",
+    "patched": ">=1.20.9",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "postcss-selector-parser",
+    "severity": "moderate",
+    "advisory": "GHSA-rj75-hqrm-r3gf",
+    "url": "https://github.com/advisories/GHSA-rj75-hqrm-r3gf",
+    "vulnerable": "<6.1.5",
+    "patched": ">=6.1.5",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      ". > stylelint@16.6.1 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/stylelint-config > stylelint@16.6.1 ",
+      "packages/stylelint-config > stylelint-config-html@1.1.0 ",
+      "packages/stylelint-config > stylelint-config-recommended@14.0.1 ",
+      "packages/stylelint-config > stylelint-config-recommended-scss@14.0.0 ",
+      "packages/stylelint-config > stylelint-config-recommended-vue@1.5.0 ",
+      "packages/stylelint-config > stylelint-config-standard-scss@13.1.0 ",
+      "packages/stylelint-config > stylelint-order@6.0.4 ",
+      "packages/stylelint-config > stylelint-scss@6.3.2 "
+    ]
+  },
+  {
+    "package": "vite",
+    "severity": "moderate",
+    "advisory": "GHSA-fx2h-pf6j-xcff",
+    "url": "https://github.com/advisories/GHSA-fx2h-pf6j-xcff",
+    "vulnerable": "<=6.4.2",
+    "patched": ">=6.4.3",
+    "affectedDependencyRoots": [
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > @vitejs/plugin-vue@5.0.5 ",
+      "packages/evui > vite@5.3.2",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "qs",
+    "severity": "moderate",
+    "advisory": "GHSA-6pq8-jhm2-2vcw",
+    "url": "https://github.com/advisories/GHSA-6pq8-jhm2-2vcw",
+    "vulnerable": ">=6.7.0 <=6.16.0",
+    "patched": ">=6.16.1",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/test@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 "
+    ]
+  },
+  {
+    "package": "glob",
+    "severity": "moderate",
+    "advisory": "GHSA-3g3m-2fjr-6pw4",
+    "url": "https://github.com/advisories/GHSA-3g3m-2fjr-6pw4",
+    "vulnerable": ">=9.0.0 <=14.0.1",
+    "patched": ">=14.0.2",
+    "affectedDependencyRoots": [
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/evui > glob@10.4.2"
+    ]
+  },
+  {
+    "package": "follow-redirects",
+    "severity": "moderate",
+    "advisory": "GHSA-r4q5-vmmm-2653",
+    "url": "https://github.com/advisories/GHSA-r4q5-vmmm-2653",
+    "vulnerable": "<=1.15.11",
+    "patched": ">=1.16.0",
+    "affectedDependencyRoots": [". > nx@19.0.4 "]
+  },
+  {
+    "package": "lodash",
+    "severity": "moderate",
+    "advisory": "GHSA-xxjr-mmjv-4gpg",
+    "url": "https://github.com/advisories/GHSA-xxjr-mmjv-4gpg",
+    "vulnerable": ">=4.0.0 <=4.17.22",
+    "patched": ">=4.17.23",
+    "affectedDependencyRoots": [
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/test@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > eslint-plugin-vue@9.26.0 ",
+      "packages/evui > vite-plugin-dts@3.9.1 "
+    ]
+  },
+  {
+    "package": "lodash-es",
+    "severity": "moderate",
+    "advisory": "GHSA-xxjr-mmjv-4gpg",
+    "url": "https://github.com/advisories/GHSA-xxjr-mmjv-4gpg",
+    "vulnerable": ">=4.0.0 <4.17.23",
+    "patched": ">=4.17.23",
+    "affectedDependencyRoots": [
+      "apps/docs > evui@link:../../packages/evui ",
+      "packages/evui > lodash-es@4.17.21"
+    ]
+  },
+  {
+    "package": "minimatch",
+    "severity": "moderate",
+    "advisory": "GHSA-g3hv-75wg-m249",
+    "url": "https://github.com/advisories/GHSA-g3hv-75wg-m249",
+    "vulnerable": ">=7.0.0 <11.0.1",
+    "patched": ">=11.0.1",
+    "affectedDependencyRoots": [
+      ". > nx@19.0.4 ",
+      ". > @evui/eslint-config@link:packages/eslint-config ",
+      "apps/docs > storybook@8.1.11 ",
+      "apps/docs > @storybook/addon-controls@8.1.11 ",
+      "apps/docs > @storybook/addon-docs@8.1.11 ",
+      "apps/docs > @storybook/addon-essentials@8.1.11 ",
+      "apps/docs > @storybook/blocks@8.1.11 ",
+      "apps/docs > @storybook/vue3@8.1.11 ",
+      "apps/docs > @storybook/vue3-vite@8.1.11 ",
+      "packages/eslint-config > typescript-eslint@7.14.1 ",
+      "packages/evui > glob@10.4.2 ",
+      "packages/evui > vite-plugin-dts@3.9.1 ",
+      "packages/evui > vue-tsc@2.0.24 "
+    ]
+  }
+]
