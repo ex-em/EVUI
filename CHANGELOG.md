@@ -1,3 +1,11 @@
+## [3.24.1](https://github.com/ex-em/EVUI/compare/3.24.0...3.24.1) (2026-11-19)
+
+
+### Bug Fixes
+
+* **ci:** forward tool arguments through npx ([76a281d](https://github.com/ex-em/EVUI/commit/76a281d97552a117da8573f3831f8d42f109c161))
+* **deps:** lodash-es 범위를 ^4.18.1 로 올린다 ([4c19845](https://github.com/ex-em/EVUI/commit/4c19845e9771cc35cba3c35077176e8fff38136d)), closes [#2353](https://github.com/ex-em/EVUI/issues/2353)
+
 # [3.24.0](https://github.com/ex-em/EVUI/compare/3.23.0...3.24.0) (2026-10-15)
 
 
