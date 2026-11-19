@@ -62,7 +62,7 @@
     "@vue/compiler-sfc": "^3.5.45",
     "@vue/test-utils": "^2.6.0",
     "codemirror": "^6.0.2",
-    "eslint": "^9.39.5",
+    "eslint": "^10.15.0",
     "eslint-config-exem": "^3.1.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
