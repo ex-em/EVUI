@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noEmit": true,
+    "noUncheckedSideEffectImports": true,
+    "strict": true,
+    "target": "ES2022",
+    "types": []
+  },
+  "vueCompilerOptions": {
+    "strictTemplates": true
+  },
+  "include": ["*.vue"]
+}

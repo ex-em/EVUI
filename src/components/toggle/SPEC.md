@@ -30,7 +30,7 @@ on/off 토글 스위치. 활성/비활성 색상, 너비, 비활성/읽기전용
 | 파일 | 역할 |
 |------|------|
 | Toggle.vue | EvToggle SFC |
-| index.js | Vue 플러그인 등록 |
+| index.ts | Vue 플러그인 등록 및 설치 타입 |
 
 ## Dependencies
 

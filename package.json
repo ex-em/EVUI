@@ -8,17 +8,20 @@
   "homepage": ".",
   "scripts": {
     "lint": "eslint src --fix",
-    "format": "prettier --write \"src/**/*.{js,vue,scss,css,json}\" \"docs/**/*.{js,vue,scss,css,json}\" \"*.{js,cjs,json,md}\"",
-    "format:check": "prettier --check \"src/**/*.{js,vue,scss,css,json}\" \"docs/**/*.{js,vue,scss,css,json}\" \"*.{js,cjs,json,md}\"",
+    "format": "prettier --write \"src/**/*.{js,ts,vue,scss,css,json}\" \"docs/**/*.{js,vue,scss,css,json}\" \"*.{js,cjs,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{js,ts,vue,scss,css,json}\" \"docs/**/*.{js,vue,scss,css,json}\" \"*.{js,cjs,json,md}\"",
     "docs": "vite serve --config vite.config.js --port 9999 --host",
     "dev_docs": "vite serve --config vite.config.js --port 9999 --host --mode internal",
     "docs:validate": "node scripts/validate-api-docs.js",
-    "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html",
+    "build:lib": "vite build --config vite.config.lib.js && rimraf ./dist/demo.html && npm run build:types",
+    "build:types": "vue-tsc -p tsconfig.types.json && node scripts/finalize-types.js",
     "build:docs": "vite build --config vite.config.js --mode production",
     "preview": "vite preview --port 9999",
     "prepare": "husky",
     "test": "node --no-experimental-webstorage node_modules/vitest/vitest.mjs",
     "test:run": "node --no-experimental-webstorage node_modules/vitest/vitest.mjs run",
+    "test:types": "vue-tsc -p tests/types/tsconfig.json && tsc -p tests/types/tsconfig.node.json",
+    "typecheck": "npm run build:types && npm run test:types",
     "test:coverage": "node --no-experimental-webstorage node_modules/vitest/vitest.mjs run --coverage",
     "test:visual": "vitest --config vitest.config.browser.js",
     "test:visual:update": "vitest --config vitest.config.browser.js --update",
@@ -29,12 +32,20 @@
   ],
   "main": "dist/index.js",
   "module": "dist/index.js",
+  "types": "./dist/types/public-types.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.umd.cjs"
+      "import": {
+        "types": "./dist/types/public-types.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/types/public-types.d.cts",
+        "default": "./dist/index.umd.cjs"
+      }
     },
     "./style": {
+      "types": "./dist/types/style/index.d.ts",
       "import": "./dist/style.css",
       "require": "./dist/style.css"
     },
@@ -92,13 +103,15 @@
     "postcss-html": "^2.0.1",
     "postcss-scss": "^4.0.9",
     "rimraf": "^6.1.4",
-    "vue-eslint-parser": "^10.4.2"
+    "vue-eslint-parser": "^10.4.2",
+    "@typescript-eslint/parser": "8.73.0",
+    "vue-tsc": "3.3.14"
   },
   "peerDependencies": {
     "vue": "^3.5.8"
   },
   "lint-staged": {
-    "*.{js,vue}": "eslint --fix",
+    "*.{js,ts,vue}": "eslint --fix",
     "docs/views/apiDocs/data/*.json": "node scripts/validate-api-docs.js"
   },
   "packageManager": "npm@11.19.1",

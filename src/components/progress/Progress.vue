@@ -13,19 +13,21 @@
   </div>
 </template>
 
-<script>
-import { computed } from 'vue';
+<script lang="ts">
+import { computed, defineComponent, type PropType } from 'vue';
 
-export default {
+const isColorArray: (value: unknown) => value is readonly unknown[] = Array.isArray;
+
+export default defineComponent({
   name: 'EvProgress',
   props: {
     modelValue: {
       type: Number,
       default: 0,
-      validator: (val) => val >= 0 && val <= 100,
+      validator: (val: number) => val >= 0 && val <= 100,
     },
     color: {
-      type: [String, Array],
+      type: [String, Array] as PropType<string | readonly { value: number; color: string }[]>,
       default: '#409EFF',
     },
     strokeWidth: {
@@ -43,7 +45,7 @@ export default {
       height: `${props.strokeWidth}px`,
     }));
     const innerStyle = computed(() => {
-      if (Array.isArray(props.color)) {
+      if (isColorArray(props.color)) {
         const sortedColorList = [...props.color].sort((curr, next) => curr.value - next.value);
         let color = sortedColorList[0].color;
         if (!props.modelValue) {
@@ -76,7 +78,7 @@ export default {
       innerStyle,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">
