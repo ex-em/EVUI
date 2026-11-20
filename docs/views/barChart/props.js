@@ -44,6 +44,8 @@ import DisplayOverflow from './example/DisplayOverflow';
 import DisplayOverflowRaw from './example/DisplayOverflow?raw';
 import Annotations from './example/Annotations';
 import AnnotationsRaw from './example/Annotations?raw';
+import ProvisionalBand from './example/ProvisionalBand';
+import ProvisionalBandRaw from './example/ProvisionalBand?raw';
 
 export default {
   mdText,
@@ -179,6 +181,12 @@ export default {
         + '시각적 중심에 정렬되며, Horizontal 토글로 가로/세로 모두 중심 정렬이 유지되는지 확인할 수 있습니다.',
       component: Annotations,
       parsedData: parse(AnnotationsRaw).descriptor,
+    },
+    ProvisionalBand: {
+      description:
+        '시간축의 잠정 구간을 배경과 경계선으로 표시합니다. 마지막 슬롯과 x로 지정한 슬롯을 비교할 수 있습니다.',
+      component: ProvisionalBand,
+      parsedData: parse(ProvisionalBandRaw).descriptor,
     },
   },
 };

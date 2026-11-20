@@ -1,3 +1,9 @@
+const getLastDataIndex = ({ labels, data }) =>
+  Object.values(data ?? {}).reduce(
+    (last, series) => Math.max(last, (series?.length ?? 0) - 1),
+    (labels?.length ?? 0) - 1,
+  );
+
 export default class EvChartZoom {
   constructor(
     evChartInfo,
@@ -11,6 +17,7 @@ export default class EvChartZoom {
     this.isExecuteZoom = isExecuteZoom;
     this.evChartProps = evChartInfo.props;
     this.evChartCloneData = evChartClone.data;
+    this.cloneLastDataIndices = evChartClone.data.map(getLastDataIndex);
     this.brushIdx = brushIdx;
 
     const zoomOptions = evChartZoomOptions.zoom;
@@ -19,6 +26,9 @@ export default class EvChartZoom {
 
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
     this.cloneLabelsLastIdx = cloneLabelsLastIdx;
+    // 실제로 data 를 잘라 넘긴 구간. zoomAreaMemory 는 브러시를 놓을 때·유효한 구간일 때만 갱신돼
+    // 드래그 중이나 [0, 0] 같은 외부 인덱스에서는 화면과 어긋난다.
+    this.appliedZoomRange = null;
 
     this.isAnimationFinish = true;
 
@@ -254,6 +264,7 @@ export default class EvChartZoom {
   }
 
   executeZoom(zoomStartIdx, zoomEndIdx) {
+    this.appliedZoomRange = [zoomStartIdx, zoomEndIdx];
     if (this.isExecuteZoom) {
       this.isExecuteZoom.value = true;
     }
@@ -308,23 +319,10 @@ export default class EvChartZoom {
     const cloneLabelsLastIdx = evChartClone.data[0].labels.length - 1;
     this.cloneLabelsLastIdx = cloneLabelsLastIdx;
     this.evChartCloneData = evChartClone.data;
+    this.cloneLastDataIndices = evChartClone.data.map(getLastDataIndex);
 
-    if (isKeepZoomStatus) {
-      const curZoomMemory = this.zoomAreaMemory.current[0];
-      let zoomStartIdx = curZoomMemory[0];
-      let zoomEndIdx = curZoomMemory[1];
-
-      if (zoomStartIdx === 0 && zoomEndIdx === -1) {
-        zoomStartIdx = 0;
-        zoomEndIdx = cloneLabelsLastIdx;
-
-        this.zoomAreaMemory = {
-          previous: [],
-          current: [[zoomStartIdx, zoomEndIdx]],
-          latest: [],
-        };
-      }
-
+    if (isKeepZoomStatus && this.hasAppliedZoom()) {
+      const [zoomStartIdx, zoomEndIdx] = this.appliedZoomRange;
       if (this.emitFunc) {
         this.emitFunc.updateZoomStartIdx(zoomStartIdx);
         this.emitFunc.updateZoomEndIdx(zoomEndIdx);
@@ -332,7 +330,7 @@ export default class EvChartZoom {
 
       this.executeZoom(zoomStartIdx, zoomEndIdx);
     } else {
-      if (this.dragZoomIcon) {
+      if (!isKeepZoomStatus && this.dragZoomIcon) {
         this.dragZoomIcon.classList.remove('active');
       }
 
@@ -341,6 +339,7 @@ export default class EvChartZoom {
         current: [[0, cloneLabelsLastIdx]],
         latest: [],
       };
+      this.appliedZoomRange = null;
 
       if (this.emitFunc) {
         this.emitFunc.updateZoomStartIdx(0);
@@ -350,6 +349,36 @@ export default class EvChartZoom {
       this.setIconStyle(isUseZoomMode);
       this.setBrushIdx(evChartClone, brushChartIdx);
     }
+  }
+
+  hasAppliedZoom() {
+    return this.appliedZoomRange?.[1] >= 0;
+  }
+
+  /**
+   * 현재 줌 구간이 원본 데이터의 마지막 점까지 포함하는지.
+   * 줌은 data.labels 를 잘라 넘기므로 차트는 잘린 구간의 끝을 최신 데이터로 오인한다 — provisionalBand 처럼
+   * "원본의 마지막 구간"에만 의미가 있는 표시는 이 값으로 걸러야 한다.
+   * 그룹은 같은 인덱스로 모든 차트를 자르지만 차트마다 라벨 수가 달라 원본 끝도 차트별로 본다.
+   * @param {number} [chartIdx=0]  그룹 안 차트 순서
+   * @returns {boolean}
+   */
+  isLatestDataInView(chartIdx = 0) {
+    const [, zoomEndIdx] = this.appliedZoomRange ?? [];
+    if (zoomEndIdx === undefined || zoomEndIdx === -1) {
+      return true;
+    }
+    const lastIdx = this.cloneLastDataIndices?.[chartIdx] ?? this.cloneLabelsLastIdx;
+    return zoomEndIdx >= lastIdx;
+  }
+
+  // 고정축에서 잘린 시리즈의 첫·마지막 점 옆에 있던 시각을 찾을 때만 원본을 제공한다.
+  getZoomSeriesSource(seriesId, chartIdx = 0) {
+    const original = this.evChartCloneData?.[chartIdx];
+    const data = original?.data?.[seriesId];
+    return this.hasAppliedZoom() && data
+      ? { data, labels: original.labels, range: this.appliedZoomRange }
+      : null;
   }
 
   setZoomAreaMemory(zoomStartIdx, zoomEndIdx, direction) {

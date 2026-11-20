@@ -139,6 +139,21 @@ const DEFAULT_OPTIONS = {
     // 임계선/밴드(plotLines·plotBands)를 series 위(true)/아래(false)에 그릴지. maxTip 은 항상 최상단.
     aboveSeries: true,
   },
+  provisionalBand: {
+    // time x축 line/bar 의 데이터 구간에 배경과 경계선을 표시한다.
+    use: false,
+    // 표시할 구간의 x 값. 비워 두면 마지막 데이터 구간을 표시한다.
+    x: null,
+    // 그리드·시리즈가 비쳐 보이도록 반투명으로 칠한다.
+    color: 'rgba(128, 128, 128, 0.12)',
+    border: {
+      color: '#8A8F98',
+      width: 1,
+      // 배열 기본값을 두면 defaultsDeep 이 사용자 배열과 인덱스 단위로 섞으므로(예: [2] → [2, 4])
+      // null 로 두고 그리기 시점에 기본 점선을 적용한다. 실선은 [] 로 지정한다.
+      segments: null,
+    },
+  },
   maxTip: {
     use: false,
     fixedPosTop: false,
@@ -736,7 +751,7 @@ export const useZoomModel = (
         evChartClone.data = evChartGroupRef ? cloneChartData(newData) : [cloneChartData(newData)];
 
         if (evChartZoomOptions.zoom.keepZoomStatus) {
-          isUpdateDataForUseZoom.value = false;
+          isUpdateDataForUseZoom.value = !evChartZoom?.hasAppliedZoom();
         } else {
           isUseZoomMode.value = false;
 
@@ -765,7 +780,10 @@ export const useZoomModel = (
       return;
     }
 
-    if (isUseZoomMode.value) {
+    // 전체 범위 갱신이 v-model 로 돌아와도 아직 자르지 않은 그룹 차트는 원본 범위를 유지한다.
+    const isCurrentFullRange =
+      !evChartZoom.hasAppliedZoom() && zoomStartIdx === 0 && zoomEndIdx === evChartZoom.cloneLabelsLastIdx;
+    if (isUseZoomMode.value && !isCurrentFullRange) {
       evChartZoom.executeZoom(zoomStartIdx, zoomEndIdx);
       evChartZoom.setZoomAreaMemory(zoomStartIdx, zoomEndIdx);
     }
@@ -822,5 +840,7 @@ export const useZoomModel = (
     setDataForUseZoom,
     controlZoomIdx,
     onClickToolbar,
+    isLatestDataInView: (chartIdx) => evChartZoom?.isLatestDataInView(chartIdx) ?? true,
+    getZoomSeriesSource: (seriesId, chartIdx) => evChartZoom?.getZoomSeriesSource(seriesId, chartIdx),
   };
 };

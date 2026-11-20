@@ -14,6 +14,7 @@ import Interaction from './plugins/plugins.interaction';
 import Tooltip from './plugins/plugins.tooltip';
 import TooltipVirtualScroll from './plugins/plugins.tooltip.virtualScroll';
 import Pie from './plugins/plugins.pie';
+import ProvisionalBand from './plugins/plugins.provisionalBand';
 import Tip from './element/element.tip';
 import Blit from './chart.blit';
 import Selection from './chart.selection';
@@ -48,6 +49,7 @@ class EvChart {
       Object.assign(this, Pie);
       Object.assign(this, Title);
       Object.assign(this, Scrollbar);
+      Object.assign(this, ProvisionalBand);
     }
 
     if (options.type === 'heatMap' && options.legend.type === 'gradient') {
@@ -1340,7 +1342,10 @@ class EvChart {
    * @returns {undefined}
    */
   drawStaticLayer(bufferCtx, hitInfo) {
-    // grid/axis 만 그린다. plot(line/band/label)은 drawPlotsFront(front 패스)에서 그린다.
+    // provisionalBand 영역 → grid/axis 순으로 그린다. plot(line/band/label)은 drawPlotsFront(front 패스)에서 그린다.
+    // provisionalBand 를 축보다 먼저 깔아 그리드·축선이 영역 위에 그대로 보이게 한다.
+    this.drawProvisionalBand?.(bufferCtx);
+
     this.axesX.forEach((axis, index) => {
       axis.ctx = bufferCtx;
       axis.draw(

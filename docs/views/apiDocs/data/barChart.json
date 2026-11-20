@@ -2908,6 +2908,68 @@
               ]
             },
             {
+              "name": "provisionalBand",
+              "type": "Object",
+              "description": "호출자가 잠정 상태로 표시하려는 시간 구간에 배경과 경계선을 그립니다. time X축을 사용하는 세로 막대 차트에서 지원합니다. x를 지정하면 해당 막대 슬롯을, 생략하면 마지막 슬롯부터 플롯 오른쪽 끝까지 칠합니다. 대상 막대가 표시 범위를 벗어나면 영역을 숨깁니다.",
+              "tryIt": {
+                "data": "{ labels: [1795132800000, 1795133400000, 1795134000000, 1795134600000, 1795135200000] }",
+                "options": "{ axesX: [{ type: 'time', categoryMode: true, timeFormat: 'HH:mm', interval: { time: 10, unit: 'minute' } }], provisionalBand: { use: true } }"
+              },
+              "children": [
+                {
+                  "name": "use",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "잠정 구간의 표시 여부입니다.",
+                  "tryIt": {
+                    "data": "{ labels: [1795132800000, 1795133400000, 1795134000000, 1795134600000, 1795135200000] }",
+                    "options": "{ axesX: [{ type: 'time', categoryMode: true, timeFormat: 'HH:mm', interval: { time: 10, unit: 'minute' } }], provisionalBand: { use: true } }"
+                  }
+                },
+                {
+                  "name": "x",
+                  "type": "Number, String, Date",
+                  "default": "null",
+                  "description": "표시할 막대의 시각입니다. 해당 막대 슬롯을 칠합니다. 생략하면 마지막 구간을 표시합니다.",
+                  "tryIt": {
+                    "data": "{ labels: [1795132800000, 1795133400000, 1795134000000, 1795134600000, 1795135200000] }",
+                    "options": "{ axesX: [{ type: 'time', categoryMode: true, timeFormat: 'HH:mm', interval: { time: 10, unit: 'minute' } }], provisionalBand: { use: true, x: 1795134000000, border: { width: 0 } } }"
+                  }
+                },
+                {
+                  "name": "color",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'rgba(128, 128, 128, 0.12)'",
+                  "description": "영역 배경색입니다. 그리드·시리즈가 비쳐 보이도록 반투명 색을 권장합니다."
+                },
+                {
+                  "name": "border",
+                  "type": "Object",
+                  "description": "영역 경계선 스타일입니다(왼쪽, 중간 버킷이면 오른쪽도).",
+                  "children": [
+                    {
+                      "name": "color",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#8A8F98'",
+                      "description": "경계선 색상입니다."
+                    },
+                    {
+                      "name": "width",
+                      "type": "Number",
+                      "default": "1",
+                      "description": "경계선 두께(px)입니다. 0이면 경계선을 그리지 않습니다."
+                    },
+                    {
+                      "name": "segments",
+                      "type": "Array",
+                      "default": "null",
+                      "description": "경계선 점선 패턴([선, 간격] px)입니다. null이면 [4, 4] 점선, []이면 실선입니다."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "name": "displayOverflow",
               "type": "Boolean",
               "default": "false",

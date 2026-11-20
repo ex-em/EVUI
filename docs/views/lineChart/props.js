@@ -54,6 +54,8 @@ import PerfStressSingle from './example/PerfStressSingle';
 import PerfStressSingleRaw from './example/PerfStressSingle?raw';
 import Annotations from './example/Annotations';
 import AnnotationsRaw from './example/Annotations?raw';
+import ProvisionalBand from './example/ProvisionalBand';
+import ProvisionalBandRaw from './example/ProvisionalBand?raw';
 
 export default {
   mdText,
@@ -220,6 +222,12 @@ export default {
         + 'position(axis/pixel/series), content 토큰·콜백, connector(연결선)를 지원합니다.',
       component: Annotations,
       parsedData: parse(AnnotationsRaw).descriptor,
+    },
+    ProvisionalBand: {
+      description:
+        '시간축의 잠정 구간을 배경과 경계선으로 표시합니다. 마지막 구간과 x로 지정한 구간을 비교할 수 있습니다.',
+      component: ProvisionalBand,
+      parsedData: parse(ProvisionalBandRaw).descriptor,
     },
   },
 };

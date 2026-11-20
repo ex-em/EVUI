@@ -1,7 +1,7 @@
-# Chart Plugins — EvChart 믹스인 플러그인 (tooltip / legend / interaction / scrollbar / title / pie)
+# Chart Plugins — EvChart 믹스인 플러그인 (tooltip / legend / interaction / scrollbar / title / pie / provisionalBand)
 
 > 차트 도메인 루트 개요·렌더 파이프라인·모델 계층은 [../SPEC.md](../SPEC.md) 참조.
-> 이 문서는 `src/components/chart/plugins/` 하위 8개 플러그인 파일의 역할·훅 지점·`chart.core.js`(EvChart)와의 결합 방식만 다룬다.
+> 이 문서는 `src/components/chart/plugins/` 하위 9개 플러그인 파일의 역할·훅 지점·`chart.core.js`(EvChart)와의 결합 방식만 다룬다.
 
 ## Purpose
 
@@ -53,9 +53,18 @@ EvChart 본체(캔버스 시리즈 렌더링)와 분리된 **부가 UI·인터�
 - **sunburst draw**: 계층 데이터의 링별 draw. `slice.id === 'dummy'`는 `destination-out`으로 빈 영역 처리.
 - **도넛 홀**: `drawDoughnutHole`이 `destination-out`으로 중앙 홀을 뚫고 `pieStroke` 시 내측 테두리를 그림. 마지막 링의 `ir`을 홀 반지름으로 갱신.
 
+### 잠정 구간 (plugins.provisionalBand.js)
+- **잠정 구간**은 `provisionalBand.use`가 활성화된 time X축의 세로 line/bar 차트에 배경(`color`)과 경계선(`border`, 기본 `[4, 4]` 점선)으로 표시한다. 호출자가 표시 여부와 시각을 결정한다.
+- **대상 버킷**은 `provisionalBand.x`로 지정한 시각 또는 시리즈의 마지막 점 중 가장 늦은 시각이다. 지정 시각은 시각 오름차순을 전제로 이진 탐색한다. 최신 시각은 각 시리즈의 마지막 점을 한 번 확인해 구하고, 좌표 계산은 그릴 수 있는 후보를 찾을 때까지만 수행한다. Date와 Dayjs 값은 `valueOf()`로 읽고 문자열은 파싱한다.
+- **기준 시리즈**는 화면에 표시되는 동일 타입의 time 축 시리즈다. 시리즈 데이터의 x를 사용하므로 `labels` 없이 `{ x, y }`로 넘긴 line도 지원한다. 첫 후보가 범위 밖이거나 그릴 수 있는 폭이 없으면 같은 시각의 다음 후보를 확인한다. 위치는 해당 시리즈의 축과 `combo` 오프셋으로 계산한다.
+- **영역**은 line의 경우 앞뒤 점과의 중간 사이다. 지정 점의 이웃이 줌으로 잘렸으면 `getZoomSeriesSource`에서 원본 이웃 시각을 읽고, 같은 원본과 줌 구간에서 재사용한다. 다음 점이 없으면 플롯 오른쪽 끝까지 칠한다. bar는 지정 시각의 슬롯을 칠하고 `x`를 생략하면 마지막 슬롯 시작부터 플롯 오른쪽 끝까지 칠한다. `timeMode` 막대의 가시성에는 렌더러와 같은 두께·패딩·시리즈 배치를 적용한다.
+- **가시성**은 시리즈의 축 범위 또는 막대 슬롯을 사용해 판정한다. 마지막 버킷은 실제 적용한 줌 구간(`appliedZoomRange`)이 해당 차트의 원본 마지막 인덱스를 포함할 때 표시한다. 그룹은 `data.chartIdx`로 자식 차트를 구분하고, 라벨 없는 차트는 원본 시리즈 길이로 마지막 인덱스를 구한다. 줌 적용 전에는 `keepZoomStatus`로 갱신해도 원본 전체를 표시한다. 두 경계가 같은 픽셀로 반올림되면 배경 없이 점선 한 줄을 그린다.
+- **경계 처리**: 시작점이 `graphMin` 이하면 플롯 왼쪽 끝부터 칠하고 왼쪽 경계선은 긋지 않는다(실제 시작점이 아님). 오른쪽 경계선은 영역이 플롯 오른쪽 끝 전에 끝날 때(중간 버킷)만 긋는다. 영역 폭이 `선 굵기 × 2 + 점선 간격`(기본 1px·[4, 4] 이면 6px, `getMinDoubleBorderWidth`)보다 좁으면 두 선이 붙어 이중선처럼 보이므로 왼쪽(잘렸으면 오른쪽) 한 줄만 긋는다. `color` 가 null 이면 기본색으로 칠한다(defaultsDeep 은 null 을 채우지 않음).
+- **z-order**: `drawStaticLayer` 첫 단계에서 그려 grid/축선·series·plot 모두 영역 위에 놓인다. static 은 main buffer 에 그리므로 worker series 경로에서도 같다.
+
 ## Business Rules
 
-1. **믹스인 장착 조건**: `options.brush`가 truthy면(브러시 차트) Tooltip/TooltipVirtualScroll/Interaction/Tip/Legend/Pie/Title/Scrollbar 전부 미장착 — 브러시 차트는 렌더 전용. `options.type === 'heatMap' && options.legend.type === 'gradient'`일 때만 GradientLegend가 Legend **뒤에** assign되어 동명 메서드(createLegendLayout/initLegend/initEvent/updateLegend/resetLegend/setLegendPosition/updateLegendContainerSize/showLegend/hideLegend)를 덮어쓴다 (chart.core.js:37-52).
+1. **믹스인 장착 조건**: `options.brush`가 truthy면(브러시 차트) Tooltip/TooltipVirtualScroll/Interaction/Tip/Legend/Pie/Title/Scrollbar/ProvisionalBand 전부 미장착 — 브러시 차트는 렌더 전용. `options.type === 'heatMap' && options.legend.type === 'gradient'`일 때만 GradientLegend가 Legend **뒤에** assign되어 동명 메서드(createLegendLayout/initLegend/initEvent/updateLegend/resetLegend/setLegendPosition/updateLegendContainerSize/showLegend/hideLegend)를 덮어쓴다 (chart.core.js:37-52).
 2. **툴팁 DOM 위치**: tooltip DOM(`.ev-chart-tooltip`)은 `document.body` 직속이고(`createTooltipDOM`), 배치는 `transform: translate3d`로만 이동한다(`top/left`는 0 고정 — 레이아웃/리페인트 회피). 좌표는 커서의 문서 좌표(`e.pageX/pageY`)이며, 반전 판정의 기준은 **문서 좌표로 환산한 가시 영역**(`getVisibleDocumentRect` = `scrollX/Y + documentElement.clientWidth/Height`)이다 — `document.body.clientWidth/Height`가 아니다(body가 뷰포트보다 넓으면 한계가 화면 밖이라 반전이 통째로 건너뛰어진다). 캔버스 툴팁과 커스텀 HTML 툴팁은 `placeTooltipDOM` 한 곳을 공유한다. **가로 반전 방향은 직전 방향을 유지한다**(히스테리시스) — 매 호출의 폭으로 다시 판정하면, hover 지점마다 폭이 달라지는 차트에서 커서가 한 방향으로 움직이는 동안에도 좌우가 번갈아 뒤집힌다. 지금 방향으로 두면 가시 영역을 벗어나는 경우에만 전환한다. **양쪽 모두 안 들어가면(툴팁이 가시 영역보다 넓음) 히스테리시스 대신 남은 폭이 넓은 쪽을 택한다** — 커서 위치만 보는 판정이라 폭 변동에 흔들리지 않고, 두 여유의 합이 항상 `가시 폭 - 40` 이라 상한이 0 이하가 되지 않는다. 폭만 보고 한쪽을 고정하면 커서가 그 반대편 20px 안에 있을 때 상한이 0 이 돼 내용이 통째로 사라진다. 판정에 쓰는 폭은 콘텐츠가 아니라 **tooltipDOM 실측 폭**이다 — 상한이 tooltipDOM 에 걸리고, 인라인 `border: 1px`·header padding 때문에 콘텐츠 폭보다 넓다. 숨김 경로(`hideTooltipDOM`·`tooltipClear`, 디바운스를 우회하는 드래그 경로의 즉시 `hideTooltip`)는 `resetTooltipPlacement` 로 방향 기억을 버려, 다시 표시될 때 기본 방향(커서 오른쪽)에서 시작한다 — mouse-leave 의 주 경로는 `tooltipClear` 라 둘 다 필요하다. 반대로 `placeTooltipDOM` 은 예약된 `debouncedHide` 를 취소한다 — 트레일링 콜백이 살아있으면 보이는 툴팁을 숨기고 방향까지 지운다. **세로는 방향 기억 없이 매번 판정하고, 폭과 달리 높이 상한을 걸지 않는다** — 대신 배치 좌표에 가시 영역 상단을 하한으로 건다(`Math.max(view.top, …)`). 상한이 없으므로 위 공간보다 높은 툴팁은 반전 좌표가 음수가 돼 상단이 잘리고, 그 손실은 스크롤로 되돌릴 수 없다 — 아래 방향은 문서 좌표라 넘쳐도 스크롤로 닿으므로 하한만 둔다. **위·아래 모두 안 들어가면 가로와 같이 남은 공간이 넓은 쪽을 택한다** — 아래가 넓은데도 위로 반전하면 툴팁이 커서와 차트를 덮는다. **반전 배치는 좌표가 아니라 `translateX(-100%)` 로 우단을 앵커(`커서 - 20px`)에 고정한다** — 좌측을 `커서 - 폭 - 20` 으로 잡으면 배치 이후 폭이 커지는 경로에서 툴팁이 커서 쪽으로 자라 커서를 덮는다. 우단을 고정하면 폭 증가가 왼쪽으로만 향한다. 폭 상한도 앵커 기준이다 — 반전이면 앵커에서 가시 영역 좌단까지, 아니면 앵커에서 우단까지.
 3. **툴팁은 문서 가로 스크롤을 늘리지 않는다**: body 직속 `absolute`라 tooltipDOM이 가시 영역 우단을 넘은 폭이 그대로 문서 스크롤 폭이 된다. 배치 시 **그 지점부터 우단까지 남은 폭**을 `max-width`로 걸어, 배치 이후 내용이 넓어지는 경로(가상 스크롤 rAF 렌더, 내부 스크롤바 출현, 웹폰트 적용, 라이브 갱신)에서도 레이아웃 단계에서 우단을 넘지 못하게 한다 — 사후 교정(ResizeObserver 등)은 한 프레임 늦어 넘친 프레임이 그대로 그려진다. 배치 방향은 `fits*` 판정을 통과한 쪽이므로 상한은 항상 실측 폭 이상이라 내용을 좁히지 않는다(= `overflow-x: hidden` 클리핑을 유발하지 않는다). 단, 양쪽 모두 안 들어가는 경우는 예외다 — 넓은 쪽 여유로 잠기므로 내용이 잘린다(툴팁이 화면보다 넓으면 잘리지 않을 방법이 없다). **상한이 실제로 구속되는 이 구간에서만 16px 단위로 내림한다**(`quantizeTooltipMaxWidth`) — 상한은 커서 좌표의 함수라 1px 이동마다 값이 달라지는데, 구속되는 구간에서는 그 값이 곧 used width 라 가상 스크롤의 폭 감시 ResizeObserver 가 mousemove 마다 행 측정을 전량 무효화한다. 내림이라 남은 폭을 넘지 않아 넘침 차단은 그대로다. 구속되지 않는 구간에 적용하면 상한이 실측 폭 아래로 내려가 위 계약이 깨지고, 없던 RO 발화가 새로 생긴다. `.ev-chart-tooltip`의 `box-sizing: border-box`는 인라인으로 붙는 `border: 1px`가 상한 안에 들어오게 한다(호스트 앱 전역 리셋에 의존하지 않기 위함). **세로에는 상한을 걸지 않는다** — 반전만 하며, 배치 이후 높이가 커지는 경우는 막지 않는다. 세로 반전 판정에 쓰는 높이도 **상한 적용 전** 실측값이다 — 상한이 구속돼 줄바꿈이 생기면 실제 높이는 그보다 커질 수 있으나, 재측정은 강제 레이아웃을 한 번 더 만들고 세로 넘침은 문서 좌표라 스크롤로 닿으므로 받아들인다. 상한이 다음 배치의 자연 크기 측정을 누르지 않도록, 각 진입점(`setTooltipLayoutPosition` / `setCustomTooltipLayoutPosition`)은 측정 직전에 이를 해제한다. 커스텀 경로는 `drawCustomTooltip`(가상 스크롤 행 높이 실측 포함)이 배치보다 먼저 실행되므로 해제 지점을 `drawCustomTooltip` 진입부에도 둔다 — 그렇지 않으면 행 높이가 직전 배치의 상한 아래(줄바꿈된 높이)에서 굳는다.
 4. **범례 최소 활성 보장**: `clickMode !== 'active'`에서 활성 범례가 1개면 클릭해도 비활성화되지 않는다(일반 범례는 `seriesInfo.count === 1`, heatMap 색상 범례는 `activeCount === 1` 기준).
@@ -124,6 +133,7 @@ EvChart (chart.core.js)
 │      Object.assign(this, Pie)                 plugins.pie.js
 │      Object.assign(this, Title)               plugins.title.js
 │      Object.assign(this, Scrollbar)           plugins.scrollbar.js
+│      Object.assign(this, ProvisionalBand)         plugins.provisionalBand.js
 │    if (type === 'heatMap' && legend.type === 'gradient')
 │      Object.assign(this, GradientLegend)      plugins.legend.gradient.js (Legend 동명 메서드 override)
 │
@@ -132,6 +142,7 @@ EvChart (chart.core.js)
 │    initRect()  : initTitle/showTitle, initLegend/setLegendPosition
 │    drawChart() : updateScrollbarPosition(scrollbarLabelOffset)   ← pre-adjust labelOffset 주입
 │                  drawPie/drawSunburst/drawDoughnutHole (series layer)
+│    drawStaticLayer() : drawProvisionalBand?.(bufferCtx)   ← 축보다 먼저(브러시 차트는 미장착)
 │    update()    : updateScrollbar→updateScrollbarInfo,
 │                  updateLegend/forceUpdateLegend/updateLegendTableValues,
 │                  initTitle/updateTitle/showTitle/hideTitle,
@@ -161,6 +172,7 @@ EvChart (chart.core.js)
 | plugins.scrollbar.js | 축 스크롤바 DOM(track/thumb/button), range·anchorEdge 관리, 드래그/클릭/휠 스크롤, 한계 클램프, 파기 |
 | plugins.title.js | 제목 DOM 생성/갱신/표시/숨김 (wrapperDOM padding-top 연동) |
 | plugins.pie.js | pie/doughnut/sunburst draw 루프(bufferCtx에 series.draw 위임), 도넛 홀(destination-out) |
+| plugins.provisionalBand.js | time x축 line/bar 의 집계 중 버킷 선택과 영역·경계선 렌더링(drawProvisionalBand) |
 
 ## Dependencies
 
@@ -170,7 +182,8 @@ EvChart (chart.core.js)
 | model/ (model.store 등) | pieDataSet 구성, createDataSet(labelValidMask 재구축 트리거), getAggregations |
 | element/ (series 인스턴스) | findGraphData/findItems/itemHighlight/draw — hit-test와 draw의 시리즈 계약 |
 | ../helpers/helpers.util | aliasPixel, truncateLabelWithEllipsis, htmlToElement, setDOMStyle, rgbaAdjustHalfOpacity, labelSignFormat, calcBoxDistance, isDoughnutHole |
-| ../helpers/helpers.canvas | createGradient (툴팁 색상 마커 그라디언트) |
+| ../helpers/helpers.canvas | createGradient (툴팁 색상 마커 그라디언트), calculateX (provisionalBand 시작 픽셀) |
+| ../annotation/annotation.axis | normalizeAxisValue (provisionalBand 의 time 라벨 → timestamp) |
 | ../helpers/helpers.constant | AXIS_OPTION.scrollbar (스크롤바 기본 옵션 defaultsDeep 병합) |
 | lodash-es | inRange, cloneDeep, defaultsDeep, isEqual, isNil, throttle |
 | dayjs | time 축 라벨 포맷 (getCurMouseTargetVal) |
