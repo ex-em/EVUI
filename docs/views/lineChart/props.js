@@ -54,8 +54,8 @@ import PerfStressSingle from './example/PerfStressSingle';
 import PerfStressSingleRaw from './example/PerfStressSingle?raw';
 import Annotations from './example/Annotations';
 import AnnotationsRaw from './example/Annotations?raw';
-import PartialData from './example/PartialData';
-import PartialDataRaw from './example/PartialData?raw';
+import ProvisionalBand from './example/ProvisionalBand';
+import ProvisionalBandRaw from './example/ProvisionalBand?raw';
 
 export default {
   mdText,
@@ -223,12 +223,11 @@ export default {
       component: Annotations,
       parsedData: parse(AnnotationsRaw).descriptor,
     },
-    PartialData: {
+    ProvisionalBand: {
       description:
-        'partialData 옵션으로 아직 집계 중인 마지막 구간을 배경 영역과 왼쪽 경계 점선으로 표시합니다. '
-        + 'x축이 time 타입인 line·area 에서 동작하며, 영역은 직전 점과 마지막 점의 중간부터 시작합니다.',
-      component: PartialData,
-      parsedData: parse(PartialDataRaw).descriptor,
+        '시간축의 잠정 구간을 배경과 경계선으로 표시합니다. 마지막 구간과 x로 지정한 구간을 비교할 수 있습니다.',
+      component: ProvisionalBand,
+      parsedData: parse(ProvisionalBandRaw).descriptor,
     },
   },
 };

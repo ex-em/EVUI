@@ -2,7 +2,21 @@ import Canvas from '../helpers/helpers.canvas';
 import Bar from './element.bar';
 import Util from '../helpers/helpers.util';
 
+export const getTimeBarOffset = (barArea, seriesPosition, width, padding) =>
+  Math.ceil(barArea * seriesPosition) - Math.round(width + padding);
+
 class TimeBar extends Bar {
+  getTimeBarLayout(area, thickness, showSeriesCount, showIndex) {
+    const cArea = area / (this.data.length || 1);
+    const cPad = 2;
+    const paddedArea = cArea - cPad * 2;
+    const bArea = this.isExistGrp ? paddedArea : paddedArea / showSeriesCount;
+    const size = this.calculateBarSize(thickness, bArea);
+    const bPad = (bArea - size) / 2;
+    const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
+    return { cArea, cPad, bArea, size, bPad, barSeriesX };
+  }
+
   /**
    * Compute pixel geometry (xp/yp/w/h) for each time bar and store it on the main model.
    * 기하 계산만 수행한다(canvas 그리기 없음). subW(부분 bar 클리핑) 누적과 gradient용 w 보정까지
@@ -36,33 +50,13 @@ class TimeBar extends Bar {
     const xep = chartRect.x2 - labelOffset.right;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (this.data.length || 1);
-    const cPad = 2;
-
-    let bArea;
-    if (this.isExistGrp) {
-      bArea = cArea - cPad * 2;
-    } else {
-      bArea = (cArea - cPad * 2) / showSeriesCount;
-    }
-
-    const getSize = () => {
-      if (typeof thickness === 'string' && /[0-9]+px/.test(thickness)) {
-        return Math.min(bArea, Number(thickness.replace('px', '')));
-      }
-      if (typeof thickness === 'number' && thickness <= 1 && thickness >= 0) {
-        return Math.ceil(bArea * thickness);
-      }
-      return bArea;
-    };
-    const size = getSize();
+    const { cArea, cPad, bArea, size, bPad, barSeriesX } = this.getTimeBarLayout(
+      dArea, thickness, showSeriesCount, showIndex,
+    );
 
     let w = isHorizontal ? null : size;
     let subW = isHorizontal ? null : size;
     let h = isHorizontal ? size : null;
-
-    const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
-    const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
 
     this.size.cat = cArea;
     this.size.bar = bArea;
@@ -92,7 +86,7 @@ class TimeBar extends Bar {
         }
 
         if (x !== null) {
-          x += Math.ceil(bArea * barSeriesX) - Math.round(w + bPad);
+          x += getTimeBarOffset(bArea, barSeriesX, w, bPad);
         }
         y = ysp;
       }
@@ -164,33 +158,13 @@ class TimeBar extends Bar {
     const xep = chartRect.x2 - labelOffset.right;
 
     const dArea = isHorizontal ? yArea : xArea;
-    const cArea = dArea / (this.data.length || 1);
-    const cPad = 2;
-
-    let bArea;
-    if (this.isExistGrp) {
-      bArea = cArea - cPad * 2;
-    } else {
-      bArea = (cArea - cPad * 2) / showSeriesCount;
-    }
-
-    const getSize = () => {
-      if (typeof thickness === 'string' && /[0-9]+px/.test(thickness)) {
-        return Math.min(bArea, Number(thickness.replace('px', '')));
-      }
-      if (typeof thickness === 'number' && thickness <= 1 && thickness >= 0) {
-        return Math.ceil(bArea * thickness);
-      }
-      return bArea;
-    };
-    const size = getSize();
+    const { cArea, cPad, bArea, size, bPad, barSeriesX } = this.getTimeBarLayout(
+      dArea, thickness, showSeriesCount, showIndex,
+    );
 
     let w = isHorizontal ? null : size;
     let subW = isHorizontal ? null : size;
     let h = isHorizontal ? size : null;
-
-    const bPad = isHorizontal ? (bArea - h) / 2 : (bArea - w) / 2;
-    const barSeriesX = this.isExistGrp ? 1 : showIndex + 1;
 
     this.size.cat = cArea;
     this.size.bar = bArea;
@@ -222,7 +196,7 @@ class TimeBar extends Bar {
         }
 
         if (x !== null) {
-          x += Math.ceil(bArea * barSeriesX) - Math.round(w + bPad);
+          x += getTimeBarOffset(bArea, barSeriesX, w, bPad);
         }
         y = ysp;
       }
