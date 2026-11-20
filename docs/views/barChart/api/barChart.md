@@ -545,17 +545,34 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 - `true`(기본): `maxTip > plot > series`
 - `false`: `maxTip > series > plot` (임계선/밴드가 데이터 시리즈 뒤로 깔림)
 
-#### partialData
+#### provisionalBand
 
-아직 집계 중인 마지막 데이터 구간을 배경 영역과 왼쪽 경계 점선으로 표시합니다. x축이 `time` 타입인 세로 막대 차트에서만 그리며, 영역은 마지막 막대 슬롯의 왼쪽 끝(series `timeMode` 막대는 마지막 라벨 시각)부터 차트 오른쪽 끝까지입니다. 스크롤·줌으로 마지막 막대가 보이지 않으면 그리지 않습니다. 숨긴 시리즈는 기준에서 빠집니다. 집계 중인지는 차트가 알 수 없으므로 사용하는 쪽이 판단해 `use` 를 켭니다. 영역은 series 아래에 깔립니다.
+호출자가 잠정 상태로 표시하려는 시간 구간에 배경과 경계선을 그립니다. `time` X축을 사용하는 세로 막대 차트에서 지원하며 시리즈와 그리드 아래에 표시합니다.
+
+`x`를 지정하면 해당 막대 슬롯을 칠합니다. 생략하면 마지막 슬롯의 왼쪽 끝부터 플롯 오른쪽 끝까지 칠합니다. `timeMode` 막대의 슬롯은 막대 시각에서 시작합니다. 스크롤이나 줌으로 대상 막대가 표시 범위를 벗어나면 영역을 숨깁니다.
 
 | 이름            | 타입                        | 디폴트                     | 설명                                           | 종류(예시)   |
 | --------------- | --------------------------- | -------------------------- | ---------------------------------------------- | ------------ |
-| use             | Boolean                     | false                      | partial 영역 표시 여부                         | true / false |
-| color           | Hex, RGB, RGBA Code(String) | 'rgba(214, 170, 98, 0.16)' | 영역 배경색 (반투명 권장)                      | '#F6EEE1'    |
-| border.color    | Hex, RGB, RGBA Code(String) | '#C9A063'                  | 왼쪽 경계선 색상                               | '#000000'    |
+| use             | Boolean                     | false                      | 잠정 구간 표시 여부                            | true / false |
+| x               | Number, String, Date        | null                       | 표시할 막대의 시각. 생략하면 마지막 구간을 표시 | 1795132800000 |
+| color           | Hex, RGB, RGBA Code(String) | 'rgba(128, 128, 128, 0.12)' | 영역 배경색 (반투명 권장)                      | '#F6EEE1'    |
+| border.color    | Hex, RGB, RGBA Code(String) | '#8A8F98'                  | 경계선 색상                                   | '#000000'    |
 | border.width    | Number                      | 1                          | 경계선 두께(px). 0 이면 경계선 미표시          | 2            |
 | border.segments | Array                       | null                       | 점선 패턴. null 이면 [4, 4] 점선, [] 이면 실선 | [6, 3]       |
+
+경계선은 기본적으로 `[4, 4]` 점선입니다. `border: { segments: [] }`는 실선으로 표시하고, `border: { width: 0 }`은 배경만 표시합니다. 영역이 플롯 오른쪽 끝 전에 끝나면 오른쪽 경계선도 표시합니다.
+
+```js
+const options = {
+  type: 'bar',
+  axesX: [{ type: 'time', categoryMode: true }],
+  provisionalBand: {
+    use: true,
+    x: chartData.labels[3],
+    border: { width: 0 },
+  },
+};
+```
 
 #### indicator
 

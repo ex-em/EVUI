@@ -109,6 +109,7 @@ export default {
     const injectGroupInteraction = inject('groupInteraction', null);
     const injectGroupSharedTooltip = inject('groupSharedTooltip', null);
     const injectIsLatestDataInView = inject('isLatestDataInView', null);
+    const injectGetZoomSeriesSource = inject('getZoomSeriesSource', null);
 
     const {
       eventListeners,
@@ -136,6 +137,7 @@ export default {
       controlZoomIdx,
       onClickToolbar,
       isLatestDataInView,
+      getZoomSeriesSource,
     } = injectIsChartGroup
       ? {}
       : useZoomModel(
@@ -216,7 +218,12 @@ export default {
         injectGroupSharedTooltip,
       );
       // 줌은 data 를 잘라 넘겨 차트가 원본의 끝을 알 수 없다 — 줌을 관리하는 쪽(그룹이면 그룹)이 판정한다.
-      evChart.isLatestDataInView = injectIsChartGroup ? injectIsLatestDataInView : isLatestDataInView;
+      evChart.isLatestDataInView = injectIsChartGroup
+        ? () => injectIsLatestDataInView?.(props.data.chartIdx) ?? true
+        : isLatestDataInView;
+      evChart.getZoomSeriesSource = injectIsChartGroup
+        ? (seriesId) => injectGetZoomSeriesSource?.(seriesId, props.data.chartIdx)
+        : getZoomSeriesSource;
     };
 
     const drawChart = () => {

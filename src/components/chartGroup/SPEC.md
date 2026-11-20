@@ -40,7 +40,8 @@ EvChartGroup
 └── <slot/>                      # 자식 EvChart 들
     provide → isExecuteZoom, isChartGroup, brushSeries, evChartPropsInGroup,
               groupInteraction, deferPollingRedraw, groupSelectedLabel,
-              groupHoveredLabel, groupSharedTooltip, evChartClone, evChartInfo, brushIdx
+              groupHoveredLabel, groupSharedTooltip, evChartClone, evChartInfo,
+              brushIdx, isLatestDataInView, getZoomSeriesSource
 ```
 
 ## File Structure
