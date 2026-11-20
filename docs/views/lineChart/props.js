@@ -54,6 +54,8 @@ import PerfStressSingle from './example/PerfStressSingle';
 import PerfStressSingleRaw from './example/PerfStressSingle?raw';
 import Annotations from './example/Annotations';
 import AnnotationsRaw from './example/Annotations?raw';
+import PartialData from './example/PartialData';
+import PartialDataRaw from './example/PartialData?raw';
 
 export default {
   mdText,
@@ -220,6 +222,13 @@ export default {
         + 'position(axis/pixel/series), content 토큰·콜백, connector(연결선)를 지원합니다.',
       component: Annotations,
       parsedData: parse(AnnotationsRaw).descriptor,
+    },
+    PartialData: {
+      description:
+        'partialData 옵션으로 아직 집계 중인 마지막 구간을 배경 영역과 왼쪽 경계 점선으로 표시합니다. '
+        + 'x축이 time 타입인 line·area 에서 동작하며, 영역은 직전 점과 마지막 점의 중간부터 시작합니다.',
+      component: PartialData,
+      parsedData: parse(PartialDataRaw).descriptor,
     },
   },
 };

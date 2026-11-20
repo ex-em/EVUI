@@ -44,6 +44,8 @@ import DisplayOverflow from './example/DisplayOverflow';
 import DisplayOverflowRaw from './example/DisplayOverflow?raw';
 import Annotations from './example/Annotations';
 import AnnotationsRaw from './example/Annotations?raw';
+import PartialData from './example/PartialData';
+import PartialDataRaw from './example/PartialData?raw';
 
 export default {
   mdText,
@@ -179,6 +181,13 @@ export default {
         + '시각적 중심에 정렬되며, Horizontal 토글로 가로/세로 모두 중심 정렬이 유지되는지 확인할 수 있습니다.',
       component: Annotations,
       parsedData: parse(AnnotationsRaw).descriptor,
+    },
+    PartialData: {
+      description:
+        'partialData 옵션으로 아직 집계 중인 마지막 막대 구간을 배경 영역과 왼쪽 경계 점선으로 표시합니다. '
+        + 'x축이 time 타입인 세로 막대에서 동작하며, 영역은 마지막 막대 슬롯의 왼쪽 끝부터 시작합니다.',
+      component: PartialData,
+      parsedData: parse(PartialDataRaw).descriptor,
     },
   },
 };
