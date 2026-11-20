@@ -12,3 +12,5 @@
 | 2026-02-09 | vue-resize-observer를 자체 `v-resize` 디렉티브(`src/directives/resize.js`)로 교체 (568ded55) | 외부 의존 제거, 컴포넌트별 로컬 import로 사용 | 외부 라이브러리 유지 |
 | 2026-03-20 | `preserveModules` 트리셰이킹 빌드(06fe8a46, 2026-02-27 도입)를 롤백하고 단일 번들 유지 (84fe88de) | revert 커밋에 사유 미기재 — 현재 상태는 ESM/UMD 단일 번들 | preserveModules 유지 (모듈 단위 산출물) |
 | 2026-07-14 | 컴포넌트 API 문서의 SSOT 를 `api/*.md` 에서 `docs/views/apiDocs/data/*.json` 으로 이관(점진적, 미이관 key 만 md 폴백 뷰로 렌더) | 표시용 마크다운은 구조가 없어 딥링크·Try It 플레이그라운드·스키마 검증을 붙일 수 없었다. JSON 은 `npm run docs:validate` 로 필수 필드·중복 name·tryIt 형식을 CI/커밋 훅에서 게이트할 수 있다 | md 유지(구조 없음, 검증 불가), 전 컴포넌트 일괄 이관(리스크·작업량) |
+| 2026-11-20 | Vue 컴포넌트를 점진적으로 TypeScript로 전환하고 공개 선언을 소스에서 생성 | 컴포넌트의 props·이벤트 타입을 구현과 함께 관리하고 전환 중에도 전체 npm API를 제공할 수 있다 | 별도 선언을 수기로 유지, 전체 소스 일괄 전환 |
+| 2026-11-20 | JavaScript 컴포넌트의 공개 타입을 `src/types/`에 도메인별로 정의 | 런타임 JS에 의존하는 코드도 현재 동작과 호환되면서 구체적인 props와 이벤트를 검사할 수 있다 | 모든 런타임 파일부터 TypeScript로 전환, 넓은 호환 타입 유지 |

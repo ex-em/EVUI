@@ -15,10 +15,10 @@
   />
 </template>
 
-<script>
-import { computed } from 'vue';
+<script lang="ts">
+import { computed, defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
   name: 'EvToggle',
   props: {
     modelValue: {
@@ -46,7 +46,10 @@ export default {
       default: '#DCDFE6',
     },
   },
-  emits: ['update:modelValue', 'change'],
+  emits: {
+    'update:modelValue': (_value: boolean) => true,
+    change: (_value: boolean) => true,
+  },
   setup(props, { emit }) {
     const mv = computed({
       get: () => props.modelValue,
@@ -66,7 +69,7 @@ export default {
       clickMv,
     };
   },
-};
+});
 </script>
 
 <style lang="scss">
