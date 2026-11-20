@@ -2852,6 +2852,53 @@
               ]
             },
             {
+              "name": "partialData",
+              "type": "Object",
+              "description": "아직 집계 중인 마지막 데이터 구간을 배경 영역과 왼쪽 경계 점선으로 표시합니다. x축이 time 타입인 세로 차트에서만 그리며, 영역은 직전 점과 마지막 점의 중간부터 차트 오른쪽 끝까지입니다. 마지막 점이 축 범위 밖이거나 줌으로 과거 구간을 보고 있으면 그리지 않습니다. 집계 중인지는 차트가 알 수 없으므로 사용하는 쪽이 판단해 use를 켭니다. 영역은 series 아래에 깔립니다.",
+              "children": [
+                {
+                  "name": "use",
+                  "type": "Boolean",
+                  "default": "false",
+                  "description": "partial 영역 표시 여부입니다.",
+                  "tryIt": {
+                    "options": "{ partialData: { use: true } }"
+                  }
+                },
+                {
+                  "name": "color",
+                  "type": "Hex, RGB, RGBA Code(String)",
+                  "default": "'rgba(214, 170, 98, 0.16)'",
+                  "description": "영역 배경색입니다. 그리드·시리즈가 비쳐 보이도록 반투명 색을 권장합니다."
+                },
+                {
+                  "name": "border",
+                  "type": "Object",
+                  "description": "영역 왼쪽 경계선 스타일입니다.",
+                  "children": [
+                    {
+                      "name": "color",
+                      "type": "Hex, RGB, RGBA Code(String)",
+                      "default": "'#C9A063'",
+                      "description": "경계선 색상입니다."
+                    },
+                    {
+                      "name": "width",
+                      "type": "Number",
+                      "default": "1",
+                      "description": "경계선 두께(px)입니다. 0이면 경계선을 그리지 않습니다."
+                    },
+                    {
+                      "name": "segments",
+                      "type": "Array",
+                      "default": "null",
+                      "description": "경계선 점선 패턴([선, 간격] px)입니다. null이면 [4, 4] 점선, []이면 실선입니다."
+                    }
+                  ]
+                }
+              ]
+            },
+            {
               "name": "displayOverflow",
               "type": "Boolean",
               "default": "false",
