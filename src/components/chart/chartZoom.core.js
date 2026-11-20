@@ -352,6 +352,18 @@ export default class EvChartZoom {
     }
   }
 
+  /**
+   * 현재 줌 구간이 원본 데이터의 마지막 라벨까지 포함하는지.
+   * 줌은 data.labels 를 잘라 넘기므로 차트는 잘린 구간의 끝을 최신 데이터로 오인한다 — partialData 처럼
+   * "원본의 마지막 구간"에만 의미가 있는 표시는 이 값으로 걸러야 한다.
+   * @returns {boolean}
+   */
+  isLatestDataInView() {
+    const [, zoomEndIdx] = this.zoomAreaMemory?.current?.[0] ?? [];
+    // [0, -1] 은 줌 전체 구간을 뜻하는 초기값이다(setZoomAreaMemory 참고).
+    return zoomEndIdx === undefined || zoomEndIdx === -1 || zoomEndIdx >= this.cloneLabelsLastIdx;
+  }
+
   setZoomAreaMemory(zoomStartIdx, zoomEndIdx, direction) {
     if (zoomStartIdx < 0 || zoomEndIdx <= 0) {
       return;

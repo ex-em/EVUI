@@ -124,6 +124,7 @@ export default {
       setDataForUseZoom,
       controlZoomIdx,
       onClickToolbar,
+      isLatestDataInView,
     } = useZoomModel(
       normalizedOptions,
       { wrapper: null, evChartGroupRef },
@@ -134,6 +135,7 @@ export default {
     provide('evChartClone', evChartClone);
     provide('evChartInfo', evChartInfo);
     provide('brushIdx', brushIdx);
+    provide('isLatestDataInView', isLatestDataInView);
 
     onMounted(() => {
       createEvChartZoom();

@@ -139,6 +139,19 @@ const DEFAULT_OPTIONS = {
     // 임계선/밴드(plotLines·plotBands)를 series 위(true)/아래(false)에 그릴지. maxTip 은 항상 최상단.
     aboveSeries: true,
   },
+  partialData: {
+    // time x축 line/bar 한정. 집계 중 여부는 차트가 알 수 없어 소비자가 판정해 켠다.
+    use: false,
+    // 그리드·시리즈가 비쳐 보이도록 반투명으로 칠한다.
+    color: 'rgba(214, 170, 98, 0.16)',
+    border: {
+      color: '#C9A063',
+      width: 1,
+      // 배열 기본값을 두면 defaultsDeep 이 사용자 배열과 인덱스 단위로 섞으므로(예: [2] → [2, 4])
+      // null 로 두고 그리기 시점에 기본 점선을 적용한다. 실선은 [] 로 지정한다.
+      segments: null,
+    },
+  },
   maxTip: {
     use: false,
     fixedPosTop: false,
@@ -822,5 +835,6 @@ export const useZoomModel = (
     setDataForUseZoom,
     controlZoomIdx,
     onClickToolbar,
+    isLatestDataInView: () => evChartZoom?.isLatestDataInView() ?? true,
   };
 };
