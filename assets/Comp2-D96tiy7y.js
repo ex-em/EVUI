@@ -1,0 +1,1 @@
+import{E as e,b as t,u as n}from"./index-CX2CVHDn.js";var r={setup(){}};function i(n,r,i,a,o,s){return e(),t(`div`,null,`COMP2`)}var a=n(r,[[`render`,i]]);export{a as default};

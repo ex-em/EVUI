@@ -1,1 +1,0 @@
-import{E as e,b as t,u as n}from"./index-BccI8IHH.js";var r={setup(){}};function i(n,r,i,a,o,s){return e(),t(`div`,null,`COMP1`)}var a=n(r,[[`render`,i]]);export{a as default};
