@@ -80,7 +80,8 @@ function debounce(func, wait, options) {
   let trailing = true;
 
   // Bypass `requestAnimationFrame` by explicitly setting `wait=0`.
-  const useRAF = !wait && wait !== 0 && typeof root.requestAnimationFrame === 'function';
+  // 원본은 lodash 내부 `root` 모듈을 참조한다 — worker(window 없음) 공통인 globalThis 로 대체.
+  const useRAF = !wait && wait !== 0 && typeof globalThis.requestAnimationFrame === 'function';
 
   if (typeof func !== 'function') {
     throw new TypeError('Expected a function');
@@ -105,15 +106,15 @@ function debounce(func, wait, options) {
 
   function startTimer(pendingFunc, wait) {
     if (useRAF) {
-      window.cancelAnimationFrame(timerId);
-      return window.requestAnimationFrame(pendingFunc);
+      globalThis.cancelAnimationFrame(timerId);
+      return globalThis.requestAnimationFrame(pendingFunc);
     }
     return setTimeout(pendingFunc, wait);
   }
 
   function cancelTimer(id) {
     if (useRAF) {
-      return window.cancelAnimationFrame(id);
+      return globalThis.cancelAnimationFrame(id);
     }
     clearTimeout(id);
   }
