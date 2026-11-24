@@ -28,7 +28,7 @@
 | 파일 | 역할 |
 |------|------|
 | Progress.vue | EvProgress SFC |
-| index.js | Vue 플러그인 등록 |
+| index.ts | Vue 플러그인 등록 및 설치 타입 |
 
 ## Dependencies
 

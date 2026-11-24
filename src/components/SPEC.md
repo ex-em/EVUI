@@ -8,9 +8,10 @@ EVUI(EXEM Vue 3 컴포넌트 라이브러리)의 33개 컴포넌트가 공유하
 
 ## Features
 
-- **컴포넌트별 Vue 플러그인 등록**: 각 컴포넌트 디렉토리의 `index.js`가 SFC를 import한 뒤 `Component.install = (app) => { app.component(Component.name, Component); }`를 부여하고 default export 한다. 이로써 `app.use(EvButton)` 형태의 개별 설치가 가능하다. 33개 중 30개가 이 패턴이며, `icon/index.js`만 추가로 `@/style/lib/icon.css`를 import 한다.
+- **컴포넌트별 Vue 플러그인 등록**: 각 컴포넌트 디렉토리의 `index.js` 또는 `index.ts`가 SFC를 import한 뒤 `install(app)`을 부여하고 default export 한다. 이로써 `app.use(EvButton)` 형태의 개별 설치가 가능하다. 33개 중 30개가 이 패턴이다.
 - **함수형 전역 서비스 3종**: `message` / `messageBox` / `notification`은 컴포넌트 등록 대신 `install`에서 `app.config.globalProperties`에 각각 `$message` / `$messagebox` / `$notify` 함수를 주입한다. 호출 시 `h()` + `render()`로 detached container에 직접 마운트하며, 문자열 또는 옵션 객체를 인자로 받고 `unmount` 콜백을 옵션에 주입한다. message/notification은 `document.body`에 고정 id(`ev-message-modal` / `ev-notification-modal`)의 루트 div를 생성해 재사용한다.
 - **통합 설치 진입점 (src/main.js)**: 33개 컴포넌트 플러그인을 `components` 배열로 모아 `install(app)`에서 `app.use()` 순회 설치한다. 개별 컴포넌트를 named export 하고, `{ version, install }` 형태의 `EVUI` 객체를 default export 한다. `version`은 `package.json`에서 읽는다.
+- **TypeScript 지원**: 30개 컴포넌트의 props·이벤트와 3개 전역 서비스의 호출 옵션·콜백을 공개 타입으로 제공한다. `EvButton`, `EvToggle`, `EvIcon`, `EvLoading`, `EvProgress`의 선언은 TypeScript SFC와 `index.ts`에서 생성하고, JavaScript 컴포넌트의 공개 API는 `src/types/`에 정의한다. `src/public-types.ts`에서 Vue 전역 컴포넌트와 서비스 타입을 등록하고, npm 패키지의 ESM과 CommonJS 진입점에 각각 선언 파일을 연결한다.
 - **uses.js 컴포저블 관례**: 로직이 큰 컴포넌트 13개(calendar, chart, chartBrush, chartGroup, contextMenu, datePicker, grid, inputNumber, scheduler, select, slider, treeGrid, window)는 `uses.js`에 named export 컴포저블(예: `useModel`, `commonFunctions`)을 두고 SFC `setup()`에서 호출한다. 컴포저블은 인자 대신 `getCurrentInstance()`로 `props` / `emit`에 접근한다.
 - **스타일 규약**: SFC 내 `<style lang="scss">` 블록에서 `@use '../../style/index.scss' as *;`로 전역 변수·믹스인·테마를 가져온다(`src/style/index.scss`는 functions/mixins/variables/themes를 `@forward`). 스타일 규모가 큰 4개 컴포넌트(chart, chartGroup, grid, treeGrid)는 `style/<name>.scss`로 분리하고 SFC에서 `@use`로 포함한다.
 - **문서화 구조 (docs/views)**: 컴포넌트별로 `docs/views/<이름>/` 아래 `example/*.vue`(예제 SFC), `api/<이름>.md`(API 문서), `props.js`(예제·문서 집계)를 둔다. `props.js`는 `?raw` import + `@vue/compiler-sfc`의 `parse()`로 예제 소스를 파싱해 문서 페이지에 코드와 렌더 결과를 함께 노출한다. 차트는 컴포넌트 디렉토리와 1:1이 아니라 차트 타입별 문서(barChart, lineChart, pieChart, scatterChart, heatMap, comboChart, brushChart, zoomChart)로 나뉜다.
@@ -22,8 +23,8 @@ EVUI(EXEM Vue 3 컴포넌트 라이브러리)의 33개 컴포넌트가 공유하
 
 - **명명**: 컴포넌트 `name`은 `Ev` 접두사 + PascalCase(`EvButton`, `EvChart`). 루트 CSS 클래스는 `ev-` 접두사 kebab-case(`ev-button`). 디렉토리명은 camelCase(`buttonGroup`, `treeGrid`).
 - **SFC 작성 방식**: `<script setup>`을 사용하지 않는다 — options 객체 + `setup()` 함수 방식(Composition API)으로 통일한다. `src/components` 전체에서 `<script setup>` 사용 0건 확인.
-- **index.js의 책임**: 등록(install 부여)만 담당한다. 로직·스타일은 SFC와 uses.js에 둔다(예외: icon의 css import).
-- **신규 컴포넌트 노출 절차**: `src/main.js`의 import, `components` 배열, named export 3곳에 모두 추가해야 라이브러리에 노출된다.
+- **index.js / index.ts의 책임**: 등록(install 부여)만 담당한다. 로직·스타일은 SFC와 uses.js에 둔다.
+- **신규 컴포넌트 노출 절차**: `src/main.js`의 import, `components` 배열, named export와 `src/public-types.ts`의 선언에 추가한다.
 - **테스트 배치**: `*.spec.js`를 소스 파일과 동일 위치에 둔다(vitest). 비주얼 테스트는 `vitest.config.browser.js`(`npm run test:visual`, Playwright 브라우저 모드)로 분리.
 - **유틸리티**: 공용 유틸은 `src/common/`(utils, emitter 등)에 두고, 범용 함수는 lodash-es를 우선 사용한다.
 - **(번들 격리)**: 라이브러리 빌드에서 `vue`는 external — 번들에 포함되지 않으며 peerDependency(`vue: *`)로 소비자가 제공한다.
@@ -39,6 +40,8 @@ EVUI(EXEM Vue 3 컴포넌트 라이브러리)의 33개 컴포넌트가 공유하
 - `app.use(EVUI)` 호출 시 33개 컴포넌트가 전역 등록되고 `$message` / `$messagebox` / `$notify`가 `globalProperties`에 주입된다.
 - 개별 컴포넌트를 `import { EvButton } from 'evui'` 후 `app.use(EvButton)` 만으로 단독 사용할 수 있다.
 - `npm run build:lib` 실행 시 `dist/index.js`, `dist/index.umd.cjs`, `dist/style.css`가 생성되고 vue는 번들에 포함되지 않는다.
+- `npm run build:lib` 후 `npm run test:types`에서 Vue SFC 및 TypeScript ESM·CommonJS 소비자 검사가 통과한다.
+- Husky `pre-push`에서 `npm run typecheck`로 선언을 생성하고 소비자 타입을 검사한다. 타입 검사에 실패하면 푸시가 중단된다.
 - `npm run test:run`(단위) 및 `npm run test:visual`(비주얼)이 통과한다.
 - `npm run docs`(포트 9999)에서 각 컴포넌트의 example 렌더와 api 문서가 함께 표시된다.
 
@@ -50,7 +53,7 @@ EVUI(EXEM Vue 3 컴포넌트 라이브러리)의 33개 컴포넌트가 공유하
         │
 src/main.js ─── components 배열 순회 app.use()
         │
-src/components/<name>/index.js ─── Component.install(app)
+src/components/<name>/index.js 또는 index.ts ─── Component.install(app)
         ├─ app.component('EvXxx', SFC)            ← 일반 컴포넌트 30종
         └─ globalProperties.$message/$messagebox/$notify  ← 함수형 서비스 3종 (h+render 직접 마운트)
         │
@@ -70,7 +73,7 @@ src/components/<name>/index.js ─── Component.install(app)
 
 | 파일 | 역할 |
 |------|------|
-| `index.js` | Vue 플러그인 등록 (`Component.install` 부여, default export) — 필수 |
+| `index.js` / `index.ts` | Vue 플러그인 등록 (`Component.install` 부여, default export) — 필수 |
 | `<Name>.vue` | SFC 본체 (options 객체 + `setup()`) — 필수. 보조 SFC 동반 가능 (예: grid의 `GridToolbar.vue` 등) |
 | `uses.js` | Composition API 컴포저블 (복잡 컴포넌트 13개만) |
 | `style/<name>.scss` | 분리 스타일시트 (chart, chartGroup, grid, treeGrid만) |
@@ -122,7 +125,7 @@ app.use(EVUI)
     │
 main.js install(app) ── components.forEach(app.use)
     │
-각 index.js install(app)
+각 index.js 또는 index.ts install(app)
     ├─ app.component('EvXxx', SFC)          → 템플릿에서 <ev-xxx> 사용 가능
     └─ globalProperties.$message = fn       → this.$message(...) / inject 없이 호출
 

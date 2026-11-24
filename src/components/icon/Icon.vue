@@ -8,8 +8,12 @@
   />
 </template>
 
-<script>
-export default {
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+const acceptsMouseEvent = (_event: MouseEvent) => true;
+
+export default defineComponent({
   name: 'EvIcon',
   props: {
     icon: {
@@ -26,18 +30,21 @@ export default {
     },
   },
   emits: {
-    click: null,
-    'dbl-click': null,
-    'context-menu': null,
+    click: acceptsMouseEvent,
+    'dbl-click': acceptsMouseEvent,
+    'context-menu': acceptsMouseEvent,
+    // Vue also dispatches these events to camel-cased render listeners.
+    dblClick: acceptsMouseEvent,
+    contextMenu: acceptsMouseEvent,
   },
-  setup(props, { emit }) {
-    const onClick = (e) => {
+  setup(_, { emit }) {
+    const onClick = (e: MouseEvent) => {
       emit('click', e);
     };
-    const onDblClick = (e) => {
+    const onDblClick = (e: MouseEvent) => {
       emit('dbl-click', e);
     };
-    const onContextMenu = (e) => {
+    const onContextMenu = (e: MouseEvent) => {
       emit('context-menu', e);
     };
     return {
@@ -46,5 +53,7 @@ export default {
       onContextMenu,
     };
   },
-};
+});
 </script>
+
+<style src="../../style/lib/icon.css"></style>
