@@ -1,3 +1,11 @@
+# [3.25.0](https://github.com/ex-em/EVUI/compare/3.24.1...3.25.0) (2026-11-24)
+
+
+### Features
+
+* **chart:** add provisional bands to time charts ([47c2a86](https://github.com/ex-em/EVUI/commit/47c2a8648d749d12ac570f879ccddb846c899c22))
+* **chart:** time 축 line·bar 에 집계 중인 마지막 구간을 표시하는 partialData 옵션을 추가한다 ([2560d11](https://github.com/ex-em/EVUI/commit/2560d11ea24fe748d0471a6b759b6994fb44b021))
+
 ## [3.24.1](https://github.com/ex-em/EVUI/compare/3.24.0...3.24.1) (2026-11-19)
 
 
