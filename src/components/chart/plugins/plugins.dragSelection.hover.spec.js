@@ -632,3 +632,27 @@ describe('formatter.html 인자', () => {
     expect(html).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('mouse-move 인자의 provisional', () => {
+  it('가리킨 점이 provisionalBand 를 칠한 점이면 provisional: true 를 넘긴다', () => {
+    const chart = createChart();
+    chart.isProvisionalBandX = (x) => x === 'L2';
+    chart.listeners['mouse-move'] = vi.fn();
+
+    chart.drawHoverArtifacts({ __pos: [300, 150, 500, 300] });
+
+    expect(chart.listeners['mouse-move']).toHaveBeenCalledWith(
+      expect.objectContaining({ provisional: true }),
+    );
+  });
+
+  it('칠하지 않은 점이면 provisional 을 넘기지 않는다', () => {
+    const chart = createChart();
+    chart.isProvisionalBandX = () => false;
+    chart.listeners['mouse-move'] = vi.fn();
+
+    chart.drawHoverArtifacts({ __pos: [300, 150, 500, 300] });
+
+    expect(chart.listeners['mouse-move'].mock.calls[0][0]).not.toHaveProperty('provisional');
+  });
+});

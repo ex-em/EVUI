@@ -336,6 +336,7 @@ const modules = {
         name: hitInfoItems[sId].name,
         dataId: hitInfoItems[sId].id,
         index: hitInfoItems[sId].index,
+        ...(this.isProvisionalBandX?.(hitInfoItems[sId].data?.x) && { provisional: true }),
       });
     });
 

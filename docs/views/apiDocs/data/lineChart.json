@@ -2711,7 +2711,7 @@
                   "name": "formatter",
                   "type": "function / Object",
                   "default": "null",
-                  "description": "데이터가 표시되기 전에 형식을 지정합니다. 함수형(({ x, y, name, seriesId }) => string), { title, value } 객체형, { html } 커스텀 HTML형 3가지 형태를 지원합니다. dragSelection.updateHoverOnDrag: true 인 차트에서 드래그하는 동안에는 html formatter 가 2번째 인자로 { dragRange: { from, to } } 을 함께 받습니다. from/to 는 mouseup 때 drag-select 가 주는 range.xMin/xMax 와 정확히 같은 값이며, 드래그 중이 아니면 전달되지 않아 기존 formatter 는 그대로 동작합니다."
+                  "description": "데이터가 표시되기 전에 형식을 지정합니다. 함수형(({ x, y, name, seriesId }) => string), { title, value } 객체형, { html } 커스텀 HTML형 3가지 형태를 지원합니다. dragSelection.updateHoverOnDrag: true 인 차트에서 드래그하는 동안에는 html formatter 가 2번째 인자로 { dragRange: { from, to } } 을 함께 받습니다. from/to 는 mouseup 때 drag-select 가 주는 range.xMin/xMax 와 정확히 같은 값이며, 드래그 중이 아니면 전달되지 않아 기존 formatter 는 그대로 동작합니다. provisionalBand 를 사용하면, 실제로 칠한 영역의 점인 seriesList 항목(html)과 title 인자에 provisional: true 가 붙습니다."
                 },
                 {
                   "name": "returnValue",
@@ -2854,7 +2854,7 @@
             {
               "name": "provisionalBand",
               "type": "Object",
-              "description": "호출자가 잠정 상태로 표시하려는 시간 구간에 배경과 경계선을 그립니다. time X축을 사용하는 라인·영역 차트에서 지원합니다. x를 지정하면 대상 점과 양쪽 이웃 점의 중간 사이를, 생략하면 마지막 두 점의 중간부터 플롯 오른쪽 끝까지 칠합니다. 대상 점이 표시 범위를 벗어나면 영역을 숨깁니다.",
+              "description": "호출자가 잠정 상태로 표시하려는 시간 구간에 배경과 경계선을 그립니다. time X축을 사용하는 라인·영역 차트에서 지원합니다. x를 지정하면 대상 점과 양쪽 이웃 점의 중간 사이를, 생략하면 마지막 두 점의 중간부터 플롯 오른쪽 끝까지 칠합니다. 대상 점이 표시 범위를 벗어나면 영역을 숨깁니다. 툴팁 formatter.html 의 seriesList 항목, formatter.title 의 인자, click·dbl-click·mouse-move 인자에는 실제로 칠한 영역의 점이면 provisional: true 가 붙습니다. 대상 점을 찾지 못했거나 앞뒤 점의 시각 순서가 뒤집혀(DST 종료 등) 칠하지 못하면 붙지 않습니다.",
               "tryIt": {
                 "options": "{ provisionalBand: { use: true } }"
               },
@@ -3367,15 +3367,15 @@
       "items": [
         {
           "name": "click",
-          "description": "차트 클릭 시 발생하며, 클릭된 series의 label, value, seriesID 값을 selectedItem으로 반환합니다. selectItem 옵션의 use가 true여야 selectedItem 객체를 반환하며, false이면 빈 객체를 반환합니다."
+          "description": "차트 클릭 시 발생하며, 클릭된 series의 label, value, seriesID 값을 selectedItem으로 반환합니다. selectItem 옵션의 use가 true여야 selectedItem 객체를 반환하며, false이면 빈 객체를 반환합니다. provisionalBand 를 칠한 점이면 provisional: true 가 함께 붙습니다."
         },
         {
           "name": "dbl-click",
-          "description": "차트 더블 클릭 시 발생하며, 더블 클릭된 series의 label, value, seriesID 값을 selectedItem으로 반환합니다. selectItem 옵션의 use가 true여야 selectedItem 객체를 반환하며, false이면 빈 객체를 반환합니다."
+          "description": "차트 더블 클릭 시 발생하며, 더블 클릭된 series의 label, value, seriesID 값을 selectedItem으로 반환합니다. selectItem 옵션의 use가 true여야 selectedItem 객체를 반환하며, false이면 빈 객체를 반환합니다. provisionalBand 를 칠한 점이면 provisional: true 가 함께 붙습니다."
         },
         {
           "name": "mouse-move",
-          "description": "커서의 현재 location과 함께, axes 위에 있을 경우 labelIdx·labelVal을, 데이터 영역에 있을 경우 dataIdx·maxDataVal을, 그리고 labelVal 또는 maxDataVal을 가공하기 전의 originVal 값을 반환합니다."
+          "description": "커서의 현재 location과 함께, axes 위에 있을 경우 labelIdx·labelVal을, 데이터 영역에 있을 경우 dataIdx·maxDataVal을, 그리고 labelVal 또는 maxDataVal을 가공하기 전의 originVal 값을 반환합니다. 가리킨 점이 provisionalBand 를 칠한 점이면 provisional: true 가 함께 붙습니다."
         },
         {
           "name": "drag-select",

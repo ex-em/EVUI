@@ -32,6 +32,21 @@
         :options="zoomOptions"
       />
     </resizable-wrapper>
+    <div class="description">
+      툴팁 <code>formatter.html</code> 항목과 <code>click</code>·<code>dbl-click</code> 인자에는 실제로
+      칠한 영역의 점이면 <code>provisional: true</code> 가 붙습니다. 데이터에 없는 시각을 지정하면 영역이
+      그려지지 않으므로 어떤 점에도 붙지 않습니다.
+    </div>
+    <div class="description">
+      <span class="toggle-label">provisionalBand.x</span>
+      <ev-select v-model="argsTarget" :items="argsTargets" class="component" />
+    </div>
+    <resizable-wrapper>
+      <ev-chart :data="lineData" :options="argsOptions" @dbl-click="onDblClick" />
+    </resizable-wrapper>
+    <div class="description">
+      더블클릭 인자: <code>{{ lastDblClick }}</code>
+    </div>
   </div>
 </template>
 
@@ -77,6 +92,34 @@ export default {
       zoomEndIdx.value = isPast ? 2 : labels.length - 1;
     });
 
+    const argsTarget = ref('last');
+    const argsTargets = [
+      { name: '생략 (마지막 구간)', value: 'last' },
+      { name: '가운데 시각', value: 'middle' },
+      { name: '데이터에 없는 시각', value: 'missing' },
+    ];
+    const argsX = computed(
+      () =>
+        ({ last: null, middle: labels[3], missing: labels[3] + 5 * 60 * 1000 })[argsTarget.value],
+    );
+    const lastDblClick = ref('차트를 더블클릭하세요');
+    const onDblClick = ({ label, provisional }) => {
+      lastDblClick.value = JSON.stringify({
+        label: label === undefined ? undefined : dayjs(label).format('HH:mm'),
+        provisional,
+      });
+    };
+    const tooltipHtml = (seriesList) => {
+      const [first] = seriesList;
+      if (!first) {
+        return '<div></div>';
+      }
+      const time = dayjs(first.data.x).format('HH:mm');
+      const suffix = seriesList.some((item) => item.provisional) ? ' (잠정)' : '';
+      const rows = seriesList.map((item) => `<div>${item.name}: ${item.data.y}</div>`).join('');
+      return `<div style="padding: 8px"><b>${time}${suffix}</b>${rows}</div>`;
+    };
+
     const createOptions = (title, { x = null, ...extra } = {}) =>
       computed(() => ({
         type: 'line',
@@ -111,6 +154,17 @@ export default {
       areaOptions: createOptions('영역 차트의 마지막 구간'),
       selectedOptions: createOptions('지정한 시각의 구간', { x: labels[3] }),
       zoomOptions: createOptions('과거 구간 확대', { zoom: { toolbar: { show: true } } }),
+      argsTarget,
+      argsTargets,
+      lastDblClick,
+      onDblClick,
+      argsOptions: computed(() => ({
+        ...createOptions('툴팁·더블클릭 인자의 provisional', {
+          x: argsX.value,
+          tooltip: { use: true, formatter: { html: tooltipHtml } },
+          selectItem: { use: true, useClick: true },
+        }).value,
+      })),
     };
   },
 };

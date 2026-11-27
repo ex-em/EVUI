@@ -1002,3 +1002,37 @@ describe('dragEnd', () => {
     expect(getRangeInfo).not.toHaveBeenCalled();
   });
 });
+
+describe('plugins.interaction click·dbl-click 인자의 provisional', () => {
+  const createClickChart = (isProvisionalBandX) => {
+    const chart = Object.assign(Object.create(modules), {
+      options: { type: 'bar', horizontal: false, dragSelection: {} },
+      listeners: { 'dbl-click': vi.fn() },
+      getMousePosition: () => [10, 10],
+      findHitItem: () => ({
+        hitId: 's1',
+        items: { s1: { label: 1000, index: 2, data: { x: 1000, o: 5 } } },
+      }),
+      isProvisionalBandX,
+      overlayCanvas: document.createElement('canvas'),
+    });
+    chart.createEventFunctions();
+    return chart;
+  };
+
+  it('provisionalBand 를 칠한 점을 더블클릭하면 provisional: true 를 넘긴다', () => {
+    const chart = createClickChart((x) => x === 1000);
+    chart.onDblClick({});
+
+    expect(chart.listeners['dbl-click']).toHaveBeenCalledWith(
+      expect.objectContaining({ label: 1000, provisional: true }),
+    );
+  });
+
+  it('칠하지 않은 점이면 provisional 을 넘기지 않는다', () => {
+    const chart = createClickChart(() => false);
+    chart.onDblClick({});
+
+    expect(chart.listeners['dbl-click'].mock.calls[0][0]).not.toHaveProperty('provisional');
+  });
+});
