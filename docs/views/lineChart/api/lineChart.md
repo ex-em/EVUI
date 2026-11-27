@@ -460,6 +460,7 @@ const chartOptions = {
 > **드래그 중 구간 정보 (`dragSelection.use` + `updateHoverOnDrag`)**
 > - 아래 동작은 `dragSelection.updateHoverOnDrag: true` 일 때만 적용됩니다(기본 `false`). 끄면 드래그 중에는 선택 영역만 갱신됩니다 — 하이라이트·인디케이터는 드래그를 시작할 때 지워지고, 툴팁은 라이브러리가 건드리지 않습니다.
 > - 드래그하는 **동안**에는 `formatter.html` 이 2번째 인자로 `{ dragRange: { from, to } }` 을 함께 받습니다. 드래그 중이 아니면 2번째 인자는 전달되지 않으므로 기존 formatter 는 그대로 동작합니다.
+> - `provisionalBand` 를 사용하면, 실제로 칠한 영역의 점인 seriesList 항목(`html`)과 `title` 인자에 `provisional: true` 가 붙습니다.
 > - `from` 은 드래그를 시작한 지점, `to` 는 현재 커서 지점의 x축 값입니다. mouseup 때 `drag-select` 가 주는 `range.xMin`/`xMax` 와 **정확히 같은 값**이라(같은 계산을 재사용) 드래그 중 보이는 구간과 최종 결과가 어긋나지 않으며, 데이터 라벨 간격보다 잘게 움직입니다. 시작/현재 순서를 유지하므로 역방향(오른쪽 → 왼쪽) 드래그면 `from` 이 `to` 보다 큽니다.
 > - `range` 와 같은 축 제약을 따릅니다 — `step` 축에서는 값이 `NaN` 입니다.
 > - 드래그 중에는 툴팁·인디케이터·하이라이트가 커서를 따라 갱신됩니다. 단 `mouse-move` 이벤트는 드래그 중 발생하지 않습니다. 드래그가 끝나면 이 툴팁은 즉시 사라지고, 커서를 움직이면 일반 툴팁으로 돌아옵니다.
@@ -509,6 +510,8 @@ plotLines/plotBands(임계선·밴드)의 표시 순서(z-order) 전역 설정. 
 | border.segments | Array                       | null                        | 점선 패턴. null 이면 [4, 4] 점선, [] 이면 실선   | [6, 3]          |
 
 경계선은 기본적으로 `[4, 4]` 점선입니다. `border: { segments: [] }`는 실선으로 표시하고, `border: { width: 0 }`은 배경만 표시합니다. 영역이 플롯 오른쪽 끝 전에 끝나면 오른쪽 경계선도 표시합니다.
+
+`tooltip.formatter.html` 의 seriesList 항목, `tooltip.formatter.title` 의 인자, `click`·`dbl-click`·`mouse-move` 인자에는, 그 점이 실제로 칠한 영역의 점이면 `provisional: true` 가 붙습니다. 대상 점을 찾지 못했거나 앞뒤 점의 시각 순서가 뒤집혀(DST 종료 등) 영역을 칠하지 못한 경우에는 붙지 않으므로, 툴팁 등 차트 밖에 그리는 표시를 실제 영역과 맞출 때 씁니다.
 
 ```js
 const options = {
@@ -717,9 +720,9 @@ chartOptions.value = {
 
 | 이름        | 파라미터     | 설명                                                                                                                                                                                                                                                                                                                                      |
 | ----------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| click       | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환                                                                                                                                                                                                                                                                                          |
-| dbl-click   | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환                                                                                                                                                                                                                                                                                     |
-| mouse-move  |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환                                                                                                                                                                |
+| click       | selectedItem | 클릭된 series의 label, value, seriesID 값을 반환. provisionalBand 를 칠한 점이면 `provisional: true` 가 붙는다                                                                                                                                                                                                                                                                                          |
+| dbl-click   | selectedItem | 더블 클릭된 series의 label, value, seriesID 값을 반환. provisionalBand 를 칠한 점이면 `provisional: true` 가 붙는다                                                                                                                                                                                                                                                                                     |
+| mouse-move  |              | 커서의 현재 location 과 axes에 있을 경우 labelIdx, labelVal 과 데이터 영역에 있을 경우 dataIdx, maxDataVal 과 labelVal 또는 maxDataVal를 가공하기 전의 originVal 값을 반환. 가리킨 점이 provisionalBand 를 칠한 점이면 `provisional: true` 가 붙는다 |
 | drag-select | data, range  | 그래프에서 드래그를 해서 선택영역 안의 데이터와 선택영역에 대한 범위 값을 얻을 수 있다. <br><br> ex) data : [{ seriesName, seriesId, items: [] }, {...}, {...}] <br> ex) range : { xMin, xMax, yMin, yMax } <br><br> data의 요소 propery중 items 는 해당 Series의 데이터 들이 있으며 x, y값은 데이터 기반 <xp, yp 는 Canvas기반의 좌표 값 |
 | click-legend | e, data      | 범례를 클릭했을 때 발생하는 이벤트. 클릭 후 활성화된 시리즈 ID 목록과 모두 활성 여부를 반환한다. <br><br> ex) e : 이벤트 객체 (external legend에서 toggleSeries()로 토글한 경우 미포함) <br> ex) data : { seriesIds: ['series1', 'series2', ...], isActiveAll: false } <br><br> seriesIds는 현재 활성화(show: true)된 시리즈의 ID 배열이다. 단, 시리즈가 모두 활성화된다면 빈배열([])로 반환한다. |
 | axes-scale-change | | 차트 사이즈를 변경하면 axes-scale-change 이벤트로 재계산된 minSteps, maxSteps를 정보를 반환한다. 단, axes옵션에 scaleRange가 true이고 scale 정보가 변경될때만 이벤트를 발생시킨다. ex)<br><br> {<br> x: [{ minSteps, maxSteps }], <br>   y: [{ minSteps, maxSteps }]<br>} | |

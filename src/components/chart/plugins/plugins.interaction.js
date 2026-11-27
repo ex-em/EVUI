@@ -209,6 +209,12 @@ const modules = {
           args.curMouseTargetVal = this.getCurMouseTargetVal(offset, hitInfo);
         }
 
+        const hoveredItem =
+          hitInfo?.items?.[hitInfo.hitId] ?? Object.values(hitInfo?.items ?? {})[0];
+        if (this.isProvisionalBandX?.(hoveredItem?.data?.x)) {
+          args.provisional = true;
+        }
+
         this.listeners['mouse-move'](args);
       }
     };
@@ -370,6 +376,10 @@ const modules = {
           setSelectedItemInfo();
           break;
         }
+      }
+
+      if (this.isProvisionalBandX?.(args.label)) {
+        args.provisional = true;
       }
 
       if (typeof this.listeners['dbl-click'] === 'function') {
@@ -578,6 +588,10 @@ const modules = {
 
           break;
         }
+      }
+
+      if (this.isProvisionalBandX?.(args.label)) {
+        args.provisional = true;
       }
 
       if (typeof this.listeners.click === 'function') {

@@ -303,7 +303,22 @@ const modules = {
    *
    * @returns {undefined}
    */
+  /**
+   * x 가 직전 렌더에서 provisionalBand 를 실제로 칠한 점인지. 툴팁 formatter(html·title)·click·
+   * dbl-click·mouse-move 인자의 provisional 필드가 이 판정을 쓴다. 지정한 x 를 찾지 못했거나 경계가
+   * 뒤집혀(DST 종료 등) 칠하지 못한 프레임에는 어떤 점도 해당하지 않는다.
+   * @param {*} x 점의 x 값(number·string·Date·dayjs)
+   * @returns {boolean}
+   */
+  isProvisionalBandX(x) {
+    const drawnX = this.provisionalBandDrawnX ?? null;
+    return drawnX !== null && x != null && toTime(x) === drawnX;
+  },
+
   drawProvisionalBand(ctx) {
+    // 실제로 칠한 점의 x 를 남긴다 — 못 칠한 프레임은 null. 툴팁·클릭 인자의 provisional 판정
+    // (isProvisionalBandX)이 이 값을 읽어, 음영이 없는 점에 표시가 붙지 않게 한다.
+    this.provisionalBandDrawnX = null;
     if (!isProvisionalBandTarget(this.options)) {
       return;
     }
@@ -408,7 +423,7 @@ const modules = {
         // 반올림으로 폭이 0이면 그릴 수 있는 경계선이 있어야 이 후보를 선택한다.
         const hasVisibleBoundary = startX === endX && !isClipped && border?.width > 0;
         if (startX < maxX && (startX < endX || hasVisibleBoundary)) {
-          region = { startX, endX, isClipped };
+          region = { startX, endX, isClipped, x: point.curX };
           break;
         }
       }
@@ -417,6 +432,7 @@ const modules = {
       return;
     }
     const { startX, endX, isClipped } = region;
+    this.provisionalBandDrawnX = region.x;
 
     ctx.save();
     // defaultsDeep 은 null 을 채우지 않아, null 이면 fillStyle 이 무시돼 검정으로 칠해진다.

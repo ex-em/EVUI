@@ -830,3 +830,79 @@ describe('drawProvisionalBand', () => {
     expect(ctx.fillRect).not.toHaveBeenCalled();
   });
 });
+
+// 소비처는 이 값으로 툴팁 등 차트 밖 표시를 음영과 맞춘다(provisional-band-change)
+describe('drawProvisionalBand — 칠한 x 기록', () => {
+  it('칠한 점의 x 를 provisionalBandDrawnX 에 남긴다', () => {
+    const chart = createChart();
+    chart.drawProvisionalBand(createCtx());
+
+    expect(chart.provisionalBandDrawnX).toBe(at(60));
+  });
+
+  it('x 로 지정한 점을 칠하면 그 x 를 남긴다', () => {
+    const chart = createChart({ partial: { x: at(30) } });
+    chart.drawProvisionalBand(createCtx());
+
+    expect(chart.provisionalBandDrawnX).toBe(at(30));
+  });
+
+  it('x 에 해당하는 점이 없어 칠하지 못하면 null 이다', () => {
+    const chart = createChart({ partial: { x: at(35) } });
+    chart.drawProvisionalBand(createCtx());
+
+    expect(chart.provisionalBandDrawnX).toBeNull();
+  });
+
+  // DST 가 끝나는 날 벽시계가 되돌아가 01:59 → 01:30 → 01:35 처럼 앞 점이 더 늦으면, 시작 경계(앞 점과의
+  // 중간)가 끝 경계(뒤 점과의 중간)보다 뒤라 칠할 구간이 없다
+  it('x 를 찾았어도 앞뒤 경계가 뒤집혀 칠하지 못하면 null 이다', () => {
+    const chart = createChart({
+      seriesList: { s1: createSeries([0, 59, 30, 35, 60]) },
+      partial: { x: at(30) },
+    });
+    const ctx = createCtx();
+    chart.drawProvisionalBand(ctx);
+
+    expect(ctx.fillRect).not.toHaveBeenCalled();
+    expect(chart.provisionalBandDrawnX).toBeNull();
+  });
+
+  it('대상 차트가 아니게 되면 직전에 남긴 x 를 지운다', () => {
+    const chart = createChart();
+    chart.drawProvisionalBand(createCtx());
+    chart.options = createOptions({}, { use: false });
+    chart.drawProvisionalBand(createCtx());
+
+    expect(chart.provisionalBandDrawnX).toBeNull();
+  });
+});
+
+describe('isProvisionalBandX', () => {
+  it('직전 렌더에서 칠한 점의 x 면 true 다 — 숫자·Date 모두 같은 시각으로 본다', () => {
+    const chart = createChart({ partial: { x: at(30) } });
+    chart.drawProvisionalBand(createCtx());
+
+    expect(chart.isProvisionalBandX(at(30))).toBe(true);
+    expect(chart.isProvisionalBandX(new Date(at(30)))).toBe(true);
+    expect(chart.isProvisionalBandX(at(20))).toBe(false);
+  });
+
+  it('칠하지 못한 프레임에는 어떤 점도 해당하지 않는다', () => {
+    const chart = createChart({
+      seriesList: { s1: createSeries([0, 59, 30, 35, 60]) },
+      partial: { x: at(30) },
+    });
+    chart.drawProvisionalBand(createCtx());
+
+    expect(chart.isProvisionalBandX(at(30))).toBe(false);
+  });
+
+  it('한 번도 그리지 않았거나 x 가 없으면 false 다', () => {
+    const chart = createChart();
+
+    expect(chart.isProvisionalBandX(at(60))).toBe(false);
+    chart.drawProvisionalBand(createCtx());
+    expect(chart.isProvisionalBandX(undefined)).toBe(false);
+  });
+});

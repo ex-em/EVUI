@@ -225,7 +225,7 @@ export default {
     },
     ProvisionalBand: {
       description:
-        '시간축의 잠정 구간을 배경과 경계선으로 표시합니다. 마지막 구간과 x로 지정한 구간을 비교할 수 있습니다.',
+        '시간축의 잠정 구간을 배경과 경계선으로 표시합니다. 마지막 구간과 x로 지정한 구간을 비교하고, 툴팁·클릭 인자의 provisional 로 칠한 점을 확인할 수 있습니다.',
       component: ProvisionalBand,
       parsedData: parse(ProvisionalBandRaw).descriptor,
     },

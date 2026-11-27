@@ -296,6 +296,7 @@ const modules = {
         this.tooltipHeaderDOM.textContent = titleFormatter({
           x: hitItem.x,
           y: hitItem.y,
+          ...(this.isProvisionalBandX?.(hitItem.x) && { provisional: true }),
         });
       } else {
         this.tooltipHeaderDOM.textContent = this.options.horizontal
@@ -1020,6 +1021,7 @@ const modules = {
         name: hitInfoItems[sId].name,
         dataId: hitInfoItems[sId].id,
         index: hitInfoItems[sId].index,
+        ...(this.isProvisionalBandX?.(hitInfoItems[sId].data?.x) && { provisional: true }),
       });
     });
 

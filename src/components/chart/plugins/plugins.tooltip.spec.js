@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import modules, { calcDomainBounds } from './plugins.tooltip';
 
 const step = (graphMin, graphMax) => ({ graphMin, graphMax });
@@ -226,5 +226,69 @@ describe('getIndicatorHitBounds', () => {
       expect(b.hitYMin).toBe(0);
       expect(b.hitYMax).toBe(100);
     });
+  });
+});
+
+describe('drawCustomTooltip — provisional', () => {
+  const callFormatter = (isProvisionalBandX) => {
+    const html = vi.fn(() => '<div>t</div>');
+    const chart = Object.assign(Object.create(modules), {
+      options: { tooltip: { formatter: { html } } },
+      tooltipDOM: document.createElement('div'),
+      isProvisionalBandX,
+    });
+    try {
+      chart.drawCustomTooltip({
+        s1: { data: { x: 1000, y: 1 }, color: '#000', name: 'a', id: 'd1', index: 0 },
+        s2: { data: { x: 2000, y: 2 }, color: '#000', name: 'b', id: 'd2', index: 1 },
+      });
+    } catch {
+      // formatter 호출 뒤의 배치 계산은 이 검증과 무관하다
+    }
+    return html.mock.calls[0][0];
+  };
+
+  it('provisionalBand 를 칠한 점의 항목에만 provisional: true 를 붙인다', () => {
+    const [first, second] = callFormatter((x) => x === 1000);
+
+    expect(first.provisional).toBe(true);
+    expect(second).not.toHaveProperty('provisional');
+  });
+});
+
+describe('setTooltipLayoutPosition — formatter.title 의 provisional', () => {
+  const callTitle = (isProvisionalBandX) => {
+    const title = vi.fn(() => 't');
+    const chart = Object.assign(Object.create(modules), {
+      options: { tooltip: { showHeader: true, formatter: { title } } },
+      axesX: [{}],
+      axesY: [{}],
+      tooltipCtx: {},
+      tooltipHeaderDOM: document.createElement('div'),
+      getBoxPadding: () => ({ t: 0, b: 0, l: 0, r: 0 }),
+      getColorMargin: () => 0,
+      isProvisionalBandX,
+    });
+    try {
+      chart.setTooltipLayoutPosition(
+        {
+          hitId: 's1',
+          maxTip: ['s1', 1],
+          items: { s1: { data: { x: 1000, y: 1 }, axis: {} } },
+        },
+        { pageX: 0, pageY: 0 },
+      );
+    } catch {
+      // 머리글 뒤의 캔버스 배치 계산은 이 검증과 무관하다
+    }
+    return title.mock.calls[0][0];
+  };
+
+  it('provisionalBand 를 칠한 점이면 provisional: true 를 넘긴다', () => {
+    expect(callTitle((x) => x === 1000)).toEqual({ x: 1000, y: 1, provisional: true });
+  });
+
+  it('칠하지 않은 점이면 기존처럼 x·y 만 넘긴다', () => {
+    expect(callTitle(() => false)).toEqual({ x: 1000, y: 1 });
   });
 });
