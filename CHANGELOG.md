@@ -1,3 +1,10 @@
+# [3.26.0](https://github.com/ex-em/EVUI/compare/3.25.0...3.26.0) (2026-11-27)
+
+
+### Features
+
+* **chart:** mark provisional points in tooltip and event args ([25665fc](https://github.com/ex-em/EVUI/commit/25665fcc2ed4192e43da6ff1cc6411cc38489c44))
+
 # [3.25.0](https://github.com/ex-em/EVUI/compare/3.24.1...3.25.0) (2026-11-24)
 
 
